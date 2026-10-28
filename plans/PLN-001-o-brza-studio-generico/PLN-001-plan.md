@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P44 ao P48 e o P50, na Run run_de875fc52a75 em execução; o P54 ao P57 do pedido 30 depois do P44 ao P50; a conferência do P42, P49, P51, P52 e P53 com Anderson"
+ready: "sim — o P54 ao P57 do pedido 30, depois da issue dos Passos e Desvios no molde; os casos manuais com Anderson"
 estimate_h: 123.6
-executed_h: 10.15
-remaining_h: 20.2
+executed_h: 13.7
+remaining_h: 14.4
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -16,39 +16,10 @@ tags:
 
 # PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat
 
-- **Retomar:** o plano veio do PLN-029 do workspace da Fixfy em 2026-10-27 (R32); o `orca-dev` é hoje o `brza-studio`
-  (`~/Projects/brza-studio`, repo `brz-anderson/brza-studio`, branch `master`), e cada passo se confere no BrzA Studio,
-  com Anderson. Evidência, horas e worklogs vão a este repositório, com `git add` por caminho e push na `master`.
-  Feitos, com a evidência abaixo: P1, P2, P6, P25, P26, P33, P34, P35, P36, P38, P39, P41, P27.1, P52 e P53 (falta a
-  conferência, P52.4 e P53.3) e, em 2026-10-28, por workers do Orca (R33), o P42, o P43, o P49 e o P51 (commits
-  `9b8a3e2e672`, `9b85279f57a` e `fbff699fa58`). **Esperam conferência com Anderson, num build com o `fbff699fa58`:** o
-  P42.3, a Skill, o Firebase e o Context7 com chamadas reais (os campos do título são suposição, sobretudo o projeto do
-  Firebase) e o P52.4 e o P53.3. O P53.4, o link sobre código inline que ficou branco, é conserto a fazer.
-  **Em execução:** a Run `run_de875fc52a75` do P44 ao P48 e do P50, disparada em 2026-10-28 às 01:11, na sessão
-  `pln-001-p44-p50` (modo chat). As rodadas fecharam na R37, R38, R40, R41 e R43 (a R39 e a R42 são do pedido 30), e o
-  D38, o D39 e o P44 ao P50 já estão reescritos por elas (`b7194b3`). São três workers (R37.3, R37.4 e R40.4), nos
-  worktrees de `~/Projects/brza-studio/.worktrees/`, na `7e9e0d18948`:
-  - o de shell, Opus, faz o P44 → P45 → P46 → P47 em `pln-001-p44-p47`, e é dono da ordem de peso da lista
-    (`task_3a795915093f`, `ctx_663c93482e60`);
-  - o do P48, Sonnet, em `pln-001-p48` (`task_1a38e7df74ee`, `ctx_4e2320de3d3c`);
-  - o do P50, Sonnet, sem a miniatura (R38.4), em `pln-001-p50` (`task_dcc18ceb0b7c`, `ctx_c0edf254fd8d`).
-
-  As especificações estão no scratch da sessão
-  (`/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace/e354254e-149e-463d-862e-f3e05a58e5ac/scratchpad/specs/`).
-  Para retomar a coordenação de outra sessão: `orca orchestration run-use --id run_de875fc52a75` e o `check --wait`.
-
-  A mudança compartilhada, idêntica nos três, é `brzaToolLineTitle(call, result?)`, com o `result` passado em
-  `native-chat-tool-line-label.ts:144`. Os workers não editam o plano: a coordenadora grava a evidência a partir do
-  `worker_done`.
-  O **pedido 30**, a prévia de imagem no chat, está desenhado (R36, R39 e R42; D42 a D44) e vira o P54 ao P57, depois do P44 ao P50 (R42.4): o P54 antes do P55, o P56 independente e o P57, a conferência, por último. Abertos desde a
-  Fixfy: o P37 e o P40. O P27.2 e o P27.3 seguem com Anderson, no Windows; o Sophos da máquina gerenciada pela TI barrou
-  o instalador sem assinatura em 2026-10-28, e Anderson respondeu "esquece". O build de Windows é `gh workflow run
-  build-win-local.yml --repo brz-anderson/brza-studio --ref master`, com a conta `brz-anderson` ativa no `gh`.
-  **Execução em paralelo:** worktrees em `.worktrees/` do `brza-studio`, criados com `git worktree add` e passados ao
-  `orchestration worker-start` por `path:` (o worktree novo do Orca cai fora do `brza_where`). O `pnpm` não está no
-  `PATH`: o 12.14.0 está em `~/.npm/_npx/aa4546e781591cea/node_modules/.bin`, e o hook do commit pede ele no `PATH`. Os
-  testes rodam com `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts <caminhos>`, e o `pnpm
-  check:changed` com `--base=origin/master`.
+- **Retomar:** a Run `run_de875fc52a75` fechou em 2026-10-28 com o P44 ao P48 e o P50 na `master` do `brza-studio`
+  (até `fc7f07a8a1e`); a próxima tarefa é a issue [Os Passos e os Desvios do PLN-001 no molde, depois da Run do P44 ao P50](../../work/issues/pln-001-passos-e-desvios-no-molde-depois-da-run.md),
+  numa sessão nova, e depois o P54 ao P57 do pedido 30 (R42.4); esperam Anderson os casos manuais (C1 ao C7, C10 e C14,
+  num build só), o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas de
@@ -1285,78 +1256,113 @@ upstream, só montagem: 16 linhas em `native-chat-tool-icon.ts`, 4 no `NativeCha
 
 #### P44 — O `git` com ícone e título próprios (pedido 27)
 
-Executa D38 · Estimado: 2 h · Executado: — h
+Executa D38 · Estimado: 2 h · Executado: 0,8 h
 
 O estimado passou de 1 h a 2 h com o diff pelo hash (R38.1).
 
-- [ ] **1.** Teste que falha: o comando de shell vira categoria segmento a segmento, e no composto vale a de mais peso,
+- [x] **1.** Teste que falha: o comando de shell vira categoria segmento a segmento, e no composto vale a de mais peso,
       testes > gh > git > pacotes e build > `brzaCli` (R37.1), com o globo do upstream no comando de navegador (R41.1);
       o `git` ganha o `git-logo`, e o `git commit`, o `git-commit-horizontal` (R40.1); a corrida de git leva o logo
       (R41.2)
-- [ ] **2.** O título lê a saída (`brzaToolLineTitle(call, result)`); "git commit — <1ª linha da mensagem>", em
+- [x] **2.** O título lê a saída (`brzaToolLineTitle(call, result)`); "git commit — <1ª linha da mensagem>", em
       português (R40.3), e o chip do hash, lido da saída, que abre o diff do commit no visualizador por uma
       `openCommitByHash` do BrzA (R38.1), só no desktop (R41.3)
 - [ ] **3.** Os testes; commit e push; conferir no BrzA Studio uma linha de `git commit`, com Anderson
 
 **Pendências:** fechadas na R37, R38, R40 e R41.
 
-**Evidência:** —
+**Evidência:** commit [`a1213f86859`](https://github.com/brz-anderson/brza-studio/commit/a1213f86859), na `master` do `brza-studio`,
+por um worker do Orca (Opus, R37.4) na Run `run_de875fc52a75`, no worktree `.worktrees/pln-001-p44-p47`, que fez o P44 ao P47 em sequência. O
+`brza-shell-segments.ts` divide o comando pelo `splitUnquotedSegments`, agora exportado (só o `export` em
+`orca-browser-cli-commands.ts`, do upstream), e o `BRZA_SHELL_CATEGORIES` guarda a ordem de peso testes > gh > git >
+pacotes e build > `brzaCli`; o comando com navegador fica com o globo. O `git` ganha o `git-logo`, o `git commit` o
+`git-commit-horizontal`, e a corrida, o ícone da categoria. O título "git commit — <assunto>" sai do `[branch hash]
+assunto` da saída, senão do `-m`. O chip do hash é o `BrzaToolLineChip.tsx` (só desktop), que abre o diff pela
+`brza-open-commit-by-hash.ts` (`getRuntimeGitCommitCompare` e `openCommitAllDiffs`, no worktree do chat). Teste novo
+`brza-git-category.test.ts` e `BrzaToolLineChip.test.tsx`, falhando antes; `run-vitest` em `tools/`, `brza/` do
+renderer, `NativeChatToolLine` e `NativeChatToolRun` → 25 arquivos, 384 passed; `pnpm tc` e o `typecheck` do
+`mobile/` → exit 0; `check:changed` → 23 de 24, com a falha no `open-uncommitted-entry.test.ts`, que já falha na
+`origin/master`. Desvios X16 e X17. Falta o C3, com Anderson.
 
 #### P45 — O `gh` de PR e issue com ícone, título e chip (pedido 27)
 
-Executa D38 · Estimado: 1 h · Executado: — h
+Executa D38 · Estimado: 1 h · Executado: 0,1 h
 
-- [ ] **1.** Teste que falha: o comando `gh` de PR e issue vira categoria própria, com o ícone GitPullRequest, pelo
+- [x] **1.** Teste que falha: o comando `gh` de PR e issue vira categoria própria, com o ícone GitPullRequest, pelo
       mesmo caminho do P44
-- [ ] **2.** O título "PR #123 — <título>" e o chip que abre o PR no navegador
+- [x] **2.** O título "PR #123 — <título>" e o chip que abre o PR no navegador
 - [ ] **3.** Os testes; commit e push; conferir uma linha de PR no BrzA Studio, com Anderson
 
 **Pendências:** fechadas na R37.1 e na R40.2: "PR #123 — <título>" e "Issue #45 — <título>", com o número pela URL
 na saída e o título pelo `--title` ou pela saída; o chip só no desktop (R41.3).
 
-**Evidência:** —
+**Evidência:** commit [`68abc3821cd`](https://github.com/brz-anderson/brza-studio/commit/68abc3821cd), na `master`, pelo mesmo worker de shell.
+`brza-gh-command.ts`: `gh pr` e `gh issue` com o `git-pull-request`; o número pela URL `/pull/N` ou `/issues/N` da
+saída; o título pelo `--title`/`-t` ou pela saída do `gh view`, em texto ou JSON; o chip `#N` abre a URL por
+`openNativeChatWebLink`. Teste novo `brza-gh-category.test.ts`, falhando antes; `brza/` do shared → 7 arquivos, 37
+passed, e do renderer → 4 arquivos, 11 passed; `check:changed` → 22 de 24, com o `format` corrigido e o `import
+boundaries` vermelho pela issue das Pendências conhecidas. Desvio X15. Falta o C4, com Anderson.
 
 #### P46 — Os testes com ícone e o resultado no título (pedido 27)
 
-Executa D38 · Estimado: 1,5 h · Executado: — h
+Executa D38 · Estimado: 1,5 h · Executado: 0,3 h
 
-- [ ] **1.** Teste que falha: `vitest`, `run-vitest.mjs`, `flutter test` e `pytest` viram a categoria de testes, com o
+- [x] **1.** Teste que falha: `vitest`, `run-vitest.mjs`, `flutter test` e `pytest` viram a categoria de testes, com o
       ícone FlaskConical, pelo mesmo caminho do P44
-- [ ] **2.** O passou/falhou contado no título a partir da saída do comando, com um teste por executor
+- [x] **2.** O passou/falhou contado no título a partir da saída do comando, com um teste por executor
 - [ ] **3.** Os testes; commit e push; conferir uma linha de teste passando e uma falhando no BrzA Studio, com Anderson
 
 **Pendências:** fechadas na R37.2, na R38.2 e na R40.2 e R40.3: o gerenciador que roda teste é testes; "<executor> —
 12 passaram, 1 falhou" pelo rodapé, e só "passou" ou "falhou" na saída cortada.
 
-**Evidência:** —
+**Evidência:** commit [`05aa8af16cc`](https://github.com/brz-anderson/brza-studio/commit/05aa8af16cc), na `master`, pelo mesmo worker de shell.
+`brza-test-command.ts`: `vitest`, `jest`, `pytest`, `python -m pytest`, `flutter test`, `node … run-vitest.mjs` e o
+gerenciador que roda teste ganham o `flask-conical`; o título conta pelo rodapé de cada executor, em português e com
+plural ("1 passou", "2 falharam"), e sem rodapé mostra "<executor> — passou/falhou" pelo `isError`, pelo `exitCode`
+ou pelo estado. Teste novo `brza-test-category.test.ts`, um caso por executor, falhando antes; o native-chat do
+renderer e do mobile → 381 arquivos, 3.996 passed; depois do rebase, 28 arquivos, 409 passed. O BrzA Studio
+reiniciou no meio, e a rodada perdida rodou de novo. Desvios X13 e X14. Falta o C5, com Anderson.
 
 #### P47 — Pacotes e build com ícone e título (pedido 27)
 
-Executa D38 · Estimado: 0,3 h · Executado: — h
+Executa D38 · Estimado: 0,3 h · Executado: 0,15 h
 
-- [ ] **1.** Teste que falha: `pnpm`, `npm`, `flutter pub` e o build viram a categoria de pacotes e build, com o ícone
+- [x] **1.** Teste que falha: `pnpm`, `npm`, `flutter pub` e o build viram a categoria de pacotes e build, com o ícone
       Package ou Hammer, só ícone e título, sem interação
-- [ ] **2.** Os testes; commit e push
+- [x] **2.** Os testes; commit e push
 
 **Pendências:** fechadas na R37: o lugar na ordem de peso e o `pnpm test` como testes. O Package ou o Hammer por
 comando, na R43.1: Package em `install`, `add` e `pub get`, e Hammer em `build`, `run build` e `flutter build`.
 
-**Evidência:** —
+**Evidência:** commit [`85469cf3b4d`](https://github.com/brz-anderson/brza-studio/commit/85469cf3b4d), na `master`, pelo mesmo worker de shell.
+`brza-package-command.ts`: `package` em `install`, `i`, `ci` e `add` dos gerenciadores e em `flutter pub get|add`;
+`hammer` em `build`, `build:*` e `flutter build`; o título segue o comando. Teste novo `brza-package-category.test.ts`,
+falhando antes; native-chat de shared, renderer e mobile → 460 arquivos, 5.144 passed; `typecheck` do `mobile/` → exit
+0. Desvio X13.
 
 #### P48 — O Jira e o Confluence com o chip que abre no navegador (pedido 27)
 
-Executa D39 · Estimado: 1 h · Executado: — h
+Executa D39 · Estimado: 1 h · Executado: 2,2 h
 
-- [ ] **1.** Teste que falha: a chamada MCP do Jira ou do Confluence, já identificada pelo `NativeChatMcpIdentity`, vira
+- [x] **1.** Teste que falha: a chamada MCP do Jira ou do Confluence, já identificada pelo `NativeChatMcpIdentity`, vira
       o chip com a chave do card (`FIX-123`, por exemplo) ou o título da página
-- [ ] **2.** O clique no chip abre o card ou a página no navegador
+- [x] **2.** O clique no chip abre o card ou a página no navegador
 - [ ] **3.** Os testes; commit e push; conferir uma linha de cada no BrzA Studio, com Anderson
 
 **Pendências:** fechadas na R38.3, na R40.2 e na R41.3: "FIX-123 — <resumo, se vier na saída>" e "<título da página>";
 o site pelo `cloudId` quando é domínio, senão pelo `siteUrl` do Jira do app, e sem nenhum o chip só copia; o chip só
 no desktop. O Confluence com o `file-text` do lucide (R43.2), e o título e a URL da página pela leitura defensiva (R44.1).
 
-**Evidência:** —
+**Evidência:** commit [`fc7f07a8a1e`](https://github.com/brz-anderson/brza-studio/commit/fc7f07a8a1e), na `master`, por um worker do Orca (Sonnet, R37.4) na Run `run_de875fc52a75`,
+no worktree `.worktrees/pln-001-p48`. A lógica mora em `brza-atlassian-tool.ts`; no registro, no título e no chip, só
+montagem. O Jira ganha o logo do Jira, o Confluence o `file-text`, novo nos glifos do desktop e do mobile. O título é
+"FIX-123 — <resumo>", com a chave do `issueIdOrKey` ou do `data.key`, e o resumo de `data.fields.summary`; no
+Confluence, o título da página pela leitura defensiva (R44.1). O chip reusa o `BrzaToolLineChip` do P44 e abre por
+`openNativeChatWebLink`, com o site pelo `cloudId` quando é domínio, senão pelo Jira do app, senão copia a chave. As
+2,2 h são de relógio, com ~35 min de espera do `check:changed` na máquina disputada e o reinício do app. Testes novos
+`brza-atlassian-tool.test.ts` e `BrzaToolLineChip.atlassian.test.tsx`, falhando antes; `src/shared/native-chat` e
+`brza/` do renderer → 85 arquivos, 1.177 passed; `pnpm tc` e o `typecheck` do `mobile/` verdes. Desvios X18 a X20.
+Falta o C6, com Anderson.
 
 #### P49 — A ferramenta Skill com ícone e título (pedido 27)
 
@@ -1700,6 +1706,25 @@ de teste citados abaixo passaram (359 testes), na `master`. "Teste a escrever" e
   o formato real for outro, o ajuste fica só em `nodeNameFromOutput`. A conferir com Anderson. Citado no P50.
 - **X12 — O `nodeId` do título sai normalizado com dois-pontos** (`12-34` vira `12:34`). Escolha do worker do P50.
   Citado no P50.
+- **X13 — O `test:*` e o `build:*` contam, e mais gerenciadores.** O D38 citava `test`, `build`, `pnpm`, `npm` e
+  `flutter pub`; o worker de shell incluiu `test:changed`, `build:mac`, o `npm i` e o `npm ci`, o `yarn`, o `bun`, o
+  `dart pub` e o `jest` direto. Citado no P46 e no P47.
+- **X14 — O resultado do teste em português fica no módulo compartilhado, e não no i18n.** A opção da R40.3 falava em
+  "strings no i18n do BrzA"; o título é montado no código compartilhado com o mobile, que não lê esse catálogo, e as
+  strings ficaram no `TEST_RESULT_COPY`. O texto visto é o mesmo. Citado no P46.
+- **X15 — O `gh` sem número fica no padrão.** Com o número e sem título, a linha diz "PR #123"; sem o número (antes da
+  saída ou com erro), cai no padrão mesmo com o `--title`, porque o número só vem da URL da saída. Citado no P45.
+- **X16 — O assunto do commit vem da saída antes do `-m`.** Assim o `--amend --no-edit` e o `-F` também ganham título.
+  Citado no P44.
+- **X17 — O composto `git add … && git commit …` conta como commit**, com ícone, título e chip; o tooltip guarda o
+  comando inteiro. Citado no P44.
+- **X18 — O chip da página diz "página", e o tooltip diz "Abrir no navegador" mesmo quando o clique só copia.** O chip
+  do Jira e do Confluence reusa o `BrzaToolLineChip` do P44. Citado no P48.
+- **X19 — O site do Jira do app é o `activeSiteId`, senão o primeiro.** Com vários sites e o `cloudId` em UUID, o chip
+  pode abrir no site errado; o `cloudId` em prefixo (`acme`) não vira domínio. Citado no P48.
+- **X20 — As meta-ferramentas `executeRead`, `executeWrite` e `discover` do MCP da Atlassian ficam sem categoria.**
+  Eram ~8 de ~45 chamadas nas transcrições; cobri-las pede o input no `matchesMcpTool`, assinatura compartilhada. A
+  decidir com Anderson. Citado no P48.
 
 ## Worklogs
 
@@ -1783,6 +1808,9 @@ de teste citados abaixo passaram (359 testes), na `master`. "Teste a escrever" e
 - 2026-10-28 — [O PLN-001 conferido contra a norma de planos da Fixfy e levado ao molde](../../work/worklogs/2026-10-28-pln-001-no-molde-da-fixfy.md):
   o desenho, a Cobertura, a Restrições, a Regressão, os Casos manuais, as Decisões e o Fechamento no molde; os Passos e
   os Desvios esperam a Run, na issue das Pendências.
+- 2026-10-28 — [O P44 ao P48 e o P50 por workers do Orca em paralelo](../../work/worklogs/2026-10-28-p44-a-p48-e-p50-por-workers-do-orca.md):
+  a Run `run_de875fc52a75`, com os commits `d7f4e5b5618`, `a1213f86859`, `68abc3821cd`, `05aa8af16cc`, `85469cf3b4d` e
+  `fc7f07a8a1e`; a R44 e os X11 ao X20. Esperam os casos manuais com Anderson.
 
 ## Decisões
 
@@ -1796,7 +1824,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 ## Pendências conhecidas
 
 - [Os Passos e os Desvios do PLN-001 no molde, depois da Run do P44 ao P50](../../work/issues/pln-001-passos-e-desvios-no-molde-depois-da-run.md)
-  — da rodada de 2026-10-28 na sessão `pln-001-norma-fixfy`; espera a Run `run_de875fc52a75` fechar.
+  — da rodada de 2026-10-28 na sessão `pln-001-norma-fixfy`; a Run `run_de875fc52a75` fechou, e a issue está livre.
 - [O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md)
   — achado pelos workers do P53.4 e do P40, em 2026-10-28; o conserto é do PLN-002.
 
@@ -1819,7 +1847,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C13 | `Pedido 30`: o que já existia funciona no BrzA Studio (P57.1, R36.1) | Um `![]()` local e um remoto; uma imagem colada e uma arrastada | A miniatura na mensagem enviada, e o clique amplia com pan e zoom nos quatro casos | | |
 | C14 | `Pedido 26`: o Continuar em outra conta no aviso de limite (P40) | No aviso "Claude atingiu seu limite de sessão", abrir o "Continuar em outra conta" e escolher a outra conta | O menu com as outras contas, também com uma só; a troca, o divisor "Conta trocada - <conta>" e só então o Continuar | | |
 
-O C1 e o C2 esperam a Run `run_de875fc52a75`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
+O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na rodada de 2026-10-28 da sessão `pln-001-retomar`,
 Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14.
 

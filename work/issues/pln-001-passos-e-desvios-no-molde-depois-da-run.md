@@ -1,8 +1,9 @@
 ---
-status: open
+status: done
 scope:
   - workspace
 opened: 2026-10-28
+completed: 2026-10-28
 tags:
   - tooling
 ---
@@ -19,7 +20,11 @@ depois, porque a sessão `pln-001-p44-p50`, que coordena a Run `run_de875fc52a75
 Antes, a coordenadora, ao fechar a Run, reescreve o `Retomar` numa linha, leva os IDs da Run ao worklog dela e tira do
 `Retomar` o operacional que já está em `## Restrições`.
 
-O que falta, numa sessão nova aberta depois do último commit da Run no plano:
+**Resolvida em 2026-10-28, na sessão `pln-001-molde`:** Passos sem fases, rodadas embutidas na Entrevista (R45 a
+R47), Desvios do X1 ao X22 em até duas linhas, testes no P26.4, no P43.4 e no P44.4 e horas recalculadas pelas linhas,
+em [Os Passos e os Desvios do PLN-001 levados ao molde, depois da Run do P44 ao P50](../worklogs/2026-10-28-pln-001-passos-e-desvios-no-molde.md).
+
+O que faltava, numa sessão nova aberta depois do último commit da Run no plano:
 
 - **Os Passos sem fases**: os `### F1 — …` a `### F7 — …` saem, e cada `#### P<n>` vira `### P<n>`, na forma do
   molde da `plan-runner` (`references/plan-template.md`, `## Passos`).

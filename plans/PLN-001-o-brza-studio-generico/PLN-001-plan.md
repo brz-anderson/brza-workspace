@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P54 ao P57 do pedido 30, depois da issue dos Passos e Desvios no molde; os casos manuais com Anderson"
-estimate_h: 123.6
-executed_h: 13.7
-remaining_h: 14.4
+ready: "sim — o P54 ao P57 do pedido 30 e os testes do P26.4, do P43.4 e do P44.4; os casos manuais com Anderson"
+estimate_h: 124.5
+executed_h: 15.25
+remaining_h: 11.7
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -16,14 +16,13 @@ tags:
 
 # PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat
 
-- **Retomar:** a Run `run_de875fc52a75` fechou em 2026-10-28 com o P44 ao P48 e o P50 na `master` do `brza-studio`
-  (até `fc7f07a8a1e`); a próxima tarefa é a issue [Os Passos e os Desvios do PLN-001 no molde, depois da Run do P44 ao P50](../../work/issues/pln-001-passos-e-desvios-no-molde-depois-da-run.md),
-  numa sessão nova, e depois o P54 ao P57 do pedido 30 (R42.4); esperam Anderson os casos manuais (C1 ao C7, C10 e C14,
-  num build só), o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37.
+- **Retomar:** os Passos e os Desvios no molde em 2026-10-28; a próxima tarefa é o P54 ao P57 do pedido 30 (R42.4), e
+  os testes do P26.4, do P43.4 e do P44.4, numa sessão do `brza-studio`; esperam Anderson os casos manuais (C1 ao C7,
+  C10 e C14, num build só), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
-  (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas de
-  2026-10-27, R29 a R32, estão na `## Entrevista` abaixo. As R até a R28, citadas nos passos e nos itens `D`, são as do
+  (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
+  deste plano, da R29 em diante, estão na `## Entrevista` abaixo. As R até a R28, citadas nos passos e nos itens `D`, são as do
   PLN-025 da Fixfy.
 
 ## Pedido
@@ -631,21 +630,123 @@ Respondida em 2026-10-28, na sessão `pln-001-p44-p50` do `brza-workspace`.
    **Decidido — "Leitura defensiva (Recomendado)".** A URL pelo id e a saída do `getConfluencePage` são suposição até a
    conferência.
 
+### Rodada 45 — o sync da v1.4.242: o helper Swift, o P40 e a linha do limite (enviada 2026-10-26)
+
+> **Apresentado antes:** a v1.4.242 corrigiu o mesmo defeito do Swift 6.4 com `--build-system native` (#21145), no
+> `build-computer-macos.mjs:30-45` que o P1.1 tinha mudado; medido no merge: o build do helper em 47 s, `lipo` com
+> `x86_64 arm64`, e o SwiftPM avisa que "'--build-system native' has been deprecated and will be removed in a future
+> release". A v1.4.242 também tirou o Continue da linha do limite (#33392, `d249c21b7f0`): o botão, o
+> `retryControl`/`continueControl` das palavras do limite, a frase "Send a message once it resets to continue." e a
+> chave `interruptedContinue.usageLimitExplanation` nas 7 línguas. Manteve o `continueUsageLimit`, o
+> `usageLimitTurnItemId` e o `usageLimitContinuationOfTurnItemId` do host, e com eles a agenda do main.
+
+Respondida em 2026-10-26, por Anderson na sessão `fixfy-orca`, pelo AskUserQuestion, e levada à sessão do `orca-dev`
+(`sync/v1.4.242`). Transcrita dos passos P1, P40 e P41 em 2026-10-28.
+
+1. **R45.1 — O helper Swift do Computer Use depois da v1.4.242.** Opções:
+   - a da v1.4.242 (recomendada): o arquivo volta a ser igual ao do upstream; custo: nenhum agora, e ~20 min para trazer
+     de volta o `--show-bin-path` quando o SwiftPM remover o `native`; se paga: agora, sem divergência nesse arquivo nas
+     próximas sincronizações;
+   - manter o nosso `--show-bin-path`: custo: ~5 min agora e um conflito nesse arquivo a cada sincronização em que o
+     upstream mexer nele; se paga: no dia em que o SwiftPM remover o `--build-system native`, se o upstream não migrar
+     antes.
+
+   **Decidido — "A da v1.4.242 (Recomendado)".** No merge `f57841688f5`, o `build-computer-macos.mjs` é o do upstream,
+   e o conserto do Swift 6.4 passou a ser o `--build-system native` (#21145). Se o SwiftPM o remover, volta o nosso
+   `--show-bin-path` (~20 min), o do commit `eabec4de25f`. Vai ao P1.
+
+2. **R45.2 — O P40, que se apoiava no Continue da linha.** Opções:
+   - botão próprio na linha (recomendada): o "Continuar em outra conta" vira botão próprio, com o menu das outras
+     contas, sem o Continue; a objeção do #33392 (o Continue antes do reset bate no mesmo limite) não vale, porque a
+     outra conta tem o seu próprio limite; custo: ~15 min para reescrever o P40.2, e a estimativa de 3 h fica; se paga:
+     quando o P40 for executado;
+   - manter o P40 ao lado do Continue: cabe só com o Continue de volta (a segunda opção da R45.3); custo: nenhum agora;
+     se paga: só com essa opção;
+   - tirar o P40 do plano: custo: o pedido 26 fica sem a troca de conta no aviso; se paga: nunca, a menos que Anderson
+     não o queira mais.
+
+   **Decidido — "Botão próprio na linha (Recomendado)".** O P40.2 foi reescrito, e a estimativa de 3 h fica.
+
+3. **R45.3 — A linha do aviso de limite depois da v1.4.242.** Opções:
+   - seguir a v1.4.242 (recomendada): sai o Continue manual, e o "Retomar automaticamente" fica sozinho na linha, só
+     com `resetsAt`, com o "Retomada às HH:MM · Cancelar"; a objeção do #33392 não vale para a agenda, que dispara no
+     reset + 1 min; sem `resetsAt`, a linha fica sem ação, como na v1.4.242; custo: ~40 min agora, nos 2 trechos da
+     linha, no teste e no comentário do componente; se paga: agora, sem conflito no Continue nas próximas
+     sincronizações;
+   - manter o Continue do `orca-dev`: devolver o botão, a chave nas 7 línguas e o `continueControl`, e ajustar os
+     testes da v1.4.242 que exigem a falta dele; custo: ~1,5 h agora, um conflito a cada sincronização que mexer na
+     linha ou nas palavras do limite, e a volta do defeito que o #33392 corrigiu; se paga: só se Anderson usa o Continue
+     manual depois do reset num limite sem `resetsAt`;
+   - tirar também o "Retomar automaticamente": custo: ~1 h para tirar a UI, e o pedido 26 perde a metade entregue; se
+     paga: nunca, a menos que Anderson desista do pedido 26.
+
+   **Decidido — "Seguir a v1.4.242 (Recomendado)".** No merge `f57841688f5`, a `NativeChatNoticeRow` mostra o
+   `NativeChatUsageLimitAutoResume` sozinho, só no corte atual (`usageLimitTurnItemId` da linha igual ao do chat) e com
+   a agenda no mesmo turno; sem `resetsAt`, a linha não tem botão. A agenda do main, o canal e o disparo ao abrir não
+   mudam. O teste da linha perdeu o Continue: o do "Retomar automaticamente" roda sobre a linha com as palavras atuais,
+   o "sem reset" só confere a falta do botão, e o "tells a chat that has no Continue to send a message" saiu, porque a
+   frase saiu do upstream. Os casos da v1.4.242 (reset futuro, passado e desconhecido, e o texto histórico) entraram.
+   Vai ao P41.
+
+### Rodada 46 — as conferências no instalado, o P53.4 e o P40 (enviada 2026-10-28)
+
+> **Apresentado antes:** o build instalado (`de3fb921ad1`) contém o `f130a85e578`, o `52f7051a45d` e o `9d289d2b631`,
+> e permite conferir o C8, o C9 e o P37.1; o C1 e o C2 pedem o `9b8a3e2e672` e o `fbff699fa58`, que ele não tem; o
+> `color: var(--chat-code-foreground)` de `.native-chat-markdown code` (`native-chat-markdown.css:35`) vence a cor do
+> link no P53.4; a Run `run_de875fc52a75` não toca o `NativeChatNoticeRow.tsx`, o `NativeChatInterruptedContinue.tsx`
+> nem o `use-native-chat-account-switch.ts`, pré-requisitos do P40, que existem na `9a81e65c852`; o `pnpm check:changed`
+> sai vermelho no import boundaries já na `9a81e65c852`.
+
+Respondida em 2026-10-28, por Anderson na sessão `pln-001-retomar`, pelo AskUserQuestion, e gravada nos passos fora da
+numeração R, para não colidir com a sessão da Run; numerada e transcrita depois da Run. As opções que perderam e o preço
+de cada uma não foram gravados no plano: ficam só as escolhidas.
+
+1. **R46.1 — Quando conferir o C8, o C9 e o P37.1.** **Decidido — "Agora, no instalado (Recomendado)".** Vai ao P37,
+   ao P52 e ao P53.
+2. **R46.2 — A cor do código inline dentro do link (P53.4).** **Decidido — "color: inherit (Recomendado)"**:
+   `.native-chat-markdown a code { color: inherit }` no `brza-chat-link.css`; o código mantém a borda e o fundo e segue
+   o tom `faint` do link. Vai ao P53.4.
+3. **R46.3 — Quem executa o P53.4 e o P40.** **Decidido — "Workers do Orca daqui (Recomendado)"**: um worker Sonnet
+   para o P53.4, em `.worktrees/pln-001-p53-4`, e um worker Codex para o P40, como o passo indica, em
+   `.worktrees/pln-001-p40`, numa Run separada da `run_de875fc52a75`; a sessão `pln-001-retomar` grava a evidência.
+4. **R46.4 — Quando conferir o C1 ao C7, o C10 e o C14.** **Decidido — "Depois da Run, num build só
+   (Recomendado)"**: uma instalação para todos. Vai aos `## Casos manuais`.
+5. **R46.5 — O botão do P40, à pergunta do worker.** **Decidido — "Menu sempre, como o P36 (Recomendado)"**: "Continue
+   in another account" e "Continuar em outra conta", o ícone `UserRound` do `NativeChatAccountPicker` e um
+   `DropdownMenu` com as outras contas, também quando só há uma. Vai ao P40.
+6. **R46.6 — O push do P53.4 e do P40 com o import boundaries vermelho**, preexistente desde o `9a81e65c852`.
+   **Decidido — "Seguir, e o conserto vai ao PLN-002 (Recomendado)".** Vai ao X21 e à issue do import boundaries.
+
+### Rodada 47 — o alinhamento e os outros elementos dos 120 colunas (enviada 2026-10-27)
+
+Respondida em 2026-10-27, por Anderson na sessão `brza-studio-chat-blocos-120-colunas`, para as pendências que o P52
+deixava "a perguntar a Anderson com opções". As opções e o preço não foram gravados no plano: ficam só as respostas.
+
+1. **R47.1 — O alinhamento do bloco e da tabela na largura "Total".** **Decidido — "À esquerda", com o texto.** Vai ao
+   P52.
+2. **R47.2 — Que outros elementos seguem a regra dos 120 colunas.** **Decidido:** o diff de edição (`NativeChatDiffView`
+   e as linhas do `NativeChatDiffCard`) e os diagramas e visuais (o Mermaid e o `NativeChatInlineVisual`) seguem a
+   regra; a saída de ferramenta não. Vai ao P52.
+
 ## Passos
 
-> Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com
-> o `brz-anderson` e dá push na `master` do `brza-studio`, como diz o `Retomar`. Cada passo só executa a pedido
-> explícito de Anderson. Os IDs são os do PLN-025 da Fixfy, e a numeração salta onde o passo foi para outro plano
-> (R28.2); os P42 a P53 são novos, daqui.
->
-> **Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com
-> "indicado". É leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a
-> pedido, numa sessão interativa, e a rodada que o passo pedir volta à sessão principal do Claude. O P27 fica com
-> Anderson, no Windows. Os P42 a P53 não levam a marca: o runtime se escolhe no pedido.
+Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
+`brz-anderson` e dá push na `master` do `brza-studio` (os feitos até 2026-10-26, na `main` do `orca-dev`, como a
+evidência diz); "worker do Orca" é o worker que a sessão que conduz dispara, num worktree em `.worktrees/`. Cada passo
+só executa a pedido explícito de Anderson, e os do chat (P33 em diante) se conferem no BrzA Studio, com ele, fora da
+trava do PLN-025/P28 da Fixfy (R25.3). Os IDs são os do PLN-025 da Fixfy, e a numeração salta onde o passo foi para
+outro plano (R28.2); os P42 em diante são novos, daqui.
 
-### F1 — A base
+A ordem é a de execução, e não a do número: o P34 vem antes do P33 e do P35, porque leva o id da mensagem à barra; o P40
+vem depois do P36, de que reaproveita a troca, e o P41 não depende dele; o P43 vem antes do P44 ao P51, porque monta a
+base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum; o P54 ao P57 vêm depois do P44 ao P50 (R42.4), o P54
+antes do P55, o P56 independente e o P57 por último.
 
-#### P1 — O build local do `orca-dev` sai em um comando, assinado pela identidade configurada
+**Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com "indicado". É
+leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a pedido, numa sessão
+interativa, e a rodada que o passo pedir volta à sessão principal do Claude. Os P42 em diante não levam a marca.
+
+### P1 — O build local do `orca-dev` sai em um comando, assinado pela identidade configurada
 
 Executa D1 · executor: sessão do `brza-studio`
 
@@ -690,25 +791,20 @@ Mac de Anderson com `Apple Development: anderson@fixfy.com.br (V72RV8BZY4)`, o `
 testes do config e do `build-mac-local` (52) passam, o `check:code-quality:changed` e o `oxfmt` passam, e o `pnpm tc`
 passa. O build assinado de novo fica com a sessão `fixfy-orca`, depois da sincronização no `orca-fixfy`.
 
-**Rodada do sync da v1.4.242 (2026-10-26):** respondida por Anderson na sessão `fixfy-orca`, pelo AskUserQuestion, e
-levada à sessão do `orca-dev` (`sync/v1.4.242`). A v1.4.242 corrigiu o mesmo defeito do Swift 6.4 com
-`--build-system native` (#21145), no `build-computer-macos.mjs:30-45` que o item 1 tinha mudado. Medido no merge:
-`node config/scripts/build-computer-macos.mjs` em 47 s, `lipo` com `x86_64 arm64`, e o SwiftPM avisa que
-"'--build-system native' has been deprecated and will be removed in a future release".
+**Rodada:** R45.1 — o helper Swift do Computer Use volta a ser o do upstream no merge `f57841688f5` da v1.4.242
+(`--build-system native`, #21145); se o SwiftPM o remover, volta o `--show-bin-path` do `eabec4de25f` (~20 min).
 
-1. **O helper Swift do Computer Use depois da v1.4.242.** Opções:
-   - a da v1.4.242 (recomendada): o arquivo volta a ser igual ao do upstream; custo: nenhum agora, e ~20 min para trazer
-     de volta o `--show-bin-path` quando o SwiftPM remover o `native`; se paga: agora, sem divergência nesse arquivo nas
-     próximas sincronizações;
-   - manter o nosso `--show-bin-path`: custo: ~5 min agora e um conflito nesse arquivo a cada sincronização em que o
-     upstream mexer nele; se paga: no dia em que o SwiftPM remover o `--build-system native`, se o upstream não migrar
-     antes.
+**Evidência do X8:** commit `ee06556cb8f`, na `main` do `orca-dev`, com o `--dmg` do `build:mac` e o
+`build-mac-local.yml` no `macos-latest` do fork. O teste do alvo `dmg` no `build-mac-local.test.mjs` falha antes e passa
+depois, e os testes que varrem os workflows ficam verdes: `build-mac-local` (7), `ci-draft-pr-admission` (79),
+`pr-preflight-gates` (42) e `workflow-ref-reachability` (5); o `ci-background-steps` saiu no upstream (#33796), com a
+`v1.4.242`. O run `40432265386` saiu `success` em 12 min 3 s. O `orca-macos-arm64.dmg` tem 239 MiB (250705822 bytes),
+sha256 `ed412bcdabd40cfa37ffac2a616862f6eaecedc216eb4be03a68ea44f0498145`, `hdiutil verify` válido, `codesign -dv` com
+`Signature=adhoc` e `Mach-O thin (arm64)`, e o app é o `1.4.242-local.1793064322587.ee06556cb8fe`. O baixado pede o
+"Abrir Mesmo Assim" (Ajustes > Privacidade e Segurança) ou `xattr -dr com.apple.quarantine /Applications/Orca.app`,
+que vai às notas do release.
 
-   **Resposta — "A da v1.4.242 (Recomendado)".** No merge `f57841688f5`, o `build-computer-macos.mjs` é o do upstream,
-   e o conserto do Swift 6.4 passou a ser o `--build-system native` (#21145). Se o SwiftPM o remover, volta o nosso
-   `--show-bin-path` (~20 min), o do commit `eabec4de25f`.
-
-#### P2 — O atualizador fica desligado no build local
+### P2 — O atualizador fica desligado no build local
 
 Executa D2 · executor: sessão do `brza-studio`
 
@@ -728,9 +824,7 @@ builds must be updated from their source checkout"), sem mexer no contrato remot
 dos builds locais e do status remoto, 428 testes, passam; `pnpm tc:node` passa. O `.app` não foi aberto: divide o
 `userData` e a trava de instância com o Orca instalado, que estava aberto.
 
-### F2 — O tema
-
-#### P6 — O tema Islands Dark no Monaco e no Shiki, no `orca-dev`
+### P6 — O tema Islands Dark no Monaco e no Shiki, no `orca-dev`
 
 Executa D6 · executor: sessão do `brza-studio`
 
@@ -757,9 +851,7 @@ novas; `components/editor/`, `components/automations/` e o destacador, 493 arqui
 superfície do design system; o `.app` não foi aberto, porque divide o `userData` com o Orca instalado — destino de
 ambos: a conferência no Orca do PLN-028/P8.
 
-### F5 — O genérico novo
-
-#### P25 — O olho no visualizador de Markdown (pedido 14)
+### P25 — O olho no visualizador de Markdown (pedido 14)
 
 Executa D20 · executor: sessão do `brza-studio`
 
@@ -782,11 +874,11 @@ vence o padrão no `editor-panel-render-model.ts` e no `editor-save-disk-precond
 — 7118 passam e 68 pulados (7186); `pnpm tc:web` sai com 0; `pnpm run check:code-quality:changed` sem achado novo. A
 conferência no Orca fica com o PLN-028/P8.
 
-#### P26 — O build local de Windows sai em um comando (pedido 15)
+### P26 — O build local de Windows sai em um comando (pedido 15)
 
 Executa D21 · executor: sessão do `brza-studio`
 
-Estimado: 2 h · Executado: 0,4 h
+Estimado: 2,3 h · Executado: 0,4 h
 
 - [x] **1.** Teste que falha: os passos do build de Windows instalam o `mobile/`, rodam o `build:desktop` e o
       `ensure:electron-runtime` e chamam o `electron-builder --win --x64`, com a `ORCA_LOCAL_BUILD_VERSION` no formato
@@ -795,6 +887,9 @@ Estimado: 2 h · Executado: 0,4 h
       reaproveitado, e o `build:win` apontando para ele
 - [x] **3.** Os testes do script e do atualizador passam; o `.github/CONTRIBUTING.md` diz o novo `build:win`; commit e
       push
+- [ ] **4.** O teste de regressão do `isUpdaterEnabled()` com versão de release (`src/main/updater/updater-enabled.ts:4-9`):
+      verdadeiro com `1.4.242` empacotado e falso com `1.4.242-local.1.abc`; rodada de 2026-10-28, "Marcar e levar à
+      issue"; commit e push
 
 **Evidência:** commit [`342d85f66c9`](https://github.com/brz-anderson/orca-dev/commit/342d85f66c9), na `main`
 (`5ded04d6bd1..342d85f66c9`, fast-forward), autor e committer `240569289+brz-anderson@users.noreply.github.com`. O
@@ -813,7 +908,7 @@ src/main/updater.startup-scheduling.test.ts src/main/local-builds` — 40 arquiv
 `pnpm run check:code-quality:changed` sem achado novo. O `.github/CONTRIBUTING.md` diz o `build:win`, o Rust e o
 atualizador desligado. O build de Windows não rodou aqui: é o P27.
 
-#### P27 — O build do `brza-studio` instalado no Windows (pedido 15)
+### P27 — O build do `brza-studio` instalado no Windows (pedido 15)
 
 Executa D21 · executor: o 1, a sessão do `brza-studio` num runner Windows do GitHub (X7); o 2 e o 3, Anderson, na
 máquina Windows
@@ -848,21 +943,11 @@ do NSIS é 32 bits; o app dentro é x64), sha256
 `091865ee297014e64465615f42d8b43cd0b660455817d24705dd0bcd6f703d3a`. O artifact `orca-windows-setup-x64` fica no run por
 14 dias. O 2 e o 3 seguem com Anderson, no Windows.
 
-### F7 — O chat (pedidos 19 a 30)
+### P34 — A barra da mensagem do agente e o Novo Chat (pedido 20)
 
-Todos com o executor sessão do `brza-studio`, fora da trava do PLN-025/P28 da Fixfy (R25.3), com commit e push na
-`master` do `brza-studio` (os feitos até 2026-10-26, na `main` do `orca-dev`, como a evidência diz); cada um se confere
-no BrzA Studio, com Anderson. O P34 vem antes do P33 e do P35, porque leva o id da mensagem à barra. O P40 vem depois do
-P36, de que reaproveita a troca; o P41 não depende dele. **O P42 ao P53** (pedidos 27 a 29, R29 a R31) vêm depois: o P43
-vem antes do P44 ao P51, porque monta a base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum. A ordem de
-entrega, se os passos não couberem numa sessão, é pendência a perguntar a Anderson.
+Executa D27, D28 · executor: sessão do `brza-studio`
 
-**O P54 ao P57** (pedido 30, R36, R39 e R42) vêm depois do P44 ao P50 (R42.4): o P54 antes do P55, o P56
-independente, e o P57, a conferência com Anderson, por último.
-
-#### P34 — A barra da mensagem do agente e o Novo Chat (pedido 20)
-
-Executa D27, D28 · Estimado: 4,5 h · Executado: 0,3 h
+Estimado: 4,5 h · Executado: 0,3 h
 
 **Outro runtime:** Codex, indicado, ou `agy` — renderer, com teste de componente
 
@@ -889,9 +974,11 @@ src/renderer/src/lib/launch-agent-in-new-tab.test.ts src/renderer/src/lib/struct
 src/renderer/src/i18n` — 405 arquivos, 4466 testes passam, antes e depois do rebase; `pnpm tc:web` sai com 0; `pnpm run
 check:code-quality:changed` sem achado novo. A conferência no Orca fica com o PLN-028/P8.
 
-#### P33 — O Bifurcar (pedido 19)
+### P33 — O Bifurcar (pedido 19)
 
-Executa D27 · Estimado: 18 h · Executado: 0,9 h
+Executa D27 · executor: sessão do `brza-studio`
+
+Estimado: 18 h · Executado: 0,9 h
 
 **Outro runtime:** Codex, indicado — main e renderer, com o mapeamento do rewind reaproveitado
 
@@ -931,14 +1018,16 @@ src/shared/host-operation-ownership.test.ts src/renderer/src/components/native-c
 src/renderer/src/components/native-chat/native-chat-new-chat-from-message.test.tsx
 src/renderer/src/components/native-chat/native-chat-edit-user-message.test.tsx` — 12 arquivos, 212 testes passam; a
 suíte larga (as pastas de Claude, RPC, native-chat, i18n e shared) foi interrompida pelo sistema por falta de memória,
-com as outras sessões do F7 rodando, e não voltou a rodar. `pnpm tc:node` e `pnpm tc:web` saem com 0 depois do último
+com as outras sessões do P33 ao P41 rodando, e não voltou a rodar. `pnpm tc:node` e `pnpm tc:web` saem com 0 depois do último
 rebase; `pnpm run check:code-quality:changed` sem achado novo; `verify:rpc-params-catalog`,
 `verify:localization-catalogs` e `verify:localization-coverage` saem com 0. A conferência no Orca fica com o
 PLN-028/P8.
 
-#### P35 — O Fixar Capítulo na régua de prompts (pedido 21)
+### P35 — O Fixar Capítulo na régua de prompts (pedido 21)
 
-Executa D29 · Estimado: 8 h · Executado: 0,6 h
+Executa D29 · executor: sessão do `brza-studio`
+
+Estimado: 8 h · Executado: 0,6 h
 
 **Outro runtime:** Codex, indicado, ou `agy` — estado e componente no renderer
 
@@ -964,9 +1053,11 @@ passam depois do último rebase (antes dele, um teste do `use-native-chat-contex
 sob carga e passou sozinho três vezes); `pnpm tc:web` sai com 0; `pnpm run check:code-quality:changed` sem achado
 novo. A conferência no Orca fica com o PLN-028/P8.
 
-#### P36 — O seletor de conta (pedido 22)
+### P36 — O seletor de conta (pedido 22)
 
-Executa D30 · Estimado: 29 h · Executado: 1,2 h
+Executa D30 · executor: sessão do `brza-studio`
+
+Estimado: 29 h · Executado: 1,2 h
 
 **Outro runtime:** Codex, indicado, do P36.2 ao P36.4 — o P36.1 confere as contas da máquina e fica com o Claude
 
@@ -1014,23 +1105,26 @@ saem com 0; `pnpm run check:code-quality:changed` sem achado novo; `oxlint` e o 
 `claude-profile-router.ts`, o host e o `NativeChatComposer.tsx` estavam no teto, e a troca saiu para módulos próprios.
 Sem `.app` aberto; a troca `claude` → `adm` no Orca se confere com o PLN-028/P8.
 
-#### P37 — As sugestões de ortografia (pedido 23)
+### P37 — As sugestões de ortografia (pedido 23)
 
-Executa D31 · Estimado: 2 h · Executado: — h
+Executa D31 · executor: sessão do `brza-studio`
+
+Estimado: 2 h · Executado: — h
 
 - [ ] **1.** Conferir, no `orca-dev` aberto, o botão direito numa palavra errada da caixa do chat, em pt-BR; se as
       sugestões aparecem, o passo fecha sem código
 - [ ] **2.** Se não, a correção do idioma ou do menu do chat, com teste; commit e push
 
-**Rodada de 2026-10-28, na sessão `pln-001-retomar`:** o subpasso 1 se confere "Agora, no instalado (Recomendado)", no
-build `de3fb921ad1`. O menu do Chromium com as sugestões do corretor já é tratado em
-`use-native-chat-context-menu.tsx:347`.
+**Rodada:** R46.1 — o 1 se confere agora, no build instalado `de3fb921ad1`; o menu do Chromium com as sugestões do
+corretor já é tratado em `use-native-chat-context-menu.tsx:347`.
 
 **Evidência:** —
 
-#### P38 — O Markdown na caixa de texto (pedido 24)
+### P38 — O Markdown na caixa de texto (pedido 24)
 
-Executa D32 · Estimado: 18 h · Executado: 1,0 h
+Executa D32 · executor: sessão do `brza-studio`
+
+Estimado: 18 h · Executado: 1,0 h
 
 **Outro runtime:** Codex, indicado — o risco é a serialização ida e volta, que se testa sozinha
 
@@ -1064,9 +1158,11 @@ testes passam (2 arquivos e 3 testes pulados, como antes), sobre o P35; depois d
 check:code-quality:changed` sem achado novo. Fora do escopo: o app móvel não tem a caixa Tiptap, e o servidor remoto só
 recebe o texto, que segue em Markdown. A conferência no Orca fica com o PLN-028/P8.
 
-#### P39 — O Editar na mensagem do usuário (pedido 25)
+### P39 — O Editar na mensagem do usuário (pedido 25)
 
-Executa D33 · Estimado: 1,5 h · Executado: 0,4 h
+Executa D33 · executor: sessão do `brza-studio`
+
+Estimado: 1,5 h · Executado: 0,4 h
 
 **Outro runtime:** Codex, indicado, ou `agy` — botão com teste, num componente que já existe
 
@@ -1090,9 +1186,11 @@ src/renderer/src/i18n` — 404 arquivos, 4419 de 4420 testes passam; a falha, no
 mudou; `pnpm tc:web` sai com 0; `pnpm run check:code-quality:changed` sem achado novo. A conferência no Orca fica com
 o PLN-028/P8.
 
-#### P40 — O Continuar em outra conta, no aviso de limite (pedido 26)
+### P40 — O Continuar em outra conta, no aviso de limite (pedido 26)
 
-Executa D34 · Estimado: 3 h · Executado: 0,25 h
+Executa D34 · executor: worker Codex do Orca (R46.3)
+
+Estimado: 3 h · Executado: 0,25 h
 
 **Travado pelo P36**, de que reaproveita a troca de conta (R27.1).
 
@@ -1105,28 +1203,9 @@ Executa D34 · Estimado: 3 h · Executado: 0,25 h
       troca do P36 e depois chama o `continueUsageLimit` (`NativeChatInterruptedContinue.tsx:112`), que a v1.4.242
       manteve; commit e push
 
-**Rodada do sync da v1.4.242 (2026-10-26):** respondida por Anderson na sessão `fixfy-orca`, pelo AskUserQuestion, e
-levada à sessão do `orca-dev` (`sync/v1.4.242`). A v1.4.242 tirou o Continue da linha do limite (#33392, `d249c21b7f0`),
-ao lado do qual o item 2 punha o botão.
-
-1. **O P40, que se apoiava no Continue da linha.** Opções:
-   - botão próprio na linha (recomendada): o "Continuar em outra conta" vira botão próprio, com o menu das outras
-     contas, sem o Continue; a objeção do #33392 (o Continue antes do reset bate no mesmo limite) não vale, porque a
-     outra conta tem o seu próprio limite; custo: ~15 min para reescrever o item 2, e a estimativa de 3 h fica; se paga:
-     quando o P40 for executado;
-   - manter o P40 ao lado do Continue: cabe só com o Continue de volta (a opção 2 da rodada do P41); custo: nenhum
-     agora; se paga: só com essa opção;
-   - tirar o P40 do plano: custo: o pedido 26 fica sem a troca de conta no aviso; se paga: nunca, a menos que Anderson
-     não o queira mais.
-
-   **Resposta — "Botão próprio na linha (Recomendado)".** O item 2 acima é o reescrito, e a estimativa de 3 h fica.
-
-**Rodada de 2026-10-28, na sessão `pln-001-retomar`:** quem executa — "Workers do Orca daqui (Recomendado)": um worker
-Codex, como o passo indica, em `.worktrees/pln-001-p40`, numa Run separada da `run_de875fc52a75`. A Run não toca o
-`NativeChatNoticeRow.tsx`, o `NativeChatInterruptedContinue.tsx` nem o `use-native-chat-account-switch.ts`, que são os
-pré-requisitos do passo e existem na `9a81e65c852`. Na mesma sessão, à pergunta do worker sobre o botão, Anderson
-escolheu "Menu sempre, como o P36 (Recomendado)": "Continue in another account" e "Continuar em outra conta", o ícone
-`UserRound` do `NativeChatAccountPicker` e um `DropdownMenu` com as outras contas, também quando só há uma.
+**Rodadas:** R45.2 — o botão próprio na linha, sem o Continue que a v1.4.242 tirou (#33392), e as 3 h estimadas
+ficam; R46.3 — um worker Codex em `.worktrees/pln-001-p40`, numa Run separada da `run_de875fc52a75`; R46.5 — o
+menu sempre, como o P36, com o `UserRound` do `NativeChatAccountPicker`, também quando só há uma outra conta.
 
 **Evidência:** commit [`15b028ba23f`](https://github.com/brz-anderson/brza-studio/commit/15b028ba23f), na `master`
 do `brza-studio`, pelo worker Codex `ctx_ec0a6e1f5a6f` da Run `run_edd8afa07cbf`, com o autor conferido. O botão mora
@@ -1141,11 +1220,13 @@ src/renderer/src/components/native-chat/NativeChatInterruptedContinue.test.tsx` 
 depois do rebase. `pnpm tc:web`, `check:code-quality:changed`, o ratchet do `max-lines`, o `oxlint` e o `oxfmt`
 passam; o `pnpm check:changed` só fica vermelho no import boundaries, preexistente, em
 [O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md).
-Executado 0,25 h, contra 3 h estimadas. Falta o C14 com Anderson.
+Executado 0,25 h, contra 3 h estimadas. Desvio X21. Falta o C14 com Anderson.
 
-#### P41 — O Retomar automaticamente, no aviso de limite (pedido 26)
+### P41 — O Retomar automaticamente, no aviso de limite (pedido 26)
 
-Executa D35 · Estimado: 11 h · Executado: 1,1 h
+Executa D35 · executor: sessão do `brza-studio`
+
+Estimado: 11 h · Executado: 1,1 h
 
 **Outro runtime:** Codex, indicado — agenda no main, canal e botão, todos testáveis sozinhos
 
@@ -1154,6 +1235,9 @@ Executa D35 · Estimado: 11 h · Executado: 1,1 h
 - [x] **2.** A agenda persistida no main e o canal que agenda, cancela e lista; o disparo pelo mesmo envio do Continuar
 - [x] **3.** Teste que falha e o disparo ao abrir o Orca, junto da retomada do restart, só se o chat ainda está no corte
 - [x] **4.** O botão ao lado do Continuar, oculto sem `resetsAt`, e a linha "Retomada às HH:MM · Cancelar"; commit e push
+
+**Rodada:** R45.3 — o "Retomar automaticamente" fica sozinho na linha do limite, como na v1.4.242, e sem `resetsAt`
+a linha não tem botão; o que o merge `f57841688f5` mudou no componente e no teste está na rodada.
 
 **Evidência:** commit
 [`a0110f3a431`](https://github.com/brz-anderson/orca-dev/commit/a0110f3a431a2a4b4e99002270f7d22d0545955b), com push na
@@ -1179,36 +1263,11 @@ capabilities publicadas, o runtime, a varredura de visuais, os limites do Claude
 P35, de novo os catálogos, o `tc:web` e os testes da linha e da agenda (52). Sem abrir o `.app`; a conferência no Orca é
 o PLN-028/P8.
 
-**Rodada do sync da v1.4.242 (2026-10-26):** respondida por Anderson na sessão `fixfy-orca`, pelo AskUserQuestion, e
-levada à sessão do `orca-dev` (`sync/v1.4.242`). A v1.4.242 tirou o Continue da linha do limite (#33392,
-`d249c21b7f0`): o botão, o `retryControl`/`continueControl` das palavras do limite, a frase "Send a message once
-it resets to continue." e a chave `interruptedContinue.usageLimitExplanation` nas 7 línguas. Manteve o
-`continueUsageLimit`, o `usageLimitTurnItemId` e o `usageLimitContinuationOfTurnItemId` do host, e com eles a agenda
-do main.
+### P42 — O "Perguntou:" em cor de destaque (pedido 27)
 
-1. **A linha do aviso de limite depois da v1.4.242.** Opções:
-   - seguir a v1.4.242 (recomendada): sai o Continue manual, e o "Retomar automaticamente" fica sozinho na linha, só
-     com `resetsAt`, com o "Retomada às HH:MM · Cancelar"; a objeção do #33392 não vale para a agenda, que dispara no
-     reset + 1 min; sem `resetsAt`, a linha fica sem ação, como na v1.4.242; custo: ~40 min agora, nos 2 trechos da
-     linha, no teste e no comentário do componente; se paga: agora, sem conflito no Continue nas próximas
-     sincronizações;
-   - manter o Continue do `orca-dev`: devolver o botão, a chave nas 7 línguas e o `continueControl`, e ajustar os
-     testes da v1.4.242 que exigem a falta dele; custo: ~1,5 h agora, um conflito a cada sincronização que mexer na
-     linha ou nas palavras do limite, e a volta do defeito que o #33392 corrigiu; se paga: só se Anderson usa o Continue
-     manual depois do reset num limite sem `resetsAt`;
-   - tirar também o "Retomar automaticamente": custo: ~1 h para tirar a UI, e o pedido 26 perde a metade entregue; se
-     paga: nunca, a menos que Anderson desista do pedido 26.
+Executa D36 · executor: worker do Orca (R33)
 
-   **Resposta — "Seguir a v1.4.242 (Recomendado)".** No merge `f57841688f5`, a `NativeChatNoticeRow` mostra o
-   `NativeChatUsageLimitAutoResume` sozinho, só no corte atual (`usageLimitTurnItemId` da linha igual ao do chat) e com
-   a agenda no mesmo turno; sem `resetsAt`, a linha não tem botão. A agenda do main, o canal e o disparo ao abrir não
-   mudam. O teste da linha perdeu o Continue: o do "Retomar automaticamente" roda sobre a linha com as palavras atuais,
-   o "sem reset" só confere a falta do botão, e o "tells a chat that has no Continue to send a message" saiu, porque a
-   frase saiu do upstream. Os casos da v1.4.242 (reset futuro, passado e desconhecido, e o texto histórico) entraram.
-
-#### P42 — O "Perguntou:" em cor de destaque (pedido 27)
-
-Executa D36 · Estimado: 0,3 h · Executado: 0,3 h
+Estimado: 0,3 h · Executado: 0,3 h
 
 - [x] **1.** Teste de aparência que falha: o texto da pergunta do agente usa a cor `primary` do tema, a mesma do ✓ de
       opção escolhida, e não o `text-chat-foreground` de hoje, nos três pontos de
@@ -1225,9 +1284,11 @@ passes depois; `pnpm check:changed --base=origin/master` → 21 checks verdes (s
 Falta a conferência no BrzA Studio com Anderson (subpasso 3), também na pergunta aberta, que só aparece com a linha
 recortada.
 
-#### P43 — A base dos ícones de marca: o módulo do BrzA e os logos SVG (pedido 27)
+### P43 — A base dos ícones de marca: o módulo do BrzA e os logos SVG (pedido 27)
 
-Executa D37 · Estimado: 0,5 h · Executado: 0,75 h
+Executa D37 · executor: worker do Orca (R33); o 4, sessão do `brza-studio`
+
+Estimado: 0,8 h · Executado: 0,75 h
 
 Antes do P44 ao P51, que usam o mapa e o componente que ele monta.
 
@@ -1240,6 +1301,10 @@ Antes do P44 ao P51, que usam o mapa e o componente que ele monta.
       com ele, como diz o comentário do tipo
 - [x] **3.** Conferir a licença de cada logo antes de trazer — por exemplo o Simple Icons, CC0 —, e o que o lucide não
       cobre: não tem logo de Jira nem de Firebase, e os de GitHub e Figma estão obsoletos; os testes; commit e push
+- [ ] **4.** O teste de regressão do recuo de cada logo de marca no mobile
+      (`mobile/src/session/native-chat/transcript/brza/brza-mobile-tool-glyphs.ts`): git → `git-branch`, GitHub →
+      `git-pull-request` e Jira → `square-kanban` (X10); rodada de 2026-10-28, "Marcar e levar à issue"; commit e
+      push
 
 **Evidência:** commit [`9b85279f57a`](https://github.com/brz-anderson/brza-studio/commit/9b85279f57a), na `master` do
 `brza-studio`, por um worker do Orca (Opus, R33), no worktree `.worktrees/pln-001-p43`. O módulo do BrzA é
@@ -1254,11 +1319,13 @@ upstream, só montagem: 16 linhas em `native-chat-tool-icon.ts`, 4 no `NativeCha
 `NativeChatAwaitingInputRow.test.tsx` → 8 arquivos, 66 passed; `pnpm check:changed --base=origin/master` → 24 checks;
 `pnpm typecheck` no `mobile/` → exit 0. Desvios X9 e X10. Nada aparece no app até o P44 ao P51 registrarem categorias.
 
-#### P44 — O `git` com ícone e título próprios (pedido 27)
+### P44 — O `git` com ícone e título próprios (pedido 27)
 
-Executa D38 · Estimado: 2 h · Executado: 0,8 h
+Executa D38 · executor: worker do Orca (R37.4); o 4, sessão do `brza-studio`
 
-O estimado passou de 1 h a 2 h com o diff pelo hash (R38.1).
+Estimado: 2,3 h · Executado: 0,8 h
+
+O estimado passou de 1 h a 2 h com o diff pelo hash (R38.1), e a 2,3 h com o teste do 4.
 
 - [x] **1.** Teste que falha: o comando de shell vira categoria segmento a segmento, e no composto vale a de mais peso,
       testes > gh > git > pacotes e build > `brzaCli` (R37.1), com o globo do upstream no comando de navegador (R41.1);
@@ -1268,6 +1335,9 @@ O estimado passou de 1 h a 2 h com o diff pelo hash (R38.1).
       português (R40.3), e o chip do hash, lido da saída, que abre o diff do commit no visualizador por uma
       `openCommitByHash` do BrzA (R38.1), só no desktop (R41.3)
 - [ ] **3.** Os testes; commit e push; conferir no BrzA Studio uma linha de `git commit`, com Anderson
+- [ ] **4.** O teste de regressão do rótulo do upstream para o comando sem categoria do BrzA, no ramo do comando de
+      `native-chat-tool-line-label.ts:94-108`: o verbo, o alvo e o título ficam os do upstream; rodada de 2026-10-28,
+      "Marcar e levar à issue"; commit e push
 
 **Pendências:** fechadas na R37, R38, R40 e R41.
 
@@ -1284,9 +1354,11 @@ renderer, `NativeChatToolLine` e `NativeChatToolRun` → 25 arquivos, 384 passed
 `mobile/` → exit 0; `check:changed` → 23 de 24, com a falha no `open-uncommitted-entry.test.ts`, que já falha na
 `origin/master`. Desvios X16 e X17. Falta o C3, com Anderson.
 
-#### P45 — O `gh` de PR e issue com ícone, título e chip (pedido 27)
+### P45 — O `gh` de PR e issue com ícone, título e chip (pedido 27)
 
-Executa D38 · Estimado: 1 h · Executado: 0,1 h
+Executa D38 · executor: worker do Orca (R37.4)
+
+Estimado: 1 h · Executado: 0,1 h
 
 - [x] **1.** Teste que falha: o comando `gh` de PR e issue vira categoria própria, com o ícone GitPullRequest, pelo
       mesmo caminho do P44
@@ -1303,9 +1375,11 @@ saída; o título pelo `--title`/`-t` ou pela saída do `gh view`, em texto ou J
 passed, e do renderer → 4 arquivos, 11 passed; `check:changed` → 22 de 24, com o `format` corrigido e o `import
 boundaries` vermelho pela issue das Pendências conhecidas. Desvio X15. Falta o C4, com Anderson.
 
-#### P46 — Os testes com ícone e o resultado no título (pedido 27)
+### P46 — Os testes com ícone e o resultado no título (pedido 27)
 
-Executa D38 · Estimado: 1,5 h · Executado: 0,3 h
+Executa D38 · executor: worker do Orca (R37.4)
+
+Estimado: 1,5 h · Executado: 0,3 h
 
 - [x] **1.** Teste que falha: `vitest`, `run-vitest.mjs`, `flutter test` e `pytest` viram a categoria de testes, com o
       ícone FlaskConical, pelo mesmo caminho do P44
@@ -1323,9 +1397,11 @@ ou pelo estado. Teste novo `brza-test-category.test.ts`, um caso por executor, f
 renderer e do mobile → 381 arquivos, 3.996 passed; depois do rebase, 28 arquivos, 409 passed. O BrzA Studio
 reiniciou no meio, e a rodada perdida rodou de novo. Desvios X13 e X14. Falta o C5, com Anderson.
 
-#### P47 — Pacotes e build com ícone e título (pedido 27)
+### P47 — Pacotes e build com ícone e título (pedido 27)
 
-Executa D38 · Estimado: 0,3 h · Executado: 0,15 h
+Executa D38 · executor: worker do Orca (R37.4)
+
+Estimado: 0,3 h · Executado: 0,15 h
 
 - [x] **1.** Teste que falha: `pnpm`, `npm`, `flutter pub` e o build viram a categoria de pacotes e build, com o ícone
       Package ou Hammer, só ícone e título, sem interação
@@ -1340,9 +1416,11 @@ comando, na R43.1: Package em `install`, `add` e `pub get`, e Hammer em `build`,
 falhando antes; native-chat de shared, renderer e mobile → 460 arquivos, 5.144 passed; `typecheck` do `mobile/` → exit
 0. Desvio X13.
 
-#### P48 — O Jira e o Confluence com o chip que abre no navegador (pedido 27)
+### P48 — O Jira e o Confluence com o chip que abre no navegador (pedido 27)
 
-Executa D39 · Estimado: 1 h · Executado: 2,2 h
+Executa D39 · executor: worker do Orca (R37.4)
+
+Estimado: 1 h · Executado: 2,2 h
 
 - [x] **1.** Teste que falha: a chamada MCP do Jira ou do Confluence, já identificada pelo `NativeChatMcpIdentity`, vira
       o chip com a chave do card (`FIX-123`, por exemplo) ou o título da página
@@ -1364,9 +1442,11 @@ Confluence, o título da página pela leitura defensiva (R44.1). O chip reusa o 
 `brza/` do renderer → 85 arquivos, 1.177 passed; `pnpm tc` e o `typecheck` do `mobile/` verdes. Desvios X18 a X20.
 Falta o C6, com Anderson.
 
-#### P49 — A ferramenta Skill com ícone e título (pedido 27)
+### P49 — A ferramenta Skill com ícone e título (pedido 27)
 
-Executa D39 · Estimado: 0,3 h · Executado: 0,2 h
+Executa D39 · executor: worker do Orca (R33)
+
+Estimado: 0,3 h · Executado: 0,2 h
 
 - [x] **1.** Teste que falha: a ferramenta Skill ganha o ícone Sparkles e o título "Skill · <nome>"
 - [x] **2.** Os testes; commit e push
@@ -1380,9 +1460,11 @@ o título, e o verbo segue o do upstream; sem o campo, a linha cai no padrão. T
 passed; `pnpm check:changed --base=origin/master` → 19 checks. Skill: `sparkles` e "Skill · <nome>", pelo campo `skill` ou `name` do input.
 Falta conferir uma chamada real no BrzA Studio.
 
-#### P50 — O Figma com logo, nome do nó e miniatura (pedido 27)
+### P50 — O Figma com logo, nome do nó e miniatura (pedido 27)
 
-Executa D39 · Estimado: 0,3 h · Executado: 0,3 h
+Executa D39 · executor: worker do Orca (R40.4)
+
+Estimado: 0,3 h · Executado: 0,3 h
 
 Sem a miniatura, que vai ao pedido 30 (R38.4), o passo cai a ~0,3 h (R29.3).
 
@@ -1404,9 +1486,11 @@ casos, 5 falhando antes; `run-vitest` em `src/shared/native-chat/tools` → 18 a
 --base=origin/master` → 19 checks; `pnpm typecheck` no `mobile/` → exit 0. Desvios X11 e X12. Falta conferir no BrzA
 Studio, com Anderson, uma linha de `get_metadata` e uma de `get_design_context` reais.
 
-#### P51 — O Firebase e o Context7 com ícone e nome no título (pedido 27)
+### P51 — O Firebase e o Context7 com ícone e nome no título (pedido 27)
 
-Executa D39 · Estimado: 0,3 h · Executado: 0,2 h
+Executa D39 · executor: worker do Orca (R33)
+
+Estimado: 0,3 h · Executado: 0,2 h
 
 - [x] **1.** Teste que falha: o Firebase ganha o ícone Flame, e o Context7, o BookOpen, com o nome do projeto ou da
       biblioteca no título, sem interação
@@ -1423,9 +1507,11 @@ passed; `pnpm check:changed --base=origin/master` → 19 checks. O Firebase sai 
 (`libraryName` ou `libraryId`, sem a barra inicial). Os nomes dos campos são suposição do worker: falta conferir com
 chamadas reais no BrzA Studio, sobretudo o Firebase, cujas ferramentas quase não levam o projeto.
 
-#### P52 — Os blocos de código e as tabelas com 120 colunas na largura total (pedido 28)
+### P52 — Os blocos de código e as tabelas com 120 colunas na largura total (pedido 28)
 
-Executa D40 · Estimado: 1 h · Executado: 0,6 h
+Executa D40 · executor: sessão do `brza-studio`
+
+Estimado: 1 h · Executado: 0,6 h
 
 - [x] **1.** Teste que falha: só com `width === 'full'`, todo bloco de código e toda tabela têm exatamente `120ch` mais
       o padding do bloco, mesmo com conteúdo curto; "Normal" e "Larga" não mudam; o texto corrido segue na largura
@@ -1444,12 +1530,8 @@ Executa D40 · Estimado: 1 h · Executado: 0,6 h
 - [ ] **4.** Os testes; commit e push; conferir no BrzA Studio, na largura "Total", com Anderson: um bloco curto e um
       longo, os dois com 120 colunas; uma tabela com a mesma largura; o painel estreito rolando na horizontal
 
-**Pendências, a perguntar a Anderson com opções:** respondidas em 2026-10-27, na sessão
-`brza-studio-chat-blocos-120-colunas`:
-
-- o alinhamento: "À esquerda", com o texto;
-- os outros elementos: o diff de edição (`NativeChatDiffView` e as linhas do `NativeChatDiffCard`) e os diagramas e
-  visuais (o Mermaid e o `NativeChatInlineVisual`) seguem a regra; a saída de ferramenta não.
+**Rodada:** R47 — o alinhamento à esquerda, com o texto; o diff de edição, o Mermaid e o visual inline seguem a
+regra, e a saída de ferramenta não.
 
 **Evidência:** commits [`f130a85e578`](https://github.com/brz-anderson/brza-studio/commit/f130a85e578) e
 [`52f7051a45d`](https://github.com/brz-anderson/brza-studio/commit/52f7051a45d), na `master` do `brza-studio`. A regra
@@ -1466,9 +1548,11 @@ régua `::before` de altura zero, com 120 zeros na fonte de código, e o diff co
 que a regra consulta. O layout não é testável em jsdom. O visual inline não foi medido, porque precisa de runtime.
 `pnpm check:changed`: 20 checks verdes. Falta a conferência no BrzA Studio com Anderson (subpasso 4).
 
-#### P53 — Os links do chat em azul claro (pedido 29)
+### P53 — Os links do chat em azul claro (pedido 29)
 
-Executa D41 · Estimado: 0,3 h · Executado: 0,6 h
+Executa D41 · executor: sessão do `brza-studio`; o 4, worker do Orca (R46.3)
+
+Estimado: 0,3 h · Executado: 1,1 h
 
 - [x] **1.** Teste que falha: o link do chat usa a variável `--chat-link`, `#79C0FF` no tema escuro e `#0969DA` no
       claro, e não o `--chat-foreground-strong` de hoje, em `.native-chat-markdown a`
@@ -1481,15 +1565,8 @@ Executa D41 · Estimado: 0,3 h · Executado: 0,6 h
       ("nesse link, o texto ficou branco e não azul"); o `color: var(--chat-code-foreground)` de
       `.native-chat-markdown code` (`native-chat-markdown.css:35`) vence a cor que o `code` herdaria do link
 
-**Rodada de 2026-10-28, na sessão `pln-001-retomar`**, respondida por Anderson pelo AskUserQuestion, fora da numeração
-R para não colidir com a sessão da Run `run_de875fc52a75`:
-
-- a conferência do C8, do C9 e do P37.1, que o build instalado (`de3fb921ad1`, que contém o `f130a85e578`, o
-  `52f7051a45d` e o `9d289d2b631`) já permite: "Agora, no instalado (Recomendado)";
-- a cor do P53.4: "color: inherit (Recomendado)" — `.native-chat-markdown a code { color: inherit }` no
-  `brza-chat-link.css`, e o código mantém a borda e o fundo e segue o tom `faint` do link;
-- quem executa o P53.4 e o P40: "Workers do Orca daqui (Recomendado)" — um worker Sonnet para o P53.4, em
-  `.worktrees/pln-001-p53-4`, numa Run separada da `run_de875fc52a75`; esta sessão grava a evidência.
+**Rodada:** R46 — o C8, o C9 e o P37.1 se conferem no instalado (R46.1); o 4 com `color: inherit` no
+`brza-chat-link.css` (R46.2), por um worker Sonnet em `.worktrees/pln-001-p53-4` (R46.3).
 
 **Evidência:** commit [`9d289d2b631`](https://github.com/brz-anderson/brza-studio/commit/9d289d2b631), na `master` do
 `brza-studio`. O `--chat-link` mora em `src/renderer/src/components/native-chat/brza-chat-link.css`, com o padrão do
@@ -1509,11 +1586,9 @@ regra, e falhava antes dela. No Chromium, sobre os dois CSS reais do chat, o `co
 escuro e `#0969DA` no claro, a cor do `a`; o `code` sem link segue com o `--chat-code-foreground`; a borda, o fundo e o
 sublinhado ficam. `pnpm check:changed --base=origin/master` → 20 de 21; o vermelho é o import boundaries, preexistente,
 em [O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md).
-Executado 0,5 h. **Desvios propostos pelo worker, a levar a `## Desvios` depois da Run `run_de875fc52a75`:** o push
-com esse gate vermelho, por resposta de Anderson; e o tom `faint` sem medição útil na fixture, porque o
-`native-chat-markdown.css:55` já põe `a, code` em `inherit` nesse tom, e fica para o C10. Falta o C10 com Anderson.
+Executado 0,5 h. Desvios X21 e X22. Falta o C10 com Anderson.
 
-#### P54 — A imagem da ferramenta extraída para arquivo (pedido 30)
+### P54 — A imagem da ferramenta extraída para arquivo (pedido 30)
 
 Executa D42 · executor: sessão do `brza-studio`
 
@@ -1536,7 +1611,7 @@ Depois do P44 ao P50 (R42.4), e antes do P55.
 
 **Evidência:** —
 
-#### P55 — A miniatura na linha da ferramenta (pedido 30)
+### P55 — A miniatura na linha da ferramenta (pedido 30)
 
 Executa D43 · executor: sessão do `brza-studio`
 
@@ -1555,7 +1630,7 @@ Depois do P54. Cobre o P50.2 (PLN-001/R38.4).
 
 **Evidência:** —
 
-#### P56 — A miniatura do caminho ou da URL de imagem solto no texto (pedido 30)
+### P56 — A miniatura do caminho ou da URL de imagem solto no texto (pedido 30)
 
 Executa D44 · executor: sessão do `brza-studio`
 
@@ -1577,7 +1652,7 @@ Não depende do P54 nem do P55; roda depois do P44 ao P50 (R42.4).
 
 **Evidência:** —
 
-#### P57 — A conferência das quatro partes da prévia (pedido 30)
+### P57 — A conferência das quatro partes da prévia (pedido 30)
 
 Executa D42, D43 e D44 · executor: Anderson, com a sessão que conduz
 
@@ -1594,8 +1669,8 @@ Depois do P55 e do P56.
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
-de teste citados abaixo passaram (359 testes), na `master`. "Teste a escrever" está na
-[issue de depois da Run](../../work/issues/pln-001-passos-e-desvios-no-molde-depois-da-run.md).
+de teste citados abaixo passaram (359 testes), na `master`. "Teste a escrever" é subpasso do passo citado, e a marca sai
+da linha quando o teste entra.
 
 - **O ícone e o título do upstream para toda ferramenta fora das categorias do BrzA** (`Read`, `Edit`, busca, web, MCP
   genérico, `ls`) ficam como estão. Como se confere: `src/shared/native-chat/tools/native-chat-tool-icon.test.ts`
@@ -1606,13 +1681,13 @@ de teste citados abaixo passaram (359 testes), na `master`. "Teste a escrever" e
   `brza/brza-cli-category.test.ts:27` e `native-chat-tool-run-sentence.test.ts:48`.
 - **O comando sem categoria do BrzA segue com o verbo, o alvo e o título do upstream**, e a frase da corrida não muda.
   Como se confere: `brza/brza-tool-line-title.test.ts:48` e `native-chat-tool-run-sentence.test.ts`; o ramo do comando
-  em `native-chat-tool-line-label.ts:94-108` não tem teste — teste a escrever, no P44.
+  em `native-chat-tool-line-label.ts:94-108` não tem teste — teste a escrever, no P44.4.
 - **A corrida com categorias misturadas, ou só com as do upstream, mantém o glifo do upstream.** Como se confere:
   `brza/brza-tool-icon-mount.test.ts:30` e `native-chat-tool-icon.test.ts:164-219`.
 - **O mobile cai no ícone lucide equivalente para todo logo de marca e mantém os glifos do upstream.** Como se confere:
   `pnpm --dir mobile typecheck`, que quebra se faltar glifo no
   `mobile/src/session/native-chat/transcript/brza/brza-mobile-tool-glyphs.ts:36`, e
-  `MobileNativeChatToolRun.test.tsx`; o recuo de cada logo não tem teste — teste a escrever, do P43.
+  `MobileNativeChatToolRun.test.tsx`; o recuo de cada logo não tem teste — teste a escrever, no P43.4.
 - **O link e o bloco de código do chat abrem, copiam e quebram linha como no upstream**; só a cor e a largura mudam.
   Como se confere, em `src/renderer/src/components/native-chat/`: `use-native-chat-link-actions.test.tsx`,
   `NativeChatPacedMarkdown.file-links.test.tsx`, `NativeChatCodeBlock.test.tsx`, `NativeChatMarkdown.code-wrap.test.tsx`
@@ -1627,8 +1702,8 @@ de teste citados abaixo passaram (359 testes), na `master`. "Teste a escrever" e
   `NativeChatComposerActions.test.tsx`, `src/main/claude/claude-structured-launch-account-routing.test.ts:131,160`,
   `use-native-chat-rewind.test.tsx:111` e `use-native-chat-context-clear-floor.test.tsx`.
 - **O aviso de limite do upstream, na conta sem troca, segue sem o Continuar e sem "Send a message once it resets"**; o
-  Retomar automaticamente e o Continuar do corte do Orca seguem iguais. O "Continuar em" do P40, ainda aberto, entra ao
-  lado, com o teste dele. Como se confere: `NativeChatNoticeRow.test.tsx:262-281,297,330` e
+  Retomar automaticamente e o Continuar do corte do Orca seguem iguais. O "Continuar em outra conta" do P40 entra ao
+  lado, com o `BrzaContinueInOtherAccount.test.tsx`. Como se confere: `NativeChatNoticeRow.test.tsx:262-281,297,330` e
   `NativeChatInterruptedContinue.test.tsx:191,259,267`.
 - **A barra do Markdown em diff mantém fonte e renderizado, com o padrão `source`; o diff combinado fica sem modos, e o
   Mermaid, o CSV e o notebook não ganham o olho.** Como se confere:
@@ -1637,7 +1712,7 @@ de teste citados abaixo passaram (359 testes), na `master`. "Teste a escrever" e
   `-local.<ms>.<commit>` desliga o atualizador (`src/main/updater/updater-enabled.ts:4-9`), e os canais `ORCA_WIN_*` do
   CI não mudam. Como se confere: `config/scripts/build-mac-local.test.mjs`, `build-win-local.test.mjs`,
   `build-linux-local.test.mjs` e `electron-builder-config.test.mjs`; o `isUpdaterEnabled()` com versão de release não
-  tem teste — teste a escrever, do P26.
+  tem teste — teste a escrever, no P26.4.
 - **O merge do `stablyai/orca` segue com conflito pequeno**: o BrzA toca o upstream só em linhas de montagem, e o resto
   mora em pastas `brza/`. Como se confere: `git diff $(git merge-base master upstream/main) master --numstat --` nos
   `native-chat-tool-icon.ts`, `native-chat-tool-line-label.ts`, `NativeChatMarkdown.tsx` e `NativeChatToolIcon.tsx`, que
@@ -1645,86 +1720,49 @@ de teste citados abaixo passaram (359 testes), na `master`. "Teste a escrever" e
 
 ## Desvios
 
-- **X1 — O `build:win` também compila o launcher da CLI e o agent hook, em Rust, para x64.** O `afterPack` do
-  `electron-builder.config.cjs` falha sem o `orca-agent-hook.exe` (`verifyPackagedWindowsAgentHook`), e nem o
-  `build:desktop` nem o `build:win` antigo o compilavam; o CI os faz no `build:release`. O D21 não muda; o P27 pede o
-  Rust (rustup) no Windows.
-- **X2 — O Novo Chat aparece só no chat estruturado.** A vista de chat sobre o terminal (`NativeChatResolvedView`) não
-  sabe o grupo da aba nem abre o chat por conta própria, e ali o botão não aparece, como o rewind. O D28 não muda: a aba
-  nova é de chat, e a vista do terminal fica para um passo próprio, se Anderson pedir.
-- **X3 — O Editar na mensagem do usuário aparece só no chat estruturado.** Pelo mesmo motivo do X2: a vista de chat
-  sobre o terminal não tem a caixa do chat estruturado, e ali o botão não aparece, como o rewind. O D33 não muda.
-- **X4 — A retomada vencida dispara quando o host do main sobe, e não pelo `native-chat-resume-on-restart-store.ts`.**
-  O store do restart é do renderer e só corre com a janela aberta; a agenda é do host, que sobe ao abrir o Orca (e no
-  servidor remoto, onde o chat roda), e ali dispara o que venceu com o Orca fechado, só se o chat ainda está no corte.
-  O app móvel não tem o botão; a agenda no host já o serve, quando um passo pedir. O D35 não muda.
+- **X1 — O `build:win` também compila o launcher da CLI e o agent hook, em Rust, para x64.** O `afterPack` falha sem o
+  `orca-agent-hook.exe`, que o `build:desktop` não compilava; afeta P26, e o P27 pede o Rust no Windows.
+- **X2 — O Novo Chat aparece só no chat estruturado.** A vista de chat sobre o terminal não sabe o grupo da aba nem abre
+  o chat por conta própria, como no rewind; afeta P34, e o D28 não muda.
+- **X3 — O Editar na mensagem do usuário aparece só no chat estruturado.** A vista de chat sobre o terminal não tem a
+  caixa do chat estruturado, como no X2; afeta P39, e o D33 não muda.
+- **X4 — A retomada vencida dispara quando o host do main sobe, e não pelo store do restart.** O
+  `native-chat-resume-on-restart-store.ts` é do renderer e só corre com a janela aberta; afeta P41, e o D35 não muda.
 - **X5 — O Bifurcar aparece só no chat estruturado do Claude.** O corte é o `forkSession` do SDK do Claude, e a vista
-  de chat sobre o terminal não tem a sessão estruturada que o canal pede, como no X2. O app móvel não tem o botão; o
-  `agentSession.forkThroughMessage` já o serve, quando um passo pedir. O D27 não muda.
-- **X6 — A chave do Markdown na caixa fica no `NativeChatGlobalSettings`, e não em `global-settings-types.ts`.** O
-  `global-settings-types.ts` está no teto de 300 linhas do `max-lines`, e o hook do commit barra a linha a mais; o
-  grupo `NativeChatGlobalSettings` (`native-chat-appearance-settings.ts`) compõe o mesmo `GlobalSettings` pelo
-  `GlobalSettingsBase`, como as outras chaves do chat. O D32 não muda.
-- **X7 — O instalador do P27.1 sai num runner Windows do GitHub, e não na máquina Windows nem no Docker do Mac.** O
-  `build:win` compila com MSVC, pelo node-gyp e contra os headers do Electron, quatro addons C++ com patch: o
-  `node-pty`, o `@vscode/windows-process-tree`, o `@orca/windows-registry` e o `@orca/windows-security`. Nem o node-gyp
-  nem o `@electron/rebuild` compilam win32 a partir do macOS ou do Linux, e a imagem
-  `electronuserland/builder:wine` não traz MSVC. Os prebuilds não servem: o `rebuild-native-deps.mjs` e o `afterPack`
-  recusam o do `node-pty` sem a negação do breakaway e o do `windows-process-tree` com `ReadProcessMemory`. Anderson
-  escolheu o runner, entre ele, a máquina Windows e o MSVC no wine, este de dias e frágil. O workflow
-  `build-win-local.yml` vive só no fork (`if: github.repository != 'stablyai/orca'`), e o runner padrão sai sem custo
-  no repositório público. O D21 não muda: é o mesmo `pnpm run build:win`. A instalação, o SmartScreen e o "Sobre" (P27.2
-  e P27.3) seguem com Anderson, no Windows.
-- **X8 — O instalador de Mac também sai num runner do GitHub, num DMG arm64 assinado ad hoc.** Anderson pediu o
-  "Local Mac Installer" na sessão da raiz de 2026-10-26 ("o build com MacOS no GitHub Actions tbm é de graça em repo
-  publico? se sim, crie um Local Mac Installer"), no formato DMG e no mesmo release do Windows. O `build:mac` ganhou o
-  `--dmg`, que troca o `--mac dir` pelo `--mac dmg`; o padrão segue `dir`. O `build-mac-local.yml` roda no
-  `macos-latest` do fork (`if: github.repository != 'stablyai/orca'`), sem custo no repositório público. O DMG é só
-  arm64, como o P1 decidiu, com a versão `-local.<ms>.<commit>`, que desliga o atualizador. Sem `CSC_NAME` no runner, o
-  app sai assinado ad hoc e sem notarização: o baixado pede o "Abrir Mesmo Assim" (Ajustes > Privacidade e Segurança)
-  ou `xattr -dr com.apple.quarantine /Applications/Orca.app`, e isso vai às notas do release. Commit `ee06556cb8f`, com
-  o teste do alvo `dmg` no `build-mac-local.test.mjs` (falha antes, passa depois) e os testes que varrem os workflows
-  verdes: `build-mac-local` (7), `ci-draft-pr-admission` (79), `pr-preflight-gates` (42) e `workflow-ref-reachability`
-  (5); o `ci-background-steps` saiu no upstream (#33796), com a `v1.4.242`. O run `40432265386` saiu `success` em
-  12 min 3 s; o `orca-macos-arm64.dmg` tem 239 MiB (250705822 bytes), sha256
-  `ed412bcdabd40cfa37ffac2a616862f6eaecedc216eb4be03a68ea44f0498145`, `hdiutil verify` válido, `codesign -dv` com
-  `Signature=adhoc` e `Mach-O thin (arm64)`, e o app é o `1.4.242-local.1793064322587.ee06556cb8fe`. O D1 não muda: é o
-  mesmo `pnpm run build:mac`.
-- **X9 — As categorias do BrzA refinam só o ícone, sem estender o `NativeChatToolCategory` nem o `CATEGORY_BY_ROW_WORD`.**
-  O D37 falava numa linha no `CATEGORY_BY_ROW_WORD`; o worker do P43 montou o módulo nos dois resolvedores de ícone
-  (`nativeChatToolIconName` e `nativeChatToolRunIconName`), na união `NativeChatToolIconName` e nas tabelas de glifos do
-  desktop e do mobile. Estender a união do upstream obrigaria a mexer nos `Record` exaustivos dele (as frases da corrida,
-  o switch do rótulo), e o `git` deixaria de ser `unknown`, perdendo o tratamento de comando no rótulo da linha. O
-  contrato do D37 segue: módulo do BrzA e uma linha de montagem por ponto do upstream. O título do P44 ao P51 sai do
-  `brzaToolCategory`. Citado no P43.
+  sobre o terminal não tem a sessão estruturada, como no X2; afeta P33, e o D27 não muda.
+- **X6 — A chave do Markdown na caixa fica no `NativeChatGlobalSettings`, e não em `global-settings-types.ts`.** Este
+  está no teto de 300 linhas do `max-lines`; afeta P38, e o D32 não muda.
+- **X7 — O instalador do P27.1 sai num runner Windows do GitHub.** O `build:win` compila quatro addons C++ com MSVC, que
+  não compila win32 no macOS nem no wine, e Anderson escolheu o runner; afeta P27, e o D21 não muda.
+- **X8 — O instalador de Mac também sai num runner do GitHub, num DMG arm64 assinado ad hoc.** Pedido de Anderson na
+  sessão da raiz de 2026-10-26 ("crie um Local Mac Installer"); afeta P1, e o D1 não muda.
+- **X9 — As categorias do BrzA refinam só o ícone, sem estender o `NativeChatToolCategory` nem o
+  `CATEGORY_BY_ROW_WORD`.** Estender a união do upstream mexeria nos `Record` exaustivos dele; afeta P43 e D37.
 - **X10 — Os recuos de marca no mobile: git → `git-branch`, GitHub → `git-pull-request`, Jira → `square-kanban`.** O D37
-  não os fixava; foi escolha do worker do P43, a conferir com Anderson junto do P44 e do P48. Citado no P43.
-- **X11 — O nome do nó do Figma sai de um formato de saída suposto.** O D39 não dizia onde o nome está na saída; o
-  worker do P50 não leu saída real (o classificador de permissão negou ler transcrições antigas) e o tirou do
-  `name` do `<frame id=… name=…>` do `get_metadata` e do `data-name` do `get_design_context`, casando pelo `nodeId`
-  pedido (`1-2` e `1:2` equivalem) e lendo só as primeiras 200 tags, para a saída cortada na cabeça não atrapalhar. Se
-  o formato real for outro, o ajuste fica só em `nodeNameFromOutput`. A conferir com Anderson. Citado no P50.
-- **X12 — O `nodeId` do título sai normalizado com dois-pontos** (`12-34` vira `12:34`). Escolha do worker do P50.
-  Citado no P50.
-- **X13 — O `test:*` e o `build:*` contam, e mais gerenciadores.** O D38 citava `test`, `build`, `pnpm`, `npm` e
-  `flutter pub`; o worker de shell incluiu `test:changed`, `build:mac`, o `npm i` e o `npm ci`, o `yarn`, o `bun`, o
-  `dart pub` e o `jest` direto. Citado no P46 e no P47.
-- **X14 — O resultado do teste em português fica no módulo compartilhado, e não no i18n.** A opção da R40.3 falava em
-  "strings no i18n do BrzA"; o título é montado no código compartilhado com o mobile, que não lê esse catálogo, e as
-  strings ficaram no `TEST_RESULT_COPY`. O texto visto é o mesmo. Citado no P46.
-- **X15 — O `gh` sem número fica no padrão.** Com o número e sem título, a linha diz "PR #123"; sem o número (antes da
-  saída ou com erro), cai no padrão mesmo com o `--title`, porque o número só vem da URL da saída. Citado no P45.
-- **X16 — O assunto do commit vem da saída antes do `-m`.** Assim o `--amend --no-edit` e o `-F` também ganham título.
-  Citado no P44.
+  não os fixava; escolha do worker, a conferir com Anderson; afeta P43, que os testa no 4.
+- **X11 — O nome do nó do Figma sai de um formato de saída suposto.** O worker não leu saída real e o tira do `name` do
+  `get_metadata` e do `data-name` do `get_design_context`; afeta P50, e o ajuste fica no `nodeNameFromOutput`.
+- **X12 — O `nodeId` do título sai normalizado com dois-pontos** (`12-34` vira `12:34`). Escolha do worker; afeta P50.
+- **X13 — O `test:*` e o `build:*` contam, e mais gerenciadores.** O worker juntou ao D38 o `npm i`, o `npm ci`, o
+  `yarn`, o `bun`, o `dart pub` e o `jest` direto; afeta P46 e P47.
+- **X14 — O resultado do teste em português fica no `TEST_RESULT_COPY` do módulo compartilhado, e não no i18n (R40.3).**
+  O mobile não lê esse catálogo, e o texto visto é o mesmo; afeta P46.
+- **X15 — O `gh` sem número fica no padrão.** O número só vem da URL da saída: sem ela, a linha cai no padrão mesmo com
+  o `--title`; com ela e sem título, diz "PR #123"; afeta P45.
+- **X16 — O assunto do commit vem da saída antes do `-m`.** Assim o `--amend --no-edit` e o `-F` também ganham título;
+  afeta P44.
 - **X17 — O composto `git add … && git commit …` conta como commit**, com ícone, título e chip; o tooltip guarda o
-  comando inteiro. Citado no P44.
+  comando inteiro; afeta P44.
 - **X18 — O chip da página diz "página", e o tooltip diz "Abrir no navegador" mesmo quando o clique só copia.** O chip
-  do Jira e do Confluence reusa o `BrzaToolLineChip` do P44. Citado no P48.
+  reusa o `BrzaToolLineChip` do P44; afeta P48.
 - **X19 — O site do Jira do app é o `activeSiteId`, senão o primeiro.** Com vários sites e o `cloudId` em UUID, o chip
-  pode abrir no site errado; o `cloudId` em prefixo (`acme`) não vira domínio. Citado no P48.
+  pode abrir no site errado, e o `cloudId` em prefixo não vira domínio; afeta P48.
 - **X20 — As meta-ferramentas `executeRead`, `executeWrite` e `discover` do MCP da Atlassian ficam sem categoria.**
-  Eram ~8 de ~45 chamadas nas transcrições; cobri-las pede o input no `matchesMcpTool`, assinatura compartilhada. A
-  decidir com Anderson. Citado no P48.
+  Cobri-las pede o input no `matchesMcpTool`; a decidir com Anderson; afeta P48.
+- **X21 — O P53.4 e o P40 foram à `master` com o import boundaries vermelho.** O vermelho é preexistente, do
+  `9a81e65c852`, e Anderson mandou seguir, com o conserto no PLN-002 (R46.6); afeta P53 e P40.
+- **X22 — O tom `faint` do link sobre código ficou sem medição útil.** O `native-chat-markdown.css:55` já põe `a, code`
+  em `inherit` nesse tom, e a fixture não o distingue; afeta P53, e fica para o C10.
 
 ## Worklogs
 
@@ -1811,6 +1849,8 @@ de teste citados abaixo passaram (359 testes), na `master`. "Teste a escrever" e
 - 2026-10-28 — [O P44 ao P48 e o P50 por workers do Orca em paralelo](../../work/worklogs/2026-10-28-p44-a-p48-e-p50-por-workers-do-orca.md):
   a Run `run_de875fc52a75`, com os commits `d7f4e5b5618`, `a1213f86859`, `68abc3821cd`, `05aa8af16cc`, `85469cf3b4d` e
   `fc7f07a8a1e`; a R44 e os X11 ao X20. Esperam os casos manuais com Anderson.
+- 2026-10-28 — [Os Passos e os Desvios do PLN-001 levados ao molde, depois da Run do P44 ao P50](../../work/worklogs/2026-10-28-pln-001-passos-e-desvios-no-molde.md):
+  os Passos sem fases, as R45 a R47, os X1 ao X22 em duas linhas e o P26.4, o P43.4 e o P44.4.
 
 ## Decisões
 
@@ -1824,7 +1864,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 ## Pendências conhecidas
 
 - [Os Passos e os Desvios do PLN-001 no molde, depois da Run do P44 ao P50](../../work/issues/pln-001-passos-e-desvios-no-molde-depois-da-run.md)
-  — da rodada de 2026-10-28 na sessão `pln-001-norma-fixfy`; a Run `run_de875fc52a75` fechou, e a issue está livre.
+  — da rodada de 2026-10-28 na sessão `pln-001-norma-fixfy`; resolvida em 2026-10-28, `done`.
 - [O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md)
   — achado pelos workers do P53.4 e do P40, em 2026-10-28; o conserto é do PLN-002.
 
@@ -1848,7 +1888,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C14 | `Pedido 26`: o Continuar em outra conta no aviso de limite (P40) | No aviso "Claude atingiu seu limite de sessão", abrir o "Continuar em outra conta" e escolher a outra conta | O menu com as outras contas, também com uma só; a troca, o divisor "Conta trocada - <conta>" e só então o Continuar | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
-`fbff699fa58`, e a coordenadora da Run roda do app instalado. Na rodada de 2026-10-28 da sessão `pln-001-retomar`,
+`fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,
 Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14.
 
 ## Fechamento

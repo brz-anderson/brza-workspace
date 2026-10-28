@@ -1,28 +1,27 @@
 ---
-status: in_progress
-phase: execution
+status: open
+phase: blocked
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: sim — o P8; o P7 espera a sessão da 2d, reaberta por Anderson
+ready: não — o P7, o último passo, espera a sessão da 2d, reaberta por Anderson
 estimate_h: 18
-executed_h: 2.2
-remaining_h: 5.0
+executed_h: 2.6
+remaining_h: 3.0
 scope:
   - workspace
   - brza-studio
 opened: 2026-10-28
 owner: Anderson
+blocks: o P7 e o fechamento do PLN-002, até a 2d reabrir.
 tags:
   - tooling
 ---
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** o P0 ao P3 e o P6 estão feitos: o `brza dev` em `brza-workspace@310e12d`, com o C1 passado, e o
-  `brza note` em `brza-workspace@bafce7e`, cujo esqueleto do worklog ainda não acha o nome da sessão (X3). O `brza test`
-  está em `brza-workspace@51eef6e` (P4). O `brza app install` está em `brza-workspace@1339793`, e o app
-  reinstalado por ele, com o C2 passado, despacha o `brza X`; a ajuda usa `brza install` e `brza run` desde o
-  `e67a3c0` (P5). O próximo é o P8, numa sessão `pln-002-p8`; o P7 espera a 2d.
+- **Retomar:** o P0 ao P6 e o P8 estão feitos; o último, o `brza doctor`, em `brza-workspace@cc19e75`, com o C4
+  passado. Falta só o P7, que espera Anderson reabrir a sessão da 2d (R5.2); depois dele vem a revisão da entrega. O
+  esqueleto do `brza note` ainda não acha o nome da sessão (X3).
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -273,15 +272,23 @@ Estimado: 3 h · Executado: — h
 
 Executa D8 · executor: sessão `pln-002-p8`
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0,4 h
 
-- [ ] **1. Testes que falham:** cada erro e cada aviso do D8, inclusive o do app velho, com o ambiente e o `rpc`
+- [x] **1. Testes que falham:** cada erro e cada aviso do D8, inclusive o do app velho, com o ambiente e o `rpc`
   trocados; a saída 1 com erro e 0 sem.
-- [ ] **2. Implementar** `scripts/brza/brza-doctor`, com o `link_state` do `brza-install`.
-- [ ] **3. Rodar e ver passar**, e o C4 com Anderson.
-- [ ] **4. Ligar e commit** — `feat(brza): brza doctor (PLN-002/P8)`.
+- [x] **2. Implementar** `scripts/brza/brza-doctor`, com o `link_state` do `brza-install`. Ver X10.
+- [x] **3. Rodar e ver passar**, e o C4 com Anderson.
+- [x] **4. Ligar e commit** — `feat(brza): brza doctor (PLN-002/P8)`.
 
-**Evidência:** —
+**Evidência:** `brza-workspace@cc19e75`, com push na `master`.
+- `python3 -m unittest scripts/brza/tests/test_brza_doctor.py` → `Ran 18 tests … OK`; sem o script, falham no
+  `run_path`. `env -u TERM_PROGRAM python3 -m unittest discover -s scripts/brza/tests` → `Ran 129 tests … OK`; eram
+  111. Sem o `env -u`, os dois testes de saída do `brza-run` falham pelo "Saving session..." do zsh, com o app aberto
+  pelo Terminal.app (ver o worklog).
+- `scripts/brza/brza-doctor`, antes de ligar → saída 1, só com `ERRO  links: brza-doctor ausente`, e o conserto
+  `brza install --all`. O `--all --dry-run` mostrou só o `brza-doctor` a ligar, e o `--all` o ligou.
+- `brza doctor` no chat → saída 0, tudo `ok`; num ambiente limpo (`env -i HOME PATH`) → saída 1, com o ERRO de medição
+  e o conserto. O C4, na linha dele em `## Casos manuais`.
 
 ## Regressão
 
@@ -318,6 +325,10 @@ Estimado: 2 h · Executado: — h
 - **X9 — O P5 commitou o script antes do C2 e da troca dos textos.** Anderson pediu o reinício do app: "avise as
   sessões pra pararem no primeiro ponto de commit e registrarem no plano, vamos reiniciar". O P5.6 sai em dois
   commits, o `1339793` e o da troca dos textos. Afeta o P5.
+- **X10 — O `brza doctor` confere também o committer, e o link do `claude-brza` vai na linha do chat.** O D8 cita só o
+  `GIT_AUTHOR_IDENT` e os links `brza-*`; o commit leva os dois idents, e o override que aponta para um link ausente
+  quebra o chat. O app velho compara com a `origin/master` do último fetch, sem buscar. O contrato não muda. Afeta o
+  P8 e o D8.
 
 ## Casos manuais
 
@@ -326,10 +337,13 @@ Estimado: 2 h · Executado: — h
 | C1  | `Pedido 2`: o dev build sobe e para pelo `brza`  | `brza tree c1-prova`; `brza dev` nele; usar; `brza dev --stop`                               | janela visível com o chat ligado; o `--stop` fecha e libera     | 2026-10-28, `pln-002-p3`: o build subiu visível no pid 82861; "Sim, janela e chat ok" e "Sim, fechou", de Anderson | passou |
 | C2  | `Pedido 7` e `Pedido 0`: o app reinstalado       | app fechado; num terminal, `brza-app install`; abrir o app; `brza sessions --help` no chat e no terminal | o app abre na versão nova; a ajuda do `brza-sessions` responde nos dois | 2026-10-28, `pln-002-p5`: o app abriu na `…fb7eb5a90827`, a `origin/master`; a ajuda respondeu no terminal, colada por Anderson, e no chat, pelo `brza` do app | passou |
 | C3  | `Pedido 5`: o `close` fecha o chat por nome      | `brza sessions open c3-prova`; `brza sessions list`; `brza sessions close c3-prova`          | o chat some da lista e da tela, sem aba órfã                    |           |          |
-| C4  | `Pedido 4`: o `doctor` no chat e no terminal     | `brza doctor` num chat do app e num terminal sem a função `claude`                           | 0 no chat; no terminal, os erros com o comando que conserta     |           |          |
+| C4  | `Pedido 4`: o `doctor` no chat e no terminal     | `brza doctor` num chat do app e num terminal sem a função `claude`                           | 0 no chat; no terminal, os erros com o comando que conserta     | 2026-10-28, `pln-002-p8`: 0 no chat, tudo `ok`; no terminal, "Como o esperado", de Anderson: saída 1 com o ERRO de medição e o conserto | passou |
 
 ## Worklogs
 
+- 2026-10-28 — P8, o `brza doctor`, em `brza-workspace@cc19e75`, com o C4 passado; X10 no committer e no link do
+  `claude-brza`. Nada travou; o plano fica `blocked` no P7.
+  [O PLN-002/P8: o brza doctor](../../work/worklogs/2026-10-28-pln-002-p8-o-brza-doctor.md)
 - 2026-10-28 — P5, o `brza app install`, em `brza-workspace@1339793` e `e67a3c0`, com o C2 passado; R8 no `--dmg` e
   na substituição, X7 ao X9. Parou no reinício do app e retomou no C2.
   [O PLN-002/P5: o brza app install](../../work/worklogs/2026-10-28-pln-002-p5-o-brza-app-install.md)

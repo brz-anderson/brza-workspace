@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+"""O `claude` das sessões de chat do BrzA Studio, com o que a função `brza_claude` do ~/.zshrc passa no terminal.
+
+O chat roda o Claude Code sem o zsh de login, e por isso sem as funções do ~/.zshrc. Com o cwd no brza-workspace, o
+`--setting-sources=user,project,local` do chat já carrega o .claude/settings.json daqui; num checkout do brza-studio, a
+sessão subiria sem os hooks de medição, sem a trava de retomada e sem a identidade do brz-anderson. O app chama no lugar
+do `claude` o executável de `agentCmdOverrides.claude`, que o `brza-install --chat-command` aponta para o
+~/.local/bin/claude-brza, um link para este arquivo.
+
+Quando o cwd é do brza-workspace ou do brza-studio, o wrapper faz o mesmo que a `brza_claude`: põe a BRZA_WORKSPACE e o
+--settings do brza-workspace. O repositório sai do `git rev-parse --git-common-dir`, e não do prefixo do caminho,
+porque o worktree que o app cria fica em ~/orca/workspaces/…, fora dos dois. Fora deles — o `--version`, o one-shot que
+o app roda com cwd=/ e os checkouts da Fixfy —, o claude puro, com os argumentos intactos. Qualquer falha também cai no
+claude puro, porque o override vale para todo chat do Claude no app.
+
+O claude real é o primeiro `claude` do PATH que não seja este arquivo. As raízes vêm da BRZA_WORKSPACE e da BRZA_STUDIO
+ou, sem elas, de ~/Projects/brza-workspace e ~/Projects/brza-studio.
+"""
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+SELF = Path(__file__).resolve()
+
+
+def real_claude():
+    for folder in os.environ.get('PATH', '').split(os.pathsep):
+        candidate = Path(folder or '.') / 'claude'
+        if os.access(candidate, os.X_OK) and candidate.is_file() and candidate.resolve() != SELF:
+            return str(candidate)
+    sys.exit('claude-brza: nenhum claude no PATH')
+
+
+def roots(environ):
+    """(brza-workspace, brza-studio), em caminho físico."""
+    home = Path.home() / 'Projects'
+    return tuple(Path(environ.get(var) or home / name).expanduser().resolve()
+                 for var, name in (('BRZA_WORKSPACE', 'brza-workspace'), ('BRZA_STUDIO', 'brza-studio')))
+
+
+def inside(path: Path, root: Path) -> bool:
+    """Compara sem maiúsculas, porque o APFS aceita ~/projects/brza-studio."""
+    here, base = str(path).lower(), str(root).lower()
+    return here == base or here.startswith(base + '/')
+
+
+def main_checkout(cwd: Path):
+    """O checkout principal do repositório do cwd, pelo git common dir, ou None fora de um repositório git."""
+    r = subprocess.run(['git', '-C', str(cwd), 'rev-parse', '--path-format=absolute', '--git-common-dir'],
+                       capture_output=True, text=True, timeout=5)
+    if r.returncode:
+        return None
+    common = Path(r.stdout.strip()).resolve()
+    return common.parent if common.name == '.git' else common
+
+
+def is_brza(cwd: Path, environ) -> bool:
+    if any(inside(cwd, root) for root in roots(environ)):
+        return True
+    checkout = main_checkout(cwd)
+    return checkout is not None and any(inside(checkout, root) for root in roots(environ))
+
+
+def command(claude, argv, cwd: Path, environ):
+    """(argumentos, ambiente) da chamada."""
+    if not is_brza(cwd.resolve(), environ):
+        return [claude, *argv], environ
+    workspace = roots(environ)[0]
+    env = {**environ, 'BRZA_WORKSPACE': str(workspace)}
+    return [claude, '--settings', str(workspace / '.claude' / 'settings.json'), *argv], env
+
+
+def main():
+    claude = real_claude()
+    try:
+        args, env = command(claude, sys.argv[1:], Path.cwd(), dict(os.environ))
+    except Exception:
+        args, env = [claude, *sys.argv[1:]], dict(os.environ)
+    os.execve(claude, args, env)
+
+
+if __name__ == '__main__':
+    main()

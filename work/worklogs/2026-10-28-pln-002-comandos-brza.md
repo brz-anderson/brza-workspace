@@ -39,3 +39,13 @@ desenho listados na issue."
 
 - **O P1 ao P8:** cada passo abre numa sessão `pln-002-pN` do `brza-workspace`, a pedido de Anderson. O próximo é o P1.
 - **A combinação com a `brza-workspace-2d`:** é o primeiro subpasso do P7, e Anderson reabre a sessão.
+
+## Fora do workspace
+
+- **O quê e onde:** a memória `abrir-sessao-nova-pelo-brza-sessions.md` e o índice `MEMORY.md`, em
+  `~/.claude/projects/-Users-andepb-Projects-brza-workspace/memory/`. Pedido de Anderson: "sempre que for me dar comando
+  Bash pra abrir sessão nova, abra vc pelo brza sessions". A sessão `pln-002-p1` foi aberta assim, pelo `brza-sessions`.
+- **O risco:** a memória vence a linha do `CLAUDE.md` que manda passar o `claude --name` a Anderson. As duas ficam
+  divergentes até a norma ser emendada.
+- **Estado:** gravada e em vigor nas sessões deste projeto.
+- **Como desfazer:** apagar o arquivo e a linha dele no `MEMORY.md`.

@@ -23,7 +23,8 @@ tags:
   conferência, P52.4 e P53.3) e, em 2026-10-28, por workers do Orca (R33), o P42, o P43, o P49 e o P51 (commits
   `9b8a3e2e672`, `9b85279f57a` e `fbff699fa58`). **Esperam conferência com Anderson, num build com o `fbff699fa58`:** o
   P42.3, a Skill, o Firebase e o Context7 com chamadas reais (os campos do título são suposição, sobretudo o projeto do
-  Firebase) e o P52.4 e o P53.3. **Próximos:** o P44 ao P48 e o P50, sobre a API do P43 (registrar um item no
+  Firebase) e o P52.4 e o P53.3. O P53.4, o link sobre código inline que ficou branco, é conserto a fazer.
+  **Próximos:** o P44 ao P48 e o P50, sobre a API do P43 (registrar um item no
   `BRZA_TOOL_CATEGORIES` de `src/shared/native-chat/tools/brza/brza-tool-categories.ts` e o título no
   `brza-tool-line-title.ts`), cada um com os pontos a perguntar a Anderson antes; o Figma fica no `pen-tool` (R35.1).
   O **pedido 30**, a prévia de imagem no chat (R34), espera entrevista e desenho numa sessão nova. Abertos desde a
@@ -1260,6 +1261,10 @@ Executa D41 · Estimado: 0,3 h · Executado: 0,1 h
 - [x] **2.** O sublinhado segue com 40% da cor (`color-mix(in srgb, currentColor 40%, transparent)`), e a mensagem com
       tom `faint` segue herdando a cor (`:55`); os testes; commit e push
 - [ ] **3.** Conferir um link em azul claro nos dois temas, no BrzA Studio, com Anderson
+- [ ] **4.** O link sobre código inline também em azul: em 2026-10-28, numa sessão de chat do `brza-workspace`, Anderson
+      viu o caminho `~/Projects/fixfy`, escrito como código inline e virado link pelo chat, em branco e não em azul
+      ("nesse link, o texto ficou branco e não azul"); o `color: var(--chat-code-foreground)` de
+      `.native-chat-markdown code` (`native-chat-markdown.css:35`) vence a cor que o `code` herdaria do link
 
 **Evidência:** commit [`9d289d2b631`](https://github.com/brz-anderson/brza-studio/commit/9d289d2b631), na `master` do
 `brza-studio`. O `--chat-link` mora em `src/renderer/src/components/native-chat/brza-chat-link.css`, com o padrão do

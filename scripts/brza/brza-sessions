@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+"""Abre uma sessão do Claude Code em modo chat no BrzA Studio, com nome e, se houver, o prompt da tarefa.
+
+O chat não tem `--name`, então o primeiro prompt é `/rename <nome>`, e o prompt da tarefa entra logo depois pelo
+`agentSession.send` do runtime, com `delivery: 'queue-if-active'`: ele espera na fila até o /rename terminar.
+
+O chat não passa pelo zsh de login, e a função `claude` do ~/.zshrc não roda. No brza-workspace isso não falta: o chat
+lê o `.claude/settings.json` do projeto pelo `--setting-sources`. Num checkout do brza-studio, os hooks e a identidade só
+chegam pelo `agentCmdOverrides.claude` apontado para o claude-brza; sem ele, o script avisa numa linha CHECK e abre
+assim mesmo.
+
+Sessão cujo nome já roda é pulada. O nome vem de <config>/sessions/<pid>.json, que o /rename grava; o config é o
+~/.claude ou o de uma conta do app, em <dados do app>/claude-profiles/<id>/home.
+
+Uso:
+  brza-sessions <nome>                                  # abre o chat no brza-workspace
+  brza-sessions <nome> --prompt "<tarefa>"              # e manda a tarefa depois do /rename
+  brza-sessions <nome> --prompt-file <arquivo>          # a tarefa lida de um arquivo
+  brza-sessions <nome> --checkout <caminho>             # noutro checkout, como um worktree do brza-studio
+  brza-sessions <nome> --wait                           # só anuncia depois que o /rename registra o nome
+  brza-sessions <nome> --dry-run                        # só mostra o que faria
+
+As linhas de saída são `open:     <nome>  (chat, <caminho>, <sessionId>)`, `running:  <nome>` e `CHECK:    …`.
+"""
+import argparse
+import hashlib
+import json
+import os
+import sys
+import time
+import uuid
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from brza_runtime import WORKSPACE, BrzaError, brza, rpc, user_data  # noqa: E402
+
+CHAT_COMMAND = 'claude-brza'
+
+
+def config_dirs() -> list[Path]:
+    return [Path.home() / '.claude', *sorted((user_data() / 'claude-profiles').glob('*/home'))]
+
+
+def alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def running(name: str) -> bool:
+    for config in config_dirs():
+        for file in (config / 'sessions').glob('*.json'):
+            try:
+                data = json.loads(file.read_text())
+                pid = int(data.get('pid') or file.stem)
+            except (OSError, ValueError):
+                continue
+            if data.get('name') == name and alive(pid):
+                return True
+    return False
+
+
+def chat_blocker(checkout: Path) -> str | None:
+    """Por que o chat nesse checkout sobe sem os hooks do workspace, ou None quando sobe com eles."""
+    if checkout == WORKSPACE or WORKSPACE in checkout.parents:
+        return None
+    try:
+        override = rpc('settings.getAgentLaunch')['settings'].get('agentCmdOverrides', {}).get('claude')
+    except (BrzaError, KeyError) as e:
+        return f'não li a configuração do app ({e})'
+    if not override:
+        return f'agentCmdOverrides.claude está vazio, e o chat em {checkout} sobe sem os hooks do workspace'
+    if Path(override).name != CHAT_COMMAND:
+        return f'agentCmdOverrides.claude é {override}, não o {CHAT_COMMAND}'
+    return None
+
+
+def canonicalize(value) -> str:
+    """O canonicalize de src/shared/structured-agent-session-mutation.ts, que a impressão digital cobre."""
+    if isinstance(value, list):
+        return '[' + ','.join(canonicalize(v) for v in value) + ']'
+    if isinstance(value, dict):
+        return '{' + ','.join(f'{json.dumps(k, ensure_ascii=False)}:{canonicalize(v)}'
+                              for k, v in sorted(value.items())) + '}'
+    return json.dumps(value, ensure_ascii=False)
+
+
+def send_to_chat(session_id: str, text: str):
+    """Manda uma mensagem ao chat como structuredAgentSessionMessageSendMutation do app."""
+    fence = rpc('agentSession.history', {'sessionId': session_id, 'direction': 'tail', 'limit': 1})['page']['fence']
+    body = {'kind': 'message', 'role': 'user', 'blocks': [{'type': 'text', 'text': text}]}
+    fields = {'body': body, 'delivery': 'queue-if-active'}
+    payload = canonicalize({'method': 'agentSession.send', 'sessionId': session_id, 'fields': fields})
+    envelope = {'sessionId': session_id, 'clientOperationId': f'{int(time.time() * 1000)}-{uuid.uuid4().hex}',
+                'expectedRuntimeFence': fence, 'payloadFingerprint': hashlib.sha256(payload.encode()).hexdigest()}
+    rpc('agentSession.send', {'envelope': envelope, **fields})
+
+
+def wait_for_name(name: str, timeout: float = 60.0) -> bool:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if running(name):
+            return True
+        time.sleep(1)
+    return False
+
+
+def main():
+    ap = argparse.ArgumentParser(description='Abre uma sessão do Claude Code em modo chat no BrzA Studio.')
+    ap.add_argument('name')
+    ap.add_argument('--checkout', type=Path, default=WORKSPACE)
+    group = ap.add_mutually_exclusive_group()
+    group.add_argument('--prompt')
+    group.add_argument('--prompt-file', type=Path)
+    ap.add_argument('--wait', action='store_true', help='espera o /rename registrar o nome antes de anunciar')
+    ap.add_argument('--dry-run', action='store_true')
+    args = ap.parse_args()
+
+    checkout = args.checkout.expanduser().resolve()
+    prompt = args.prompt_file.read_text().strip() if args.prompt_file else (args.prompt or '').strip()
+    if running(args.name):
+        print(f'running:  {args.name}')
+        return 0
+    if blocker := chat_blocker(checkout):
+        print(f'CHECK:    {args.name}: {blocker}')
+    if args.dry_run:
+        print(f'abriria:  {args.name}  (chat, {checkout}){", com prompt" if prompt else ""}')
+        return 0
+
+    try:
+        launched = brza('agent', 'launch', '--agent', 'claude', '--surface', 'chat', '--worktree', f'path:{checkout}',
+                        '--prompt', f'/rename {args.name}')
+    except BrzaError as e:
+        print(f'CHECK:    {args.name} não abriu: {e}')
+        return 1
+    outcome = launched.get('outcome') or {}
+    if outcome.get('kind') != 'structured' or not outcome.get('sessionId'):
+        detail = (launched.get('receipt') or {}).get('detail') or 'sem motivo'
+        print(f'CHECK:    {args.name} abriu como {outcome.get("kind")}, não como chat: {detail}')
+        return 1
+    session_id = outcome['sessionId']
+    if prompt:
+        try:
+            send_to_chat(session_id, prompt)
+        except BrzaError as e:
+            print(f'CHECK:    {args.name} abriu, mas o prompt não entrou: {e}')
+            return 1
+    if args.wait and not wait_for_name(args.name):
+        print(f'CHECK:    {args.name} não registrou o nome em 60 s; confira o /rename na aba')
+        return 1
+    print(f'open:     {args.name}  (chat, {checkout}, {session_id})')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

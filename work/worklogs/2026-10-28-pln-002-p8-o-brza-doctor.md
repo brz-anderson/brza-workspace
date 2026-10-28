@@ -52,12 +52,16 @@ O commit é `brza-workspace@cc19e75`.
 - **Os dois testes de saída do `brza-run` falham quando o app foi aberto pelo Terminal.app.** O `TERM_PROGRAM=Apple_Terminal`
   herdado liga o `zsh_sessions` do macOS no `$SHELL -ic`, que imprime "Saving session..." ao sair. Com
   `env -u TERM_PROGRAM`, passam. O ▶ de um app aberto assim deve levar as mesmas linhas ao chat.
+  - **Emenda em 2026-10-28:** a aba do app põe `TERM_PROGRAM=Orca` por cima do herdado, e o `brza run` numa aba real
+    saiu sem as linhas. O ▶ não foi clicado: que ele também não as leve é inferência pelo código. O detalhe está em
+    [O `brza-run` imprime o "Saving session..." do zsh quando roda fora da aba do app](../issues/brza-run-imprime-saving-session-fora-da-aba-do-app.md).
 - **O X3 segue:** o esqueleto do `brza note new` saiu com `<a escrever>` no lugar do nome da sessão.
 
 ## O que ficou
 
 - O P7 do PLN-002, que espera a 2d, e a revisão da entrega depois dele.
 - O "Saving session..." do `brza-run` com o app aberto pelo Terminal.app, sem casa ainda.
+  - **Emenda em 2026-10-28:** a casa é [O `brza-run` imprime o "Saving session..." do zsh quando roda fora da aba do app](../issues/brza-run-imprime-saving-session-fora-da-aba-do-app.md).
 
 ## Fora do workspace
 

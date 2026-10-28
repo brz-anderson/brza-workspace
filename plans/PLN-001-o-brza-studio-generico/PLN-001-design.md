@@ -140,13 +140,15 @@ repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do 
 
 ### D37 — A base dos ícones de marca — `brza-studio/src/shared/native-chat/tools/` e `…/native-chat/NativeChatToolIcon.tsx` (P43)
 
-- **Origem:** pedido 27, R29.4
+- **Origem:** pedido 27, R29.4, R35.1
 - **Como fica:** as categorias novas moram num módulo do BrzA, por exemplo `src/shared/native-chat/tools/brza/`, com
   uma linha de montagem no `CATEGORY_BY_ROW_WORD` (`native-chat-tool-icon.ts:58`), arquivo do upstream, para os merges
-  de `stablyai/orca` seguirem com conflito pequeno. Os ícones genéricos são lucide; o SVG de marca (git, GitHub, Jira,
-  Figma, Firebase) vem de um componente do BrzA só no desktop, pelo `NATIVE_CHAT_TOOL_GLYPHS`, e o mobile
-  (`lucide-react-native`, que compartilha os ids de ícone) cai no lucide equivalente. A licença de cada logo se confere
-  antes de trazer, por exemplo o Simple Icons, CC0.
+  de `stablyai/orca` seguirem com conflito pequeno. Os ícones genéricos são lucide; o SVG de marca vem de um componente
+  do BrzA só no desktop, pelo `NATIVE_CHAT_TOOL_GLYPHS`, e o mobile (`lucide-react-native`, que compartilha os ids de
+  ícone) cai no lucide equivalente. Os logos de marca são o do git, novo (traço do Simple Icons, CC0, com a atribuição
+  CC BY 3.0 de Jason Long ao lado), e o `GitHubIcon` e o `JiraIcon` que o upstream já tem. O Figma e o Firebase ficam
+  no lucide (`pen-tool` e `flame`) também no desktop, porque as diretrizes de marca deles proíbem mudar a cor, e o glifo
+  do chat é monocromático; a API deixa ligar o logo depois com uma linha, se houver permissão.
 
 ### D38 — Os comandos de shell com ícone e título por categoria — `brza-studio/src/shared/native-chat/tools/brza/` (P44 a P47)
 

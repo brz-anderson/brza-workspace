@@ -1130,7 +1130,8 @@ Falta a conferência no BrzA Studio com Anderson (subpasso 3).
 - 2026-10-26 — worklog `work/worklogs/2026-10-26-p26-e-p34-do-pln-029-repassados.md` do workspace da Fixfy.
 - 2026-10-26 — worklog `work/worklogs/2026-10-26-primeiro-build-assinado-do-orca-fixfy.md` do workspace da Fixfy.
 - 2026-10-26 — worklog `work/worklogs/2026-10-26-rota-da-fixfy-no-orca-fica-no-fork.md` do workspace da Fixfy.
-- 2026-10-27 — plano movido do PLN-029 da Fixfy (rodada D)
+- 2026-10-27 — plano movido do PLN-029 da Fixfy (rodada D), na montagem do brza-workspace:
+  [O brza-workspace nasce com a norma, o PLN-001, a medição e as skills de notas e de plano](../../work/worklogs/2026-10-27-o-brza-workspace-nasce.md)
 - 2026-10-27 — [Os blocos de 120 colunas na largura "Total" e os links em azul claro no chat](../../work/worklogs/2026-10-27-chat-blocos-120-colunas-e-links.md):
   o P52 e o P53, com os commits `f130a85e578`, `9d289d2b631` e `52f7051a45d` do `brza-studio`.
 

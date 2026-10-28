@@ -49,3 +49,17 @@ desenho listados na issue."
   divergentes até a norma ser emendada.
 - **Estado:** gravada e em vigor nas sessões deste projeto.
 - **Como desfazer:** apagar o arquivo e a linha dele no `MEMORY.md`.
+
+- **O quê e onde:** o P2 aberto no agy, num chat do BrzA Studio no `brza-workspace`
+  (`antigravity_1fd68ef7_407a_4161_a5c5_5b1a704ddb80`), pelo `brza agent launch --agent antigravity`, a pedido de Anderson:
+  "execute o proximo passo com o agy". O chat não leva o nome `pln-002-p2` e não é medido.
+- **O risco:** nenhum além do passo em si.
+- **Estado:** em execução.
+- **Como desfazer:** fechar o chat.
+
+- **O quê e onde:** o chat da `pln-002-p1` fechado, a pedido de Anderson: "feche as sessão que ja terminaram suas
+  tarefas". Foi pelo `agentSession.close` e pelo `session.tabs.close` com `reason: 'user'`. As outras sessões abertas
+  tinham trabalho ou resposta pendente, e a `fixfy-13` é da Fixfy; nenhuma foi fechada.
+- **O risco:** a conversa não se retoma, pela norma. O registro do chat fica no app.
+- **Estado:** fechado; o processo e a aba sumiram.
+- **Como desfazer:** não se desfaz. A tarefa dela estava fechada (`dab8fd9`).

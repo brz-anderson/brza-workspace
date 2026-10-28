@@ -237,10 +237,18 @@ brza sessions close <nome>           agentSession.close e session.tabs.close com
 
 #### Em aberto
 
-A combinação com a 2d, no primeiro subpasso do P7, confere e fecha os dois pontos que não se mediram:
-- se o título da aba é o nome do `/rename`. Sem isso, o `open` grava o par nome e id;
-- se o `session.tabs.close` aceita o `reason: 'user'` vindo de script. Sem isso, fica só o `agentSession.close`, e a
-  conferência C3 diz se a aba some.
+Os dois pontos foram medidos em 2026-10-28, na sessão `pln-002-comandos-brza`, ao fechar o chat da `pln-002-p1`
+(`claude_e143df1e_87f7_48f7_8a1b_90407d3c500c`) pelo `brza_runtime.rpc`:
+- **O título da aba não é o nome do `/rename`.** O `session.tabs.listAll` deu `"title": "PLN-002 P1 – sessão de
+  execução"` para o chat renomeado `pln-002-p1`, e a aba não traz o nome. Achar pelo título não serve. Vale a saída já
+  prevista: o `open` grava o par nome e id. O `list` cruza esse registro com os arquivos de `~/.claude/sessions/`, que
+  têm o `name`.
+- **O `close` precisa dos dois RPCs.** O `agentSession.close` deu `{"ok": true}` e encerrou o processo, mas a aba seguiu
+  no `listAll`. O `session.tabs.close` com `worktree`, `tabId` (`agent-session:<id>`) e `reason: 'user'`, vindo de script,
+  deu `{"closed": true}`, e a aba sumiu.
+
+A combinação com a 2d, no primeiro subpasso do P7, parte destes dois fatos e decide o registro nome e id. A divergência
+da proposta acima volta à Entrevista.
 
 ## D8 — O `brza doctor` — `scripts/brza/brza-doctor` (P8)
 

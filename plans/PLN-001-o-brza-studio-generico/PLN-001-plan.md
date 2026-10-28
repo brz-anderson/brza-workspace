@@ -2,7 +2,7 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P27.2 e o P27.3, com Anderson no Windows, e o F7, numa sessão do `brza-studio`"
+ready: "sim — o P42, o P43, o P49 e o P51, numa sessão do `brza-studio`; o P27.2 e o P27.3, com Anderson no Windows"
 estimate_h: 116.0
 executed_h: 8.4
 remaining_h: 14.3
@@ -29,8 +29,11 @@ tags:
   `gh workflow run build-win-local.yml --repo brz-anderson/brza-studio --ref master`, com a conta `brz-anderson` ativa no
   `gh` (`gh auth switch`). Abertos desde a Fixfy: o P37 e o P40, que já pode abrir, porque o P36 está feito. **Novos em
   2026-10-27: o P42 ao P53**, no F7 — o "Perguntou:", a base de ícones e os ícones por categoria, os blocos e tabelas
-  de 120 colunas e os links —, das rodadas R29 a R31, nenhum executado, cada um com os pontos abertos a perguntar a
-  Anderson. A sessão aberta no `brza-studio` ou aqui pela função `claude` do `~/.zshrc` sobe com o `settings.json` deste
+  de 120 colunas e os links —, das rodadas R29 a R31, cada um com os pontos abertos a perguntar a Anderson. O P52 e o
+  P53 saíram em 2026-10-27 e esperam só a conferência com Anderson (P52.4 e P53.3), num build que tenha o `52f7051a45d`.
+  **Próximo, escolhido por Anderson em 2026-10-27, na sessão do `brza-workspace`:** o P42, o P43, o P49 e o P51, numa
+  sessão do `brza-studio` (~1,4 h). No P42, os pontos de `NativeChatAwaitingInputRow.tsx` estão agora em `:76`, `:117` e
+  `:123`. A sessão aberta no `brza-studio` ou aqui pela função `claude` do `~/.zshrc` sobe com o `settings.json` deste
   repositório, cujo `env` põe a identidade do `brz-anderson` e a chave `personal`; o `env -u` das cinco variáveis só
   é preciso numa sessão aberta sem a função. O trabalho de código vai num worktree em `.worktrees/` do `brza-studio`,
   porque outras sessões editam o checkout principal. O `pnpm` não está no `PATH`; o 12.14.0 está no cache do `npx` (`~/.npm/_npx/aa4546e781591cea/node_modules/.bin`),

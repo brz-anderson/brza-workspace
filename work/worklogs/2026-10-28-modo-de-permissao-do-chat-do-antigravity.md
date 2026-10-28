@@ -36,6 +36,11 @@ mesmo checkout):
 - O teste `switches the live server to the chat permission mode picked mid-chat, without a restart`, em
   `acp-structured-antigravity.test.ts`, substitui o que fixava o reinício no próximo envio.
 
+**O teste da troca com o turno aberto**, no commit `9747ac2b68d`, com push: `switches the live server to Full access
+while its turn waits on an approval`. O turno fica parado num pedido de aprovação, a troca para Full access manda o
+`yolo` ao mesmo processo, e o pedido aberto segue esperando a pessoa. Sem a chamada ao vivo no
+`recordStructuredAgentSessionOptionIntent`, este teste e o da troca entre envios falham.
+
 **O que rodou:**
 - `typecheck:node` limpo;
 - `oxlint` e `oxfmt` limpos, também no hook do commit;
@@ -44,9 +49,8 @@ mesmo checkout):
 
 ## Retomar
 
-- O build do app com a correção, para conferir no chat real: pôr Full access durante um turno e ver os comandos seguintes
+- O build do app com a correção, por `brza-app install` num terminal fora do app e com ele fechado, e a conferência no
+  chat real: pôr Full access durante um turno e ver os comandos seguintes
   rodarem sem pedir.
-- Falta teste da troca durante um turno aberto, o caso exato do sintoma. Hoje o teste cobre a troca entre envios, no
-  mesmo processo.
 - O pedido de aprovação que já está pendente na hora da troca continua esperando resposta. A troca vale só para os
   pedidos seguintes.

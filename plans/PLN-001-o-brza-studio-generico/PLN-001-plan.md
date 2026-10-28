@@ -1153,7 +1153,9 @@ ao lado do qual o item 2 punha o botão.
 **Rodada de 2026-10-28, na sessão `pln-001-retomar`:** quem executa — "Workers do Orca daqui (Recomendado)": um worker
 Codex, como o passo indica, em `.worktrees/pln-001-p40`, numa Run separada da `run_de875fc52a75`. A Run não toca o
 `NativeChatNoticeRow.tsx`, o `NativeChatInterruptedContinue.tsx` nem o `use-native-chat-account-switch.ts`, que são os
-pré-requisitos do passo e existem na `9a81e65c852`.
+pré-requisitos do passo e existem na `9a81e65c852`. Na mesma sessão, à pergunta do worker sobre o botão, Anderson
+escolheu "Menu sempre, como o P36 (Recomendado)": "Continue in another account" e "Continuar em outra conta", o ícone
+`UserRound` do `NativeChatAccountPicker` e um `DropdownMenu` com as outras contas, também quando só há uma.
 
 **Evidência:** —
 

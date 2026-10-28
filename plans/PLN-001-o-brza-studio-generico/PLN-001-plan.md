@@ -21,7 +21,7 @@ tags:
   `main`), com o rebrand em curso na sessão `brza-studio-rebrand`. O `orca-fixfy` está congelado, e por isso deixaram de
   valer o "cada passo chega ao `orca-fixfy` pela sincronização seguinte" e a conferência pelo PLN-028/P8 da Fixfy: cada
   passo se confere no BrzA Studio, com Anderson. A evidência, as horas e os worklogs vão agora a este repositório
-  (`~/Projects/brza-workspace`), com `git add` por caminho e push direto na `main`. Feitos, com a evidência abaixo: P1,
+  (`~/Projects/brza-workspace`), com `git add` por caminho e push direto na `master`. Feitos, com a evidência abaixo: P1,
   P2, P6, P25, P26, P33, P34, P35, P36, P38, P39 e P41, e o P27.1, que saiu num runner Windows do GitHub (X7). O P27.2 e
   o P27.3 seguem com Anderson, no Windows: o instalador está em
   `~/Downloads/orca-dev-windows-1.4.239-local.1793060470212.68ffa0a223d8/orca-windows-setup.exe`, e o pre-release

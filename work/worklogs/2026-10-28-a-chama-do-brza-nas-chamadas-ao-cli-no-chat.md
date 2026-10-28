@@ -16,8 +16,15 @@ do `brza-studio`, sobre `fbff699fa58`.
 ## O que Anderson respondeu
 
 - **Ligar ao chat:** "ligar já". A outra opção era deixar só o arquivo e ligar depois.
-- **Versão simplificada para 14 e 16 px:** não respondeu. Ficou a recomendada, uma versão só, com todos os detalhes.
+- **Versão simplificada para 14 e 16 px:** sem resposta na primeira rodada, ficou a recomendada, uma versão só, com todos
+  os detalhes. Depois de ver a chama no dev build, Anderson disse "o brza ficou mto bom", e a segunda versão não foi
+  feita.
 - **Fechamento:** "Commit e push já", sem conferir antes no dev build.
+- **Conferência** (pedida com "execute as pendencias"): Anderson conferiu ele mesmo na janela do dev build. A outra
+  opção era conceder Acessibilidade ao Orca Computer Use para a sessão dirigir a janela. O resultado foi "o brza ficou
+  mto bom, o git não pegou".
+- **O `git` sem ícone próprio:** "Deixar para o P44". As outras opções eram adiantar só o `git-logo` para qualquer
+  `git`, ou fazer o P44 inteiro nesta sessão.
 
 ## O que se fez
 
@@ -56,12 +63,21 @@ do `brza-studio`, sobre `fbff699fa58`.
 - **O comando é `brza`, mas os terminais do app põem o `orca` no PATH** (`src/shared/brand-identity.ts`). Os dois
   nomes contam como chamada ao CLI.
 
+## A conferência no dev build
+
+- O dev build subiu do checkout principal, na `7e9e0d18948`, com o perfil `brza-dev` semeado do app instalado pelo
+  `pnpm dev:seed-profile`. Assim, o chat e os projetos já vieram ligados.
+- No chat, o agente rodou `brza --help` e `git status` em duas chamadas `Bash` (transcript `4029d54d…`). A linha do
+  `brza` mostrou a chama, e a do `git status`, o terminal, como o código de hoje manda: nenhum comando `git` tem
+  categoria ainda.
+- O computer use não pôde dirigir a janela: falta a permissão de Acessibilidade (`permission_denied`), que ficou como
+  estava.
+
 ## O que ficou aberto
 
-- **Conferir no dev build** uma linha de chat com `brza …`, para ver o alinhamento no slot real. Por enquanto só a
-  prévia renderizada foi vista.
-- **Para o P44 a P47 do PLN-001:** a `brzaCli` já é uma categoria de comando. A pendência "o comando que casa com mais
-  de uma categoria" passa a incluir ela, como em `brza … && git commit`. Hoje vale a primeira da lista que casar.
+- **O ícone do `git`** é o P44 do PLN-001, que segue sem executar. Ali a pendência "o comando que casa com mais de uma
+  categoria" agora cita a `brzaCli` (`e9c1217`), como em `brza … && git commit`. Hoje vale a primeira da lista que
+  casar.
 
 ## Fora do workspace
 
@@ -71,6 +87,12 @@ do `brza-studio`, sobre `fbff699fa58`.
   - **O risco:** nenhum, porque é diretório temporário.
   - **Estado:** ativo até o sistema limpar o `/private/tmp`.
   - **Como desfazer:** `rm -rf /private/tmp/brza-icon`.
+- **`~/Library/Application Support/brza-dev/`**:
+  - **O quê e onde:** o perfil do dev build, criado pelo `pnpm dev:seed-profile` com projetos, configurações e sessão
+    copiados do perfil `brza-studio` do app instalado, que não foi alterado.
+  - **O risco:** o dev build seguinte reabre com esse perfil, e as automações não vêm junto, por desenho do script.
+  - **Estado:** ativo; o dev build foi encerrado.
+  - **Como desfazer:** apagar a pasta com o dev build fechado.
 - **`brza-flame-mono-a41c.html`**:
   - **O quê e onde:** a prévia do ícone no scratch deste chat, em
     `~/Library/Application Support/brza-studio/chat-scratch/76a22f374cd971e03654434b1f71b8ad/`.

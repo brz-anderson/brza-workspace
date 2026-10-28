@@ -1,14 +1,20 @@
 ---
-status: open
+status: done
 scope:
   - brza-studio
 opened: 2026-10-28
+completed: 2026-10-28
 priority: medium
 tags:
   - tooling
 ---
 
 # O CLI `brza` manda o subcomando desconhecido ao `brza-<sub>` do PATH, como o git
+
+**Resolvida em 2026-10-28** pelo `9a81e65c852` do `brza-studio`, em
+[O CLI brza despacha o subcomando desconhecido ao brza-X do PATH](../worklogs/2026-10-28-o-cli-brza-despacha-ao-brza-x-do-path.md).
+Por resposta de Anderson, a reinstalação do app e a troca dos textos para `brza install` e `brza run` ficaram para o
+`brza app install` do PLN-002.
 
 ## O pedido
 

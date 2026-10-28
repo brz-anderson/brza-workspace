@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P42, o P43, o P49 e o P51, numa sessão do `brza-studio`; o P27.2 e o P27.3, com Anderson no Windows"
+ready: "sim — o P44 ao P48 e o P50, com rodada antes; o pedido 30 a desenhar; a conferência do P42, P49, P51, P52 e P53 com Anderson"
 estimate_h: 116.0
-executed_h: 8.4
-remaining_h: 14.3
+executed_h: 9.85
+remaining_h: 12.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -16,29 +16,25 @@ tags:
 
 # PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat
 
-- **Retomar:** o plano veio do PLN-029 do workspace da Fixfy em 2026-10-27, a pedido de Anderson (rodada D, R32), e o
-  `orca-dev` virou `brza-studio` (`~/Projects/brza-studio`, repo `brz-anderson/brza-studio`, branch `master`, não mais
-  `main`), com o rebrand em curso na sessão `brza-studio-rebrand`. O `orca-fixfy` está congelado, e por isso deixaram de
-  valer o "cada passo chega ao `orca-fixfy` pela sincronização seguinte" e a conferência pelo PLN-028/P8 da Fixfy: cada
-  passo se confere no BrzA Studio, com Anderson. A evidência, as horas e os worklogs vão agora a este repositório
-  (`~/Projects/brza-workspace`), com `git add` por caminho e push direto na `master`. Feitos, com a evidência abaixo: P1,
-  P2, P6, P25, P26, P33, P34, P35, P36, P38, P39 e P41, e o P27.1, que saiu num runner Windows do GitHub (X7). O P27.2 e
-  o P27.3 seguem com Anderson, no Windows: o instalador está em
-  `~/Downloads/orca-dev-windows-1.4.239-local.1793060470212.68ffa0a223d8/orca-windows-setup.exe`, e o pre-release
-  `v1.4.242-local.1793065827033.ee06556cb8fe` do fork traz o de Windows e o DMG de Mac. O próximo build de Windows é
-  `gh workflow run build-win-local.yml --repo brz-anderson/brza-studio --ref master`, com a conta `brz-anderson` ativa no
-  `gh` (`gh auth switch`). Abertos desde a Fixfy: o P37 e o P40, que já pode abrir, porque o P36 está feito. **Novos em
-  2026-10-27: o P42 ao P53**, no F7 — o "Perguntou:", a base de ícones e os ícones por categoria, os blocos e tabelas
-  de 120 colunas e os links —, das rodadas R29 a R31, cada um com os pontos abertos a perguntar a Anderson. O P52 e o
-  P53 saíram em 2026-10-27 e esperam só a conferência com Anderson (P52.4 e P53.3), num build que tenha o `52f7051a45d`.
-  **Próximo, escolhido por Anderson em 2026-10-27, na sessão do `brza-workspace`:** o P42, o P43, o P49 e o P51, numa
-  sessão do `brza-studio` (~1,4 h). No P42, os pontos de `NativeChatAwaitingInputRow.tsx` estão agora em `:76`, `:117` e
-  `:123`. A sessão aberta no `brza-studio` ou aqui pela função `claude` do `~/.zshrc` sobe com o `settings.json` deste
-  repositório, cujo `env` põe a identidade do `brz-anderson` e a chave `personal`; o `env -u` das cinco variáveis só
-  é preciso numa sessão aberta sem a função. O trabalho de código vai num worktree em `.worktrees/` do `brza-studio`,
-  porque outras sessões editam o checkout principal. O `pnpm` não está no `PATH`; o 12.14.0 está no cache do `npx` (`~/.npm/_npx/aa4546e781591cea/node_modules/.bin`),
-  e o hook do commit pede ele no `PATH`. Os testes rodam com `node config/scripts/run-vitest.mjs run --config
-  config/vitest.config.ts <caminhos>`, e não com o `vitest` solto.
+- **Retomar:** o plano veio do PLN-029 do workspace da Fixfy em 2026-10-27 (R32); o `orca-dev` é hoje o `brza-studio`
+  (`~/Projects/brza-studio`, repo `brz-anderson/brza-studio`, branch `master`), e cada passo se confere no BrzA Studio,
+  com Anderson. Evidência, horas e worklogs vão a este repositório, com `git add` por caminho e push na `master`.
+  Feitos, com a evidência abaixo: P1, P2, P6, P25, P26, P33, P34, P35, P36, P38, P39, P41, P27.1, P52 e P53 (falta a
+  conferência, P52.4 e P53.3) e, em 2026-10-28, por workers do Orca (R33), o P42, o P43, o P49 e o P51 (commits
+  `9b8a3e2e672`, `9b85279f57a` e `fbff699fa58`). **Esperam conferência com Anderson, num build com o `fbff699fa58`:** o
+  P42.3, a Skill, o Firebase e o Context7 com chamadas reais (os campos do título são suposição, sobretudo o projeto do
+  Firebase) e o P52.4 e o P53.3. **Próximos:** o P44 ao P48 e o P50, sobre a API do P43 (registrar um item no
+  `BRZA_TOOL_CATEGORIES` de `src/shared/native-chat/tools/brza/brza-tool-categories.ts` e o título no
+  `brza-tool-line-title.ts`), cada um com os pontos a perguntar a Anderson antes; o Figma fica no `pen-tool` (R35.1).
+  O **pedido 30**, a prévia de imagem no chat (R34), espera entrevista e desenho numa sessão nova. Abertos desde a
+  Fixfy: o P37 e o P40. O P27.2 e o P27.3 seguem com Anderson, no Windows; o Sophos da máquina gerenciada pela TI barrou
+  o instalador sem assinatura em 2026-10-28, e Anderson respondeu "esquece". O build de Windows é `gh workflow run
+  build-win-local.yml --repo brz-anderson/brza-studio --ref master`, com a conta `brz-anderson` ativa no `gh`.
+  **Execução em paralelo:** worktrees em `.worktrees/` do `brza-studio`, criados com `git worktree add` e passados ao
+  `orchestration worker-start` por `path:` (o worktree novo do Orca cai fora do `brza_where`). O `pnpm` não está no
+  `PATH`: o 12.14.0 está em `~/.npm/_npx/aa4546e781591cea/node_modules/.bin`, e o hook do commit pede ele no `PATH`. Os
+  testes rodam com `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts <caminhos>`, e o `pnpm
+  check:changed` com `--base=origin/master`.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas de
@@ -94,6 +90,8 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 - **Pedido 28 (2026-10-27, sessão `fixfy-9b` da Fixfy):** "blocos de código - ``` - e as tabelas, largura sempre de 120 colunas + padding, quando selecionado
   `largura total` nas configs de largura do conteudo"
 - **Pedido 29 (2026-10-27, sessão `fixfy-9b` da Fixfy):** "e links no chat, na cor azul padrão de link, mais clarinho"
+- **Pedido 30 (2026-10-28, sessão do `brza-workspace` que orquestrou o P42 e o P43):** "seria mto bom se conseguicemos
+  adicionar image preview no chat"
 
 ### Cobertura
 
@@ -112,7 +110,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | Pedido 26 | O "Retomar automaticamente" agenda no main, persistido, o Continuar para o reset + 1 min, no mesmo chat; a linha mostra "Retomada às HH:MM · Cancelar", uma mensagem enviada antes cancela, e sem `resetsAt` o botão não aparece; com o Orca fechado na hora, dispara ao abrir se o chat ainda está no corte (R27.3, R27.4) | P41 | teste da agenda, do cancelamento e do disparo ao abrir (unidade); retomada com o relógio adiantado (manual) |
 | Pedido 25 | A mensagem enviada tem o Editar, que a leva à caixa, abaixo do rascunho se houver; o Copiar e o Enviar agora seguem onde estão (R25.1, R25.2) | P39 | teste do componente (unidade) |
 | Pedido 27 | O texto da pergunta no bloco "Perguntou:" usa a cor `primary` do tema, a do ✓ de opção escolhida, nos três pontos (R29.1) | P42 | teste de aparência (unidade); conferência no BrzA Studio (manual) |
-| Pedido 27 | Os logos SVG de marca (git, GitHub, Jira, Figma, Firebase) entram só no desktop, por um componente do BrzA, e o mobile cai no ícone lucide equivalente (R29.4) | P43 | teste do mapa de categorias e do recuo no mobile (unidade) |
+| Pedido 27 | Os logos SVG de marca entram só no desktop, por um componente do BrzA: o do git, novo, e o GitHub e o Jira, que o upstream já tem; o Figma e o Firebase ficam no lucide também no desktop; o mobile cai no ícone lucide equivalente (R29.4, R35.1) | P43 | teste do mapa de categorias e do recuo no mobile (unidade) |
 | Pedido 27 | O comando `git` ganha ícone pelo subcomando, o título "git commit — <mensagem>" e o hash que abre o diff do commit (R29.2) | P44 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual) |
 | Pedido 27 | O comando `gh` de PR e issue ganha o ícone de PR, o título "PR #123 — <título>" e o chip que abre o PR no navegador (R29.2) | P45 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual) |
 | Pedido 27 | Os testes (`vitest`, `run-vitest.mjs`, `flutter test`, `pytest`) ganham o ícone de testes, com passou/falhou contado no título pela saída (R29.2) | P46 | teste da contagem por executor (unidade); conferência no BrzA Studio (manual) |
@@ -123,6 +121,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | Pedido 27 | O Firebase e o Context7 ganham ícone e o nome do projeto ou da biblioteca no título, sem interação (R29.3) | P51 | teste da categoria e do título (unidade) |
 | Pedido 28 | Só na largura "Total", todo bloco de código e toda tabela têm exatamente `120ch` mais o padding, e no painel estreito encolhem até 100% e rolam na horizontal, com o texto corrido na largura total (R30.1, R30.2) | P52 | teste do estilo (unidade); conferência no BrzA Studio (manual) |
 | Pedido 29 | O link do chat usa `--chat-link`, `#79C0FF` no escuro e `#0969DA` no claro, com o sublinhado a 40% (R31.1) | P53 | teste da variável (unidade); conferência nos dois temas (manual) |
+| Pedido 30 | A prévia de imagem no chat: o link ou o caminho de imagem na mensagem, a imagem lida por ferramenta e o anexo enviado viram miniatura, que amplia ao clicar (R34.2) | a desenhar | a desenhar |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
 
@@ -267,6 +266,71 @@ do BrzA Studio para lá (brza-workspace)". Respondida em 2026-10-27, nas sessõe
    - sem norma, só o arquivo — custo: ~0,1 h; se paga: agora.
 
    **Decidido — "Mesma norma, renumerado PLN-001 (Recomendado)".**
+
+### Rodada 33 — o P42, o P43, o P49 e o P51 em paralelo, por workers do Orca (enviada 2026-10-28)
+
+> **Apresentado antes:** o P43 é a base do P49 e do P51 (`PLN-001-plan.md`, P43: "Antes do P44 ao P51"), e o P42 é
+> independente; um worktree novo do Orca vai para `~/orca/workspaces/brza-studio/…`, fora do `brza_where` do
+> `~/.zshrc:57`, e o `claude` dali cairia na função da Fixfy.
+
+Pedido de Anderson: "retome o plano 001, utilize /orchestration para organizar e executar os passos em paralelo".
+Respondida em 2026-10-28, na sessão do `brza-workspace` que orquestrou o pacote.
+
+1. **R33.1 — Como dividir o pacote entre os workers?** Seleção única. Opções: 2 workers (recomendada) — o P42 num, e o
+   P43, o P49 e o P51 em sequência no outro; 3 workers — o P42 e o P43 em paralelo, e o P49 com o P51 num terceiro,
+   depois do P43; 4 workers — o P49 e o P51 em paralelo depois do P43.
+
+   **Decidido — "3 workers".**
+
+2. **R33.2 — Os workers fazem commit e push na master sozinhos?** Seleção única. Opções: commit e push com testes
+   verdes (recomendada), depois de conferir a identidade com `git var GIT_AUTHOR_IDENT`, com rebase na master; commit na
+   branch e push depois do aviso.
+
+   **Decidido — "Commit e push com testes verdes (Recomendado)".**
+
+3. **R33.3 — Que modelo cada worker usa?** Seleção única. Opções: Opus no P43 e Sonnet no P42 (recomendada); Opus nos
+   dois; o padrão do agente, sem `--model`.
+
+   **Decidido — "Opus no P43, Sonnet no P42 (Recomendado)".** O worker do P49 e do P51, mecânico, vai de Sonnet, pela
+   mesma regra.
+
+4. **R33.4 — Onde ficam os worktrees?** Seleção única. Opções: em `brza-studio/.worktrees/` (recomendada), criados com
+   `git worktree add` e passados ao Orca por `path:`; worktree novo do Orca (`new-top-level`).
+
+   **Decidido — "Em brza-studio/.worktrees/ (Recomendado)".**
+
+### Rodada 34 — a prévia de imagem no chat (enviada 2026-10-28)
+
+Pedido de Anderson: "seria mto bom se conseguicemos adicionar image preview no chat". Respondida em 2026-10-28, na mesma
+sessão.
+
+1. **R34.1 — Onde se registra o pedido?** Seleção única. Opções: pedido 30 no PLN-001 (recomendada), no F7, com a
+   entrevista e os passos numa sessão nova; issue em `work/issues/`.
+
+   **Decidido — "Pedido 30 no PLN-001 (Recomendado)".**
+
+2. **R34.2 — Que imagens a prévia mostra?** Seleção múltipla. Opções: links e caminhos de imagem na mensagem; imagens
+   lidas por ferramenta (o `Read` de imagem, o `get_screenshot`); anexos enviados por Anderson; ampliar ao clicar.
+
+   **Decidido — as quatro marcadas.** O desenho, o custo de cada uma e os passos ficam para a sessão que desenhar o
+   pedido 30.
+
+### Rodada 35 — os logos de marca do P43 (enviada 2026-10-28)
+
+> **Apresentado antes, pelo worker do P43:** o upstream já embarca o `GitHubIcon` (Octicons `mark-github`) e o
+> `JiraIcon`; o logo do Git é CC BY 3.0 (Jason Long), com o traço do Simple Icons (CC0), e a política de marca do Git
+> permite identificá-lo; as diretrizes do Figma proíbem modificar a marca, multicolorida, e as do Firebase proíbem mudar
+> as cores e restringem o uso em produto; os glifos do chat são monocromáticos (`currentColor`) e mudam de tom com o
+> estado da linha.
+
+Respondida em 2026-10-28, na mesma sessão, duas vezes, a pedido de Anderson ("pergunta dnv"), com a mesma resposta.
+
+1. **R35.1 — Quais logos de marca o P43 traz para o desktop?** Seleção única. Opções: o Git novo, e o GitHub e o Jira
+   reusados (recomendada), com o Figma e o Firebase no lucide (`pen-tool` e `flame`) também no desktop; os cinco
+   monocromáticos; o Figma e o Firebase nas cores oficiais; nenhum logo novo, nem o Git.
+
+   **Decidido — "Git novo, GitHub e Jira reusados (Recomendado)".** Reescreve o D37; no P50, o Figma fica com o
+   `pen-tool`.
 
 ## Passos
 
@@ -818,34 +882,51 @@ do main.
 
 #### P42 — O "Perguntou:" em cor de destaque (pedido 27)
 
-Executa D36 · Estimado: 0,3 h · Executado: — h
+Executa D36 · Estimado: 0,3 h · Executado: 0,3 h
 
-- [ ] **1.** Teste de aparência que falha: o texto da pergunta do agente usa a cor `primary` do tema, a mesma do ✓ de
+- [x] **1.** Teste de aparência que falha: o texto da pergunta do agente usa a cor `primary` do tema, a mesma do ✓ de
       opção escolhida, e não o `text-chat-foreground` de hoje, nos três pontos de
       `src/renderer/src/components/native-chat/NativeChatAwaitingInputRow.tsx`: `:76` (a linha fechada), `:113` (a
       pergunta aberta) e `:118` (a lista de perguntas)
-- [ ] **2.** A troca da cor nos três pontos; os testes do arquivo; commit e push
+- [x] **2.** A troca da cor nos três pontos; os testes do arquivo; commit e push
 - [ ] **3.** Conferir no BrzA Studio, com Anderson: uma pergunta respondida, em cor de destaque
 
-**Evidência:** —
+**Evidência:** commit [`9b8a3e2e672`](https://github.com/brz-anderson/brza-studio/commit/9b8a3e2e672), na `master` do
+`brza-studio`, por um worker do Orca (Sonnet, R33), no worktree `.worktrees/pln-001-p42`. Os três pontos passaram de
+`text-chat-foreground` a `text-primary`, a classe do ✓ de opção escolhida (`NativeChatQuestionCard.tsx:242`); o marcador
+`faint` da lista não mudou. O teste novo, `NativeChatAwaitingInputRow.test.tsx`, com 3 casos, deu 3 falhas antes e 3
+passes depois; `pnpm check:changed --base=origin/master` → 21 checks verdes (sem o `--base`, ele procura `origin/main`).
+Falta a conferência no BrzA Studio com Anderson (subpasso 3), também na pergunta aberta, que só aparece com a linha
+recortada.
 
 #### P43 — A base dos ícones de marca: o módulo do BrzA e os logos SVG (pedido 27)
 
-Executa D37 · Estimado: 0,5 h · Executado: — h
+Executa D37 · Estimado: 0,5 h · Executado: 0,75 h
 
 Antes do P44 ao P51, que usam o mapa e o componente que ele monta.
 
-- [ ] **1.** O módulo do BrzA para as categorias novas, por exemplo `src/shared/native-chat/tools/brza/`, com uma linha
+- [x] **1.** O módulo do BrzA para as categorias novas, por exemplo `src/shared/native-chat/tools/brza/`, com uma linha
       de montagem no `CATEGORY_BY_ROW_WORD` de `src/shared/native-chat/tools/native-chat-tool-icon.ts:58`, que é arquivo
       do upstream: os merges de `stablyai/orca` seguem com conflito pequeno
-- [ ] **2.** O componente do BrzA que desenha o SVG de marca (git, GitHub, Jira, Figma, Firebase) só no desktop, ligado
+- [x] **2.** O componente do BrzA que desenha o SVG de marca (git, GitHub, Jira, Figma, Firebase) só no desktop, ligado
       ao `NATIVE_CHAT_TOOL_GLYPHS` de `src/renderer/src/components/native-chat/NativeChatToolIcon.tsx`; o mobile
       (`lucide-react-native`) cai no ícone lucide equivalente, porque os ids de ícone são do lucide e compartilhados
       com ele, como diz o comentário do tipo
-- [ ] **3.** Conferir a licença de cada logo antes de trazer — por exemplo o Simple Icons, CC0 —, e o que o lucide não
+- [x] **3.** Conferir a licença de cada logo antes de trazer — por exemplo o Simple Icons, CC0 —, e o que o lucide não
       cobre: não tem logo de Jira nem de Firebase, e os de GitHub e Figma estão obsoletos; os testes; commit e push
 
-**Evidência:** —
+**Evidência:** commit [`9b85279f57a`](https://github.com/brz-anderson/brza-studio/commit/9b85279f57a), na `master` do
+`brza-studio`, por um worker do Orca (Opus, R33), no worktree `.worktrees/pln-001-p43`. O módulo do BrzA é
+`src/shared/native-chat/tools/brza/brza-tool-categories.ts`, com o registro `BRZA_TOOL_CATEGORIES` vazio: o P44 ao P51
+registram as suas categorias. Os glifos ficam em `src/renderer/src/components/native-chat/brza/brza-tool-glyphs.tsx`
+(desktop) e em `mobile/src/session/native-chat/transcript/brza/brza-mobile-tool-glyphs.ts`. Os logos são o do git, novo
+(`BrzaGitLogo.tsx`), e o `GitHubIcon` e o `JiraIcon` do upstream; o Figma e o Firebase ficam no lucide (R35.1). A fonte e
+a licença de cada logo estão em `src/renderer/src/components/native-chat/brza/brza-brand-logos.md`. Nos arquivos do
+upstream, só montagem: 16 linhas em `native-chat-tool-icon.ts`, 4 no `NativeChatToolIcon.tsx` e 4 no
+`MobileNativeChatToolIcon.tsx`. Os testes novos falharam antes, porque o módulo não existia e o glifo era `undefined`.
+`run-vitest` em `brza/` (shared e renderer), `native-chat-tool-icon.test.ts`, `NativeChatReasoningRow.test.tsx` e
+`NativeChatAwaitingInputRow.test.tsx` → 8 arquivos, 66 passed; `pnpm check:changed --base=origin/master` → 24 checks;
+`pnpm typecheck` no `mobile/` → exit 0. Desvios X9 e X10. Nada aparece no app até o P44 ao P51 registrarem categorias.
 
 #### P44 — O `git` com ícone e título próprios (pedido 27)
 
@@ -921,12 +1002,19 @@ site para o navegador.
 
 #### P49 — A ferramenta Skill com ícone e título (pedido 27)
 
-Executa D39 · Estimado: 0,3 h · Executado: — h
+Executa D39 · Estimado: 0,3 h · Executado: 0,2 h
 
-- [ ] **1.** Teste que falha: a ferramenta Skill ganha o ícone Sparkles e o título "Skill · <nome>"
-- [ ] **2.** Os testes; commit e push
+- [x] **1.** Teste que falha: a ferramenta Skill ganha o ícone Sparkles e o título "Skill · <nome>"
+- [x] **2.** Os testes; commit e push
 
-**Evidência:** —
+**Evidência:** commit [`fbff699fa58`](https://github.com/brz-anderson/brza-studio/commit/fbff699fa58), na `master` do `brza-studio`,
+que fecha o P49 e o P51, por um worker do Orca (Sonnet, R33), no worktree `.worktrees/pln-001-p49-p51`. As categorias
+entram no `BRZA_TOOL_CATEGORIES` do P43, e o título sai de `src/shared/native-chat/tools/brza/brza-tool-line-title.ts`,
+ligado por uma atribuição em `native-chat-tool-line-label.ts` (5 linhas do upstream): o alvo e a dica da linha viram
+o título, e o verbo segue o do upstream; sem o campo, a linha cai no padrão. Teste novo `brza-tool-line-title.test.ts`,
+5 casos, 4 falhando antes; `run-vitest` em `src/shared/native-chat` e no `native-chat` do renderer → 451 arquivos, 5084
+passed; `pnpm check:changed --base=origin/master` → 19 checks. Skill: `sparkles` e "Skill · <nome>", pelo campo `skill` ou `name` do input.
+Falta conferir uma chamada real no BrzA Studio.
 
 #### P50 — O Figma com logo, nome do nó e miniatura (pedido 27)
 
@@ -945,13 +1033,22 @@ miniatura na linha.
 
 #### P51 — O Firebase e o Context7 com ícone e nome no título (pedido 27)
 
-Executa D39 · Estimado: 0,3 h · Executado: — h
+Executa D39 · Estimado: 0,3 h · Executado: 0,2 h
 
-- [ ] **1.** Teste que falha: o Firebase ganha o ícone Flame, e o Context7, o BookOpen, com o nome do projeto ou da
+- [x] **1.** Teste que falha: o Firebase ganha o ícone Flame, e o Context7, o BookOpen, com o nome do projeto ou da
       biblioteca no título, sem interação
-- [ ] **2.** Os testes; commit e push
+- [x] **2.** Os testes; commit e push
 
-**Evidência:** —
+**Evidência:** o mesmo commit [`fbff699fa58`](https://github.com/brz-anderson/brza-studio/commit/fbff699fa58), na `master` do `brza-studio`,
+que fecha o P49 e o P51, por um worker do Orca (Sonnet, R33), no worktree `.worktrees/pln-001-p49-p51`. As categorias
+entram no `BRZA_TOOL_CATEGORIES` do P43, e o título sai de `src/shared/native-chat/tools/brza/brza-tool-line-title.ts`,
+ligado por uma atribuição em `native-chat-tool-line-label.ts` (5 linhas do upstream): o alvo e a dica da linha viram
+o título, e o verbo segue o do upstream; sem o campo, a linha cai no padrão. Teste novo `brza-tool-line-title.test.ts`,
+5 casos, 4 falhando antes; `run-vitest` em `src/shared/native-chat` e no `native-chat` do renderer → 451 arquivos, 5084
+passed; `pnpm check:changed --base=origin/master` → 19 checks. O Firebase sai com `flame` e "Firebase · <projeto>"
+(`project_id`, `projectId`, `project` ou `active_project`), e o Context7 com `book-open` e "Context7 · <biblioteca>"
+(`libraryName` ou `libraryId`, sem a barra inicial). Os nomes dos campos são suposição do worker: falta conferir com
+chamadas reais no BrzA Studio, sobretudo o Firebase, cujas ferramentas quase não levam o projeto.
 
 #### P52 — Os blocos de código e as tabelas com 120 colunas na largura total (pedido 28)
 
@@ -1062,6 +1159,15 @@ Falta a conferência no BrzA Studio com Anderson (subpasso 3).
   `ed412bcdabd40cfa37ffac2a616862f6eaecedc216eb4be03a68ea44f0498145`, `hdiutil verify` válido, `codesign -dv` com
   `Signature=adhoc` e `Mach-O thin (arm64)`, e o app é o `1.4.242-local.1793064322587.ee06556cb8fe`. O D1 não muda: é o
   mesmo `pnpm run build:mac`.
+- **X9 — As categorias do BrzA refinam só o ícone, sem estender o `NativeChatToolCategory` nem o `CATEGORY_BY_ROW_WORD`.**
+  O D37 falava numa linha no `CATEGORY_BY_ROW_WORD`; o worker do P43 montou o módulo nos dois resolvedores de ícone
+  (`nativeChatToolIconName` e `nativeChatToolRunIconName`), na união `NativeChatToolIconName` e nas tabelas de glifos do
+  desktop e do mobile. Estender a união do upstream obrigaria a mexer nos `Record` exaustivos dele (as frases da corrida,
+  o switch do rótulo), e o `git` deixaria de ser `unknown`, perdendo o tratamento de comando no rótulo da linha. O
+  contrato do D37 segue: módulo do BrzA e uma linha de montagem por ponto do upstream. O título do P44 ao P51 sai do
+  `brzaToolCategory`. Citado no P43.
+- **X10 — Os recuos de marca no mobile: git → `git-branch`, GitHub → `git-pull-request`, Jira → `square-kanban`.** O D37
+  não os fixava; foi escolha do worker do P43, a conferir com Anderson junto do P44 e do P48. Citado no P43.
 
 ## Worklogs
 
@@ -1137,6 +1243,9 @@ Falta a conferência no BrzA Studio com Anderson (subpasso 3).
   [O brza-workspace nasce com a norma, o PLN-001, a medição e as skills de notas e de plano](../../work/worklogs/2026-10-27-o-brza-workspace-nasce.md)
 - 2026-10-27 — [Os blocos de 120 colunas na largura "Total" e os links em azul claro no chat](../../work/worklogs/2026-10-27-chat-blocos-120-colunas-e-links.md):
   o P52 e o P53, com os commits `f130a85e578`, `9d289d2b631` e `52f7051a45d` do `brza-studio`.
+- 2026-10-28 — [O P42, o P43, o P49 e o P51 por workers do Orca em paralelo](../../work/worklogs/2026-10-28-p42-p43-p49-p51-por-workers-do-orca.md):
+  o P42, o P43, o P49 e o P51, com os commits `9b8a3e2e672`, `9b85279f57a` e `fbff699fa58`; as R33 a R35, o pedido 30 e os
+  X9 e X10. Esperam a conferência com Anderson.
 
 ## Decisões
 

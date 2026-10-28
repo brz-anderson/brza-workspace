@@ -208,7 +208,7 @@ O `brza-studio` é outro repositório, com branch `master` e a norma dele: o pla
 | `trigger` | A condição que encerra a espera, em prosa |
 | `deadline` | A **data** que encerra a espera, quando existe uma de verdade. Opcional, em `issues/`, `decisions/` e `plans/` |
 | `superseded_by` | A decisão que substitui esta. Supersedência é relação, não estado: a nota fica `done` |
-| `tags` | Assunto transversal, e só ele: `auth` · `design` · `infra` · `tooling` · `planning`. Opcional. É a lista do checador; tag nova entra nele antes de entrar numa nota |
+| `tags` | Assunto transversal, e só ele: `auth` · `chat` · `design` · `infra` · `planning` · `release` · `tooling`. Opcional. É a lista do checador; tag nova entra nele antes de entrar numa nota |
 
 `blocks` e `trigger` guardam **a primeira frase** do campo correspondente no corpo: a propriedade é resumo para
 varredura. **Tag nunca espelha campo nem caminho** — `work/*`, `scope/*` e `status/*` estão proibidas — e **é atalho,
@@ -283,9 +283,9 @@ transcrição.
 - **Plano que atravessa mais de uma sessão** é copiado para `plans/`, com os mesmos IDs, e o worklog ganha
   "promovido a PLN-NNN".
 - **O que muda estado fora do workspace tem seção própria**, `## Fora do workspace`, no worklog do dia: arquivo criado
-  ou alterado fora de `~/Projects/brza-workspace` e comando que muda estado fora dele; leitura pura não entra. Um item
-  por coisa, com quatro campos — **o quê e onde**; **o risco**, o que pode dar errado e para quem; **estado**, se segue
-  ativo; **como desfazer**.
+  ou alterado fora de `~/Projects/brza-workspace` e do `brza-studio`, cujo commit já é o registro, e comando que muda
+  estado fora deles; leitura pura não entra. Um item por coisa, com quatro campos — **o quê e onde**; **o risco**, o
+  que pode dar errado e para quem; **estado**, se segue ativo; **como desfazer**.
 
 ### `work/reviews/`
 

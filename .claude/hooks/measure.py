@@ -65,9 +65,9 @@ def request_cost(price, tokens):
 
 
 # A raiz é a do workspace, e não o diretório da sessão: sessão aberta no brza-studio também carrega este hook, pelo
-# --settings da função do ~/.zshrc, que passa a BRZA_WORKSPACE. Sem ela vale o CLAUDE_PROJECT_DIR e, por último, o
-# diretório onde o script mora. MEASURE_DIR existe só para teste.
-ROOT = (os.environ.get("MEASURE_DIR") or os.environ.get("BRZA_WORKSPACE") or os.environ.get("CLAUDE_PROJECT_DIR")
+# --settings da função do ~/.zshrc, que passa a BRZA_WORKSPACE. Sem ela vale o diretório onde o script mora, e nunca
+# o CLAUDE_PROJECT_DIR, para um .measurements/ não nascer no brza-studio. MEASURE_DIR existe só para teste.
+ROOT = (os.environ.get("MEASURE_DIR") or os.environ.get("BRZA_WORKSPACE")
         or os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 DIR = os.path.join(ROOT, ".measurements")
 LOG = os.path.join(DIR, "measurements.jsonl")

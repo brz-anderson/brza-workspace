@@ -31,7 +31,7 @@ from urllib.parse import unquote
 # Os vocabulários são do work/README.md e do plans/README.md; mudou lá, muda aqui no mesmo commit.
 STATUSES = {"open", "in_progress", "in_review", "done", "dropped"}
 STATELESS_GENRES = {"guide", "worklog", "note"}
-TAGS = {"auth", "design", "infra", "tooling", "planning"}
+TAGS = {"auth", "chat", "design", "infra", "planning", "release", "tooling"}
 FORBIDDEN_TAG_PREFIXES = ("work/", "repo/", "scope/", "status/")
 # O dia em que o workspace nasceu (a abertura do PLN-001): toda nota datada daí em diante é cobrada; só a que não tem
 # data nenhuma sai como aviso, porque data que não está escrita não se infere.

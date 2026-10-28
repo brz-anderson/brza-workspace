@@ -3,10 +3,10 @@ status: in_progress
 phase: execution
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: sim — o P2; o P7 espera a sessão da 2d, reaberta por Anderson
+ready: sim — o P3 ao P6, em paralelo; o P7 espera a sessão da 2d, reaberta por Anderson
 estimate_h: 18
-executed_h: 0.2
-remaining_h: 16.5
+executed_h: 0.4
+remaining_h: 14.0
 scope:
   - workspace
   - brza-studio
@@ -18,9 +18,9 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** o P0 e o P1 estão feitos; o runtime comum está em `brza-workspace@9e95a2c`. O próximo é o P2, o
-  `brza tree`, numa sessão `pln-002-p2` que Anderson abre a pedido. Depois dele, o P3 ao P6 podem correr em paralelo
-  (R4.4), e o P7 espera a 2d.
+- **Retomar:** o P0, o P1 e o P2 estão feitos; o `brza tree` está em `brza-workspace@2ac6638`. O P3 ao P6 podem
+  correr em paralelo (R4.4), cada um numa sessão `pln-002-pN` que Anderson abre a pedido, e o worktree de código sai do
+  `brza-tree <nome>`. O P7 espera a 2d.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -131,17 +131,25 @@ Estimado: 1,5 h · Executado: 0,2 h
 
 Executa D2 · executor: sessão `pln-002-p2`
 
-Estimado: 2,5 h · Executado: — h
+Estimado: 2,5 h · Executado: 0,2 h
 
-- [ ] **1. Testes que falham:** criar com o tipo padrão e com `--type` e `--base`; o install offline que falha mantém o
+- [x] **1. Testes que falham:** criar com o tipo padrão e com `--type` e `--base`; o install offline que falha mantém o
   worktree e imprime o comando; `--rm` recusa o sujo, o não mergeado e a branch sem commit próprio sem `--force`, e
   remove o mergeado limpo; `--rm` no órfão; `--list` marca os órfãos; `--chat` chama o `brza-sessions --checkout`.
-- [ ] **2. Implementar** `scripts/brza/brza-tree` sobre o `worktree_add` e o `install_offline`.
-- [ ] **3. Rodar e ver passar**, e uma corrida real: `brza tree pln-002-p2-prova`, conferir que o `node_modules` não é
+- [x] **2. Implementar** `scripts/brza/brza-tree` sobre o `worktree_add` e o `install_offline`.
+- [x] **3. Rodar e ver passar**, e uma corrida real: `brza tree pln-002-p2-prova`, conferir que o `node_modules` não é
   link, e `brza tree --rm pln-002-p2-prova --force`.
-- [ ] **4. Ligar e commit** — `brza install --all`; `feat(brza): brza tree (PLN-002/P2)`.
+- [x] **4. Ligar e commit** — `brza install --all`; `feat(brza): brza tree (PLN-002/P2)`.
 
-**Evidência:** —
+**Evidência:** `brza-workspace@2ac6638`, com push na `master`.
+- `python3 -m unittest discover -s scripts/brza/tests` → `Ran 47 tests … OK`. Eram 33; o `test_brza_tree.py` traz 14,
+  num clone de uma `origin` local, com o install trocado por um falso.
+- A corrida real, pelo caminho inteiro: `scripts/brza/brza-tree pln-002-p2-prova` → saída 0 em 10 s, na
+  `feat/pln-002-p2-prova` em `fc7f07a8a1e`, a `origin/master` depois do fetch, e o `node_modules` é diretório, não link.
+  O `--rm` sem `--force` recusou pela branch sem commit próprio (saída 1); o `--rm` no `chat-markdown-largura-e-links`
+  o listou como órfão com `.cache/` e recusou (saída 1); o `--rm … --force` removeu o worktree e a branch (saída 0).
+- `brza-tree --list` mostra os 7 de `.worktrees/`, com o órfão marcado.
+- `brza-install --all` ligou o `brza-tree`, e o `brza-install` mostra todo link `ok`.
 
 ### P3 — O `brza dev`
 
@@ -258,6 +266,8 @@ Estimado: 2 h · Executado: — h
 
 ## Worklogs
 
+- 2026-10-28 — P2, o `brza tree`, em `brza-workspace@2ac6638`. Nada travou.
+  [O PLN-002/P2: o brza tree](../../work/worklogs/2026-10-28-pln-002-p2-o-brza-tree.md)
 - 2026-10-28 — P1, o runtime comum e o `brza-install --all`, em `brza-workspace@9e95a2c`; X1 no `git`. Nada travou.
   [O PLN-002/P1: o runtime comum e o brza-install --all](../../work/worklogs/2026-10-28-pln-002-p1-o-runtime-comum-e-o-install-all.md)
 - 2026-10-28 — P0, o despacho, feito pela `brza-cli-subcomandos` em `brza-studio@9a81e65c852`. A reinstalação e a troca

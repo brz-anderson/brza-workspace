@@ -450,6 +450,42 @@ Respondida em 2026-10-28, na sessão `pln-001-p44-p50` do `brza-workspace`.
 
    **Decidido — "Fica para o pedido 30 (Recomendado)".**
 
+### Rodada 39 — a prévia de imagem: o arquivo, o texto solto, a URL remota e as várias imagens (enviada 2026-10-28)
+
+> **Apresentado antes:** a imagem colada vai para o temp do sistema (`clipboard-image-temp-file.ts:44`,
+> `getPath('temp')`), e não há rotina que apague arquivo de sessão excluída; o texto já faz link do caminho de arquivo
+> pelo `linkifyFilePaths` (`NativeChatMarkdown.tsx:105`); o `![]()` remoto carrega sozinho
+> (`NativeChatMarkdownImage.tsx:131` e `:156`).
+
+Respondida em 2026-10-28, na sessão do `brza-workspace` que desenhou o pedido 30.
+
+1. **R39.1 — Onde fica o arquivo da imagem extraída, e por quanto tempo?** Seleção única. Opções: no temp, como o colar
+   (recomendada) — a sessão antiga reaberta dias depois mostra "Preview unavailable", como o anexo — custo: ~0,3 h; se
+   paga: agora; no app, com limpeza por idade de 30 dias — custo: ~1,5 h; se paga: na primeira sessão antiga reaberta;
+   no app, sem limpeza — custo: ~0,5 h; se paga: na sessão antiga, com o disco sem teto.
+
+   **Decidido — "No temp, como o colar (Recomendado)".**
+
+2. **R39.2 — O caminho ou a URL de imagem solto no texto vira o quê?** Seleção única. Opções: miniatura abaixo do
+   parágrafo (recomendada) — o link fica, a miniatura só se o arquivo existir, a mesma imagem uma vez por mensagem —
+   custo: ~3 h; se paga: na primeira resposta que cite um print; o clique abre o visualizador, sem miniatura — custo:
+   ~1 h; se paga: agora; fica como está — custo: zero; se paga: agora, com a parte 1 só no `![]()`.
+
+   **Decidido — "Miniatura abaixo (Recomendado)".**
+
+3. **R39.3 — A URL http(s) de imagem carrega sozinha?** Seleção única. Opções: sozinha, como hoje (recomendada) —
+   custo: zero; se paga: agora; só caminho local, a URL remota solta segue link — custo: -0,5 h; se paga: agora, sem
+   requisição de fora.
+
+   **Decidido — "Sozinha, como hoje (Recomendado)".**
+
+4. **R39.4 — Quando a ferramenta devolve mais de uma imagem, a linha mostra quantas?** Seleção única. Opções: até 4,
+   com "+N" que abre o visualizador nas demais (recomendada) — custo: ~0,3 h; se paga: na primeira chamada com várias;
+   todas — custo: ~0,1 h; só a primeira, com contador — custo: ~0,2 h.
+
+   **Decidido — "Até 4, com +N (Recomendado)".** O visualizador de hoje mostra uma imagem só
+   (`PanZoomImageDialog.tsx:64`), sem navegação: o que o "+N" abre vai à R42.
+
 ## Passos
 
 > Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com

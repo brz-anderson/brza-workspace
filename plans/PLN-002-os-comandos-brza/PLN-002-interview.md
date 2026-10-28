@@ -299,3 +299,31 @@ Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
    - dividir o P5. Custo: uma sessão a mais. Se paga: se o C2 precisar de outro dia.
 
    **Decidido — aceitar como está.** É o aceite do plano, em 2026-10-28.
+
+### Rodada 8 — o `--dmg` e a substituição do app, no P5 (enviada 2026-10-28)
+
+**Apresentado antes:**
+- **O `--dmg` e o worktree temporário:** o D5 constrói num worktree que sai no fim (R3.3), e o `.dmg` iria junto. O
+  fluxo manual era `build:mac --dmg`, `ditto` e `rm -rf dist`
+  (`work/issues/os-comandos-brza-que-viram-o-pln-002.md:41`): o dmg nascia e se jogava fora.
+- **O `ditto` sobre um `.app` que existe mescla:** o arquivo que saiu da versão nova fica no pacote e quebra o selo da
+  assinatura ad hoc. A primeira instalação foi num destino vazio
+  (`work/worklogs/2026-10-27-brza-studio-convive-com-o-orca.md:97-99`).
+
+Respondida em 2026-10-28, na sessão `pln-002-p5`.
+
+1. **Com o build no worktree temporário, para onde vai o `.dmg` do `--dmg`?** Opções:
+   - `~/Downloads`, com o caminho impresso (recomendada). Custo: ~470 MB por build com `--dmg`. Se paga: na primeira vez
+     que o build for entregue a alguém;
+   - só com `--from`, e o `--dmg` sem ele é uso errado. Custo: o dmg da `origin/master` pede um checkout limpo à mão. Se
+     paga: agora, se o dmg quase nunca for usado;
+   - no diretório atual. Custo: cai onde a sessão estiver. Se paga: nunca, comparado a `~/Downloads`.
+
+   **Decidido — `~/Downloads`.**
+
+2. **Como o app novo substitui o que está em `/Applications`?** Opções:
+   - apaga o antigo e copia com `ditto`; o `ditto` que falha deixa o worktree e imprime o comando a repetir
+     (recomendada). Custo: segundos sem app instalado. Se paga: no primeiro build que tirar um arquivo do pacote;
+   - `ditto` por cima, mesclando. Custo: o arquivo que saiu fica e quebra a assinatura. Se paga: nunca.
+
+   **Decidido — apaga e copia.**

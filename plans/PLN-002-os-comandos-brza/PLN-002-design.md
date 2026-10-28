@@ -162,17 +162,24 @@ brza test [<worktree>] [--no-baseline] [-- <caminhos de teste>]
 
 ## D5 — O `brza app install` — `scripts/brza/brza-app` (P5)
 
-- **Origem:** R3.2, R3.3; a reinstalação e a troca dos textos vêm do P0.
+- **Origem:** R3.2, R3.3, R8.1, R8.2; a reinstalação e a troca dos textos vêm do P0.
 - **Contexto:** a instalação foi feita à mão, e o despacho do P0 só chega ao app instalado por ela.
 
 #### Como fica
 
 ```text
 brza app install [--from <checkout>] [--dmg] [--yes] [--clean]
-    constrói o app de um worktree temporário da origin/master (ou de --from), com pnpm build:mac [--dmg], e copia
-    dist/mac-arm64/BrzA Studio.app para /Applications com ditto. Pergunta antes de sobrescrever; com o app aberto,
-    recusa (saída 2) sem --yes. --clean apaga o dist depois. O worktree temporário sai no fim.
+    constrói o app de um worktree temporário da origin/master (ou de --from), com pnpm build:mac [--dmg], apaga o
+    /Applications/BrzA Studio.app antigo e copia dist/mac-arm64/BrzA Studio.app no lugar com ditto. Pergunta antes de
+    substituir; com o app aberto, recusa (saída 2) sem --yes. --dmg copia o .dmg para ~/Downloads. --clean apaga o
+    dist depois. O worktree temporário sai no fim; só o ditto que falha o deixa, com o ditto a repetir.
 ```
+
+- **O `.dmg` vai para `~/Downloads`** (R8.1), porque o worktree temporário sai com ele.
+- **Apaga e copia, e não `ditto` por cima** (R8.2): o `ditto` mescla, e o arquivo que saiu da versão nova quebraria a
+  assinatura ad hoc.
+- **O app aberto** é todo processo de `/Applications/BrzA Studio.app/Contents/`, menos o comando e os pais dele, porque
+  o `brza app install` digitado no app chega ao script por um processo do app.
 
 - **A conferência do P0**, depois da primeira instalação: `brza sessions --help` responde do chat e do terminal.
 - **A troca dos textos:** `brza-install`/`brza-run` viram `brza install`/`brza run` na ajuda dos scripts e no

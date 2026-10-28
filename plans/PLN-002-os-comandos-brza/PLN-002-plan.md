@@ -3,10 +3,10 @@ status: in_progress
 phase: execution
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: sim — o P3 ao P6, em paralelo; o P7 espera a sessão da 2d, reaberta por Anderson
+ready: sim — o C2 do P5, com Anderson, e a troca dos textos; o P7 espera a sessão da 2d, reaberta por Anderson
 estimate_h: 18
-executed_h: 1.5
-remaining_h: 7.5
+executed_h: 2.0
+remaining_h: 5.5
 scope:
   - workspace
   - brza-studio
@@ -20,7 +20,9 @@ tags:
 
 - **Retomar:** o P0 ao P3 e o P6 estão feitos: o `brza dev` em `brza-workspace@310e12d`, com o C1 passado, e o
   `brza note` em `brza-workspace@bafce7e`, cujo esqueleto do worklog ainda não acha o nome da sessão (X3). O `brza test`
-  está em `brza-workspace@51eef6e` (P4). O P5 segue na sessão `pln-002-p5`, e o worktree de código sai do `brza-tree <nome>`. O P7 espera a 2d.
+  está em `brza-workspace@51eef6e` (P4). O `brza app install` está em `brza-workspace@1339793`, e o P5 parou no
+  P5.4 pelo reinício do app: falta o C2, com Anderson fora do app, e depois a troca dos textos do P5.5, na sessão
+  `pln-002-p5`. O P7 espera a 2d.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -203,18 +205,24 @@ Estimado: 2,5 h · Executado: 0,5 h
 
 Executa D5 · executor: sessão `pln-002-p5`; a instalação, com Anderson
 
-Estimado: 2,5 h · Executado: — h
+Estimado: 2,5 h · Executado: 0,5 h
 
-- [ ] **1. Testes que falham:** a pergunta antes do `ditto`; a recusa com o app aberto sem `--yes` (saída 2); o build no
+- [x] **1. Testes que falham:** a pergunta antes do `ditto`; a recusa com o app aberto sem `--yes` (saída 2); o build no
   worktree temporário, ou no `--from`; o `--clean`; o worktree temporário sai mesmo com o build falhando.
-- [ ] **2. Implementar** `scripts/brza/brza-app`, com o subcomando `install`.
-- [ ] **3. Rodar e ver passar.**
+- [x] **2. Implementar** `scripts/brza/brza-app`, com o subcomando `install`. Ver R8, X7 e X8.
+- [x] **3. Rodar e ver passar.**
 - [ ] **4. Primeiro uso, com Anderson:** o C2. O `brza app install` roda de um terminal fora do app, com o app fechado.
 - [ ] **5. A troca dos textos:** `brza-install`/`brza-run` por `brza install`/`brza run` na ajuda dos scripts e no
   `CLAUDE.md:33`.
-- [ ] **6. Commit** — `feat(brza): brza app install (PLN-002/P5)`.
+- [ ] **6. Commit** — `feat(brza): brza app install (PLN-002/P5)`. O script e o teste já subiram nele; a troca dos
+  textos vai noutro commit (X9).
 
-**Evidência:** —
+**Evidência:** `brza-workspace@1339793`, com push na `master`, do P5.1 ao P5.3.
+- `python3 -m unittest discover -s scripts/brza/tests` → `Ran 111 tests … OK`, com o P3, o P4 e o P6 commitados. O
+  `test_brza_app.py` traz 15 casos; sem o `rmtree` antes do `ditto`, ou sem a recusa com o app aberto, um deles falha.
+- `scripts/brza/brza-app install`, de dentro do chat → `recusado: o BrzA Studio.app está aberto (pid …)`, saída 2, sem
+  build.
+- O link `~/.local/bin/brza-app` está `ok`, ligado só ele, pelo `link_command`.
 
 ### P6 — O `brza note`
 
@@ -296,6 +304,14 @@ Estimado: 2 h · Executado: — h
 - **X6 — O baseline compara teste a teste, e não arquivo a arquivo.** O D4 diz "roda nele só os arquivos que
   falharam"; ele roda os arquivos, mas a falha nova num arquivo que já falhava na master por outro teste seria lida como
   antiga. O arquivo que não carrega conta como uma falha do arquivo inteiro. Afeta o P4 e o D4.
+- **X7 — O worktree temporário do `brza app install` mora no temp do sistema e sai com `git worktree remove --force`.**
+  O D1 descreve o `worktree_remove` sem `--force`; o build pode deixar arquivo rastreado alterado, que ele recusaria,
+  e o worktree é só do comando. Fora de `.worktrees/`, ele não aparece no `brza tree --list`. Afeta o P5 e o D5.
+- **X8 — O `--clean` sem `--from` é aceito e não faz nada a mais.** O `dist` do worktree temporário sai com ele. Afeta
+  o P5 e o D5.
+- **X9 — O P5 commitou o script antes do C2 e da troca dos textos.** Anderson pediu o reinício do app: "avise as
+  sessões pra pararem no primeiro ponto de commit e registrarem no plano, vamos reiniciar". O P5.6 sai em dois
+  commits, o `1339793` e o da troca dos textos. Afeta o P5.
 
 ## Casos manuais
 
@@ -308,6 +324,9 @@ Estimado: 2 h · Executado: — h
 
 ## Worklogs
 
+- 2026-10-28 — P5.1 ao P5.3, o `brza app install`, em `brza-workspace@1339793`; R8 no `--dmg` e na substituição, X7 ao
+  X9. Parou no C2 pelo reinício do app.
+  [O PLN-002/P5: o brza app install](../../work/worklogs/2026-10-28-pln-002-p5-o-brza-app-install.md)
 - 2026-10-28 — P4, o `brza test`, em `brza-workspace@51eef6e`; X5 no preparo do vitest, X6 no baseline por teste.
   Nada travou; o `check:changed` segue vermelho pela pendência do import boundaries.
   [O PLN-002/P4: o brza test](../../work/worklogs/2026-10-28-pln-002-p4-o-brza-test.md)

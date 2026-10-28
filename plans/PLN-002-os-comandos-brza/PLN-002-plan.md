@@ -1,9 +1,9 @@
 ---
-status: open
-phase: design
+status: in_progress
+phase: execution
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: não — aguarda a R7, com os pontos do desenho e o corte dos passos
+ready: sim — o P1; o P7 espera a sessão da 2d, reaberta por Anderson
 estimate_h: 18
 executed_h: 0
 remaining_h: 18
@@ -18,8 +18,8 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** o desenho e os passos estão escritos, e falta a R7, com os pontos sem lastro do desenho e o corte. O P0, o
-  despacho, está feito em `brza-studio@9a81e65c852`. Depois do aceite, o P1 abre numa sessão `pln-002-p1`.
+- **Retomar:** o plano foi aceito na R7.4, em 2026-10-28. O P0 está feito (`brza-studio@9a81e65c852`, na
+  `origin/master`). O próximo é o P1, numa sessão `pln-002-p1` que Anderson abre a pedido; o P7 espera a 2d.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -193,7 +193,7 @@ Estimado: 2 h · Executado: — h
 
 - [ ] **1. Testes que falham:** o esqueleto de worklog e de issue, num `work/` temporário, e a recusa do que existe; o
   `commit` que para no erro do checador, o `git add` só dos caminhos dados (com outro arquivo sujo ao lado) e o
-  `pull --rebase`.
+  `pull --rebase`, o push e o `--no-push`.
 - [ ] **2. Implementar** `scripts/brza/brza-note`.
 - [ ] **3. Rodar e ver passar**, e o primeiro uso real: o worklog da própria sessão sai do `brza note new`.
 - [ ] **4. Ligar e commit** — pelo próprio `brza note commit`.
@@ -222,8 +222,8 @@ Executa D8 · executor: sessão `pln-002-p8`
 
 Estimado: 2 h · Executado: — h
 
-- [ ] **1. Testes que falham:** cada erro e cada aviso do D8, com o ambiente e o `rpc` trocados; a saída 1 com erro e 0
-  sem.
+- [ ] **1. Testes que falham:** cada erro e cada aviso do D8, inclusive o do app velho, com o ambiente e o `rpc`
+  trocados; a saída 1 com erro e 0 sem.
 - [ ] **2. Implementar** `scripts/brza/brza-doctor`, com o `link_state` do `brza-install`.
 - [ ] **3. Rodar e ver passar**, e o C4 com Anderson.
 - [ ] **4. Ligar e commit** — `feat(brza): brza doctor (PLN-002/P8)`.
@@ -250,7 +250,8 @@ Estimado: 2 h · Executado: — h
 - 2026-10-28 — P0, o despacho, feito pela `brza-cli-subcomandos` em `brza-studio@9a81e65c852`. A reinstalação e a troca
   dos textos ficam para o `brza app install`.
   [O CLI brza despacha o subcomando desconhecido ao brza-X do PATH](../../work/worklogs/2026-10-28-o-cli-brza-despacha-ao-brza-x-do-path.md)
-- 2026-10-28 — aberto; o Terreno foi levantado, a R1 a R6 fecharam, e o D1 a D8 e o P1 a P8 foram escritos.
+- 2026-10-28 — aberto; o Terreno foi levantado, a R1 a R7 fecharam, o D1 a D8 e o P1 a P8 foram escritos, e o plano foi
+  aceito na R7.4.
   [O PLN-002 escrito: os comandos brza, com as rodadas de desenho](../../work/worklogs/2026-10-28-pln-002-comandos-brza.md)
 
 ## Fechamento

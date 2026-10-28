@@ -51,7 +51,7 @@ de cada uma, no [PLN-002 — Entrevista](PLN-002-interview.md).
 
 ## D1 — A base comum — `scripts/brza/brza_runtime.py`, `scripts/brza/brza-install` (P1)
 
-- **Origem:** R3.4, R4.1, R6.1; a autoligação e o PATH vêm da `brza-cli-subcomandos`, no P0.
+- **Origem:** R3.4, R4.1, R6.1, R7.1; a autoligação e o PATH vêm da `brza-cli-subcomandos`, no P0.
 - **Contexto:** o `sessions send`, o `tree`, o `test` e o `app install` precisam do mesmo envio e do mesmo worktree, e
   sete scripts novos não cabem em sete flags.
 
@@ -97,7 +97,7 @@ O primeiro `--all` roda com o caminho inteiro, `scripts/brza/brza-install --all`
 
 ## D2 — O `brza tree` — `scripts/brza/brza-tree` (P2)
 
-- **Origem:** R1.1 a R1.4, R5.1.
+- **Origem:** R1.1 a R1.4, R5.1, R7.1.
 - **Contexto:** 9 worktrees em 2 dias, o node_modules por symlink que derrubou o checkout principal e dois órfãos em
   disco.
 
@@ -121,7 +121,7 @@ brza tree --list
 
 ## D3 — O `brza dev` — `scripts/brza/brza-dev` (P3)
 
-- **Origem:** R2.1 a R2.3.
+- **Origem:** R2.1 a R2.3, R7.1.
 - **Contexto:** o dev build foi subido e encerrado à mão 4 ou mais vezes, e há 6 conferências pendentes no PLN-001.
 
 #### Como fica
@@ -142,7 +142,7 @@ brza dev --status [<worktree>]
 
 ## D4 — O `brza test` — `scripts/brza/brza-test` (P4)
 
-- **Origem:** R2.4, R3.1.
+- **Origem:** R2.4, R3.1, R7.3.
 - **Contexto:** o baseline foi refeito à mão 3 vezes, e o `--base` foi esquecido.
 
 #### Como fica
@@ -180,7 +180,7 @@ brza app install [--from <checkout>] [--dmg] [--yes] [--clean]
 
 ## D6 — O `brza note` — `scripts/brza/brza-note` (P6)
 
-- **Origem:** R4.3.
+- **Origem:** R4.3, R7.2.
 - **Contexto:** 10 commits de worklog e 3 issues em 2 dias, com o esqueleto e o commit feitos à mão.
 
 #### Como fica
@@ -191,7 +191,8 @@ brza note new worklog <assunto> [--scope workspace,brza-studio]
 brza note new issue <assunto> [--scope …] [--priority low|medium|high]
     cria work/issues/<assunto>.md, com status: open e opened de hoje.
 brza note commit <caminho>… -m <mensagem>
-    roda o check_notes.py (sai se há erro), git add dos caminhos, commit e git pull --rebase; o push só com --push.
+    roda o check_notes.py (sai se há erro), git add dos caminhos, commit, git pull --rebase e push na master;
+    --no-push para no commit.
 ```
 
 O esqueleto do worklog segue os de 2026-10-28 e o `work/README.md` (`:140-149`, `:297-303`):
@@ -243,7 +244,7 @@ A combinação com a 2d, no primeiro subpasso do P7, confere e fecha os dois pon
 
 ## D8 — O `brza doctor` — `scripts/brza/brza-doctor` (P8)
 
-- **Origem:** R4.2.
+- **Origem:** R4.2, R7.1.
 - **Contexto:** o `git var` foi rodado à mão 5 vezes, e a sessão aberta sem o wrapper sobe sem medição e sem aviso.
 
 #### Como fica

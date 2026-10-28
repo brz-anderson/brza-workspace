@@ -259,3 +259,43 @@ Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
    - módulo novo `brza_worktree.py`. Custo: mais um arquivo, fora do contrato. Se paga: se o runtime passar de ~200 linhas.
 
    **Decidido — no `brza_runtime.py`.**
+
+### Rodada 7 — os pontos sem lastro do desenho e o corte (enviada 2026-10-28)
+
+**Apresentado antes:** o D1 ao D8 e o P1 ao P8, gravados em `a518b8b`, e os pontos que entraram no rascunho sem fonte:
+`tree --list`, `dev --status`, o `install --all` como flag, o aviso de app velho no `doctor`, o push do `note commit`
+só com `--push` (o `AGENTS.md` manda o push direto na `master`) e a escolha dos testes do `brza test`.
+
+Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
+
+1. **Quais extras ficam?** Seleção múltipla:
+   - `tree --list` e `dev --status` (recomendada). Custo: ~30 linhas cada, no P2 e no P3. Se paga: na primeira limpeza de
+     worktrees e na primeira conferência;
+   - o aviso de app velho no `doctor` (recomendada). Custo: ~15 linhas no P8. Se paga: no primeiro esquecimento de
+     reinstalar;
+   - `install --all` virar o padrão. Custo: muda o `brza install` sem flag, que hoje mostra o estado. Se paga: nunca, se
+     mostrar continuar útil.
+
+   **Decidido — `tree --list`, `dev --status` e o aviso de app velho.** O `--all` fica flag.
+
+2. **O `note commit` faz o push?** Opções:
+   - sempre, com `--no-push` (recomendada). Custo: rede pela chave `personal` em todo commit. Se paga: agora;
+   - só com `--push`. Custo: a nota pode ficar só no local. Se paga: se houver muito commit em série, o que não se viu.
+
+   **Decidido — sempre, com `--no-push`.**
+
+3. **Quais testes o `test` escolhe sem caminho dado?** Opções:
+   - o `*.test.ts` alterado e o vizinho de cada fonte alterada, com "sem teste" para a fonte sem vizinho (recomendada).
+     Custo: ~20 linhas; teste que mora longe fica de fora. Se paga: agora;
+   - o `vitest --changed`. Custo: não se conferiu se o `run-vitest.mjs` repassa o flag. Se paga: se o P4 mostrar que
+     funciona;
+   - sempre a suíte inteira. Custo: o tempo da suíte, não medido. Se paga: antes de push, se a suíte for rápida.
+
+   **Decidido — alterados e vizinhos.**
+
+4. **O corte — P1 a P8, um por comando, 18 h — está aceito?** Opções:
+   - aceitar como está (recomendada). Custo: 8 sessões. Se paga: agora;
+   - juntar o P1 ao P2. Custo: um passo de 4 h, e o P3 ao P6 esperam mais. Se paga: uma sessão a menos;
+   - dividir o P5. Custo: uma sessão a mais. Se paga: se o C2 precisar de outro dia.
+
+   **Decidido — aceitar como está.** É o aceite do plano, em 2026-10-28.

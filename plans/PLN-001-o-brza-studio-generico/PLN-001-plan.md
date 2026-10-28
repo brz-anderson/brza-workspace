@@ -1051,6 +1051,10 @@ Executa D31 · Estimado: 2 h · Executado: — h
       sugestões aparecem, o passo fecha sem código
 - [ ] **2.** Se não, a correção do idioma ou do menu do chat, com teste; commit e push
 
+**Rodada de 2026-10-28, na sessão `pln-001-retomar`:** o subpasso 1 se confere "Agora, no instalado (Recomendado)", no
+build `de3fb921ad1`. O menu do Chromium com as sugestões do corretor já é tratado em
+`use-native-chat-context-menu.tsx:347`.
+
 **Evidência:** —
 
 #### P38 — O Markdown na caixa de texto (pedido 24)
@@ -1145,6 +1149,11 @@ ao lado do qual o item 2 punha o botão.
      não o queira mais.
 
    **Resposta — "Botão próprio na linha (Recomendado)".** O item 2 acima é o reescrito, e a estimativa de 3 h fica.
+
+**Rodada de 2026-10-28, na sessão `pln-001-retomar`:** quem executa — "Workers do Orca daqui (Recomendado)": um worker
+Codex, como o passo indica, em `.worktrees/pln-001-p40`, numa Run separada da `run_de875fc52a75`. A Run não toca o
+`NativeChatNoticeRow.tsx`, o `NativeChatInterruptedContinue.tsx` nem o `use-native-chat-account-switch.ts`, que são os
+pré-requisitos do passo e existem na `9a81e65c852`.
 
 **Evidência:** —
 
@@ -1450,6 +1459,16 @@ Executa D41 · Estimado: 0,3 h · Executado: 0,1 h
       viu o caminho `~/Projects/fixfy`, escrito como código inline e virado link pelo chat, em branco e não em azul
       ("nesse link, o texto ficou branco e não azul"); o `color: var(--chat-code-foreground)` de
       `.native-chat-markdown code` (`native-chat-markdown.css:35`) vence a cor que o `code` herdaria do link
+
+**Rodada de 2026-10-28, na sessão `pln-001-retomar`**, respondida por Anderson pelo AskUserQuestion, fora da numeração
+R para não colidir com a sessão da Run `run_de875fc52a75`:
+
+- a conferência do C8, do C9 e do P37.1, que o build instalado (`de3fb921ad1`, que contém o `f130a85e578`, o
+  `52f7051a45d` e o `9d289d2b631`) já permite: "Agora, no instalado (Recomendado)";
+- a cor do P53.4: "color: inherit (Recomendado)" — `.native-chat-markdown a code { color: inherit }` no
+  `brza-chat-link.css`, e o código mantém a borda e o fundo e segue o tom `faint` do link;
+- quem executa o P53.4 e o P40: "Workers do Orca daqui (Recomendado)" — um worker Sonnet para o P53.4, em
+  `.worktrees/pln-001-p53-4`, numa Run separada da `run_de875fc52a75`; esta sessão grava a evidência.
 
 **Evidência:** commit [`9d289d2b631`](https://github.com/brz-anderson/brza-studio/commit/9d289d2b631), na `master` do
 `brza-studio`. O `--chat-link` mora em `src/renderer/src/components/native-chat/brza-chat-link.css`, com o padrão do
@@ -1767,6 +1786,10 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C11 | `Pedido 30`: a miniatura na linha da ferramenta (P55.3) | Um `Read` de PNG, um `get_screenshot` do Figma e um print do browser | A miniatura na linha fechada de cada um, ampliando no clique | | |
 | C12 | `Pedido 30`: a miniatura do caminho ou da URL solta no texto (P56.3) | Uma resposta com um print por caminho em código inline e outra com uma URL de imagem | A miniatura abaixo do parágrafo, uma vez por mensagem, com a mensagem terminada | | |
 | C13 | `Pedido 30`: o que já existia funciona no BrzA Studio (P57.1, R36.1) | Um `![]()` local e um remoto; uma imagem colada e uma arrastada | A miniatura na mensagem enviada, e o clique amplia com pan e zoom nos quatro casos | | |
+
+O C1 e o C2 esperam a Run `run_de875fc52a75`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
+`fbff699fa58`, e a coordenadora da Run roda do app instalado. Na rodada de 2026-10-28 da sessão `pln-001-retomar`,
+Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7 e o C10.
 
 ## Fechamento
 

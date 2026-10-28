@@ -632,6 +632,23 @@ Respondida em 2026-10-28, na sessão `pln-001-p44-p50` do `brza-workspace`.
 
    **Decidido — "Lucide `file-text` (Recomendado)".**
 
+### Rodada 44 — o título e a URL da página do Confluence (enviada 2026-10-28)
+
+> **Apresentado antes**, pelo worker do P48 na Run `run_de875fc52a75`: nas transcrições reais do MCP da Atlassian, o
+> `cloudId` é UUID, e não domínio, então o site do chip sai do Jira do app (R38.3); só houve saída do
+> `createConfluenceContent` (`data.content.{id,title,webUrl}` e `baseUrl`) e do `searchConfluence` (`data.results[]`,
+> URL relativa); o `getConfluencePage` nunca foi chamado.
+
+Respondida em 2026-10-28, na sessão `pln-001-p44-p50` do `brza-workspace`.
+
+1. **R44.1 — P48: como o chip do Confluence pega o título e a URL da página?** Seleção única. Opções: leitura defensiva
+   (recomendada) — o título por `data.title` ou `data.content.title`, senão o `title` do input; a URL por
+   `baseUrl`+`webUrl`, senão `https://<site>/wiki/pages/viewpage.action?pageId=<id>` — custo: ~0,3 h no P48; se paga: na
+   primeira página aberta pelo agente; sem URL montada pelo id — custo: ~0,2 h; só o create e o search — custo: ~0,1 h.
+
+   **Decidido — "Leitura defensiva (Recomendado)".** A URL pelo id e a saída do `getConfluencePage` são suposição até a
+   conferência.
+
 ## Passos
 
 > Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com
@@ -1302,7 +1319,7 @@ Executa D39 · Estimado: 1 h · Executado: — h
 
 **Pendências:** fechadas na R38.3, na R40.2 e na R41.3: "FIX-123 — <resumo, se vier na saída>" e "<título da página>";
 o site pelo `cloudId` quando é domínio, senão pelo `siteUrl` do Jira do app, e sem nenhum o chip só copia; o chip só
-no desktop. O Confluence com o `file-text` do lucide (R43.2).
+no desktop. O Confluence com o `file-text` do lucide (R43.2), e o título e a URL da página pela leitura defensiva (R44.1).
 
 **Evidência:** —
 

@@ -31,5 +31,12 @@ O que falta, numa sessão nova aberta depois do último commit da Run no plano:
   (`mobile/src/session/native-chat/transcript/brza/`), do P43; e o `isUpdaterEnabled()` com versão de release
   (`1.4.242` e `1.4.242-local.1.abc`), do P26. Cada um vira subpasso do passo dele, e a linha da Regressão perde o
   "teste a escrever" quando o teste entra.
+- **O que a sessão `pln-001-retomar` deixou fora do frontmatter e dos Desvios**, por eles serem da Run
+  `run_de875fc52a75` (2026-10-28):
+  - o `executed_h` soma 0,75 h: 0,5 h do P53.4 e 0,25 h do P40;
+  - o `remaining_h` deixa de contar as 3 h do P40;
+  - o `ready` perde o P53.4 e o P40;
+  - os desvios propostos no P53 (o push com o import boundaries vermelho e o tom `faint` sem medição) e no P40 viram
+    `X`.
 - **O checador** (`python3 .claude/skills/notes-checker/scripts/check_notes.py`) com zero erro, e esta issue em
   `done`, com a linha de como se resolveu.

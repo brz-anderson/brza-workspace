@@ -1121,15 +1121,15 @@ o PLN-028/P8.
 
 #### P40 — O Continuar em outra conta, no aviso de limite (pedido 26)
 
-Executa D34 · Estimado: 3 h · Executado: — h
+Executa D34 · Estimado: 3 h · Executado: 0,25 h
 
 **Travado pelo P36**, de que reaproveita a troca de conta (R27.1).
 
 **Outro runtime:** Codex, indicado — botão com menu e a ordem troca → envio, com teste
 
-- [ ] **1.** Teste que falha: o Continuar só sai depois que a sessão nova sobe na conta escolhida, e nada sai se a troca
+- [x] **1.** Teste que falha: o Continuar só sai depois que a sessão nova sobe na conta escolhida, e nada sai se a troca
       falha
-- [ ] **2.** O botão próprio "Continuar em outra conta", com o menu das outras contas, na linha do limite, ao lado do
+- [x] **2.** O botão próprio "Continuar em outra conta", com o menu das outras contas, na linha do limite, ao lado do
       "Retomar automaticamente" (`NativeChatNoticeRow.tsx`, no ramo do `usageLimitAutoResume`): troca a conta pela
       troca do P36 e depois chama o `continueUsageLimit` (`NativeChatInterruptedContinue.tsx:112`), que a v1.4.242
       manteve; commit e push
@@ -1157,7 +1157,20 @@ pré-requisitos do passo e existem na `9a81e65c852`. Na mesma sessão, à pergun
 escolheu "Menu sempre, como o P36 (Recomendado)": "Continue in another account" e "Continuar em outra conta", o ícone
 `UserRound` do `NativeChatAccountPicker` e um `DropdownMenu` com as outras contas, também quando só há uma.
 
-**Evidência:** —
+**Evidência:** commit [`15b028ba23f`](https://github.com/brz-anderson/brza-studio/commit/15b028ba23f), na `master`
+do `brza-studio`, pelo worker Codex `ctx_ec0a6e1f5a6f` da Run `run_edd8afa07cbf`, com o autor conferido. O botão mora
+em `src/renderer/src/components/native-chat/brza/BrzaContinueInOtherAccount.tsx`, e o `NativeChatNoticeRow.tsx` o
+monta ao lado do "Retomar automaticamente". O `BrzaContinueInOtherAccount.test.tsx` falhava antes, pela falta do
+componente, e cobre "hides without another saved account" e "sends Continue only after switching accounts and never
+after a failed switch"; o `NativeChatNoticeRow.test.tsx` ganhou "places Continue in another account beside Resume
+automatically". `ORCA_BACKGROUND_LAUNCH=1 node config/scripts/run-vitest.mjs run --config config/vitest.config.ts
+src/renderer/src/components/native-chat/brza/BrzaContinueInOtherAccount.test.tsx
+src/renderer/src/components/native-chat/NativeChatNoticeRow.test.tsx
+src/renderer/src/components/native-chat/NativeChatInterruptedContinue.test.tsx` → 3 arquivos, 68 passed, também
+depois do rebase. `pnpm tc:web`, `check:code-quality:changed`, o ratchet do `max-lines`, o `oxlint` e o `oxfmt`
+passam; o `pnpm check:changed` só fica vermelho no import boundaries, preexistente, em
+[O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md).
+Executado 0,25 h, contra 3 h estimadas. Falta o C14 com Anderson.
 
 #### P41 — O Retomar automaticamente, no aviso de limite (pedido 26)
 
@@ -1804,10 +1817,11 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C11 | `Pedido 30`: a miniatura na linha da ferramenta (P55.3) | Um `Read` de PNG, um `get_screenshot` do Figma e um print do browser | A miniatura na linha fechada de cada um, ampliando no clique | | |
 | C12 | `Pedido 30`: a miniatura do caminho ou da URL solta no texto (P56.3) | Uma resposta com um print por caminho em código inline e outra com uma URL de imagem | A miniatura abaixo do parágrafo, uma vez por mensagem, com a mensagem terminada | | |
 | C13 | `Pedido 30`: o que já existia funciona no BrzA Studio (P57.1, R36.1) | Um `![]()` local e um remoto; uma imagem colada e uma arrastada | A miniatura na mensagem enviada, e o clique amplia com pan e zoom nos quatro casos | | |
+| C14 | `Pedido 26`: o Continuar em outra conta no aviso de limite (P40) | No aviso "Claude atingiu seu limite de sessão", abrir o "Continuar em outra conta" e escolher a outra conta | O menu com as outras contas, também com uma só; a troca, o divisor "Conta trocada - <conta>" e só então o Continuar | | |
 
 O C1 e o C2 esperam a Run `run_de875fc52a75`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na rodada de 2026-10-28 da sessão `pln-001-retomar`,
-Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7 e o C10.
+Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14.
 
 ## Fechamento
 

@@ -1,9 +1,12 @@
 ---
 status: open
-phase: interview
+phase: design
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: não — faltam as rodadas dos pontos de desenho da issue
+ready: não — aguarda a R7, com os pontos do desenho e o corte dos passos
+estimate_h: 18
+executed_h: 0
+remaining_h: 18
 scope:
   - workspace
   - brza-studio
@@ -15,9 +18,9 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** a entrevista está em curso, na sessão `pln-002-comandos-brza`. A R1 a R4 fecharam, e as rodadas
-  seguintes cobrem o nome do `tree`, o `sessions`, o executor e o corte dos
-  passos. O P0, o despacho, está feito em `brza-studio@9a81e65c852`.
+- **Retomar:** o desenho e os passos estão escritos, e falta a R7, com os pontos sem lastro do desenho e o corte. O P0, o
+  despacho, está feito em `brza-studio@9a81e65c852`. Depois do aceite, o P1 abre numa sessão `pln-002-p1`.
+- **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
 
@@ -29,212 +32,230 @@ tags:
 comando, com as rodadas dos pontos de desenho listados na issue." — Anderson, na sessão `pln-002-comandos-brza`, em
 2026-10-28.
 
-## Entrevista
+Os itens da issue, numerados para a Cobertura:
 
-### Rodada 1 — o `brza tree` (enviada 2026-10-28)
+0. o despacho `brza X` → `brza-X`, passo 0 ("Sim, passo 0 do PLN-002 (Recomendado)");
+1. `brza tree <nome>` / `--rm`;
+2. `brza dev` / `--stop`;
+3. `brza test`;
+4. `brza doctor`;
+5. `brza sessions list|send|close`;
+6. `brza note new|commit`;
+7. `brza app install`.
 
-**Apresentado antes:**
-- **O P0:** o despacho `brza X` → `brza-X` é feito pela `brza-cli-subcomandos`, fora desta sessão. O checkout principal
-  do `brza-studio` está sujo e com a `master` local atrás da `origin/master` (`7e9e0d18948` contra `d7f4e5b5618`).
-- **Os worktrees de hoje:** ficam todos em `.worktrees/`. As branches nasceram de `origin/master`, pelo reflog de
-  `feat/pln-001-p48` e `feat/pln-001-p44-p47`.
-- **O `brza-sessions --checkout`:** só abre o chat (`scripts/brza/brza-sessions:115,135`).
-- **O conserto do node_modules:** foi `pnpm install --offline --frozen-lockfile` no próprio worktree, em menos de 1 s
-  ([o worklog do ▶ e do ⤢](../../work/worklogs/2026-10-27-o-executar-e-o-expandir-do-orca-fixfy-no-chat.md), linhas
-  48-52).
-- **Os órfãos:**
-  - o `conferencia-p52-p53` é worktree registrado, em detached HEAD;
-  - o `chat-markdown-largura-e-links` é só um diretório com `.cache/`, sem registro.
-- **A regra "na `origin/master`":** deixaria o `--rm` apagar as branches sem commit próprio, como `feat/pln-001-p44-p47`
-  e `feat/pln-001-p48`.
+### Cobertura
 
-Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
+| Origem     | Critério de aceite                                                                                           | Passo | Teste (nível)                                         |
+| :--------- | :----------------------------------------------------------------------------------------------------------- | :---- | :---------------------------------------------------- |
+| `Pedido 0` | `brza <sub>` desconhecido executa o `brza-<sub>` do PATH                                                     | P0    | teste do `brza-studio` (unidade); C2 (manual)         |
+| R3.4, R6.1 | o runtime tem o envio ao chat, o `STUDIO` e o worktree, e os 21 testes de hoje passam                        | P1    | `test_brza_runtime.py` (unidade)                      |
+| R4.1       | `brza install --all` liga todo `brza-*`, inclusive ele mesmo                                                 | P1    | `InstallTest` (unidade)                               |
+| `Pedido 1` | `brza tree x` cria `.worktrees/x` em `feat/x` da `origin/master`, com `node_modules` real                    | P2    | `test_brza_tree.py`, com repositório temporário       |
+| R1.4       | `--rm` recusa o worktree sujo, o não mergeado e a branch sem commit sem `--force`                            | P2    | `test_brza_tree.py` (unidade)                         |
+| `Pedido 2` | `brza dev` sobe o build visível do worktree e semeia o perfil vazio; `--stop` encerra só o runner vivo       | P3    | `test_brza_dev.py` (unidade); C1 (manual)             |
+| `Pedido 3` | `brza test` separa a falha nova da que já falhava na master e sempre passa `--base=origin/master`            | P4    | `test_brza_test.py` (unidade); uma corrida real       |
+| `Pedido 7` | `brza app install` constrói da `origin/master`, pergunta, recusa com o app aberto sem `--yes` e instala      | P5    | `test_brza_app.py` (unidade); C2 (manual)             |
+| `Pedido 6` | `brza note new` cria o esqueleto do gênero; `note commit` barra o erro do checador e commita por caminho     | P6    | `test_brza_note.py` (unidade)                         |
+| `Pedido 5` | `brza sessions list`, `send` e `close` acham o chat pelo nome; o `close` não usa `--resume`                  | P7    | `test_brza_sessions.py` (unidade); C3 (manual)        |
+| `Pedido 4` | `brza doctor` sai com 1 quando falta identidade, medição, link ou override, e diz o comando que conserta     | P8    | `test_brza_doctor.py` (unidade); C4 (manual)          |
 
-1. **O `tree` abre também o chat?** Opções:
-   - só cria o worktree, instala e imprime o caminho (recomendada). Custo: um segundo comando por quem abre a sessão. Se
-     paga: agora, porque o `tree` não depende do app aberto nem da interface do `sessions`;
-   - `--chat <nome>` opcional, que chama o `brza-sessions --checkout` no fim. Custo: o `tree` passa a depender do app e da
-     interface do `sessions`, a combinar com a 2d. Se paga: depois que o `list/send/close` fechar;
-   - sempre abre o chat. Custo: quem quer o worktree só para `dev`, `test` ou worker abre sessão à toa. Se paga: nunca, no
-     uso levantado.
+### Fora de escopo
 
-   **Decidido — `--chat <nome>` opcional.** O `tree` chama o `--checkout` que já existe, sem esperar o `list/send/close`.
+- **O `ship`, o `fanout` e o status da Run.** Ficaram fora nas rodadas da `brza-comandos-lacunas`, como diz a
+  [issue de origem](../../work/issues/os-comandos-brza-que-viram-o-pln-002.md).
+- **Os scripts da Fixfy.** Já têm gatilho em
+  [Os scripts de orquestração da Fixfy que ficaram fora do port para o BrzA](../../work/issues/scripts-da-fixfy-fora-do-port-para-o-brza.md).
+- **Dois dev builds no mesmo worktree.** R2.2.
+- **Apagar os dois órfãos de hoje.** O `conferencia-p52-p53` pode servir às conferências pendentes do PLN-001; o
+  `brza tree --list` os mostra, e quem remove é Anderson.
 
-2. **De que base sai a branch?** Opções:
-   - `git fetch origin` e a branch de `origin/master`, com `--base <ref>` opcional (recomendada). Custo: um fetch pela
-     chave `personal` por chamada. Se paga: agora, porque a `master` local está atrás;
-   - `origin/master` sem fetch. Custo: pode sair de base velha sem avisar. Se paga: só offline;
-   - o `HEAD` do checkout principal. Custo: herda o checkout sujo e atrasado. Se paga: nunca, para trabalho de plano.
+## Restrições
 
-   **Decidido — fetch e `origin/master`, com `--base <ref>`.**
+- **O contrato do runtime só cresce.** Nenhum nome de hoje do `brza_runtime.py` muda, e os testes de
+  `scripts/brza/tests` seguem passando (o aviso da `brza-workspace-80`, na issue).
+- **O checkout principal do `brza-studio` não é tocado.** O que precisa de código parte de worktree da `origin/master`
+  (R1.2, R2.4, R3.3).
+- **O `close` não reabre.** Nada de `--resume` nem "restart" (`AGENTS.md`, "Uma tarefa, uma sessão, um worklog").
 
-3. **Como instala sem o node_modules por symlink?** Opções:
-   - `pnpm install --offline --frozen-lockfile` dentro do worktree, com falha clara que diz o comando online
-     (recomendada). Custo: menos de 1 s; falha quando há dependência nova. Se paga: agora;
-   - offline e depois online, sozinho. Custo: rede e minutos no pior caso, sem aviso. Se paga: quando o offline falhar na
-     prática, o que não se mediu;
-   - não instalar. Custo: o `verifyDepsBeforeRun` já derrubou o checkout principal uma vez. Se paga: nunca.
+## Pré-requisitos
 
-   **Decidido — offline, com falha clara.**
+- **P0 na `origin/master`:** `git -C ~/Projects/brza-studio merge-base --is-ancestor 9a81e65c852 origin/master` sai 0.
+  Sem isso, os scripts rodam pelo nome `brza-<sub>`, e o P5 espera.
+- **O P1 antes do P2 ao P8:** todos importam do runtime novo (R4.4).
+- **A 2d reaberta, para o P7:** Anderson abre a sessão da combinação (R5.2). Sem ela, o P7 espera, e os outros seguem.
 
-4. **Qual a regra do `--rm`?** Opções:
-   - remove se o `HEAD` é ancestral da `origin/master` e o worktree está limpo; pede `--force` à branch sem commit
-     próprio; trata o diretório órfão sem registro (recomendada). Custo: umas 30 linhas a mais. Se paga: no primeiro
-     `--rm`;
-   - só a regra da issue. Custo: o diretório órfão fica sem proteção, e a branch vazia passa por mergeada. Se paga: nunca,
-     porque a perda é irreversível;
-   - o `brza worktree rm` do app. Custo: não se conferiu se ele remove do disco e do git. Se paga: se o app guardar estado
-     fora do `git worktree list`, o que não se mediu.
+## Passos
 
-   **Decidido — merge, limpo e órfãos.**
+> Cada passo roda numa sessão `pln-002-pN` do `brza-workspace`, aberta por Anderson (R5.3), com commit direto na
+> `master` e `git add` por caminho. O teste de cada script carrega o script com `runpy.run_path`, como os de hoje, e o
+> que toca o git usa um repositório temporário com uma `origin` local. Comando dos testes, da raiz:
+> `python3 -m unittest discover -s scripts/brza/tests`.
 
-### Rodada 2 — o `brza dev` e o baseline do `brza test` (enviada 2026-10-28)
+### P0 — O despacho `brza X` → `brza-X`
 
-**Apresentado antes:**
-- **O seed:** o `pnpm dev:seed-profile` falha quando o perfil já tem estado (`config/scripts/dev-profile-seed.mjs:126-128`).
-- **Um build por worktree:** cada worktree tem perfil e portas próprios (`config/scripts/dev-instance-isolation.mjs:90-111`).
-  O lock de instância única é por `userData`, então dois builds no mesmo worktree colidem.
-- **O pid:** o runner grava o `runnerPid` em `out/dev-instance.json`, não o apaga ao sair, e escala de SIGTERM para
-  SIGKILL em 5 s (`config/scripts/run-electron-vite-dev.mjs:593-645`). Os dois pids em disco são de processos mortos.
-- **O baseline:** nenhuma nota registra como foi refeito.
+Executa a [issue do despacho](../../work/issues/cli-brza-manda-subcomando-desconhecido-ao-brza-x-do-path.md) · executor:
+`brza-cli-subcomandos`, fora desta sessão
 
-Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
+- [x] **1. O desvio no CLI**, com teste e a conferência de ponta a ponta com o `out/cli/index.js` novo no Electron do app
+  instalado.
+- [ ] **2. A reinstalação**, que vai ao P5, por resposta de Anderson: "No brza app install (Recomendado)".
 
-1. **O `dev` semeia o perfil por padrão?** Opções:
-   - só se o perfil do worktree está vazio, com `--no-seed` e `--reset` opcionais (recomendada). Custo: lê o perfil do
-     `brza-dev` ou do app instalado na primeira subida. Se paga: agora, porque sem seed o build abre vazio e com a
-     Interface de Chat desligada;
-   - nunca semeia. Custo: toda conferência começa configurando o app à mão. Se paga: nunca;
-   - sempre com `--reset`. Custo: perde o estado da conferência anterior. Se paga: nunca.
+**Evidência:** `brza-studio@9a81e65c852`, com push na `master`; o worklog está em `## Worklogs`. As horas estão lá, fora
+da estimativa deste plano.
 
-   **Decidido — só se o perfil está vazio.**
+### P1 — A base comum: o runtime e o `brza install --all`
 
-2. **Quantos builds por worktree, e de onde o `--stop` tira o pid?** Opções:
-   - um por worktree, com o `runnerPid` de `out/dev-instance.json`, conferido vivo e como runner antes do SIGTERM
-     (recomendada). Custo: umas 40 linhas. Se paga: agora;
-   - vários por worktree. Custo: mexer no `dev-instance-isolation.mjs` do `brza-studio`. Se paga: nenhum caso levantado
-     precisa;
-   - pid próprio em `~/.local/state`. Custo: duplica o registro do runner. Se paga: nunca.
+Executa D1 · executor: sessão `pln-002-p1`
 
-   **Decidido — um, pelo `dev-instance.json`.**
+Estimado: 1,5 h · Executado: — h
 
-3. **A janela sobe visível ou em background?** Opções:
-   - visível, com `--background` opcional, que põe `ORCA_BACKGROUND_LAUNCH=1` (recomendada). Custo: o agente que esquecer
-     o flag rouba o foco. Se paga: agora, porque as conferências são com Anderson olhando;
-   - background, com `--visible` opcional. Custo: na conferência, a janela não aparece sem o flag. Se paga: se a maioria
-     das chamadas for de agente, o que não se mediu.
+- [ ] **1. Testes que falham:** `test_brza_runtime.py` com `canonicalize`, `send_mutation`, `worktree_add` (detached e
+  com branch, num repositório temporário) e `install_offline` (com o `pnpm` trocado por um falso, que sai 1 e depois 0);
+  o `InstallTest` com o `--all` ligando um `brza-*` novo e o próprio `brza-install`.
+- [ ] **2. Implementar:** mover o `canonicalize`, o `send_mutation` e o `send_to_chat` para o runtime; o `brza-run` e o
+  `brza-sessions` importam e reexportam; os patches dos testes passam a `brza_runtime.rpc`. Somar `STUDIO`, `git`,
+  `worktree_add`, `install_offline` e `worktree_remove`. O `--all` no `brza-install`, e a ajuda nova.
+- [ ] **3. Rodar e ver passar:** `python3 -m unittest discover -s scripts/brza/tests`.
+- [ ] **4. Ligar:** `scripts/brza/brza-install --all`, e `brza install` mostra todo link `ok`.
+- [ ] **5. Commit** — `feat(brza): o runtime comum e o brza install --all (PLN-002/P1)`.
 
-   **Decidido — visível, com `--background` opcional.**
+**Evidência:** —
 
-4. **De onde o `test` tira o baseline da master?** Opções:
-   - worktree temporário da `origin/master`, pelo código do `tree`, rodando só os arquivos que falharam, removido no fim
-     (recomendada). Custo: segundos de criação e install, mais a corrida. Se paga: agora, porque não toca o checkout
-     principal;
-   - checkout principal com stash. Custo: mexe no que outras sessões usam. Se paga: nunca;
-   - sem baseline. Custo: o julgamento volta à mão. Se paga: só se o baseline ficar caro, o que não se mediu.
+### P2 — O `brza tree`
 
-   **Decidido — worktree temporário.**
+Executa D2 · executor: sessão `pln-002-p2`
 
-### Rodada 3 — o `brza test`, o `brza app install` e o `brza_runtime.py` (enviada 2026-10-28)
+Estimado: 2,5 h · Executado: — h
 
-**Apresentado antes:**
-- **O `check:changed`:** sem `--base`, ele cai em `origin/main`, que não existe no `brza-studio`
-  (`config/scripts/check-changed.mjs:48,64`).
-- **O build:** o `build:mac` grava na versão o `HEAD` de onde roda (`config/scripts/build-mac-local.mjs:22-30`). O alvo
-  padrão é `dir`.
-- **O app aberto:** o chat roda dentro do `/Applications/BrzA Studio.app`, e o `claude-brza` e os `brza-*` chamam o CLI
-  dele. Ninguém mediu o que o `ditto` faz com o app aberto.
-- **O que o P0 deixa para o `app install`:**
-  - a reinstalação, com a conferência do `brza sessions --help` no chat e no terminal;
-  - a troca de `brza-install`/`brza-run` por `brza install`/`brza run` na ajuda dos scripts e no `CLAUDE.md`.
-- **A duplicação:** o `canonicalize` e o `send_to_chat` estão iguais em `brza-run:109-133` e `brza-sessions:82-100`.
+- [ ] **1. Testes que falham:** criar com o tipo padrão e com `--type` e `--base`; o install offline que falha mantém o
+  worktree e imprime o comando; `--rm` recusa o sujo, o não mergeado e a branch sem commit próprio sem `--force`, e
+  remove o mergeado limpo; `--rm` no órfão; `--list` marca os órfãos; `--chat` chama o `brza-sessions --checkout`.
+- [ ] **2. Implementar** `scripts/brza/brza-tree` sobre o `worktree_add` e o `install_offline`.
+- [ ] **3. Rodar e ver passar**, e uma corrida real: `brza tree pln-002-p2-prova`, conferir que o `node_modules` não é
+  link, e `brza tree --rm pln-002-p2-prova --force`.
+- [ ] **4. Ligar e commit** — `brza install --all`; `feat(brza): brza tree (PLN-002/P2)`.
 
-Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
+**Evidência:** —
 
-1. **O que o `test` roda?** Opções:
-   - os testes dos caminhos alterados contra `origin/master` e o `check:changed --base=origin/master`, sempre com a base
-     injetada (recomendada). Custo: o tempo do `check:changed`, que não se mediu. Se paga: agora, porque o `--base`
-     esquecido já quebrou a corrida;
-   - só o vitest por caminho. Custo: lint, tipos e ratchets voltam à mão. Se paga: só se o `check:changed` for lento demais.
+### P3 — O `brza dev`
 
-   **Decidido — vitest e `check:changed`.**
+Executa D3 · executor: sessão `pln-002-p3`
 
-2. **O `app install` pede confirmação antes de sobrescrever?** Opções:
-   - pergunta antes do `ditto`, recusa com o app aberto (saída 2) sem `--yes` e só apaga `dist` com `--clean`
-     (recomendada). Custo: um `--yes` a mais. Se paga: na primeira vez com sessões abertas;
-   - sem confirmação. Custo: a sessão que roda o comando pode derrubar a si mesma e às outras. Se paga: nunca;
-   - instala ao lado e troca no fim. Custo: mais 1,8 GB temporário. Se paga: se a falha no meio do `ditto` virar problema.
+Estimado: 2 h · Executado: — h
 
-   **Decidido — confirma e recusa com o app aberto.**
+- [ ] **1. Testes que falham:** o seed só no perfil vazio, e o `--no-seed` e o `--reset`; o `--background` põe o
+  `ORCA_BACKGROUND_LAUNCH=1`; recusa com build vivo; o `--stop` com pid vivo de runner, morto, e vivo de outro processo
+  (o `ps` trocado por um falso).
+- [ ] **2. Implementar** `scripts/brza/brza-dev`.
+- [ ] **3. Rodar e ver passar**, e o C1 com Anderson.
+- [ ] **4. Ligar e commit** — `feat(brza): brza dev (PLN-002/P3)`.
 
-3. **De que checkout o `app install` constrói?** Opções:
-   - um worktree da `origin/master` pelo código do `tree`, com `--from <caminho>` e `--dmg` opcionais (recomendada).
-     Custo: um worktree e um install a mais por build. Se paga: agora, porque o checkout principal está sujo;
-   - sempre do checkout principal. Custo: constrói o que estiver lá. Se paga: nunca;
-   - do diretório atual. Custo: o resultado depende de onde a sessão está. Se paga: para testar um worktree antes do
-     merge, que o `--from` também cobre.
+**Evidência:** —
 
-   **Decidido — worktree da `origin/master`.**
+### P4 — O `brza test`
 
-4. **O `canonicalize` e o `send_to_chat` vão para o `brza_runtime.py`?** Opções:
-   - sim, e o runtime ganha a constante `STUDIO`, do checkout do `brza-studio`; o contrato só cresce (recomendada). Custo:
-     ajustar os patches de `test_brza_sessions.py:62-76` e `test_brza_scripts.py:110-113`. Se paga: no primeiro
-     `sessions send`;
-   - não. Custo: três cópias do envio. Se paga: nunca;
-   - módulo novo `brza_chat.py`. Custo: mais um arquivo. Se paga: se o runtime passar de ~200 linhas (tem 77).
+Executa D4 · executor: sessão `pln-002-p4`
 
-   **Decidido — sim, com o `STUDIO`.**
+Estimado: 2,5 h · Executado: — h
 
-### Rodada 4 — o `brza-install`, o `brza doctor`, o `brza note` e a ordem (enviada 2026-10-28)
+- [ ] **1. Testes que falham:** a lista dos testes alterados e dos vizinhos; o `--base=origin/master` sempre presente;
+  os três grupos do relatório, com o vitest e o `check:changed` trocados por falsos; o worktree temporário sai mesmo
+  quando o baseline falha.
+- [ ] **2. Implementar** `scripts/brza/brza-test`.
+- [ ] **3. Rodar e ver passar**, e uma corrida real num worktree do `tree`, com o tempo do `check:changed` medido e
+  anotado no passo.
+- [ ] **4. Ligar e commit** — `feat(brza): brza test (PLN-002/P4)`.
 
-**Apresentado antes:**
-- **O `brza-install`:** liga uma lista fixa de três scripts, com uma flag por script
-  (`scripts/brza/brza-install:24-26,82-84`). A `brza-cli-subcomandos` deixou duas coisas para o PLN-002: o
-  `~/.local/bin/brza-install` não está no PATH, e ele deve ligar a si mesmo.
-- **O PATH:** o do chat é diferente do do terminal. O `brza-dev-wt` ainda não existe, e isso é normal.
-- **As notas:** não há molde de worklog nem de issue (`work/README.md:84`). O frontmatter de cada pasta está em
-  `work/README.md:140-149`, e o `## Fora do workspace`, em `:297-303`.
-- **O encadeamento:** o `dev`, o `test` e o `app install` usam o worktree do `tree`. O `doctor` confere o que os outros
-  instalam.
+**Evidência:** —
 
-Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
+### P5 — O `brza app install`, a reinstalação do P0 e a troca dos textos
 
-1. **Como o `brza-install` liga os scripts novos?** Opções:
-   - glob `brza-*` executável em `scripts/brza/`, inclusive ele mesmo, com as flags de hoje como atalho (recomendada).
-     Custo: ajustar o `InstallTest.setUp` (`test_brza_scripts.py:168-180`). Se paga: no segundo script novo;
-   - uma flag por script. Custo: sete flags novas. Se paga: nunca.
+Executa D5 · executor: sessão `pln-002-p5`; a instalação, com Anderson
 
-   **Decidido — glob `brza-*`, inclusive ele.**
+Estimado: 2,5 h · Executado: — h
 
-2. **O que o `doctor` trata como erro?** Opções:
-   - sai com 1 se falta identidade, hook de medição, link em `~/.local/bin` ou override `claude-brza`; só avisa o que
-     depende de onde roda, como o pnpm no PATH e o perfil `brza-dev` (recomendada). Custo: umas 100 linhas. Se paga:
-     agora, como portão no arranque;
-   - tudo é aviso. Custo: não serve de portão. Se paga: nunca.
+- [ ] **1. Testes que falham:** a pergunta antes do `ditto`; a recusa com o app aberto sem `--yes` (saída 2); o build no
+  worktree temporário, ou no `--from`; o `--clean`; o worktree temporário sai mesmo com o build falhando.
+- [ ] **2. Implementar** `scripts/brza/brza-app`, com o subcomando `install`.
+- [ ] **3. Rodar e ver passar.**
+- [ ] **4. Primeiro uso, com Anderson:** o C2. O `brza app install` roda de um terminal fora do app, com o app fechado.
+- [ ] **5. A troca dos textos:** `brza-install`/`brza-run` por `brza install`/`brza run` na ajuda dos scripts e no
+  `CLAUDE.md:33`.
+- [ ] **6. Commit** — `feat(brza): brza app install (PLN-002/P5)`.
 
-   **Decidido — erro no essencial.**
+**Evidência:** —
 
-3. **O que o `note` faz?** Opções:
-   - `note new <issue|worklog> <assunto>` gera o esqueleto; `note commit <caminho…> -m` roda o `check_notes.py`, `git add`
-     por caminho, commit e `pull --rebase` (recomendada). Custo: o texto do esqueleto é escolha nova, que vai ao Desenho.
-     Se paga: agora;
-   - só `commit`. Custo: o esqueleto segue à mão. Se paga: se o esqueleto variar demais, o que não se viu.
+### P6 — O `brza note`
 
-   **Decidido — `new` e `commit`.**
+Executa D6 · executor: sessão `pln-002-p6`
 
-4. **Em que ordem os passos rodam?** Opções:
-   - primeiro o runtime e o `brza-install` por glob; depois o `tree`; depois `dev`, `test`, `app install` e `note` em
-     paralelo; o `sessions` quando a combinação com a 2d fechar; o `doctor` por último (recomendada). Custo: dois passos em
-     série antes do resto. Se paga: agora, porque evita conflito no `brza_runtime.py` e no `brza-install`;
-   - todos em série. Custo: o tempo total soma os sete. Se paga: se só uma sessão executar;
-   - todos em paralelo. Custo: conflito nos dois arquivos comuns. Se paga: nunca.
+Estimado: 2 h · Executado: — h
 
-   **Decidido — base, `tree`, paralelo, `doctor`.**
+- [ ] **1. Testes que falham:** o esqueleto de worklog e de issue, num `work/` temporário, e a recusa do que existe; o
+  `commit` que para no erro do checador, o `git add` só dos caminhos dados (com outro arquivo sujo ao lado) e o
+  `pull --rebase`.
+- [ ] **2. Implementar** `scripts/brza/brza-note`.
+- [ ] **3. Rodar e ver passar**, e o primeiro uso real: o worklog da própria sessão sai do `brza note new`.
+- [ ] **4. Ligar e commit** — pelo próprio `brza note commit`.
+
+**Evidência:** —
+
+### P7 — O `brza sessions list|send|close`
+
+Executa D7 · executor: a sessão da 2d, reaberta por Anderson (R5.2)
+
+Estimado: 3 h · Executado: — h
+
+- [ ] **1. A combinação:** a 2d confere os dois pontos em aberto do D7 — o título da aba e o `reason: 'user'` vindo de
+  script — e ajusta o D7. Uma divergência da proposta volta à Entrevista antes do código.
+- [ ] **2. Testes que falham:** `list` sobre um `session.tabs.listAll` falso; `send` pelo nome; `close` pelo nome, sem
+  `--resume`; nome ausente e nome repetido.
+- [ ] **3. Implementar** no `scripts/brza/brza-sessions`, mantendo o `open` de hoje.
+- [ ] **4. Rodar e ver passar**, e o C3 com Anderson.
+- [ ] **5. Commit** — `feat(brza): brza sessions list, send e close (PLN-002/P7)`.
+
+**Evidência:** —
+
+### P8 — O `brza doctor`
+
+Executa D8 · executor: sessão `pln-002-p8`
+
+Estimado: 2 h · Executado: — h
+
+- [ ] **1. Testes que falham:** cada erro e cada aviso do D8, com o ambiente e o `rpc` trocados; a saída 1 com erro e 0
+  sem.
+- [ ] **2. Implementar** `scripts/brza/brza-doctor`, com o `link_state` do `brza-install`.
+- [ ] **3. Rodar e ver passar**, e o C4 com Anderson.
+- [ ] **4. Ligar e commit** — `feat(brza): brza doctor (PLN-002/P8)`.
+
+**Evidência:** —
+
+## Regressão
+
+- **O `brza-run`, o `brza-sessions open` e o `brza-install --chat-command` seguem iguais.** Como se confere:
+  `python3 -m unittest discover -s scripts/brza/tests`, com os 21 testes de hoje entre os que passam, a cada passo.
+- **Os links de hoje em `~/.local/bin` seguem `ok`.** Como se confere: `brza install`, depois do P1 e de cada passo.
+
+## Casos manuais
+
+| ID  | Critério                                         | Passos                                                                                       | Esperado                                                        | Observado | Veredito |
+| :-- | :----------------------------------------------- | :------------------------------------------------------------------------------------------- | :-------------------------------------------------------------- | :-------- | :------- |
+| C1  | `Pedido 2`: o dev build sobe e para pelo `brza`  | `brza tree c1-prova`; `brza dev` nele; usar; `brza dev --stop`                               | janela visível com o chat ligado; o `--stop` fecha e libera     |           |          |
+| C2  | `Pedido 7` e `Pedido 0`: o app reinstalado       | app fechado; num terminal, `brza-app install`; abrir o app; `brza sessions --help` no chat e no terminal | o app abre na versão nova; a ajuda do `brza-sessions` responde nos dois | |          |
+| C3  | `Pedido 5`: o `close` fecha o chat por nome      | `brza sessions open c3-prova`; `brza sessions list`; `brza sessions close c3-prova`          | o chat some da lista e da tela, sem aba órfã                    |           |          |
+| C4  | `Pedido 4`: o `doctor` no chat e no terminal     | `brza doctor` num chat do app e num terminal sem a função `claude`                           | 0 no chat; no terminal, os erros com o comando que conserta     |           |          |
 
 ## Worklogs
 
 - 2026-10-28 — P0, o despacho, feito pela `brza-cli-subcomandos` em `brza-studio@9a81e65c852`. A reinstalação e a troca
   dos textos ficam para o `brza app install`.
   [O CLI brza despacha o subcomando desconhecido ao brza-X do PATH](../../work/worklogs/2026-10-28-o-cli-brza-despacha-ao-brza-x-do-path.md)
-- 2026-10-28 — aberto; o Terreno foi levantado e a R1 fechou.
+- 2026-10-28 — aberto; o Terreno foi levantado, a R1 a R6 fecharam, e o D1 a D8 e o P1 a P8 foram escritos.
   [O PLN-002 escrito: os comandos brza, com as rodadas de desenho](../../work/worklogs/2026-10-28-pln-002-comandos-brza.md)
+
+## Fechamento
+
+- [ ] Todo passo `[x]` com evidência, ou `[-]` com motivo.
+- [ ] Todo achado com destino que existe.
+- [ ] O durável saiu para a casa dona e está em `## Documentação`: a ajuda dos scripts e o `CLAUDE.md`.
+- [ ] `status: done`, `phase: closed` e `completed` no frontmatter.

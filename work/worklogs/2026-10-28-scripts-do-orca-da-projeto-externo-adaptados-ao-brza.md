@@ -45,6 +45,14 @@ O abridor, `scripts/brza/brza-sessions`, é da `brza-workspace-2d`, que o testou
 Fora do port, no PLN-001: o achado de Anderson no chat ("nesse link, o texto ficou branco e não azul") virou o P53.4,
 commit `b6cece9`.
 
+## A conferência
+
+Feita em 2026-10-28, às 01:08, num chat novo de Anderson no `brza-studio`:
+- o `git var GIT_AUTHOR_IDENT` saiu `Anderson Pereira Brzezinski <240569289+brz-anderson@users.noreply.github.com>`;
+- o `.measurements/measurements.jsonl` ganhou a linha `turn` da sessão `38818f48`, com o cwd no `brza-studio`.
+
+O chat passou pelo `claude-brza`: a medição e a identidade, que faltavam no `brza-studio`, chegaram.
+
 ## O que se aprendeu
 
 - **O chat estruturado já carrega o `settings.json` do projeto.** Ele roda o `claude` com
@@ -57,10 +65,6 @@ commit `b6cece9`.
 
 ## O que ficou aberto
 
-- **A conferência com Anderson:**
-  - abrir um chat novo num checkout do `brza-studio`;
-  - conferir que ele grava uma linha `turn` em `.measurements/` e que o `git var GIT_AUTHOR_IDENT` sai com o noreply do
-    `brz-anderson`.
 - **O `CLAUDE.md` ainda descreve a lacuna do chat como aberta**, em "A configuração chega pela função do shell". O
   texto muda com o aceite de Anderson.
 

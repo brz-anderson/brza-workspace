@@ -3,9 +3,9 @@ status: in_progress
 phase: execution
 origin: request
 ready: "sim — o P44 ao P48 e o P50, com rodada antes; o P54 ao P57 do pedido 30 depois do P44 ao P50; a conferência do P42, P49, P51, P52 e P53 com Anderson"
-estimate_h: 123.8
+estimate_h: 123.6
 executed_h: 9.85
-remaining_h: 20.7
+remaining_h: 20.5
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -539,6 +539,32 @@ Respondida em 2026-10-28, na sessão `pln-001-p44-p50` do `brza-workspace`.
 
    **Decidido — "R33.2 e R33.4, e P50 de Sonnet (Recomendado)".** Reescreve a R37.4 no P50.
 
+### Rodada 41 — o navegador no composto, a corrida de git e os chips no mobile (enviada 2026-10-28)
+
+> **Apresentado antes:** a `brzaCli` só casa fora do comando de navegador, para o globo do upstream ficar
+> (`brza-tool-categories.ts:64-65`); o ícone da corrida só sai quando todas as chamadas casam com a mesma definição
+> (`runIconName`, `:117-127`), e o GitCommit do commit (R40.1) mistura dois ícones na corrida de git; o chip é
+> componente do desktop (`NativeChatToolFileTarget.tsx`), e o título é compartilhado com o mobile.
+
+Respondida em 2026-10-28, na sessão `pln-001-p44-p50` do `brza-workspace`.
+
+1. **R41.1 — No composto com navegador (`orca browser snapshot && git status`), qual ícone vale?** Seleção única.
+   Opções: o globo do upstream (recomendada) — as categorias do BrzA só entram fora dele — custo: ~0,1 h no P44; a
+   ordem de peso da R37.1, com o navegador abaixo do git — custo: ~0,1 h.
+
+   **Decidido — "O globo do upstream (Recomendado)".**
+
+2. **R41.2 — A corrida com vários `git` e um `git commit` mostra qual ícone?** Seleção única. Opções: o logo do Git
+   (recomendada) — o GitCommit fica só na linha do commit — custo: ~0,1 h no P44; GitCommit se houver commit — custo:
+   ~0,2 h; terminal, como hoje — custo: zero.
+
+   **Decidido — "O logo do Git (Recomendado)".**
+
+3. **R41.3 — No mobile, os chips entram?** Seleção única. Opções: só o título no mobile (recomendada) — o ícone lucide e
+   o título, e os chips só no desktop, como os logos (R29.4) — custo: zero; chips no mobile também — custo: ~1 a 1,5 h.
+
+   **Decidido — "Só o título no mobile (Recomendado)".**
+
 ### Rodada 42 — a prévia de imagem: o "+N", o streaming, o corte e a ordem (enviada 2026-10-28)
 
 > **Apresentado antes:** o `PanZoomImageDialog` mostra uma imagem só (`PanZoomImageDialog.tsx:64`); o Mermaid só
@@ -573,6 +599,25 @@ Respondida em 2026-10-28, na sessão do `brza-workspace` que desenhou o pedido 3
    com ~6 h adiantadas; tudo já, em paralelo — custo: rebase provável; se paga: só com prazo apertado.
 
    **Decidido — "Depois do P44 ao P50 (Recomendado)".**
+
+### Rodada 43 — o Package ou o Hammer e o ícone do Confluence (enviada 2026-10-28)
+
+> **Apresentado antes:** a R29.2 deixou "Package ou Hammer" sem regra; o upstream só tem o logo do Jira, e o BookOpen
+> já é do Context7 (P51).
+
+Respondida em 2026-10-28, na sessão `pln-001-p44-p50` do `brza-workspace`.
+
+1. **R43.1 — P47: Package ou Hammer?** Seleção única. Opções: Package nos pacotes, Hammer no build (recomendada) —
+   `install`, `add` e `pub get` com Package, e `build`, `run build` e `flutter build` com Hammer — custo: ~0,1 h; só
+   Package — custo: zero.
+
+   **Decidido — "Package nos pacotes, Hammer no build (Recomendado)".**
+
+2. **R43.2 — P48: que ícone o Confluence ganha?** Seleção única. Opções: lucide `file-text` (recomendada), novo nas
+   tabelas de glifos do desktop e do mobile — custo: ~0,1 h; o logo do Jira nos dois — custo: zero; logo do Confluence
+   — custo: ~0,3 h e as diretrizes da Atlassian.
+
+   **Decidido — "Lucide `file-text` (Recomendado)".**
 
 ## Passos
 
@@ -1175,22 +1220,20 @@ upstream, só montagem: 16 linhas em `native-chat-tool-icon.ts`, 4 no `NativeCha
 
 #### P44 — O `git` com ícone e título próprios (pedido 27)
 
-Executa D38 · Estimado: 1 h · Executado: — h
+Executa D38 · Estimado: 2 h · Executado: — h
 
-- [ ] **1.** Teste que falha: o comando de shell que roda `git` vira uma categoria própria, lida do input pelo mesmo
-      caminho do `runsOrcaBrowserCommand` (o precedente de `orca browser …` virar a categoria `browser`), com o ícone
-      GitBranch ou GitCommit conforme o subcomando
-- [ ] **2.** O título "git commit — <mensagem>", e o hash que, no clique, abre o diff do commit no visualizador
+O estimado passou de 1 h a 2 h com o diff pelo hash (R38.1).
+
+- [ ] **1.** Teste que falha: o comando de shell vira categoria segmento a segmento, e no composto vale a de mais peso,
+      testes > gh > git > pacotes e build > `brzaCli` (R37.1), com o globo do upstream no comando de navegador (R41.1);
+      o `git` ganha o `git-logo`, e o `git commit`, o `git-commit-horizontal` (R40.1); a corrida de git leva o logo
+      (R41.2)
+- [ ] **2.** O título lê a saída (`brzaToolLineTitle(call, result)`); "git commit — <1ª linha da mensagem>", em
+      português (R40.3), e o chip do hash, lido da saída, que abre o diff do commit no visualizador por uma
+      `openCommitByHash` do BrzA (R38.1), só no desktop (R41.3)
 - [ ] **3.** Os testes; commit e push; conferir no BrzA Studio uma linha de `git commit`, com Anderson
 
-**Pendências, a perguntar a Anderson com opções:**
-
-- o comando que casa com mais de uma categoria, como `git` dentro de `&&` com um comando de pacote ou de teste: qual
-  categoria vale. A categoria `brzaCli` já está registrada no `BRZA_TOOL_CATEGORIES` (`7e9e0d18948`), com a chama
-  BrzA para quem chama o `brza` ou o `orca`, e entra nessa pergunta, como em `brza … && git commit`. Hoje vale a
-  primeira da lista que casar. O registro está em
-  [A chama do BrzA, monocromática, nas chamadas ao CLI no chat](../../work/worklogs/2026-10-28-a-chama-do-brza-nas-chamadas-ao-cli-no-chat.md);
-- o formato exato do chip e do título, se o código pedir algo diferente do que está acima.
+**Pendências:** fechadas na R37, R38, R40 e R41.
 
 **Evidência:** —
 
@@ -1203,8 +1246,8 @@ Executa D38 · Estimado: 1 h · Executado: — h
 - [ ] **2.** O título "PR #123 — <título>" e o chip que abre o PR no navegador
 - [ ] **3.** Os testes; commit e push; conferir uma linha de PR no BrzA Studio, com Anderson
 
-**Pendências, a perguntar a Anderson com opções:** o comando que casa com duas categorias (o `gh` dentro de `&&`), e o
-formato exato do chip e do título, como no P44.
+**Pendências:** fechadas na R37.1 e na R40.2: "PR #123 — <título>" e "Issue #45 — <título>", com o número pela URL
+na saída e o título pelo `--title` ou pela saída; o chip só no desktop (R41.3).
 
 **Evidência:** —
 
@@ -1217,8 +1260,8 @@ Executa D38 · Estimado: 1,5 h · Executado: — h
 - [ ] **2.** O passou/falhou contado no título a partir da saída do comando, com um teste por executor
 - [ ] **3.** Os testes; commit e push; conferir uma linha de teste passando e uma falhando no BrzA Studio, com Anderson
 
-**Pendências, a perguntar a Anderson com opções:** o comando que casa com duas categorias (`pnpm` que roda `vitest`:
-testes ou pacotes), e o formato exato do título.
+**Pendências:** fechadas na R37.2, na R38.2 e na R40.2 e R40.3: o gerenciador que roda teste é testes; "<executor> —
+12 passaram, 1 falhou" pelo rodapé, e só "passou" ou "falhou" na saída cortada.
 
 **Evidência:** —
 
@@ -1230,7 +1273,8 @@ Executa D38 · Estimado: 0,3 h · Executado: — h
       Package ou Hammer, só ícone e título, sem interação
 - [ ] **2.** Os testes; commit e push
 
-**Pendências, a perguntar a Anderson com opções:** o comando que casa com duas categorias, como no P46.
+**Pendências:** fechadas na R37: o lugar na ordem de peso e o `pnpm test` como testes. O Package ou o Hammer por
+comando, na R43.1: Package em `install`, `add` e `pub get`, e Hammer em `build`, `run build` e `flutter build`.
 
 **Evidência:** —
 
@@ -1243,8 +1287,9 @@ Executa D39 · Estimado: 1 h · Executado: — h
 - [ ] **2.** O clique no chip abre o card ou a página no navegador
 - [ ] **3.** Os testes; commit e push; conferir uma linha de cada no BrzA Studio, com Anderson
 
-**Pendências, a perguntar a Anderson com opções:** o formato exato do chip e do título, e de onde sai o endereço do
-site para o navegador.
+**Pendências:** fechadas na R38.3, na R40.2 e na R41.3: "FIX-123 — <resumo, se vier na saída>" e "<título da página>";
+o site pelo `cloudId` quando é domínio, senão pelo `siteUrl` do Jira do app, e sem nenhum o chip só copia; o chip só
+no desktop. O Confluence com o `file-text` do lucide (R43.2).
 
 **Evidência:** —
 
@@ -1266,16 +1311,16 @@ Falta conferir uma chamada real no BrzA Studio.
 
 #### P50 — O Figma com logo, nome do nó e miniatura (pedido 27)
 
-Executa D39 · Estimado: 1,5 h · Executado: — h
+Executa D39 · Estimado: 0,3 h · Executado: — h
 
-Sem a miniatura, o passo cai a ~0,3 h (R29.3).
+Sem a miniatura, que vai ao pedido 30 (R38.4), o passo cai a ~0,3 h (R29.3).
 
-- [ ] **1.** Teste que falha: a chamada MCP do Figma vira a linha com o logo, pelo componente do P43, e o nome do nó
-- [ ] **2.** A miniatura do `get_screenshot` na linha
+- [ ] **1.** Teste que falha: a chamada MCP do Figma vira a linha com o `pen-tool` (R35.1) e "Figma · <nome do nó, ou
+      o `nodeId`>", com o nome quando a saída o traz (R40.2)
+- [-] **2.** A miniatura do `get_screenshot` na linha — sai pelo pedido 30, em PLN-001/D43 e no P55 (R38.4)
 - [ ] **3.** Os testes; commit e push; conferir uma linha de Figma no BrzA Studio, com Anderson
 
-**Pendências, a perguntar a Anderson com opções:** o formato exato do chip e do título, e o tamanho e o lugar da
-miniatura na linha.
+**Pendências:** fechadas na R38.4 e na R40.2.
 
 **Evidência:** —
 

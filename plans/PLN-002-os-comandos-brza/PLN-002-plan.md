@@ -15,8 +15,8 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** a entrevista está em curso, na sessão `pln-002-comandos-brza`. A R1 e a R2 fecharam, e as rodadas
-  seguintes cobrem o `test`, o `app install`, o `brza_runtime.py`, o `brza-install`, o `doctor`, o `note` e a
+- **Retomar:** a entrevista está em curso, na sessão `pln-002-comandos-brza`. A R1, a R2 e a R3 fecharam, e as rodadas
+  seguintes cobrem o `brza-install`, o `doctor`, o `note`, o nome do `tree`, o `sessions` e a
   ordem. O P0, o despacho, está feito em `brza-studio@9a81e65c852`.
 
 ## Pedido
@@ -134,6 +134,56 @@ Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
    - sem baseline. Custo: o julgamento volta à mão. Se paga: só se o baseline ficar caro, o que não se mediu.
 
    **Decidido — worktree temporário.**
+
+### Rodada 3 — o `brza test`, o `brza app install` e o `brza_runtime.py` (enviada 2026-10-28)
+
+**Apresentado antes:**
+- **O `check:changed`:** sem `--base`, ele cai em `origin/main`, que não existe no `brza-studio`
+  (`config/scripts/check-changed.mjs:48,64`).
+- **O build:** o `build:mac` grava na versão o `HEAD` de onde roda (`config/scripts/build-mac-local.mjs:22-30`). O alvo
+  padrão é `dir`.
+- **O app aberto:** o chat roda dentro do `/Applications/BrzA Studio.app`, e o `claude-brza` e os `brza-*` chamam o CLI
+  dele. Ninguém mediu o que o `ditto` faz com o app aberto.
+- **O que o P0 deixa para o `app install`:**
+  - a reinstalação, com a conferência do `brza sessions --help` no chat e no terminal;
+  - a troca de `brza-install`/`brza-run` por `brza install`/`brza run` na ajuda dos scripts e no `CLAUDE.md`.
+- **A duplicação:** o `canonicalize` e o `send_to_chat` estão iguais em `brza-run:109-133` e `brza-sessions:82-100`.
+
+Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
+
+1. **O que o `test` roda?** Opções:
+   - os testes dos caminhos alterados contra `origin/master` e o `check:changed --base=origin/master`, sempre com a base
+     injetada (recomendada). Custo: o tempo do `check:changed`, que não se mediu. Se paga: agora, porque o `--base`
+     esquecido já quebrou a corrida;
+   - só o vitest por caminho. Custo: lint, tipos e ratchets voltam à mão. Se paga: só se o `check:changed` for lento demais.
+
+   **Decidido — vitest e `check:changed`.**
+
+2. **O `app install` pede confirmação antes de sobrescrever?** Opções:
+   - pergunta antes do `ditto`, recusa com o app aberto (saída 2) sem `--yes` e só apaga `dist` com `--clean`
+     (recomendada). Custo: um `--yes` a mais. Se paga: na primeira vez com sessões abertas;
+   - sem confirmação. Custo: a sessão que roda o comando pode derrubar a si mesma e às outras. Se paga: nunca;
+   - instala ao lado e troca no fim. Custo: mais 1,8 GB temporário. Se paga: se a falha no meio do `ditto` virar problema.
+
+   **Decidido — confirma e recusa com o app aberto.**
+
+3. **De que checkout o `app install` constrói?** Opções:
+   - um worktree da `origin/master` pelo código do `tree`, com `--from <caminho>` e `--dmg` opcionais (recomendada).
+     Custo: um worktree e um install a mais por build. Se paga: agora, porque o checkout principal está sujo;
+   - sempre do checkout principal. Custo: constrói o que estiver lá. Se paga: nunca;
+   - do diretório atual. Custo: o resultado depende de onde a sessão está. Se paga: para testar um worktree antes do
+     merge, que o `--from` também cobre.
+
+   **Decidido — worktree da `origin/master`.**
+
+4. **O `canonicalize` e o `send_to_chat` vão para o `brza_runtime.py`?** Opções:
+   - sim, e o runtime ganha a constante `STUDIO`, do checkout do `brza-studio`; o contrato só cresce (recomendada). Custo:
+     ajustar os patches de `test_brza_sessions.py:62-76` e `test_brza_scripts.py:110-113`. Se paga: no primeiro
+     `sessions send`;
+   - não. Custo: três cópias do envio. Se paga: nunca;
+   - módulo novo `brza_chat.py`. Custo: mais um arquivo. Se paga: se o runtime passar de ~200 linhas (tem 77).
+
+   **Decidido — sim, com o `STUDIO`.**
 
 ## Worklogs
 

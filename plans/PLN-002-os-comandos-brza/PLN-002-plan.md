@@ -5,8 +5,8 @@ origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
 ready: sim — o P3 ao P6, em paralelo; o P7 espera a sessão da 2d, reaberta por Anderson
 estimate_h: 18
-executed_h: 1.0
-remaining_h: 10.0
+executed_h: 1.5
+remaining_h: 7.5
 scope:
   - workspace
   - brza-studio
@@ -19,8 +19,8 @@ tags:
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
 - **Retomar:** o P0 ao P3 e o P6 estão feitos: o `brza dev` em `brza-workspace@310e12d`, com o C1 passado, e o
-  `brza note` em `brza-workspace@bafce7e`, cujo esqueleto do worklog ainda não acha o nome da sessão (X3). O P4 e o P5
-  seguem nas sessões `pln-002-pN` deles, e o worktree de código sai do `brza-tree <nome>`. O P7 espera a 2d.
+  `brza note` em `brza-workspace@bafce7e`, cujo esqueleto do worklog ainda não acha o nome da sessão (X3). O `brza test`
+  está em `brza-workspace@51eef6e` (P4). O P5 segue na sessão `pln-002-p5`, e o worktree de código sai do `brza-tree <nome>`. O P7 espera a 2d.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -178,17 +178,26 @@ Estimado: 2 h · Executado: 0,2 h
 
 Executa D4 · executor: sessão `pln-002-p4`
 
-Estimado: 2,5 h · Executado: — h
+Estimado: 2,5 h · Executado: 0,5 h
 
-- [ ] **1. Testes que falham:** a lista dos testes alterados e dos vizinhos; o `--base=origin/master` sempre presente;
+- [x] **1. Testes que falham:** a lista dos testes alterados e dos vizinhos; o `--base=origin/master` sempre presente;
   os três grupos do relatório, com o vitest e o `check:changed` trocados por falsos; o worktree temporário sai mesmo
   quando o baseline falha.
-- [ ] **2. Implementar** `scripts/brza/brza-test`.
-- [ ] **3. Rodar e ver passar**, e uma corrida real num worktree do `tree`, com o tempo do `check:changed` medido e
+- [x] **2. Implementar** `scripts/brza/brza-test`. Ver X5 e X6.
+- [x] **3. Rodar e ver passar**, e uma corrida real num worktree do `tree`, com o tempo do `check:changed` medido e
   anotado no passo.
-- [ ] **4. Ligar e commit** — `feat(brza): brza test (PLN-002/P4)`.
+- [x] **4. Ligar e commit** — `feat(brza): brza test (PLN-002/P4)`.
 
-**Evidência:** —
+**Evidência:** `brza-workspace@51eef6e`, com push na `master`.
+- `python3 -m unittest test_brza_runtime test_brza_scripts test_brza_sessions test_brza_tree test_brza_test`, em
+  `scripts/brza/tests` → `Ran 61 tests … OK`. Eram 47; o `test_brza_test.py` traz 14, num clone de uma `origin` local,
+  com o vitest e o install falsos e um `pnpm` falso no PATH.
+- A corrida real no `brza tree pln-002-p4-prova`, com a fonte `config/scripts/vitest-changed-precheck.mjs` alterada:
+  vitest de 1 arquivo em 1,6 s, "passou", e o **`check:changed` em 20,3 s**, vermelho só pelo import boundaries do
+  `external-subcommand.ts` (a pendência); total de 24,7 s. Com um caso que falha no vizinho: "falha nova", baseline
+  em 36,0 s, `check:changed` em 18,5 s, total de 58,4 s, e nenhum `brza-test-` no `git worktree list` nem no `$TMPDIR`
+  depois.
+- O `~/.local/bin/brza-test` já estava ligado pelo `--all` de outra sessão; o `brza-install` o mostra `ok`.
 
 ### P5 — O `brza app install`, a reinstalação do P0 e a troca dos textos
 
@@ -281,6 +290,13 @@ Estimado: 2 h · Executado: — h
   aberta pelo app e renomeada com `/rename`, a variável vem vazia, e o esqueleto escreve `<a escrever>`. Falta a
   fonte do nome, que está no `Retomar`. Afeta o P6 e o D6.
 
+- **X5 — O vitest roda como o `pnpm test`: antes do `run-vitest.mjs`, o build dos pacotes e o runtime nativo do node,
+  e o `check:changed` leva o `--maxWorkers=2` da norma do `brza-studio`.** O D4 cita só o `run-vitest.mjs`, que importa
+  o `@orca/process-host` construído, ausente no worktree temporário recém-criado. O contrato não muda. Afeta o P4 e o D4.
+- **X6 — O baseline compara teste a teste, e não arquivo a arquivo.** O D4 diz "roda nele só os arquivos que
+  falharam"; ele roda os arquivos, mas a falha nova num arquivo que já falhava na master por outro teste seria lida como
+  antiga. O arquivo que não carrega conta como uma falha do arquivo inteiro. Afeta o P4 e o D4.
+
 ## Casos manuais
 
 | ID  | Critério                                         | Passos                                                                                       | Esperado                                                        | Observado | Veredito |
@@ -292,6 +308,9 @@ Estimado: 2 h · Executado: — h
 
 ## Worklogs
 
+- 2026-10-28 — P4, o `brza test`, em `brza-workspace@51eef6e`; X5 no preparo do vitest, X6 no baseline por teste.
+  Nada travou; o `check:changed` segue vermelho pela pendência do import boundaries.
+  [O PLN-002/P4: o brza test](../../work/worklogs/2026-10-28-pln-002-p4-o-brza-test.md)
 - 2026-10-28 — P3, o `brza dev`, em `brza-workspace@310e12d`, com o C1 passado; X4 no seed. Nada travou.
   [O PLN-002/P3: o brza dev](../../work/worklogs/2026-10-28-pln-002-p3-o-brza-dev.md)
 - 2026-10-28 — P6, o `brza note`, em `brza-workspace@bafce7e`; X2 no commit por caminho, X3 no nome da sessão.

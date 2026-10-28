@@ -63,6 +63,7 @@ está nos passos do plano.
 - **O quê e onde:** a Run `run_1e6437039fee` do Orca, com três tarefas e três terminais de worker. **Risco:** nenhum.
   **Estado:** os três workers liberados, sem terminal pendente (`worker-list --terminal-state reclaimable` vazio).
   **Como desfazer:** nada a desfazer.
-- **O quê e onde:** a memória `comandos-em-bloco-bash.md` e o índice `MEMORY.md`, criado agora, em
+- **O quê e onde:** a memória `comandos-em-bloco-bash.md` e o índice `MEMORY.md`, em
   `~/.claude/projects/-Users-andepb-Projects-brza-workspace/memory/`: comando para Anderson vai em cerca `bash`, para o
-  ▶ do chat aparecer. **Risco:** nenhum. **Estado:** ativo. **Como desfazer:** apagar os dois arquivos.
+  ▶ do chat aparecer. **Risco:** nenhum. **Estado:** removidos na mesma sessão, porque a regra foi para o `AGENTS.md`,
+  a pedido de Anderson ("adicione na norma desse workspace"). **Como desfazer:** nada a desfazer.

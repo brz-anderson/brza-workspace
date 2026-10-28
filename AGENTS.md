@@ -7,6 +7,10 @@ feito, as decisões, a norma de agente e a configuração das sessões. O códig
 Toda prosa para quem pediu — resposta, pergunta, opção, plano, revisão, documento — é em português do Brasil, também na
 delegação a _subagente_. Identificador, comando, caminho e chave de configuração ficam na forma original.
 
+**Comando para quem pediu rodar vai em bloco cercado com a linguagem de shell** — ` ```bash `, um comando por bloco
+quando cada um roda sozinho —, nunca em cerca sem linguagem. O chat do BrzA Studio só mostra o ▶, que roda o bloco
+num terminal do worktree do chat, nas cercas `sh`, `bash`, `zsh`, `shell` e `console`.
+
 ## Planos vivem em `plans/`, e as execuções em `work/`
 
 Os planos ficam em `plans/`, uma pasta por plano, com a norma no [`plans/README.md`](plans/README.md). O resto do estado

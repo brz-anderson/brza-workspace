@@ -15,8 +15,8 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** a entrevista está em curso, na sessão `pln-002-comandos-brza`. A R1, do `tree`, fechou, e as rodadas
-  seguintes cobrem o `dev`, o `test`, o `app install`, o `brza_runtime.py`, o `brza-install`, o `doctor`, o `note` e a
+- **Retomar:** a entrevista está em curso, na sessão `pln-002-comandos-brza`. A R1 e a R2 fecharam, e as rodadas
+  seguintes cobrem o `test`, o `app install`, o `brza_runtime.py`, o `brza-install`, o `doctor`, o `note` e a
   ordem. O P0, o despacho, está feito em `brza-studio@9a81e65c852`.
 
 ## Pedido
@@ -87,6 +87,53 @@ Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
      fora do `git worktree list`, o que não se mediu.
 
    **Decidido — merge, limpo e órfãos.**
+
+### Rodada 2 — o `brza dev` e o baseline do `brza test` (enviada 2026-10-28)
+
+**Apresentado antes:**
+- **O seed:** o `pnpm dev:seed-profile` falha quando o perfil já tem estado (`config/scripts/dev-profile-seed.mjs:126-128`).
+- **Um build por worktree:** cada worktree tem perfil e portas próprios (`config/scripts/dev-instance-isolation.mjs:90-111`).
+  O lock de instância única é por `userData`, então dois builds no mesmo worktree colidem.
+- **O pid:** o runner grava o `runnerPid` em `out/dev-instance.json`, não o apaga ao sair, e escala de SIGTERM para
+  SIGKILL em 5 s (`config/scripts/run-electron-vite-dev.mjs:593-645`). Os dois pids em disco são de processos mortos.
+- **O baseline:** nenhuma nota registra como foi refeito.
+
+Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
+
+1. **O `dev` semeia o perfil por padrão?** Opções:
+   - só se o perfil do worktree está vazio, com `--no-seed` e `--reset` opcionais (recomendada). Custo: lê o perfil do
+     `brza-dev` ou do app instalado na primeira subida. Se paga: agora, porque sem seed o build abre vazio e com a
+     Interface de Chat desligada;
+   - nunca semeia. Custo: toda conferência começa configurando o app à mão. Se paga: nunca;
+   - sempre com `--reset`. Custo: perde o estado da conferência anterior. Se paga: nunca.
+
+   **Decidido — só se o perfil está vazio.**
+
+2. **Quantos builds por worktree, e de onde o `--stop` tira o pid?** Opções:
+   - um por worktree, com o `runnerPid` de `out/dev-instance.json`, conferido vivo e como runner antes do SIGTERM
+     (recomendada). Custo: umas 40 linhas. Se paga: agora;
+   - vários por worktree. Custo: mexer no `dev-instance-isolation.mjs` do `brza-studio`. Se paga: nenhum caso levantado
+     precisa;
+   - pid próprio em `~/.local/state`. Custo: duplica o registro do runner. Se paga: nunca.
+
+   **Decidido — um, pelo `dev-instance.json`.**
+
+3. **A janela sobe visível ou em background?** Opções:
+   - visível, com `--background` opcional, que põe `ORCA_BACKGROUND_LAUNCH=1` (recomendada). Custo: o agente que esquecer
+     o flag rouba o foco. Se paga: agora, porque as conferências são com Anderson olhando;
+   - background, com `--visible` opcional. Custo: na conferência, a janela não aparece sem o flag. Se paga: se a maioria
+     das chamadas for de agente, o que não se mediu.
+
+   **Decidido — visível, com `--background` opcional.**
+
+4. **De onde o `test` tira o baseline da master?** Opções:
+   - worktree temporário da `origin/master`, pelo código do `tree`, rodando só os arquivos que falharam, removido no fim
+     (recomendada). Custo: segundos de criação e install, mais a corrida. Se paga: agora, porque não toca o checkout
+     principal;
+   - checkout principal com stash. Custo: mexe no que outras sessões usam. Se paga: nunca;
+   - sem baseline. Custo: o julgamento volta à mão. Se paga: só se o baseline ficar caro, o que não se mediu.
+
+   **Decidido — worktree temporário.**
 
 ## Worklogs
 

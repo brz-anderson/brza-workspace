@@ -3,10 +3,10 @@ status: in_progress
 phase: execution
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: sim — o P1; o P7 espera a sessão da 2d, reaberta por Anderson
+ready: sim — o P2; o P7 espera a sessão da 2d, reaberta por Anderson
 estimate_h: 18
-executed_h: 0
-remaining_h: 18
+executed_h: 0.2
+remaining_h: 16.5
 scope:
   - workspace
   - brza-studio
@@ -18,8 +18,9 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** o plano foi aceito na R7.4, em 2026-10-28. O P0 está feito (`brza-studio@9a81e65c852`, na
-  `origin/master`). O próximo é o P1, numa sessão `pln-002-p1` que Anderson abre a pedido; o P7 espera a 2d.
+- **Retomar:** o P0 e o P1 estão feitos; o runtime comum está em `brza-workspace@9e95a2c`. O próximo é o P2, o
+  `brza tree`, numa sessão `pln-002-p2` que Anderson abre a pedido. Depois dele, o P3 ao P6 podem correr em paralelo
+  (R4.4), e o P7 espera a 2d.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -107,19 +108,24 @@ da estimativa deste plano.
 
 Executa D1 · executor: sessão `pln-002-p1`
 
-Estimado: 1,5 h · Executado: — h
+Estimado: 1,5 h · Executado: 0,2 h
 
-- [ ] **1. Testes que falham:** `test_brza_runtime.py` com `canonicalize`, `send_mutation`, `worktree_add` (detached e
+- [x] **1. Testes que falham:** `test_brza_runtime.py` com `canonicalize`, `send_mutation`, `worktree_add` (detached e
   com branch, num repositório temporário) e `install_offline` (com o `pnpm` trocado por um falso, que sai 1 e depois 0);
   o `InstallTest` com o `--all` ligando um `brza-*` novo e o próprio `brza-install`.
-- [ ] **2. Implementar:** mover o `canonicalize`, o `send_mutation` e o `send_to_chat` para o runtime; o `brza-run` e o
+- [x] **2. Implementar:** mover o `canonicalize`, o `send_mutation` e o `send_to_chat` para o runtime; o `brza-run` e o
   `brza-sessions` importam e reexportam; os patches dos testes passam a `brza_runtime.rpc`. Somar `STUDIO`, `git`,
-  `worktree_add`, `install_offline` e `worktree_remove`. O `--all` no `brza-install`, e a ajuda nova.
-- [ ] **3. Rodar e ver passar:** `python3 -m unittest discover -s scripts/brza/tests`.
-- [ ] **4. Ligar:** `scripts/brza/brza-install --all`, e `brza install` mostra todo link `ok`.
-- [ ] **5. Commit** — `feat(brza): o runtime comum e o brza install --all (PLN-002/P1)`.
+  `worktree_add`, `install_offline` e `worktree_remove`. O `--all` no `brza-install`, e a ajuda nova. Ver X1.
+- [x] **3. Rodar e ver passar:** `python3 -m unittest discover -s scripts/brza/tests`.
+- [x] **4. Ligar:** `scripts/brza/brza-install --all`, e `brza install` mostra todo link `ok`.
+- [x] **5. Commit** — `feat(brza): o runtime comum e o brza install --all (PLN-002/P1)`.
 
-**Evidência:** —
+**Evidência:** `brza-workspace@9e95a2c`, com push na `master`.
+- `python3 -m unittest discover -s scripts/brza/tests` → `Ran 33 tests … OK`. Eram 21, que seguem entre eles; o
+  `test_brza_runtime.py` traz 10 casos novos, e o `InstallTest` traz 2.
+- `scripts/brza/brza-install --all` ligou o `brza-install`. Pelo link, o `brza-install` mostra `claude-brza`,
+  `brza-install`, `brza-run` e `brza-sessions` como `ok`. O `brza install` ainda dá `Unknown command: install` no app
+  instalado, porque o despacho chega com o P5; por isso a ajuda segue com os nomes `brza-install`/`brza-run` até o P5.5.
 
 ### P2 — O `brza tree`
 
@@ -236,6 +242,11 @@ Estimado: 2 h · Executado: — h
   `python3 -m unittest discover -s scripts/brza/tests`, com os 21 testes de hoje entre os que passam, a cada passo.
 - **Os links de hoje em `~/.local/bin` seguem `ok`.** Como se confere: `brza install`, depois do P1 e de cada passo.
 
+## Desvios
+
+- **X1 — O `git` do runtime recebe `cwd: Path | None = None`, e não `cwd: Path = STUDIO`.** O padrão ligado na
+  definição ignora o `STUDIO` trocado no teste e o `BRZA_STUDIO` lido depois; o contrato não muda. Afeta o P1 e o D1.
+
 ## Casos manuais
 
 | ID  | Critério                                         | Passos                                                                                       | Esperado                                                        | Observado | Veredito |
@@ -247,12 +258,19 @@ Estimado: 2 h · Executado: — h
 
 ## Worklogs
 
+- 2026-10-28 — P1, o runtime comum e o `brza-install --all`, em `brza-workspace@9e95a2c`; X1 no `git`. Nada travou.
+  [O PLN-002/P1: o runtime comum e o brza-install --all](../../work/worklogs/2026-10-28-pln-002-p1-o-runtime-comum-e-o-install-all.md)
 - 2026-10-28 — P0, o despacho, feito pela `brza-cli-subcomandos` em `brza-studio@9a81e65c852`. A reinstalação e a troca
   dos textos ficam para o `brza app install`.
   [O CLI brza despacha o subcomando desconhecido ao brza-X do PATH](../../work/worklogs/2026-10-28-o-cli-brza-despacha-ao-brza-x-do-path.md)
 - 2026-10-28 — aberto; o Terreno foi levantado, a R1 a R7 fecharam, o D1 a D8 e o P1 a P8 foram escritos, e o plano foi
   aceito na R7.4.
   [O PLN-002 escrito: os comandos brza, com as rodadas de desenho](../../work/worklogs/2026-10-28-pln-002-comandos-brza.md)
+
+## Pendências conhecidas
+
+- [O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md)
+  — do P0, aberta pela sessão do PLN-001; o `spawn` direto de `node:child_process` vai ao `@orca/process-host`.
 
 ## Fechamento
 

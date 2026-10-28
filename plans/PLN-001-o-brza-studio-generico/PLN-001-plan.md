@@ -408,6 +408,48 @@ disparar os workers, faça comigo as rodadas das pendências de cada passo". Res
 
    **Decidido — "Opus no shell e no Figma (Recomendado)".**
 
+### Rodada 38 — o que pede a saída da ferramenta, o site do Jira e a miniatura do Figma (enviada 2026-10-28)
+
+> **Apresentado antes**, levantado em `brza-studio@7e9e0d18948`: o `brzaToolLineTitle(call)` só lê o input e é
+> chamado em `native-chat-tool-line-label.ts:144` sem o resultado, que já chega à função (`:69-72`), e a linha
+> re-renderiza quando ele chega (`NativeChatToolLine.tsx:96-102`); o hash do `git commit` só sai na saída; abrir o diff
+> pelo hash não existe pronto, mas há `getRuntimeGitCommitCompare` (`runtime-git-diff-client.ts:60-73`) e
+> `openCommitAllDiffs`, presos ao painel de histórico; a saída que passa de 16 KiB chega cortada na cabeça
+> (`agent-session-item-wire-form.ts:21`, `structured-agent-session-projection.ts:59`), e o rodapé do teste fica no fim;
+> no Claude não vem `exitCode`, só o `isError` (`transcript-record-blocks.ts:90-97`); o MCP da Atlassian traz `cloudId`
+> e `issueIdOrKey`, sem a URL, e o domínio que o app conhece é o `JiraSite.siteUrl` do Jira nativo
+> (`jira-types.ts:5-13`); o decoder descarta a imagem do `get_screenshot` (`transcript-record-blocks.ts:8-34`), que o
+> pedido 30 extrai para arquivo (R36.2); o nome do nó do Figma não vem no input, só o `nodeId`.
+
+Respondida em 2026-10-28, na sessão `pln-001-p44-p50` do `brza-workspace`.
+
+1. **R38.1 — P44: o hash do `git commit`, lido da saída, abre o diff do commit no visualizador?** Seleção única.
+   Opções: abre, por função nova (recomendada) — uma `openCommitByHash` do BrzA reusa o `getRuntimeGitCommitCompare` e
+   o `openCommitAllDiffs`, no worktree do chat — custo: ~1 h a mais no P44; se paga: na primeira revisão de commit do
+   agente; só mostra o hash — custo: zero agora; o clique copia o hash — custo: ~0,2 h.
+
+   **Decidido — "Abre, por função nova (Recomendado)".** O P44 passa a ~2 h.
+
+2. **R38.2 — P46: como contar passou/falhou com a saída cortada nos primeiros 16 KiB?** Seleção única. Opções: rodapé
+   se houver, senão passou/falhou (recomendada) — conta pelo rodapé quando ele está na parte que chegou, e na saída
+   cortada mostra só o estado, pelo `isError` ou `exitCode` — custo: ~0,3 h, dentro do P46; busca o resto da saída pelo
+   `fullOutputItemId` — custo: ~1,5 h a mais e uma leitura por linha cortada; só passou/falhou — custo: ~0,1 h.
+
+   **Decidido — "Rodapé se houver, senão passou/falhou (Recomendado)".**
+
+3. **R38.3 — P48: de onde sai o endereço do site para o chip do Jira e do Confluence?** Seleção única. Opções: `cloudId`,
+   senão o Jira do app (recomendada) — o `cloudId` quando é domínio, senão o `siteUrl` da conexão nativa do Jira, e sem
+   nenhum o chip só copia a chave — custo: ~0,5 h, dentro do P48; configuração nova — custo: ~1 h e uma tela; o chip
+   só copia — custo: ~0,1 h.
+
+   **Decidido — "cloudId, senão o Jira do app (Recomendado)".**
+
+4. **R38.4 — P50: e a miniatura do `get_screenshot`?** Seleção única. Opções: fica para o pedido 30 (recomendada) — o
+   P50 entrega o `pen-tool` e o título, cai a ~0,3 h, e o P50.2 vira `[-]` com o link para o pedido 30 — custo: zero;
+   o P50 espera o pedido 30; o P50 faz a extração — custo: ~4 a 5 h, em conflito com o desenho do pedido 30.
+
+   **Decidido — "Fica para o pedido 30 (Recomendado)".**
+
 ## Passos
 
 > Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com

@@ -5,8 +5,8 @@ origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
 ready: sim — o P3 ao P6, em paralelo; o P7 espera a sessão da 2d, reaberta por Anderson
 estimate_h: 18
-executed_h: 0.4
-remaining_h: 14.0
+executed_h: 0.8
+remaining_h: 12.0
 scope:
   - workspace
   - brza-studio
@@ -21,6 +21,8 @@ tags:
 - **Retomar:** o P0, o P1 e o P2 estão feitos; o `brza tree` está em `brza-workspace@2ac6638`. O P3 ao P6 podem
   correr em paralelo (R4.4), cada um numa sessão `pln-002-pN` que Anderson abre a pedido, e o worktree de código sai do
   `brza-tree <nome>`. O P7 espera a 2d.
+  O P6, o `brza note`, está feito em `brza-workspace@bafce7e`; o esqueleto do worklog ainda não acha o nome da
+  sessão (X3).
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -203,16 +205,24 @@ Estimado: 2,5 h · Executado: — h
 
 Executa D6 · executor: sessão `pln-002-p6`
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0,4 h
 
-- [ ] **1. Testes que falham:** o esqueleto de worklog e de issue, num `work/` temporário, e a recusa do que existe; o
+- [x] **1. Testes que falham:** o esqueleto de worklog e de issue, num `work/` temporário, e a recusa do que existe; o
   `commit` que para no erro do checador, o `git add` só dos caminhos dados (com outro arquivo sujo ao lado) e o
   `pull --rebase`, o push e o `--no-push`.
-- [ ] **2. Implementar** `scripts/brza/brza-note`.
-- [ ] **3. Rodar e ver passar**, e o primeiro uso real: o worklog da própria sessão sai do `brza note new`.
-- [ ] **4. Ligar e commit** — pelo próprio `brza note commit`.
+- [x] **2. Implementar** `scripts/brza/brza-note`.
+- [x] **3. Rodar e ver passar**, e o primeiro uso real: o worklog da própria sessão sai do `brza note new`.
+- [x] **4. Ligar e commit** — pelo próprio `brza note commit`. Ver X2.
 
-**Evidência:** —
+**Evidência:** `brza-workspace@bafce7e`, com push na `master`, pelo próprio `brza-note commit`.
+- `python3 -m unittest scripts/brza/tests/test_brza_note.py` → `Ran 14 tests … OK`, num clone de uma
+  `origin` local com um checador falso. `python3 -m unittest discover -s scripts/brza/tests` →
+  `Ran 111 tests … OK`, contando os testes do P3 ao P5, em escrita no mesmo checkout.
+- O worklog da sessão saiu do `brza-note new worklog pln-002-p6-o-brza-note` (saída 0), e a segunda
+  chamada recusou (saída 1).
+- O `brza-note commit` levou só os dois caminhos, com os scripts das outras sessões sujos ao lado.
+- O link saiu da `link_command` do `brza-install`, e não do `--all`, que ligaria os scripts ainda em
+  escrita; o `brza-install` mostra o `brza-note` como `ok`.
 
 ### P7 — O `brza sessions list|send|close`
 
@@ -254,6 +264,13 @@ Estimado: 2 h · Executado: — h
 
 - **X1 — O `git` do runtime recebe `cwd: Path | None = None`, e não `cwd: Path = STUDIO`.** O padrão ligado na
   definição ignora o `STUDIO` trocado no teste e o `BRZA_STUDIO` lido depois; o contrato não muda. Afeta o P1 e o D1.
+- **X2 — O `note commit` commita só os caminhos dados e faz o pull com `--autostash`.** O D6 diz "git add dos
+  caminhos, commit, git pull --rebase". Com as sessões do P3 ao P6 no mesmo checkout, o commit sem caminho levaria
+  o índice da outra sessão, e o `pull --rebase` recusa com arquivo sujo ao lado. O contrato não muda. Afeta o P6 e
+  o D6.
+- **X3 — O `$CLAUDE_SESSION_NAME` do esqueleto do worklog não existe no ambiente da sessão.** Na `pln-002-p6`,
+  aberta pelo app e renomeada com `/rename`, a variável vem vazia, e o esqueleto escreve `<a escrever>`. Falta a
+  fonte do nome, que está no `Retomar`. Afeta o P6 e o D6.
 
 ## Casos manuais
 
@@ -266,6 +283,9 @@ Estimado: 2 h · Executado: — h
 
 ## Worklogs
 
+- 2026-10-28 — P6, o `brza note`, em `brza-workspace@bafce7e`; X2 no commit por caminho, X3 no nome da sessão.
+  Nada travou.
+  [O PLN-002/P6: o brza note](../../work/worklogs/2026-10-28-pln-002-p6-o-brza-note.md)
 - 2026-10-28 — P2, o `brza tree`, em `brza-workspace@2ac6638`. Nada travou.
   [O PLN-002/P2: o brza tree](../../work/worklogs/2026-10-28-pln-002-p2-o-brza-tree.md)
 - 2026-10-28 — P1, o runtime comum e o `brza-install --all`, em `brza-workspace@9e95a2c`; X1 no `git`. Nada travou.

@@ -18,11 +18,9 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** o P0 ao P3 estão feitos; o `brza dev` está em `brza-workspace@310e12d`, com o C1 passado. O P4 ao P6
-  correm em paralelo (R4.4), cada um na sessão `pln-002-pN` dele, e o worktree de código sai do `brza-tree <nome>`. O P7
-  espera a 2d.
-  O P6, o `brza note`, está feito em `brza-workspace@bafce7e`; o esqueleto do worklog ainda não acha o nome da
-  sessão (X3).
+- **Retomar:** o P0 ao P3 e o P6 estão feitos: o `brza dev` em `brza-workspace@310e12d`, com o C1 passado, e o
+  `brza note` em `brza-workspace@bafce7e`, cujo esqueleto do worklog ainda não acha o nome da sessão (X3). O P4 e o P5
+  seguem nas sessões `pln-002-pN` deles, e o worktree de código sai do `brza-tree <nome>`. O P7 espera a 2d.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -162,7 +160,7 @@ Estimado: 2 h · Executado: 0,2 h
 - [x] **1. Testes que falham:** o seed só no perfil vazio, e o `--no-seed` e o `--reset`; o `--background` põe o
   `ORCA_BACKGROUND_LAUNCH=1`; recusa com build vivo; o `--stop` com pid vivo de runner, morto, e vivo de outro processo
   (o `ps` trocado por um falso).
-- [x] **2. Implementar** `scripts/brza/brza-dev`. Ver X2.
+- [x] **2. Implementar** `scripts/brza/brza-dev`. Ver X4.
 - [x] **3. Rodar e ver passar**, e o C1 com Anderson.
 - [x] **4. Ligar e commit** — `feat(brza): brza dev (PLN-002/P3)`.
 
@@ -272,7 +270,7 @@ Estimado: 2 h · Executado: — h
 
 - **X1 — O `git` do runtime recebe `cwd: Path | None = None`, e não `cwd: Path = STUDIO`.** O padrão ligado na
   definição ignora o `STUDIO` trocado no teste e o `BRZA_STUDIO` lido depois; o contrato não muda. Afeta o P1 e o D1.
-- **X2 — O `brza dev` semeia pelo `ORCA_DEV_SEED_PROFILE=1` do runner, e não pelo `pnpm dev:seed-profile`.** O runner
+- **X4 — O `brza dev` semeia pelo `ORCA_DEV_SEED_PROFILE=1` do runner, e não pelo `pnpm dev:seed-profile`.** O runner
   semeia só o perfil vazio, com a mesma função (`config/scripts/run-electron-vite-dev.mjs:81,420`), e numa chamada a
   menos; o contrato do D3 não muda. Afeta o P3 e o D3.
 - **X2 — O `note commit` commita só os caminhos dados e faz o pull com `--autostash`.** O D6 diz "git add dos
@@ -294,7 +292,7 @@ Estimado: 2 h · Executado: — h
 
 ## Worklogs
 
-- 2026-10-28 — P3, o `brza dev`, em `brza-workspace@310e12d`, com o C1 passado; X2 no seed. Nada travou.
+- 2026-10-28 — P3, o `brza dev`, em `brza-workspace@310e12d`, com o C1 passado; X4 no seed. Nada travou.
   [O PLN-002/P3: o brza dev](../../work/worklogs/2026-10-28-pln-002-p3-o-brza-dev.md)
 - 2026-10-28 — P6, o `brza note`, em `brza-workspace@bafce7e`; X2 no commit por caminho, X3 no nome da sessão.
   Nada travou.

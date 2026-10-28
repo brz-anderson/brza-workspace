@@ -487,6 +487,55 @@ Respondida em 2026-10-28, na sessão do `brza-workspace` que desenhou o pedido 3
    **Decidido — "Até 4, com +N (Recomendado)".** O visualizador de hoje mostra uma imagem só
    (`PanZoomImageDialog.tsx:64`), sem navegação: o que o "+N" abre vai à R42.
 
+### Rodada 40 — o ícone do git, os títulos, o idioma e as regras da Run (enviada 2026-10-28)
+
+> **Apresentado antes:** a R29.2 fala em "GitBranch ou GitCommit pelo subcomando", e a R35.1 trouxe o logo do Git, que
+> o P43 deixou pronto como `git-logo` (`BrzaGitLogo.tsx`); na conferência da chama do BrzA, Anderson disse "o git não
+> pegou"; os textos da UI do app são em inglês ("Preview unavailable"); as regras da R33.2 e da R33.4 eram da Run
+> anterior, e a leitura da sessão era que valem de novo.
+
+Respondida em 2026-10-28, na sessão `pln-001-p44-p50` do `brza-workspace`.
+
+1. **R40.1 — P44: que ícone a linha de `git` ganha?** Seleção única. Opções: logo do Git em todo git (recomendada) —
+   custo: zero; se paga: na hora; logo, e commit com GitCommit — o `git-commit-horizontal` só no `git commit` — custo:
+   ~0,1 h; se paga: em sessões com muitos `git status` entre os commits; lucide pelo subcomando, sem o logo — custo:
+   ~0,1 h.
+
+   **Decidido — "Logo, e commit com GitCommit".**
+
+2. **R40.2 — Que formato de título e de chip cada categoria usa?** Seleção única. Opções: conjunto A, com chip
+   (recomendada) — custo: o estimado dos passos; conjunto B, mínimo — o texto do comando como hoje e só o chip ao lado
+   — custo: ~0,5 h a menos.
+
+   **Decidido — "Conjunto A, com chip (Recomendado)"**, na prévia escolhida:
+
+   ```text
+   git commit  git commit — <1ª linha da mensagem>   [abc1234] → diff
+   git outros  o comando, como hoje (só o ícone muda)
+   gh pr       PR #123 — <título>                [#123] → navegador
+   gh issue    Issue #45 — <título>              [#45]  → navegador
+               (número pela URL na saída; título do --title ou da saída)
+   testes      vitest — 12 passed, 1 failed
+               vitest — failed   (saída cortada, R38.2)
+   pacotes     o comando, como hoje (só o ícone)
+   Jira        FIX-123 — <resumo, se vier na saída>   [FIX-123] → navegador
+   Confluence  <título da página>                [página] → navegador
+   Figma       Figma · <nome do nó, ou o nodeId>
+   ```
+
+3. **R40.3 — Em que idioma vai o resultado no título?** Seleção única. Opções: inglês, como o app (recomendada) —
+   custo: zero; português — "12 passaram, 1 falhou", "falhou", com as strings no i18n do BrzA — custo: ~0,3 h; se
+   paga: só se o app for traduzido inteiro.
+
+   **Decidido — "Português".** Os textos em inglês da prévia da R40.2 saem em português.
+
+4. **R40.4 — As regras da Run e o modelo do P50, sem a miniatura?** Seleção única. Opções: R33.2 e R33.4, e P50 de
+   Sonnet (recomendada) — commit e push na `master` com os testes verdes, depois do `git var GIT_AUTHOR_IDENT` e do
+   rebase, e os worktrees em `brza-studio/.worktrees/`, passados por `path:`; o shell de Opus e o P48 de Sonnet; R33.2
+   e R33.4, e P50 de Opus; push só depois do aviso de Anderson.
+
+   **Decidido — "R33.2 e R33.4, e P50 de Sonnet (Recomendado)".** Reescreve a R37.4 no P50.
+
 ## Passos
 
 > Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com

@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: "sim — o P44 ao P48 e o P50, na Run run_de875fc52a75 em execução; o P54 ao P57 do pedido 30 depois do P44 ao P50; a conferência do P42, P49, P51, P52 e P53 com Anderson"
 estimate_h: 123.6
-executed_h: 9.85
-remaining_h: 20.5
+executed_h: 10.15
+remaining_h: 20.2
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -1341,18 +1341,27 @@ Falta conferir uma chamada real no BrzA Studio.
 
 #### P50 — O Figma com logo, nome do nó e miniatura (pedido 27)
 
-Executa D39 · Estimado: 0,3 h · Executado: — h
+Executa D39 · Estimado: 0,3 h · Executado: 0,3 h
 
 Sem a miniatura, que vai ao pedido 30 (R38.4), o passo cai a ~0,3 h (R29.3).
 
-- [ ] **1.** Teste que falha: a chamada MCP do Figma vira a linha com o `pen-tool` (R35.1) e "Figma · <nome do nó, ou
+- [x] **1.** Teste que falha: a chamada MCP do Figma vira a linha com o `pen-tool` (R35.1) e "Figma · <nome do nó, ou
       o `nodeId`>", com o nome quando a saída o traz (R40.2)
 - [-] **2.** A miniatura do `get_screenshot` na linha — sai pelo pedido 30, em PLN-001/D43 e no P55 (R38.4)
 - [ ] **3.** Os testes; commit e push; conferir uma linha de Figma no BrzA Studio, com Anderson
 
 **Pendências:** fechadas na R38.4 e na R40.2.
 
-**Evidência:** —
+**Evidência:** commit [`d7f4e5b5618`](https://github.com/brz-anderson/brza-studio/commit/d7f4e5b5618), na `master` do
+`brza-studio`, por um worker do Orca (Sonnet, R40.4) na Run `run_de875fc52a75`, no worktree `.worktrees/pln-001-p50`.
+A categoria `figma` mora em `src/shared/native-chat/tools/brza/brza-figma-tool.ts`, casada por `/figma/i` no servidor
+MCP, com o `pen-tool`, que já estava nas tabelas de glifos (P43); no registro e no título, só a linha de montagem. O
+commit traz a assinatura compartilhada `brzaToolLineTitle(call, result?)`, com o `result` passado em
+`native-chat-tool-line-label.ts:144`. O título é "Figma · <nome>" quando a saída traz o nome, senão "Figma ·
+<nodeId>"; sem nenhum, a linha cai no padrão; com `isError`, cai no `nodeId`. Teste novo `brza-figma-tool.test.ts`, 6
+casos, 5 falhando antes; `run-vitest` em `src/shared/native-chat/tools` → 18 arquivos, 252 passed; `pnpm check:changed
+--base=origin/master` → 19 checks; `pnpm typecheck` no `mobile/` → exit 0. Desvios X11 e X12. Falta conferir no BrzA
+Studio, com Anderson, uma linha de `get_metadata` e uma de `get_design_context` reais.
 
 #### P51 — O Firebase e o Context7 com ícone e nome no título (pedido 27)
 
@@ -1573,6 +1582,13 @@ Depois do P55 e do P56.
   `brzaToolCategory`. Citado no P43.
 - **X10 — Os recuos de marca no mobile: git → `git-branch`, GitHub → `git-pull-request`, Jira → `square-kanban`.** O D37
   não os fixava; foi escolha do worker do P43, a conferir com Anderson junto do P44 e do P48. Citado no P43.
+- **X11 — O nome do nó do Figma sai de um formato de saída suposto.** O D39 não dizia onde o nome está na saída; o
+  worker do P50 não leu saída real (o classificador de permissão negou ler transcrições antigas) e o tirou do
+  `name` do `<frame id=… name=…>` do `get_metadata` e do `data-name` do `get_design_context`, casando pelo `nodeId`
+  pedido (`1-2` e `1:2` equivalem) e lendo só as primeiras 200 tags, para a saída cortada na cabeça não atrapalhar. Se
+  o formato real for outro, o ajuste fica só em `nodeNameFromOutput`. A conferir com Anderson. Citado no P50.
+- **X12 — O `nodeId` do título sai normalizado com dois-pontos** (`12-34` vira `12:34`). Escolha do worker do P50.
+  Citado no P50.
 
 ## Worklogs
 

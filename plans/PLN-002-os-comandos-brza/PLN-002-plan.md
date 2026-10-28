@@ -15,9 +15,9 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** a entrevista está em curso, na sessão `pln-002-comandos-brza`. A R1, a R2 e a R3 fecharam, e as rodadas
-  seguintes cobrem o `brza-install`, o `doctor`, o `note`, o nome do `tree`, o `sessions` e a
-  ordem. O P0, o despacho, está feito em `brza-studio@9a81e65c852`.
+- **Retomar:** a entrevista está em curso, na sessão `pln-002-comandos-brza`. A R1 a R4 fecharam, e as rodadas
+  seguintes cobrem o nome do `tree`, o `sessions`, o executor e o corte dos
+  passos. O P0, o despacho, está feito em `brza-studio@9a81e65c852`.
 
 ## Pedido
 
@@ -184,6 +184,52 @@ Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
    - módulo novo `brza_chat.py`. Custo: mais um arquivo. Se paga: se o runtime passar de ~200 linhas (tem 77).
 
    **Decidido — sim, com o `STUDIO`.**
+
+### Rodada 4 — o `brza-install`, o `brza doctor`, o `brza note` e a ordem (enviada 2026-10-28)
+
+**Apresentado antes:**
+- **O `brza-install`:** liga uma lista fixa de três scripts, com uma flag por script
+  (`scripts/brza/brza-install:24-26,82-84`). A `brza-cli-subcomandos` deixou duas coisas para o PLN-002: o
+  `~/.local/bin/brza-install` não está no PATH, e ele deve ligar a si mesmo.
+- **O PATH:** o do chat é diferente do do terminal. O `brza-dev-wt` ainda não existe, e isso é normal.
+- **As notas:** não há molde de worklog nem de issue (`work/README.md:84`). O frontmatter de cada pasta está em
+  `work/README.md:140-149`, e o `## Fora do workspace`, em `:297-303`.
+- **O encadeamento:** o `dev`, o `test` e o `app install` usam o worktree do `tree`. O `doctor` confere o que os outros
+  instalam.
+
+Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
+
+1. **Como o `brza-install` liga os scripts novos?** Opções:
+   - glob `brza-*` executável em `scripts/brza/`, inclusive ele mesmo, com as flags de hoje como atalho (recomendada).
+     Custo: ajustar o `InstallTest.setUp` (`test_brza_scripts.py:168-180`). Se paga: no segundo script novo;
+   - uma flag por script. Custo: sete flags novas. Se paga: nunca.
+
+   **Decidido — glob `brza-*`, inclusive ele.**
+
+2. **O que o `doctor` trata como erro?** Opções:
+   - sai com 1 se falta identidade, hook de medição, link em `~/.local/bin` ou override `claude-brza`; só avisa o que
+     depende de onde roda, como o pnpm no PATH e o perfil `brza-dev` (recomendada). Custo: umas 100 linhas. Se paga:
+     agora, como portão no arranque;
+   - tudo é aviso. Custo: não serve de portão. Se paga: nunca.
+
+   **Decidido — erro no essencial.**
+
+3. **O que o `note` faz?** Opções:
+   - `note new <issue|worklog> <assunto>` gera o esqueleto; `note commit <caminho…> -m` roda o `check_notes.py`, `git add`
+     por caminho, commit e `pull --rebase` (recomendada). Custo: o texto do esqueleto é escolha nova, que vai ao Desenho.
+     Se paga: agora;
+   - só `commit`. Custo: o esqueleto segue à mão. Se paga: se o esqueleto variar demais, o que não se viu.
+
+   **Decidido — `new` e `commit`.**
+
+4. **Em que ordem os passos rodam?** Opções:
+   - primeiro o runtime e o `brza-install` por glob; depois o `tree`; depois `dev`, `test`, `app install` e `note` em
+     paralelo; o `sessions` quando a combinação com a 2d fechar; o `doctor` por último (recomendada). Custo: dois passos em
+     série antes do resto. Se paga: agora, porque evita conflito no `brza_runtime.py` e no `brza-install`;
+   - todos em série. Custo: o tempo total soma os sete. Se paga: se só uma sessão executar;
+   - todos em paralelo. Custo: conflito nos dois arquivos comuns. Se paga: nunca.
+
+   **Decidido — base, `tree`, paralelo, `doctor`.**
 
 ## Worklogs
 

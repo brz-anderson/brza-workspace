@@ -111,34 +111,34 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 
 | Origem | Critério de aceite | Passo | Teste (nível) |
 | :----- | :----------------- | :---- | :------------ |
-| Pedido 5 | O arquivo de código e o bloco de código seguem o tema Islands Dark do Android Studio | P6 | conferência no Orca (manual) |
-| Pedido 14 | Na barra do arquivo Markdown aberto no editor, o olho — renderizado e só leitura — vem antes do lápis e do código e é o modo padrão; a aba de diff não muda (R19) | P25 | teste dos modos e do padrão (unidade); conferência no Orca (manual) |
-| Pedido 15 | O `brza-studio` sai num instalador x64 de Windows, sem assinatura, por um comando, com o `mobile/` instalado e a versão `-local.<ms>.<commit>`, e o atualizador fica desligado no app instalado (R20) | P26, P27 | teste do script (unidade); instalação no Windows (manual) |
-| Pedido 19 | O Bifurcar da mensagem do agente abre uma aba nova com a sessão cortada até ela, pelo `forkSession` do SDK, e a conversa de origem não muda (R26.2) | P33 | teste do corte e do canal (unidade); bifurcar no Orca (manual) |
-| Pedido 20 | O Novo Chat abre uma aba nova com a mensagem como rascunho na caixa, sem enviar | P34 | teste do componente (unidade) |
-| Pedido 21 | O Fixar Capítulo vem marcado, fixa e desafixa, e a régua de prompts destaca os fixados, com a prévia do capítulo (R26.1) | P35 | teste do estado e da régua (unidade) |
-| Pedido 22 | Ao lado do seletor de modelo e esforço, o seletor de conta troca a conta no mesmo chat, com o contexto pelo transcript copiado e o divisor "Conta trocada - <conta>" (R26.3) | P36 | teste da cópia e do lançamento (unidade); troca `claude` → `adm` no Orca (manual) |
-| Pedido 23 | O botão direito numa palavra errada na caixa do chat mostra as sugestões e troca a palavra | P37 | conferência no Orca (manual) |
-| Pedido 24 | Com o switch das configurações de chat ligado, a caixa de texto mostra o Markdown formatado, e o que se envia segue em Markdown; desligado por padrão | P38 | teste da serialização ida e volta (unidade); conferência no Orca (manual) |
-| Pedido 26 | Na linha do aviso de limite, o "Continuar em <conta>" lista as outras contas e, num clique, troca a conta como o P36 e envia o Continuar depois que a sessão nova sobe; com a troca falha, nada é enviado (R27.1, R27.2) | P40 | teste da ordem troca → envio e da falha (unidade); limite na `claude` → continuar na `adm` (manual) |
-| Pedido 26 | O "Retomar automaticamente" agenda no main, persistido, o Continuar para o reset + 1 min, no mesmo chat; a linha mostra "Retomada às HH:MM · Cancelar", uma mensagem enviada antes cancela, e sem `resetsAt` o botão não aparece; com o Orca fechado na hora, dispara ao abrir se o chat ainda está no corte (R27.3, R27.4) | P41 | teste da agenda, do cancelamento e do disparo ao abrir (unidade); retomada com o relógio adiantado (manual) |
-| Pedido 25 | A mensagem enviada tem o Editar, que a leva à caixa, abaixo do rascunho se houver; o Copiar e o Enviar agora seguem onde estão (R25.1, R25.2) | P39 | teste do componente (unidade) |
-| Pedido 27 | O texto da pergunta no bloco "Perguntou:" usa a cor `primary` do tema, a do ✓ de opção escolhida, nos três pontos (R29.1) | P42 | teste de aparência (unidade); conferência no BrzA Studio (manual) |
-| Pedido 27 | Os logos SVG de marca entram só no desktop, por um componente do BrzA: o do git, novo, e o GitHub e o Jira, que o upstream já tem; o Figma e o Firebase ficam no lucide também no desktop; o mobile cai no ícone lucide equivalente (R29.4, R35.1) | P43 | teste do mapa de categorias e do recuo no mobile (unidade) |
-| Pedido 27 | O comando `git` ganha ícone pelo subcomando, o título "git commit — <mensagem>" e o hash que abre o diff do commit (R29.2) | P44 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual) |
-| Pedido 27 | O comando `gh` de PR e issue ganha o ícone de PR, o título "PR #123 — <título>" e o chip que abre o PR no navegador (R29.2) | P45 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual) |
-| Pedido 27 | Os testes (`vitest`, `run-vitest.mjs`, `flutter test`, `pytest`) ganham o ícone de testes, com passou/falhou contado no título pela saída (R29.2) | P46 | teste da contagem por executor (unidade); conferência no BrzA Studio (manual) |
-| Pedido 27 | Pacotes e build (`pnpm`, `npm`, `flutter pub`, build) ganham ícone e título, sem interação (R29.2) | P47 | teste da categoria (unidade) |
-| Pedido 27 | O Jira e o Confluence ganham o chip com a chave do card ou o título da página, que abre no navegador (R29.3) | P48 | teste do chip (unidade); conferência no BrzA Studio (manual) |
-| Pedido 27 | A ferramenta Skill ganha o ícone e o título "Skill · <nome>" (R29.3) | P49 | teste do título (unidade) |
-| Pedido 27 | O Figma ganha o logo, o nome do nó e a miniatura do `get_screenshot` na linha (R29.3) | P50 | teste do nome e da miniatura (unidade); conferência no BrzA Studio (manual) |
-| Pedido 27 | O Firebase e o Context7 ganham ícone e o nome do projeto ou da biblioteca no título, sem interação (R29.3) | P51 | teste da categoria e do título (unidade) |
-| Pedido 28 | Só na largura "Total", todo bloco de código e toda tabela têm exatamente `120ch` mais o padding, e no painel estreito encolhem até 100% e rolam na horizontal, com o texto corrido na largura total (R30.1, R30.2) | P52 | teste do estilo (unidade); conferência no BrzA Studio (manual) |
-| Pedido 29 | O link do chat usa `--chat-link`, `#79C0FF` no escuro e `#0969DA` no claro, com o sublinhado a 40% (R31.1) | P53 | teste da variável (unidade); conferência nos dois temas (manual) |
-| Pedido 30 | A imagem do `Read`, do `get_screenshot` e do print do browser vira arquivo no temp, com o `image-ref` no resultado da ferramenta, ao vivo e no histórico (R36.2, R39.1) | P54 | teste da extração e dos dois decoders (unidade) |
-| Pedido 30 | A linha da ferramenta mostra, fechada, até 4 miniaturas de ~96 px e um "+N" que abre a linha; o clique amplia (R36.3, R39.4, R42.1) | P55 | teste do componente (unidade); conferência no BrzA Studio (manual) |
-| Pedido 30 | O caminho ou a URL de imagem solto no texto ganha a miniatura abaixo do parágrafo, uma vez por mensagem, só se abre e só com a mensagem terminada (R39.2, R39.3, R42.2) | P56 | teste do plugin (unidade); conferência no BrzA Studio (manual) |
-| Pedido 30 | O `![]()`, o anexo enviado e o ampliar ao clicar, que já existem, funcionam no BrzA Studio (R36.1) | P57 | conferência no BrzA Studio (manual) |
+| `Pedido 5` | O arquivo de código e o bloco de código seguem o tema Islands Dark do Android Studio | P6 | conferência no Orca (manual) |
+| `Pedido 14` | Na barra do arquivo Markdown aberto no editor, o olho — renderizado e só leitura — vem antes do lápis e do código e é o modo padrão; a aba de diff não muda (R19) | P25 | teste dos modos e do padrão (unidade); conferência no Orca (manual) |
+| `Pedido 15` | O `brza-studio` sai num instalador x64 de Windows, sem assinatura, por um comando, com o `mobile/` instalado e a versão `-local.<ms>.<commit>`, e o atualizador fica desligado no app instalado (R20) | P26, P27 | teste do script (unidade); instalação no Windows (manual) |
+| `Pedido 19` | O Bifurcar da mensagem do agente abre uma aba nova com a sessão cortada até ela, pelo `forkSession` do SDK, e a conversa de origem não muda (R26.2) | P33 | teste do corte e do canal (unidade); bifurcar no Orca (manual) |
+| `Pedido 20` | O Novo Chat abre uma aba nova com a mensagem como rascunho na caixa, sem enviar | P34 | teste do componente (unidade) |
+| `Pedido 21` | O Fixar Capítulo vem marcado, fixa e desafixa, e a régua de prompts destaca os fixados, com a prévia do capítulo (R26.1) | P35 | teste do estado e da régua (unidade) |
+| `Pedido 22` | Ao lado do seletor de modelo e esforço, o seletor de conta troca a conta no mesmo chat, com o contexto pelo transcript copiado e o divisor "Conta trocada - <conta>" (R26.3) | P36 | teste da cópia e do lançamento (unidade); troca `claude` → `adm` no Orca (manual) |
+| `Pedido 23` | O botão direito numa palavra errada na caixa do chat mostra as sugestões e troca a palavra | P37 | conferência no Orca (manual) |
+| `Pedido 24` | Com o switch das configurações de chat ligado, a caixa de texto mostra o Markdown formatado, e o que se envia segue em Markdown; desligado por padrão | P38 | teste da serialização ida e volta (unidade); conferência no Orca (manual) |
+| `Pedido 26` | Na linha do aviso de limite, o "Continuar em <conta>" lista as outras contas e, num clique, troca a conta como o P36 e envia o Continuar depois que a sessão nova sobe; com a troca falha, nada é enviado (R27.1, R27.2) | P40 | teste da ordem troca → envio e da falha (unidade); limite na `claude` → continuar na `adm` (manual) |
+| `Pedido 26` | O "Retomar automaticamente" agenda no main, persistido, o Continuar para o reset + 1 min, no mesmo chat; a linha mostra "Retomada às HH:MM · Cancelar", uma mensagem enviada antes cancela, e sem `resetsAt` o botão não aparece; com o Orca fechado na hora, dispara ao abrir se o chat ainda está no corte (R27.3, R27.4) | P41 | teste da agenda, do cancelamento e do disparo ao abrir (unidade); retomada com o relógio adiantado (manual) |
+| `Pedido 25` | A mensagem enviada tem o Editar, que a leva à caixa, abaixo do rascunho se houver; o Copiar e o Enviar agora seguem onde estão (R25.1, R25.2) | P39 | teste do componente (unidade) |
+| `Pedido 27` | O texto da pergunta no bloco "Perguntou:" usa a cor `primary` do tema, a do ✓ de opção escolhida, nos três pontos (R29.1) | P42 | teste de aparência (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 27` | Os logos SVG de marca entram só no desktop, por um componente do BrzA: o do git, novo, e o GitHub e o Jira, que o upstream já tem; o Figma e o Firebase ficam no lucide também no desktop; o mobile cai no ícone lucide equivalente (R29.4, R35.1) | P43 | teste do mapa de categorias e do recuo no mobile (unidade) |
+| `Pedido 27` | O comando `git` ganha ícone pelo subcomando, o título "git commit — <mensagem>" e o hash que abre o diff do commit (R29.2) | P44 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 27` | O comando `gh` de PR e issue ganha o ícone de PR, o título "PR #123 — <título>" e o chip que abre o PR no navegador (R29.2) | P45 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 27` | Os testes (`vitest`, `run-vitest.mjs`, `flutter test`, `pytest`) ganham o ícone de testes, com passou/falhou contado no título pela saída (R29.2) | P46 | teste da contagem por executor (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 27` | Pacotes e build (`pnpm`, `npm`, `flutter pub`, build) ganham ícone e título, sem interação (R29.2) | P47 | teste da categoria (unidade) |
+| `Pedido 27` | O Jira e o Confluence ganham o chip com a chave do card ou o título da página, que abre no navegador (R29.3) | P48 | teste do chip (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 27` | A ferramenta Skill ganha o ícone e o título "Skill · <nome>" (R29.3) | P49 | teste do título (unidade) |
+| `Pedido 27` | O Figma ganha o logo, o nome do nó e a miniatura do `get_screenshot` na linha (R29.3) | P50 | teste do nome e da miniatura (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 27` | O Firebase e o Context7 ganham ícone e o nome do projeto ou da biblioteca no título, sem interação (R29.3) | P51 | teste da categoria e do título (unidade) |
+| `Pedido 28` | Só na largura "Total", todo bloco de código e toda tabela têm exatamente `120ch` mais o padding, e no painel estreito encolhem até 100% e rolam na horizontal, com o texto corrido na largura total (R30.1, R30.2) | P52 | teste do estilo (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 29` | O link do chat usa `--chat-link`, `#79C0FF` no escuro e `#0969DA` no claro, com o sublinhado a 40% (R31.1) | P53 | teste da variável (unidade); conferência nos dois temas (manual) |
+| `Pedido 30` | A imagem do `Read`, do `get_screenshot` e do print do browser vira arquivo no temp, com o `image-ref` no resultado da ferramenta, ao vivo e no histórico (R36.2, R39.1) | P54 | teste da extração e dos dois decoders (unidade) |
+| `Pedido 30` | A linha da ferramenta mostra, fechada, até 4 miniaturas de ~96 px e um "+N" que abre a linha; o clique amplia (R36.3, R39.4, R42.1) | P55 | teste do componente (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 30` | O caminho ou a URL de imagem solto no texto ganha a miniatura abaixo do parágrafo, uma vez por mensagem, só se abre e só com a mensagem terminada (R39.2, R39.3, R42.2) | P56 | teste do plugin (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 30` | O `![]()`, o anexo enviado e o ampliar ao clicar, que já existem, funcionam no BrzA Studio (R36.1) | P57 | conferência no BrzA Studio (manual) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
 
@@ -151,6 +151,17 @@ Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão n
 - **A sincronização em cadeia e a conferência no Orca da Fixfy.** A sincronização era o PLN-025/P4, e a conferência, o
   PLN-028/P8, com o build do `orca-fixfy`, que está congelado. A conferência de cada passo é no BrzA Studio, com
   Anderson.
+
+## Restrições
+
+- **O `pnpm` não está no `PATH`.** O 12.14.0 está em `~/.npm/_npx/aa4546e781591cea/node_modules/.bin`, e o hook do
+  commit do `brza-studio` falha sem ele no `PATH`.
+- **Os testes rodam pelo `run-vitest.mjs`, por caminho.** `node config/scripts/run-vitest.mjs run --config
+  config/vitest.config.ts <caminhos>`; o `pnpm check:changed` leva `--base=origin/master`.
+- **Worker em paralelo trabalha num worktree em `.worktrees/` do `brza-studio`.** Criado com `git worktree add` e passado
+  ao `orchestration worker-start` por `path:`: o worktree novo do Orca cai fora do `brza_where`.
+- **O instalador de Windows sai pelo runner do GitHub** (X7): `gh workflow run build-win-local.yml --repo
+  brz-anderson/brza-studio --ref master`, com a conta `brz-anderson` ativa no `gh`.
 
 ## Entrevista
 
@@ -1672,14 +1683,38 @@ Depois do P55 e do P56.
 
 ## Decisões
 
-Notas de decisão do workspace da Fixfy, citadas pelo caminho de lá:
+Notas de decisão do workspace da Fixfy, ao lado deste clone:
 
-- `work/decisions/orca-da-fixfy-substitui-o-original-e-sincroniza-por-tag.md`, "O Orca da Fixfy substitui o original, sem atualizador, sincroniza por tag e guarda o código da Fixfy em pasta própria" — `done`
-- `work/decisions/orca-dev-commita-como-brz-anderson-com-push-na-main.md`, "O orca-dev commita com o noreply do brz-anderson, pela chave personal, com push direto na main" — `done`
+- [O Orca da Fixfy substitui o original, sem atualizador, sincroniza por tag e guarda o código da Fixfy em pasta própria](../../../fixfy/work/decisions/orca-da-fixfy-substitui-o-original-e-sincroniza-por-tag.md)
+  — PLN-025/R10 da Fixfy, `done`.
+- [O orca-dev commita com o noreply do brz-anderson, pela chave personal, com push direto na main](../../../fixfy/work/decisions/orca-dev-commita-como-brz-anderson-com-push-na-main.md)
+  — PLN-025/R14 da Fixfy, `done`.
+
+## Casos manuais
+
+| ID  | Critério | Passos | Esperado | Observado | Veredito |
+| :-- | :------- | :----- | :------- | :-------- | :------- |
+| C1  | `Pedido 27`: a pergunta do "Perguntou:" na cor `primary` do tema (P42.3) | No build com o `fbff699fa58`, responder uma pergunta do agente | O texto da pergunta na cor do ✓, na linha fechada, na pergunta aberta e na lista | | |
+| C2  | `Pedido 27`: a Skill, o Firebase e o Context7 com ícone e título (P49, P51) | No mesmo build, uma chamada real de cada | "Skill · <nome>"; o nome do projeto do Firebase e o da biblioteca do Context7 no título | | |
+| C3  | `Pedido 27`: o `git` com ícone pelo subcomando e o hash que abre o diff (P44.3) | Um `git commit` do agente | "git commit — <mensagem>", e o hash abre o diff do commit | | |
+| C4  | `Pedido 27`: o `gh` de PR com ícone, título e chip (P45.3) | Um `gh pr` do agente | "PR #123 — <título>", e o chip abre o PR no navegador | | |
+| C5  | `Pedido 27`: os testes com passou/falhou no título (P46.3) | Uma execução de teste passando e uma falhando | As contagens de passou e falhou no título das duas linhas | | |
+| C6  | `Pedido 27`: o Jira e o Confluence com chip (P48.3) | Uma chamada de cada | O chip com a chave do card ou o título da página, que abre no navegador | | |
+| C7  | `Pedido 27`: o Figma com o logo e o nome do nó, sem a miniatura (P50.3, R38.4) | Uma chamada do Figma | O ícone e o nome do nó na linha | | |
+| C8  | `Pedido 28`: 120 colunas na largura "Total" (P52.4) | Na largura "Total", um bloco curto, um longo e uma tabela; depois o painel estreito | Os três com `120ch` mais o padding; no painel estreito, encolhem e rolam na horizontal | | |
+| C9  | `Pedido 29`: o link em azul claro (P53.3) | Um link no tema escuro e no claro | `#79C0FF` no escuro e `#0969DA` no claro, com o sublinhado a 40% | | |
+| C10 | `Pedido 29`: o link sobre código inline também em azul (P53.4) | Um caminho em código inline que o chat vira link | O texto em azul, como o link comum | 2026-10-28: em branco, pelo `color` de `.native-chat-markdown code` | falha |
+| C11 | `Pedido 30`: a miniatura na linha da ferramenta (P55.3) | Um `Read` de PNG, um `get_screenshot` do Figma e um print do browser | A miniatura na linha fechada de cada um, ampliando no clique | | |
+| C12 | `Pedido 30`: a miniatura do caminho ou da URL solta no texto (P56.3) | Uma resposta com um print por caminho em código inline e outra com uma URL de imagem | A miniatura abaixo do parágrafo, uma vez por mensagem, com a mensagem terminada | | |
+| C13 | `Pedido 30`: o que já existia funciona no BrzA Studio (P57.1, R36.1) | Um `![]()` local e um remoto; uma imagem colada e uma arrastada | A miniatura na mensagem enviada, e o clique amplia com pan e zoom nos quatro casos | | |
 
 ## Fechamento
 
 - [ ] Todo passo `[x]` com evidência, ou `[-]` com motivo.
 - [ ] Todo achado com destino que existe.
-- [ ] Um resumo por commit ou PR da entrega, com o link do plano: os achados e o destino de cada um.
-- [ ] `status: done` e `completed` no frontmatter.
+- [ ] Um resumo por commit ou PR do `brza-studio` da entrega, com o link do plano: os achados e o destino de cada um.
+      Trabalho só em notas de `work/` e `plans/` não tem resumo.
+- [ ] O durável saiu para a casa dona e está em `## Decisões` e `## Documentação`: a decisão em `work/decisions/`, a
+      norma do `brza-studio`, o guia.
+- [ ] As decisões que o plano respondeu estão `done`, citando a rodada.
+- [ ] `status: done`, `phase: closed` e `completed` no frontmatter.

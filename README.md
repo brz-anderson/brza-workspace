@@ -27,7 +27,7 @@ python3 scripts/summarize_measurements.py
 ```
 
 A norma de agente está no [`AGENTS.md`](AGENTS.md), e o adaptador do Claude Code no [`CLAUDE.md`](CLAUDE.md). O commit
-é com o `brz-anderson`, pelo `env` do `.claude/settings.json`, e o push vai direto na `main`, pela chave `personal`.
+é com o `brz-anderson`, pelo `env` do `.claude/settings.json`, e o push vai direto na `master`, pela chave `personal`.
 
 ## Funções do shell
 

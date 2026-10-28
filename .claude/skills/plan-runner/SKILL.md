@@ -91,7 +91,7 @@ worklog que nasce de um plano aceito.
 ## Quem grava — a sessão que conduz
 
 **Só esta skill decide o conteúdo do plano; quem grava e commita em `plans/` e `work/` é a sessão que conduz**, só nos
-caminhos da tarefa, como o `work/README.md` manda em "Commit": direto na `main`, sem PR, com a identidade do
+caminhos da tarefa, como o `work/README.md` manda em "Commit": direto na `master`, sem PR, com a identidade do
 `brz-anderson`, `git add` por caminho e `git pull --rebase` quando outro push corre junto.
 
 1. **Grave só os caminhos da tarefa**: o plano dela, o worklog dela e, ao abrir `PLN`, a linha "Último PLN usado" do

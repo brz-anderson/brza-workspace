@@ -26,14 +26,14 @@ Link entre notas é Markdown relativo, com o H1 da nota de destino como rótulo,
 - **Nome acompanha o foco:** quando o foco de uma nota ou de um plano muda, o nome do arquivo, o H1 e os links mudam
   junto, com `move_note.py <origem> <destino> --title "<H1 novo>"`.
 
-Nota se grava direto na `main`, com `git add` por caminho e `git pull --rebase` quando outro push corre junto.
+Nota se grava direto na `master`, com `git add` por caminho e `git pull --rebase` quando outro push corre junto.
 
 ## Quem commita é o brz-anderson
 
 Os commits deste repositório e do `brza-studio` saem com o noreply do `brz-anderson`
 (`240569289+brz-anderson@users.noreply.github.com`) e vão ao GitHub pela chave `personal`. A identidade vem do ambiente
-da sessão, como diz o adaptador do runtime, e não depende do `.git/config`. O push vai direto na `main` daqui e na
-`master` do `brza-studio`, sem PR.
+da sessão, como diz o adaptador do runtime, e não depende do `.git/config`. O push vai direto na `master`, daqui e do
+`brza-studio`, sem PR.
 
 ## O uso é medido
 

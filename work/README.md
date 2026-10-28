@@ -179,7 +179,7 @@ por um formatador que junta linhas.
 
 ### Commit
 
-`work/`, `plans/` e `wiki/` são deste repositório, e **as notas commitam direto na `main`**, sem PR. **O commit é com a
+`work/`, `plans/` e `wiki/` são deste repositório, e **as notas commitam direto na `master`**, sem PR. **O commit é com a
 identidade do `brz-anderson`, que vem do `.git/config` daqui, e o push vai pela chave `personal` do `origin`**
 (`git@personal:brz-anderson/brza-workspace.git`). `git add` por caminho,
 só os da tarefa, e `git pull --rebase` quando outro push correr junto.

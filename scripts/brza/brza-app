@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+"""Constrói o BrzA Studio e o instala em /Applications.
+
+  brza-app install [--from <checkout>] [--dmg] [--yes] [--clean]
+      constrói o app num worktree temporário da origin/master, depois de git fetch origin e do install offline, ou no
+      checkout de --from, com pnpm build:mac [--dmg]. Pergunta antes de substituir /Applications/BrzA Studio.app, apaga
+      o antigo e copia o novo com ditto. Com o app aberto, recusa sem --yes; --yes também pula a pergunta. --dmg copia
+      o .dmg para ~/Downloads. --clean apaga o dist no fim. O worktree temporário sai no fim, também quando o
+      build falha.
+
+Saídas: 0 instalado; 1 falhou ou cancelado; 2 uso errado, ou o app aberto sem --yes. O ditto que falha deixa o worktree
+temporário onde está e imprime o ditto a repetir, porque o app antigo já foi apagado.
+
+A primeira instalação, e toda instalação que troca o app em uso, roda de um terminal fora do app, com ele fechado: o
+chat e o `brza` do PATH dele são do próprio app.
+"""
+import argparse
+import os
+import platform
+import plistlib
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import brza_runtime as runtime  # noqa: E402
+
+APP = Path('/Applications/BrzA Studio.app')
+DOWNLOADS = Path.home() / 'Downloads'
+
+
+def ancestors() -> set[int]:
+    """Este processo e os pais dele: o `brza app install` do app chega aqui por um processo do próprio app."""
+    pids, pid = set(), os.getpid()
+    while pid > 1 and pid not in pids:
+        pids.add(pid)
+        r = subprocess.run(['ps', '-o', 'ppid=', '-p', str(pid)], capture_output=True, text=True)
+        pid = int(r.stdout.strip() or 0)
+    return pids
+
+
+def app_pids() -> list[int]:
+    """Os processos que rodam de dentro do app instalado — a janela, os helpers e os supervisores dos chats."""
+    r = subprocess.run(['pgrep', '-f', f'{APP}/Contents/'], capture_output=True, text=True)
+    mine = ancestors()
+    return [int(p) for p in r.stdout.split() if int(p) not in mine]
+
+
+def build(src: Path, dmg: bool) -> bool:
+    print(f'build:    pnpm build:mac{" --dmg" if dmg else ""} em {src}', flush=True)
+    return subprocess.run(['pnpm', 'build:mac', *(('--dmg',) if dmg else ())], cwd=src).returncode == 0
+
+
+def ditto(source: Path, target: Path) -> bool:
+    return subprocess.run(['ditto', str(source), str(target)]).returncode == 0
+
+
+def ask(question: str) -> bool:
+    if not sys.stdin.isatty():
+        print(f'{question} [s/N] sem terminal para responder; use --yes')
+        return False
+    return input(f'{question} [s/N] ').strip().lower() in ('s', 'sim', 'y', 'yes')
+
+
+def built_app(src: Path) -> Path:
+    arch = 'mac-arm64' if platform.machine() == 'arm64' else 'mac'
+    return src / 'dist' / arch / APP.name
+
+
+def version(app: Path) -> str:
+    try:
+        with open(app / 'Contents' / 'Info.plist', 'rb') as f:
+            return plistlib.load(f).get('CFBundleShortVersionString', '?')
+    except (OSError, plistlib.InvalidFileException):
+        return '?'
+
+
+def refuse_open() -> bool:
+    pids = app_pids()
+    if pids:
+        print(f'recusado: o {APP.name} está aberto (pid {", ".join(map(str, pids))}); feche o app e rode de um terminal'
+              ' fora dele, ou repita com --yes')
+    return bool(pids)
+
+
+def install(src: Path, dmg: bool, yes: bool) -> tuple[int, bool]:
+    """Constrói em `src` e instala. Devolve a saída e se o `src` deve ficar, que é o caso do ditto que falhou."""
+    if not build(src, dmg):
+        print('falhou:   o build:mac saiu com erro; o app instalado não mudou')
+        return 1, False
+    new = built_app(src)
+    if not new.is_dir():
+        print(f'falhou:   o build não deixou {new}')
+        return 1, False
+    print(f'build:    {new}  ({version(new)})')
+    if not yes:
+        if refuse_open():
+            return 2, False
+        installed = f'a {version(APP)}' if APP.exists() else 'nenhuma'
+        if not ask(f'Instalar a {version(new)} em {APP}? A instalada é {installed}.'):
+            print('cancelado: o app instalado não mudou')
+            return 1, False
+    if APP.exists():
+        shutil.rmtree(APP)
+    if not ditto(new, APP):
+        print(f'falhou:   o ditto não copiou o app, e o antigo já foi apagado. Repita:\n'
+              f"          ditto '{new}' '{APP}'")
+        return 1, True
+    print(f'instalado: {APP}  ({version(APP)})')
+    if dmg:
+        for image in sorted((src / 'dist').glob('*.dmg')):
+            shutil.copy2(image, DOWNLOADS / image.name)
+            print(f'dmg:      {DOWNLOADS / image.name}')
+    return 0, False
+
+
+def run(checkout: Path | None, dmg: bool, yes: bool, clean: bool) -> int:
+    if not yes and refuse_open():
+        return 2
+    if checkout is not None:
+        code, _ = install(checkout, dmg, yes)
+        if clean:
+            shutil.rmtree(checkout / 'dist', ignore_errors=True)
+            print(f'removido: {checkout / "dist"}')
+        return code
+
+    temp = Path(tempfile.mkdtemp(prefix='brza-app-'))
+    src = temp / 'brza-studio'
+    keep = False
+    try:
+        runtime.worktree_add(src)
+        print(f'worktree: {src}  (detached, da origin/master)')
+        runtime.install_offline(src)
+        print('install:  ok (offline)')
+        code, keep = install(src, dmg, yes)
+        return code
+    except runtime.BrzaError as e:
+        print(f'falhou:   {e}')
+        return 1
+    finally:
+        if keep:
+            print(f'          o worktree fica em {src}; depois do ditto, git -C {runtime.STUDIO} worktree remove'
+                  f' --force {src}')
+        else:
+            if (src / '.git').exists():
+                runtime.git('worktree', 'remove', '--force', str(src))
+            shutil.rmtree(temp, ignore_errors=True)
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog='brza app', description='Constrói o BrzA Studio e o instala em /Applications.')
+    sub = ap.add_subparsers(dest='command', required=True)
+    inst = sub.add_parser('install', help='constrói da origin/master, ou de --from, e instala em /Applications')
+    inst.add_argument('--from', dest='checkout', type=Path, metavar='CHECKOUT',
+                      help='constrói neste checkout em vez de um worktree temporário da origin/master')
+    inst.add_argument('--dmg', action='store_true', help='gera também o .dmg e o copia para ~/Downloads')
+    inst.add_argument('--yes', action='store_true', help='não pergunta, e instala mesmo com o app aberto')
+    inst.add_argument('--clean', action='store_true',
+                      help='apaga o dist no fim; sem --from, o worktree temporário já sai com ele')
+    args = ap.parse_args(argv)
+
+    if args.checkout is not None:
+        args.checkout = args.checkout.expanduser().resolve()
+        if not (args.checkout / 'package.json').is_file():
+            ap.error(f'--from: {args.checkout} não é um checkout do brza-studio')
+    return run(args.checkout, args.dmg, args.yes, args.clean)
+
+
+if __name__ == '__main__':
+    sys.exit(main())

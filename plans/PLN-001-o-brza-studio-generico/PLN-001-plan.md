@@ -332,6 +332,46 @@ Respondida em 2026-10-28, na mesma sessão, duas vezes, a pedido de Anderson ("p
    **Decidido — "Git novo, GitHub e Jira reusados (Recomendado)".** Reescreve o D37; no P50, o Figma fica com o
    `pen-tool`.
 
+### Rodada 36 — a prévia de imagem: o que falta e de onde vem a imagem da ferramenta (enviada 2026-10-28)
+
+> **Apresentado antes**, levantado em `brza-studio@7e9e0d18948`: o `![]()` da mensagem já vira imagem, por URL ou por
+> caminho local (`NativeChatMarkdown.tsx:73` → `NativeChatMarkdownImage.tsx`, com carga perto da tela e "Preview
+> unavailable" na falha); o anexo enviado já tem miniatura na mensagem (`NativeChatUserMessageRow.tsx:138-164`); ampliar
+> ao clicar já existe (`MarkdownImageLightbox.tsx` e `PanZoomImageDialog.tsx`, com pan e zoom). A lacuna é a imagem
+> lida por ferramenta: o `resultText` de `claude-structured-item-translation.ts:127-143` fica só com os blocos `text` do
+> `tool_result` e descarta o bloco `image` em base64; o `NativeChatToolResultBlock` (`native-chat-types.ts:94-104`) só
+> tem `output: string`; e o journal corta o que passa do limite (`journal-payload-bounds.ts:44-51`). O caminho ou a URL
+> de imagem solto no texto, fora do `![]()`, não vira imagem.
+
+Respondida em 2026-10-28, na sessão do `brza-workspace` que desenhou o pedido 30.
+
+1. **R36.1 — O que motivou o pedido?** Seleção única. Opções: imagem de ferramenta (recomendada) — as partes 1, 3 e 4
+   viram conferência do que existe — custo: ~0,3 h; se paga: agora; nunca vi prévia nenhuma — um passo de diagnóstico
+   antes — custo: +1 a 2 h; se paga: no primeiro passo, se for defeito; caminho solto no texto — custo: ~3 a 4 h; se
+   paga: na primeira resposta que cite um print.
+
+   **Decidido — "Imagem de ferramenta (Recomendado)".**
+
+2. **R36.2 — De onde vem a imagem da ferramenta?** Seleção única. Opções: extrair para arquivo (recomendada) — o main
+   tira o bloco `image` do `tool_result`, grava num arquivo e põe a referência no resultado; vale para o `Read`, o Figma e
+   o browser — custo: ~4 a 5 h; se paga: na primeira ferramenta além do `Read`; só o `Read`, pelo `file_path` — custo:
+   ~1,5 h; se paga: agora, sem o `get_screenshot` do P50; base64 no journal — custo: ~3 h e os limites; se paga: nunca,
+   pelo corte.
+
+   **Decidido — "Extrair para arquivo (Recomendado)".**
+
+3. **R36.3 — Onde a miniatura aparece na linha da ferramenta?** Seleção única. Opções: com a linha fechada
+   (recomendada) — ~96 px de altura, abaixo do título, o clique amplia — custo: ~1 h; se paga: na hora; só com a linha
+   aberta — custo: ~0,5 h; se paga: se muitos prints poluírem; só um ícone — custo: ~0,7 h; se paga: se abrir for raro.
+
+   **Decidido — "Com a linha fechada (Recomendado)".**
+
+4. **R36.4 — E o mobile?** Seleção única. Opções: só desktop agora (recomendada) — o mobile segue com o anexo e o
+   `image-ref`, sem a imagem de ferramenta — custo: zero; se paga: agora; mobile junto, pelo relay — custo: +4 a 6 h; se
+   paga: só com sessões acompanhadas pelo celular.
+
+   **Decidido — "Só desktop agora (Recomendado)".**
+
 ## Passos
 
 > Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com

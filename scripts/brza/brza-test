@@ -1,0 +1,238 @@
+#!/usr/bin/env python3
+"""Roda os testes alterados de um worktree do brza-studio e o check:changed, e separa a falha nova da que já falhava na
+master.
+
+  brza-test [<worktree>] [--no-baseline] [-- <caminhos de teste>]
+      no worktree (padrão: o atual), roda o vitest nos testes dos arquivos alterados contra a origin/master (ou nos
+      caminhos dados, relativos à raiz do worktree), e o pnpm check:changed --base=origin/master --maxWorkers=2. Se
+      algum teste falha, cria um worktree temporário da origin/master, roda nele só os arquivos que falharam e o remove
+      no fim; --no-baseline pula essa conferência.
+
+O teste alterado é o *.test.ts, *.test.tsx ou *.test.mjs alterado, e o vizinho de mesmo nome de cada fonte alterada; a
+fonte sem vizinho entra no relatório como "sem teste". Alterado é o que difere do merge-base com a origin/master, com o
+que não foi commitado e o não rastreado. O vitest roda como o pnpm test: build dos pacotes, o runtime nativo do node e
+o config/scripts/run-vitest.mjs.
+
+O relatório separa "passou", "falha nova" (passa na master, ou o arquivo não existe lá) e "já falhava na master", teste
+a teste. Saídas: 0 sem falha nova e com o check:changed verde; 1 com falha nova, com falha sem baseline, com o
+check:changed vermelho ou quando o vitest não roda; 2 uso errado.
+"""
+import argparse
+import json
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import brza_runtime as runtime  # noqa: E402
+
+TEST_SUFFIXES = ('.test.ts', '.test.tsx', '.test.mjs')
+SOURCE = re.compile(r'(?<!\.d)\.(ts|tsx|mts|js|mjs|cjs)$')
+PRELUDE = (['node', 'config/scripts/build-workspace-packages.mjs'],
+           ['node', 'config/scripts/ensure-native-runtime.mjs', '--runtime=node'])
+CHECK = ['pnpm', 'check:changed', '--base=origin/master', '--maxWorkers=2']
+TAIL = 40
+
+
+def seconds(start: float) -> str:
+    return f'{time.monotonic() - start:.1f} s'.replace('.', ',')
+
+
+def tail(text: str, lines: int = TAIL) -> str:
+    return '\n'.join(text.rstrip().splitlines()[-lines:])
+
+
+def worktree_root(path: Path) -> Path | None:
+    """A raiz do worktree do brza-studio que contém `path`, ou None quando ele é de outro repositório."""
+    try:
+        top = runtime.git('rev-parse', '--show-toplevel', cwd=path).strip()
+        common = runtime.git('rev-parse', '--path-format=absolute', '--git-common-dir', cwd=path).strip()
+    except runtime.BrzaError:
+        return None
+    if Path(common).resolve() != (runtime.STUDIO / '.git').resolve():
+        return None
+    return Path(top).resolve()
+
+
+def changed_files(root: Path) -> list[str]:
+    """O que difere do merge-base com a origin/master — commitado, no índice ou no disco — e o não rastreado, sem os
+    apagados."""
+    base = runtime.git('merge-base', 'origin/master', 'HEAD', cwd=root).strip()
+    tracked = runtime.git('diff', '--name-only', '--diff-filter=d', base, cwd=root).splitlines()
+    untracked = runtime.git('ls-files', '--others', '--exclude-standard', cwd=root).splitlines()
+    return sorted(set(tracked) | set(untracked))
+
+
+def select_tests(root: Path, changed: list[str]) -> tuple[list[str], list[str]]:
+    """Os testes a rodar e as fontes sem teste vizinho."""
+    tests, untested = set(), []
+    for rel in changed:
+        if rel.endswith(TEST_SUFFIXES):
+            tests.add(rel)
+        elif SOURCE.search(rel):
+            stem = SOURCE.sub('', rel)
+            neighbours = [stem + s for s in TEST_SUFFIXES if (root / (stem + s)).is_file()]
+            tests.update(neighbours)
+            if not neighbours:
+                untested.append(rel)
+    return sorted(tests), sorted(untested)
+
+
+def vitest_command(files: list[str], output: Path) -> list[str]:
+    return ['node', 'config/scripts/run-vitest.mjs', 'run', '--config', 'config/vitest.config.ts',
+            '--reporter=json', f'--outputFile={output}', *files]
+
+
+def parse_report(report: dict, root: Path) -> dict[str, list[str]]:
+    """Cada arquivo do relatório JSON do vitest com os testes que falharam; '' é a falha do arquivo inteiro, que não
+    chegou a rodar teste."""
+    results = {}
+    for entry in report.get('testResults', []):
+        rel = Path(entry['name']).resolve().relative_to(root.resolve()).as_posix()
+        failed = [a['fullName'] for a in entry.get('assertionResults', []) if a.get('status') == 'failed']
+        if entry.get('status') == 'failed' and not failed:
+            failed = ['']
+        results[rel] = failed
+    return results
+
+
+def run_vitest(root: Path, files: list[str]) -> dict[str, list[str]]:
+    """Roda o vitest em `files`, como o pnpm test, e devolve o parse_report; o vitest que não roda vira BrzaError."""
+    for command in PRELUDE:
+        r = subprocess.run(command, cwd=root, capture_output=True, text=True)
+        if r.returncode != 0:
+            raise runtime.BrzaError(f'{" ".join(command)} falhou em {root}\n{tail(r.stdout + r.stderr)}')
+    with tempfile.TemporaryDirectory(prefix='brza-test-report-') as temp:
+        output = Path(temp) / 'vitest.json'
+        r = subprocess.run(vitest_command(files, output), cwd=root, capture_output=True, text=True)
+        try:
+            report = json.loads(output.read_text())
+        except (OSError, ValueError):
+            raise runtime.BrzaError(f'o vitest não gravou o relatório (saída {r.returncode})\n'
+                                    f'{tail(r.stdout + r.stderr)}') from None
+    return parse_report(report, root)
+
+
+def remove_temporary(path: Path):
+    """Tira o worktree temporário mesmo sujo pelos testes: ele é deste comando, e nada nele é trabalho de alguém."""
+    try:
+        runtime.worktree_remove(path)
+    except runtime.BrzaError:
+        try:
+            runtime.git('worktree', 'remove', '--force', str(path))
+        except runtime.BrzaError:
+            shutil.rmtree(path, ignore_errors=True)
+            runtime.git('worktree', 'prune')
+    shutil.rmtree(path.parent, ignore_errors=True)
+
+
+def baseline(files: list[str]) -> dict[str, list[str]]:
+    """As falhas de `files` num worktree temporário da origin/master, que sai no fim; o arquivo que não existe na
+    master fica de fora."""
+    path = Path(tempfile.mkdtemp(prefix='brza-test-')).resolve() / 'master'
+    try:
+        runtime.worktree_add(path, fetch=False)
+        present = [f for f in files if (path / f).is_file()]
+        if not present:
+            return {}
+        runtime.install_offline(path)
+        return run_vitest(path, present)
+    finally:
+        remove_temporary(path)
+
+
+def run_check(root: Path) -> tuple[bool, str]:
+    r = subprocess.run(CHECK, cwd=root, capture_output=True, text=True)
+    return r.returncode == 0, r.stdout + r.stderr
+
+
+def section(title: str, lines: list[str]):
+    if lines:
+        print(f'{title}:')
+        for line in lines:
+            print(f'  {line}')
+
+
+def label(file: str, name: str) -> str:
+    return f'{file} › {name}' if name else f'{file} (o arquivo)'
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    paths = None
+    if '--' in argv:
+        cut = argv.index('--')
+        argv, paths = argv[:cut], argv[cut + 1:]
+    ap = argparse.ArgumentParser(prog='brza test', description='Roda os testes alterados e o check:changed de um '
+                                 'worktree do brza-studio, com o baseline da origin/master.')
+    ap.add_argument('worktree', nargs='?', help='o worktree; padrão: o diretório atual')
+    ap.add_argument('--no-baseline', action='store_true', help='não confere as falhas na origin/master')
+    args = ap.parse_args(argv)
+
+    root = worktree_root(Path(args.worktree or '.').resolve())
+    if root is None:
+        ap.error(f'{args.worktree or Path.cwd()} não é um worktree do brza-studio ({runtime.STUDIO})')
+
+    try:
+        try:
+            runtime.git('fetch', 'origin')
+        except runtime.BrzaError as e:
+            print(f'CHECK:    sem fetch ({e}); a origin/master é a do último fetch')
+        untested = []
+        if paths:
+            tests = paths
+        else:
+            tests, untested = select_tests(root, changed_files(root))
+
+        results = {}
+        if tests:
+            start = time.monotonic()
+            results = run_vitest(root, tests)
+            print(f'vitest:   {len(tests)} arquivo(s) em {seconds(start)}')
+        failures = {(f, n) for f, names in results.items() for n in names}
+
+        old, unclassified = set(), set()
+        if failures and args.no_baseline:
+            unclassified = failures
+        elif failures:
+            start = time.monotonic()
+            try:
+                master = baseline(sorted({f for f, _ in failures}))
+                print(f'baseline: origin/master em {seconds(start)}')
+                old = failures & {(f, n) for f, names in master.items() for n in names}
+            except runtime.BrzaError as e:
+                print(f'baseline: falhou em {seconds(start)} ({e})')
+                unclassified = failures
+        new = failures - old - unclassified
+
+        start = time.monotonic()
+        check_ok, check_output = run_check(root)
+        check_time = seconds(start)
+    except runtime.BrzaError as e:
+        print(f'falhou:   {e}')
+        return 1
+
+    print()
+    passed = sorted(f for f, names in results.items() if not names)
+    print(f'passou:   {len(passed)} arquivo(s)' if tests else 'passou:   nenhum teste alterado')
+    for f in passed:
+        print(f'  {f}')
+    section('falha nova', [label(*k) for k in sorted(new)])
+    section('falha, sem baseline', [label(*k) for k in sorted(unclassified)])
+    section('já falhava na master', [label(*k) for k in sorted(old)])
+    section('não rodou', sorted(set(tests) - set(results)) if results else [])
+    section('sem teste', untested)
+    if check_ok:
+        print(f'check:changed: ok em {check_time}')
+    else:
+        print(f'check:changed: vermelho em {check_time}\n{tail(check_output)}')
+    return 1 if new or unclassified or not check_ok else 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

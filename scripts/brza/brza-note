@@ -1,0 +1,159 @@
+#!/usr/bin/env python3
+"""Cria o esqueleto de uma nota do brza-workspace e commita notas por caminho, com o checador antes.
+
+  brza-note new worklog <assunto> [--scope workspace,brza-studio]
+      cria work/worklogs/AAAA-MM-DD-<assunto>.md com o esqueleto do worklog e imprime o caminho; recusa se existe.
+  brza-note new issue <assunto> [--scope …] [--priority low|medium|high]
+      cria work/issues/<assunto>.md, com status: open e opened de hoje.
+  brza-note commit <caminho>… -m <mensagem> [--no-push]
+      roda o check_notes.py (sai se há erro), git add dos caminhos, commit só deles, git pull --rebase --autostash e
+      push na master; --no-push para no commit.
+
+O assunto é kebab-case, sem a data, e o --scope padrão é workspace. O worklog leva a sessão do $CLAUDE_SESSION_NAME,
+ou "<a escrever>" sem ele, e o H1 e o pedido ficam a escrever. O ## Fora do workspace sai vazio e é apagado quando não
+há o que registrar; os quatro campos estão no work/README.md.
+
+O caminho relativo parte do diretório atual quando ele está no workspace, e da raiz do workspace quando não está, como
+numa sessão do brza-studio. O commit leva só os caminhos dados, mesmo com outro arquivo no índice, porque outra sessão pode estar no mesmo checkout;
+o --autostash guarda e devolve o que estiver sujo ao lado durante o pull.
+
+Saídas: 0 feito; 1 recusado (a nota existe, o checador achou erro, nada a commitar) ou o git falhou; 2 uso errado.
+"""
+import argparse
+import datetime
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import brza_runtime as runtime  # noqa: E402
+
+SUBJECT = re.compile(r'[a-z0-9]+(-[a-z0-9]+)*')
+DATED = re.compile(r'\d{4}-\d{2}-\d{2}-')
+PRIORITIES = ('low', 'medium', 'high')
+CHECKER = Path('.claude') / 'skills' / 'notes-checker' / 'scripts' / 'check_notes.py'
+
+WORKLOG = """---
+scope:
+{scope}
+---
+
+# <H1 a escrever>
+
+O pedido de Anderson, em {today}, na sessão `{session}`: "<o pedido>".
+
+## O que se fez
+
+## O que ficou
+
+## Fora do workspace
+"""
+
+ISSUE = """---
+status: open
+scope:
+{scope}
+opened: {today}
+{priority}---
+
+# <H1 a escrever>
+
+## O pedido
+"""
+
+
+def today() -> datetime.date:
+    return datetime.date.today()
+
+
+def new(kind: str, subject: str, scope: list[str], priority: str | None) -> int:
+    fields = {'scope': '\n'.join(f'  - {s}' for s in scope), 'today': today().isoformat()}
+    if kind == 'worklog':
+        path = runtime.WORKSPACE / 'work' / 'worklogs' / f'{fields["today"]}-{subject}.md'
+        text = WORKLOG.format(**fields, session=os.environ.get('CLAUDE_SESSION_NAME') or '<a escrever>')
+    else:
+        path = runtime.WORKSPACE / 'work' / 'issues' / f'{subject}.md'
+        text = ISSUE.format(**fields, priority=f'priority: {priority}\n' if priority else '')
+    if path.exists():
+        print(f'recusado: {path} já existe')
+        return 1
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text)
+    print(path)
+    return 0
+
+
+def check() -> int:
+    """Roda o checador das notas do workspace e devolve a saída dele; a saída dele vai à tela."""
+    r = subprocess.run([sys.executable, str(runtime.WORKSPACE / CHECKER), '--root', str(runtime.WORKSPACE)],
+                       capture_output=True, text=True)
+    print((r.stdout + r.stderr).rstrip())
+    return r.returncode
+
+
+def commit(paths: list[str], message: str, push: bool) -> int:
+    if check() != 0:
+        print('recusado: o checador achou erro; nada foi commitado')
+        return 1
+    ws = runtime.WORKSPACE
+    runtime.git('add', '--', *paths, cwd=ws)
+    if not runtime.git('diff', '--cached', '--name-only', '--', *paths, cwd=ws).strip():
+        print('recusado: nada a commitar nos caminhos dados')
+        return 1
+    # Com caminhos, o commit leva só eles e deixa o resto do índice como está.
+    runtime.git('commit', '-q', '-m', message, '--', *paths, cwd=ws)
+    print(runtime.git('log', '-1', '--format=%h %s', cwd=ws).strip())
+    if not push:
+        return 0
+    runtime.git('pull', '-q', '--rebase', '--autostash', cwd=ws)
+    runtime.git('push', '-q', cwd=ws)
+    print(f'enviado:  {runtime.git("log", "-1", "--format=%h", cwd=ws).strip()} na origin')
+    return 0
+
+
+def relative(ap: argparse.ArgumentParser, raw: str) -> str:
+    """O caminho dado como caminho do workspace. O relativo parte do diretório atual quando ele está no workspace, e da
+    raiz do workspace quando não está; o que cai fora dele é uso errado."""
+    ws, cwd = runtime.WORKSPACE.resolve(), Path.cwd().resolve()
+    start = cwd if cwd.is_relative_to(ws) else ws
+    try:
+        return str((start / raw).resolve().relative_to(ws))
+    except ValueError:
+        ap.error(f'{raw} está fora do workspace ({runtime.WORKSPACE})')
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog='brza note', description='Cria o esqueleto de nota e commita notas por caminho.')
+    sub = ap.add_subparsers(dest='command', required=True)
+    ap_new = sub.add_parser('new', help='cria o esqueleto de um worklog ou de uma issue')
+    ap_new.add_argument('kind', choices=('worklog', 'issue'))
+    ap_new.add_argument('subject', metavar='assunto', help='em kebab-case, sem a data')
+    ap_new.add_argument('--scope', default='workspace', help='lista separada por vírgula; padrão workspace')
+    ap_new.add_argument('--priority', choices=PRIORITIES, help='só na issue')
+    ap_commit = sub.add_parser('commit', help='checa, commita os caminhos dados e faz o push')
+    ap_commit.add_argument('paths', nargs='+', metavar='caminho')
+    ap_commit.add_argument('-m', dest='message', required=True, help='a mensagem do commit')
+    ap_commit.add_argument('--no-push', action='store_true', help='para no commit, sem pull nem push')
+    args = ap.parse_args(argv)
+
+    try:
+        if args.command == 'new':
+            if not SUBJECT.fullmatch(args.subject) or DATED.match(args.subject):
+                ap_new.error(f'assunto inválido: {args.subject}; use kebab-case, sem a data')
+            if args.priority and args.kind != 'issue':
+                ap_new.error('--priority vale só na issue')
+            scope = [s.strip() for s in args.scope.split(',') if s.strip()]
+            if not scope:
+                ap_new.error('--scope vazio')
+            return new(args.kind, args.subject, scope, args.priority)
+        return commit([relative(ap_commit, p) for p in args.paths], args.message, not args.no_push)
+    except runtime.BrzaError as e:
+        print(f'falhou:   {e}')
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())

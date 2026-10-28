@@ -1449,7 +1449,7 @@ que a regra consulta. O layout não é testável em jsdom. O visual inline não 
 
 #### P53 — Os links do chat em azul claro (pedido 29)
 
-Executa D41 · Estimado: 0,3 h · Executado: 0,1 h
+Executa D41 · Estimado: 0,3 h · Executado: 0,6 h
 
 - [x] **1.** Teste que falha: o link do chat usa a variável `--chat-link`, `#79C0FF` no tema escuro e `#0969DA` no
       claro, e não o `--chat-foreground-strong` de hoje, em `.native-chat-markdown a`
@@ -1457,7 +1457,7 @@ Executa D41 · Estimado: 0,3 h · Executado: 0,1 h
 - [x] **2.** O sublinhado segue com 40% da cor (`color-mix(in srgb, currentColor 40%, transparent)`), e a mensagem com
       tom `faint` segue herdando a cor (`:55`); os testes; commit e push
 - [ ] **3.** Conferir um link em azul claro nos dois temas, no BrzA Studio, com Anderson
-- [ ] **4.** O link sobre código inline também em azul: em 2026-10-28, numa sessão de chat do `brza-workspace`, Anderson
+- [x] **4.** O link sobre código inline também em azul: em 2026-10-28, numa sessão de chat do `brza-workspace`, Anderson
       viu o caminho `~/Projects/fixfy`, escrito como código inline e virado link pelo chat, em branco e não em azul
       ("nesse link, o texto ficou branco e não azul"); o `color: var(--chat-code-foreground)` de
       `.native-chat-markdown code` (`native-chat-markdown.css:35`) vence a cor que o `code` herdaria do link
@@ -1479,6 +1479,20 @@ modo "igualar ao terminal". A linha upstream de `.native-chat-markdown a` passou
 a regra do tom `faint` não mudaram, e o `faint` ganha pela especificidade. **Desvio do texto do passo:** sem teste de
 unidade, porque a cor é só CSS, e o jsdom não a resolve. Conferido na fixture: `#79C0FF` no escuro e `#0969DA` no claro.
 Falta a conferência no BrzA Studio com Anderson (subpasso 3).
+
+**Evidência do 4:** commit [`1a6cbf3e14c`](https://github.com/brz-anderson/brza-studio/commit/1a6cbf3e14c), na `master`
+do `brza-studio`, pelo worker Sonnet `ctx_1915e2e41676` da Run `run_edd8afa07cbf`, com o autor conferido. A regra
+`.native-chat-markdown a code { color: inherit }` mora no `brza-chat-link.css`, sem arquivo do upstream tocado. O DOM é
+`a > code`: o `inlineCodeFileLink` (`comment-markdown-native-chat-file-links.ts:255-269`) embrulha o `inlineCode` num
+`link`. `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts
+src/renderer/src/components/native-chat/brza-chat-link.test.ts` → 1 arquivo, 1 passed: o teste lê o CSS e afirma a
+regra, e falhava antes dela. No Chromium, sobre os dois CSS reais do chat, o `code` dentro do link sai `#79C0FF` no
+escuro e `#0969DA` no claro, a cor do `a`; o `code` sem link segue com o `--chat-code-foreground`; a borda, o fundo e o
+sublinhado ficam. `pnpm check:changed --base=origin/master` → 20 de 21; o vermelho é o import boundaries, preexistente,
+em [O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md).
+Executado 0,5 h. **Desvios propostos pelo worker, a levar a `## Desvios` depois da Run `run_de875fc52a75`:** o push
+com esse gate vermelho, por resposta de Anderson; e o tom `faint` sem medição útil na fixture, porque o
+`native-chat-markdown.css:55` já põe `a, code` em `inherit` nesse tom, e fica para o C10. Falta o C10 com Anderson.
 
 #### P54 — A imagem da ferramenta extraída para arquivo (pedido 30)
 
@@ -1770,6 +1784,8 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 
 - [Os Passos e os Desvios do PLN-001 no molde, depois da Run do P44 ao P50](../../work/issues/pln-001-passos-e-desvios-no-molde-depois-da-run.md)
   — da rodada de 2026-10-28 na sessão `pln-001-norma-fixfy`; espera a Run `run_de875fc52a75` fechar.
+- [O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md)
+  — achado pelos workers do P53.4 e do P40, em 2026-10-28; o conserto é do PLN-002.
 
 ## Casos manuais
 

@@ -90,6 +90,34 @@ da Fixfy faz lá. O hook de medição registrou as duas.
   `/orchestration`.
 - **`pln-001-pedido-30`:** conduz a entrevista e o desenho da prévia de imagem no chat, sem código.
 
+## As sessões em modo chat
+
+Anderson pediu que as sessões abrissem em modo chat e que esta sessão coordenasse com a `brza-workspace-80`, que
+adaptava os scripts da Fixfy para o brza. A coordenação foi por `/orchestration`, com mensagens diretas entre as duas
+sessões, sem Run.
+
+- **A divisão**, decidida por Anderson numa rodada da `brza-workspace-80`: o abridor de sessões fica com esta sessão.
+  O `claude-brza`, o `brza-run`, o `brza-install` e o módulo comum `brza_runtime.py` ficam com a outra (`54aefe3`).
+- **O `brza-sessions`** (`scripts/brza/brza-sessions`, `711ed55`, com 6 testes em
+  `scripts/brza/tests/test_brza_sessions.py`):
+  - abre o chat com `brza agent launch --surface chat` e `/rename <nome>` como primeiro prompt;
+  - manda a tarefa pelo `agentSession.send`, com `queue-if-active`, montando o envelope como o
+    `structuredAgentSessionMessageSendMutation` do app;
+  - pula o nome que já roda, lido de `~/.claude/sessions` e de `claude-profiles/*/home/sessions`;
+  - fora do `brza-workspace`, avisa quando o `agentCmdOverrides.claude` não é o `claude-brza`.
+
+  Foi testado com um chat real, o `brza-sessions-teste`, que ficou aberto para Anderson fechar a aba, porque o CLI não
+  fecha chat.
+- **A troca das sessões**, a pedido de Anderson ("peça as sessões que abriram no terminal para que devolvam o trabalho
+  pra vc, ai voce fecha elas e reabre com o modo de chat"):
+  - **`pln-001-p44-p50`:** ela gravou o estado no `Retomar` e respondeu "3cf6ad6 — sem Run". O terminal foi fechado, e
+    a sessão voltou em chat (`claude_6537844c…`) para disparar a Run.
+  - **`pln-001-pedido-30`:** ela já tinha terminado, com o worklog `2026-10-28-pedido-30-previa-de-imagem-desenhada.md`.
+    O terminal foi fechado e a sessão não voltou.
+- **"tudo sob a tag `brza` sem kebab-case, `brza sessions`":** a `brza-workspace-80` levou isso a Anderson, que
+  respondeu "No CLI do app, como no git". O CLI vai mandar o `brza X` desconhecido ao `brza-X` do PATH, e nenhum
+  arquivo muda de nome. A mudança é a issue `cli-brza-manda-subcomando-desconhecido-ao-brza-x-do-path.md`.
+
 ## Fora do workspace
 
 - **`/private/tmp/brza-icon/`**:

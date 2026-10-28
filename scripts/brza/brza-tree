@@ -1,0 +1,213 @@
+#!/usr/bin/env python3
+"""Cria, remove e lista os worktrees do brza-studio em .worktrees/, sem tocar no checkout principal.
+
+  brza-tree <nome> [--type feat|fix|docs|chore] [--base <ref>] [--chat <sessão>]
+      cria ~/Projects/brza-studio/.worktrees/<nome> na branch <tipo>/<nome> (tipo padrão feat), a partir da
+      origin/master depois de git fetch origin, ou de --base; instala com pnpm install --offline --frozen-lockfile e
+      imprime o caminho. --chat abre a sessão no worktree pelo brza-sessions --checkout.
+  brza-tree --rm <nome> [--force]
+      remove o worktree e a branch quando o HEAD é ancestral da origin/master e o worktree está limpo. A branch sem
+      commit próprio pede --force, porque "na origin/master" vale também para ela. Diretório em .worktrees/ sem registro
+      no git worktree list é órfão: remove com --force, depois de listar o que há nele.
+  brza-tree --list
+      os worktrees de .worktrees/, cada um com a branch, os commits à frente da origin/master, se está limpo e os órfãos.
+
+Saídas: 0 feito; 1 recusado (sujo, não mergeado, sem commit próprio, órfão sem --force) ou falhou; 2 uso errado. O
+install offline que falha não apaga o worktree: imprime o caminho e o pnpm install --frozen-lockfile a rodar lá, e sai
+com 1.
+
+Quando o nome é de plano, ele traz o pln-NNN-: `brza-tree pln-002-p3` cria .worktrees/pln-002-p3 em feat/pln-002-p3.
+"""
+import argparse
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import brza_runtime as runtime  # noqa: E402
+
+SESSIONS = HERE / 'brza-sessions'
+TYPES = ('feat', 'fix', 'docs', 'chore')
+NAME = re.compile(r'[a-z0-9][a-z0-9._-]*')
+
+
+def trees_dir() -> Path:
+    return runtime.STUDIO / '.worktrees'
+
+
+def registered() -> dict[Path, str | None]:
+    """Os worktrees do git worktree list, cada caminho com a branch, ou None quando está detached."""
+    trees, path = {}, None
+    for line in runtime.git('worktree', 'list', '--porcelain').splitlines():
+        if line.startswith('worktree '):
+            path = Path(line[len('worktree '):]).resolve()
+            trees[path] = None
+        elif line.startswith('branch refs/heads/'):
+            trees[path] = line[len('branch refs/heads/'):]
+    return trees
+
+
+def fetch(required: bool = True):
+    try:
+        runtime.git('fetch', 'origin')
+    except runtime.BrzaError as e:
+        if required:
+            raise
+        print(f'CHECK:    sem fetch ({e}); a origin/master é a do último fetch')
+
+
+def dirty(path: Path) -> bool:
+    return bool(runtime.git('status', '--porcelain', cwd=path).strip())
+
+
+def merged(path: Path) -> bool:
+    try:
+        runtime.git('merge-base', '--is-ancestor', 'HEAD', 'origin/master', cwd=path)
+    except runtime.BrzaError:
+        return False
+    return True
+
+
+def own_commits(branch: str) -> bool:
+    """Se a branch andou depois de criada. Pelo reflog: ele começa em "branch: Created from …" e ganha uma linha por
+    commit, rebase ou merge. Reflog vazio, ou expirado, conta como sem commit próprio, o lado seguro."""
+    try:
+        moves = runtime.git('reflog', 'show', '--format=%gs', f'refs/heads/{branch}').splitlines()
+    except runtime.BrzaError:
+        return False
+    return any(not m.startswith('branch: ') for m in moves)
+
+
+def ahead(path: Path) -> int:
+    return int(runtime.git('rev-list', '--count', 'origin/master..HEAD', cwd=path).strip())
+
+
+def contents(path: Path) -> str:
+    return ', '.join(sorted(p.name + ('/' if p.is_dir() else '') for p in path.iterdir())) or 'vazio'
+
+
+def create(name: str, kind: str, base: str | None, chat: str | None) -> int:
+    path, branch = trees_dir() / name, f'{kind}/{name}'
+    if path.exists():
+        print(f'recusado: {path} já existe; use outro nome, ou brza tree --rm {name}')
+        return 1
+    try:
+        fetch()
+        runtime.worktree_add(path, base=base or 'origin/master', branch=branch, fetch=False)
+    except runtime.BrzaError as e:
+        print(f'falhou:   {e}')
+        return 1
+    print(f'worktree: {path}  ({branch}, de {base or "origin/master"})')
+    try:
+        runtime.install_offline(path)
+    except runtime.BrzaError as e:
+        print(f'CHECK:    {e}')
+        print(f'          o worktree fica em {path}; rode lá `pnpm install --frozen-lockfile`')
+        return 1
+    print('install:  ok (offline)')
+    if chat:
+        r = subprocess.run([str(SESSIONS), chat, '--checkout', str(path)])
+        if r.returncode != 0:
+            return 1
+    print(path)
+    return 0
+
+
+def remove(name: str, force: bool) -> int:
+    path = trees_dir() / name
+    trees = registered()
+    resolved = path.resolve()
+    if resolved not in trees:
+        if not path.is_dir():
+            print(f'recusado: {path} não existe nem está no git worktree list')
+            return 1
+        print(f'órfão:    {path} não está no git worktree list; contém: {contents(path)}')
+        if not force:
+            print('recusado: confira o que há nele e repita com --force para apagar')
+            return 1
+        shutil.rmtree(path)
+        print(f'removido: {path}')
+        return 0
+
+    branch = trees[resolved]
+    fetch()
+    refusals = []
+    if dirty(path):
+        refusals.append('o worktree está sujo')
+    if not merged(path):
+        refusals.append('o HEAD não está na origin/master')
+    elif branch and not own_commits(branch):
+        refusals.append(f'a branch {branch} está sem commit próprio, e pode ser trabalho que nem começou')
+    if refusals and not force:
+        for reason in refusals:
+            print(f'recusado: {reason}')
+        print(f'          repita com --force para remover {path}{f" e a branch {branch}" if branch else ""} assim mesmo')
+        return 1
+    runtime.git('worktree', 'remove', *(('--force',) if force else ()), str(path))
+    print(f'removido: {path}')
+    if branch:
+        runtime.git('branch', '-D', branch)
+        print(f'removido: a branch {branch}')
+    return 0
+
+
+def list_trees() -> int:
+    fetch(required=False)
+    trees = registered()
+    root = trees_dir().resolve()
+    names = {p.name for p in trees if p.parent == root}
+    if root.is_dir():
+        names |= {p.name for p in root.iterdir() if p.is_dir()}
+    if not names:
+        print(f'nenhum worktree em {trees_dir()}')
+        return 0
+    width = max(map(len, names))
+    for name in sorted(names):
+        path = root / name
+        if path not in trees:
+            print(f'{name:<{width}}  órfão, fora do git worktree list; contém: {contents(path)}')
+        elif not path.is_dir():
+            print(f'{name:<{width}}  registrado, mas o diretório sumiu; git worktree prune o limpa')
+        else:
+            state = 'sujo' if dirty(path) else 'limpo'
+            print(f'{name:<{width}}  {trees[path] or "detached":<28}  {ahead(path)} à frente  {state}')
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog='brza tree', description='Cria, remove e lista os worktrees do brza-studio.')
+    ap.add_argument('name', nargs='?', help='o worktree a criar, em .worktrees/<nome>')
+    ap.add_argument('--type', choices=TYPES, help='o tipo da branch, <tipo>/<nome>; padrão feat')
+    ap.add_argument('--base', help='a ref de onde a branch sai; padrão origin/master')
+    ap.add_argument('--chat', metavar='SESSÃO', help='abre a sessão no worktree pelo brza-sessions --checkout')
+    ap.add_argument('--rm', metavar='NOME', help='remove o worktree e a branch')
+    ap.add_argument('--force', action='store_true', help='com --rm: remove o sujo, o não mergeado e o órfão')
+    ap.add_argument('--list', action='store_true', help='lista os worktrees de .worktrees/ e os órfãos')
+    args = ap.parse_args(argv)
+
+    if sum((args.name is not None, args.rm is not None, args.list)) != 1:
+        ap.error('use um de: <nome>, --rm <nome> ou --list')
+    if (args.type or args.base or args.chat) and args.name is None:
+        ap.error('--type, --base e --chat valem só para criar')
+    if args.force and args.rm is None:
+        ap.error('--force vale só com --rm')
+    name = args.name or args.rm
+    if name is not None and not NAME.fullmatch(name):
+        ap.error(f'nome inválido: {name}; use minúsculas, dígitos, ponto, hífen e sublinhado')
+
+    try:
+        if args.list:
+            return list_trees()
+        if args.rm is not None:
+            return remove(args.rm, args.force)
+        return create(args.name, args.type or 'feat', args.base, args.chat)
+    except runtime.BrzaError as e:
+        print(f'falhou:   {e}')
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())

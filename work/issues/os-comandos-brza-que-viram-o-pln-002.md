@@ -16,10 +16,9 @@ Em 2026-10-28, a sessão `brza-comandos-lacunas` levantou os passos manuais que 
 um passo por comando. O levantamento e as respostas estão em
 [Os comandos brza que faltam, levantados nas notas e nos scripts](../worklogs/2026-10-28-os-comandos-brza-que-faltam.md).
 
-**Pendente:**
-- escrever o PLN-002 pela skill `plan-runner`;
-- reabrir a `brza-workspace-2d`, dona do `brza-sessions` (`711ed55`), e combinar com ela a interface do
-  `list/send/close`, como Anderson escolheu: "Reabrir a 2d e combinar".
+**Pendente:** o PLN-002 está escrito e aceito, em
+[PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`](../../plans/PLN-002-os-comandos-brza/PLN-002-plan.md).
+A combinação com a `brza-workspace-2d` virou o primeiro subpasso do P7 de lá (R5.2), e o resto segue nos passos.
 
 ## O que entra
 

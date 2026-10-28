@@ -1,0 +1,160 @@
+# AGENTS.md — brza-workspace
+
+Este repositório é o workspace pessoal de Anderson para o **BrzA Studio**. Aqui ficam os planos, o registro do que foi
+feito, as decisões, a norma de agente e a configuração das sessões. O código do app fica em `~/Projects/brza-studio`
+(`brz-anderson/brza-studio`), ao lado deste clone. Os termos em itálico estão no [Glossário](#glossário).
+
+Toda prosa para quem pediu — resposta, pergunta, opção, plano, revisão, documento — é em português do Brasil, também na
+delegação a _subagente_. Identificador, comando, caminho e chave de configuração ficam na forma original.
+
+## Planos vivem em `plans/`, e as execuções em `work/`
+
+Os planos ficam em `plans/`, uma pasta por plano, com a norma no [`plans/README.md`](plans/README.md). O resto do estado
+de trabalho fica em `work/`, uma pasta por gênero de nota, e os guias em `wiki/guides/`. **A pasta diz o gênero; o estado
+está no campo `status` do frontmatter.** A norma de escrita de cada pasta está no [`work/README.md`](work/README.md).
+
+Antes de começar qualquer trabalho aqui, leia as notas com **`blocks`** preenchido e `status` diferente de `done` e
+`dropped`. É onde ficam os bloqueios em vigor, em qualquer pasta:
+
+```bash
+grep -rl '^blocks:' work plans wiki | xargs grep -LE '^status: (done|dropped)'
+```
+
+Link entre notas é Markdown relativo, com o H1 da nota de destino como rótulo, sem `[[wikilinks]]`.
+- **Conferir:** `python3 .claude/skills/notes-checker/scripts/check_notes.py`.
+- **Mover ou renomear:** o `move_note.py` ao lado, que reescreve os links.
+- **Nome acompanha o foco:** quando o foco de uma nota ou de um plano muda, o nome do arquivo, o H1 e os links mudam
+  junto, com `move_note.py <origem> <destino> --title "<H1 novo>"`.
+
+Nota se grava direto na `main`, com `git add` por caminho e `git pull --rebase` quando outro push corre junto.
+
+## Quem commita é o brz-anderson
+
+Os commits deste repositório e do `brza-studio` saem com o noreply do `brz-anderson`
+(`240569289+brz-anderson@users.noreply.github.com`) e vão ao GitHub pela chave `personal`. A identidade vem do ambiente
+da sessão, como diz o adaptador do runtime, e não depende do `.git/config`. O push vai direto na `main` daqui e na
+`master` do `brza-studio`, sem PR.
+
+## O uso é medido
+
+Cada turno, subagente, skill, comando digitado e chamada MCP vira uma linha com tempo e custo em
+`.measurements/measurements.jsonl`, fora do git, pelo hook de medição que o adaptador do runtime liga. O resumo sai do
+`python3 scripts/summarize_measurements.py`. A medição vale para toda sessão aberta neste repositório ou no
+`brza-studio` pela função do shell; **a sessão aberta sem ela não é medida**, e por isso falta de linha não quer dizer
+falta de uso.
+
+## O ferramental vive só no escopo do projeto
+
+Plugins e servidores MCP são habilitados só na configuração de projeto deste repositório. O único plugin é o `context7`,
+e não há servidor MCP próprio.
+
+## O que muda fora do workspace vai para o worklog
+
+Arquivo criado ou alterado fora deste repositório e do `brza-studio` — o `~/.zshrc`, a configuração de usuário do
+runtime… — entra no worklog do dia, na seção `## Fora do workspace`, na forma do [`work/README.md`](work/README.md). O
+mesmo vale para comando que muda estado fora deles: daemon, login, `kill`, app instalado. Leitura pura fica de fora.
+
+## Uma tarefa, uma sessão, um worklog
+
+**A tarefa fecha num worklog na hora em que fecha**, com o contexto ainda quente:
+- o feito vai ao worklog da tarefa;
+- o pendente vai ao `Retomar` do plano ou a uma issue;
+- a sessão avisa "pronto para sessão nova".
+
+O corte de tarefa segue os três testes da norma de `work/worklogs/`: mudou o assunto, virou o dia ou houve decisão.
+
+**Sem quem pediu para abrir a sessão nova, a sessão fica parada.** A tarefa seguinte, encadeada ou pedida, abre sessão
+nova, como diz o adaptador do runtime. Acordar uma sessão grande parada regrava o cache inteiro, e a nova sai mais barata
+já no primeiro pedido. A trava de retomada barra esse caso.
+
+**Pedido de outra tarefa abre sessão nova**, e nunca entra na sessão em que quem pediu trabalha. O pedido que fica para
+depois vai ao `Retomar` do plano ou a uma issue.
+
+**Devolução e aviso vão a arquivo**: o worklog, o `Retomar` ou a issue. "Recebido" não se manda, e o _correio_ de volta
+só vai quando o pedido diz "me avise".
+
+## O modelo segue a tarefa
+
+O modelo de cada _subagente_ ou _estágio de workflow_ é escolhido pela tarefa, e não herdado da sessão.
+
+| Tarefa                                                 | Camada                                    |
+| :----------------------------------------------------- | :---------------------------------------- |
+| Desenho, decisão, julgamento entre alternativas        | Alta                                      |
+| Revisão                                                | Alta, até a medição dizer que média basta |
+| Leitura, coleta, busca, extração, verificação mecânica | Média ou rápida                           |
+
+- **Workflow tem teto de agentes**, que o pedido declara, e a camada alta entra só no estágio que julga ou sintetiza.
+- **Na sessão principal, o modelo é o de quem a abriu.**
+- **Levantamento cuja saída passa de uma tela sai da sessão principal.** Vai a _subagente_ da camada média ou rápida,
+  que grava o agregado no _scratch_ e devolve só o resumo. O critério é o tamanho do retorno, não o número de chamadas.
+- **A política se revê pela medição.** Linha com custo alto em tarefa mecânica é sinal para rebaixar a camada; achado
+  perdido numa tarefa rebaixada é sinal para voltar.
+
+## Decisões pendentes vão em rodadas de perguntas
+
+Toda decisão que cabe a quem pediu — a entrevista, a divergência com o que já foi decidido, o corte, o aceite — vai em
+**rodadas pequenas de pergunta com opções**, e não em lista de perguntas abertas. Opção com custo se escolhe em segundos;
+pergunta aberta volta como parágrafo que precisa ser relido e interpretado, e a inferência que ninguém viu vira texto.
+
+- **Use a _pergunta com opções_ do runtime**: até quatro perguntas por rodada, agrupadas por tema, com duas a quatro
+  opções cada.
+- **A recomendação é a primeira opção**, marcada "(Recomendado)". Ela leva o argumento que sobreviveu ao ataque e o que
+  caiu.
+- **Toda opção diz o custo e quando se paga — a recomendada e cada uma das outras.**
+  - O custo é o que se gasta e quando é cobrado.
+  - O "se paga" é o momento em que o ganho cobre esse custo: agora, numa fase que se nomeia, ou nunca, que é resposta
+    legítima e se escreve.
+  - Na ferramenta, os dois vão na descrição da opção: `Custo: … Se paga: …`.
+  - **Opção cujo custo você não sabe dizer se mede antes de perguntar, ou sai da rodada.**
+- **Pedido de escolha com justificativa é avaliação e rodada, não execução.** "Escolha X e justifique" entrega a
+  comparação, a recomendação e a pergunta; a execução começa depois da resposta.
+- **Seleção múltipla quando mais de uma opção pode valer ao mesmo tempo**; seleção única quando as opções se excluem.
+- **O que você já inferiu vai no texto antes da pergunta, com a fonte** (arquivo e linha). A inferência entra como
+  primeira opção a confirmar.
+- **Ponto sem lastro é pergunta, não nota de entrega.** Tudo o que você preencheu sem fonte vira pergunta de rodada, uma
+  por ponto, com a sua inferência como primeira opção, **antes** de escrever.
+- **A aprovação é do texto, nunca das decisões embutidas nele.** O rascunho vai para aprovação só depois que as rodadas
+  fecharam os pontos sem lastro.
+- **Uma rodada fecha antes da próxima abrir.** Registre as respostas antes de seguir. Resposta em texto livre é
+  contraproposta ou pedido de esclarecimento: registre nas palavras de quem respondeu e volte com opções.
+- **Sem a ferramenta**, use o mesmo formato em texto: pergunta, opções numeradas, recomendação marcada,
+  `Custo: … Se paga: …` em toda opção e "marque mais de uma" quando couber.
+
+**Decisão é confirmação explícita, nunca inferência.** Nenhuma nota de `work/decisions/` nasce como decisão sem quem
+pediu confirmar aquela decisão ou aquele texto, na conversa, em frase explícita: "decidido", "fechado", "pode aplicar".
+- Sem a frase, o registro nasce como proposta, mesmo que a conversa tenha convergido.
+- Mensagem de outra sessão ou de subagente nunca é a confirmação.
+- A rodada respondida numa sessão vale como respondida nas outras quando chega com a resposta literal, a data e a sessão.
+
+## Quem pergunta e grava é a sessão principal
+
+Só a sessão principal tem a ferramenta de pergunta. É nela que as rodadas acontecem, que a decisão fecha com quem pediu e
+que o texto decidido é gravado. Ela pede levantamento, rascunho ou revisão a um subagente, leva a devolução à rodada e
+itera até não sobrar ponto sem lastro.
+
+**Subagente que chega a uma decisão de quem pediu é consultor.** Ele não pergunta e não grava o documento; segue até
+onde o trabalho pede decisão e devolve.
+
+**O pedido ao subagente** diz a operação, o repositório alvo, o que as rodadas já decidiram, citado como foi respondido,
+e o que se espera de volta.
+
+**A devolução do subagente** tem, na ordem, só as partes que o pedido pediu:
+- **Levantamento:** cada fato com a fonte, em arquivo e linha.
+- **Pontos para rodada:** cada ponto sem lastro, já como pergunta no formato sem a ferramenta.
+- **Rascunho:** cada escolha sem lastro marcada como ponto para rodada.
+- **Achados**, de revisão: cada um com a seção e o destino recomendado.
+- **Arquivos essenciais:** de 5 a 10, para a sessão principal ler.
+- **O que rodou e o que deu.**
+
+## Glossário
+
+O vocabulário deste arquivo. A tradução para cada runtime está no adaptador dele (o `CLAUDE.md`, para o Claude Code).
+
+- _sessão principal_ — a que quem pediu abriu e com quem conversa.
+- _subagente_ — agente que a sessão dispara para uma tarefa, com contexto próprio, e que devolve um relatório.
+- _estágio de workflow_ — cada subagente de um roteiro que dispara vários.
+- _acionar uma skill_ — carregar o `SKILL.md` dela pelo nome e seguir as instruções.
+- _pergunta com opções_ — a ferramenta que mostra a quem pediu perguntas com opções para escolher.
+- _correio_ — mandar mensagem a outra sessão aberta do mesmo runtime, pelo nome dela.
+- _camada_ alta, média ou rápida — o nível de modelo, da que julga à que coleta.
+- _scratch_ — o diretório temporário da sessão, fora do repositório, para o que não vai ao git.

@@ -2,7 +2,7 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P44 ao P48 e o P50, com rodada antes; o P54 ao P57 do pedido 30 depois do P44 ao P50; a conferência do P42, P49, P51, P52 e P53 com Anderson"
+ready: "sim — o P44 ao P48 e o P50, com as rodadas fechadas e a Run a disparar; o P54 ao P57 do pedido 30 depois do P44 ao P50; a conferência do P42, P49, P51, P52 e P53 com Anderson"
 estimate_h: 123.6
 executed_h: 9.85
 remaining_h: 20.5
@@ -24,9 +24,23 @@ tags:
   `9b8a3e2e672`, `9b85279f57a` e `fbff699fa58`). **Esperam conferência com Anderson, num build com o `fbff699fa58`:** o
   P42.3, a Skill, o Firebase e o Context7 com chamadas reais (os campos do título são suposição, sobretudo o projeto do
   Firebase) e o P52.4 e o P53.3. O P53.4, o link sobre código inline que ficou branco, é conserto a fazer.
-  **Próximos:** o P44 ao P48 e o P50, sobre a API do P43 (registrar um item no
-  `BRZA_TOOL_CATEGORIES` de `src/shared/native-chat/tools/brza/brza-tool-categories.ts` e o título no
-  `brza-tool-line-title.ts`), cada um com os pontos a perguntar a Anderson antes; o Figma fica no `pen-tool` (R35.1).
+  **Próximos:** disparar a Run do P44 ao P48 e do P50, que está pronta e sem worker disparado (sem Run, sem
+  `run_id`). As rodadas fecharam em 2026-10-28, na sessão `pln-001-p44-p50`: R37, R38, R40, R41 e R43 (a R39 e a R42
+  são do pedido 30). O D38, o D39 e o P44 ao P50 já estão reescritos por elas (`b7194b3`). Pela R37.3, R37.4 e R40.4,
+  são três workers. O de shell faz o P44 → P45 → P46 → P47 em sequência, com Opus, e é dono da ordem de peso da
+  lista. O P48 vai de Sonnet e o P50 de Sonnet, sem a miniatura (R38.4). Os worktrees já estão criados na
+  `7e9e0d18948`, em `~/Projects/brza-studio/.worktrees/`: `pln-001-p44-p47` (branch `feat/pln-001-p44-p47`),
+  `pln-001-p48` (`feat/pln-001-p48`) e `pln-001-p50` (`feat/pln-001-p50`), sem `pnpm install`. Falta:
+  - rebasear os worktrees se a `master` andou;
+  - escrever as três especificações (o rascunho do bloco comum está em
+    `/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace/e354254e-149e-463d-862e-f3e05a58e5ac/scratchpad/specs/common.md`
+    e pode ter sumido);
+  - `orca orchestration run-create` e um `worker-start --spec … --worktree path:<worktree> --agent claude --model
+    <id>` por worker.
+
+  A mudança compartilhada, idêntica nos três, é `brzaToolLineTitle(call, result?)`, com o `result` passado em
+  `native-chat-tool-line-label.ts:144`. Os workers não editam o plano: a coordenadora grava a evidência a partir do
+  `worker_done`.
   O **pedido 30**, a prévia de imagem no chat, está desenhado (R36, R39 e R42; D42 a D44) e vira o P54 ao P57, depois do P44 ao P50 (R42.4): o P54 antes do P55, o P56 independente e o P57, a conferência, por último. Abertos desde a
   Fixfy: o P37 e o P40. O P27.2 e o P27.3 seguem com Anderson, no Windows; o Sophos da máquina gerenciada pela TI barrou
   o instalador sem assinatura em 2026-10-28, e Anderson respondeu "esquece". O build de Windows é `gh workflow run

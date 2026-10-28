@@ -1537,6 +1537,58 @@ Depois do P55 e do P56.
 
 **Evidência:** —
 
+## Regressão
+
+Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
+de teste citados abaixo passaram (359 testes), na `master`. "Teste a escrever" está na
+[issue de depois da Run](../../work/issues/pln-001-passos-e-desvios-no-molde-depois-da-run.md).
+
+- **O ícone e o título do upstream para toda ferramenta fora das categorias do BrzA** (`Read`, `Edit`, busca, web, MCP
+  genérico, `ls`) ficam como estão. Como se confere: `src/shared/native-chat/tools/native-chat-tool-icon.test.ts`
+  (`:60`, `:74`, `:81`, `:226`), `src/shared/native-chat/tools/brza/brza-tool-icon-mount.test.ts:25` e
+  `native-chat-tool-line-label.test.ts`.
+- **O comando de navegador do app (`brza snapshot`, `orca …`) mantém o globo**, e nenhuma categoria do BrzA o captura,
+  nem em composto com `git` ou `gh` (R41.1). Como se confere: `native-chat-tool-icon.test.ts:180`,
+  `brza/brza-cli-category.test.ts:27` e `native-chat-tool-run-sentence.test.ts:48`.
+- **O comando sem categoria do BrzA segue com o verbo, o alvo e o título do upstream**, e a frase da corrida não muda.
+  Como se confere: `brza/brza-tool-line-title.test.ts:48` e `native-chat-tool-run-sentence.test.ts`; o ramo do comando
+  em `native-chat-tool-line-label.ts:94-108` não tem teste — teste a escrever, no P44.
+- **A corrida com categorias misturadas, ou só com as do upstream, mantém o glifo do upstream.** Como se confere:
+  `brza/brza-tool-icon-mount.test.ts:30` e `native-chat-tool-icon.test.ts:164-219`.
+- **O mobile cai no ícone lucide equivalente para todo logo de marca e mantém os glifos do upstream.** Como se confere:
+  `pnpm --dir mobile typecheck`, que quebra se faltar glifo no
+  `mobile/src/session/native-chat/transcript/brza/brza-mobile-tool-glyphs.ts:36`, e
+  `MobileNativeChatToolRun.test.tsx`; o recuo de cada logo não tem teste — teste a escrever, do P43.
+- **O link e o bloco de código do chat abrem, copiam e quebram linha como no upstream**; só a cor e a largura mudam.
+  Como se confere, em `src/renderer/src/components/native-chat/`: `use-native-chat-link-actions.test.tsx`,
+  `NativeChatPacedMarkdown.file-links.test.tsx`, `NativeChatCodeBlock.test.tsx`, `NativeChatMarkdown.code-wrap.test.tsx`
+  e `NativeChatMarkdown.image-preview.test.tsx`.
+- **As larguras "Normal" e "Larga" do chat não mudam, e o `120ch` só vale em "Total".** Como se confere:
+  `native-chat-appearance-style.test.ts:205,230,248`, e na tela, porque o jsdom não avalia o `@container style()`.
+- **A barra da mensagem do agente segue com Copiar, hora e rolar ao topo, só depois que o turno para; a do usuário
+  mantém Copiar e Rewind.** Como se confere: `NativeChatMessageRow.test.tsx:92,106,118,185` e
+  `NativeChatMessageTimestamp.test.tsx`.
+- **O seletor de modelo e esforço funciona como antes, e a retomada de chat com a história em outra conta segue
+  recusada por `historyInOtherAccount`.** Como se confere: `NativeChatModelCombobox.test.tsx:49-94`,
+  `NativeChatComposerActions.test.tsx`, `src/main/claude/claude-structured-launch-account-routing.test.ts:131,160`,
+  `use-native-chat-rewind.test.tsx:111` e `use-native-chat-context-clear-floor.test.tsx`.
+- **O aviso de limite do upstream, na conta sem troca, segue sem o Continuar e sem "Send a message once it resets"**; o
+  Retomar automaticamente e o Continuar do corte do Orca seguem iguais. O "Continuar em" do P40, ainda aberto, entra ao
+  lado, com o teste dele. Como se confere: `NativeChatNoticeRow.test.tsx:262-281,297,330` e
+  `NativeChatInterruptedContinue.test.tsx:191,259,267`.
+- **A barra do Markdown em diff mantém fonte e renderizado, com o padrão `source`; o diff combinado fica sem modos, e o
+  Mermaid, o CSV e o notebook não ganham o olho.** Como se confere:
+  `src/renderer/src/components/editor/markdown-preview-controls.test.ts:20,30,39,59`.
+- **O build local de Mac e Linux e o atualizador do app de release ficam como estão**: só a versão
+  `-local.<ms>.<commit>` desliga o atualizador (`src/main/updater/updater-enabled.ts:4-9`), e os canais `ORCA_WIN_*` do
+  CI não mudam. Como se confere: `config/scripts/build-mac-local.test.mjs`, `build-win-local.test.mjs`,
+  `build-linux-local.test.mjs` e `electron-builder-config.test.mjs`; o `isUpdaterEnabled()` com versão de release não
+  tem teste — teste a escrever, do P26.
+- **O merge do `stablyai/orca` segue com conflito pequeno**: o BrzA toca o upstream só em linhas de montagem, e o resto
+  mora em pastas `brza/`. Como se confere: `git diff $(git merge-base master upstream/main) master --numstat --` nos
+  `native-chat-tool-icon.ts`, `native-chat-tool-line-label.ts`, `NativeChatMarkdown.tsx` e `NativeChatToolIcon.tsx`, que
+  davam 14/2, 5/0, 4/1 e 3/1 em 2026-10-28.
+
 ## Desvios
 
 - **X1 — O `build:win` também compila o launcher da CLI e o agent hook, em Rust, para x64.** O `afterPack` do
@@ -1680,6 +1732,9 @@ Depois do P55 e do P56.
   X9 e X10. Esperam a conferência com Anderson.
 - 2026-10-28 — [O pedido 30, a prévia de imagem no chat, desenhado](../../work/worklogs/2026-10-28-pedido-30-previa-de-imagem-desenhada.md):
   as R36, R39 e R42, o D42 ao D44 e o P54 ao P57, sem código; o corte aceito na R42.3.
+- 2026-10-28 — [O PLN-001 conferido contra a norma de planos da Fixfy e levado ao molde](../../work/worklogs/2026-10-28-pln-001-no-molde-da-fixfy.md):
+  o desenho, a Cobertura, a Restrições, a Regressão, os Casos manuais, as Decisões e o Fechamento no molde; os Passos e
+  os Desvios esperam a Run, na issue das Pendências.
 
 ## Decisões
 
@@ -1689,6 +1744,11 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
   — PLN-025/R10 da Fixfy, `done`.
 - [O orca-dev commita com o noreply do brz-anderson, pela chave personal, com push direto na main](../../../fixfy/work/decisions/orca-dev-commita-como-brz-anderson-com-push-na-main.md)
   — PLN-025/R14 da Fixfy, `done`.
+
+## Pendências conhecidas
+
+- [Os Passos e os Desvios do PLN-001 no molde, depois da Run do P44 ao P50](../../work/issues/pln-001-passos-e-desvios-no-molde-depois-da-run.md)
+  — da rodada de 2026-10-28 na sessão `pln-001-norma-fixfy`; espera a Run `run_de875fc52a75` fechar.
 
 ## Casos manuais
 

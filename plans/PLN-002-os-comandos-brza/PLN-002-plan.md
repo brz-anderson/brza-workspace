@@ -206,24 +206,29 @@ Estimado: 2,5 h · Executado: 0,5 h
 
 Executa D5 · executor: sessão `pln-002-p5`; a instalação, com Anderson
 
-Estimado: 2,5 h · Executado: 0,5 h
+Estimado: 2,5 h · Executado: 0,7 h
 
 - [x] **1. Testes que falham:** a pergunta antes do `ditto`; a recusa com o app aberto sem `--yes` (saída 2); o build no
   worktree temporário, ou no `--from`; o `--clean`; o worktree temporário sai mesmo com o build falhando.
 - [x] **2. Implementar** `scripts/brza/brza-app`, com o subcomando `install`. Ver R8, X7 e X8.
 - [x] **3. Rodar e ver passar.**
-- [ ] **4. Primeiro uso, com Anderson:** o C2. O `brza app install` roda de um terminal fora do app, com o app fechado.
-- [ ] **5. A troca dos textos:** `brza-install`/`brza-run` por `brza install`/`brza run` na ajuda dos scripts e no
+- [x] **4. Primeiro uso, com Anderson:** o C2. O `brza app install` roda de um terminal fora do app, com o app fechado.
+- [x] **5. A troca dos textos:** `brza-install`/`brza-run` por `brza install`/`brza run` na ajuda dos scripts e no
   `CLAUDE.md:33`.
-- [ ] **6. Commit** — `feat(brza): brza app install (PLN-002/P5)`. O script e o teste já subiram nele; a troca dos
-  textos vai noutro commit (X9).
+- [x] **6. Commit** — `feat(brza): brza app install (PLN-002/P5)`. O script e o teste subiram nele; a troca dos
+  textos, no `docs(brza): brza install e brza run na ajuda e no CLAUDE.md (PLN-002/P5)` (X9).
 
-**Evidência:** `brza-workspace@1339793`, com push na `master`, do P5.1 ao P5.3.
+**Evidência:** `brza-workspace@1339793` (P5.1 ao P5.3) e `brza-workspace@e67a3c0` (P5.5), com push na `master`.
 - `python3 -m unittest discover -s scripts/brza/tests` → `Ran 111 tests … OK`, com o P3, o P4 e o P6 commitados. O
   `test_brza_app.py` traz 15 casos; sem o `rmtree` antes do `ditto`, ou sem a recusa com o app aberto, um deles falha.
 - `scripts/brza/brza-app install`, de dentro do chat → `recusado: o BrzA Studio.app está aberto (pid …)`, saída 2, sem
   build.
 - O link `~/.local/bin/brza-app` está `ok`, ligado só ele, pelo `link_command`.
+- O C2, na linha dele em `## Casos manuais`: o app instalado é o `1.4.242-alpha.1.local.1793166405233.fb7eb5a90827`, da
+  `origin/master` `fb7eb5a90827`; `codesign --verify --deep` passa; o worktree temporário e o diretório dele saíram.
+- A troca dos textos: `python3 -m unittest discover -s scripts/brza/tests` → `OK`; `brza install`, pelo despacho do app
+  novo, mostra todo link `ok`; o `brza` está no PATH do zsh de login (`zsh -lic 'command -v brza'`), onde o ▶ roda o
+  `brza run`.
 
 ### P6 — O `brza note`
 
@@ -319,14 +324,14 @@ Estimado: 2 h · Executado: — h
 | ID  | Critério                                         | Passos                                                                                       | Esperado                                                        | Observado | Veredito |
 | :-- | :----------------------------------------------- | :------------------------------------------------------------------------------------------- | :-------------------------------------------------------------- | :-------- | :------- |
 | C1  | `Pedido 2`: o dev build sobe e para pelo `brza`  | `brza tree c1-prova`; `brza dev` nele; usar; `brza dev --stop`                               | janela visível com o chat ligado; o `--stop` fecha e libera     | 2026-10-28, `pln-002-p3`: o build subiu visível no pid 82861; "Sim, janela e chat ok" e "Sim, fechou", de Anderson | passou |
-| C2  | `Pedido 7` e `Pedido 0`: o app reinstalado       | app fechado; num terminal, `brza-app install`; abrir o app; `brza sessions --help` no chat e no terminal | o app abre na versão nova; a ajuda do `brza-sessions` responde nos dois | |          |
+| C2  | `Pedido 7` e `Pedido 0`: o app reinstalado       | app fechado; num terminal, `brza-app install`; abrir o app; `brza sessions --help` no chat e no terminal | o app abre na versão nova; a ajuda do `brza-sessions` responde nos dois | 2026-10-28, `pln-002-p5`: o app abriu na `…fb7eb5a90827`, a `origin/master`; a ajuda respondeu no terminal, colada por Anderson, e no chat, pelo `brza` do app | passou |
 | C3  | `Pedido 5`: o `close` fecha o chat por nome      | `brza sessions open c3-prova`; `brza sessions list`; `brza sessions close c3-prova`          | o chat some da lista e da tela, sem aba órfã                    |           |          |
 | C4  | `Pedido 4`: o `doctor` no chat e no terminal     | `brza doctor` num chat do app e num terminal sem a função `claude`                           | 0 no chat; no terminal, os erros com o comando que conserta     |           |          |
 
 ## Worklogs
 
-- 2026-10-28 — P5.1 ao P5.3, o `brza app install`, em `brza-workspace@1339793`; R8 no `--dmg` e na substituição, X7 ao
-  X9. Parou no C2 pelo reinício do app.
+- 2026-10-28 — P5, o `brza app install`, em `brza-workspace@1339793` e `e67a3c0`, com o C2 passado; R8 no `--dmg` e
+  na substituição, X7 ao X9. Parou no reinício do app e retomou no C2.
   [O PLN-002/P5: o brza app install](../../work/worklogs/2026-10-28-pln-002-p5-o-brza-app-install.md)
 - 2026-10-28 — P4, o `brza test`, em `brza-workspace@51eef6e`; X5 no preparo do vitest, X6 no baseline por teste.
   Nada travou; o `check:changed` segue vermelho pela pendência do import boundaries.

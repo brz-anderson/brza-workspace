@@ -9,7 +9,7 @@ O pedido de Anderson, em 2026-10-28, na sessão `pln-002-p5`: "Execute o P5 do p
 pela plan-runner". O passo executa o D5 do
 [PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`](../../plans/PLN-002-os-comandos-brza/PLN-002-plan.md).
 Parou no primeiro ponto de commit, a pedido de Anderson, para o reinício do app: "avise as sessões pra pararem no
-primeiro ponto de commit e registrarem no plano, vamos reiniciar".
+primeiro ponto de commit e registrarem no plano, vamos reiniciar". Retomou depois do C2.
 
 ## O que se fez
 
@@ -40,6 +40,22 @@ e o P6 já commitados.
 
 O commit é `brza-workspace@1339793`.
 
+**O aviso às sessões.** A pedido de Anderson, o correio foi à `pln-002-p3`, à `pln-002-p4`, à `pln-002-p6` e à
+`brza-workspace-cb`, com o recado dele citado. O P3, o P4 e o P6 já tinham fechado e registrado no plano.
+
+**O C2**, com Anderson: ele fechou o app, rodou `brza-app install` no Terminal.app e colou a ajuda do
+`brza sessions --help`. A conferência daqui:
+- o app instalado é o `1.4.242-alpha.1.local.1793166405233.fb7eb5a90827`, e o `fb7eb5a90827` é a `origin/master`;
+- `codesign --verify --deep '/Applications/BrzA Studio.app'` passa;
+- o worktree temporário saiu do `git worktree list`, e o diretório `brza-app-*` saiu do temp;
+- no chat, o `brza` é o do app novo, e `brza sessions --help` responde com saída 0.
+
+**A troca dos textos (P5.5):** `brza-install`/`brza-run` viraram `brza install`/`brza run` nas linhas de uso do
+`brza-install` e do `brza-run`, nas docstrings do `brza-run` e do `claude-brza` e no `CLAUDE.md:33`. O nome do arquivo,
+do link e o caminho `scripts/brza/brza-install --all` ficam. O `brza install` responde pelo despacho e mostra todo
+link `ok`, e o `brza` está no PATH do zsh de login, onde o ▶ roda o `brza run`. O commit é
+`brza-workspace@e67a3c0`.
+
 ## O que se aprendeu
 
 - **Os processos do app incluem os supervisores dos chats**, que rodam o executável do app como node. Fechar a janela
@@ -49,12 +65,15 @@ O commit é `brza-workspace@1339793`.
 
 ## O que ficou
 
-- O P5.4, o C2: Anderson fecha o app, roda `brza-app install` num terminal fora dele e confere o `brza sessions --help`
-  no chat e no terminal.
-- O P5.5, a troca dos textos: `brza-install`/`brza-run` por `brza install`/`brza run` na ajuda dos scripts e no
-  `CLAUDE.md:33`, depois do C2.
+- Nada do P5. O plano segue no P8, e o P7 espera a 2d.
 
 ## Fora do workspace
+
+- **O quê e onde:** o `/Applications/BrzA Studio.app`, substituído pelo build `…fb7eb5a90827` da `origin/master`, pelo
+  `brza-app install` que Anderson rodou.
+- **O risco:** o app novo é o que todas as sessões do chat usam; assinado ad hoc, sem notarização, como o anterior.
+- **Estado:** ativo.
+- **Como desfazer:** `brza app install --from <checkout>` de um checkout no commit anterior.
 
 - **O quê e onde:** o link `~/.local/bin/brza-app` → `scripts/brza/brza-app` do checkout principal, criado pelo
   `link_command` do `brza-install`. Não usei o `--all`, para não ligar os scripts ainda não commitados dos outros passos.

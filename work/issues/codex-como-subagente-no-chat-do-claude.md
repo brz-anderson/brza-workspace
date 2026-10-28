@@ -89,22 +89,32 @@ A conversa com o Codex só existe com o `codex_reply` do MCP, e a conversa com o
 No caminho 1 e no 2 sem MCP, o cartão é só exibição.
 
 **3. O chat só orquestra, e o subagente abre como sessão de terminal.** Ideia de Anderson, em 2026-10-28, que vira o
-caminho 2 do avesso: em vez de trazer os passos do Codex para dentro do chat, o chat deixa de rodar subagente. Com o
-MCP do BrzA Studio e a CLI `brza`, a sessão do chat, quando vai chamar um subagente, abre uma sessão de terminal no app
-— Claude, Codex ou `agy` — e acompanha por ela. O chat fica como a visão de quem orquestra, e cada subagente vira uma
-aba de terminal com a conversa inteira, onde quem pediu pode entrar e falar direto. É a troca do caminho 1b sem a flag
+caminho 2 do avesso: em vez de trazer os passos do Codex para dentro do chat, o subagente roda numa sessão de terminal
+do app — Claude, Codex ou `agy` —, aberta pela sessão do chat com o MCP do BrzA Studio e a CLI `brza`. Cada subagente
+vira uma aba com a conversa inteira, onde quem pediu pode entrar e falar direto. É a troca do caminho 1b sem a flag
 experimental das equipes e sem o Claude que embrulha o Codex: o runtime do subagente é qualquer um que o app abra no
-terminal. Não foi medida, e a sessão que pegar a issue confere antes:
+terminal.
 
-- **o que o chat mostra da sessão aberta**: um cartão que aponta para a aba, com estado e resposta final, ou nada, e
-  como a resposta volta à sessão que orquestra — pela ferramenta do MCP, que espera o fim, ou por correio;
-- **se o `Agent` nativo continua**: o chat passa a abrir sessão para todo subagente, ou só para o que não é Claude;
+**A visão do chat não muda, qualquer que seja a forma da chamada**, nas palavras de Anderson. O requisito é o
+orquestrador do chat interagir com a sessão de terminal como se ela fosse um subagente: o mesmo cartão, com nome,
+estado, duração e resposta final, e a mesma vida — disparar, acompanhar, mandar mensagem, receber o fim. Quem lê o
+chat não distingue um subagente nativo de uma sessão de terminal. O que falta é o mecanismo, e a análise procura um.
+O ponto de partida é o caminho 2: ferramentas do MCP que espelham o `Agent` e o `SendMessage` — abrir a sessão,
+mandar mensagem, esperar o fim — e o app gravando as linhas da sessão como filhas do `tool_use_id` da chamada
+(`AgentJournalProducerLinkage`), para o chat montar o cartão como monta o do nativo. Não foi medido, e a sessão que
+pegar a issue confere antes:
+
+- **como o fim volta ao orquestrador**: a ferramenta do MCP espera a sessão terminar, ou devolve na hora e o fim chega
+  depois como aviso, do jeito que o subagente em segundo plano chega hoje;
+- **o que conta como fim de uma sessão interativa**, que não termina sozinha: o turno ocioso, que o app já detecta
+  (`src/main/agent-turn-idle-verdict.ts`), ou um sinal explícito da sessão;
+- **o que entra no cartão** do que quem pediu digitou direto na aba;
 - **o custo**: cada subagente vira uma sessão inteira, com contexto próprio e vida longa, como o colega do caminho 1b.
 
 **A variante a analisar divide pelo tipo de chamada**, também ideia de Anderson, no mesmo dia: só a chamada interativa
-abre sessão de terminal, e o agente em modo consultor continua como subagente nativo, pelo `Agent`, com o cartão no
-chat. O consultor lê, levanta ou revisa e devolve um relatório. A sessão de terminal fica para quem precisa de conversa
-ou de vida longa. Essa divisão abre espaço para três tipos de agente:
+abre sessão de terminal, e o agente em modo consultor continua como subagente nativo, pelo `Agent`. Para quem lê o
+chat, os dois são o mesmo cartão. O consultor lê, levanta ou revisa e devolve um relatório; a sessão de terminal fica
+para quem precisa de conversa ou de vida longa. Essa divisão abre espaço para três tipos de agente:
 
 - **orquestrador**: a sessão do chat, que conversa com quem pediu e distribui o trabalho;
 - **consultor**: subagente nativo, de vida curta, que devolve e some;
@@ -112,7 +122,7 @@ ou de vida longa. Essa divisão abre espaço para três tipos de agente:
 
 A análise diz como o orquestrador escolhe entre consultor e executor: pelo agente, declarado na definição dele, ou pela
 chamada, com quem pediu dizendo se quer conversar. Ela também confere se o executor do Codex e do `agy` precisa do MCP
-ou se basta a CLI.
+ou se basta a CLI — sem o MCP, falta o `tool_use_id` que liga a sessão ao cartão.
 
 ## A ressalva de permissão
 

@@ -4,7 +4,7 @@
 O chat roda o Claude Code sem o zsh de login, e por isso sem as funções do ~/.zshrc. Com o cwd no brza-workspace, o
 `--setting-sources=user,project,local` do chat já carrega o .claude/settings.json daqui; num checkout do brza-studio, a
 sessão subiria sem os hooks de medição, sem a trava de retomada e sem a identidade do brz-anderson. O app chama no lugar
-do `claude` o executável de `agentCmdOverrides.claude`, que o `brza-install --chat-command` aponta para o
+do `claude` o executável de `agentCmdOverrides.claude`, que o `brza install --chat-command` aponta para o
 ~/.local/bin/claude-brza, um link para este arquivo.
 
 Quando o cwd é do brza-workspace ou do brza-studio, o wrapper faz o mesmo que a `brza_claude`: põe a BRZA_WORKSPACE e o

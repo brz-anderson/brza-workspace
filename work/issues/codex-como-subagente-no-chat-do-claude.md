@@ -101,6 +101,19 @@ terminal. Não foi medida, e a sessão que pegar a issue confere antes:
 - **se o `Agent` nativo continua**: o chat passa a abrir sessão para todo subagente, ou só para o que não é Claude;
 - **o custo**: cada subagente vira uma sessão inteira, com contexto próprio e vida longa, como o colega do caminho 1b.
 
+**A variante a analisar divide pelo tipo de chamada**, também ideia de Anderson, no mesmo dia: só a chamada interativa
+abre sessão de terminal, e o agente em modo consultor continua como subagente nativo, pelo `Agent`, com o cartão no
+chat. O consultor lê, levanta ou revisa e devolve um relatório. A sessão de terminal fica para quem precisa de conversa
+ou de vida longa. Essa divisão abre espaço para três tipos de agente:
+
+- **orquestrador**: a sessão do chat, que conversa com quem pediu e distribui o trabalho;
+- **consultor**: subagente nativo, de vida curta, que devolve e some;
+- **executor**: sessão de terminal aberta pelo MCP ou pela CLI `brza`, interativa, onde quem pediu pode entrar.
+
+A análise diz como o orquestrador escolhe entre consultor e executor: pelo agente, declarado na definição dele, ou pela
+chamada, com quem pediu dizendo se quer conversar. Ela também confere se o executor do Codex e do `agy` precisa do MCP
+ou se basta a CLI.
+
 ## A ressalva de permissão
 
 O `canUseTool` do chat aprova só o Bash que liga o Codex. O que o Codex faz depois roda sob a sandbox e a política de
@@ -123,7 +136,8 @@ dois pontos, porque cada um pode mudar o desenho:
 
 Depois, a entrevista:
 
-- **o caminho:** o 1 sozinho, o 1b, o 1 como passo para o 2, direto o 2, ou o 3, com o chat só orquestrando;
+- **o caminho:** o 1 sozinho, o 1b, o 1 como passo para o 2, direto o 2, ou o 3, com o chat só orquestrando,
+  inteiro ou na variante que separa consultor e executor;
 - **a forma do caminho 2:** o MCP do BrzA Studio ou o reconhecimento do `codex exec` no Bash; com o MCP, quais
   ferramentas além do `codex_run` — o `codex_reply`, o `agy`, o correio entre contas — e a exceção na norma do
   ferramental;

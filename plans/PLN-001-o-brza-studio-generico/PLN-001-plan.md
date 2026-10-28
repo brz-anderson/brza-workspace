@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P54 ao P57 do pedido 30 e os testes do P26.4, do P43.4 e do P44.4; os casos manuais com Anderson"
+ready: "sim — o P55 ao P57 do pedido 30 e os testes do P26.4, do P43.4 e do P44.4; os casos manuais com Anderson"
 estimate_h: 124.5
-executed_h: 15.25
-remaining_h: 11.7
+executed_h: 17.0
+remaining_h: 8.7
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -16,8 +16,9 @@ tags:
 
 # PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat
 
-- **Retomar:** os Passos e os Desvios no molde em 2026-10-28; a próxima tarefa é o P54 ao P57 do pedido 30 (R42.4), e
-  os testes do P26.4, do P43.4 e do P44.4, numa sessão do `brza-studio`; esperam Anderson os casos manuais (C1 ao C7,
+- **Retomar:** o P54 feito em 2026-10-28 (`brza-studio@44ed13bfec9`); a próxima tarefa é o P55 e o P56 do pedido 30,
+  cada um com a autorização de Anderson, e depois o P57, e os testes do P26.4, do P43.4 e do P44.4, numa sessão do
+  `brza-studio`; esperam Anderson os casos manuais (C1 ao C7,
   C10 e C14, num build só), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
@@ -1592,24 +1593,53 @@ Executado 0,5 h. Desvios X21 e X22. Falta o C10 com Anderson.
 
 Executa D42 · executor: sessão do `brza-studio`
 
-Estimado: 3 h · Executado: — h
+Estimado: 3 h · Executado: 1,75 h
 
 Depois do P44 ao P50 (R42.4), e antes do P55.
 
-- [ ] **1.** Teste que falha, em `src/main/native-chat/brza/brza-tool-result-images.test.ts`: o `brzaToolResultImages`
+- [x] **1.** Teste que falha, em `src/main/native-chat/brza/brza-tool-result-images.test.ts`: o `brzaToolResultImages`
       de um `content` com `{ type: 'image', source: { type: 'base64', media_type: 'image/png', data } }` devolve um
       `image-ref` com o `path` no temp (`brza-tool-images/<sha256 de 16>.png`), e o arquivo tem os bytes; a mesma imagem
       duas vezes dá o mesmo caminho e um arquivo só; `source.type: 'url'` vira `image-ref` com a `url`; `media_type` fora
       de gif, jpeg, png e webp fica de fora
-- [ ] **2.** Teste que falha nos dois decoders: o `tool_result` com texto e imagem dá o `output` de hoje e mais o
+- [x] **2.** Teste que falha nos dois decoders: o `tool_result` com texto e imagem dá o `output` de hoje e mais o
       `images` — o ao vivo (`claudeToolResults` e `claudeToolBody`, `claude-structured-item-translation.ts:150-163` e
       `:176-187`) e o do histórico (`toolResultBlock`, `transcript-record-blocks.ts:90-97`)
-- [ ] **3.** O campo `images?: NativeChatImageRefBlock[]` no `NativeChatToolResultBlock` (`native-chat-types.ts:94-104`)
+- [x] **3.** O campo `images?: NativeChatImageRefBlock[]` no `NativeChatToolResultBlock` (`native-chat-types.ts:94-104`)
       e no corpo `tool-call` do journal (`agent-session-journal-types.ts:132`), uma linha de montagem em cada decoder e a
       projeção do journal ao renderer; os dois pontos "A conferir no passo" do D42
-- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push
 
-**Evidência:** —
+**Evidência:** commit [`44ed13bfec9`](https://github.com/brz-anderson/brza-studio/commit/44ed13bfec9), na `master` do
+`brza-studio`, pela sessão `pln-001-p54`, autorizada por Anderson em 2026-10-28 ("siga com P54"). O
+`brzaToolResultImages` mora em `src/main/native-chat/brza/brza-tool-result-images.ts`. Grava o base64 em
+`<temp>/brza-tool-images/<sha256 de 16>.<ext>` (o jpeg sai `.jpg`) e devolve `image-ref` com o `path`, ou com a `url`. O
+campo `images` está no `NativeChatToolResultBlock`, no corpo `tool-call` do journal e no schema do journal, no corpo e no
+bloco `tool-result`. Quem o preenche: o `claudeToolResults` e o `claudeToolBody` (ao vivo), o `toolResultBlock` (histórico)
+e a projeção ao renderer. Os testes do 1 e do 2 moram em `brza-tool-result-images.test.ts`, com 5 casos: antes da
+montagem, os 2 da extração passaram, e os 3 dos decoders e da projeção falharam pela asserção.
+
+`node config/scripts/run-vitest.mjs run --config config/vitest.config.ts` sobre o teste novo, o schema e os conjuntos
+fechados do journal, a projeção, a tradução do Claude, os decoders do transcript e o sanitize do RPC → 23 arquivos,
+307 passed. No commit, o teste novo e o `journal-closed-sets.test.ts` → 2 arquivos, 6 passed.
+
+`pnpm check:changed --base=origin/master` → 20 de 22. Os dois vermelhos são preexistentes:
+
+- o import boundaries, só no `src/cli/external-subcommand.ts`, em
+  [O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md);
+- os unit tests, com 25 testes em 13 arquivos: o updater, os goldens do sidebar com "Orca server", o
+  `open-uncommitted-entry`, o `claude-stop-ack-race` e o wire entre versões. Os mesmos 25 falham na `master` limpa, em
+  `9747ac2b68d`, com o P54 no `stash`. Dos 58 570 testes relacionados, 58 402 passaram.
+
+**Os dois pontos "A conferir no passo" do D42:**
+
+- **A tradução ao vivo é síncrona.** O `journalClaudeMessage` não espera nada. A gravação vai ao temp do colar
+  (`getPath('temp')`, ou `os.tmpdir()` sem o `AppEnvironment`), mas síncrona: `writeFileSync` num `.partial`, depois
+  `renameSync`, e o arquivo que já existe não é regravado.
+- **O relay ao mobile não rejeita o campo.** O `sanitizeNativeChatRpcBlock` espalha o `tool-result`, e o mobile não
+  valida o bloco por schema. O campo segue no relay, e o mobile o ignora (R36.4).
+
+Desvios X23 ao X25.
 
 ### P55 — A miniatura na linha da ferramenta (pedido 30)
 
@@ -1763,6 +1793,13 @@ da linha quando o teste entra.
   `9a81e65c852`, e Anderson mandou seguir, com o conserto no PLN-002 (R46.6); afeta P53 e P40.
 - **X22 — O tom `faint` do link sobre código ficou sem medição útil.** O `native-chat-markdown.css:55` já põe `a, code`
   em `inherit` nesse tom, e a fixture não o distingue; afeta P53, e fica para o C10.
+- **X23 — O `type` das imagens no schema do journal ficou aberto (`z.string()`), e não `'image-ref'`.** O literal abria
+  um conjunto fechado novo, que o `journal-closed-sets.test.ts` só aceita com a versão da linha subindo; afeta P54.
+- **X24 — Os testes do P54.1 e do P54.2 moram num arquivo só do BrzA**, o `brza-tool-result-images.test.ts`, com a
+  projeção e o schema, e não no teste dos decoders do upstream; afeta P54.
+- **X25 — Dois arquivos do upstream no teto do `max-lines` pediram mais que a montagem.** O tipo do journal usa o alias
+  `BrzaToolCallMetadata` do `native-chat-types.ts`, e a projeção lê `call.callId` em vez de desestruturá-lo; afeta P54,
+  e o D42 não muda.
 
 ## Worklogs
 
@@ -1851,6 +1888,8 @@ da linha quando o teste entra.
   `fc7f07a8a1e`; a R44 e os X11 ao X20. Esperam os casos manuais com Anderson.
 - 2026-10-28 — [Os Passos e os Desvios do PLN-001 levados ao molde, depois da Run do P44 ao P50](../../work/worklogs/2026-10-28-pln-001-passos-e-desvios-no-molde.md):
   os Passos sem fases, as R45 a R47, os X1 ao X22 em duas linhas e o P26.4, o P43.4 e o P44.4.
+- 2026-10-28 — [O P54 do PLN-001, a imagem da ferramenta extraída para arquivo](../../work/worklogs/2026-10-28-pln-001-p54-imagem-da-ferramenta-extraida.md):
+  o P54, com o commit `44ed13bfec9`; os dois pontos "A conferir" do D42 e os X23 ao X25. Esperam o P55 e o P56.
 
 ## Decisões
 

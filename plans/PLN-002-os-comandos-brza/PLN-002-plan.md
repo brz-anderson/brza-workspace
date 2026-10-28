@@ -5,8 +5,8 @@ origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
 ready: sim — o P3 ao P6, em paralelo; o P7 espera a sessão da 2d, reaberta por Anderson
 estimate_h: 18
-executed_h: 0.8
-remaining_h: 12.0
+executed_h: 1.0
+remaining_h: 10.0
 scope:
   - workspace
   - brza-studio
@@ -18,9 +18,9 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** o P0, o P1 e o P2 estão feitos; o `brza tree` está em `brza-workspace@2ac6638`. O P3 ao P6 podem
-  correr em paralelo (R4.4), cada um numa sessão `pln-002-pN` que Anderson abre a pedido, e o worktree de código sai do
-  `brza-tree <nome>`. O P7 espera a 2d.
+- **Retomar:** o P0 ao P3 estão feitos; o `brza dev` está em `brza-workspace@310e12d`, com o C1 passado. O P4 ao P6
+  correm em paralelo (R4.4), cada um na sessão `pln-002-pN` dele, e o worktree de código sai do `brza-tree <nome>`. O P7
+  espera a 2d.
   O P6, o `brza note`, está feito em `brza-workspace@bafce7e`; o esqueleto do worklog ainda não acha o nome da
   sessão (X3).
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
@@ -157,16 +157,24 @@ Estimado: 2,5 h · Executado: 0,2 h
 
 Executa D3 · executor: sessão `pln-002-p3`
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0,2 h
 
-- [ ] **1. Testes que falham:** o seed só no perfil vazio, e o `--no-seed` e o `--reset`; o `--background` põe o
+- [x] **1. Testes que falham:** o seed só no perfil vazio, e o `--no-seed` e o `--reset`; o `--background` põe o
   `ORCA_BACKGROUND_LAUNCH=1`; recusa com build vivo; o `--stop` com pid vivo de runner, morto, e vivo de outro processo
   (o `ps` trocado por um falso).
-- [ ] **2. Implementar** `scripts/brza/brza-dev`.
-- [ ] **3. Rodar e ver passar**, e o C1 com Anderson.
-- [ ] **4. Ligar e commit** — `feat(brza): brza dev (PLN-002/P3)`.
+- [x] **2. Implementar** `scripts/brza/brza-dev`. Ver X2.
+- [x] **3. Rodar e ver passar**, e o C1 com Anderson.
+- [x] **4. Ligar e commit** — `feat(brza): brza dev (PLN-002/P3)`.
 
-**Evidência:** —
+**Evidência:** `brza-workspace@310e12d`, com push na `master`.
+- `python3 -m unittest test_brza_runtime test_brza_scripts test_brza_sessions test_brza_tree test_brza_dev`, em
+  `scripts/brza/tests` → `Ran 68 tests … OK`. Eram 47; o `test_brza_dev.py` traz 21. O `discover` inteiro falha só nos
+  testes do P4 e do P6, que estavam em andamento nas sessões deles.
+- A corrida real no `.worktrees/c1-prova`: `brza-dev --background` → saída 0 em 6 s, com o `Seeded … (1 profile(s))` no
+  log, o `userData` igual ao derivado pelo script e o CDP respondendo 200. O segundo `brza-dev` recusou (saída 1); o
+  `--stop` encerrou em 0,6 s, sem processo do `c1-prova` depois.
+- O C1 passou (ver `## Casos manuais`), e o `c1-prova` saiu pelo `brza-tree --rm c1-prova --force`.
+- `brza-install --all` ligou o `brza-dev`.
 
 ### P4 — O `brza test`
 
@@ -264,6 +272,9 @@ Estimado: 2 h · Executado: — h
 
 - **X1 — O `git` do runtime recebe `cwd: Path | None = None`, e não `cwd: Path = STUDIO`.** O padrão ligado na
   definição ignora o `STUDIO` trocado no teste e o `BRZA_STUDIO` lido depois; o contrato não muda. Afeta o P1 e o D1.
+- **X2 — O `brza dev` semeia pelo `ORCA_DEV_SEED_PROFILE=1` do runner, e não pelo `pnpm dev:seed-profile`.** O runner
+  semeia só o perfil vazio, com a mesma função (`config/scripts/run-electron-vite-dev.mjs:81,420`), e numa chamada a
+  menos; o contrato do D3 não muda. Afeta o P3 e o D3.
 - **X2 — O `note commit` commita só os caminhos dados e faz o pull com `--autostash`.** O D6 diz "git add dos
   caminhos, commit, git pull --rebase". Com as sessões do P3 ao P6 no mesmo checkout, o commit sem caminho levaria
   o índice da outra sessão, e o `pull --rebase` recusa com arquivo sujo ao lado. O contrato não muda. Afeta o P6 e
@@ -276,13 +287,15 @@ Estimado: 2 h · Executado: — h
 
 | ID  | Critério                                         | Passos                                                                                       | Esperado                                                        | Observado | Veredito |
 | :-- | :----------------------------------------------- | :------------------------------------------------------------------------------------------- | :-------------------------------------------------------------- | :-------- | :------- |
-| C1  | `Pedido 2`: o dev build sobe e para pelo `brza`  | `brza tree c1-prova`; `brza dev` nele; usar; `brza dev --stop`                               | janela visível com o chat ligado; o `--stop` fecha e libera     |           |          |
+| C1  | `Pedido 2`: o dev build sobe e para pelo `brza`  | `brza tree c1-prova`; `brza dev` nele; usar; `brza dev --stop`                               | janela visível com o chat ligado; o `--stop` fecha e libera     | 2026-10-28, `pln-002-p3`: o build subiu visível no pid 82861; "Sim, janela e chat ok" e "Sim, fechou", de Anderson | passou |
 | C2  | `Pedido 7` e `Pedido 0`: o app reinstalado       | app fechado; num terminal, `brza-app install`; abrir o app; `brza sessions --help` no chat e no terminal | o app abre na versão nova; a ajuda do `brza-sessions` responde nos dois | |          |
 | C3  | `Pedido 5`: o `close` fecha o chat por nome      | `brza sessions open c3-prova`; `brza sessions list`; `brza sessions close c3-prova`          | o chat some da lista e da tela, sem aba órfã                    |           |          |
 | C4  | `Pedido 4`: o `doctor` no chat e no terminal     | `brza doctor` num chat do app e num terminal sem a função `claude`                           | 0 no chat; no terminal, os erros com o comando que conserta     |           |          |
 
 ## Worklogs
 
+- 2026-10-28 — P3, o `brza dev`, em `brza-workspace@310e12d`, com o C1 passado; X2 no seed. Nada travou.
+  [O PLN-002/P3: o brza dev](../../work/worklogs/2026-10-28-pln-002-p3-o-brza-dev.md)
 - 2026-10-28 — P6, o `brza note`, em `brza-workspace@bafce7e`; X2 no commit por caminho, X3 no nome da sessão.
   Nada travou.
   [O PLN-002/P6: o brza note](../../work/worklogs/2026-10-28-pln-002-p6-o-brza-note.md)

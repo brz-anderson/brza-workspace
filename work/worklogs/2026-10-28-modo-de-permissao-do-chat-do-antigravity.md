@@ -24,7 +24,8 @@ O servidor `agy_acp_server.par` 1.3.0, testado direto com uma cópia da conta em
 
 ## O que se fez
 
-O commit `4bed5665efd` no `brza-studio` (só local, sem push):
+O commit `e2c71f9f5fe` na `master` do `brza-studio`, com push (era o `4bed5665efd` local, rebaseado por outra sessão no
+mesmo checkout):
 - **A troca de modo vai ao processo vivo.** O `recordStructuredAgentSessionOptionIntent` grava o registro e chama o
   novo `applyPermissionMode` do adapter, que manda o `session/set_config_option` com o valor mapeado (`default`,
   `auto_edit`, `yolo`). Se a escrita falhar, o erro é engolido e a troca fica para o próximo arranque.
@@ -43,7 +44,6 @@ O commit `4bed5665efd` no `brza-studio` (só local, sem push):
 
 ## Retomar
 
-- O push do `4bed5665efd` para a `master` do `brza-studio`. Não foi feito porque o recado de reinício pedia só o commit.
 - O build do app com a correção, para conferir no chat real: pôr Full access durante um turno e ver os comandos seguintes
   rodarem sem pedir.
 - Falta teste da troca durante um turno aberto, o caso exato do sintoma. Hoje o teste cobre a troca entre envios, no

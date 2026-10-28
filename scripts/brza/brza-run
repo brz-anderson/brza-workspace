@@ -26,7 +26,6 @@ O ▶ abre a aba no zsh de login, que acha o brza-run pelo link em ~/.local/bin/
 cria. A regra do AGENTS.md — comando para quem pediu em cerca bash, sem o brza-run — não muda: ele é opção explícita.
 """
 import argparse
-import hashlib
 import json
 import os
 import pty
@@ -42,6 +41,7 @@ from pathlib import Path
 SELF = Path(__file__).resolve()
 sys.path.insert(0, str(SELF.parent))
 import brza_runtime as runtime  # noqa: E402
+from brza_runtime import canonicalize, send_mutation, send_to_chat  # noqa: E402,F401
 
 TAIL_LINES = 200
 TAIL_BYTES = 16 * 1024
@@ -104,33 +104,6 @@ def run_here(command: str, run: Path) -> tuple[int, str]:
     output = clean(bytes(captured))
     (run / 'output.log').write_text(output)
     return code, output
-
-
-def canonicalize(value) -> str:
-    """O canonicalize do brza-studio (src/shared/structured-agent-session-mutation.ts), que a impressão digital cobre."""
-    if isinstance(value, list):
-        return '[' + ','.join(canonicalize(v) for v in value) + ']'
-    if isinstance(value, dict):
-        return '{' + ','.join(f'{json.dumps(k, ensure_ascii=False)}:{canonicalize(v)}'
-                              for k, v in sorted(value.items())) + '}'
-    return json.dumps(value, ensure_ascii=False)
-
-
-def send_mutation(session_id: str, text: str, fence: int, now_ms: int, entropy: str) -> dict:
-    """Os parâmetros do agentSession.send, como os monta structuredAgentSessionMessageSendMutation no brza-studio."""
-    body = {'kind': 'message', 'role': 'user', 'blocks': [{'type': 'text', 'text': text}]}
-    fields = {'body': body, 'delivery': 'queue-if-active'}
-    payload = canonicalize({'method': 'agentSession.send', 'sessionId': session_id, 'fields': fields})
-    return {'envelope': {'sessionId': session_id, 'clientOperationId': f'{now_ms}-{entropy}',
-                         'expectedRuntimeFence': fence,
-                         'payloadFingerprint': hashlib.sha256(payload.encode()).hexdigest()},
-            **fields}
-
-
-def send_to_chat(session_id: str, text: str):
-    page = runtime.rpc('agentSession.history', {'sessionId': session_id, 'direction': 'tail', 'limit': 1})['page']
-    runtime.rpc('agentSession.send', send_mutation(session_id, text, page['fence'], int(time.time() * 1000),
-                                                   uuid.uuid4().hex))
 
 
 def run_in_chat(command: str, session_id: str) -> int:

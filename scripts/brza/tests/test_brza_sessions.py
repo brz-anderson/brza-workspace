@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import runpy
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -68,7 +69,7 @@ class SendTest(unittest.TestCase):
             calls.append((method, params))
             return {'page': {'fence': 7}} if method == 'agentSession.history' else {}
 
-        with patch.dict(GLOBALS, {'rpc': rpc}):
+        with patch.object(sys.modules['brza_runtime'], 'rpc', rpc):
             SESSIONS['send_to_chat']('claude_1', 'faça a tarefa')
         method, params = calls[-1]
         fields = {'body': {'kind': 'message', 'role': 'user', 'blocks': [{'type': 'text', 'text': 'faça a tarefa'}]},

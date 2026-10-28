@@ -23,16 +23,15 @@ Uso:
 As linhas de saída são `open:     <nome>  (chat, <caminho>, <sessionId>)`, `running:  <nome>` e `CHECK:    …`.
 """
 import argparse
-import hashlib
 import json
 import os
 import sys
 import time
-import uuid
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from brza_runtime import WORKSPACE, BrzaError, brza, rpc, user_data  # noqa: E402
+from brza_runtime import (WORKSPACE, BrzaError, brza, canonicalize, rpc, send_to_chat,  # noqa: E402,F401
+                          user_data)
 
 CHAT_COMMAND = 'claude-brza'
 
@@ -77,27 +76,6 @@ def chat_blocker(checkout: Path) -> str | None:
     if Path(override).name != CHAT_COMMAND:
         return f'agentCmdOverrides.claude é {override}, não o {CHAT_COMMAND}'
     return None
-
-
-def canonicalize(value) -> str:
-    """O canonicalize de src/shared/structured-agent-session-mutation.ts, que a impressão digital cobre."""
-    if isinstance(value, list):
-        return '[' + ','.join(canonicalize(v) for v in value) + ']'
-    if isinstance(value, dict):
-        return '{' + ','.join(f'{json.dumps(k, ensure_ascii=False)}:{canonicalize(v)}'
-                              for k, v in sorted(value.items())) + '}'
-    return json.dumps(value, ensure_ascii=False)
-
-
-def send_to_chat(session_id: str, text: str):
-    """Manda uma mensagem ao chat como structuredAgentSessionMessageSendMutation do app."""
-    fence = rpc('agentSession.history', {'sessionId': session_id, 'direction': 'tail', 'limit': 1})['page']['fence']
-    body = {'kind': 'message', 'role': 'user', 'blocks': [{'type': 'text', 'text': text}]}
-    fields = {'body': body, 'delivery': 'queue-if-active'}
-    payload = canonicalize({'method': 'agentSession.send', 'sessionId': session_id, 'fields': fields})
-    envelope = {'sessionId': session_id, 'clientOperationId': f'{int(time.time() * 1000)}-{uuid.uuid4().hex}',
-                'expectedRuntimeFence': fence, 'payloadFingerprint': hashlib.sha256(payload.encode()).hexdigest()}
-    rpc('agentSession.send', {'envelope': envelope, **fields})
 
 
 def wait_for_name(name: str, timeout: float = 60.0) -> bool:

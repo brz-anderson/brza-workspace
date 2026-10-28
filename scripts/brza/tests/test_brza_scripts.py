@@ -205,6 +205,25 @@ class InstallTest(unittest.TestCase):
                                   {'type': 'command', 'agent': 'claude', 'value': str(self.bin / 'claude-brza')})])
         self.assertEqual(INSTALL['link_state']('claude-brza'), 'ok')
 
+    def test_all_links_every_brza_command_including_itself(self):
+        scripts = self.workspace / 'scripts' / 'brza'
+        for name in ('brza-install', 'brza-novo', 'brza-run'):
+            (scripts / name).write_text('#!/bin/sh\n')
+            (scripts / name).chmod(0o755)
+        (scripts / 'brza-rascunho').write_text('não executável\n')
+        (scripts / 'brza_runtime.py').write_text('')
+        with contextlib.redirect_stdout(io.StringIO()):
+            INSTALL['install_all'](False)
+        self.assertEqual(sorted(p.name for p in self.bin.iterdir()), ['brza-install', 'brza-novo', 'brza-run'])
+        self.assertTrue(all(INSTALL['link_state'](p.name) == 'ok' for p in self.bin.iterdir()))
+
+    def test_all_dry_run_links_nothing(self):
+        (self.workspace / 'scripts' / 'brza' / 'brza-run').chmod(0o755)
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            INSTALL['install_all'](True)
+        self.assertIn('brza-run', out.getvalue())
+        self.assertFalse(self.bin.exists())
+
 
 if __name__ == '__main__':
     unittest.main()

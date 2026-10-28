@@ -1,0 +1,223 @@
+#!/usr/bin/env python3
+"""Sobe, para e mostra o dev build de um worktree do brza-studio, um por worktree.
+
+  brza-dev [<worktree>] [--background] [--no-seed] [--reset]
+      sobe o pnpm dev do worktree (padrão: o do diretório atual, que tem de ser um worktree do brza-studio, nunca o
+      checkout principal), solto do terminal, com a saída em <worktree>/out/brza-dev.log, e espera ele anunciar o
+      runnerPid e as portas. Semeia o perfil do worktree só quando ele está vazio, pelo ORCA_DEV_SEED_PROFILE=1 do
+      runner; --reset apaga o perfil antes, e --no-seed pula. Visível por padrão; --background põe
+      ORCA_BACKGROUND_LAUNCH=1. Recusa se já há um build vivo no worktree.
+  brza-dev --stop [<worktree>]
+      lê o runnerPid de <worktree>/out/dev-instance.json, confere que o processo vive e é o runner, manda SIGTERM e
+      espera até 10 s. Pid morto ou de outro processo: diz que não há build e sai 0.
+  brza-dev --status [<worktree>]
+      o pid, as portas e o userData do build, ou "parado".
+
+Saídas: 0 feito; 1 recusado (build vivo, checkout principal, sem node_modules) ou falhou; 2 uso errado. O build que
+demora mais que 3 min a anunciar segue subindo, e o brza-dev sai 0 com o caminho do log.
+"""
+import argparse
+import hashlib
+import json
+import os
+import shutil
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import brza_runtime as runtime  # noqa: E402
+
+RUNNER_SCRIPT = 'run-electron-vite-dev.mjs'
+# O que um dev build exporta aos terminais dele e o runner derivaria de novo; herdado, aponta para o build de fora
+# (dropInheritedDevInstanceEnv, em config/scripts/dev-instance-isolation.mjs).
+INHERITED_ENV = ('ORCA_DEV_REPO_ROOT', 'ORCA_DEV_INSTANCE_KEY', 'ORCA_DEV_BRANCH', 'ORCA_DEV_WORKTREE_NAME',
+                 'ORCA_DEV_INSTANCE_LABEL', 'ORCA_DEV_DOCK_TITLE', 'ORCA_DEV_RENDERER_PORT', 'ORCA_DEV_USER_DATA_PATH',
+                 'ORCA_DEV_PROFILE', 'ORCA_DEV_SEED_PROFILE', 'ORCA_BACKGROUND_LAUNCH')
+# Os arquivos que dizem que o perfil tem estado (profileHasState, em config/scripts/dev-profile-seed.mjs).
+PROFILE_STATE = ('orca-profile-index.json', 'profiles', 'orca-data.json')
+POLL = 0.5
+START_TIMEOUT = 180.0
+STOP_TIMEOUT = 10.0
+
+
+def worktree_root(target: Path) -> Path:
+    """A raiz do worktree ligado do brza-studio que contém `target`."""
+    try:
+        root = Path(runtime.git('rev-parse', '--show-toplevel', cwd=target).strip()).resolve()
+        common = Path(runtime.git('rev-parse', '--path-format=absolute', '--git-common-dir', cwd=root).strip())
+    except runtime.BrzaError:
+        raise runtime.BrzaError(f'{target} não é um worktree do brza-studio') from None
+    if common.resolve() != (runtime.STUDIO / '.git').resolve():
+        raise runtime.BrzaError(f'{target} não é um worktree do brza-studio ({runtime.STUDIO})')
+    if not (root / '.git').is_file():
+        raise runtime.BrzaError(f'{root} é o checkout principal, que o brza dev não toca; crie um com brza tree <nome>')
+    return root
+
+
+def profile_path(root: Path) -> Path:
+    """O perfil do worktree, como o runner o deriva: brza-dev-wt/<sha1 da raiz, 10 dígitos>
+    (getWorktreeDevUserDataPath, em config/scripts/dev-instance-isolation.mjs)."""
+    name = hashlib.sha1(str(root).encode()).hexdigest()[:10]
+    return Path.home() / 'Library' / 'Application Support' / 'brza-dev-wt' / name
+
+
+def has_state(profile: Path) -> bool:
+    return any((profile / name).exists() for name in PROFILE_STATE)
+
+
+def record(root: Path) -> dict | None:
+    try:
+        return json.loads((root / 'out' / 'dev-instance.json').read_text())
+    except (OSError, ValueError):
+        return None
+
+
+def process_command(pid: int) -> str | None:
+    """A linha de comando do processo, ou None quando ele não vive."""
+    r = subprocess.run(['ps', '-o', 'command=', '-p', str(pid)], capture_output=True, text=True)
+    return r.stdout.strip() or None
+
+
+def signal_runner(pid: int, sig: int):
+    os.kill(pid, sig)
+
+
+def launch(root: Path, env: dict, log: Path) -> subprocess.Popen:
+    """O pnpm dev solto do terminal, na sessão própria, para seguir vivo depois que o brza-dev sai."""
+    with log.open('w') as out:
+        return subprocess.Popen(['pnpm', 'dev'], cwd=root, env=env, stdin=subprocess.DEVNULL, stdout=out,
+                                stderr=subprocess.STDOUT, start_new_session=True)
+
+
+def live_runner(root: Path) -> dict | None:
+    """O registro do build, quando o runnerPid dele vive e é o runner; o registro fica em disco depois que ele sai."""
+    rec = record(root)
+    pid = rec and rec.get('runnerPid')
+    if not isinstance(pid, int):
+        return None
+    command = process_command(pid)
+    return rec if command and RUNNER_SCRIPT in command else None
+
+
+def describe(rec: dict, log: Path):
+    print(f'pid:      {rec["runnerPid"]}')
+    print(f'renderer: {rec.get("rendererUrl") or "sem porta"}')
+    print(f'cdp:      {rec.get("cdpUrl") or "sem porta"}')
+    print(f'userData: {rec.get("userData")}')
+    print(f'log:      {log}')
+
+
+def tail(log: Path, lines: int = 15) -> str:
+    try:
+        return '\n'.join(log.read_text(errors='replace').splitlines()[-lines:])
+    except OSError:
+        return '(sem log)'
+
+
+def start(root: Path, background: bool, seed: bool, reset: bool) -> int:
+    live = live_runner(root)
+    if live:
+        print(f'recusado: já há um build vivo em {root}, no pid {live["runnerPid"]}; brza dev --stop o encerra')
+        return 1
+    if not (root / 'node_modules').is_dir():
+        print(f'recusado: {root} está sem node_modules; rode lá `pnpm install --offline --frozen-lockfile`')
+        return 1
+    profile = profile_path(root)
+    if reset and profile.exists():
+        shutil.rmtree(profile)
+        print(f'perfil:   apagado {profile}')
+    if has_state(profile):
+        seed = False
+        print(f'perfil:   {profile}, com estado; sobe como está')
+    else:
+        print(f'perfil:   {profile}, vazio; {"o runner semeia na subida" if seed else "sobe sem seed (--no-seed)"}')
+
+    env = {k: v for k, v in os.environ.items() if k not in INHERITED_ENV}
+    if seed:
+        env['ORCA_DEV_SEED_PROFILE'] = '1'
+    if background:
+        env['ORCA_BACKGROUND_LAUNCH'] = '1'
+    old = (record(root) or {}).get('runnerPid')
+    log = root / 'out' / 'brza-dev.log'
+    log.parent.mkdir(exist_ok=True)
+    process = launch(root, env, log)
+    print(f'subindo:  pnpm dev em {root}{" (background)" if background else ""}')
+
+    deadline = time.monotonic() + START_TIMEOUT
+    while True:
+        rec = live_runner(root)
+        if rec and rec['runnerPid'] != old:
+            describe(rec, log)
+            return 0
+        if process.poll() is not None:
+            print(f'falhou:   o pnpm dev saiu com {process.returncode} antes de anunciar o build; o fim de {log}:')
+            print(tail(log))
+            return 1
+        if time.monotonic() >= deadline:
+            print(f'CHECK:    o build ainda não anunciou o runnerPid; segue subindo, com o log em {log}')
+            print('          brza dev --status mostra quando ele estiver no ar')
+            return 0
+        time.sleep(POLL)
+
+
+def stop(root: Path) -> int:
+    rec = live_runner(root)
+    if not rec:
+        print(f'não há build vivo em {root}')
+        return 0
+    pid = rec['runnerPid']
+    signal_runner(pid, signal.SIGTERM)
+    print(f'SIGTERM:  runner {pid}')
+    deadline = time.monotonic() + STOP_TIMEOUT
+    while live_runner(root):
+        if time.monotonic() >= deadline:
+            print(f'falhou:   o runner {pid} segue vivo {STOP_TIMEOUT:g} s depois do SIGTERM; kill -9 {pid} o derruba')
+            return 1
+        time.sleep(POLL)
+    print(f'parado:   {root}')
+    return 0
+
+
+def status(root: Path) -> int:
+    rec = live_runner(root)
+    if not rec:
+        print(f'parado:   {root}')
+        return 0
+    describe(rec, root / 'out' / 'brza-dev.log')
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog='brza dev', description='Sobe, para e mostra o dev build de um worktree.')
+    ap.add_argument('worktree', nargs='?', type=Path,
+                    help='o worktree do brza-studio; padrão, o do diretório atual')
+    ap.add_argument('--background', action='store_true', help='sobe com ORCA_BACKGROUND_LAUNCH=1, sem roubar o foco')
+    ap.add_argument('--no-seed', action='store_true', help='não semeia o perfil vazio')
+    ap.add_argument('--reset', action='store_true', help='apaga o perfil do worktree antes de subir')
+    ap.add_argument('--stop', action='store_true', help='encerra o build vivo do worktree')
+    ap.add_argument('--status', action='store_true', help='mostra o build vivo, ou "parado"')
+    args = ap.parse_args(argv)
+
+    if args.stop and args.status:
+        ap.error('use --stop ou --status, não os dois')
+    if (args.stop or args.status) and (args.background or args.no_seed or args.reset):
+        ap.error('--background, --no-seed e --reset valem só para subir')
+
+    try:
+        root = worktree_root(args.worktree or Path.cwd())
+        if args.stop:
+            return stop(root)
+        if args.status:
+            return status(root)
+        return start(root, args.background, not args.no_seed, args.reset)
+    except runtime.BrzaError as e:
+        print(f'recusado: {e}')
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())

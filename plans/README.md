@@ -6,7 +6,7 @@ Um plano responde a uma pergunta só: **como estou fazendo este trabalho**. Quem
 [`work/README.md`](../work/README.md); aqui fica só o que é de plano. Adaptada da norma de planos do workspace da
 Fixfy, sem o que é só de lá.
 
-**Último PLN usado:** 001
+**Último PLN usado:** 002
 
 **Abre plano** o trabalho que não cabe numa sessão só: lacuna a entrevistar, passo que precisa de detalhamento, ou
 proposta que precisa de desenho. Trabalho de uma sessão só não abre plano: o plano de implementação dele abre o

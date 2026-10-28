@@ -25,8 +25,11 @@ um passo por comando. O levantamento e as respostas estão em
 
 O despacho `brza X` → `brza-X` vem da issue
 [O CLI brza manda o subcomando desconhecido ao brza-<sub> do PATH, como o git](cli-brza-manda-subcomando-desconhecido-ao-brza-x-do-path.md).
-Cada script se chama `brza-<sub>` e roda sozinho, sem esperar por ele. Script novo entra no `brza-install`, que cria os
-links.
+O despacho é o passo 0 do PLN-002, antes dos comandos. Anderson respondeu em 2026-10-28, na sessão
+`brza-comandos-lacunas`: "Sim, passo 0 do PLN-002 (Recomendado)". Assim, os comandos já nascem chamados como `brza <sub>`,
+como ele pediu ("tudo sob a tag `brza` sem kebab-case"). A reinstalação do app que o despacho exige serve de primeiro uso
+do `brza app install`. Cada script continua se chamando `brza-<sub>` em disco, e script novo entra no `brza-install`, que
+cria os links.
 
 | Comando | O passo manual que substitui | Onde se repetiu |
 | :------ | :--------------------------- | :-------------- |
@@ -68,5 +71,5 @@ links.
 - **`app install`:** pede confirmação antes de sobrescrever o app em `/Applications`?
 - **`brza_runtime.py`:** o `canonicalize` e a impressão digital, hoje duplicados em `brza-run` e `brza-sessions`, vão
   para lá? A proposta foi feita à `brza-workspace-80`, mas não foi levada a Anderson.
-- **Ordem dos passos e paralelismo:** o `dev` e o `test` usam o worktree do `tree`, e o `doctor` confere o que os outros
+- **Ordem dos passos e paralelismo:** o despacho vem primeiro. Depois, o `dev` e o `test` usam o worktree do `tree`, e o `doctor` confere o que os outros
   instalam.

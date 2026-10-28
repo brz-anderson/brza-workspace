@@ -48,6 +48,10 @@ O `brza --help` conferido nesta sessão mostrou que o `check` também colide.
 - **Notas:** "brza note new|commit (Recomendado)".
 - **Execução:** "PLN-002, um passo por comando (Recomendado)".
 
+**Rodada 3**, depois que Anderson perguntou "eu não pedi pra que fosse `brza sessions`?". O `brza sessions --help`
+ainda responde `Unknown command`, porque o despacho não foi feito.
+- **O despacho `brza X` como primeiro passo do PLN-002:** "Sim, passo 0 do PLN-002 (Recomendado)".
+
 ## O que ficou
 
 O pendente está na issue

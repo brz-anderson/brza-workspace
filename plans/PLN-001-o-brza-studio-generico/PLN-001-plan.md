@@ -2,7 +2,7 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P44 ao P48 e o P50, com as rodadas fechadas e a Run a disparar; o P54 ao P57 do pedido 30 depois do P44 ao P50; a conferência do P42, P49, P51, P52 e P53 com Anderson"
+ready: "sim — o P44 ao P48 e o P50, na Run run_de875fc52a75 em execução; o P54 ao P57 do pedido 30 depois do P44 ao P50; a conferência do P42, P49, P51, P52 e P53 com Anderson"
 estimate_h: 123.6
 executed_h: 9.85
 remaining_h: 20.5
@@ -24,19 +24,18 @@ tags:
   `9b8a3e2e672`, `9b85279f57a` e `fbff699fa58`). **Esperam conferência com Anderson, num build com o `fbff699fa58`:** o
   P42.3, a Skill, o Firebase e o Context7 com chamadas reais (os campos do título são suposição, sobretudo o projeto do
   Firebase) e o P52.4 e o P53.3. O P53.4, o link sobre código inline que ficou branco, é conserto a fazer.
-  **Próximos:** disparar a Run do P44 ao P48 e do P50, que está pronta e sem worker disparado (sem Run, sem
-  `run_id`). As rodadas fecharam em 2026-10-28, na sessão `pln-001-p44-p50`: R37, R38, R40, R41 e R43 (a R39 e a R42
-  são do pedido 30). O D38, o D39 e o P44 ao P50 já estão reescritos por elas (`b7194b3`). Pela R37.3, R37.4 e R40.4,
-  são três workers. O de shell faz o P44 → P45 → P46 → P47 em sequência, com Opus, e é dono da ordem de peso da
-  lista. O P48 vai de Sonnet e o P50 de Sonnet, sem a miniatura (R38.4). Os worktrees já estão criados na
-  `7e9e0d18948`, em `~/Projects/brza-studio/.worktrees/`: `pln-001-p44-p47` (branch `feat/pln-001-p44-p47`),
-  `pln-001-p48` (`feat/pln-001-p48`) e `pln-001-p50` (`feat/pln-001-p50`), sem `pnpm install`. Falta:
-  - rebasear os worktrees se a `master` andou;
-  - escrever as três especificações (o rascunho do bloco comum está em
-    `/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace/e354254e-149e-463d-862e-f3e05a58e5ac/scratchpad/specs/common.md`
-    e pode ter sumido);
-  - `orca orchestration run-create` e um `worker-start --spec … --worktree path:<worktree> --agent claude --model
-    <id>` por worker.
+  **Em execução:** a Run `run_de875fc52a75` do P44 ao P48 e do P50, disparada em 2026-10-28 às 01:11, na sessão
+  `pln-001-p44-p50` (modo chat). As rodadas fecharam na R37, R38, R40, R41 e R43 (a R39 e a R42 são do pedido 30), e o
+  D38, o D39 e o P44 ao P50 já estão reescritos por elas (`b7194b3`). São três workers (R37.3, R37.4 e R40.4), nos
+  worktrees de `~/Projects/brza-studio/.worktrees/`, na `7e9e0d18948`:
+  - o de shell, Opus, faz o P44 → P45 → P46 → P47 em `pln-001-p44-p47`, e é dono da ordem de peso da lista
+    (`task_3a795915093f`, `ctx_663c93482e60`);
+  - o do P48, Sonnet, em `pln-001-p48` (`task_1a38e7df74ee`, `ctx_4e2320de3d3c`);
+  - o do P50, Sonnet, sem a miniatura (R38.4), em `pln-001-p50` (`task_dcc18ceb0b7c`, `ctx_c0edf254fd8d`).
+
+  As especificações estão no scratch da sessão
+  (`/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace/e354254e-149e-463d-862e-f3e05a58e5ac/scratchpad/specs/`).
+  Para retomar a coordenação de outra sessão: `orca orchestration run-use --id run_de875fc52a75` e o `check --wait`.
 
   A mudança compartilhada, idêntica nos três, é `brzaToolLineTitle(call, result?)`, com o `result` passado em
   `native-chat-tool-line-label.ts:144`. Os workers não editam o plano: a coordenadora grava a evidência a partir do

@@ -941,7 +941,10 @@ Executa D38 · Estimado: 1 h · Executado: — h
 **Pendências, a perguntar a Anderson com opções:**
 
 - o comando que casa com mais de uma categoria, como `git` dentro de `&&` com um comando de pacote ou de teste: qual
-  categoria vale;
+  categoria vale. A categoria `brzaCli` já está registrada no `BRZA_TOOL_CATEGORIES` (`7e9e0d18948`), com a chama
+  BrzA para quem chama o `brza` ou o `orca`, e entra nessa pergunta, como em `brza … && git commit`. Hoje vale a
+  primeira da lista que casar. O registro está em
+  [A chama do BrzA, monocromática, nas chamadas ao CLI no chat](../../work/worklogs/2026-10-28-a-chama-do-brza-nas-chamadas-ao-cli-no-chat.md);
 - o formato exato do chip e do título, se o código pedir algo diferente do que está acima.
 
 **Evidência:** —

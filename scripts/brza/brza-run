@@ -4,11 +4,11 @@
 Dois modos, que dão no mesmo par de blocos — o comando num ```bash e as últimas 200 linhas da saída (até 16 KB) noutro,
 com o código de saída e o caminho do arquivo da saída inteira:
 
-  brza-run --chat <id> -- <comando>   o bloco que o agente propõe no chat, para o ▶ do app: roda o comando ali
+  brza run --chat <id> -- <comando>   o bloco que o agente propõe no chat, para o ▶ do app: roda o comando ali
                                       mesmo, na aba que o ▶ abriu, e manda os blocos ao chat <id> como
                                       mensagem, que acorda o agente para tomar as providências; o id é o
                                       ORCA_AGENT_SESSION_ID do chat
-  brza-run -- <comando>               o agente roda pelo Bash: abre uma aba visível no worktree do cwd, espera o comando,
+  brza run -- <comando>               o agente roda pelo Bash: abre uma aba visível no worktree do cwd, espera o comando,
                                       imprime os blocos para o agente colar na resposta e sai com o código do comando;
                                       a aba fecha quando dá 0 e fica aberta quando falha
 
@@ -22,7 +22,7 @@ A mensagem entra no chat pelo `agentSession.send` do runtime do app, pelo `rpc` 
 `delivery: 'queue-if-active'`: com o agente no meio de um turno, ela espera na fila. A saída inteira fica em
 <ORCA_CHAT_SCRATCH_DIR ou o temp>/brza-run/<hora>-<id>/output.log.
 
-O ▶ abre a aba no zsh de login, que acha o brza-run pelo link em ~/.local/bin/brza-run, que o `brza-install --run`
+O ▶ abre a aba no zsh de login, que acha o brza-run pelo link em ~/.local/bin/brza-run, que o `brza install --run`
 cria. A regra do AGENTS.md — comando para quem pediu em cerca bash, sem o brza-run — não muda: ele é opção explícita.
 """
 import argparse
@@ -118,7 +118,7 @@ def run_in_chat(command: str, session_id: str) -> int:
 
 
 def run_for_result(command: str, result: Path) -> int:
-    """O modo interno do `brza-run -- <comando>`: roda na aba e grava o código em result.json, que o de fora espera."""
+    """O modo interno do `brza run -- <comando>`: roda na aba e grava o código em result.json, que o de fora espera."""
     code, _ = run_here(command, result.parent)
     partial = result.with_suffix('.tmp')
     partial.write_text(json.dumps({'code': code}))

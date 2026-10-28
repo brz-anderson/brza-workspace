@@ -30,7 +30,7 @@ isso a função `claude` do `~/.zshrc` passa `--settings ~/Projects/brza-workspa
 segue para a função da Fixfy. O bloco está no `README.md`, em "Funções do shell".
 
 O chat do BrzA Studio não passa pelo zsh de login: o app roda no lugar do `claude` o `agentCmdOverrides.claude`, que é
-o `~/.local/bin/claude-brza` (`scripts/brza/claude-brza`, instalado pelo `brza-install --chat-command`). Ele faz o mesmo
+o `~/.local/bin/claude-brza` (`scripts/brza/claude-brza`, instalado pelo `brza install --chat-command`). Ele faz o mesmo
 que a função, no `brza-workspace`, no `brza-studio` e nos worktrees que o app cria em `~/orca/workspaces/…`, achados
 pelo `git --git-common-dir`. A sessão aberta sem nenhum dos dois — numa IDE, ou no app com o override vazio — sobe sem
 os hooks, sem a trava e sem a identidade abaixo.

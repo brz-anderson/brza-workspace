@@ -3,10 +3,10 @@ status: in_progress
 phase: execution
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: sim — o C2 do P5, com Anderson, e a troca dos textos; o P7 espera a sessão da 2d, reaberta por Anderson
+ready: sim — o P8; o P7 espera a sessão da 2d, reaberta por Anderson
 estimate_h: 18
-executed_h: 2.0
-remaining_h: 5.5
+executed_h: 2.2
+remaining_h: 5.0
 scope:
   - workspace
   - brza-studio
@@ -20,9 +20,9 @@ tags:
 
 - **Retomar:** o P0 ao P3 e o P6 estão feitos: o `brza dev` em `brza-workspace@310e12d`, com o C1 passado, e o
   `brza note` em `brza-workspace@bafce7e`, cujo esqueleto do worklog ainda não acha o nome da sessão (X3). O `brza test`
-  está em `brza-workspace@51eef6e` (P4). O `brza app install` está em `brza-workspace@1339793`, e o P5 parou no
-  P5.4 pelo reinício do app: falta o C2, com Anderson fora do app, e depois a troca dos textos do P5.5, na sessão
-  `pln-002-p5`. O P7 espera a 2d.
+  está em `brza-workspace@51eef6e` (P4). O `brza app install` está em `brza-workspace@1339793`, e o app
+  reinstalado por ele, com o C2 passado, despacha o `brza X`; a ajuda usa `brza install` e `brza run` desde o
+  `e67a3c0` (P5). O próximo é o P8, numa sessão `pln-002-p8`; o P7 espera a 2d.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -101,7 +101,8 @@ Executa a [issue do despacho](../../work/issues/cli-brza-manda-subcomando-descon
 
 - [x] **1. O desvio no CLI**, com teste e a conferência de ponta a ponta com o `out/cli/index.js` novo no Electron do app
   instalado.
-- [ ] **2. A reinstalação**, que vai ao P5, por resposta de Anderson: "No brza app install (Recomendado)".
+- [x] **2. A reinstalação**, que vai ao P5, por resposta de Anderson: "No brza app install (Recomendado)". Feita no
+  P5.4, com o C2 passado.
 
 **Evidência:** `brza-studio@9a81e65c852`, com push na `master`; o worklog está em `## Worklogs`. As horas estão lá, fora
 da estimativa deste plano.

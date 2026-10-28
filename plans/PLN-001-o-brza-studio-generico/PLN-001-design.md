@@ -152,23 +152,38 @@ repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do 
 
 ### D38 — Os comandos de shell com ícone e título por categoria — `brza-studio/src/shared/native-chat/tools/brza/` (P44 a P47)
 
-- **Origem:** pedido 27, R29.2
-- **Como fica:** o comando de shell vira a categoria pelo input, como o `runsOrcaBrowserCommand` já faz com `orca
-  browser …`. `git`: GitBranch ou GitCommit pelo subcomando, título "git commit — <mensagem>", e o clique no hash abre
-  o diff do commit no visualizador. `gh` de PR e issue: GitPullRequest, título "PR #123 — <título>" e um chip que abre
-  o PR no navegador. Testes (`vitest`, `run-vitest.mjs`, `flutter test`, `pytest`): FlaskConical, com passou/falhou
-  contado no título a partir da saída. Pacotes e build (`pnpm`, `npm`, `flutter pub`, build): Package ou Hammer, só
-  ícone e título, sem interação.
-- **A perguntar a Anderson:** o comando que casa com mais de uma categoria, como `git` dentro de `&&`, e o formato
-  exato do chip e do título.
+- **Origem:** pedido 27, R29.2, R37.1, R37.2, R38.1, R38.2, R40.1 a R40.3, R41.1 a R41.3, R43.1
+- **Como fica:** o comando de shell vira a categoria pelo input, segmento a segmento (o `splitUnquotedSegments` de
+  `orca-browser-cli-commands.ts`), e no composto vale a de mais peso: testes > gh > git > pacotes e build > `brzaCli`
+  (R37.1). O comando de navegador mantém o globo do upstream, e nenhuma categoria do BrzA entra nele (R41.1). O título
+  lê a saída: o `brzaToolLineTitle` passa a receber o `result` que o `nativeChatToolLineLabel` já tem
+  (`native-chat-tool-line-label.ts:69-72` e `:144`). O resultado no título vai em português (R40.3).
+  - **`git`:** o logo do Git (`git-logo`) em todo subcomando, e o `git commit` com o `git-commit-horizontal` (R40.1); a
+    corrida de git leva o logo, mesmo com um commit dentro (R41.2). O commit tem o título "git commit — <1ª linha da
+    mensagem>" e o chip com o hash curto, lido da saída (`[branch abc1234]`), que abre o diff do commit no visualizador
+    por uma `openCommitByHash` do BrzA, sobre o `getRuntimeGitCommitCompare` e o `openCommitAllDiffs`, no worktree do
+    chat (R38.1). Os outros subcomandos ficam com o texto do comando, como hoje.
+  - **`gh` de PR e issue:** GitPullRequest, "PR #123 — <título>" e "Issue #45 — <título>", com o número pela URL na
+    saída e o título pelo `--title` ou pela saída, e o chip "#123" que abre no navegador pelo `openNativeChatWebLink`.
+  - **Testes:** `vitest`, `run-vitest.mjs`, `flutter test`, `pytest` e o gerenciador que roda `test`, `vitest`, `jest`
+    ou o `run-vitest.mjs` (R37.2): FlaskConical, com "<executor> — 12 passaram, 1 falhou" pelo rodapé, quando ele está
+    na parte da saída que chegou, e só "passou" ou "falhou" pelo `isError` ou `exitCode` na saída cortada (R38.2).
+  - **Pacotes e build:** `pnpm`, `npm` e `flutter pub` com `install`, `add` ou `get`, e o build: Package nos pacotes e
+    Hammer no build (`build`, `run build`, `flutter build`) (R43.1), com o texto do comando como hoje, sem interação.
+  - **Mobile:** o ícone lucide e o título; os chips ficam só no desktop (R41.3).
 
 ### D39 — As ferramentas de MCP e do agente com ícone e título — `brza-studio/src/shared/native-chat/tools/brza/` (P48 a P51)
 
-- **Origem:** pedido 27, R29.3
-- **Como fica:** a chamada MCP chega identificada pelo `NativeChatMcpIdentity`. Jira e Confluence: chip com a chave do
-  card (`FIX-123`) ou o título da página, que abre no navegador. Skill: Sparkles e "Skill · <nome>". Figma: logo, nome
-  do nó e miniatura do `get_screenshot` na linha. Firebase e Context7: Flame e BookOpen, com o nome do projeto ou da
-  biblioteca no título, sem interação.
+- **Origem:** pedido 27, R29.3, R35.1, R38.3, R38.4, R40.2 a R40.4, R41.3, R43.2
+- **Como fica:** a chamada MCP chega identificada pelo `NativeChatMcpIdentity`, e o título lê a saída como no D38.
+  - **Jira e Confluence** (servidor `/atlassian/i`): o Jira com o `jira-logo` (R35.1), "FIX-123 — <resumo, se vier na
+    saída>" e o chip com a chave; o Confluence com o `file-text` do lucide (R43.2), "<título da página>" e o chip da página. O chip abre no navegador: o
+    site sai do `cloudId` quando ele é domínio (`x.atlassian.net`), senão do `siteUrl` da conexão nativa do Jira no app
+    (`JiraSite.siteUrl`), e sem nenhum o chip só copia a chave (R38.3). Só no desktop (R41.3).
+  - **Skill:** Sparkles e "Skill · <nome>" (P49).
+  - **Figma:** o `pen-tool` e "Figma · <nome do nó, ou o `nodeId`>", com o nome quando a saída o traz. A miniatura do
+    `get_screenshot` sai pelo pedido 30, em PLN-001/D43 (R38.4).
+  - **Firebase e Context7:** Flame e BookOpen, com o nome do projeto ou da biblioteca no título, sem interação (P51).
 
 ### D40 — Os blocos de código e as tabelas com 120 colunas na largura total — `brza-studio/…/native-chat/` (P52)
 

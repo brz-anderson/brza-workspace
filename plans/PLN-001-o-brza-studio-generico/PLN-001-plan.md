@@ -372,6 +372,42 @@ Respondida em 2026-10-28, na sessão do `brza-workspace` que desenhou o pedido 3
 
    **Decidido — "Só desktop agora (Recomendado)".**
 
+### Rodada 37 — o comando composto e a divisão do P44 ao P48 e do P50 (enviada 2026-10-28)
+
+> **Apresentado antes:** hoje vale a primeira categoria da lista que casar com o comando inteiro
+> (`brza-tool-categories.ts:48` e `:112`), e em `brza … && git commit` ganha a `brzaCli`; o `splitUnquotedSegments`
+> (`orca-browser-cli-commands.ts:134`) já divide o comando por segmento, fora de aspas; o P44 ao P47 disputam a mesma
+> lista, e na R33 o rebase de duas listas em paralelo deu conflito.
+
+Pedido de Anderson: "execute o P44 ao P48 e o P50 em paralelo com /orchestration, em workers do Orca […] Antes de
+disparar os workers, faça comigo as rodadas das pendências de cada passo". Respondida em 2026-10-28, na sessão
+`pln-001-p44-p50` do `brza-workspace`.
+
+1. **R37.1 — No comando composto que casa com mais de uma categoria, qual vale?** Seleção única. Opções: ordem fixa por
+   peso (recomendada) — testes > gh > git > pacotes e build > `brzaCli`, casando por segmento — custo: ~0,3 h no P44;
+   se paga: na hora; o último segmento — custo: ~0,3 h; se paga: em `cd x && pnpm test`, mas `git commit && git push`
+   mostraria o push; o primeiro que casar, como hoje — custo: zero; composto sem categoria — custo: ~0,3 h; se paga:
+   nunca mostra a errada.
+
+   **Decidido — "Ordem fixa por peso (Recomendado)".** Vai ao P44, e o P45 ao P47 se encaixam na ordem.
+
+2. **R37.2 — `pnpm test`, `npm test`, `pnpm vitest` e `npx vitest` são testes ou pacotes?** Seleção única. Opções:
+   testes (recomendada) — gerenciador que roda `test`, `vitest`, `jest` ou o `run-vitest.mjs` é testes, e `install`,
+   `add`, `build` e `run build` são pacotes e build — custo: ~0,2 h no P46; só o executor direto — custo: zero.
+
+   **Decidido — "Testes (Recomendado)".** Vai ao P46 e ao P47.
+
+3. **R37.3 — Como dividir os passos entre os workers?** Seleção única. Opções: 3 workers (recomendada) — o P44, o P45,
+   o P46 e o P47 em sequência num worker de shell, dono da ordem da lista, e o P48 e o P50 em paralelo, um worker cada;
+   4 workers — git e gh, testes e pacotes, P48 e P50; 6 workers, um por passo.
+
+   **Decidido — "3 workers (Recomendado)".**
+
+4. **R37.4 — Que modelo cada worker usa?** Seleção única. Opções: Opus no shell e no Figma (recomendada), Sonnet no
+   P48, pela regra da R33.3; Opus só no shell; Sonnet em todos.
+
+   **Decidido — "Opus no shell e no Figma (Recomendado)".**
+
 ## Passos
 
 > Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com

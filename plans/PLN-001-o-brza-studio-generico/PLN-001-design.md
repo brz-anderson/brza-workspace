@@ -3,7 +3,7 @@
 O desenho do [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](PLN-001-plan.md). O
 que este desenho assume e o Terreno medido em 2026-10-24 estão no desenho do PLN-025 do workspace da Fixfy
 (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-design.md`); os itens D1 a D35 vieram de lá, pelo PLN-029 da Fixfy,
-com os IDs de antes (PLN-025/R28.2), e os D36 a D41 são daqui, de 2026-10-27. Nos itens D1 a D35, o nome do
+com os IDs de antes (PLN-025/R28.2), e os D36 a D44 são daqui, de 2026-10-27 e 2026-10-28. Nos itens D1 a D35, o nome do
 repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do rebrand.
 
 ### D1 — O build local, assinado — `brza-studio/config/scripts/build-mac-local.mjs` (P1, PLN-028/P5)
@@ -188,3 +188,63 @@ repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do 
 - **Como fica:** `.native-chat-markdown a` (`:18`) passa de `color: var(--chat-foreground-strong)` a uma variável
   `--chat-link`, `#79C0FF` no tema escuro e `#0969DA` no claro. O sublinhado segue com 40% da cor
   (`color-mix(in srgb, currentColor 40%, transparent)`), e a mensagem com tom `faint` segue herdando a cor (`:55`).
+
+### D42 — A imagem da ferramenta extraída para arquivo — `brza-studio/src/main/native-chat/brza/` e `src/shared/native-chat-types.ts` (P54)
+
+- **Origem:** pedido 30, R36.1, R36.2, R36.4, R39.1
+- **Contexto:** o `tool_result` do Claude traz a imagem do `Read`, do `get_screenshot` do Figma e do print do browser
+  como bloco `image` em base64. Os dois decoders ficam só com o texto: o do turno ao vivo
+  (`claude-structured-item-translation.ts:127-143`, `resultText`) e o do histórico lido do transcript
+  (`transcript-record-blocks.ts:8-34`, `toolResultOutput`). O base64 não vai ao journal, que corta o que passa do limite
+  (`journal-payload-bounds.ts:44-51`).
+- **Como fica:**
+  - **A extração.** Uma função do BrzA, por exemplo `brzaToolResultImages(content)` em
+    `src/main/native-chat/brza/brza-tool-result-images.ts`, lê do `content` do `tool_result` os blocos
+    `{ type: 'image', source: { type: 'base64', media_type, data } }`.
+    - Grava cada um no temp do sistema, como o colar (`clipboard-image-temp-file.ts:44`, `getPath('temp')`), e devolve
+      `NativeChatImageRefBlock[]` com o `path`.
+    - O bloco com `source.type: 'url'` vira `image-ref` com a `url`, sem arquivo.
+    - Só entram os tipos que o envio já aceita (`claude-structured-dispatch-content.ts:105-111`: gif, jpeg, png e webp).
+  - **O nome do arquivo sai do digest do conteúdo**, por exemplo `brza-tool-images/<sha256 de 16>.<ext>`. Assim a mesma
+    imagem decodificada duas vezes, ao vivo e no histórico, não duplica o arquivo. E o arquivo que o macOS limpou do temp
+    volta quando a chamada é decodificada de novo do transcript. Sem essa nova decodificação, a miniatura cai no "Preview
+    unavailable", como o anexo (R39.1).
+  - **O campo.** O `NativeChatToolResultBlock` (`native-chat-types.ts:94-104`) e o corpo `tool-call` do journal
+    (`agent-session-journal-types.ts:132`) ganham `images?: NativeChatImageRefBlock[]`. Os dois decoders o preenchem,
+    com uma linha de montagem cada, e a projeção do journal ao renderer leva o campo. Nos arquivos do upstream entram só
+    a montagem e o campo opcional.
+  - **O mobile não muda** (R36.4): o campo é opcional, e o mobile segue sem ele.
+- **A conferir no passo, sem rodada:** se a tradução ao vivo é síncrona, a gravação vai pelo mesmo caminho do colar. Se o
+  relay ao mobile rejeitar campo desconhecido, o campo fica fora do relay.
+
+### D43 — A miniatura na linha da ferramenta — `brza-studio/src/renderer/src/components/native-chat/brza/` e `NativeChatToolLine.tsx` (P55)
+
+- **Origem:** pedido 30, R36.3, R39.4, PLN-001/R38.4 (o P50.2), R42.1
+- **Como fica:**
+  - **O lugar.** Um componente do BrzA, por exemplo `BrzaToolImageStrip`, montado por uma linha em
+    `NativeChatToolLine.tsx`, logo abaixo do título e fora da parte que abre e fecha (o corpo aberto está em `:75`). As
+    miniaturas aparecem com a linha fechada.
+  - **O tamanho.** Altura de ~96 px, largura pela proporção, lado a lado. Até 4 miniaturas; da quinta em diante, um "+N"
+    no lugar da quinta (R39.4), cujo clique abre o corpo da linha, com todas as imagens em faixa com quebra (R42.1).
+  - **A leitura e o clique.** Cada miniatura reusa o `ExpandableMarkdownImage` (`MarkdownImageLightbox.tsx:28`), que
+    amplia no `PanZoomImageDialog` com pan e zoom. A leitura do arquivo é a do `NativeChatMarkdownImage`: o
+    `useLocalImageSrc` com o acesso `chat-image` (`:42` e `:134-141`) e a carga perto da tela
+    (`observeTranscriptVisibility`, `:142`). O arquivo que sumiu do temp mostra o "Preview unavailable" (`:215-219`).
+  - **O que cobre:** o `Read` de imagem, o print do browser e o `get_screenshot` do Figma, que é o P50.2 (PLN-001/R38.4).
+
+### D44 — A miniatura do caminho ou da URL de imagem solto no texto — `brza-studio/src/renderer/src/components/native-chat/brza/` e `NativeChatMarkdown.tsx` (P56)
+
+- **Origem:** pedido 30, R39.2, R39.3, R42.2
+- **Contexto:** o texto já faz link de caminho de arquivo que existe, na prosa e no código inline
+  (`comment-markdown-native-chat-file-links.ts:255`, `inlineCodeFileLink`), pelo `linkifyFilePaths`
+  (`NativeChatMarkdown.tsx:105` e `:125`). O `[x](a.png)` e a URL http(s) já são links do Markdown.
+- **Como fica:**
+  - **O que vira miniatura.** Um plugin remark do BrzA, ligado pelos `remarkPlugins` da extensão de imagem
+    (`NativeChatMarkdown.tsx:68`), acha no parágrafo o link cujo alvo termina em extensão de imagem
+    (`src/shared/image-file-extensions.ts`). O link fica, e depois do parágrafo entra um nó que um componente do BrzA
+    desenha com o `NativeChatMarkdownImage`.
+  - **A mesma imagem aparece uma vez por mensagem**, na primeira menção, e o `![]()` da mesma imagem conta como menção.
+  - **Só aparece se abre.** O caminho que não abre e a URL que falha não mostram nada, ao contrário do `![]()`, que
+    mantém o "Preview unavailable". A URL remota carrega sozinha, como o `![]()` (R39.3).
+  - **O bloco de código cercado fica de fora**, e a mensagem em streaming só ganha a miniatura ao terminar, como o
+    Mermaid (`NativeChatMarkdown.tsx:141`, `renderMermaid={!streaming}`; R42.2).

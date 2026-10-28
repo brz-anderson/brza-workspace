@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P44 ao P48 e o P50, com rodada antes; o pedido 30 a desenhar; a conferência do P42, P49, P51, P52 e P53 com Anderson"
-estimate_h: 116.0
+ready: "sim — o P44 ao P48 e o P50, com rodada antes; o P54 ao P57 do pedido 30 depois do P44 ao P50; a conferência do P42, P49, P51, P52 e P53 com Anderson"
+estimate_h: 123.8
 executed_h: 9.85
-remaining_h: 12.9
+remaining_h: 20.7
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -27,7 +27,7 @@ tags:
   **Próximos:** o P44 ao P48 e o P50, sobre a API do P43 (registrar um item no
   `BRZA_TOOL_CATEGORIES` de `src/shared/native-chat/tools/brza/brza-tool-categories.ts` e o título no
   `brza-tool-line-title.ts`), cada um com os pontos a perguntar a Anderson antes; o Figma fica no `pen-tool` (R35.1).
-  O **pedido 30**, a prévia de imagem no chat (R34), espera entrevista e desenho numa sessão nova. Abertos desde a
+  O **pedido 30**, a prévia de imagem no chat, está desenhado (R36, R39 e R42; D42 a D44) e vira o P54 ao P57, depois do P44 ao P50 (R42.4): o P54 antes do P55, o P56 independente e o P57, a conferência, por último. Abertos desde a
   Fixfy: o P37 e o P40. O P27.2 e o P27.3 seguem com Anderson, no Windows; o Sophos da máquina gerenciada pela TI barrou
   o instalador sem assinatura em 2026-10-28, e Anderson respondeu "esquece". O build de Windows é `gh workflow run
   build-win-local.yml --repo brz-anderson/brza-studio --ref master`, com a conta `brz-anderson` ativa no `gh`.
@@ -122,7 +122,10 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | Pedido 27 | O Firebase e o Context7 ganham ícone e o nome do projeto ou da biblioteca no título, sem interação (R29.3) | P51 | teste da categoria e do título (unidade) |
 | Pedido 28 | Só na largura "Total", todo bloco de código e toda tabela têm exatamente `120ch` mais o padding, e no painel estreito encolhem até 100% e rolam na horizontal, com o texto corrido na largura total (R30.1, R30.2) | P52 | teste do estilo (unidade); conferência no BrzA Studio (manual) |
 | Pedido 29 | O link do chat usa `--chat-link`, `#79C0FF` no escuro e `#0969DA` no claro, com o sublinhado a 40% (R31.1) | P53 | teste da variável (unidade); conferência nos dois temas (manual) |
-| Pedido 30 | A prévia de imagem no chat: o link ou o caminho de imagem na mensagem, a imagem lida por ferramenta e o anexo enviado viram miniatura, que amplia ao clicar (R34.2) | a desenhar | a desenhar |
+| Pedido 30 | A imagem do `Read`, do `get_screenshot` e do print do browser vira arquivo no temp, com o `image-ref` no resultado da ferramenta, ao vivo e no histórico (R36.2, R39.1) | P54 | teste da extração e dos dois decoders (unidade) |
+| Pedido 30 | A linha da ferramenta mostra, fechada, até 4 miniaturas de ~96 px e um "+N" que abre a linha; o clique amplia (R36.3, R39.4, R42.1) | P55 | teste do componente (unidade); conferência no BrzA Studio (manual) |
+| Pedido 30 | O caminho ou a URL de imagem solto no texto ganha a miniatura abaixo do parágrafo, uma vez por mensagem, só se abre e só com a mensagem terminada (R39.2, R39.3, R42.2) | P56 | teste do plugin (unidade); conferência no BrzA Studio (manual) |
+| Pedido 30 | O `![]()`, o anexo enviado e o ampliar ao clicar, que já existem, funcionam no BrzA Studio (R36.1) | P57 | conferência no BrzA Studio (manual) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
 
@@ -536,6 +539,41 @@ Respondida em 2026-10-28, na sessão `pln-001-p44-p50` do `brza-workspace`.
 
    **Decidido — "R33.2 e R33.4, e P50 de Sonnet (Recomendado)".** Reescreve a R37.4 no P50.
 
+### Rodada 42 — a prévia de imagem: o "+N", o streaming, o corte e a ordem (enviada 2026-10-28)
+
+> **Apresentado antes:** o `PanZoomImageDialog` mostra uma imagem só (`PanZoomImageDialog.tsx:64`); o Mermaid só
+> desenha com a mensagem terminada (`NativeChatMarkdown.tsx:141`, `renderMermaid={!streaming}`); o P55 e o P50 tocam a
+> linha da ferramenta e o módulo `brza`, e na R33 o rebase de duas listas em paralelo deu conflito. Os passos propostos:
+> o P54 (D42, a extração no main, 3 h), o P55 (D43, a faixa na linha, 1,5 h, depois do P54), o P56 (D44, o texto solto,
+> 3 h, independente) e o P57 (a conferência das quatro partes com Anderson, 0,3 h), 7,8 h ao todo. A R40 e a R41 estão
+> reservadas à sessão `pln-001-p44-p50`.
+
+Respondida em 2026-10-28, na sessão do `brza-workspace` que desenhou o pedido 30.
+
+1. **R42.1 — O que o "+N" da linha abre?** Seleção única. Opções: abre a linha (recomendada) — o corpo mostra todas as
+   imagens em faixa com quebra — custo: ~0,2 h; se paga: agora; visualizador com setas ← → — custo: +1 a 1,5 h; se paga:
+   com chamadas de muitas imagens frequentes.
+
+   **Decidido — "Abre a linha (Recomendado)".** Vai ao D43 e ao P55.
+
+2. **R42.2 — A miniatura do texto solto aparece quando?** Seleção única. Opções: ao terminar a mensagem, como o Mermaid
+   (recomendada) — custo: zero; se paga: agora; assim que o link chega — custo: +0,5 h; se paga: em respostas longas com
+   o print no começo.
+
+   **Decidido — "Ao terminar a mensagem (Recomendado)".** Vai ao D44 e ao P56.
+
+3. **R42.3 — O corte dos passos.** Seleção única. Opções: aceitar o P54 ao P57 (recomendada) — um commit por passo —
+   custo: 7,8 h; se paga: a cada passo; juntar o P54 e o P55 — custo: o mesmo; se paga: sem commit sem nada visível;
+   tirar o P56 por ora — custo: 4,8 h; se paga: agora.
+
+   **Decidido — "Aceitar P54 a P57 (Recomendado)".** É o aceite do desenho do pedido 30.
+
+4. **R42.4 — Quando o P54 ao P56 rodam?** Seleção única. Opções: depois do P44 ao P50 (recomendada) — custo: a espera;
+   se paga: no primeiro rebase sem conflito; o P54 e o P56 já, o P55 depois — custo: um worker a mais; se paga: agora,
+   com ~6 h adiantadas; tudo já, em paralelo — custo: rebase provável; se paga: só com prazo apertado.
+
+   **Decidido — "Depois do P44 ao P50 (Recomendado)".**
+
 ## Passos
 
 > Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com
@@ -753,7 +791,7 @@ do NSIS é 32 bits; o app dentro é x64), sha256
 `091865ee297014e64465615f42d8b43cd0b660455817d24705dd0bcd6f703d3a`. O artifact `orca-windows-setup-x64` fica no run por
 14 dias. O 2 e o 3 seguem com Anderson, no Windows.
 
-### F7 — O chat (pedidos 19 a 29)
+### F7 — O chat (pedidos 19 a 30)
 
 Todos com o executor sessão do `brza-studio`, fora da trava do PLN-025/P28 da Fixfy (R25.3), com commit e push na
 `master` do `brza-studio` (os feitos até 2026-10-26, na `main` do `orca-dev`, como a evidência diz); cada um se confere
@@ -761,6 +799,9 @@ no BrzA Studio, com Anderson. O P34 vem antes do P33 e do P35, porque leva o id 
 P36, de que reaproveita a troca; o P41 não depende dele. **O P42 ao P53** (pedidos 27 a 29, R29 a R31) vêm depois: o P43
 vem antes do P44 ao P51, porque monta a base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum. A ordem de
 entrega, se os passos não couberem numa sessão, é pendência a perguntar a Anderson.
+
+**O P54 ao P57** (pedido 30, R36, R39 e R42) vêm depois do P44 ao P50 (R42.4): o P54 antes do P55, o P56
+independente, e o P57, a conferência com Anderson, por último.
 
 #### P34 — A barra da mensagem do agente e o Novo Chat (pedido 20)
 
@@ -1323,6 +1364,84 @@ a regra do tom `faint` não mudaram, e o `faint` ganha pela especificidade. **De
 unidade, porque a cor é só CSS, e o jsdom não a resolve. Conferido na fixture: `#79C0FF` no escuro e `#0969DA` no claro.
 Falta a conferência no BrzA Studio com Anderson (subpasso 3).
 
+#### P54 — A imagem da ferramenta extraída para arquivo (pedido 30)
+
+Executa D42 · executor: sessão do `brza-studio`
+
+Estimado: 3 h · Executado: — h
+
+Depois do P44 ao P50 (R42.4), e antes do P55.
+
+- [ ] **1.** Teste que falha, em `src/main/native-chat/brza/brza-tool-result-images.test.ts`: o `brzaToolResultImages`
+      de um `content` com `{ type: 'image', source: { type: 'base64', media_type: 'image/png', data } }` devolve um
+      `image-ref` com o `path` no temp (`brza-tool-images/<sha256 de 16>.png`), e o arquivo tem os bytes; a mesma imagem
+      duas vezes dá o mesmo caminho e um arquivo só; `source.type: 'url'` vira `image-ref` com a `url`; `media_type` fora
+      de gif, jpeg, png e webp fica de fora
+- [ ] **2.** Teste que falha nos dois decoders: o `tool_result` com texto e imagem dá o `output` de hoje e mais o
+      `images` — o ao vivo (`claudeToolResults` e `claudeToolBody`, `claude-structured-item-translation.ts:150-163` e
+      `:176-187`) e o do histórico (`toolResultBlock`, `transcript-record-blocks.ts:90-97`)
+- [ ] **3.** O campo `images?: NativeChatImageRefBlock[]` no `NativeChatToolResultBlock` (`native-chat-types.ts:94-104`)
+      e no corpo `tool-call` do journal (`agent-session-journal-types.ts:132`), uma linha de montagem em cada decoder e a
+      projeção do journal ao renderer; os dois pontos "A conferir no passo" do D42
+- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push
+
+**Evidência:** —
+
+#### P55 — A miniatura na linha da ferramenta (pedido 30)
+
+Executa D43 · executor: sessão do `brza-studio`
+
+Estimado: 1,5 h · Executado: — h
+
+Depois do P54. Cobre o P50.2 (PLN-001/R38.4).
+
+- [ ] **1.** Teste que falha, em `src/renderer/src/components/native-chat/brza/BrzaToolImageStrip.test.tsx`: a linha com
+      `result.images` mostra as miniaturas com a linha fechada, abaixo do título; com seis imagens, quatro miniaturas e
+      um "+2", cujo clique abre o corpo da linha, com as seis em faixa com quebra; sem `images`, a linha não muda
+- [ ] **2.** O `BrzaToolImageStrip`, com o `ExpandableMarkdownImage` (`MarkdownImageLightbox.tsx:28`) e a leitura do
+      `NativeChatMarkdownImage` (o `useLocalImageSrc` com o acesso `chat-image` e a carga perto da tela), e a linha de
+      montagem em `NativeChatToolLine.tsx`, fora do corpo aberto (`:75`)
+- [ ] **3.** Os testes; commit e push; conferir no BrzA Studio, com Anderson: um `Read` de PNG, um `get_screenshot` do
+      Figma e um print do browser, cada um com a miniatura na linha fechada e ampliando no clique
+
+**Evidência:** —
+
+#### P56 — A miniatura do caminho ou da URL de imagem solto no texto (pedido 30)
+
+Executa D44 · executor: sessão do `brza-studio`
+
+Estimado: 3 h · Executado: — h
+
+Não depende do P54 nem do P55; roda depois do P44 ao P50 (R42.4).
+
+- [ ] **1.** Teste que falha, num teste do plugin em `src/renderer/src/components/native-chat/brza/` e num caso em
+      `NativeChatMarkdown.image-preview.test.tsx`: na mensagem terminada, o `` `/abs/shot.png` `` que existe, o
+      `[print](shot.png)` e o `https://…/a.png` ganham a miniatura abaixo do parágrafo, e o link fica; a mesma imagem duas
+      vezes, ou já num `![]()`, dá uma miniatura só; o caminho que não existe não mostra nada; o bloco cercado não muda;
+      com `streaming`, nada entra
+- [ ] **2.** O plugin remark do BrzA, ligado pelos `remarkPlugins` da extensão (`NativeChatMarkdown.tsx:68`), e o
+      componente que desenha o nó com o `NativeChatMarkdownImage` e some na falha. Conferir a ordem dos plugins: o
+      `remarkNativeChatFileLinks` entra depois dos outros (`CommentMarkdown.tsx:367-368`), e o do BrzA precisa ver o link
+      que ele cria, ou ler o `inlineCode` com o mesmo teste de existência
+- [ ] **3.** Os testes; commit e push; conferir no BrzA Studio, com Anderson: uma resposta que cite um print por caminho
+      em código inline e outra com uma URL de imagem
+
+**Evidência:** —
+
+#### P57 — A conferência das quatro partes da prévia (pedido 30)
+
+Executa D42, D43 e D44 · executor: Anderson, com a sessão que conduz
+
+Estimado: 0,3 h · Executado: — h
+
+Depois do P55 e do P56.
+
+- [ ] **1.** No BrzA Studio: um `![]()` local e um remoto na resposta do agente; uma imagem colada e uma arrastada, com
+      a miniatura na mensagem enviada; o clique amplia, com pan e zoom, nos quatro casos (R36.1)
+- [ ] **2.** O Observado e o veredito na linha da evidência
+
+**Evidência:** —
+
 ## Desvios
 
 - **X1 — O `build:win` também compila o launcher da CLI e o agent hook, em Rust, para x64.** O `afterPack` do
@@ -1457,6 +1576,8 @@ Falta a conferência no BrzA Studio com Anderson (subpasso 3).
 - 2026-10-28 — [O P42, o P43, o P49 e o P51 por workers do Orca em paralelo](../../work/worklogs/2026-10-28-p42-p43-p49-p51-por-workers-do-orca.md):
   o P42, o P43, o P49 e o P51, com os commits `9b8a3e2e672`, `9b85279f57a` e `fbff699fa58`; as R33 a R35, o pedido 30 e os
   X9 e X10. Esperam a conferência com Anderson.
+- 2026-10-28 — [O pedido 30, a prévia de imagem no chat, desenhado](../../work/worklogs/2026-10-28-pedido-30-previa-de-imagem-desenhada.md):
+  as R36, R39 e R42, o D42 ao D44 e o P54 ao P57, sem código; o corte aceito na R42.3.
 
 ## Decisões
 

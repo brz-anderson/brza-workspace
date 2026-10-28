@@ -79,6 +79,17 @@ do `brza-studio`, sobre `fbff699fa58`.
   categoria" agora cita a `brzaCli` (`e9c1217`), como em `brza … && git commit`. Hoje vale a primeira da lista que
   casar.
 
+## As sessões seguintes
+
+A pedido de Anderson ("abra as sessões que precisar, utilizando o orca cli"), esta sessão abriu duas sessões em
+terminais do BrzA Studio no `brza-workspace`, com `brza terminal create --command 'claude --name … '`. O comando é
+digitado no zsh de login, e a função `claude` do `~/.zshrc` passa o `--settings` do workspace, como o `orca-sessions`
+da Fixfy faz lá. O hook de medição registrou as duas.
+
+- **`pln-001-p44-p50`:** faz as rodadas das pendências do P44 ao P48 e do P50 e depois os executa com
+  `/orchestration`.
+- **`pln-001-pedido-30`:** conduz a entrevista e o desenho da prévia de imagem no chat, sem código.
+
 ## Fora do workspace
 
 - **`/private/tmp/brza-icon/`**:

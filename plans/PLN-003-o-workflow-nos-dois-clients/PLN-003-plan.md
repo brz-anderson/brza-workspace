@@ -14,8 +14,8 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** as rodadas 1 e 2 fecharam o escopo e a CLI. Falta registrar a medição das três formas do MCP (R1.3), do
-  worker de plugin do Orca e do empacotamento do plugin do Claude, e levá-las à rodada 3.
+- **Retomar:** as rodadas 1 a 3 fecharam o escopo, a CLI e a distribuição; as três medições (MCP, worker de plugin do
+  Orca, plugin do Claude) estão feitas e vão à rodada 4 e ao Terreno.
 
 ## Pedido
 
@@ -29,7 +29,13 @@ Os itens do pedido, numerados para a Cobertura:
 
 1. o plugin do Orca para o Workspace;
 2. o plugin do Claude com o MCP para o Workflow — o fluxo do workspace e o recurso Workflow do Claude Code (R1.1);
-3. a CLI `brza` ajustada para o workflow funcionar no BrzA Studio e no Orca.
+3. a CLI `brza` ajustada para o workflow funcionar no BrzA Studio e no Orca;
+4. a CLI instala e atualiza o app, o plugin do Orca, o plugin do Claude e o MCP, e inicia e para o MCP; e é ela mesma
+   instalável por `npm`, `npx`, `pnpm`, `brew`, `pip` e `winget`.
+
+"o `BrzA CLI` deve conseguir instalar/atualizar o app `BrzA Studio`, o plugin do `Orca`, o plugin do `Claude`, o MCP -
+iniciar/parar tbm -, como fazemos para que o CLI possa ser instalado com `npm|npx|pnpm|brew|pip|winget install`?" —
+Anderson, em 2026-10-29, na mesma sessão.
 
 ### Cobertura
 
@@ -41,6 +47,9 @@ Os itens do pedido, numerados para a Cobertura:
 | `Pedido 1` | os comandos do plugin mandam o `brza` certo ao terminal do worktree em foco                             | —     | —             |
 | `Pedido 2` | o plugin do Claude traz as skills, os hooks e o MCP do workspace, e sobe nos chats dos dois apps          | —     | —             |
 | `Pedido 2` | o plugin traz roteiros de Workflow do Claude Code para o fluxo do workspace                               | —     | —             |
+| `Pedido 4` | `pipx install brza` e `brew install brz-anderson/tap/brza` instalam o CLI, com o `brza` e os `brza-*` no PATH | —     | —             |
+| `Pedido 4` | `brza app install` baixa o DMG da release e troca o app; `--from-source` compila da `origin/master`            | —     | —             |
+| `Pedido 4` | `brza mcp start`, `stop` e `status` controlam o servidor residente                                           | —     | —             |
 | `Pedido 3` | `brza <sub>` acha o app que está rodando — BrzA Studio ou Orca — sem caminho fixo                        | —     | —             |
 
 ## Entrevista
@@ -139,6 +148,60 @@ Respondida em 2026-10-29, no chat do BrzA Studio.
    - sempre nos dois. Custo: ~1 h; mexe no Orca mesmo sem uso. Se paga: se os dois forem usados todo dia.
 
    **Decidido — no client detectado, com `--client`.**
+
+### Rodada 3 — a distribuição do CLI (enviada 2026-10-29)
+
+**Apresentado antes:**
+- **Os 10 scripts são Python só com a biblioteca padrão**; o macOS está preso em `brza_runtime.py:63` (`AF_UNIX`),
+  `brza-run:31` (`pty`) e em `brza-app` e `brza-doctor` (`/Applications`, `plistlib`).
+- **O nome `brza` está livre** no npm, no PyPI e no Homebrew core (404 nos três registros, 2026-10-29).
+- **O `brza-studio` é público**, com a release `v1.4.242.alpha.1` em pré-release e CI de build para mac e Windows;
+  o `brza app install` de hoje compila da `origin/master`.
+- **O MCP stdio não tem processo próprio**: o `claude` o inicia e encerra por sessão; iniciar e parar só tem sentido
+  literal num servidor residente.
+
+Respondida em 2026-10-29, no chat do BrzA Studio.
+
+1. **Quem instala pelos gerenciadores.** Opções:
+   - público, por fases: pip, pipx e uv (PyPI) e brew (tap `brz-anderson/homebrew-tap`), só macOS; depois npm, npx e
+     pnpm; o winget depois do porte para Windows (recomendada). Custo: ~4–6 h na fase 1, e o cuidado de não vazar caminho
+     pessoal no pacote. Se paga: na 1ª instalação fora desta máquina;
+   - os cinco canais já. Custo: ~20–30 h, com o porte para Windows e um binário por plataforma. Se paga: só com usuário
+     Windows em vista;
+   - só para Anderson, sem registro: pipx e uv do git e a fórmula num tap. Custo: ~2 h. Se paga: agora, sem outros
+     instalarem.
+
+   **Decidido — público, por fases.**
+
+2. **A forma do pacote.** Opções:
+   - Python stdlib com shims: `pyproject` com o console script `brza` e os `brza-*`; a fórmula do brew instala do PyPI; o
+     pacote npm é um shim que chama o `python3` (recomendada). Custo: ~4 h; o npm exige `python3` na máquina. Se paga: na
+     fase 1, sem reescrever as 1855 linhas nem os testes;
+   - reescrever em TypeScript, com binário único por `bun build --compile`. Custo: ~20–25 h. Se paga: quando o winget e o
+     npm pesarem mais que o pip;
+   - binário único do Python (PyInstaller) por plataforma. Custo: ~8–10 h de CI, e assinatura no macOS. Se paga: na fase
+     do winget.
+
+   **Decidido — Python stdlib com shims.**
+
+3. **De onde o `brza` instala e atualiza o app.** Opções:
+   - da release do GitHub, com `--from-source` para o build da `origin/master` de hoje (recomendada). Custo: ~3 h no CLI
+     e uma release com DMG por versão; sem assinatura nem notarização, o Gatekeeper avisa. Se paga: na 1ª máquina sem o
+     repositório;
+   - só build da fonte. Custo: ~0. Se paga: só enquanto for Anderson, nesta máquina;
+   - cask no tap, chamado pelo `brza`. Custo: ~2 h e a release com DMG; só macOS. Se paga: se o brew for o canal
+     principal.
+
+   **Decidido — a release, com `--from-source`.**
+
+4. **O que é iniciar e parar o MCP.** Opções:
+   - stdio: o `claude` inicia por sessão; `brza mcp enable|disable|status` liga e desliga no projeto, e `brza mcp serve`
+     roda à mão (recomendada). Custo: ~1 h. Se paga: agora, sem processo residente;
+   - HTTP residente: servidor local no `launchd`, com `brza mcp start|stop|status`, comum às sessões e aos apps. Custo:
+     ~4–6 h, mais porta, token e o serviço do `launchd`. Se paga: se várias sessões precisarem de estado comum.
+
+   **Decidido — HTTP residente.** Consequência a levar ao Desenho: o servidor não herda o `ORCA_*` do chat, então acha o
+   client pela detecção da R2.1 e precisa saber de que sessão vem cada chamada.
 
 ## Worklogs
 

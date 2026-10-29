@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P55 ao P57 do pedido 30 e os testes do P26.4, do P43.4 e do P44.4; os casos manuais com Anderson"
+ready: "sim — o P56 e o P57 do pedido 30 e os testes do P26.4, do P43.4 e do P44.4; os casos manuais com Anderson"
 estimate_h: 124.5
-executed_h: 17.0
-remaining_h: 8.7
+executed_h: 17.75
+remaining_h: 7.2
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -16,10 +16,10 @@ tags:
 
 # PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat
 
-- **Retomar:** o P54 feito em 2026-10-28 (`brza-studio@44ed13bfec9`); a próxima tarefa é o P55 e o P56 do pedido 30,
-  cada um com a autorização de Anderson, e depois o P57, e os testes do P26.4, do P43.4 e do P44.4, numa sessão do
-  `brza-studio`; esperam Anderson os casos manuais (C1 ao C7,
-  C10 e C14, num build só), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37.
+- **Retomar:** o P55 feito em 2026-10-28 (`brza-studio@eca0bf772ba`); a próxima tarefa é o P56 do pedido 30, com a
+  autorização de Anderson, e depois o P57, e os testes do P26.4, do P43.4 e do P44.4, numa sessão do `brza-studio`;
+  esperam Anderson os casos manuais (C1 ao C7, C10, C11 e C14, num build só), o X10, o X20 e o P27.2 e o P27.3; aberto
+  desde a Fixfy, o P37.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
@@ -1645,20 +1645,49 @@ Desvios X23 ao X25.
 
 Executa D43 · executor: sessão do `brza-studio`
 
-Estimado: 1,5 h · Executado: — h
+Estimado: 1,5 h · Executado: 0,75 h
 
 Depois do P54. Cobre o P50.2 (PLN-001/R38.4).
 
-- [ ] **1.** Teste que falha, em `src/renderer/src/components/native-chat/brza/BrzaToolImageStrip.test.tsx`: a linha com
+- [x] **1.** Teste que falha, em `src/renderer/src/components/native-chat/brza/BrzaToolImageStrip.test.tsx`: a linha com
       `result.images` mostra as miniaturas com a linha fechada, abaixo do título; com seis imagens, quatro miniaturas e
       um "+2", cujo clique abre o corpo da linha, com as seis em faixa com quebra; sem `images`, a linha não muda
-- [ ] **2.** O `BrzaToolImageStrip`, com o `ExpandableMarkdownImage` (`MarkdownImageLightbox.tsx:28`) e a leitura do
+- [x] **2.** O `BrzaToolImageStrip`, com o `ExpandableMarkdownImage` (`MarkdownImageLightbox.tsx:28`) e a leitura do
       `NativeChatMarkdownImage` (o `useLocalImageSrc` com o acesso `chat-image` e a carga perto da tela), e a linha de
       montagem em `NativeChatToolLine.tsx`, fora do corpo aberto (`:75`)
-- [ ] **3.** Os testes; commit e push; conferir no BrzA Studio, com Anderson: um `Read` de PNG, um `get_screenshot` do
-      Figma e um print do browser, cada um com a miniatura na linha fechada e ampliando no clique
+- [x] **3.** Os testes; commit e push; conferir no BrzA Studio, com Anderson: um `Read` de PNG, um `get_screenshot` do
+      Figma e um print do browser, cada um com a miniatura na linha fechada e ampliando no clique — a conferência é o
+      C11, aberto, no build único dos casos manuais
 
-**Evidência:** —
+**Evidência:** commit [`eca0bf772ba`](https://github.com/brz-anderson/brza-studio/commit/eca0bf772ba), na `master` do
+`brza-studio`, pela sessão `pln-001-p55`, autorizada por Anderson em 2026-10-28 ("siga com o P55"). O
+`BrzaToolImageStrip` mora em `src/renderer/src/components/native-chat/brza/BrzaToolImageStrip.tsx`, montado por uma
+linha em `NativeChatToolLine.tsx`, logo abaixo do botão da linha e fora do `NativeChatExpandable`, com o `body?.images`:
+o `body` é o resultado tanto na linha da chamada quanto na do resultado solto. Cada miniatura é o
+`NativeChatMarkdownImage` com o `path` ou a `url`. Ele traz o `ExpandableMarkdownImage` e o `PanZoomImageDialog`, o
+`useLocalImageSrc` com o acesso `chat-image` e a carga perto da tela. O caminho absoluto do temp resolve pelo
+`resolveExplicitFileLinkTargetPath`, e o `chat-image` autoriza fora das raízes pelo tipo do arquivo
+(`local-file-access-resolution.ts:215-217`). O tamanho vem das variantes da faixa: `[&_img]:h-24`, `w-auto` e o
+`my-0` no gatilho. O "+N" é um quadrado `size-24`, com o rótulo `brza.native-chat.showAllImages` em en e pt.
+
+O teste do 1 mora em `BrzaToolImageStrip.test.tsx`, com 3 casos; antes do componente, os 2 com imagens falharam pela
+asserção e o sem imagens passou. Conferido na fixture (`pnpm fixtures:shot`, temporária, fora do commit): 96 px de
+altura pela proporção, o "+2" no lugar da quinta, e a linha aberta com as seis em faixa com quebra, acima do corpo.
+
+`node config/scripts/run-vitest.mjs run --config config/vitest.config.ts` sobre a pasta `native-chat/brza/`, o
+`NativeChatToolLine.test.tsx` e o `NativeChatMarkdown.image-preview.test.tsx` → 9 arquivos, 119 passed.
+
+`pnpm check:changed --base=origin/master --maxWorkers=2` → 19 de 21. Os dois vermelhos são preexistentes:
+
+- o import boundaries, só no `src/cli/external-subcommand.ts`, na issue das Pendências;
+- os unit tests, com 2 testes do `open-uncommitted-entry.test.ts` ("opens untracked/unstaged Markdown additions in the
+  rich editor"). Os mesmos 2 falham na `master` limpa, em `44ed13bfec9`, com o P55 no `stash`. Dos 19 613 testes
+  relacionados, 19 560 passaram.
+
+A primeira corrida do check pegou a `key` por índice (react-doctor `no-array-index-as-key`) e o format da linha de
+montagem, corrigidos antes do commit (X28).
+
+Desvios X26 ao X28.
 
 ### P56 — A miniatura do caminho ou da URL de imagem solto no texto (pedido 30)
 
@@ -1800,6 +1829,13 @@ da linha quando o teste entra.
 - **X25 — Dois arquivos do upstream no teto do `max-lines` pediram mais que a montagem.** O tipo do journal usa o alias
   `BrzaToolCallMetadata` do `native-chat-types.ts`, e a projeção lê `call.callId` em vez de desestruturá-lo; afeta P54,
   e o D42 não muda.
+- **X26 — O "+N" abre a linha, e as imagens todas aparecem na própria faixa, acima do corpo, e não dentro dele.** A
+  faixa fica fora do `NativeChatExpandable`, como o D43 pede, e com a linha aberta mostra todas, com quebra; o corpo
+  abre logo abaixo; afeta P55, e o D43 não muda.
+- **X27 — A faixa quebra também fechada.** Num painel estreito, as quatro miniaturas e o "+N" passam à segunda linha,
+  em vez de cortadas; afeta P55.
+- **X28 — A mesma imagem duas vezes no resultado aparece uma vez.** A `key` é o `path` ou a `url`, pela regra do
+  react-doctor contra o índice, e o "+N" conta as distintas; afeta P55.
 
 ## Worklogs
 
@@ -1890,6 +1926,8 @@ da linha quando o teste entra.
   os Passos sem fases, as R45 a R47, os X1 ao X22 em duas linhas e o P26.4, o P43.4 e o P44.4.
 - 2026-10-28 — [O P54 do PLN-001, a imagem da ferramenta extraída para arquivo](../../work/worklogs/2026-10-28-pln-001-p54-imagem-da-ferramenta-extraida.md):
   o P54, com o commit `44ed13bfec9`; os dois pontos "A conferir" do D42 e os X23 ao X25. Esperam o P55 e o P56.
+- 2026-10-28 — [O P55 do PLN-001, a miniatura na linha da ferramenta](../../work/worklogs/2026-10-28-pln-001-p55-miniatura-na-linha-da-ferramenta.md):
+  o P55, com o commit `eca0bf772ba`, e os X26 ao X28. O C11 entra no build único dos casos manuais; espera o P56.
 
 ## Decisões
 
@@ -1928,7 +1966,8 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,
-Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14.
+Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14. O C11
+entra no mesmo build, pelo pedido do P55 (2026-10-28).
 
 ## Fechamento
 

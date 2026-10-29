@@ -22,6 +22,10 @@ tags:
 - **Retomar:** o P0 ao P6 e o P8 estão feitos; o último, o `brza doctor`, em `brza-workspace@cc19e75`, com o C4
   passado. Falta só o P7, que espera Anderson reabrir a sessão da 2d (R5.2); depois dele vem a revisão da entrega. O
   esqueleto do `brza note` ainda não acha o nome da sessão (X3).
+- **Pedido de fora (2026-10-29):** Anderson decidiu, na
+  [R6.1 do PLN-003](../PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md), que o P7 roda já numa sessão nova,
+  `pln-002-p7`, sem a 2d — "Sessão nova pln-002-p7, eu abro (Recomendado)". A sessão nova faz a combinação do D7 e
+  registra a R5.2 como reaberta; o roteador do PLN-003 usa o `list|send|close`.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido

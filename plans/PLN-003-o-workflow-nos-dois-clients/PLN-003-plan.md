@@ -15,8 +15,8 @@ tags:
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
 - **Retomar:** as rodadas 1 a 5 fecharam o escopo, a CLI, a distribuição, o painel, as skills, os roteiros e o
-  orquestrador. A matriz feature × frente está no scratch da sessão e vai ao Desenho. Falta a rodada 6: o P7 "agora"
-  (R5.4), o `DESIGN.md`, a tabela de política, o modelo da sessão e o escopo do semáforo.
+  orquestrador. A matriz feature × frente está no scratch da sessão e vai ao Desenho. A rodada 6 mandou o P7 a uma sessão
+  nova, `pln-002-p7`. Falta a rodada 7 — o escopo do semáforo e a casa da arquitetura e do contrato — e então o Desenho.
 
 ## Pedido
 
@@ -321,6 +321,47 @@ Respondida em 2026-10-29, no chat do BrzA Studio.
 
    **Resposta:** "P7 agora". Leitura: o P7 não espera — executa já, antes da fase 1 deste plano. Em aberto se ele roda
    no PLN-002 por uma sessão nova, sem a 2d, ou se o PLN-003 o absorve; vai à rodada 6.
+
+### Rodada 6 — o P7, o `DESIGN.md`, a política e o modelo (enviada 2026-10-29)
+
+**Apresentado antes:** a leitura da R5.4 — o P7 executa antes da fase 1 —, e que o executor do P7 no PLN-002 é "a
+sessão da 2d, reaberta por Anderson" (`plans/PLN-002-os-comandos-brza/PLN-002-plan.md:257`, R5.2 de lá); por
+`AGENTS.md`, esta sessão não executa passo de outro plano.
+
+Respondida em 2026-10-29, no chat do BrzA Studio.
+
+1. **Por onde o P7 roda.** Opções:
+   - uma sessão nova, `pln-002-p7`, aberta por esta pelo `brza-sessions`, que faz o P7 no PLN-002 com a combinação do
+     D7 feita por ela, sem a 2d (recomendada). Custo: ~3 h estimadas na sessão nova. Se paga: agora; o PLN-002 fecha;
+   - Anderson reabre a 2d. Custo: acordar a 2d regrava o cache dela. Se paga: só se ela tiver contexto que as notas não
+     guardam;
+   - o PLN-003 absorve o P7 e o faz primeiro. Custo: 3 h e reescrever o passo. Se paga: depois do Desenho daqui.
+
+   **Decidido — a sessão nova `pln-002-p7`, aberta por esta.**
+
+2. **O que é o `DESIGN.md`.** Opções:
+   - a arquitetura e o contrato entre as frentes, no `brz-anderson/brza` (recomendada). Custo: 2–3 h na fase 2. Se paga:
+     no fechamento, como casa dona do Desenho;
+   - o design system do painel, no formato do Stitch. Custo: ~1–2 h. Se paga: quando o painel tiver mais de uma tela;
+   - sem `DESIGN.md`. Custo: 0. Se paga: nunca.
+
+   **Decidido — o design system do painel.** A arquitetura e o contrato ficam sem casa nomeada: vão a uma rodada
+   própria.
+
+3. **Onde mora a tabela de política.** Opções:
+   - um `brza.toml`, lido por `tomllib`, que o `AGENTS.md` cita (recomendada). Custo: ~1 h. Se paga: na fase 2;
+   - a tabela Markdown do `AGENTS.md`. Custo: ~1 h e parser frágil. Se paga: agora, com uma fonte só;
+   - só norma. Custo: 0. Se paga: nunca para a R4.1.
+
+   **Decidido — o `brza.toml`.**
+
+4. **De que sessão o orquestrador decide o modelo.** Opções:
+   - só da que ele abre (recomendada). Custo: 0. Se paga: na fase 2;
+   - também sugere à principal, por aviso. Custo: ~1 h. Se paga: quando a medição mostrar a principal cara em tarefa
+     mecânica;
+   - decide a principal. Custo: ~4–6 h no fork, só BrzA. Se paga: fora do PLN-003.
+
+   **Decidido — também sugere à principal.** A principal continua "o de quem a abriu" (`AGENTS.md`); o aviso é sugestão.
 
 ## Worklogs
 

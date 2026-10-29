@@ -2,7 +2,7 @@
 status: open
 phase: interview
 origin: request
-ready: não — falta a rodada do MCP (R1.3, a medir), a medição do worker de plugin e o empacotamento do plugin do Claude
+ready: não — falta desenhar o orquestrador (R4.1) e escrever o Desenho
 scope:
   - workspace
   - brza-studio
@@ -14,8 +14,8 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** as rodadas 1 a 3 fecharam o escopo, a CLI e a distribuição; as três medições (MCP, worker de plugin do
-  Orca, plugin do Claude) estão feitas e vão à rodada 4 e ao Terreno.
+- **Retomar:** as rodadas 1 a 4 fecharam o escopo, a CLI, a distribuição, o painel, as skills e os roteiros. O MCP virou
+  o orquestrador do fluxo (R4.1): falta levantar o que o Orca já orquestra e fazer a rodada de esclarecimento.
 
 ## Pedido
 
@@ -202,6 +202,62 @@ Respondida em 2026-10-29, no chat do BrzA Studio.
 
    **Decidido — HTTP residente.** Consequência a levar ao Desenho: o servidor não herda o `ORCA_*` do chat, então acha o
    client pela detecção da R2.1 e precisa saber de que sessão vem cada chamada.
+
+### Rodada 4 — o MCP, o painel, as skills e os roteiros (enviada 2026-10-29)
+
+**Apresentado antes:**
+- **Plugin do Orca:** o worker é Node completo, sem sandbox (`brza-studio/src/main/plugins/plugin-host-process.ts`); o
+  painel é iframe com `connect-src 'none'` (`src/shared/plugins/plugin-panel-shell.ts:9`), sem canal do worker para ele
+  (`plugin-host-protocol.ts`), e chama só `readContext` (sem o caminho), `terminal.sendText` e `notifications.show`. Os
+  dois apps têm o mesmo sistema, ligado; o Orca 1.4.244 aceita também o manifesto v2, o fork só o v1.
+- **MCP:** o chat dos dois apps sobe o `claude` pelo SDK com `settingSources` de projeto
+  (`src/main/claude/claude-structured-launch-resolution.ts:43,74`), sem injetar MCP; o `rpc()` respondeu contra o Orca
+  1.4.244. A1 ~9 h, A2 com a premissa caída, A3 ~10–27 h só no fork. Com o HTTP residente, o servidor não herda o
+  `ORCA_*` do chat.
+- **Plugin do Claude:** carrega skills, hooks, `.mcp.json` e `workflows/*.js` (campo `@internal` no binário 2.1.292);
+  `env` e `promptCacheTtl` não vão no plugin; `check_notes.py:54` e `measure.py:70-73` acham a raiz pelo `__file__`.
+
+Respondida em 2026-10-29, no chat do BrzA Studio.
+
+1. **A forma do MCP.** Opções:
+   - A1, as operações do fluxo, 1ª leva c2, c3 e c1 (recomendada). Custo: ~9 h, mais ~4–6 h do HTTP e a norma. Se paga:
+     no 1º c2 ou c3 pelo chat, nos dois apps;
+   - A2, o MCP fino. Custo: ~5 h, mais HTTP e norma. Se paga: no 1º c3; vira um A1 recortado;
+   - A3, o MCP dentro do app. Custo: ~10–12 h no fork, ~15 h a mais com cartão; nada no Orca. Se paga: só com o cartão de
+     subagente pedido;
+   - nenhum MCP agora. Custo: 0. Se paga: agora; o c3 espera o P7.
+
+   **Resposta:** "o MCP é o orquestrador/coordenador, é por ele - rodando um agente - que decide qual sessão chamar, com
+   qual conta e por qual runtime, funcionando como um semaforo enfileirando chamadas, tbm decide o modelo/esforço da
+   sessão (pode ser desativado), em resumo, é o coração do fluxo". Leitura: contraproposta — o MCP deixa de ser uma
+   fachada da CLI e vira o coordenador do fluxo, com um agente que roteia por sessão, conta, runtime, modelo e esforço, e
+   uma fila. Vai ao levantamento do que o Orca já orquestra e a uma rodada de esclarecimento.
+
+2. **Como o painel mostra planos, notas e worklogs.** Opções:
+   - HTML regenerado com os dados embutidos, o plugin em `devPluginPaths` nos dois apps, botões que mandam `brza` ao
+     terminal (recomendada). Custo: ~1 sessão de protótipo para provar a remontagem sem novo consentimento. Se paga: no
+     protótipo; se falhar, cai na segunda;
+   - só botões de `brza`. Custo: ~3 h. Se paga: agora, sem a visão do estado;
+   - API push no fork e PR ao upstream. Custo: alto; o manifesto diverge até o upstream aceitar. Se paga: só se o
+     contorno não bastar.
+
+   **Decidido — HTML regenerado, na pasta dev.**
+
+3. **Onde moram as skills e os hooks.** Opções:
+   - no plugin, com o `.claude/` só com o `settings.json`; namespace `brza:`, raiz por argumento ou env (recomendada).
+     Custo: ~3 h, mais `AGENTS.md`, `CLAUDE.md` e o glossário. Se paga: quando o plugin for a fonte única nos dois apps;
+   - tudo em `.claude/`, o plugin só com MCP e roteiros. Custo: ~1 h. Se paga: agora, sem levar as skills adiante;
+   - duplicar. Custo: ~1 h e divergência. Se paga: nunca.
+
+   **Decidido — no plugin.**
+
+4. **Os roteiros de Workflow.** Opções:
+   - piloto em `workflows/*.js` do plugin, o levantamento do Terreno antes dos outros (recomendada). Custo: ~2 h, e o
+     risco do `@internal`, mitigado pinando a versão do `claude`. Se paga: no 1º roteiro nos dois apps;
+   - só `.claude/workflows/`. Custo: ~1 h. Se paga: agora, sem levar ao público;
+   - adiar. Custo: ~0. Se paga: quando a doc cobrir.
+
+   **Decidido — piloto em `workflows/*.js`.**
 
 ## Worklogs
 

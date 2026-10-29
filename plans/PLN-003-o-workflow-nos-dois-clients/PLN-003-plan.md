@@ -14,8 +14,9 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** as rodadas 1 a 4 fecharam o escopo, a CLI, a distribuição, o painel, as skills e os roteiros. O MCP virou
-  o orquestrador do fluxo (R4.1): falta levantar o que o Orca já orquestra e fazer a rodada de esclarecimento.
+- **Retomar:** as rodadas 1 a 5 fecharam o escopo, a CLI, a distribuição, o painel, as skills, os roteiros e o
+  orquestrador. A matriz feature × frente está no scratch da sessão e vai ao Desenho. Falta a rodada 6: o P7 "agora"
+  (R5.4), o `DESIGN.md`, a tabela de política, o modelo da sessão e o escopo do semáforo.
 
 ## Pedido
 
@@ -258,6 +259,68 @@ Respondida em 2026-10-29, no chat do BrzA Studio.
    - adiar. Custo: ~0. Se paga: quando a doc cobrir.
 
    **Decidido — piloto em `workflows/*.js`.**
+
+### Rodada 5 — o orquestrador e as frentes (enviada 2026-10-29)
+
+**Apresentado antes:** depois da R4, Anderson pediu: "sobre a resposta da forma do MCP, meça todas as sugestões
+propostas por mim + as sugestões que já estão nas issues e sugira quais features são melhores em qual frente
+cli|mcp|plugin|app", e em seguida: "considere tbm que parte da norma de fluxo de trabalho do workspace pode ficar nos
+arquivos AGENTS/CLAUDE/DESIGN do próprio workspace". A medição juntou:
+- **O que o Orca já orquestra:** a `orchestration` (run, task, dispatch, `worker-start --agent --model --effort`,
+  ask/reply, gates) não agenda nem limita concorrência ("does not schedule or place workers", `orca orchestration
+  run-create --help`); o `Coordinator` com `maxConcurrent` 4 só é criado pelos gates
+  (`brza-studio/src/main/runtime/orchestration/coordinator.ts:37`). O `orca account list --json` dá o uso por conta
+  (5 h, semanal). A conta não se escolhe por chamada: o `agentSession.create` não tem campo de conta, e o
+  `agentSession.switchAccount` não foi testado. O `claude -p` com `CLAUDE_CONFIG_DIR` é o agente interno sem
+  dependência, com precedente em `fixfy/scripts/delegate.py:186`.
+- **O inventário das notas:** 34 sugestões (F1–F34), a maior parte da issue
+  [O Codex como subagente no chat do Claude](../../work/issues/codex-como-subagente-no-chat-do-claude.md).
+- **Os critérios de alocação**, aplicados na ordem: juízo vai à norma; o que roda fora do Claude vai à CLI, que é o
+  núcleo; estado comum vai ao MCP; ciclo do Claude ao plugin do Claude; interface nos dois apps ao plugin do Orca; o
+  que só se faz dentro do app vai ao app; regra que gasta cota e cabe numa tabela é declarada na norma e imposta pelo
+  MCP; no empate, vence o que roda no Orca.
+- **As fases:** 0, medir 7 riscos (~3–4 h); 1, CLI, plugin do Claude e norma, sem servidor (~31 h); 2, o MCP
+  coordenador só com o runtime Claude (~48 h); 3, outros runtimes e contas (~13 h). A matriz vai ao Desenho.
+- **Os conflitos:** a autonomia do orquestrador contra `AGENTS.md` "Uma tarefa, uma sessão" e "Quem pergunta e grava é
+  a sessão principal"; o plugin público e o servidor residente contra "O ferramental vive só no escopo do projeto"; o
+  correio sem trava de retomada (`CLAUDE.md`) num orquestrador que manda prompt; o roteador e o P7 do PLN-002.
+
+Respondida em 2026-10-29, no chat do BrzA Studio.
+
+1. **Quem decide no orquestrador.** Opções:
+   - a tabela de política decide, e um agente Haiku por `claude -p --json-schema` só desempata, atrás da chave
+     (recomendada). Custo: ~1,5–2 h de regra e 3–4 h de agente; latência só no empate. Se paga: a regra na fase 2, o
+     agente quando a medição mostrar empate;
+   - o agente decide toda chamada. Custo: 3–4 h, ~2–6 s e cota a cada `dispatch`. Se paga: só se a tabela não cobrir;
+   - regra pura. Custo: 1,5–2 h. Se paga: agora, contra o "rodando um agente" da R4.1.
+
+   **Decidido — a regra, e o agente desempata.**
+
+2. **O que o orquestrador faz sem perguntar.** Opções:
+   - o consultor roda direto; abrir executor ou trocar conta devolve proposta, e a sessão principal pergunta
+     (recomendada). Custo: 1–2 h e uma seção no `AGENTS.md`. Se paga: na fase 2, no 1º executor;
+   - tudo com gate. Custo: 1 h e um clique por chamada. Se paga: agora, sem fila automática;
+   - autônomo, reescrevendo as duas seções. Custo: 1 h e o risco de gastar cota sem ver. Se paga: só com o painel da
+     fila e o aviso prontos, na fase 3.
+
+   **Decidido — o consultor livre, o executor com gate.**
+
+3. **Onde mora o código público.** Opções:
+   - um repositório próprio, `brz-anderson/brza`, com CLI, MCP, os dois plugins e o `DESIGN.md`; o `brza-workspace` fica
+     com as notas, os planos e a instância da norma (recomendada). Custo: ~2 h e a CI do pacote. Se paga: na 1ª
+     publicação no PyPI;
+   - `scripts/brza` do workspace. Custo: ~0,5 h e filtrar o pessoal a cada release. Se paga: agora, com dívida;
+   - dentro do `brza-studio`. Custo: ~1 h e o atrito de merge. Se paga: nunca para o Orca.
+
+   **Decidido — o repositório próprio `brz-anderson/brza`.**
+
+4. **O `brza sessions list|send|close`, o P7 do PLN-002.** Opções:
+   - o PLN-003 absorve o P7 (recomendada). Custo: 3 h na fase 1. Se paga: na fase 2, no roteador;
+   - fazer o P7 no PLN-002 antes da fase 2. Custo: 3 h e a dependência entre planos. Se paga: igual;
+   - o MCP fala direto com o app, sem verbo na CLI. Custo: ~1,5 h. Se paga: agora, contra a CLI como núcleo.
+
+   **Resposta:** "P7 agora". Leitura: o P7 não espera — executa já, antes da fase 1 deste plano. Em aberto se ele roda
+   no PLN-002 por uma sessão nova, sem a 2d, ou se o PLN-003 o absorve; vai à rodada 6.
 
 ## Worklogs
 

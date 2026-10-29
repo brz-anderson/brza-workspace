@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P56 e o P57 do pedido 30 e os testes do P26.4, do P43.4 e do P44.4; os casos manuais com Anderson"
+ready: "sim — o P57 do pedido 30 e os casos manuais, com Anderson"
 estimate_h: 124.5
-executed_h: 17.75
-remaining_h: 7.2
+executed_h: 19.3
+remaining_h: 3.3
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -16,10 +16,10 @@ tags:
 
 # PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat
 
-- **Retomar:** o P55 feito em 2026-10-28 (`brza-studio@eca0bf772ba`); a próxima tarefa é o P56 do pedido 30, com a
-  autorização de Anderson, e depois o P57, e os testes do P26.4, do P43.4 e do P44.4, numa sessão do `brza-studio`;
-  esperam Anderson os casos manuais (C1 ao C7, C10, C11 e C14, num build só), o X10, o X20 e o P27.2 e o P27.3; aberto
-  desde a Fixfy, o P37.
+- **Retomar:** o P56 e os testes do P26.4, do P43.4 e do P44.4 feitos em 2026-10-29 (`brza-studio@fc43b03b9ef`,
+  `8e708f9790d`, `2e263df152f` e `8850460267c`); a próxima tarefa é o P57, com Anderson, junto dos casos manuais (C1 ao
+  C7, C10, C11, C12 e C14, num build só); esperam Anderson também o X10, o X20 e o P27.2 e o P27.3; aberto desde a
+  Fixfy, o P37.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
@@ -879,7 +879,7 @@ conferência no Orca fica com o PLN-028/P8.
 
 Executa D21 · executor: sessão do `brza-studio`
 
-Estimado: 2,3 h · Executado: 0,4 h
+Estimado: 2,3 h · Executado: 0,5 h
 
 - [x] **1.** Teste que falha: os passos do build de Windows instalam o `mobile/`, rodam o `build:desktop` e o
       `ensure:electron-runtime` e chamam o `electron-builder --win --x64`, com a `ORCA_LOCAL_BUILD_VERSION` no formato
@@ -888,7 +888,7 @@ Estimado: 2,3 h · Executado: 0,4 h
       reaproveitado, e o `build:win` apontando para ele
 - [x] **3.** Os testes do script e do atualizador passam; o `.github/CONTRIBUTING.md` diz o novo `build:win`; commit e
       push
-- [ ] **4.** O teste de regressão do `isUpdaterEnabled()` com versão de release (`src/main/updater/updater-enabled.ts:4-9`):
+- [x] **4.** O teste de regressão do `isUpdaterEnabled()` com versão de release (`src/main/updater/updater-enabled.ts:4-9`):
       verdadeiro com `1.4.242` empacotado e falso com `1.4.242-local.1.abc`; rodada de 2026-10-28, "Marcar e levar à
       issue"; commit e push
 
@@ -908,6 +908,12 @@ config/scripts/windows-cmd-shim-spawn-boundary.test.mjs config/scripts/pnpm-cli-
 src/main/updater.startup-scheduling.test.ts src/main/local-builds` — 40 arquivos, 454 testes passam;
 `pnpm run check:code-quality:changed` sem achado novo. O `.github/CONTRIBUTING.md` diz o `build:win`, o Rust e o
 atualizador desligado. O build de Windows não rodou aqui: é o P27.
+
+**Evidência do 4:** commit [`8e708f9790d`](https://github.com/brz-anderson/brza-studio/commit/8e708f9790d), na `master`
+do `brza-studio`, pela sessão `pln-001-p56`, autorizada por Anderson em 2026-10-29 ("P56 e os testes pendentes"). O
+teste mora em `src/main/updater/updater-enabled.test.ts`, com o `electron` simulado: `1.4.242` empacotado dá verdadeiro,
+e `1.4.242-local.1.abc`, falso. É regressão e passou com o código de hoje. `node config/scripts/run-vitest.mjs run
+--config config/vitest.config.ts src/main/updater/updater-enabled.test.ts` → 2 passed.
 
 ### P27 — O build do `brza-studio` instalado no Windows (pedido 15)
 
@@ -1289,7 +1295,7 @@ recortada.
 
 Executa D37 · executor: worker do Orca (R33); o 4, sessão do `brza-studio`
 
-Estimado: 0,8 h · Executado: 0,75 h
+Estimado: 0,8 h · Executado: 0,85 h
 
 Antes do P44 ao P51, que usam o mapa e o componente que ele monta.
 
@@ -1302,7 +1308,7 @@ Antes do P44 ao P51, que usam o mapa e o componente que ele monta.
       com ele, como diz o comentário do tipo
 - [x] **3.** Conferir a licença de cada logo antes de trazer — por exemplo o Simple Icons, CC0 —, e o que o lucide não
       cobre: não tem logo de Jira nem de Firebase, e os de GitHub e Figma estão obsoletos; os testes; commit e push
-- [ ] **4.** O teste de regressão do recuo de cada logo de marca no mobile
+- [x] **4.** O teste de regressão do recuo de cada logo de marca no mobile
       (`mobile/src/session/native-chat/transcript/brza/brza-mobile-tool-glyphs.ts`): git → `git-branch`, GitHub →
       `git-pull-request` e Jira → `square-kanban` (X10); rodada de 2026-10-28, "Marcar e levar à issue"; commit e
       push
@@ -1320,11 +1326,19 @@ upstream, só montagem: 16 linhas em `native-chat-tool-icon.ts`, 4 no `NativeCha
 `NativeChatAwaitingInputRow.test.tsx` → 8 arquivos, 66 passed; `pnpm check:changed --base=origin/master` → 24 checks;
 `pnpm typecheck` no `mobile/` → exit 0. Desvios X9 e X10. Nada aparece no app até o P44 ao P51 registrarem categorias.
 
+**Evidência do 4:** commit [`2e263df152f`](https://github.com/brz-anderson/brza-studio/commit/2e263df152f), na `master`
+do `brza-studio`, pela sessão `pln-001-p56`. O teste mora em
+`mobile/src/session/native-chat/transcript/brza/brza-mobile-tool-glyphs.test.ts`, com o `lucide-react-native` simulado
+por nomes, como o `MobileNativeChatToolRun.test.tsx`: `git-logo` → `GitBranch`, `github-logo` → `GitPullRequest` e
+`jira-logo` → `SquareKanban`. É regressão e passou com o código de hoje. `pnpm --dir mobile exec vitest run
+src/session/native-chat/transcript/brza/brza-mobile-tool-glyphs.test.ts` → 1 passed. O X10 segue a conferir com
+Anderson: o teste prende a escolha de hoje, e trocá-la muda o teste junto.
+
 ### P44 — O `git` com ícone e título próprios (pedido 27)
 
 Executa D38 · executor: worker do Orca (R37.4); o 4, sessão do `brza-studio`
 
-Estimado: 2,3 h · Executado: 0,8 h
+Estimado: 2,3 h · Executado: 0,9 h
 
 O estimado passou de 1 h a 2 h com o diff pelo hash (R38.1), e a 2,3 h com o teste do 4.
 
@@ -1336,7 +1350,7 @@ O estimado passou de 1 h a 2 h com o diff pelo hash (R38.1), e a 2,3 h com o tes
       português (R40.3), e o chip do hash, lido da saída, que abre o diff do commit no visualizador por uma
       `openCommitByHash` do BrzA (R38.1), só no desktop (R41.3)
 - [ ] **3.** Os testes; commit e push; conferir no BrzA Studio uma linha de `git commit`, com Anderson
-- [ ] **4.** O teste de regressão do rótulo do upstream para o comando sem categoria do BrzA, no ramo do comando de
+- [x] **4.** O teste de regressão do rótulo do upstream para o comando sem categoria do BrzA, no ramo do comando de
       `native-chat-tool-line-label.ts:94-108`: o verbo, o alvo e o título ficam os do upstream; rodada de 2026-10-28,
       "Marcar e levar à issue"; commit e push
 
@@ -1354,6 +1368,14 @@ assunto` da saída, senão do `-m`. O chip do hash é o `BrzaToolLineChip.tsx` (
 renderer, `NativeChatToolLine` e `NativeChatToolRun` → 25 arquivos, 384 passed; `pnpm tc` e o `typecheck` do
 `mobile/` → exit 0; `check:changed` → 23 de 24, com a falha no `open-uncommitted-entry.test.ts`, que já falha na
 `origin/master`. Desvios X16 e X17. Falta o C3, com Anderson.
+
+**Evidência do 4:** commit [`8850460267c`](https://github.com/brz-anderson/brza-studio/commit/8850460267c), na `master`
+do `brza-studio`, pela sessão `pln-001-p56`. O caso entrou em `src/shared/native-chat/tools/brza/brza-tool-line-title.test.ts`,
+e não no teste do upstream, para o merge do `stablyai/orca` seguir sem conflito: o `Bash` com `echo done && wc -l
+notes.txt` dá `running` rodando e `ran` com o resultado, com o alvo e o título iguais ao comando; o comando longo dá o
+alvo do `summarizeToolInput`, cortado com "…", e o título inteiro. É regressão e passou com o código de hoje.
+`node config/scripts/run-vitest.mjs run --config config/vitest.config.ts
+src/shared/native-chat/tools/brza/brza-tool-line-title.test.ts` → 6 passed.
 
 ### P45 — O `gh` de PR e issue com ícone, título e chip (pedido 27)
 
@@ -1693,23 +1715,57 @@ Desvios X26 ao X28.
 
 Executa D44 · executor: sessão do `brza-studio`
 
-Estimado: 3 h · Executado: — h
+Estimado: 3 h · Executado: 1,25 h
 
 Não depende do P54 nem do P55; roda depois do P44 ao P50 (R42.4).
 
-- [ ] **1.** Teste que falha, num teste do plugin em `src/renderer/src/components/native-chat/brza/` e num caso em
+- [x] **1.** Teste que falha, num teste do plugin em `src/renderer/src/components/native-chat/brza/` e num caso em
       `NativeChatMarkdown.image-preview.test.tsx`: na mensagem terminada, o `` `/abs/shot.png` `` que existe, o
       `[print](shot.png)` e o `https://…/a.png` ganham a miniatura abaixo do parágrafo, e o link fica; a mesma imagem duas
       vezes, ou já num `![]()`, dá uma miniatura só; o caminho que não existe não mostra nada; o bloco cercado não muda;
       com `streaming`, nada entra
-- [ ] **2.** O plugin remark do BrzA, ligado pelos `remarkPlugins` da extensão (`NativeChatMarkdown.tsx:68`), e o
+- [x] **2.** O plugin remark do BrzA, ligado pelos `remarkPlugins` da extensão (`NativeChatMarkdown.tsx:68`), e o
       componente que desenha o nó com o `NativeChatMarkdownImage` e some na falha. Conferir a ordem dos plugins: o
       `remarkNativeChatFileLinks` entra depois dos outros (`CommentMarkdown.tsx:367-368`), e o do BrzA precisa ver o link
       que ele cria, ou ler o `inlineCode` com o mesmo teste de existência
-- [ ] **3.** Os testes; commit e push; conferir no BrzA Studio, com Anderson: uma resposta que cite um print por caminho
-      em código inline e outra com uma URL de imagem
+- [x] **3.** Os testes; commit e push; conferir no BrzA Studio, com Anderson: uma resposta que cite um print por caminho
+      em código inline e outra com uma URL de imagem — a conferência é o C12, aberto, no build único dos casos manuais
 
-**Evidência:** —
+**Evidência:** commit [`fc43b03b9ef`](https://github.com/brz-anderson/brza-studio/commit/fc43b03b9ef), na `master` do
+`brza-studio`, pela sessão `pln-001-p56`, autorizada por Anderson em 2026-10-29, na sessão do `brza-workspace` ("P56 e
+os testes pendentes"). O plugin é o `remarkBrzaImageMentions`, em
+`src/renderer/src/components/native-chat/brza/brza-image-mention-markdown.ts`. Ele acha o `link` e o `image` cujo alvo
+termina numa extensão de `src/shared/image-file-extensions.ts`, o caminho pelo `routeNativeChatHref` e a URL http(s) pelo
+`pathname`. Depois do bloco que nomeia a imagem, entra um nó `div` com o `dataBrzaImageMention`, liberado no sanitize.
+O componente, o hook `useBrzaImageMentionExtension` e o `div` que delega ao do visual estão em
+`src/renderer/src/components/native-chat/brza/BrzaImageMention.tsx`. Em `NativeChatMarkdown.tsx`, a montagem é o hook,
+mais 7 linhas e 1 import. O plugin só entra com a mensagem terminada (`settled: !streaming`).
+
+**A ordem dos plugins.** O `CommentMarkdown` monta a base, o `remarkNativeChatFileLinks`, o math e só então os da
+extensão. O do BrzA vem por último e vê o `link` que o de links cria no código inline, só para o caminho que existe. O
+caminho que não existe nunca vira link, e por isso não ganha miniatura.
+
+**Uma vez por mensagem.** A resposta que veio em streaming fica cortada em blocos, cada um com o seu parse
+(`useMarkdownBlocks`). O plugin recebe o texto da mensagem e guarda a primeira menção de cada imagem num mapa da
+mensagem, identificada pela posição do bloco e pela ordem da menção nele. O `![]()` da mesma imagem também reivindica.
+
+**A falha.** A miniatura fica montada, invisível (`invisible h-0`, `inert` e `aria-hidden`), até o `load` da imagem. A
+carga perto da tela continua disparando, e o caminho ou a URL que falha não mostra nada.
+
+**Os testes.** O teste do plugin é o `brza-image-mention-markdown.test.ts`, com 4 casos: as três formas, uma por
+imagem e nenhuma quando o `![]()` veio antes, os blocos de uma mensagem, e o que não muda (caminho ausente, link que
+não é imagem, bloco cercado, item de lista). O caso de `NativeChatMarkdown.image-preview.test.tsx` cobre o streaming
+sem nada, os links que ficam, quatro miniaturas montadas e só a autoral visível antes do `load`, e as visíveis depois do
+`load` e do `error`. Antes do plugin, o do plugin falhou pelo módulo ausente, e o caso, pela asserção: os links
+existiam, sem miniatura.
+
+`node config/scripts/run-vitest.mjs run --config config/vitest.config.ts` sobre os dois → 2 arquivos, 39 passed;
+`pnpm tc:web` → exit 0.
+
+`pnpm check:changed --base=origin/master --maxWorkers=2` → 20 de 21. O vermelho é o import boundaries, só no
+`src/cli/external-subcommand.ts`, preexistente, na issue das Pendências. Os testes unitários passaram.
+
+Desvios X29 ao X31. O mobile não ganha a miniatura, como no P55 (R36.4).
 
 ### P57 — A conferência das quatro partes da prévia (pedido 30)
 
@@ -1740,13 +1796,14 @@ da linha quando o teste entra.
   `brza/brza-cli-category.test.ts:27` e `native-chat-tool-run-sentence.test.ts:48`.
 - **O comando sem categoria do BrzA segue com o verbo, o alvo e o título do upstream**, e a frase da corrida não muda.
   Como se confere: `brza/brza-tool-line-title.test.ts:48` e `native-chat-tool-run-sentence.test.ts`; o ramo do comando
-  em `native-chat-tool-line-label.ts:94-108` não tem teste — teste a escrever, no P44.4.
+  em `native-chat-tool-line-label.ts:94-108` tem o caso do P44.4 em `brza/brza-tool-line-title.test.ts`.
 - **A corrida com categorias misturadas, ou só com as do upstream, mantém o glifo do upstream.** Como se confere:
   `brza/brza-tool-icon-mount.test.ts:30` e `native-chat-tool-icon.test.ts:164-219`.
 - **O mobile cai no ícone lucide equivalente para todo logo de marca e mantém os glifos do upstream.** Como se confere:
   `pnpm --dir mobile typecheck`, que quebra se faltar glifo no
   `mobile/src/session/native-chat/transcript/brza/brza-mobile-tool-glyphs.ts:36`, e
-  `MobileNativeChatToolRun.test.tsx`; o recuo de cada logo não tem teste — teste a escrever, no P43.4.
+  `MobileNativeChatToolRun.test.tsx`; o recuo de cada logo, por
+  `mobile/src/session/native-chat/transcript/brza/brza-mobile-tool-glyphs.test.ts` (P43.4).
 - **O link e o bloco de código do chat abrem, copiam e quebram linha como no upstream**; só a cor e a largura mudam.
   Como se confere, em `src/renderer/src/components/native-chat/`: `use-native-chat-link-actions.test.tsx`,
   `NativeChatPacedMarkdown.file-links.test.tsx`, `NativeChatCodeBlock.test.tsx`, `NativeChatMarkdown.code-wrap.test.tsx`
@@ -1770,8 +1827,8 @@ da linha quando o teste entra.
 - **O build local de Mac e Linux e o atualizador do app de release ficam como estão**: só a versão
   `-local.<ms>.<commit>` desliga o atualizador (`src/main/updater/updater-enabled.ts:4-9`), e os canais `ORCA_WIN_*` do
   CI não mudam. Como se confere: `config/scripts/build-mac-local.test.mjs`, `build-win-local.test.mjs`,
-  `build-linux-local.test.mjs` e `electron-builder-config.test.mjs`; o `isUpdaterEnabled()` com versão de release não
-  tem teste — teste a escrever, no P26.4.
+  `build-linux-local.test.mjs`, `electron-builder-config.test.mjs` e, com versão de release,
+  `src/main/updater/updater-enabled.test.ts` (P26.4).
 - **O merge do `stablyai/orca` segue com conflito pequeno**: o BrzA toca o upstream só em linhas de montagem, e o resto
   mora em pastas `brza/`. Como se confere: `git diff $(git merge-base master upstream/main) master --numstat --` nos
   `native-chat-tool-icon.ts`, `native-chat-tool-line-label.ts`, `NativeChatMarkdown.tsx` e `NativeChatToolIcon.tsx`, que
@@ -1836,6 +1893,13 @@ da linha quando o teste entra.
   em vez de cortadas; afeta P55.
 - **X28 — A mesma imagem duas vezes no resultado aparece uma vez.** A `key` é o `path` ou a `url`, pela regra do
   react-doctor contra o índice, e o "+N" conta as distintas; afeta P55.
+- **X29 — A miniatura entra depois do bloco que nomeia a imagem, e não só do parágrafo.** No título e na tabela, vem
+  depois deles; no item de lista e na citação, dentro deles, abaixo do parágrafo; afeta P56, e o D44 não muda.
+- **X30 — O `![]()` que vem depois do link não apaga a miniatura da primeira menção.** A imagem aparece duas vezes: a
+  miniatura no link e a autoral no `![]()`. Só o `![]()` que vem antes conta como menção que impede a miniatura; afeta
+  P56 e D44.
+- **X31 — A miniatura tem 96 px de altura, como a da linha da ferramenta (D43).** Fica montada invisível até a imagem
+  carregar; o D44 não fixava o tamanho; afeta P56.
 
 ## Worklogs
 
@@ -1928,6 +1992,9 @@ da linha quando o teste entra.
   o P54, com o commit `44ed13bfec9`; os dois pontos "A conferir" do D42 e os X23 ao X25. Esperam o P55 e o P56.
 - 2026-10-28 — [O P55 do PLN-001, a miniatura na linha da ferramenta](../../work/worklogs/2026-10-28-pln-001-p55-miniatura-na-linha-da-ferramenta.md):
   o P55, com o commit `eca0bf772ba`, e os X26 ao X28. O C11 entra no build único dos casos manuais; espera o P56.
+- 2026-10-29 — [O P56 do PLN-001 e os testes de regressão do P26.4, do P43.4 e do P44.4](../../work/worklogs/2026-10-29-pln-001-p56-miniatura-do-texto-solto-e-testes-de-regressao.md):
+  o P56, com o commit `fc43b03b9ef`, os X29 ao X31 e os testes em `8e708f9790d`, `2e263df152f` e `8850460267c`, todos
+  verdes com o código de hoje. O C12 entra no build único dos casos manuais; espera o P57.
 
 ## Decisões
 
@@ -1967,7 +2034,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,
 Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14. O C11
-entra no mesmo build, pelo pedido do P55 (2026-10-28).
+entra no mesmo build, pelo pedido do P55 (2026-10-28), e o C12, pelo do P56 (2026-10-29).
 
 ## Fechamento
 

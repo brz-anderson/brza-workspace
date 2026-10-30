@@ -227,35 +227,43 @@ O pedido de Anderson, em AAAA-MM-DD, na sessão `<$CLAUDE_SESSION_NAME, ou a esc
 
 ## D7 — O `brza sessions list|send|close` — `scripts/brza/brza-sessions` (P7)
 
-- **Origem:** R5.2; a escolha "Reabrir a 2d e combinar" da `brza-comandos-lacunas`.
-- **Contexto:** achar, mandar e fechar sessão por nome se repetiu 8 ou mais vezes, e o CLI não fecha chat.
+- **Origem:** R9.1, R9.2, R9.4 e R10.1, na combinação feita pela `pln-002-p7` (PLN-003/R6.1, que reabriu a R5.2).
+- **Contexto:** achar, mandar e fechar sessão por nome se repetiu 8 ou mais vezes, e o CLI não fecha chat. O roteador
+  do PLN-003 chama o `list`, o `send` e o `close` por nome, e lê o `--json`.
 
-#### Como fica — proposta, a combinar com a 2d
+#### Como fica
 
 ```text
-brza sessions [open] <nome>… [--checkout <caminho>] [--task …]   o de hoje
-brza sessions list [--json]          os chats abertos: nome, id do chat (claude_…), worktree, ocupado ou parado
-brza sessions send <nome> <texto>    manda pelo agentSession.send, com queue-if-active
-brza sessions close <nome>           agentSession.close e session.tabs.close com reason 'user'; sem --resume
+brza sessions [open] <nome> [--checkout <caminho>] [--prompt …]   o de hoje, sem mudança (R9.2)
+brza sessions list [--json]                     os chats do app: nome, título, chat, worktree, estado
+brza sessions send <nome> <texto> [--json]      agentSession.send, com queue-if-active
+brza sessions close <nome> [--force] [--json]   agentSession.close e session.tabs.close com reason 'user'; sem --resume
 ```
 
-- **Achar o chat pelo nome:** pelo título da aba em `session.tabs.listAll`, onde a aba de chat tem
-  `contentType: 'agent-session'`.
+- **Achar o chat pelo nome (R9.1):** as abas `agent-session` do `session.tabs.listAll`; para cada uma, o
+  `agentSession.history` dá o `providerSession.id`, o id da sessão do Claude; o nome é o último `custom-title` do
+  transcript `<config>/projects/*/<id>.jsonl`, nos mesmos `config_dirs()` do `running()`. Chat sem `/rename` fica sem
+  nome e não é achado pelo `send` nem pelo `close`. Nome ausente ou repetido sai 1, e o repetido lista os chats.
+- **O `send` não consulta trava (R10.1):** a trava de retomada foi desligada, e o `send` manda sempre. Quem decide
+  acordar uma sessão grande parada é quem chama.
+- **O `close` (R9.4):** recusa com saída 1 o chat `working` sem `--force`. Com ele, chama os dois RPCs; o
+  `agentSession.close` sozinho deixa a aba no `listAll`. Nada de `--resume` nem de restart.
 
-#### Em aberto
+#### O `--json`, estável para o roteador
 
-Os dois pontos foram medidos em 2026-10-28, na sessão `pln-002-comandos-brza`, ao fechar o chat da `pln-002-p1`
-(`claude_e143df1e_87f7_48f7_8a1b_90407d3c500c`) pelo `brza_runtime.rpc`:
-- **O título da aba não é o nome do `/rename`.** O `session.tabs.listAll` deu `"title": "PLN-002 P1 – sessão de
-  execução"` para o chat renomeado `pln-002-p1`, e a aba não traz o nome. Achar pelo título não serve. Vale a saída já
-  prevista: o `open` grava o par nome e id. O `list` cruza esse registro com os arquivos de `~/.claude/sessions/`, que
-  têm o `name`.
-- **O `close` precisa dos dois RPCs.** O `agentSession.close` deu `{"ok": true}` e encerrou o processo, mas a aba seguiu
-  no `listAll`. O `session.tabs.close` com `worktree`, `tabId` (`agent-session:<id>`) e `reason: 'user'`, vindo de script,
-  deu `{"closed": true}`, e a aba sumiu.
+```text
+list   {"sessions": [{"name": str|null, "title": str, "chat": "claude_…", "claude_session": str|null,
+                      "worktree": str, "state": str|null}]}
+send   {"sent": true, "name", "chat"}
+close  {"closed": true, "name", "chat"}  ·  saída 1: {"closed": false, "name", "chat", "state"}
+erro   saída 1: {"error": "<motivo>"}, no nome ausente, no repetido e no app que não responde
+```
 
-A combinação com a 2d, no primeiro subpasso do P7, parte destes dois fatos e decide o registro nome e id. A divergência
-da proposta acima volta à Entrevista.
+- **Descartada — o registro nome e id gravado pelo `open`.** O `providerSession.id` do `agentSession.history` e o
+  `custom-title` do transcript dão o par sem arquivo novo, também para o chat aberto à mão (R9.1).
+- **Descartada — achar pelo título da aba.** O título é o nome do app, do `agentSession.rename`, e não o do `/rename`.
+- **Descartada — a trava no `send` (R9.3).** Entrou em `brza-workspace@9daa020` e saiu em `88d8a3a`, com a trava
+  desligada (R10.1).
 
 ## D8 — O `brza doctor` — `scripts/brza/brza-doctor` (P8)
 

@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: "sim — o P62 ao P64 do pedido 32, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
 estimate_h: 164.6
-executed_h: 26.0
-remaining_h: 15.9
+executed_h: 27.5
+remaining_h: 5.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -20,8 +20,8 @@ tags:
   mesmo dia, com a R50 e a R51, o D48 ao D50 e o P62 ao P65. O P58 fechou em `brza-studio@9c7fcdebbb0`, com o
   resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`, o P60 em `brza-studio@a44e84add32`, com a
   R53 e os X38 ao X40, e o P59 em `brza-studio@697ee59c0bf`, com os X41 ao X44: o pedido 31 espera só o P61 e o C15
-  ao C17, num build, com Anderson. Rodam em paralelo, autorizados por Anderson, o P63 e o P64, na
-  sessão `pln-001-pedido-32`, depois do P62, fechado em `brza-studio@21f9cfe90bb`. O P66 do pedido 33 fechou em `brza-studio@9118f60672b`, com a R54 e os X45 ao
+  ao C17, num build, com Anderson. Roda, autorizado por Anderson, o P64, na
+  sessão `pln-001-pedido-32`, depois do P62 e do P63, fechados em `brza-studio@21f9cfe90bb` e `9564eff9368`. O P66 do pedido 33 fechou em `brza-studio@9118f60672b`, com a R54 e os X45 ao
   X48, e espera só o C21; sete arquivos de teste do transcript do mobile não carregam desde o P43 (X47). Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
   C17 depois do P60 o C18 ao C20 depois do P64 e o C21), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
@@ -2201,19 +2201,52 @@ Desvios X34 ao X37. A conferência no app é o C18, com o P65.
 
 Executa D49 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-32`
 
-Estimado: 10 h · Executado: — h
+Estimado: 10 h · Executado: 1,5 h
 
 Depois do P62.
 
-- [ ] **1.** Trazer o `7321b066e83` do upstream (#34824) com `git cherry-pick -x`, com os arquivos de que ele depende e
+- [x] **1.** Trazer o `7321b066e83` do upstream (#34824) com `git cherry-pick -x`, com os arquivos de que ele depende e
       que faltam; os conflitos se resolvem a favor do upstream fora do código do BrzA. Registrar como `X` cada arquivo
       trazido além do commit
-- [ ] **2.** O cartão desenha também a mensagem do P62: a de outra sessão e a devolução, com o rótulo do P62; os testes
+- [x] **2.** O cartão desenha também a mensagem do P62: a de outra sessão e a devolução, com o rótulo do P62; os testes
       do cartão trazidos passam, e um caso novo cobre a mensagem do Claude Code
-- [ ] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C19
 
-**Evidência:** —
+**Evidência:** commit [`9564eff9368`](https://github.com/brz-anderson/brza-studio/commit/9564eff9368), na `master` do
+`brza-studio`, pela sessão `pln-001-pedido-32`, com `git cherry-pick -x 7321b066e83`: a mensagem do upstream, a linha
+"(cherry picked from commit 7321b066e83…)" e as adaptações do BrzA. Antes do cherry-pick, uma sondagem num worktree
+descartável mediu 6 conflitos e os módulos que faltavam ao cartão: só o `native-chat-prose`, que aqui mora em outro
+caminho, e o harness de tooltip dos testes. Não foi preciso trazer módulo do cartão além disso, e a parada com Anderson
+não se aplicou.
+
+**Os conflitos, 7.** A linha do remetente e a linha do usuário ficaram com o upstream, mais as linhas do BrzA. A fila
+(`structured-agent-session-queued-cards.ts` no renderer e `mobile-structured-queued-message-cards.ts`) ficou com a
+versão do BrzA, com o `displayText` do commit portado (X51). Os testes da edição da fila do upstream ficaram de fora
+(X52).
+
+**O cartão desenha o remetente do P62.** No `NativeChatAgentMessageCard.tsx`, o título "Hand-back from" quando todo
+remetente é devolução, e o "Message from" do upstream no resto; o rótulo saiu da linha do remetente para o título do
+cartão, como no upstream (X54). Em `NativeChatAgentMessageSenders.tsx`, o nome do remetente do Claude Code segue sem
+botão. Sem status no correio do Orca, o avatar mostra o ícone do Claude e nenhum ponto, sem erro. No mobile, a linha
+diz "Hand-back from <nome>" para a devolução (`MobileNativeChatMessage.tsx`). O `pt.json` ganhou as 5 chaves novas do
+cartão (X55).
+
+**Os testes.** Os 11 arquivos de teste do commit que entraram passam, com um ajuste no caso de escala do cartão (X53). O
+caso novo do Claude Code é o `brza-claude-peer-card.test.tsx`: os dois títulos, o texto e os nomes sem botão; ele
+substitui o teste da linha do remetente do P62. No mobile, o `brza-mobile-peer-attribution.test.ts`. Depois do rebase em
+`9118f60672b`: `pnpm tc` → exit 0; `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts` sobre os
+testes do commit, os do BrzA, os da fila, os do i18n e o `src/main/runtime/orchestration` → 156 arquivos, 1263 passed;
+pela `mobile/vitest.config.ts`, os do BrzA, o da atribuição e o da fila → 31 passed e 1 failed. O que falha é o
+"words a host-restart returned card", que espera "Orca restarted" e recebe "BrzA Studio restarted", igual sem o P63
+(num worktree em `21f9cfe90bb`: 1 failed, 25 passed). Os outros arquivos do mobile não carregam no worktree, sem o
+`react-test-renderer` (X47).
+
+`pnpm check:changed --base=origin/master --maxWorkers=2` → 23 de 26, em 1851 s. Os três vermelhos são preexistentes: o
+typecheck do `updater-enabled.test.ts`, já corrigido na `master` em `586f4f69eb7`; o import boundaries, na issue das
+Pendências; e os 2 casos do `open-uncommitted-entry.test.ts`.
+
+Desvios X49 ao X55. A conferência no app é o C19, com o P65.
 
 ### P64 — O clique no remetente abre a aba da sessão (pedido 32)
 
@@ -2456,6 +2489,27 @@ da linha quando o teste entra.
 - **X48 — O tipo do `getVersion` simulado do teste do atualizador, num commit à parte.** O `updater-enabled.test.ts:20`
   quebrava o typecheck da `master` desde o `brza-studio@8e708f9790d` (P2), porque o `vi.hoisted` inferia o literal
   `'1.4.242'`; o `brza-studio@586f4f69eb7` tipa o retorno como `string`. Afeta P2.
+- **X49 — O harness de tooltip dos testes veio de fora do commit.** O
+  `src/renderer/src/components/native-chat/native-chat-tooltip-test-harness.tsx`, 7 linhas, do `f150deb2266` do upstream;
+  o teste do cartão depende dele; afeta P63.
+- **X50 — O `agent-message-display-text.ts` importa o `../native-chat-prose`.** O upstream moveu o módulo para
+  `src/shared/native-chat/transcript/` no `6bb0c14a985`, que não está aqui; afeta P63.
+- **X51 — A fila fica com a projeção do BrzA, com o `displayText` do commit portado.** O upstream mudou a fila para o
+  `shared/` e para o `queuedMessageCardLine`, que não estão aqui. O tipo e a projeção da fila, no desktop e no mobile,
+  ganharam o `displayText`, e a linha do cartão da fila (`NativeChatQueuedMessageCard.tsx`, `MobileQueuedMessageCardRow.tsx`)
+  o mostra; afeta P63.
+- **X52 — Os testes da edição da fila do upstream ficaram de fora.** O
+  `NativeChatQueuedMessageComposer.raw-task.test.tsx`, o `structured-queued-edit.test-fixture.tsx`, o
+  `agent-message-command-contract.test.ts` e os trechos do commit no `use-mobile-structured-queued-edit.test.tsx` e no
+  `structured-agent-session-queued-message-rig.test-fixture.ts` dependem da edição da fila nova do upstream; afeta P63,
+  e o D49 não muda: nenhum é teste do cartão.
+- **X53 — O caso de escala do cartão conta duas enumerações do status, e não três.** O BrzA não tem a "aquisição de
+  autoridade visível" do store do upstream; uma linha em `NativeChatAgentMessageCard.test.tsx`; afeta P63.
+- **X54 — O "Mensagem de" e o "Devolução de" passaram ao título do cartão.** O upstream tirou o rótulo da linha do
+  remetente; o teste do P62 virou o `brza-claude-peer-card.test.tsx`, e o mobile ganhou o "Hand-back from"; afeta P62,
+  P63 e D49.
+- **X55 — O `pt.json` ganhou as 5 chaves do cartão.** "Ir para o agente", "Mensagem do seu coordenador", "Mostrar mais",
+  "Tarefa do seu coordenador" e "Atualização do seu worker"; afeta P63.
 
 ## Worklogs
 
@@ -2561,7 +2615,7 @@ da linha quando o teste entra.
 - 2026-10-29 — [O pedido 33 do PLN-001, o "Pensou" como o "Perguntou"](../../work/worklogs/2026-10-29-pln-001-pedido-33-pensou-como-perguntou.md):
   o pedido 33, a R52, o D51 e o P66, sem código; o P66 em paralelo com os pedidos 31 e 32.
 - 2026-10-29 — [O P62 ao P64 do PLN-001, as mensagens entre sessões no chat](../../work/worklogs/2026-10-29-pln-001-p62-a-p64-mensagens-entre-sessoes.md):
-  o P62 em `brza-studio@21f9cfe90bb`, com os X34 ao X37.
+  o P62 em `brza-studio@21f9cfe90bb`, com os X34 ao X37, e o P63 em `brza-studio@9564eff9368`, com os X49 ao X55.
 - 2026-10-29 — [O P60 do PLN-001, o Markdown segue o chat](../../work/worklogs/2026-10-29-pln-001-p60-markdown-segue-o-chat.md):
   o P60 em `brza-studio@a44e84add32`, com a R53 e os X38 ao X40; o C17 espera o build do pedido 31, com Anderson.
 - 2026-10-29 — [O P59 do PLN-001, o terminal segue o chat](../../work/worklogs/2026-10-29-pln-001-p59-o-terminal-segue-o-chat.md):

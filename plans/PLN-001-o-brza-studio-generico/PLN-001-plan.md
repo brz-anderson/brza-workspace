@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P58 ao P60 do pedido 31 e o P62 ao P64 do pedido 32, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
+ready: "sim — o P59 e o P60 do pedido 31, em execução, e o P62 ao P64 do pedido 32, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
 estimate_h: 163.1
-executed_h: 19.3
-remaining_h: 41.9
+executed_h: 20.1
+remaining_h: 31.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -17,9 +17,10 @@ tags:
 # PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat
 
 - **Retomar:** o pedido 31 entrou em 2026-10-29, com a R48 e a R49, o D45 ao D47 e o P58 ao P61, e o pedido 32 no
-  mesmo dia, com a R50 e a R51, o D48 ao D50 e o P62 ao P65. Rodam em paralelo, autorizados por Anderson: o P58, e
-  depois o P59 e o P60, na sessão `pln-001-p58` e nas que ela abre; o P62 ao P64, na sessão `pln-001-pedido-32`, num
-  worktree. Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
+  mesmo dia, com a R50 e a R51, o D48 ao D50 e o P62 ao P65. O P58 fechou em `brza-studio@9c7fcdebbb0`, com o
+  resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`; rodam em paralelo, autorizados por
+  Anderson, o P59 e o P60, nas sessões `pln-001-p59` e `pln-001-p60`, cada uma no seu worktree, e o P62 ao P64, na
+  sessão `pln-001-pedido-32`. Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
   C17 depois do P60 e o C18 ao C20 depois do P64), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
@@ -1896,25 +1897,65 @@ Depois do P55 e do P56.
 
 Executa D45 · executor: sessão do `brza-studio`
 
-Estimado: 10 h · Executado: — h
+Estimado: 10 h · Executado: 0,8 h
 
 Primeiro do pedido 31; o P59 e o P60 dependem dele.
 
-- [ ] **1.** Teste que falha, junto de `native-chat-appearance-style.test.ts`: o resolvedor do tema do chat devolve o
+- [x] **1.** Teste que falha, junto de `native-chat-appearance-style.test.ts`: o resolvedor do tema do chat devolve o
       fundo, a frente, a paleta e o esquema do tema escuro com o app escuro e do claro com o app claro, quando o par
       claro está ligado; o "Padrão do BrzA" dá o canvas de hoje (`#161616` no escuro, `#fff` no claro); um tema do
-      catálogo dá o fundo dele com o contraste aplicado pela fórmula do `--chat-canvas`
-- [ ] **2.** Teste que falha da migração, em `normalize-loaded-global-settings.test.ts`: com o `matchTerminalInterface`
+      catálogo dá o fundo dele com o contraste aplicado pela fórmula do `--chat-canvas` — `src/shared/native-chat-theme.test.ts`,
+      ao lado do resolvedor (X33), 4 casos; falhou antes pelo módulo ausente, e depois → 4 passed
+- [x] **2.** Teste que falha da migração, em `normalize-loaded-global-settings.test.ts`: com o `matchTerminalInterface`
       ligado, o par de temas do terminal vira o do chat, a fonte e o tamanho do terminal viram os do chat, o contraste
-      fica em 100, o terminal fica seguindo o chat e a chave sai; desligado, o chat fica no "Padrão do BrzA"
-- [ ] **3.** O campo do tema do chat no `NativeChatAppearanceSettings`, com a normalização no renderer e no main; o
+      fica em 100, o terminal fica seguindo o chat e a chave sai; desligado, o chat fica no "Padrão do BrzA" — 2 casos;
+      antes → 1 failed | 23 passed, depois → 24 passed. O "terminal seguindo o chat" é o padrão ligado do campo do P59
+      (X32)
+- [x] **3.** O campo do tema do chat no `NativeChatAppearanceSettings`, com a normalização no renderer e no main; o
       resolvedor; o `nativeChatAppearanceStyle` lendo o tema do chat no lugar do terminal; a migração; a seção do chat
       com o seletor no lugar do interruptor, e os controles de fonte, tamanho e contraste sempre ativos. Os pontos "A
-      conferir no passo" do D45
-- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push. A conferência no
-      app é o C15, no build do pedido 31
+      conferir no passo" do D45 — `brza-studio@9c7fcdebbb0`
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push. A conferência no
+      app é o C15, no build do pedido 31 — os 15 arquivos de teste tocados → 164 passed; `pnpm tc` → só o erro
+      preexistente de `updater-enabled.test.ts:20`; o check, abaixo
 
-**Evidência:** —
+**Evidência:** commit [`9c7fcdebbb0`](https://github.com/brz-anderson/brza-studio/commit/9c7fcdebbb0), na `master` do
+`brza-studio`, pela sessão `pln-001-p58`, autorizada por Anderson em 2026-10-29, na sessão do `brza-workspace` que
+gravou o pedido 31 ("e já execute os passos em paralelo").
+
+**O contrato do resolvedor, que o P59 e o P60 leem sem mudar.** Em `src/shared/native-chat-theme.ts`:
+
+- `resolveNativeChatTheme(settings: NativeChatThemeContext & Partial<Pick<GlobalSettings, 'nativeChatAppearance'>>,
+  systemPrefersDark: boolean): NativeChatTheme` — o tema do chat, com o contraste dele. O `NativeChatThemeContext` é
+  `Partial<Pick<GlobalSettings, 'theme' | 'terminalCustomThemes'>>`.
+- `resolveNativeChatThemePair(pair: NativeChatThemePair | undefined, context: NativeChatThemeContext,
+  systemPrefersDark: boolean, contrast = 100): NativeChatTheme` — o mesmo para qualquer par na forma do chat, como o
+  tema próprio do Markdown (D47). O `NativeChatThemePair` é `{ themeDark?, useSeparateLightTheme?, themeLight? }`.
+- O `NativeChatTheme` devolve: `themeName`; `scheme` (`'dark' | 'light'`) e `followsAppScheme`, verdadeiro só no
+  "Padrão do BrzA"; `background` e `foreground`, as cores do tema antes da mistura; `palette`, o `ITheme` inteiro (as 16
+  ANSI, o cursor e a seleção) com essas duas cores; `canvas`, o `#rrggbb` que o `--chat-canvas` pinta; `canvasMix`; e
+  `foregroundMix`, `strongMix` e `text`, o contraste aplicado ao texto sobre o canvas.
+- O "Padrão do BrzA" é o `NATIVE_CHAT_THEME_BRZA_DEFAULT` (`'brza:default'`), em
+  `src/shared/native-chat-appearance-settings.ts`: o fundo e a frente do app (`#0a0a0a`/`#fafafa` com 5 % no escuro,
+  `#fff`/`#0a0a0a` no claro) e as ANSI do tema padrão do terminal no modo do app. O tema que sumiu volta a ele.
+- O seletor é o `ChatThemePairPicker` (`src/renderer/src/components/settings/ChatThemePairPicker.tsx`), com o catálogo
+  do terminal mais o "Padrão do BrzA" e a prop `disabled`, para o P60 reusar.
+
+**O resto.** A migração é o `migrateNativeChatAppearanceSettings`, chamado na carga
+(`normalize-loaded-global-settings.ts`); a normalização tira a chave antiga em qualquer cliente. O estilo do chat lê o
+resolvedor e remapeia as variáveis só com tema do catálogo; o "Padrão do BrzA" segue a raiz, como antes. A fonte, os
+tamanhos e o contraste deixaram de ser do terminal, e o Cmd +/- vale sempre. O `mixCssColors` entrou em
+`src/shared/terminal-title-contrast.ts`, ao lado do parser de cor que reusa. O web lê o campo pela normalização e não
+mudou; o mobile não lê o `nativeChatAppearance`. As traduções novas entraram no `en` e no `pt`, e as quatro antigas
+saíram dos sete idiomas. Os 14 testes que usavam a chave antiga passaram ao tema do chat, e os que só provavam o
+comportamento retirado saíram.
+
+**O check.** O `pnpm check:changed --base=origin/master --maxWorkers=2` deu 23 de 27, em 1042 s. O format, de 6
+arquivos, foi corrigido antes do commit (`oxfmt --check` → correct format). Os outros três vermelhos já estão na
+`master` sem esta mudança: o typecheck, por `src/main/updater/updater-enabled.test.ts:20` (`'1.4.242-local.1.abc'` não
+cabe no tipo, do `8e708f9790d`); o import boundaries, pelo `external-subcommand.ts`, da issue de mesmo assunto; e os
+testes unitários, pelos 2 casos de `open-uncommitted-entry.test.ts` (`'preview'` em vez de `'rich-editor'`), que dão
+2 failed | 3 passed com e sem a mudança (`git stash`).
 
 ### P59 — O terminal segue o chat (pedido 31)
 
@@ -2156,6 +2197,14 @@ da linha quando o teste entra.
   P56 e D44.
 - **X31 — A miniatura tem 96 px de altura, como a da linha da ferramenta (D43).** Fica montada invisível até a imagem
   carregar; o D44 não fixava o tamanho; afeta P56.
+- **X32 — O chat migrado do "igualar ao terminal" fica no contraste 100 da fórmula, e não no texto a 100 % de antes.** O
+  texto vai a 78 % no escuro e 82 % no claro, como o D45 pede ("o contraste em 100"); a R48.4 dizia "sem mudar a tela".
+  Anderson tinha a chave desligada, e a tela dele não muda. O "terminal seguindo o chat" da migração é o padrão ligado do
+  campo do P59, sem gravação no P58; afeta P58 e D45.
+- **X33 — O teste do resolvedor fica ao lado dele, e o resolvedor e o seletor servem a qualquer par.** O teste está em
+  `src/shared/native-chat-theme.test.ts`; o `resolveNativeChatThemePair` e o `ChatThemePairPicker`, com `disabled`,
+  servem ao par próprio do Markdown (P60); o "Tema claro separado" é um interruptor direto, e não o "Match dark mode"
+  invertido do terminal; afeta P58.
 
 ## Worklogs
 
@@ -2255,6 +2304,9 @@ da linha quando o teste entra.
   o pedido 31, a R48 e a R49, o D45 ao D47 e o P58 ao P61, sem código; o P58, depois o P59 e o P60 em paralelo.
 - 2026-10-29 — [O pedido 32 do PLN-001, as mensagens entre sessões no chat](../../work/worklogs/2026-10-29-pln-001-pedido-32-mensagens-entre-sessoes.md):
   o pedido 32, a R50 e a R51, o D48 ao D50 e o P62 ao P65, sem código; o P62 ao P64 em paralelo com o pedido 31.
+- 2026-10-29 — [O P58 do PLN-001, o tema do chat](../../work/worklogs/2026-10-29-pln-001-p58-tema-do-chat.md):
+  o P58, com o commit `9c7fcdebbb0`, o resolvedor do tema do chat e os X32 e X33; abertas as sessões `pln-001-p59` e
+  `pln-001-p60`. Vermelhos preexistentes no check: `updater-enabled.test.ts` e `open-uncommitted-entry.test.ts`.
 
 ## Decisões
 

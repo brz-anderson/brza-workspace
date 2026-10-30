@@ -125,6 +125,10 @@ pergunta aberta volta como parágrafo que precisa ser relido e interpretado, e a
   por ponto, com a sua inferência como primeira opção, **antes** de escrever.
 - **A aprovação é do texto, nunca das decisões embutidas nele.** O rascunho vai para aprovação só depois que as rodadas
   fecharam os pontos sem lastro.
+- **A rodada que aprova um texto vai na mensagem, e não na ferramenta.** O texto vai inteiro na mensagem — a nota de
+  `work/decisions/`, o rascunho, tudo o que quem pediu precisa ler para decidir —, seguido da pergunta no formato sem a
+  ferramenta. A caixa da pergunta pode esconder o texto escrito antes dela, e a resposta dada sem o texto à vista não
+  vale como aprovação: desfaça o que ela gravou e pergunte de novo.
 - **Uma rodada fecha antes da próxima abrir.** Registre as respostas antes de seguir. Resposta em texto livre é
   contraproposta ou pedido de esclarecimento: registre nas palavras de quem respondeu e volte com opções.
 - **Sem a ferramenta**, use o mesmo formato em texto: pergunta, opções numeradas, recomendação marcada,

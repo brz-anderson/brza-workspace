@@ -3,7 +3,7 @@
 O desenho do [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](PLN-001-plan.md). O
 que este desenho assume e o Terreno medido em 2026-10-24 estão no desenho do PLN-025 do workspace da Fixfy
 (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-design.md`); os itens D1 a D35 vieram de lá, pelo PLN-029 da Fixfy,
-com os IDs de antes (PLN-025/R28.2), e os D36 a D47 são daqui, de 2026-10-27 a 2026-10-29. Nos itens D1 a D35, o nome do
+com os IDs de antes (PLN-025/R28.2), e os D36 a D50 são daqui, de 2026-10-27 a 2026-10-29. Nos itens D1 a D35, o nome do
 repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do rebrand.
 
 ### O que este desenho assume
@@ -58,6 +58,10 @@ repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do 
 - **R49.2:** o tema do chat é um par escuro e claro, pelo claro/escuro do app, como o do terminal.
 - **R49.3:** o padrão do chat é o "Padrão do BrzA", o visual de hoje.
 - **R49.4:** o modo código segue o fundo e o claro/escuro do chat, com a sintaxe Islands Dark e light-plus.
+- **R50.1:** a mensagem do Claude Code entre sessões ganha um leitor do BrzA e o cartão do Orca de 2026-10-29.
+- **R50.2:** entram o correio entre sessões e a devolução de subagente.
+- **R50.3:** o clique no remetente abre a aba da sessão dele, se aberta.
+- **R51.1:** a devolução tem o rótulo "Devolução de <nome>".
 
 ### D1 — O build local, assinado — `brza-studio/config/scripts/build-mac-local.mjs` (P1, PLN-028/P5)
 
@@ -507,3 +511,59 @@ ferramenta não (P52, resposta de 2026-10-27).
   `--chat-font-size`), e o código dentro deles, a fonte de código do chat. O modo código usa a fonte de código do
   chat, que é a do terminal, e mantém o tamanho do editor (R48.3). O zoom do editor continua somando ao tamanho.
   Desligado, a tipografia de hoje.
+
+### D48 — O leitor do BrzA para a mensagem de outra sessão — `brza-studio/src/main/native-chat/brza/` e `transcript-line-decoders-claude.ts` (P62)
+
+- **Origem:** pedido 32, R50.1, R50.2, R51.1
+- **Contexto:** o Claude Code entrega a mensagem de outra sessão num turno `isMeta`, com "Another Claude session sent a
+  message:" e o `<agent-message from="…">`, e o leitor descarta todo turno `isMeta` que não é imagem
+  (`transcript-line-decoders-claude.ts:108-109`). A devolução de subagente chega no mesmo envelope, com "[Subagent
+  hand-back]" e o relatório recuado. A mensagem do usuário já aceita um remetente (`from: AgentMessageSource`,
+  `NativeChatAgentMessageRow.test.tsx:20-29`), e a linha desenha "Message from <nome>"
+  (`NativeChatAgentMessageSenders.tsx:35`).
+
+#### Como fica
+
+- **O leitor.** Uma função do BrzA reconhece o envelope e devolve o remetente, o texto sem o envelope e o tipo:
+  mensagem ou devolução. O descarte do `isMeta` em `:108` ganha uma linha que pergunta antes a essa função.
+- **A mensagem.** Vira uma mensagem do usuário com o `from` do remetente, no histórico e ao vivo. O nome é o `from=` do
+  envelope: o nome da sessão, ou o ID do subagente.
+- **O rótulo.** "Mensagem de <nome>" para a mensagem e "Devolução de <nome>" para a devolução, no `pt.json`, com o
+  inglês no `en.json`.
+
+#### A conferir no passo
+
+- Se o caminho ao vivo recebe o turno `isMeta`, ou se a mensagem só aparece pelo transcript.
+- Se o `AgentMessageSource` comporta o tipo devolução sem mudar o contrato do upstream, ou se o tipo vai num campo do
+  BrzA.
+
+### D49 — O cartão do Orca para as mensagens entre agentes — o `7321b066e83` do upstream (P63)
+
+- **Origem:** pedido 32, R50.1
+- **Contexto:** o upstream de 2026-10-29 troca a linha "Message from" por um cartão com o status do remetente
+  (`7321b066e83`, #34824): `NativeChatAgentMessageCard.tsx`, a relação do remetente no main
+  (`src/main/runtime/orchestration/agent-message-relation.ts`) e dois módulos do `src/shared/agent-session/` que não
+  existem aqui. O `upstream/main` está 1021 commits à frente da `master`.
+
+#### Como fica
+
+- **O commit vem com `cherry-pick -x`**, para o próximo sync reconhecer, mais os arquivos de que ele depende. Cada
+  arquivo além do commit vira um desvio `X`.
+- **O cartão lê também o remetente do D48.** A sessão do Claude Code não tem o status do correio do Orca; o cartão
+  mostra o que tiver, e o que faltar fica de fora, sem erro.
+
+### D50 — O clique no remetente abre a aba da sessão — `brza-studio/src/renderer/src/components/native-chat/` (P64)
+
+- **Origem:** pedido 32, R50.3
+- **Contexto:** o clique no remetente do Orca abre o terminal dele pelo `openAgentMessageSender`
+  (`NativeChatAgentMessageRow.test.tsx:11-12`). A sessão do Claude Code tem só o nome.
+
+#### Como fica
+
+- O clique procura, entre as abas de chat abertas, a da sessão com aquele nome, e a foca. Sem aba, o nome fica sem
+  ação.
+
+#### A conferir no passo
+
+- De onde vem o nome da aba: o `/rename` que o `brza-sessions --wait` espera, o `--name` do Claude Code, ou o título da
+  aba. A busca usa o que o app guardar.

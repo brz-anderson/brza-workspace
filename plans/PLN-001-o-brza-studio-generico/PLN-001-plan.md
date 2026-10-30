@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P58 ao P60 do pedido 31, cada um com a autorização de Anderson; o P57, o P61 e os casos manuais com Anderson"
-estimate_h: 146.8
+ready: "sim — o P58 ao P60 do pedido 31 e o P62 ao P64 do pedido 32, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
+estimate_h: 163.1
 executed_h: 19.3
-remaining_h: 25.6
+remaining_h: 41.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -16,10 +16,11 @@ tags:
 
 # PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat
 
-- **Retomar:** o pedido 31 entrou em 2026-10-29, com a R48 e a R49, o D45 ao D47 e o P58 ao P61; a próxima tarefa é
-  o P58, com a autorização de Anderson, numa sessão do `brza-studio`, e depois o P59 e o P60, que não dependem um do
-  outro; esperam Anderson o P57 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, e o C15 ao C17 do pedido
-  31, depois do P60), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37.
+- **Retomar:** o pedido 31 entrou em 2026-10-29, com a R48 e a R49, o D45 ao D47 e o P58 ao P61, e o pedido 32 no
+  mesmo dia, com a R50 e a R51, o D48 ao D50 e o P62 ao P65. Rodam em paralelo, autorizados por Anderson: o P58, e
+  depois o P59 e o P60, na sessão `pln-001-p58` e nas que ela abre; o P62 ao P64, na sessão `pln-001-pedido-32`, num
+  worktree. Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
+  C17 depois do P60 e o C18 ao C20 depois do P64), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
@@ -80,6 +81,8 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 - **Pedido 31 (2026-10-29, sessão do `brza-workspace` que orquestrou o P54 ao P56):** "o fundo do visualizador de
   markdown ficou mto escuro, deixe da mesma cor que o fundo do chat, deixe com o mesmo tema/tipografia que o chat - o
   terminal igual ao chat tbm -, trocar o tema do chat, troca de todos, trocar o tema dos outros troca só deles"
+- **Pedido 32 (2026-10-29, a mesma sessão):** "faça com que as mensagens entre sessões apareçam no chat como "Mensagem
+  de..." como já é na interface do `Orca` na versão mais atual"
 
 ### Cobertura
 
@@ -117,6 +120,9 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 31` | O terminal tem o interruptor "Seguir o chat", ligado por padrão: ligado, o fundo e as cores são os do chat, com a fonte do terminal; desligado, o tema próprio de hoje (R48.2, R48.3) | P59 | teste da aparência do terminal (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 31` | O visualizador de Markdown tem o interruptor "Seguir o chat", ligado por padrão: ligado, os três modos têm o fundo e o claro/escuro do chat, e o olho e o lápis, a fonte e o tamanho do chat; desligado, um seletor de tema próprio (R48.2, R48.3, R49.1, R49.4) | P60 | teste do fundo e da tipografia nos três modos (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 31` | Trocar o tema do chat troca os três que o seguem; trocar o do terminal ou o do Markdown troca só ele | P61 | conferência no BrzA Studio (manual) |
+| `Pedido 32` | A mensagem de outra sessão (`SendMessage` do Claude Code) aparece no chat como "Mensagem de <nome>", e a devolução de subagente como "Devolução de <nome>", no histórico e ao vivo (R50.1, R50.2, R51.1) | P62 | teste do leitor (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 32` | As duas aparecem no cartão do Orca de 2026-10-29 (#34824), com o status do remetente (R50.1) | P63 | os testes do cartão trazidos do upstream (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 32` | O clique no nome do remetente abre a aba de chat da sessão dele, se aberta no app (R50.3) | P64 | teste da busca da aba (unidade); conferência no BrzA Studio (manual) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
 
@@ -794,6 +800,44 @@ estimativa, não medidos.
    com o mesmo fundo; nada, fica Islands Dark — custo: nenhum; se paga: na hora, com o modo código diferente.
    **Decidido — "Fundo e claro/escuro (Recomendado)".** Vai ao D47 e ao P60.
 
+### Rodada 50 — as mensagens entre sessões no chat (enviada 2026-10-29)
+
+> **Apresentado antes:** o Claude Code grava a mensagem de outra sessão como um turno `isMeta`, "Another Claude session
+> sent a message:" seguido de `<agent-message from="…">`, e o leitor do Claude o descarta
+> (`src/main/native-chat/transcript-line-decoders-claude.ts:108`; o caso em `transcript-reader.test.ts:107-125`). O chat
+> já tem a linha "Message from <nome>" (`NativeChatAgentMessageSenders.tsx:35`), só para o correio do próprio Orca, e o
+> `pt.json` não tem a chave `messageFrom`, que cai no inglês. O upstream de 2026-10-29 troca essa linha por um cartão
+> com o status do remetente (`7321b066e83`, #34824), também só para o correio do Orca, apoiado em
+> `src/shared/agent-session/agent-message-presentation.ts` e `agent-message-display-text.ts`, que não existem no
+> `brza-studio`; o `upstream/main` está 1021 commits à frente da `master`.
+
+Respondida em 2026-10-29, por Anderson na sessão do `brza-workspace` que gravou o pedido 31, pelo AskUserQuestion. Os
+custos são estimativa, não medidos.
+
+1. **R50.1 — Como fazer.** Seleção única. Opções: um leitor do BrzA e a linha que já existe, com o "Mensagem de" no
+   `pt.json` (recomendada) — custo: 3 a 4 h; se paga: agora; o mesmo leitor e o cartão do #34824 trazido agora — custo:
+   8 a 12 h, mais conflito no próximo sync; se paga: agora, com o visual igual ao do Orca.
+   **Decidido — "Leitor + cartão do upstream".** Vai ao D48, ao D49, ao P62 e ao P63.
+2. **R50.2 — Quais mensagens.** Seleção múltipla. Opções: o correio entre sessões (recomendada) — custo: incluso; a
+   devolução de subagente, com rótulo próprio — custo: uns 0,5 h a mais.
+   **Decidido — "Correio entre sessões (Recomendado)" e "Devolução de subagente".** Vai ao D48 e ao P62.
+3. **R50.3 — O clique no nome do remetente.** Seleção única. Opções: só texto agora (recomendada) — custo: nenhum; abre
+   a aba da sessão, se aberta no app, pelo nome — custo: 1 a 2 h, não medido.
+   **Decidido — "Abre a aba da sessão".** Vai ao D50 e ao P64.
+4. **R50.4 — Onde fica registrado.** Seleção única. Opções: o PLN-001, pedido 32 (recomendada); só um worklog.
+   **Decidido — "PLN-001, pedido 32 (Recomendado)".**
+
+### Rodada 51 — o rótulo da devolução e quando o pedido 32 roda (enviada 2026-10-29)
+
+Respondida em 2026-10-29, por Anderson na mesma sessão, logo depois da R50.
+
+1. **R51.1 — O rótulo da devolução de subagente.** Seleção única. Opções: "Devolução de <nome>" (recomendada) — custo:
+   o 0,5 h da R50.2; se paga: na hora; "Mensagem de <nome>" — custo: nenhum; se paga: na hora, com as duas iguais.
+   **Decidido — "Devolução de <nome>" (Recomendado).** Vai ao D48 e ao P62.
+2. **R51.2 — Quando o pedido 32 roda.** Seleção única. Opções: depois do pedido 31 (recomendada) — custo: a espera; se
+   paga: no rebase; agora, em paralelo, num worktree — custo: uma sessão a mais e um rebase provável; se paga: agora.
+   **Decidido — "Agora, em paralelo".** É a autorização do P62 ao P64.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -807,7 +851,8 @@ A ordem é a de execução, e não a do número: o P34 vem antes do P33 e do P35
 vem depois do P36, de que reaproveita a troca, e o P41 não depende dele; o P43 vem antes do P44 ao P51, porque monta a
 base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum; o P54 ao P57 vêm depois do P44 ao P50 (R42.4), o P54
 antes do P55, o P56 independente e o P57 por último; o P58 vem antes do P59 e do P60, que não dependem um do outro, e
-o P61 por último.
+o P61 por último; o pedido 32 roda em paralelo com o 31 (R51.2), o P62 antes do P63, o P64 depois do P63 e o P65 por
+último.
 
 **Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com "indicado". É
 leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a pedido, numa sessão
@@ -1924,6 +1969,74 @@ Depois do P59 e do P60.
 
 **Evidência:** —
 
+### P62 — O leitor do BrzA para a mensagem de outra sessão e a devolução de subagente (pedido 32)
+
+Executa D48 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-32`
+
+Estimado: 4 h · Executado: — h
+
+Primeiro do pedido 32; em paralelo com o pedido 31 (R51.2).
+
+- [ ] **1.** Teste que falha, junto de `transcript-reader.test.ts`: o turno `isMeta` com "Another Claude session sent a
+      message:" e `<agent-message from="revisor">oi</agent-message>` vira uma mensagem do usuário com o `from` do
+      remetente "revisor" e o texto "oi", sem o envelope; o de "[Subagent hand-back]" vira o mesmo, marcado como
+      devolução; os outros turnos `isMeta` seguem descartados
+- [ ] **2.** O leitor do BrzA, ligado por uma linha no `transcript-line-decoders-claude.ts:108`, e o mesmo no caminho
+      ao vivo; o rótulo "Mensagem de" e o "Devolução de" no `pt.json` e no `en.json`. Os pontos "A conferir no passo"
+      do D48
+- [ ] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C18
+
+**Evidência:** —
+
+### P63 — O cartão do Orca para as mensagens entre agentes (pedido 32)
+
+Executa D49 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-32`
+
+Estimado: 10 h · Executado: — h
+
+Depois do P62.
+
+- [ ] **1.** Trazer o `7321b066e83` do upstream (#34824) com `git cherry-pick -x`, com os arquivos de que ele depende e
+      que faltam; os conflitos se resolvem a favor do upstream fora do código do BrzA. Registrar como `X` cada arquivo
+      trazido além do commit
+- [ ] **2.** O cartão desenha também a mensagem do P62: a de outra sessão e a devolução, com o rótulo do P62; os testes
+      do cartão trazidos passam, e um caso novo cobre a mensagem do Claude Code
+- [ ] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C19
+
+**Evidência:** —
+
+### P64 — O clique no remetente abre a aba da sessão (pedido 32)
+
+Executa D50 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-32`
+
+Estimado: 2 h · Executado: — h
+
+Depois do P63.
+
+- [ ] **1.** Teste que falha: o clique no nome de uma sessão do Claude Code aberta no app foca a aba de chat dela; o
+      nome que não casa com nenhuma aba aberta fica sem ação, com o cursor normal
+- [ ] **2.** A busca da aba pelo nome da sessão, no lugar do `openAgentMessageSender` quando o remetente é do Claude
+      Code. Os pontos "A conferir no passo" do D50
+- [ ] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C20
+
+**Evidência:** —
+
+### P65 — A conferência das mensagens entre sessões (pedido 32)
+
+Executa D48, D49 e D50 · executor: Anderson, com a sessão que conduz
+
+Estimado: 0,3 h · Executado: — h
+
+Depois do P64.
+
+- [ ] **1.** No BrzA Studio, o C18 ao C20
+- [ ] **2.** O Observado e o veredito na linha de cada caso
+
+**Evidência:** —
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -2140,6 +2253,8 @@ da linha quando o teste entra.
   verdes com o código de hoje. O C12 entra no build único dos casos manuais; espera o P57.
 - 2026-10-29 — [O pedido 31 do PLN-001, o tema do chat no Markdown e no terminal](../../work/worklogs/2026-10-29-pln-001-pedido-31-tema-do-chat.md):
   o pedido 31, a R48 e a R49, o D45 ao D47 e o P58 ao P61, sem código; o P58, depois o P59 e o P60 em paralelo.
+- 2026-10-29 — [O pedido 32 do PLN-001, as mensagens entre sessões no chat](../../work/worklogs/2026-10-29-pln-001-pedido-32-mensagens-entre-sessoes.md):
+  o pedido 32, a R50 e a R51, o D48 ao D50 e o P62 ao P65, sem código; o P62 ao P64 em paralelo com o pedido 31.
 
 ## Decisões
 
@@ -2178,12 +2293,15 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C15 | `Pedido 31`: o tema do chat e a migração (P58.4) | Trocar o tema do chat entre o "Padrão do BrzA" e um do catálogo, no app escuro e no claro | O chat com o fundo e as cores do tema; no "Padrão do BrzA", o visual de antes | | |
 | C16 | `Pedido 31`: o terminal segue o chat (P59.3) | Com o "Seguir o chat" ligado, trocar o tema do chat; depois desligar e escolher outro tema no terminal | Ligado, o terminal com o fundo e as cores do chat e a fonte dele; desligado, só o terminal muda | | |
 | C17 | `Pedido 31`: o Markdown segue o chat (P60.4) | Um `.md` no olho, no lápis e no código, com o "Seguir o chat" ligado e desligado | Ligado, os três com o fundo do chat, e o olho e o lápis com a fonte do chat; desligado, o tema próprio | | |
+| C18 | `Pedido 32`: a mensagem de outra sessão e a devolução no chat (P62.3) | Mandar uma mensagem de uma sessão a outra, aberta no app; numa sessão, rodar um subagente; recarregar a aba | "Mensagem de <sessão>" e "Devolução de <subagente>", ao vivo e depois de recarregar, sem o envelope | | |
+| C19 | `Pedido 32`: o cartão do Orca (P63.3) | As mesmas mensagens do C18 | O cartão, com o status do remetente | | |
+| C20 | `Pedido 32`: o clique no remetente (P64.3) | Clicar no nome de uma sessão aberta e no de uma fechada | A aba da sessão aberta em foco; a fechada sem ação | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,
 Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14. O C11
 entra no mesmo build, pelo pedido do P55 (2026-10-28), e o C12, pelo do P56 (2026-10-29). O C15 ao C17 são do
-pedido 31 e vão a um build depois do P60, com o P61.
+pedido 31 e vão a um build depois do P60, com o P61; o C18 ao C20, do pedido 32, a um build depois do P64, com o P65.
 
 ## Fechamento
 

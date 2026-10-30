@@ -127,11 +127,7 @@ class CommandTest(unittest.TestCase):
         self.transcript('uuid-a', 'primeiro', 'pln-002-p7')
         self.transcript('uuid-b', 'pln-003')
         self.transcript('uuid-c')
-        self.guards: dict[str, dict] = {}
-        self.held: list[tuple[str, str]] = []
-        patcher = patch.dict(GLOBALS, {'config_dirs': lambda: [self.config], 'rpc': self.app.rpc,
-                                       'pending_guard': lambda sid: self.guards.get(sid),
-                                       'hold_guard': lambda sid, text: self.held.append((sid, text))})
+        patcher = patch.dict(GLOBALS, {'config_dirs': lambda: [self.config], 'rpc': self.app.rpc})
         patcher.start()
         self.addCleanup(patcher.stop)
         sent = patch.object(sys.modules['brza_runtime'], 'rpc', self.app.rpc)
@@ -158,17 +154,16 @@ class CommandTest(unittest.TestCase):
         self.assertEqual([s['name'] for s in sessions], ['pln-002-p7', 'pln-003', None])
         self.assertEqual(sessions[0], {'name': 'pln-002-p7', 'title': 'PLN-002 P7: renomear chat', 'chat': 'claude_a',
                                        'claude_session': 'uuid-a', 'worktree': '/Users/x/brza-workspace',
-                                       'state': 'working', 'guard': None})
+                                       'state': 'working'})
         self.assertIsNone(sessions[2]['state'])
 
-    def test_list_carries_the_guard_of_an_idle_large_session(self):
-        self.guards['uuid-b'] = {'idle_min': 90, 'ttl_min': 60, 'context': 200_000, 'cost_usd': 3.75}
+    def test_list_prints_one_line_per_chat_with_a_dash_for_no_name(self):
         code, out = self.run_main('list')
         self.assertEqual(code, 0)
-        self.assertIn('pln-003', out)
-        self.assertIn('parada há 90 min, e o cache dura 60 min: o próximo pedido regrava 200.000 tokens, cerca de '
-                      'US$ 3,75', out)
-        self.assertIn('-', out.splitlines()[-1])  # o chat sem nome
+        lines = out.splitlines()
+        self.assertEqual(len(lines), 3)
+        self.assertTrue(lines[1].startswith('pln-003'))
+        self.assertTrue(lines[2].startswith('- '))
 
     def test_a_chat_without_provider_session_is_listed_without_name(self):
         del self.app.providers['claude_c']
@@ -183,25 +178,6 @@ class CommandTest(unittest.TestCase):
         self.assertEqual(method, 'agentSession.send')
         self.assertEqual(params['envelope']['sessionId'], 'claude_b')
         self.assertEqual(params['body']['blocks'][0]['text'], 'faça o P1')
-        self.assertEqual(self.held, [])
-
-    def test_send_refuses_the_session_the_guard_would_block(self):
-        guard = {'idle_min': 90, 'ttl_min': 60, 'context': 200_000, 'cost_usd': 3.75}
-        self.guards['uuid-b'] = guard
-        code, out = self.run_main('send', 'pln-003', 'faça o P1', '--json')
-        self.assertEqual(code, 3)
-        self.assertEqual(json.loads(out), {'sent': False, 'name': 'pln-003', 'chat': 'claude_b', 'guard': guard})
-        self.assertNotIn('agentSession.send', self.app.methods())
-        code, out = self.run_main('send', 'pln-003', 'faça o P1')
-        self.assertEqual(code, 3)
-        self.assertIn('--wake', out)
-
-    def test_send_wake_holds_the_passage_and_sends_once(self):
-        self.guards['uuid-b'] = {'idle_min': 90, 'ttl_min': 60, 'context': 200_000, 'cost_usd': None}
-        code, _ = self.run_main('send', 'pln-003', 'faça o P1', '--wake')
-        self.assertEqual(code, 0)
-        self.assertEqual(self.held, [('uuid-b', 'faça o P1')])
-        self.assertEqual(self.app.methods().count('agentSession.send'), 1)
 
     def test_close_calls_both_rpcs_with_the_user_reason_and_never_resumes(self):
         code, out = self.run_main('close', 'pln-003', '--json')

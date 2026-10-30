@@ -137,39 +137,22 @@ def message(idle, ttl, context, model, cost):
             "em plans/ ou pela issue em work/issues/.\nPara continuar aqui mesmo, reenvie o mesmo prompt em até 2 min.")
 
 
-def pending(session_id, now):
-    """O que a trava diria do próximo prompt da sessão: None quando ele passa; senão os minutos parada, o TTL, o
-    contexto e o modelo do último turno. O `brza sessions send` pergunta por aqui antes de mandar."""
-    ttl, last = ttl_minutes(session_turns(session_id))
-    if not last or not last.get("max_context") or not last.get("timestamp"):
-        return None
-    idle = (now - datetime.fromisoformat(last["timestamp"]).timestamp()) / 60
-    context = last["max_context"]
-    if idle <= ttl or context < THRESHOLD:
-        return None
-    return {"idle_min": round(idle), "ttl_min": ttl, "context": context, "model": last.get("model")}
-
-
-def hold(session_id, prompt, now):
-    """Grava a passagem do prompt como se ele tivesse sido barrado agora: o mesmo prompt em até 2 min passa."""
-    with State() as state:
-        state.data[f"resume:{session_id}"] = {"hash": fnv1a64(prompt.strip()), "at": now}
-        state.save(now)
-
-
 def guard(p, clock=None):
     session_id = p.get("session_id")
     if not session_id:
         return None
-    now = (clock or time.time)()
-    found = pending(session_id, now)
-    if not found:
+    ttl, last = ttl_minutes(session_turns(session_id))
+    if not last or not last.get("max_context") or not last.get("timestamp"):
         return None
-    idle, ttl, context, model = found["idle_min"], found["ttl_min"], found["context"], found["model"]
+    now = (clock or time.time)()
+    idle = (now - datetime.fromisoformat(last["timestamp"]).timestamp()) / 60
+    context = last["max_context"]
+    if idle <= ttl or context < THRESHOLD:
+        return None
     prompt = (p.get("prompt") or "").strip()
     row = {"event": "guard", "timestamp": measure.now(), "session_id": session_id,
            "bridge_session_id": measure.bridge_session(), "cwd": p.get("cwd"), "kind": "resume",
-           "idle_min": idle, "ttl_min": ttl, "max_context": context}
+           "idle_min": round(idle), "ttl_min": ttl, "max_context": context}
     if prompt.startswith(MAILBOX):
         measure.write(dict(row, decision="skipped"))
         return None
@@ -183,9 +166,9 @@ def guard(p, clock=None):
             return None
         state.data[key] = {"hash": digest, "at": now}
         state.save(now)
-    cost = rewrite_cost(model, context, ttl)
+    cost = rewrite_cost(last.get("model"), context, ttl)
     measure.write(dict(row, decision="blocked", estimated_cost_usd=round(cost, 2) if cost is not None else None))
-    return {"decision": "block", "reason": message(idle, ttl, context, model, cost)}
+    return {"decision": "block", "reason": message(round(idle), ttl, context, last.get("model"), cost)}
 
 
 def main():

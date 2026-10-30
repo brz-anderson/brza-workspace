@@ -1,31 +1,26 @@
 ---
-status: open
-phase: blocked
+status: in_review
+phase: review
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: não — o P7, o último passo, espera a sessão da 2d, reaberta por Anderson
+ready: sim — todo passo feito; falta a revisão da entrega
 estimate_h: 18
-executed_h: 2.6
-remaining_h: 3.0
+executed_h: 2.9
+remaining_h: 0.0
 scope:
   - workspace
   - brza-studio
 opened: 2026-10-28
 owner: Anderson
-blocks: o P7 e o fechamento do PLN-002, até a 2d reabrir.
 tags:
   - tooling
 ---
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** o P0 ao P6 e o P8 estão feitos; o último, o `brza doctor`, em `brza-workspace@cc19e75`, com o C4
-  passado. Falta só o P7, que espera Anderson reabrir a sessão da 2d (R5.2); depois dele vem a revisão da entrega. O
-  esqueleto do `brza note` ainda não acha o nome da sessão (X3).
-- **Pedido de fora (2026-10-29):** Anderson decidiu, na
-  [R6.1 do PLN-003](../PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md), que o P7 roda já numa sessão nova,
-  `pln-002-p7`, sem a 2d — "Sessão nova pln-002-p7, eu abro (Recomendado)". A sessão nova faz a combinação do D7 e
-  registra a R5.2 como reaberta; o roteador do PLN-003 usa o `list|send|close`.
+- **Retomar:** o P0 ao P8 estão feitos; o último, o P7, em `brza-workspace@9daa020` e `88d8a3a`, com o C3 passado.
+  Vem a revisão da entrega, em sessão nova, pela "Pedir a revisão da entrega" da plan-runner. O X3 tem fonte agora
+  (ver o worklog do P7), sem passo para ela.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -88,7 +83,7 @@ Os itens da issue, numerados para a Cobertura:
 - **P0 na `origin/master`:** `git -C ~/Projects/brza-studio merge-base --is-ancestor 9a81e65c852 origin/master` sai 0.
   Sem isso, os scripts rodam pelo nome `brza-<sub>`, e o P5 espera.
 - **O P1 antes do P2 ao P8:** todos importam do runtime novo (R4.4).
-- **A 2d reaberta, para o P7:** Anderson abre a sessão da combinação (R5.2). Sem ela, o P7 espera, e os outros seguem.
+- **A sessão do P7:** a `pln-002-p7`, que faz a combinação do D7 sem a 2d (R5.2, reaberta pela PLN-003/R6.1).
 
 ## Passos
 
@@ -258,19 +253,26 @@ Estimado: 2 h · Executado: 0,4 h
 
 ### P7 — O `brza sessions list|send|close`
 
-Executa D7 · executor: a sessão da 2d, reaberta por Anderson (R5.2)
+Executa D7 · executor: sessão `pln-002-p7`, sem a 2d (PLN-003/R6.1, que reabriu a R5.2)
 
-Estimado: 3 h · Executado: — h
+Estimado: 3 h · Executado: 0,3 h
 
-- [ ] **1. A combinação:** a 2d confere os dois pontos em aberto do D7 — o título da aba e o `reason: 'user'` vindo de
+- [x] **1. A combinação:** a `pln-002-p7` confere os dois pontos em aberto do D7 — o título da aba e o `reason: 'user'` vindo de
   script — e ajusta o D7. Uma divergência da proposta volta à Entrevista antes do código.
-- [ ] **2. Testes que falham:** `list` sobre um `session.tabs.listAll` falso; `send` pelo nome; `close` pelo nome, sem
+- [x] **2. Testes que falham:** `list` sobre um `session.tabs.listAll` falso; `send` pelo nome; `close` pelo nome, sem
   `--resume`; nome ausente e nome repetido.
-- [ ] **3. Implementar** no `scripts/brza/brza-sessions`, mantendo o `open` de hoje.
-- [ ] **4. Rodar e ver passar**, e o C3 com Anderson.
-- [ ] **5. Commit** — `feat(brza): brza sessions list, send e close (PLN-002/P7)`.
+- [x] **3. Implementar** no `scripts/brza/brza-sessions`, mantendo o `open` de hoje. Ver X11.
+- [x] **4. Rodar e ver passar**, e o C3 com Anderson.
+- [x] **5. Commit** — `feat(brza): brza sessions list, send e close (PLN-002/P7)`.
 
-**Evidência:** —
+**Evidência:** `brza-workspace@9daa020` e `brza-workspace@88d8a3a`, com push na `master`.
+- A combinação divergiu da proposta e foi à Rodada 9: o nome vem do `custom-title` do transcript, pelo
+  `providerSession.id` do `agentSession.history`. O D7 foi reescrito no lugar; a R10.1 tirou a trava do `send`.
+- `python3 -m unittest discover -s scripts/brza/tests` → `Ran 139 tests … OK`; eram 129. Os casos novos do
+  `test_brza_sessions.py` falharam antes do código. `python3 -m unittest discover -s .claude/hooks/tests` → `OK`.
+- `brza sessions list` achou esta sessão como `pln-002-p7`, com o título "PLN-002 P7: renomear chat"; o `--json` traz
+  `chat`, `claude_session`, `name`, `state`, `title` e `worktree`.
+- O C3, na linha dele em `## Casos manuais`.
 
 ### P8 — O `brza doctor`
 
@@ -329,6 +331,9 @@ Estimado: 2 h · Executado: 0,4 h
 - **X9 — O P5 commitou o script antes do C2 e da troca dos textos.** Anderson pediu o reinício do app: "avise as
   sessões pra pararem no primeiro ponto de commit e registrarem no plano, vamos reiniciar". O P5.6 sai em dois
   commits, o `1339793` e o da troca dos textos. Afeta o P5.
+- **X11 — O P7 entrou com a trava no `send` e a tirou no mesmo dia.** A R9.3 pôs a recusa e o `--wake`, com o
+  `pending` e o `hold` no `resume_guard.py`, em `9daa020`; a R10.1, depois que a b7 desligou a trava, tirou os dois em
+  `88d8a3a`, e o `resume_guard.py` voltou ao que era. Afeta o P7 e o D7.
 - **X10 — O `brza doctor` confere também o committer, e o link do `claude-brza` vai na linha do chat.** O D8 cita só o
   `GIT_AUTHOR_IDENT` e os links `brza-*`; o commit leva os dois idents, e o override que aponta para um link ausente
   quebra o chat. O app velho compara com a `origin/master` do último fetch, sem buscar. O contrato não muda. Afeta o
@@ -340,11 +345,15 @@ Estimado: 2 h · Executado: 0,4 h
 | :-- | :----------------------------------------------- | :------------------------------------------------------------------------------------------- | :-------------------------------------------------------------- | :-------- | :------- |
 | C1  | `Pedido 2`: o dev build sobe e para pelo `brza`  | `brza tree c1-prova`; `brza dev` nele; usar; `brza dev --stop`                               | janela visível com o chat ligado; o `--stop` fecha e libera     | 2026-10-28, `pln-002-p3`: o build subiu visível no pid 82861; "Sim, janela e chat ok" e "Sim, fechou", de Anderson | passou |
 | C2  | `Pedido 7` e `Pedido 0`: o app reinstalado       | app fechado; num terminal, `brza-app install`; abrir o app; `brza sessions --help` no chat e no terminal | o app abre na versão nova; a ajuda do `brza-sessions` responde nos dois | 2026-10-28, `pln-002-p5`: o app abriu na `…fb7eb5a90827`, a `origin/master`; a ajuda respondeu no terminal, colada por Anderson, e no chat, pelo `brza` do app | passou |
-| C3  | `Pedido 5`: o `close` fecha o chat por nome      | `brza sessions open c3-prova`; `brza sessions list`; `brza sessions close c3-prova`          | o chat some da lista e da tela, sem aba órfã                    |           |          |
+| C3  | `Pedido 5`: o `close` fecha o chat por nome      | `brza sessions open c3-prova`; `brza sessions list`; `brza sessions close c3-prova`          | o chat some da lista e da tela, sem aba órfã                    | 2026-10-29, `pln-002-p7`: o `send` chegou, "Sim, respondeu ok"; o `close` no turno saiu 1; depois saiu 0, sumiu do `list` e do `listAll`, e "Sim, sumiu", de Anderson | passou |
 | C4  | `Pedido 4`: o `doctor` no chat e no terminal     | `brza doctor` num chat do app e num terminal sem a função `claude`                           | 0 no chat; no terminal, os erros com o comando que conserta     | 2026-10-28, `pln-002-p8`: 0 no chat, tudo `ok`; no terminal, "Como o esperado", de Anderson: saída 1 com o ERRO de medição e o conserto | passou |
 
 ## Worklogs
 
+- 2026-10-29 — P7, o `brza sessions list|send|close`, em `brza-workspace@9daa020` e `88d8a3a`, com o C3 passado; a
+  R5.2 reaberta pela PLN-003/R6.1, a R9 na combinação do D7, a R10 tirando a trava do `send`, X11. Nada travou; o
+  plano vai à revisão.
+  [O PLN-002/P7: o brza sessions list, send e close](../../work/worklogs/2026-10-29-pln-002-p7-o-brza-sessions.md)
 - 2026-10-28 — P8, o `brza doctor`, em `brza-workspace@cc19e75`, com o C4 passado; X10 no committer e no link do
   `claude-brza`. Nada travou; o plano fica `blocked` no P7.
   [O PLN-002/P8: o brza doctor](../../work/worklogs/2026-10-28-pln-002-p8-o-brza-doctor.md)

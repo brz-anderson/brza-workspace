@@ -231,7 +231,9 @@ Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
      ideia muito diferente;
    - sem a 2d, o executor decide. Custo: reverte a escolha "Reabrir a 2d e combinar". Se paga: se a 2d não for reaberta.
 
-   **Decidido — proposta, com a combinação como primeiro subpasso.**
+   **Decidido — proposta, com a combinação como primeiro subpasso.** → reaberta em
+   [PLN-003/R6.1](../PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md), em 2026-10-29: "Sessão nova pln-002-p7, eu
+   abro (Recomendado)". A combinação sai da 2d e vai à sessão `pln-002-p7`, que a faz sem ela.
 
 3. **Quem executa os passos de script?** Opções:
    - uma sessão por passo, `claude --name pln-002-pN` no `brza-workspace`, aberta por Anderson, com commit direto na
@@ -327,3 +329,70 @@ Respondida em 2026-10-28, na sessão `pln-002-p5`.
    - `ditto` por cima, mesclando. Custo: o arquivo que saiu fica e quebra a assinatura. Se paga: nunca.
 
    **Decidido — apaga e copia.**
+
+### Rodada 9 — a combinação do D7, sem a 2d (enviada 2026-10-29)
+
+**Apresentado antes**, medido nesta sessão contra o app aberto:
+- **O título da aba não é o nome.** O `session.tabs.listAll` deu `"PLN-002 P7: renomear chat"` para o chat
+  `claude_d839fe67_…`, renomeado `pln-002-p7`. O título é o nome do chat no app, trocado pelo `agentSession.rename`
+  (`brza-studio/src/main/runtime/rpc/methods/structured-agent-session-rename.ts:1-2`); o `/rename` não chega a ele.
+- **O app liga o chat à sessão do Claude.** O `agentSession.history` devolve `providerSession: {"key": "session_id",
+  "id": "56c85a7b-…"}`, o mesmo `--session-id` do processo, também para o chat parado, sem processo vivo.
+- **O nome do `/rename` fica no transcript**, `{"type": "custom-title", "customTitle": "pln-002-p7"}`, em
+  `~/.claude/projects/<cwd>/<id>.jsonl`. O `~/.claude/sessions/<pid>.json` também o traz, mas só do processo vivo: 4
+  arquivos para 7 chats.
+- **A trava roda no chat**, que sobe com o `--settings` do workspace; o `send` comum a uma sessão grande parada seria
+  barrado lá dentro sem o script saber (`.claude/hooks/resume_guard.py:141-170`), o conflito K5 do PLN-003.
+
+Respondida em 2026-10-29, na sessão `pln-002-p7`.
+
+1. **De onde o `brza sessions` tira o nome do chat?** Opções:
+   - o transcript: `listAll` → `history.providerSession.id` → o último `custom-title` (recomendada). Custo: ler o
+     transcript de cada chat a cada `list`; ~30 linhas. Se paga: agora, porque cobre os chats abertos à mão;
+   - o registro dos processos vivos. Custo: o chat sem processo fica sem nome. Se paga: se o transcript ficar lento;
+   - o título da aba, com o `open` chamando o `agentSession.rename`. Custo: o chat renomeado só pelo `/rename` não é
+     achado. Se paga: nunca sozinho.
+
+   **Decidido — o transcript.**
+
+2. **O `open` também troca o título da aba pelo nome?** Opções:
+   - não agora; o `list` mostra o nome e o título lado a lado (recomendada). Custo: a aba segue com o título
+     automático. Se paga: agora, sem mudar o escopo;
+   - sim, no `open`. Custo: ~0,3 h e o fim do título automático. Se paga: quando o nome for procurado na tela.
+
+   **Decidido — não agora.**
+
+3. **O que o `send` faz quando a trava barraria o destino?** Opções:
+   - recusa com saída 3 e a conta da trava, também no `--json`; o `--wake` grava a passagem no `guard.json`, como o
+     reenvio, e manda uma vez (recomendada). Custo: ~0,5 h e o acoplamento ao `resume_guard.py`. Se paga: no primeiro
+     envio do roteador do PLN-003 a uma sessão grande parada;
+   - só recusa. Custo: acordar de propósito pede o reenvio à mão. Se paga: se a regra virar "nunca acordar por script";
+   - avisa e manda. Custo: a mensagem é barrada lá dentro e o script sai 0. Se paga: nunca.
+
+   **Decidido — recusa, e o `--wake` passa.** → reaberta em R10.1.
+
+4. **O `close` num chat no meio de um turno?** Opções:
+   - recusa com saída 1 sem `--force` (recomendada). Custo: uma flag e um teste. Se paga: no primeiro `close` por
+     engano;
+   - fecha sempre. Custo: o turno em curso se perde. Se paga: só com um `list` conferido antes de todo `close`.
+
+   **Decidido — recusa sem `--force`.**
+
+### Rodada 10 — o `send` sem a trava de retomada (enviada 2026-10-29)
+
+**Apresentado antes:** a sessão `brza-workspace-b7` mandou, por correio, a rodada que Anderson respondeu lá em
+2026-10-29: "O que fazer com a trava de retomada (resume_guard no UserPromptSubmit)?" → "Desligar (Recomendado)", cuja
+opção dizia que o `brza sessions send` deixa de consultá-la. A mudança estava na árvore, sem commit nem "decidido", e o
+P7 já tinha a trava no `send` em `brza-workspace@9daa020` (R9.3).
+
+Respondida em 2026-10-29, na sessão `pln-002-p7`.
+
+1. **Com a trava desligada, como fica o `send`?** Opções:
+   - tirar a trava do `send`: saem a saída 3, o `--wake`, o `guard` do `--json` e a linha do `list`, e o
+     `resume_guard.py` volta ao que era (recomendada). Custo: ~0,3 h; o roteador do PLN-003 pode acordar uma sessão
+     grande parada sem aviso. Se paga: agora, sem campo morto no contrato do `--json`;
+   - aviso sem recusa, com o `guard` no `--json`. Custo: ~0,3 h e o `resume_guard.py` vivo só como calculadora. Se paga:
+     quando o roteador precisar pesar o custo antes de acordar;
+   - manter até o "decidido" da b7. Custo: o `send` recusa o que o hook já não barra. Se paga: só se a b7 voltar atrás.
+
+   **Decidido — tirar a trava do `send`.**

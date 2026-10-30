@@ -30,6 +30,21 @@ Commit `brza-studio@21f9cfe90bb`.
 - **Os testes.** Dois arquivos do BrzA, com 6 casos; antes do leitor, 3 falharam pela asserção. Depois do rebase,
   16 arquivos → 101 passed.
 
+## O P63 — o cartão do upstream
+
+Commit `brza-studio@9564eff9368`, com `git cherry-pick -x 7321b066e83`.
+
+- **A sondagem.** Antes do cherry-pick, um worktree descartável mediu 6 conflitos e o que faltava ao cartão: o
+  `native-chat-prose`, que aqui mora em outro caminho (X50), e o harness de tooltip dos testes, 7 linhas (X49). Não foi
+  preciso trazer módulo além disso, e a parada com Anderson não se aplicou.
+- **A fila.** O upstream mudou a fila de mensagens para o `shared/`; a do BrzA ficou, com o `displayText` do commit
+  portado no desktop e no mobile (X51). Os testes da edição da fila nova ficaram de fora (X52).
+- **O cartão e o Claude Code.** O título diz "Hand-back from" para a devolução; o rótulo saiu da linha do remetente
+  para o título do cartão, como no upstream (X54). O nome do remetente do Claude Code segue sem botão até o P64. O
+  mobile ganhou o "Hand-back from", e o `pt.json` as 5 chaves do cartão (X55).
+- **Os testes.** O caso de escala do cartão conta duas enumerações, e não três, sem a "aquisição de autoridade
+  visível" do store do upstream (X53). Depois do rebase: `pnpm tc` → exit 0; 156 arquivos → 1263 passed.
+
 ## O check
 
 O `pnpm check:changed --base=origin/master --maxWorkers=2` do P62 rodou a suíte inteira, em 1514 s, e deu 22 de 26. O
@@ -37,7 +52,11 @@ format saiu no `oxfmt`. Os outros vermelhos já estão na `master`: o typecheck 
 `8e708f9790d`; o import boundaries, na issue das Pendências; e 5 testes em 3 arquivos, que falham igual num worktree
 da `origin/master` em `9c7fcdebbb0`.
 
+O do P63 deu 23 de 26, em 1851 s: o typecheck do mesmo teste, já corrigido na `master` em `586f4f69eb7`, o import
+boundaries e os 2 casos do `open-uncommitted-entry.test.ts`, todos preexistentes. No mobile, o "words a host-restart
+returned card" espera "Orca restarted" e falha igual sem o P63.
+
 ## O que fica
 
-- O P63 e o P64, nesta sessão.
-- O C18, com Anderson, no build depois do P64.
+- O P64, nesta sessão.
+- O C18 e o C19, com Anderson, no build depois do P64.

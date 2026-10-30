@@ -19,7 +19,7 @@ A norma de escrita das notas está no [`work/README.md`](work/README.md). Os com
 # Conferir as notas antes de commitar
 python3 .claude/skills/notes-checker/scripts/check_notes.py
 
-# Testar os hooks de medição e a trava de retomada
+# Testar os hooks de medição
 python3 -m unittest discover -s .claude/hooks/tests
 
 # Resumir a medição de .measurements/measurements.jsonl
@@ -51,8 +51,8 @@ brza_where() {
   done
 }
 
-# Claude Code no BrzA: o --settings do brza-workspace (hooks de medição, trava de retomada e a identidade do
-# brz-anderson) e a raiz para os hooks; o gh fica no perfil padrão.
+# Claude Code no BrzA: o --settings do brza-workspace (hooks de medição e a identidade do brz-anderson) e a raiz
+# para os hooks; o gh fica no perfil padrão.
 brza_claude() {
   BRZA_WORKSPACE="$BRZA_WORKSPACE" command claude --settings "$BRZA_WORKSPACE/.claude/settings.json" "$@"
 }

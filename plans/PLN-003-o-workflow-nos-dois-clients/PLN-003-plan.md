@@ -17,6 +17,9 @@ tags:
 - **Retomar:** a Entrevista fechou nas rodadas 1 a 7. O próximo é escrever os itens `D` a partir da matriz do
   Desenho, com os riscos da fase 0 como hipóteses (R7.3), e depois os Passos, com o P0 numa sessão `pln-003-p0`. O P7
   do PLN-002 corre na sessão `pln-002-p7`.
+- **Mudou a norma (2026-10-29):** a trava de retomada saiu, e a sessão passou a ser por frente, não por tarefa
+  ([Uma sessão por frente de trabalho, sem trava de retomada e com o cache de 1 h](../../work/decisions/uma-sessao-por-frente-e-sem-trava-de-retomada.md)). O Desenho ainda conta com a
+  trava no roteador (M2) e na tabela de conflitos (`PLN-003-design.md:181-182`): ajustar antes dos itens `D`.
 - **Dividido:** [PLN-003 — Entrevista](PLN-003-interview.md) · [PLN-003 — Desenho](PLN-003-design.md)
 
 ## Pedido

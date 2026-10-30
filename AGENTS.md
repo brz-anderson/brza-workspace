@@ -58,20 +58,26 @@ Arquivo criado ou alterado fora deste repositório e do `brza-studio` — o `~/.
 runtime… — entra no worklog do dia, na seção `## Fora do workspace`, na forma do [`work/README.md`](work/README.md). O
 mesmo vale para comando que muda estado fora deles: daemon, login, `kill`, app instalado. Leitura pura fica de fora.
 
-## Uma tarefa, uma sessão, um worklog
+## Uma frente, uma sessão; uma tarefa, um worklog
+
+**A sessão acompanha a frente de trabalho — o plano ou o assunto —, e não a tarefa.** A tarefa encadeada na mesma frente
+segue na sessão que já tem o contexto. Sessão nova relê a norma, o plano e as notas: na medição de 2026-10-27 a
+2026-10-29, esse arranque foi metade do gasto da sessão principal, e retomar uma sessão de 175 mil tokens com o cache
+vencido custou o mesmo que abrir uma nova.
+
+**Sessão nova abre quando:**
+- muda o plano ou o assunto;
+- o contexto passa de ~200 mil tokens — antes disso, a _compactação_ enxuga a sessão sem perder a frente;
+- quem pediu pede.
 
 **A tarefa fecha num worklog na hora em que fecha**, com o contexto ainda quente:
 - o feito vai ao worklog da tarefa;
-- o pendente vai ao `Retomar` do plano ou a uma issue;
-- a sessão avisa "pronto para sessão nova".
+- o pendente vai ao `Retomar` do plano ou a uma issue.
 
-O corte de tarefa segue os três testes da norma de `work/worklogs/`: mudou o assunto, virou o dia ou houve decisão.
+O corte de tarefa segue os três testes da norma de `work/worklogs/`: mudou o assunto, virou o dia ou houve decisão. **O
+corte fecha o worklog, não a sessão.**
 
-**Sem quem pediu para abrir a sessão nova, a sessão fica parada.** A tarefa seguinte, encadeada ou pedida, abre sessão
-nova, como diz o adaptador do runtime. Acordar uma sessão grande parada regrava o cache inteiro, e a nova sai mais barata
-já no primeiro pedido. A trava de retomada barra esse caso.
-
-**Pedido de outra tarefa abre sessão nova**, e nunca entra na sessão em que quem pediu trabalha. O pedido que fica para
+**Pedido de outra frente abre sessão nova**, e nunca entra na sessão em que quem pediu trabalha. O pedido que fica para
 depois vai ao `Retomar` do plano ou a uma issue.
 
 **Devolução e aviso vão a arquivo**: o worklog, o `Retomar` ou a issue. "Recebido" não se manda, e o _correio_ de volta
@@ -162,3 +168,4 @@ O vocabulário deste arquivo. A tradução para cada runtime está no adaptador 
 - _correio_ — mandar mensagem a outra sessão aberta do mesmo runtime, pelo nome dela.
 - _camada_ alta, média ou rápida — o nível de modelo, da que julga à que coleta.
 - _scratch_ — o diretório temporário da sessão, fora do repositório, para o que não vai ao git.
+- _compactação_ — o resumo que o runtime faz da conversa, no lugar dela, para a sessão seguir com menos contexto.

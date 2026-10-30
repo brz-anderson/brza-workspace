@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P62 ao P64 do pedido 32 e o P66 do pedido 33, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
+ready: "sim — o P62 ao P64 do pedido 32, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
 estimate_h: 164.6
-executed_h: 24.0
-remaining_h: 17.4
+executed_h: 26.0
+remaining_h: 15.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -21,8 +21,9 @@ tags:
   resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`, o P60 em `brza-studio@a44e84add32`, com a
   R53 e os X38 ao X40, e o P59 em `brza-studio@697ee59c0bf`, com os X41 ao X44: o pedido 31 espera só o P61 e o C15
   ao C17, num build, com Anderson. Rodam em paralelo, autorizados por Anderson, o P63 e o P64, na
-  sessão `pln-001-pedido-32`, depois do P62, fechado em `brza-studio@21f9cfe90bb`; o P66 do pedido 33, na sessão `pln-001-pedido-33`, noutro worktree. Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
-  C17 depois do P60 o C18 ao C20 depois do P64 e o C21 depois do P66), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
+  sessão `pln-001-pedido-32`, depois do P62, fechado em `brza-studio@21f9cfe90bb`. O P66 do pedido 33 fechou em `brza-studio@9118f60672b`, com a R54 e os X45 ao
+  X48, e espera só o C21; sete arquivos de teste do transcript do mobile não carregam desde o P43 (X47). Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
+  C17 depois do P60 o C18 ao C20 depois do P64 e o C21), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
   sessão entra no correio com o nome automático `brza-workspace-<hex>`. O P64 não lê o mapa de sessões do PLN-002 e
   casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
@@ -891,6 +892,27 @@ estimativa.
    2 h; se paga: só sem outro editor de código visível ao mesmo tempo; CSS de tokens por instância, pelas classes
    `mtkN` — custo: 6 a 10 h; se paga: nunca com folga, quebra em atualização do Monaco.
    **Decidido — "Fica como hoje (Recomendado)".** Vai ao D47 e ao P60 (X38).
+
+### Rodada 54 — o "Pensou" no celular e no streaming (enviada 2026-10-29)
+
+> **Apresentado antes:** o app do celular também mostra o "Asked: <pergunta>" na linha
+> (`MobileNativeChatAwaitingInputRow.tsx`), e a linha do raciocínio de lá mostra só "Thought for 3s"
+> (`MobileNativeChatReasoningRow.tsx`); o D51 só nomeia o desktop. No turno principal, o raciocínio que chega aparece
+> na linha ao vivo (`NativeChatTurnActivityLine.tsx`: o spinner, "Pensando" e a seta), e não na `NativeChatReasoningRow`,
+> que só aparece em andamento dentro de um subagente que ainda roda.
+
+Respondida em 2026-10-29, por Anderson na sessão `pln-001-pedido-33` do `brza-studio`, pelo AskUserQuestion. Os
+custos são estimativa.
+
+1. **R54.1 — O mobile entra no P66?** Seleção única. Opções: mobile junto, com o texto corrido numa função de
+   `src/shared` usada pelos dois (recomendada) — custo: +0,3 a 0,5 h; se paga: agora, com as duas linhas iguais nos dois
+   apps; só desktop — custo: zero; se paga: quando o chat quase nunca é acompanhado pelo celular.
+   **Decidido — "Mobile junto (Recomendado)".** Vai ao D51 e ao P66.
+2. **R54.2 — Onde o começo do texto aparece durante o streaming?** Seleção única. Opções: só na linha do raciocínio —
+   no subagente que roda, "Raciocínio: <começo>", e a linha ao vivo do turno principal segue "Pensando" com a seta
+   (recomendada) — custo: zero a mais; se paga: a linha ao vivo continua mostrando a atividade; na linha ao vivo também
+   — custo: +0,3 a 0,5 h; se paga: lê o raciocínio sem abrir, mas a linha muda a cada pedaço que chega.
+   **Decidido — "Só na linha do raciocínio (Recomendado)".** Vai ao D51 e ao P66.
 
 ## Passos
 
@@ -2227,20 +2249,34 @@ Depois do P64.
 
 Executa D51 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-33`
 
-Estimado: 1,5 h · Executado: — h
+Estimado: 1,5 h · Executado: 2,0 h
 
 Em paralelo com os pedidos 31 e 32 (R52.4).
 
-- [ ] **1.** Teste que falha, junto do teste da `NativeChatReasoningRow`: fechada, a linha mostra "Pensou por 3s:" e o
+- [x] **1.** Teste que falha, junto do teste da `NativeChatReasoningRow`: fechada, a linha mostra "Pensou por 3s:" e o
       começo do raciocínio em texto corrido, cortado numa linha, no tom apagado; aberta, o texto sai da linha e aparece
       inteiro no corpo; sem duração, "Pensou:" e o texto; o rótulo da pergunta em português é "Perguntou:"
-- [ ] **2.** A linha em `NativeChatReasoningRow.tsx`, com o texto corrido tirado do Markdown, e a chave nova de rótulo
+- [x] **2.** A linha em `NativeChatReasoningRow.tsx`, com o texto corrido tirado do Markdown, e a chave nova de rótulo
       com dois-pontos no `pt.json` e no `en.json`; o "Perguntado:" vira "Perguntou:" (`pt.json:19772`). Os pontos "A
       conferir no passo" do D51
-- [ ] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C21
 
-**Evidência:** —
+**Evidência:** commit [`9118f60672b`](https://github.com/brz-anderson/brza-studio/commit/9118f60672b), na `master` do
+`brza-studio`, com o [`586f4f69eb7`](https://github.com/brz-anderson/brza-studio/commit/586f4f69eb7) antes dele (X48),
+pela sessão `pln-001-pedido-33`. O texto corrido é o `nativeChatReasoningPreview`, e o rótulo do mobile, o
+`nativeChatReasoningLabelText`, em `src/shared/native-chat-reasoning-row.ts`; o desktop traduz as chaves novas
+`reasoningLabel`, `thoughtLabel` e `thoughtForDurationLabel`, nos 7 catálogos, e cai no rótulo de hoje quando o
+raciocínio é só marcação. O mobile entrou pela R54.1 (`MobileNativeChatReasoningRow.tsx`), e o streaming ficou na linha
+do raciocínio pela R54.2. Antes do código, os testes deram: `NativeChatReasoningRow.test.tsx` → 9 failed, 9 passed;
+`native-chat-reasoning-row.test.ts` (novo, X45) → 3 failed; `MobileNativeChatMessage.reasoning.test.ts` → 4 failed, 3
+passed, depois do mock completado (X46). Depois: `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts`
+nos 4 arquivos do desktop tocados → 47 passed; `pnpm exec vitest run` do teste mobile → 7 passed; `pnpm typecheck` no
+`mobile/` → exit 0. O fixture temporário, apagado antes do commit, deu "Thought for 3s:" com o texto apagado e cortado
+ao lado do "Asked:" em destaque, e, aberto, "Pensou:" sozinho na linha com o texto abaixo. Depois do rebase sobre o
+P59, `pnpm check:changed --base=origin/master --maxWorkers=2` → 24 de 26, em 588 s, com os dois vermelhos de antes
+desta mudança: o `external-subcommand.ts` nas fronteiras de import e os 2 casos de `open-uncommitted-entry.test.ts`
+(19561 passed). O worktree e a branch saíram depois do push. Desvios X45 ao X48.
 
 ## Regressão
 
@@ -2407,6 +2443,19 @@ da linha quando o teste entra.
   desligam.** Fica fora do `global-settings-types.ts`, como no X6. Os 19 casos do upstream, em 4 arquivos, que provavam
   o tema próprio com as configurações padrão ganharam `terminalFollowsChatTheme: false`, e o teste da tela acha o
   "Match dark mode" pelo rótulo. Afeta P59.
+- **X45 — O teste do texto corrido está num `.test.ts` novo, e não no `.spec.ts`.** Os `src/shared/**/*.spec.ts` não
+  entram no `UNIT_INCLUDE` do vitest e ficam fora do typecheck: o `native-chat-reasoning-row.spec.ts` não roda. Os 3
+  casos foram para `src/shared/native-chat-reasoning-row.test.ts`. Afeta P66.
+- **X46 — O mock do `lucide-react-native` do teste mobile do raciocínio ganhou os ícones do P43.** O
+  `brza-mobile-tool-glyphs.ts` importa o `GitBranch` e outros 11 que o mock não tinha, e o arquivo nem carregava; o
+  `MobileNativeChatMessage.reasoning.test.ts` ganhou os nomes. Afeta P66.
+- **X47 — Sete arquivos de teste do transcript do mobile seguem sem carregar, pela mesma causa do X46.** O
+  `MobileNativeChatMessage.test.ts`, o `.android`, o `.subagent-group`, o `.tool-result-availability` e o `.work-run`, o
+  `MobileNativeChatToolRun.test.tsx` e o `.identity` dão `No "GitBranch" export is defined on the "lucide-react-native"
+  mock`, desde o P43; ficaram fora do P66, que não os toca. Afeta P43.
+- **X48 — O tipo do `getVersion` simulado do teste do atualizador, num commit à parte.** O `updater-enabled.test.ts:20`
+  quebrava o typecheck da `master` desde o `brza-studio@8e708f9790d` (P2), porque o `vi.hoisted` inferia o literal
+  `'1.4.242'`; o `brza-studio@586f4f69eb7` tipa o retorno como `string`. Afeta P2.
 
 ## Worklogs
 
@@ -2517,6 +2566,8 @@ da linha quando o teste entra.
   o P60 em `brza-studio@a44e84add32`, com a R53 e os X38 ao X40; o C17 espera o build do pedido 31, com Anderson.
 - 2026-10-29 — [O P59 do PLN-001, o terminal segue o chat](../../work/worklogs/2026-10-29-pln-001-p59-o-terminal-segue-o-chat.md):
   o P59 em `brza-studio@697ee59c0bf`, com os X41 ao X44; o C16 e o P61 esperam o build do pedido 31, com Anderson.
+- 2026-10-29 — [O P66 do PLN-001, o "Pensou" com o texto na linha](../../work/worklogs/2026-10-29-pln-001-p66-o-pensou-com-o-texto-na-linha.md):
+  o P66 em `brza-studio@9118f60672b`, com a R54 e os X45 ao X48; o C21 espera o build, com Anderson.
 
 ## Decisões
 
@@ -2558,7 +2609,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C18 | `Pedido 32`: a mensagem de outra sessão e a devolução no chat (P62.3) | Mandar uma mensagem de uma sessão a outra, aberta no app; numa sessão, rodar um subagente; recarregar a aba | "Mensagem de <sessão>" e "Devolução de <subagente>", ao vivo e depois de recarregar, sem o envelope | | |
 | C19 | `Pedido 32`: o cartão do Orca (P63.3) | As mesmas mensagens do C18 | O cartão, com o status do remetente | | |
 | C20 | `Pedido 32`: o clique no remetente (P64.3) | Clicar no nome de uma sessão aberta e no de uma fechada | A aba da sessão aberta em foco; a fechada sem ação | | |
-| C21 | `Pedido 33`: o "Pensou" com o texto na linha (P66.3) | Uma resposta com raciocínio, entre comandos e fora deles; abrir e fechar a linha | "Pensou por Xs:" e o começo do texto, apagado, cortado; aberta, o texto inteiro abaixo; a pergunta com "Perguntou:" | | |
+| C21 | `Pedido 33`: o "Pensou" com o texto na linha (P66.3) | Uma resposta com raciocínio, entre comandos e fora deles, no desktop e no app do celular (R54.1); abrir e fechar a linha | "Pensou por Xs:" e o começo do texto, apagado, cortado; aberta, o texto inteiro abaixo; a pergunta com "Perguntou:" | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,

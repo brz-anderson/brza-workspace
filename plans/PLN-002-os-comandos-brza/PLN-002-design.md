@@ -98,7 +98,7 @@ O primeiro `--all` roda com o caminho inteiro, `scripts/brza/brza-install --all`
 
 ## D2 — O `brza tree` — `scripts/brza/brza-tree` (P2)
 
-- **Origem:** R1.1 a R1.4, R5.1, R7.1.
+- **Origem:** R1.1 a R1.3, R5.1, R7.1; R14.2, que reabriu a R1.4.
 - **Contexto:** 9 worktrees em 2 dias, o node_modules por symlink que derrubou o checkout principal e dois órfãos em
   disco.
 
@@ -109,15 +109,19 @@ brza tree <nome> [--type feat|fix|docs|chore] [--base <ref>] [--chat <sessão>]
     cria ~/Projects/brza-studio/.worktrees/<nome> na branch <tipo>/<nome> (tipo padrão feat), a partir de
     origin/master depois de git fetch origin, ou de --base; instala com pnpm install --offline --frozen-lockfile e
     imprime o caminho. --chat abre a sessão no worktree pelo brza sessions --checkout.
-brza tree --rm <nome> [--force]
+brza tree --rm <nome> [--empty] [--force]
     remove o worktree e a branch quando o HEAD é ancestral da origin/master e o worktree está limpo. A branch sem
-    commit próprio pede --force, porque "na origin/master" vale também para ela. Diretório em .worktrees/ sem registro
-    no git worktree list é órfão: remove com --force, depois de listar o que há nele.
+    commit próprio pede --empty, porque "na origin/master" vale também para ela. O sujo, o não mergeado e o órfão pedem
+    --force, que imprime como `descartado:` cada razão que passou por cima. Diretório em .worktrees/ sem registro no
+    git worktree list é órfão: remove com --force, depois de listar o que há nele.
 brza tree --list
     os worktrees de .worktrees/, cada um com a branch, os commits à frente da origin/master, se está limpo e os órfãos.
 ```
 
-- **Saídas:** 0 feito; 1 recusado (sujo, não mergeado, órfão sem `--force`); 2 uso errado.
+- **Saídas:** 0 feito; 1 recusado (sujo, não mergeado ou órfão sem `--force`; vazio sem `--empty`); 2 uso errado.
+- **O `--force` não cobre o vazio (R14.2).** O worktree de prova recém-criado cai no vazio, e o `--empty` o remove
+  sem pôr o `--force` na rotina, onde ele apagaria em silêncio o trabalho não commitado do dia em que houver.
+- **Descartada — um flag só, o `--force`, para tudo (R1.4).** Com o `--force` de rotina, o sujo ia embora sem aviso.
 - **O install offline que falha** não apaga o worktree: imprime o caminho e o `pnpm install --frozen-lockfile` a rodar.
 
 ## D3 — O `brza dev` — `scripts/brza/brza-dev` (P3)
@@ -188,7 +192,7 @@ brza app install [--from <checkout>] [--dmg] [--yes] [--clean]
 
 ## D6 — O `brza note` — `scripts/brza/brza-note` (P6)
 
-- **Origem:** R4.3, R7.2.
+- **Origem:** R4.3, R7.2; R15.2, no nome da sessão.
 - **Contexto:** 10 commits de worklog e 3 issues em 2 dias, com o esqueleto e o commit feitos à mão.
 
 #### Como fica
@@ -213,7 +217,7 @@ scope:
 
 # <H1 a escrever>
 
-O pedido de Anderson, em AAAA-MM-DD, na sessão `<$CLAUDE_SESSION_NAME, ou a escrever>`: "<o pedido>".
+O pedido de Anderson, em AAAA-MM-DD, na sessão `<o nome da sessão, ou a escrever>`: "<o pedido>".
 
 ## O que se fez
 
@@ -225,6 +229,9 @@ O pedido de Anderson, em AAAA-MM-DD, na sessão `<$CLAUDE_SESSION_NAME, ou a esc
 - **O `## Fora do workspace`** sai vazio e é apagado quando não há o que registrar; os quatro campos estão no
   `work/README.md`.
 - **A issue** leva o frontmatter, o H1 e a seção `## O pedido`.
+- **O nome da sessão (R15.2, o X3):** dentro do chat, o `ORCA_AGENT_SESSION_ID` dá o chat; o nome vem do mapa de
+  sessões do D7 e, sem entrada, do `/rename` do transcript, pelo `providerSession.id` do `agentSession.history`, com as
+  funções do `brza-sessions`. Fora do chat, ou sem nome, o esqueleto escreve `<a escrever>`.
 
 ## D7 — O `brza sessions open|list|send|title|close` e o mapa de sessões — `scripts/brza/brza-sessions` (P7, P9)
 

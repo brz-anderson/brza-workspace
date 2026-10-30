@@ -1,12 +1,12 @@
 ---
-status: in_review
-phase: review
+status: in_progress
+phase: execution
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: sim — todo passo feito; falta a revisão da entrega, do P0 ao P9 (R11.2)
-estimate_h: 20.5
+ready: sim — o P10 espera a autorização de Anderson
+estimate_h: 22.6
 executed_h: 3.2
-remaining_h: 0.0
+remaining_h: 2.1
 scope:
   - workspace
   - brza-studio
@@ -18,9 +18,9 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** o P0 ao P9 estão feitos; o último, o P9, em `brza-workspace@95d21cc`, com o C5 passado. Vem a revisão
-  da entrega do P0 ao P9, numa revisão só (R11.2), pela "Pedir a revisão da entrega" da plan-runner, com um revisor que
-  não executou. O X3 tem fonte (ver o worklog do P7), sem passo para ela.
+- **Retomar:** a revisão da entrega do P0 ao P9 fechou em 2026-10-29, com seis achados e destino para todos (R14,
+  R15). Vem o P10, que corrige o A1 ao A4 e o A6, e espera a autorização de Anderson; o A5 foi a issue. Depois do P10,
+  o Fechamento.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -344,6 +344,27 @@ Estimado: 2,5 h · Executado: 0,3 h
   `abriria:`.
 - O C5, na linha dele em `## Casos manuais`. A memória de abrir sessão ganhou o `--title` e o `--rename` (fora do git).
 
+### P10 — As correções da revisão: o A1 ao A4 e o A6
+
+Executa D2, D4, D5 e D6, nos achados da [REV: a entrega do PLN-002, do P0 ao P9](../../work/reviews/pln-002-os-comandos-brza.md)
+· executor: sessão `pln-002-sessions-rename`, só com a autorização de Anderson
+
+Estimado: 2,1 h · Executado: — h
+
+- [ ] **1. Testes que falham**, um por achado:
+  - A1: o `brza test` no checkout principal sai com a recusa do `brza dev`, sem rodar o `PRELUDE`;
+  - A2: o `--rm` do vazio recusa sem `--empty` e remove com ele; o `--force` sozinho recusa o vazio; o `--force` no sujo
+    imprime `descartado:` com a razão; o `--empty` não passa por cima do sujo;
+  - A3: o `note commit` sem nada novo na origin não faz o `pull`, e com a origin à frente faz;
+  - A4: o `OSError` e o `KeyboardInterrupt` depois do `rmtree(APP)` mantêm o worktree temporário e imprimem o caminho;
+  - A6: o esqueleto do worklog leva o nome do mapa pelo `ORCA_AGENT_SESSION_ID`, e o do transcript sem entrada.
+- [ ] **2. Implementar** no `brza-test`, no `brza-tree`, no `brza-note` e no `brza-app`, e a ajuda de cada um. O A6 usa
+  as funções do `brza-sessions`, sem copiá-las.
+- [ ] **3. Rodar e ver passar** — `env -u TERM_PROGRAM python3 -m unittest discover -s scripts/brza/tests`.
+- [ ] **4. Commit** — `fix(brza): as correções da revisão do PLN-002 (PLN-002/P10)`.
+
+**Evidência:** —
+
 ## Regressão
 
 - **O `brza-run`, o `brza-sessions open` e o `brza-install --chat-command` seguem iguais.** Como se confere:
@@ -365,7 +386,7 @@ Estimado: 2,5 h · Executado: 0,3 h
   o D6.
 - **X3 — O `$CLAUDE_SESSION_NAME` do esqueleto do worklog não existe no ambiente da sessão.** Na `pln-002-p6`,
   aberta pelo app e renomeada com `/rename`, a variável vem vazia, e o esqueleto escreve `<a escrever>`. Falta a
-  fonte do nome, que está no `Retomar`. Afeta o P6 e o D6.
+  fonte do nome, que o worklog do P7 achou; vai ao P10 (A6, R15.2). Afeta o P6 e o D6.
 
 - **X5 — O vitest roda como o `pnpm test`: antes do `run-vitest.mjs`, o build dos pacotes e o runtime nativo do node,
   e o `check:changed` leva o `--maxWorkers=2` da norma do `brza-studio`.** O D4 cita só o `run-vitest.mjs`, que importa
@@ -401,6 +422,9 @@ Estimado: 2,5 h · Executado: 0,3 h
 
 ## Worklogs
 
+- 2026-10-29 — a revisão da entrega do P0 ao P9, por um subagente da camada alta: seis achados, a R14 e a R15 com os
+  destinos, a R1.4 reaberta pela R14.2, o D2 e o D6 reescritos, o P10 e a issue do A5. O plano volta à execução.
+  [A revisão da entrega do PLN-002, do P0 ao P9](../../work/worklogs/2026-10-29-pln-002-revisao-da-entrega.md)
 - 2026-10-29 — P9, o `/rename` opcional, o título da aba e o mapa de sessões, em `brza-workspace@95d21cc`, com o C5
   passado; o formato do correio medido e levado ao `Retomar` do PLN-001. Nada travou; o plano volta à revisão.
   [O PLN-002/P9: o /rename opcional, o título da aba e o mapa de sessões](../../work/worklogs/2026-10-29-pln-002-p9-o-rename-opcional-e-o-mapa.md)
@@ -436,8 +460,15 @@ Estimado: 2,5 h · Executado: 0,3 h
   aceito na R7.4.
   [O PLN-002 escrito: os comandos brza, com as rodadas de desenho](../../work/worklogs/2026-10-28-pln-002-comandos-brza.md)
 
+## Revisões
+
+- [REV: a entrega do PLN-002, do P0 ao P9](../../work/reviews/pln-002-os-comandos-brza.md) — 2026-10-29, a revisão
+  única depois do P9 (R11.2); seis achados, o A1 ao A4 e o A6 no P10, o A5 em issue.
+
 ## Pendências conhecidas
 
+- [O brza test sai 0 com os testes de mobile/ e cloud/, que o vitest da raiz não roda](../../work/issues/brza-test-sai-0-com-testes-fora-do-vitest-da-raiz.md)
+  — o A5 da revisão (R15.1), com as opções para a rodada.
 - [O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md)
   — do P0, aberta pela sessão do PLN-001; o `spawn` direto de `node:child_process` vai ao `@orca/process-host`.
 

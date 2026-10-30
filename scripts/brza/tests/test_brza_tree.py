@@ -115,7 +115,7 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(calls.read_text().strip(), f'pln-009-p1 --checkout {self.tree("x")}')
 
     def test_usage_errors_exit_2(self):
-        for argv in ([], ['x', '--list'], ['--rm', 'x', '--list'], ['a/b'], ['x', '--force'],
+        for argv in ([], ['x', '--list'], ['--rm', 'x', '--list'], ['a/b'], ['x', '--force'], ['x', '--empty'],
                      ['--rm', 'x', '--chat', 's'], ['x', '--type', 'wip']):
             with self.subTest(argv=argv):
                 self.assertEqual(self.run_tree(*argv)[0], 2)
@@ -140,7 +140,9 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn('sujo', out)
         self.assertTrue(self.tree('x').exists())
-        self.assertEqual(self.run_tree('--rm', 'x', '--force')[0], 0)
+        code, out = self.run_tree('--rm', 'x', '--force')
+        self.assertEqual(code, 0, out)
+        self.assertIn('descartado: o worktree está sujo', out)
         self.assertFalse(self.tree('x').exists())
         self.assertNotIn('feat/x', self.branches())
 
@@ -151,18 +153,35 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn('origin/master', out)
         self.assertIn('feat/x', self.branches())
-        self.assertEqual(self.run_tree('--rm', 'x', '--force')[0], 0)
+        code, out = self.run_tree('--rm', 'x', '--force')
+        self.assertEqual(code, 0, out)
+        self.assertIn('descartado: o HEAD não está na origin/master', out)
         self.assertNotIn('feat/x', self.branches())
 
-    def test_rm_asks_force_for_the_branch_without_own_commit(self):
+    def test_rm_asks_empty_for_the_branch_without_own_commit_and_force_does_not_cover_it(self):
         self.run_tree('x')
         code, out = self.run_tree('--rm', 'x')
         self.assertEqual(code, 1)
         self.assertIn('sem commit próprio', out)
+        self.assertIn('--empty', out)
+        code, out = self.run_tree('--rm', 'x', '--force')
+        self.assertEqual(code, 1, out)
         self.assertTrue(self.tree('x').exists())
-        self.assertEqual(self.run_tree('--rm', 'x', '--force')[0], 0)
+        code, out = self.run_tree('--rm', 'x', '--empty')
+        self.assertEqual(code, 0, out)
         self.assertFalse(self.tree('x').exists())
         self.assertNotIn('feat/x', self.branches())
+
+    def test_empty_does_not_cover_the_dirty_worktree(self):
+        self.run_tree('x')
+        (self.tree('x') / 'novo.txt').write_text('trabalho do dia')
+        code, out = self.run_tree('--rm', 'x', '--empty')
+        self.assertEqual(code, 1, out)
+        self.assertIn('sujo', out)
+        self.assertTrue((self.tree('x') / 'novo.txt').exists())
+        code, out = self.run_tree('--rm', 'x', '--empty', '--force')
+        self.assertEqual(code, 0, out)
+        self.assertFalse(self.tree('x').exists())
 
     def test_rm_takes_the_detached_worktree_on_origin_master(self):
         runtime.worktree_add(self.tree('conferencia'))

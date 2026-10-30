@@ -223,6 +223,22 @@ class AppInstallTest(unittest.TestCase):
         self.assertTrue(GLOBALS['built_app'](src).is_dir())
         self.assertEqual(len(self.worktrees()), 2)
 
+    def test_interrupted_swap_keeps_the_new_build_and_prints_the_ditto(self):
+        for error in (OSError('rmtree parcial'), KeyboardInterrupt()):
+            with self.subTest(error=type(error).__name__):
+                self.built_in.clear()
+
+                def broken(source, target, error=error):
+                    raise error
+
+                with patch.dict(GLOBALS, {'ditto': broken}):
+                    code, out = self.run_app()
+                self.assertEqual(code, 1, out)
+                src = self.built_in[0][0]
+                self.assertTrue(GLOBALS['built_app'](src).is_dir())
+                self.assertIn(f"ditto '{GLOBALS['built_app'](src)}' '{self.app}'", out)
+                self.assertNotIn('Traceback', out)
+
     # --from, --clean e --dmg
 
     def test_from_builds_in_checkout_without_worktree_and_keeps_dist(self):

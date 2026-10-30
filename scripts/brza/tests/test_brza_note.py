@@ -90,9 +90,43 @@ class NoteTest(unittest.TestCase):
     def test_new_worklog_without_session_name_leaves_it_to_write(self):
         with patch.dict('os.environ'):
             os.environ.pop('CLAUDE_SESSION_NAME', None)
+            os.environ.pop('ORCA_AGENT_SESSION_ID', None)
             code, out = self.run_note('new', 'worklog', 'sem-nome')
         self.assertEqual(code, 0, out)
         text = (self.ws / 'work' / 'worklogs' / '2026-10-28-sem-nome.md').read_text()
+        self.assertIn('na sessão `<a escrever>`', text)
+
+    def fake_sessions(self, mapped: dict, provider: str | None, renamed: str | None):
+        asked = []
+
+        def provider_session(chat):
+            asked.append(chat)
+            return provider
+
+        return asked, {'session_map': lambda: mapped, 'provider_session': provider_session,
+                       'chat_name': lambda claude_session: renamed}
+
+    def new_worklog_in_chat(self, mapped: dict, provider: str | None, renamed: str | None) -> tuple[str, list]:
+        asked, sessions = self.fake_sessions(mapped, provider, renamed)
+        with patch.dict('os.environ', {'ORCA_AGENT_SESSION_ID': 'claude_x'}), \
+                patch.dict(GLOBALS, {'sessions_module': lambda: sessions}):
+            os.environ.pop('CLAUDE_SESSION_NAME', None)
+            code, out = self.run_note('new', 'worklog', 'no-chat')
+        self.assertEqual(code, 0, out)
+        return (self.ws / 'work' / 'worklogs' / '2026-10-28-no-chat.md').read_text(), asked
+
+    def test_new_worklog_in_a_chat_takes_the_name_from_the_session_map(self):
+        text, asked = self.new_worklog_in_chat({'claude_x': {'name': 'pln-coord'}}, 'uuid-x', 'outro')
+        self.assertIn('na sessão `pln-coord`', text)
+        self.assertEqual(asked, [])
+
+    def test_new_worklog_in_a_chat_out_of_the_map_takes_the_rename(self):
+        text, asked = self.new_worklog_in_chat({}, 'uuid-x', 'pln-renomeada')
+        self.assertIn('na sessão `pln-renomeada`', text)
+        self.assertEqual(asked, ['claude_x'])
+
+    def test_new_worklog_in_a_chat_without_name_leaves_it_to_write(self):
+        text, _ = self.new_worklog_in_chat({}, None, None)
         self.assertIn('na sessão `<a escrever>`', text)
 
     def test_new_issue_has_open_status_today_scope_and_priority(self):
@@ -186,6 +220,23 @@ class NoteTest(unittest.TestCase):
         self.assertEqual(code, 0, out)
         self.assertEqual(self.origin_log()[:2], ['docs: a', 'docs: outra'])
         self.assertEqual((self.ws / 'README.md').read_text(), 'sujo ao lado\n')
+
+    def test_commit_with_nothing_new_on_the_origin_does_not_pull(self):
+        self.write('work/issues/a.md')
+        self.write('README.md', 'sujo de outra sessão\n')
+        calls, real = [], runtime.git
+
+        def spy(*args, **kwargs):
+            calls.append(args)
+            return real(*args, **kwargs)
+
+        with patch.object(runtime, 'git', spy):
+            code, out = self.run_note('commit', 'work/issues/a.md', '-m', 'docs: a')
+        self.assertEqual(code, 0, out)
+        self.assertNotIn('pull', [args[0] for args in calls])
+        self.assertIn('fetch', [args[0] for args in calls])
+        self.assertEqual(self.origin_log()[:1], ['docs: a'])
+        self.assertEqual((self.ws / 'README.md').read_text(), 'sujo de outra sessão\n')
 
     def test_commit_no_push_stops_at_the_commit(self):
         self.write('work/issues/a.md')

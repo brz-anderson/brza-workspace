@@ -141,6 +141,15 @@ class BrzaTestTest(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn('worktree do brza-studio', out)
 
+    def test_the_main_checkout_is_refused_before_any_build(self):
+        code, out = self.run_test(str(self.studio), cwd=self.base)
+        self.assertEqual(code, 2)
+        self.assertIn('checkout principal', out)
+        self.assertEqual((self.runs, self.installed), ([], []))
+        code, out = self.run_test(cwd=self.studio)
+        self.assertEqual(code, 2)
+        self.assertIn('checkout principal', out)
+
     # o check:changed
 
     def test_check_changed_always_gets_the_origin_master_base(self):

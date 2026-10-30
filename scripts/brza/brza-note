@@ -6,8 +6,8 @@
   brza-note new issue <assunto> [--scope …] [--priority low|medium|high]
       cria work/issues/<assunto>.md, com status: open e opened de hoje.
   brza-note commit <caminho>… -m <mensagem> [--no-push]
-      roda o check_notes.py (sai se há erro), git add dos caminhos, commit só deles, git pull --rebase --autostash e
-      push na master; --no-push para no commit.
+      roda o check_notes.py (sai se há erro), git add dos caminhos, commit só deles, git fetch e push na master, com o
+      git pull --rebase --autostash antes só quando a origin andou; --no-push para no commit.
 
 O assunto é kebab-case, sem a data, e o --scope padrão é workspace. O worklog leva a sessão do $CLAUDE_SESSION_NAME,
 ou "<a escrever>" sem ele, e o H1 e o pedido ficam a escrever. O ## Fora do workspace sai vazio e é apagado quando não
@@ -15,7 +15,11 @@ há o que registrar; os quatro campos estão no work/README.md.
 
 O caminho relativo parte do diretório atual quando ele está no workspace, e da raiz do workspace quando não está, como
 numa sessão do brza-studio. O commit leva só os caminhos dados, mesmo com outro arquivo no índice, porque outra sessão pode estar no mesmo checkout;
-o --autostash guarda e devolve o que estiver sujo ao lado durante o pull.
+o --autostash guarda e devolve o que estiver sujo ao lado durante o pull, que só roda quando a origin andou, para não
+tirar da árvore à toa o trabalho das outras sessões.
+
+O nome da sessão no esqueleto do worklog é o CLAUDE_SESSION_NAME ou, num chat do BrzA Studio, o do chat do
+ORCA_AGENT_SESSION_ID: o do mapa de sessões e, sem entrada, o último /rename, como no brza-sessions.
 
 Saídas: 0 feito; 1 recusado (a nota existe, o checador achou erro, nada a commitar) ou o git falhou; 2 uso errado.
 """
@@ -23,6 +27,7 @@ import argparse
 import datetime
 import os
 import re
+import runpy
 import subprocess
 import sys
 from pathlib import Path
@@ -69,11 +74,29 @@ def today() -> datetime.date:
     return datetime.date.today()
 
 
+def sessions_module() -> dict:
+    return runpy.run_path(str(HERE / 'brza-sessions'))
+
+
+def session_name() -> str | None:
+    """O nome da sessão: o CLAUDE_SESSION_NAME ou, num chat do app, o do mapa de sessões e, sem entrada, o /rename."""
+    if name := os.environ.get('CLAUDE_SESSION_NAME'):
+        return name
+    chat = os.environ.get('ORCA_AGENT_SESSION_ID')
+    if not chat:
+        return None
+    sessions = sessions_module()
+    if entry := sessions['session_map']().get(chat):
+        return entry['name']
+    claude_session = sessions['provider_session'](chat)
+    return sessions['chat_name'](claude_session) if claude_session else None
+
+
 def new(kind: str, subject: str, scope: list[str], priority: str | None) -> int:
     fields = {'scope': '\n'.join(f'  - {s}' for s in scope), 'today': today().isoformat()}
     if kind == 'worklog':
         path = runtime.WORKSPACE / 'work' / 'worklogs' / f'{fields["today"]}-{subject}.md'
-        text = WORKLOG.format(**fields, session=os.environ.get('CLAUDE_SESSION_NAME') or '<a escrever>')
+        text = WORKLOG.format(**fields, session=session_name() or '<a escrever>')
     else:
         path = runtime.WORKSPACE / 'work' / 'issues' / f'{subject}.md'
         text = ISSUE.format(**fields, priority=f'priority: {priority}\n' if priority else '')
@@ -108,7 +131,9 @@ def commit(paths: list[str], message: str, push: bool) -> int:
     print(runtime.git('log', '-1', '--format=%h %s', cwd=ws).strip())
     if not push:
         return 0
-    runtime.git('pull', '-q', '--rebase', '--autostash', cwd=ws)
+    runtime.git('fetch', '-q', cwd=ws)
+    if runtime.git('rev-list', '--count', 'HEAD..@{upstream}', cwd=ws).strip() != '0':
+        runtime.git('pull', '-q', '--rebase', '--autostash', cwd=ws)
     runtime.git('push', '-q', cwd=ws)
     print(f'enviado:  {runtime.git("log", "-1", "--format=%h", cwd=ws).strip()} na origin')
     return 0

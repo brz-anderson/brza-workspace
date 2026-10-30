@@ -8,8 +8,9 @@
       o .dmg para ~/Downloads. --clean apaga o dist no fim. O worktree temporário sai no fim, também quando o
       build falha.
 
-Saídas: 0 instalado; 1 falhou ou cancelado; 2 uso errado, ou o app aberto sem --yes. O ditto que falha deixa o worktree
-temporário onde está e imprime o ditto a repetir, porque o app antigo já foi apagado.
+Saídas: 0 instalado; 1 falhou, cancelado ou interrompido; 2 uso errado, ou o app aberto sem --yes. A troca que falha
+ou é interrompida depois de apagar o app antigo — o ditto com erro, o rmtree parcial, o Ctrl-C — deixa o worktree
+temporário onde está, com o app novo, e imprime o ditto a repetir.
 
 A primeira instalação, e toda instalação que troca o app em uso, roda de um terminal fora do app, com ele fechado: o
 chat e o `brza` do PATH dele são do próprio app.
@@ -86,8 +87,10 @@ def refuse_open() -> bool:
     return bool(pids)
 
 
-def install(src: Path, dmg: bool, yes: bool) -> tuple[int, bool]:
-    """Constrói em `src` e instala. Devolve a saída e se o `src` deve ficar, que é o caso do ditto que falhou."""
+def install(src: Path, dmg: bool, yes: bool, swapping=lambda: None) -> tuple[int, bool]:
+    """Constrói em `src` e instala. Devolve a saída e se o `src` deve ficar, que é o caso do ditto que falhou.
+
+    O `swapping` é chamado antes de apagar o app antigo: daí em diante, o `src` é a única cópia do app."""
     if not build(src, dmg):
         print('falhou:   o build:mac saiu com erro; o app instalado não mudou')
         return 1, False
@@ -103,9 +106,15 @@ def install(src: Path, dmg: bool, yes: bool) -> tuple[int, bool]:
         if not ask(f'Instalar a {version(new)} em {APP}? A instalada é {installed}.'):
             print('cancelado: o app instalado não mudou')
             return 1, False
-    if APP.exists():
-        shutil.rmtree(APP)
-    if not ditto(new, APP):
+    swapping()
+    try:
+        if APP.exists():
+            shutil.rmtree(APP)
+        copied = ditto(new, APP)
+    except OSError as e:
+        print(f'falhou:   a troca do app parou ({e})')
+        copied = False
+    if not copied:
         print(f'falhou:   o ditto não copiou o app, e o antigo já foi apagado. Repita:\n'
               f"          ditto '{new}' '{APP}'")
         return 1, True
@@ -130,15 +139,25 @@ def run(checkout: Path | None, dmg: bool, yes: bool, clean: bool) -> int:
     temp = Path(tempfile.mkdtemp(prefix='brza-app-'))
     src = temp / 'brza-studio'
     keep = False
+
+    def swapping():
+        nonlocal keep
+        keep = True
+
     try:
         runtime.worktree_add(src)
         print(f'worktree: {src}  (detached, da origin/master)')
         runtime.install_offline(src)
         print('install:  ok (offline)')
-        code, keep = install(src, dmg, yes)
+        code, keep = install(src, dmg, yes, swapping)
         return code
     except runtime.BrzaError as e:
         print(f'falhou:   {e}')
+        return 1
+    except KeyboardInterrupt:
+        print('interrompido')
+        if keep:
+            print(f"          o app antigo já foi apagado. Repita:\n          ditto '{built_app(src)}' '{APP}'")
         return 1
     finally:
         if keep:

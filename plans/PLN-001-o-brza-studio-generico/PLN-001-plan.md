@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P59 e o P60 do pedido 31, em execução, e o P62 ao P64 do pedido 32, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 163.1
+ready: "sim — o P59 e o P60 do pedido 31, em execução, o P62 ao P64 do pedido 32 e o P66 do pedido 33, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
+estimate_h: 164.6
 executed_h: 20.1
-remaining_h: 31.9
+remaining_h: 33.4
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -20,8 +20,8 @@ tags:
   mesmo dia, com a R50 e a R51, o D48 ao D50 e o P62 ao P65. O P58 fechou em `brza-studio@9c7fcdebbb0`, com o
   resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`; rodam em paralelo, autorizados por
   Anderson, o P59 e o P60, nas sessões `pln-001-p59` e `pln-001-p60`, cada uma no seu worktree, e o P62 ao P64, na
-  sessão `pln-001-pedido-32`. Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
-  C17 depois do P60 e o C18 ao C20 depois do P64), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
+  sessão `pln-001-pedido-32`; o P66 do pedido 33, na sessão `pln-001-pedido-33`, noutro worktree. Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
+  C17 depois do P60 o C18 ao C20 depois do P64 e o C21 depois do P66), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
   sessão entra no correio com o nome automático `brza-workspace-<hex>`. O P64 não lê o mapa de sessões do PLN-002 e
   casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
@@ -89,6 +89,8 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   terminal igual ao chat tbm -, trocar o tema do chat, troca de todos, trocar o tema dos outros troca só deles"
 - **Pedido 32 (2026-10-29, a mesma sessão):** "faça com que as mensagens entre sessões apareçam no chat como "Mensagem
   de..." como já é na interface do `Orca` na versão mais atual"
+- **Pedido 33 (2026-10-29, a mesma sessão):** "o texto do "Pensou" que aparece nos comandos executados deve aparecer
+  no chat igual ao "Perguntou" com >"
 
 ### Cobertura
 
@@ -129,6 +131,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 32` | A mensagem de outra sessão (`SendMessage` do Claude Code) aparece no chat como "Mensagem de <nome>", e a devolução de subagente como "Devolução de <nome>", no histórico e ao vivo (R50.1, R50.2, R51.1) | P62 | teste do leitor (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 32` | As duas aparecem no cartão do Orca de 2026-10-29 (#34824), com o status do remetente (R50.1) | P63 | os testes do cartão trazidos do upstream (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 32` | O clique no nome do remetente abre a aba de chat da sessão dele, se aberta no app (R50.3) | P64 | teste da busca da aba (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 33` | A linha do raciocínio, fechada, mostra "Pensou por 3s:" e o começo do texto, cortado, no tom apagado, com a seta que abre o texto inteiro; o rótulo da pergunta passa a "Perguntou:" (R52.1 a R52.3) | P66 | teste da linha (unidade); conferência no BrzA Studio (manual) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
 
@@ -844,6 +847,32 @@ Respondida em 2026-10-29, por Anderson na mesma sessão, logo depois da R50.
    paga: no rebase; agora, em paralelo, num worktree — custo: uma sessão a mais e um rebase provável; se paga: agora.
    **Decidido — "Agora, em paralelo".** É a autorização do P62 ao P64.
 
+### Rodada 52 — o "Pensou" como o "Perguntou" (enviada 2026-10-29)
+
+> **Apresentado antes:** a linha da pergunta mostra o rótulo, a pergunta cortada na mesma linha, em `text-primary`, e a
+> seta `ChevronRight` que abre a pergunta inteira, sumindo da linha (`NativeChatAwaitingInputRow.tsx:62-90`, `:117-121`).
+> A linha do raciocínio mostra só o ícone `brain`, "Pensou por {{duration}}" e a seta, e o texto fica no corpo
+> recolhido (`NativeChatReasoningRow.tsx`); é o mesmo componente dentro e fora da corrida de comandos
+> (`NativeChatToolRunMemberList.tsx:29`). O `pt.json` diz "Perguntado:" (`:19772`).
+
+Respondida em 2026-10-29, por Anderson na sessão do `brza-workspace` que gravou os pedidos 31 e 32, pelo
+AskUserQuestion. Os custos são estimativa.
+
+1. **R52.1 — A linha fechada.** Seleção única. Opções: "Pensou por 3s: <texto>", com a duração e o começo do raciocínio
+   cortado, e a seta que abre o texto inteiro (recomendada) — custo: 1 a 1,5 h; "Pensou: <texto>", sem a duração —
+   custo: o mesmo; se paga: com mais espaço, mas perde a duração.
+   **Decidido — "Pensou por 3s: <texto> (Recomendado)".** Vai ao D51 e ao P66.
+2. **R52.2 — A cor do texto.** Seleção única. Opções: apagada, como hoje (recomendada) — custo: nenhum; se paga: a
+   pergunta segue a única linha em destaque (R29.1); destaque, como o Perguntou — custo: nenhum; se paga: com o
+   raciocínio competindo com as perguntas.
+   **Decidido — "Apagada, como hoje (Recomendado)".** Vai ao D51 e ao P66.
+3. **R52.3 — O rótulo "Perguntado:".** Seleção única. Opções: trocar para "Perguntou:" (recomendada) — custo: uma linha
+   no `pt.json`; manter — custo: nenhum; se paga: nunca.
+   **Decidido — "Trocar para 'Perguntou:' (Recomendado)".** Vai ao P66.
+4. **R52.4 — Quando roda.** Seleção única. Opções: agora, em paralelo, num worktree (recomendada); depois dos pedidos
+   31 e 32.
+   **Decidido — "Agora, em paralelo (Recomendado)".** É a autorização do P66.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -858,7 +887,7 @@ vem depois do P36, de que reaproveita a troca, e o P41 não depende dele; o P43 
 base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum; o P54 ao P57 vêm depois do P44 ao P50 (R42.4), o P54
 antes do P55, o P56 independente e o P57 por último; o P58 vem antes do P59 e do P60, que não dependem um do outro, e
 o P61 por último; o pedido 32 roda em paralelo com o 31 (R51.2), o P62 antes do P63, o P64 depois do P63 e o P65 por
-último.
+último; o P66 do pedido 33 roda em paralelo com os dois (R52.4).
 
 **Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com "indicado". É
 leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a pedido, numa sessão
@@ -2083,6 +2112,25 @@ Depois do P64.
 
 **Evidência:** —
 
+### P66 — O "Pensou" com o texto na linha, como o "Perguntou" (pedido 33)
+
+Executa D51 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-33`
+
+Estimado: 1,5 h · Executado: — h
+
+Em paralelo com os pedidos 31 e 32 (R52.4).
+
+- [ ] **1.** Teste que falha, junto do teste da `NativeChatReasoningRow`: fechada, a linha mostra "Pensou por 3s:" e o
+      começo do raciocínio em texto corrido, cortado numa linha, no tom apagado; aberta, o texto sai da linha e aparece
+      inteiro no corpo; sem duração, "Pensou:" e o texto; o rótulo da pergunta em português é "Perguntou:"
+- [ ] **2.** A linha em `NativeChatReasoningRow.tsx`, com o texto corrido tirado do Markdown, e a chave nova de rótulo
+      com dois-pontos no `pt.json` e no `en.json`; o "Perguntado:" vira "Perguntou:" (`pt.json:19772`). Os pontos "A
+      conferir no passo" do D51
+- [ ] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C21
+
+**Evidência:** —
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -2312,6 +2360,8 @@ da linha quando o teste entra.
 - 2026-10-29 — [O P58 do PLN-001, o tema do chat](../../work/worklogs/2026-10-29-pln-001-p58-tema-do-chat.md):
   o P58, com o commit `9c7fcdebbb0`, o resolvedor do tema do chat e os X32 e X33; abertas as sessões `pln-001-p59` e
   `pln-001-p60`. Vermelhos preexistentes no check: `updater-enabled.test.ts` e `open-uncommitted-entry.test.ts`.
+- 2026-10-29 — [O pedido 33 do PLN-001, o "Pensou" como o "Perguntou"](../../work/worklogs/2026-10-29-pln-001-pedido-33-pensou-como-perguntou.md):
+  o pedido 33, a R52, o D51 e o P66, sem código; o P66 em paralelo com os pedidos 31 e 32.
 
 ## Decisões
 
@@ -2353,12 +2403,13 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C18 | `Pedido 32`: a mensagem de outra sessão e a devolução no chat (P62.3) | Mandar uma mensagem de uma sessão a outra, aberta no app; numa sessão, rodar um subagente; recarregar a aba | "Mensagem de <sessão>" e "Devolução de <subagente>", ao vivo e depois de recarregar, sem o envelope | | |
 | C19 | `Pedido 32`: o cartão do Orca (P63.3) | As mesmas mensagens do C18 | O cartão, com o status do remetente | | |
 | C20 | `Pedido 32`: o clique no remetente (P64.3) | Clicar no nome de uma sessão aberta e no de uma fechada | A aba da sessão aberta em foco; a fechada sem ação | | |
+| C21 | `Pedido 33`: o "Pensou" com o texto na linha (P66.3) | Uma resposta com raciocínio, entre comandos e fora deles; abrir e fechar a linha | "Pensou por Xs:" e o começo do texto, apagado, cortado; aberta, o texto inteiro abaixo; a pergunta com "Perguntou:" | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,
 Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14. O C11
 entra no mesmo build, pelo pedido do P55 (2026-10-28), e o C12, pelo do P56 (2026-10-29). O C15 ao C17 são do
-pedido 31 e vão a um build depois do P60, com o P61; o C18 ao C20, do pedido 32, a um build depois do P64, com o P65.
+pedido 31 e vão a um build depois do P60, com o P61; o C18 ao C20, do pedido 32, a um build depois do P64, com o P65; o C21, do pedido 33, ao mesmo build.
 
 ## Fechamento
 

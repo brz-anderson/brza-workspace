@@ -3,7 +3,7 @@
 O desenho do [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](PLN-001-plan.md). O
 que este desenho assume e o Terreno medido em 2026-10-24 estão no desenho do PLN-025 do workspace da Fixfy
 (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-design.md`); os itens D1 a D35 vieram de lá, pelo PLN-029 da Fixfy,
-com os IDs de antes (PLN-025/R28.2), e os D36 a D50 são daqui, de 2026-10-27 a 2026-10-29. Nos itens D1 a D35, o nome do
+com os IDs de antes (PLN-025/R28.2), e os D36 a D51 são daqui, de 2026-10-27 a 2026-10-29. Nos itens D1 a D35, o nome do
 repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do rebrand.
 
 ### O que este desenho assume
@@ -62,6 +62,8 @@ repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do 
 - **R50.2:** entram o correio entre sessões e a devolução de subagente.
 - **R50.3:** o clique no remetente abre a aba da sessão dele, se aberta.
 - **R51.1:** a devolução tem o rótulo "Devolução de <nome>".
+- **R52.1:** a linha do raciocínio fechada mostra "Pensou por 3s:" e o começo do texto.
+- **R52.2:** o texto do raciocínio fica no tom apagado.
 
 ### D1 — O build local, assinado — `brza-studio/config/scripts/build-mac-local.mjs` (P1, PLN-028/P5)
 
@@ -567,3 +569,23 @@ ferramenta não (P52, resposta de 2026-10-27).
 
 - De onde vem o nome da aba: o `/rename` que o `brza-sessions --wait` espera, o `--name` do Claude Code, ou o título da
   aba. A busca usa o que o app guardar.
+
+### D51 — O "Pensou" com o texto na linha — `brza-studio/src/renderer/src/components/native-chat/NativeChatReasoningRow.tsx` (P66)
+
+- **Origem:** pedido 33, R52.1, R52.2, R52.3
+- **Contexto:** a linha da pergunta mostra o texto cortado ao lado do rótulo e o tira da linha quando aberta
+  (`NativeChatAwaitingInputRow.tsx:62-90`). A do raciocínio mostra só o rótulo com a duração
+  (`NativeChatReasoningRow.tsx`, `translatedHeadline`), e o corpo é o `NativeChatReasoningBody`, recolhido.
+
+#### Como fica
+
+- **Fechada.** Ícone `brain`, o rótulo com dois-pontos ("Pensou por 3s:", ou "Pensou:" sem duração) e o começo do
+  raciocínio em texto corrido, numa linha, cortado com reticências, no `text-chat-foreground-faint`, e a seta.
+- **Aberta.** O texto sai da linha, que fica só com o rótulo, como no "Perguntou", e o corpo de hoje aparece.
+- **O texto corrido** é o Markdown do raciocínio sem marcação, com as quebras viradas em espaço.
+
+#### A conferir no passo
+
+- Enquanto o raciocínio chega em streaming, a linha mostra o começo do que já chegou, e o rótulo segue o de hoje.
+- O rótulo sem dois-pontos ainda é usado em outro lugar (`thought`, `thoughtForDuration`): a chave nova não quebra
+  esses usos.

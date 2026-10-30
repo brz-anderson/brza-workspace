@@ -91,11 +91,11 @@ worklog que nasce de um plano aceito.
 ## Quem grava — a sessão que conduz
 
 **Só esta skill decide o conteúdo do plano; quem grava e commita em `plans/` e `work/` é a sessão que conduz**, só nos
-caminhos da tarefa, como o `work/README.md` manda em "Commit": direto na `master`, sem PR, com a identidade do
-`brz-anderson`, `git add` por caminho e `git pull --rebase` quando outro push corre junto.
+caminhos da tarefa, como o `work/README.md` manda em "Commit": na branch do workstream da sessão, pelo `brza note
+commit`, sem PR, com a identidade do `brz-anderson`.
 
 1. **Grave só os caminhos da tarefa**: o plano dela, o worklog dela e, ao abrir `PLN`, a linha "Último PLN usado" do
-   `plans/README.md`, que sobe no mesmo commit. O `phase` e o `status` saem do mapa de lá. Confira com o checador, de
+   `plans/README.md`, que sobe na `master`, num commit próprio, antes de gravar o plano. O `phase` e o `status` saem do mapa de lá. Confira com o checador, de
    qualquer diretório do workspace — `python3 ${CLAUDE_SKILL_DIR}/../notes-checker/scripts/check_notes.py` — antes de
    commitar.
 2. **O que é de outra tarefa, esta sessão não executa** — outro plano, o trabalho de outra issue, o passo de código que

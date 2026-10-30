@@ -11,8 +11,9 @@ entram junto com o plano aceito, na seção datada que o abre. No `PLN`, cada et
 ## Abrir
 
 1. **Confirme que é plano e onde ele mora**, pelos Passos 1 e 2 da `SKILL.md`.
-2. **Resolva o nome.** No `PLN`, o número seguinte ao "Último PLN usado" do `plans/README.md` — releia a linha ao
-   gravar, porque outra sessão pode ter aberto um plano no meio, e suba-a no mesmo commit — e o assunto em kebab-case; no
+2. **Resolva o nome.** No `PLN`, o número seguinte ao "Último PLN usado" do `plans/README.md` — releia a linha na
+   `origin/master` ao gravar, porque outra sessão pode ter aberto um plano no meio, suba-a num commit de norma na
+   `master` e grave o plano no worktree do workstream da sessão — e o assunto em kebab-case; no
    worklog, `AAAA-MM-DD-assunto-em-kebab.md`.
 3. **Escreva o frontmatter, o `Retomar`, o `## Pedido` e o `## Worklogs`** pelo molde, com o pedido nas palavras de quem
    pediu e a linha da sessão que abre. `phase: interview` quando há rodada a fazer; `phase: design` quando a origem já

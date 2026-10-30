@@ -179,10 +179,12 @@ por um formatador que junta linhas.
 
 ### Commit
 
-`work/`, `plans/` e `wiki/` são deste repositório, e **as notas commitam direto na `master`**, sem PR. **O commit é com a
-identidade do `brz-anderson`, que vem do `.git/config` daqui, e o push vai pela chave `personal` do `origin`**
-(`git@personal:brz-anderson/brza-workspace.git`). `git add` por caminho,
-só os da tarefa, e `git pull --rebase` quando outro push correr junto.
+`work/`, `plans/` e `wiki/` são deste repositório, mas **não moram na `master`**: cada nota mora na branch do
+workstream dela, `workstream/<nome>`, no worktree `.worktrees/<nome>`, como diz o `AGENTS.md`. **A nota nasce no
+workstream da sessão que a escreve.** **O commit é pelo `brza note commit`**, que roda o checador, commita só os
+caminhos dados e dá o push na branch do workstream, sem PR, e recusa a `master`. O commit é com a identidade do
+`brz-anderson`, que vem do `env` da sessão, e o push vai pela chave `personal` do `origin`
+(`git@personal:brz-anderson/brza-workspace.git`).
 
 O `brza-studio` é outro repositório, com branch `master` e a norma dele: o plano daqui só aponta para ele.
 

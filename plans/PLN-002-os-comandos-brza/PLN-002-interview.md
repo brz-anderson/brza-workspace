@@ -55,7 +55,7 @@ Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
    - o `brza worktree rm` do app. Custo: não se conferiu se ele remove do disco e do git. Se paga: se o app guardar estado
      fora do `git worktree list`, o que não se mediu.
 
-   **Decidido — merge, limpo e órfãos.**
+   **Decidido — merge, limpo e órfãos.** → reaberta em R14.2.
 
 ### Rodada 2 — o `brza dev` e o baseline do `brza test` (enviada 2026-10-28)
 
@@ -534,3 +534,61 @@ Respondida em 2026-10-29, na sessão `pln-002-sessions-rename`.
      acha o destino, e o remetente do D48 fica sem nome. Se paga: se o correio do runtime cair em desuso.
 
    **Decidido — sim, e a regra vai à ajuda e à memória.**
+
+### Rodada 14 — os achados de código da revisão (enviada 2026-10-29)
+
+**Apresentado antes:** o parecer
+[REV: a entrega do PLN-002, do P0 ao P9](../../work/reviews/pln-002-os-comandos-brza.md), com o A1 ao A4 conferidos no
+código nesta sessão: `brza-test:50-59` sem a trava de `brza-dev:56-57`; `brza-tree:127-152`, que com `--force` não
+imprime as razões; `brza-note:111`, com o `--autostash` sempre; `brza-app:134-150`, com o `keep` dado só no retorno.
+
+Respondida em 2026-10-29, na sessão `pln-002-sessions-rename`.
+
+1. **A1 — o `brza test` aceita o checkout principal.** Opções:
+   - corrigir aqui, num P10, com a trava do `brza-dev` e um teste (recomendada). Custo: 0,3 h. Se paga: no primeiro
+     `brza test` de uma sessão aberta no principal;
+   - issue. Custo: a restrição do plano fica furada. Se paga: só se ninguém rodar o `brza test` no principal.
+
+   **Decidido — corrigir aqui, num P10.**
+
+2. **A2 — o `--force` do `--rm` apaga em silêncio o sujo e o não mergeado.** Opções:
+   - flag própria para o vazio: o `--empty` remove o limpo sem commit próprio, e o `--force` fica para o sujo, o não
+     mergeado e o órfão (recomendada). Custo: 0,5 h e a troca do D2. Se paga: no primeiro `--rm` de um worktree com
+     trabalho não commitado;
+   - flag única, com cada razão impressa como `descartado:`. Custo: 0,2 h. Se paga: só quando alguém lê a saída;
+   - deixar como está. Custo: nenhum agora. Se paga: nunca, se a perda acontecer.
+
+   **Decidido — flag própria para o vazio.**
+
+3. **A3 — o `note commit` põe no stash o trabalho sujo das outras sessões a cada push.** Opções:
+   - corrigir aqui, no P10: `git fetch`, e o pull com `--autostash` só quando a `origin/master` andou (recomendada).
+     Custo: 0,5 h. Se paga: agora, com as sessões do PLN-001 gravando em paralelo no mesmo checkout;
+   - issue. Custo: a janela segue aberta. Se paga: se o `note commit` for pouco usado em paralelo.
+
+   **Decidido — corrigir aqui, no P10.**
+
+4. **A4 — o `app install` interrompido apaga o build novo e deixa o `/Applications` sem app.** Opções:
+   - corrigir aqui, no P10: o `keep` marcado antes do `rmtree(APP)` e o `OSError` pego (recomendada). Custo: 0,3 h. Se
+     paga: na primeira instalação interrompida;
+   - issue. Custo: a janela segue. Se paga: se a instalação nunca for interrompida.
+
+   **Decidido — corrigir aqui, no P10.**
+
+### Rodada 15 — os achados de lacuna da revisão (enviada 2026-10-29)
+
+Respondida em 2026-10-29, na sessão `pln-002-sessions-rename`.
+
+1. **A5 — o `brza test` sai 0 com testes de `mobile/` e `cloud/`, que o vitest da raiz não roda.** Opções:
+   - issue, com as opções, porque a escolha muda o contrato do D4 (recomendada). Custo: 0,1 h agora e 1 h depois. Se
+     paga: quando uma sessão mexer em `mobile/` ou `cloud/`;
+   - corrigir aqui, saindo 1 com o que não rodou. Custo: 0,4 h e a troca do D4. Se paga: agora, sem verde falso;
+   - descartar. Custo: o verde falso fica. Se paga: nunca, se alguém mexer em `mobile/`.
+
+   **Decidido — issue, com as opções.**
+
+2. **A6 — o X3 tem fonte e não tem destino.** Opções:
+   - corrigir aqui, no P10: o `brza-note` acha o nome pelo `ORCA_AGENT_SESSION_ID`, no mapa e, sem entrada, no
+     `/rename` do transcript (recomendada). Custo: 0,5 h. Se paga: no próximo worklog do `brza note new`;
+   - issue. Custo: 0,1 h agora; o esqueleto segue com `<a escrever>`. Se paga: se o `brza note new` for pouco usado.
+
+   **Decidido — corrigir aqui, no P10.**

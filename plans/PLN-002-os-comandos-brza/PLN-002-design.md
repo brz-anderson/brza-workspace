@@ -15,7 +15,8 @@ passo, o disco é a verdade, e a divergência vira um desvio `X`.
   worktree da `origin/master`, depois de um `git fetch origin`.
 - **R3.4, R6.1:** o código comum — o envio ao chat, o checkout do `brza-studio` e o worktree — mora no runtime.
 - **R4.4:** primeiro o P1, depois o P2; o P3 ao P6 em paralelo; o P7 quando a combinação com a 2d fechar; o P8 por último.
-- **R5.3:** cada passo roda numa sessão `pln-002-pN` do `brza-workspace`, com commit direto na `master`.
+- **R5.3:** cada passo roda numa sessão `pln-002-pN` do `brza-workspace`, com commit direto na `master`. O P9 roda na
+  sessão da frente, a `pln-002-sessions-rename`, pela norma "Uma frente, uma sessão" do `AGENTS.md`.
 
 ## Terreno
 
@@ -225,45 +226,95 @@ O pedido de Anderson, em AAAA-MM-DD, na sessão `<$CLAUDE_SESSION_NAME, ou a esc
   `work/README.md`.
 - **A issue** leva o frontmatter, o H1 e a seção `## O pedido`.
 
-## D7 — O `brza sessions list|send|close` — `scripts/brza/brza-sessions` (P7)
+## D7 — O `brza sessions open|list|send|title|close` e o mapa de sessões — `scripts/brza/brza-sessions` (P7, P9)
 
-- **Origem:** R9.1, R9.2, R9.4 e R10.1, na combinação feita pela `pln-002-p7` (PLN-003/R6.1, que reabriu a R5.2).
+- **Origem:** R9.1, R9.4 e R10.1, na combinação feita pela `pln-002-p7` (PLN-003/R6.1, que reabriu a R5.2); R11.3,
+  R11.4, R12.1 ao R12.4 e R13.1 ao R13.4, no pedido 8.
 - **Contexto:** achar, mandar e fechar sessão por nome se repetiu 8 ou mais vezes, e o CLI não fecha chat. O roteador
-  do PLN-003 chama o `list`, o `send` e o `close` por nome, e lê o `--json`.
+  do PLN-003 chama o `list`, o `send` e o `close` por nome, e lê o `--json`. O pedido 8 tira o `/rename` do padrão: o
+  `open` nomeia a aba no app e grava o par nome e chat num mapa, que o coordenador lê pelo `list --json`.
 
 #### Como fica
 
 ```text
-brza sessions [open] <nome> [--checkout <caminho>] [--prompt …]   o de hoje, sem mudança (R9.2)
-brza sessions list [--json]                     os chats do app: nome, título, chat, worktree, estado
+brza sessions [open] <nome> [--title <título>] [--rename] [--checkout <caminho>] [--prompt …|--prompt-file …]
+                            [--wait] [--dry-run]
+brza sessions list [--json]                     os chats do app: nome, título, chat, worktree, estado, origem, aberto
 brza sessions send <nome> <texto> [--json]      agentSession.send, com queue-if-active
+brza sessions title <nome> <título> [--json]    agentSession.rename, e uma linha `title` no mapa
 brza sessions close <nome> [--force] [--json]   agentSession.close e session.tabs.close com reason 'user'; sem --resume
 ```
 
-- **Achar o chat pelo nome (R9.1):** as abas `agent-session` do `session.tabs.listAll`; para cada uma, o
-  `agentSession.history` dá o `providerSession.id`, o id da sessão do Claude; o nome é o último `custom-title` do
-  transcript `<config>/projects/*/<id>.jsonl`, nos mesmos `config_dirs()` do `running()`. Chat sem `/rename` fica sem
-  nome e não é achado pelo `send` nem pelo `close`. Nome ausente ou repetido sai 1, e o repetido lista os chats.
+- **O `open` (R11.3, R11.4):** abre o chat sem o `/rename`. O título da aba é o `--title`, ou o `<nome>` sem ele, pelo
+  `agentSession.rename`; o prompt da tarefa vai como hoje. O `--rename` manda o `/rename <nome>` antes dele, como até o
+  P7. Grava a linha `open` no mapa.
+- **Quem passa `--rename` (R13.4):** a sessão que vai mandar ou receber correio, porque o correio endereça pelo nome da
+  sessão do Claude, que só o `/rename` dá. A regra vai à ajuda do script e à memória de abrir sessão; o resto conversa
+  pelo `brza sessions send`.
+- **O nome que já roda é pulado (R12.3):** o `open` sai com `running:` quando o mapa tem o nome com o chat ainda no
+  `session.tabs.listAll`, ou quando o `running()` de hoje acha o `/rename` num processo vivo.
+- **O `--wait` (R13.2):** espera, por até 60 s, o `agentSession.history` dar o `providerSession.id` e grava a linha
+  `session` no mapa; com o `--rename`, espera também o nome, como hoje. Sem o id no prazo, sai 1 com `CHECK:`.
+- **Achar o chat pelo nome (R9.1, R12.3):** as abas `agent-session` do `session.tabs.listAll`; o nome de cada uma vem do
+  mapa, pelo `chat`, e, sem entrada, do último `custom-title` do transcript `<config>/projects/*/<id>.jsonl`, pelo
+  `providerSession.id` do `agentSession.history`, nos mesmos `config_dirs()` do `running()`. Chat sem nenhum dos dois
+  fica sem nome e não é achado. Nome ausente ou repetido sai 1, e o repetido lista os chats.
 - **O `send` não consulta trava (R10.1):** a trava de retomada foi desligada, e o `send` manda sempre. Quem decide
   acordar uma sessão grande parada é quem chama.
+- **O `title` (R13.3):** acha o chat pelo nome, chama o `agentSession.rename` e grava a linha `title`.
 - **O `close` (R9.4):** recusa com saída 1 o chat `working` sem `--force`. Com ele, chama os dois RPCs; o
-  `agentSession.close` sozinho deixa a aba no `listAll`. Nada de `--resume` nem de restart.
+  `agentSession.close` sozinho deixa a aba no `listAll`. Nada de `--resume` nem de restart. Grava a linha `close`.
+
+#### O mapa de sessões (R12.1, R12.2, R13.1)
+
+`.sessions/sessions.jsonl` na raiz do `brza-workspace`, pela `WORKSPACE` do runtime — também quando o chat abre num
+checkout do `brza-studio` —, fora do git como o `.measurements/`. Só de acréscimo, uma linha por evento:
+
+```text
+{"event": "open",    "at": "<ISO 8601>", "name", "title", "chat", "checkout", "renamed": bool}
+{"event": "session", "at", "name", "chat", "claude_session"}
+{"event": "title",   "at", "name", "chat", "title"}
+{"event": "close",   "at", "name", "chat"}
+```
+
+- **O estado é a dobra das linhas, por `chat`:** o `open` liga o nome ao chat; o `title` e o `session` atualizam; o
+  `close` desliga. O nome reaberto depois de um `close` é outro chat, e vale o `open` mais recente.
+- **Quem lê é o `list --json` (R12.2)**, que junta o mapa ao estado do app; o arquivo é detalhe interno, e o formato
+  dele pode mudar sem quebrar o roteador. O `list` não grava.
+- **O P64 do PLN-001 não lê o mapa (R12.4):** o app genérico não depende de arquivo do workspace, e o P64 acha a aba
+  pelo que o app guarda.
 
 #### O `--json`, estável para o roteador
 
 ```text
 list   {"sessions": [{"name": str|null, "title": str, "chat": "claude_…", "claude_session": str|null,
-                      "worktree": str, "state": str|null}]}
+                      "worktree": str, "state": str|null, "source": "map"|"transcript"|null,
+                      "opened": str|null}]}
 send   {"sent": true, "name", "chat"}
+title  {"titled": true, "name", "chat", "title"}
 close  {"closed": true, "name", "chat"}  ·  saída 1: {"closed": false, "name", "chat", "state"}
 erro   saída 1: {"error": "<motivo>"}, no nome ausente, no repetido e no app que não responde
 ```
 
-- **Descartada — o registro nome e id gravado pelo `open`.** O `providerSession.id` do `agentSession.history` e o
-  `custom-title` do transcript dão o par sem arquivo novo, também para o chat aberto à mão (R9.1).
-- **Descartada — achar pelo título da aba.** O título é o nome do app, do `agentSession.rename`, e não o do `/rename`.
+O `source` e o `opened` são novos (R12.2); o resto é o contrato do P7, sem mudança.
+
+#### A conferir no P9
+
+- O `agentSession.rename` logo depois do `brza agent launch`: o handler sai com `agent_session_identity_required` quando
+  o host não tem a identidade do chat (`structured-agent-session-rename.ts:15-22`), que talvez só exista depois do
+  primeiro turno.
+- O `brza agent launch --surface chat` sem `--prompt`, quando a abertura não traz tarefa.
+- Quando o `providerSession.id` aparece no `agentSession.history` de um chat sem prompt.
+- O título trocado pelo `agentSession.rename` no `title` do `listAll`, como a R9 mediu.
+- O `from=` do correio de uma sessão sem `/rename`, para a linha que vai ao `Retomar` do PLN-001.
+
+- **Descartada — achar pelo título da aba.** O título é o nome do app, do `agentSession.rename`, e não o do `/rename`; e
+  o título com espaço e dois-pontos não serve de chave (R11.4).
 - **Descartada — a trava no `send` (R9.3).** Entrou em `brza-workspace@9daa020` e saiu em `88d8a3a`, com a trava
   desligada (R10.1).
+- **Descartada — o mapa em JSON, um objeto por nome (R12.1).** O JSONL só de acréscimo guarda o histórico.
+- **Descartada — o mapa no `userData` do app, lido pelo P64 (R12.4).** O dev build teria outro mapa, e o app genérico
+  passaria a ler arquivo do workspace.
 
 ## D8 — O `brza doctor` — `scripts/brza/brza-doctor` (P8)
 

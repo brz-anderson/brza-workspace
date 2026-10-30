@@ -1,12 +1,12 @@
 ---
-status: in_review
-phase: review
+status: in_progress
+phase: execution
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: sim — todo passo feito; falta a revisão da entrega
-estimate_h: 18
+ready: sim — o P9 espera a autorização de Anderson; a revisão da entrega vem depois dele (R11.2)
+estimate_h: 20.5
 executed_h: 2.9
-remaining_h: 0.0
+remaining_h: 2.5
 scope:
   - workspace
   - brza-studio
@@ -18,9 +18,10 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** o P0 ao P8 estão feitos; o último, o P7, em `brza-workspace@9daa020` e `88d8a3a`, com o C3 passado.
-  Vem a revisão da entrega, em sessão nova, pela "Pedir a revisão da entrega" da plan-runner. O X3 tem fonte agora
-  (ver o worklog do P7), sem passo para ela.
+- **Retomar:** o pedido 8 entrou em 2026-10-29, com a R11 a R13, o D7 reescrito no lugar e o P9: o `/rename` opcional
+  no `brza sessions`, o título da aba e o mapa de sessões. O P9 espera a autorização de Anderson e roda na sessão
+  `pln-002-sessions-rename`, começando pela combinação (P9.1). Depois dele, a revisão da entrega do P0 ao P9, numa
+  revisão só (R11.2). O X3 tem fonte (ver o worklog do P7), sem passo para ela.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -42,7 +43,13 @@ Os itens da issue, numerados para a Cobertura:
 4. `brza doctor`;
 5. `brza sessions list|send|close`;
 6. `brza note new|commit`;
-7. `brza app install`.
+7. `brza app install`;
+8. o `/rename` opcional no `brza sessions` e o mapa de sessões, o pedido abaixo.
+
+"tornar o /rename opcional no `brza sessions`, que vem desabilitado por padrão, o comando deve apenas nomear a aba no
+app - ex: "PLN-002 P7: renomear chat" | "PLN-001: Coordenador" | "MIG-001: rebrand" | "ADR-002: tema do chat" - e gravar
+num mapa de sessões, que pode ser usado pelo orquestrador/coordenador" — Anderson, na sessão do `brza-workspace` que
+conduz o PLN-001, em 2026-10-29; entrou pela R11.1, na sessão `pln-002-sessions-rename`.
 
 ### Cobertura
 
@@ -58,6 +65,11 @@ Os itens da issue, numerados para a Cobertura:
 | `Pedido 7` | `brza app install` constrói da `origin/master`, pergunta, recusa com o app aberto sem `--yes` e instala      | P5    | `test_brza_app.py` (unidade); C2 (manual)             |
 | `Pedido 6` | `brza note new` cria o esqueleto do gênero; `note commit` barra o erro do checador e commita por caminho     | P6    | `test_brza_note.py` (unidade)                         |
 | `Pedido 5` | `brza sessions list`, `send` e `close` acham o chat pelo nome; o `close` não usa `--resume`                  | P7    | `test_brza_sessions.py` (unidade); C3 (manual)        |
+| `Pedido 8` | `brza sessions open` sem `--rename` não manda o `/rename`, nomeia a aba pelo `--title` ou pelo `<nome>` e grava o `open` no mapa | P9 | `test_brza_sessions.py` (unidade); C5 (manual) |
+| R12.3      | `list`, `send` e `close` acham o nome pelo mapa e, sem entrada, pelo `/rename` do transcript; o `open` pula o nome aberto | P9 | `test_brza_sessions.py` (unidade) |
+| R12.2      | o `list --json` traz o `source` e o `opened`, e o resto do contrato do P7 fica igual                          | P9    | `test_brza_sessions.py` (unidade)                     |
+| R13.2      | o `--wait` sem `--rename` espera o `claude_session` e o grava; com ele, espera também o nome                 | P9    | `test_brza_sessions.py` (unidade)                     |
+| R13.3      | `brza sessions title` troca o título da aba e grava a linha `title`                                          | P9    | `test_brza_sessions.py` (unidade); C5 (manual)        |
 | `Pedido 4` | `brza doctor` sai com 1 quando falta identidade, medição, link ou override, e diz o comando que conserta     | P8    | `test_brza_doctor.py` (unidade); C4 (manual)          |
 
 ### Fora de escopo
@@ -296,10 +308,35 @@ Estimado: 2 h · Executado: 0,4 h
 - `brza doctor` no chat → saída 0, tudo `ok`; num ambiente limpo (`env -i HOME PATH`) → saída 1, com o ERRO de medição
   e o conserto. O C4, na linha dele em `## Casos manuais`.
 
+### P9 — O `/rename` opcional, o título da aba e o mapa de sessões (pedido 8)
+
+Executa D7, na parte do pedido 8 · executor: sessão `pln-002-sessions-rename`, só com a autorização de Anderson
+
+Estimado: 2,5 h · Executado: — h
+
+- [ ] **1. A combinação:** os pontos "A conferir no P9" do D7, contra o app aberto, com um chat de prova fechado no fim.
+  Uma divergência do D7 volta à Entrevista antes do código.
+- [ ] **2. Testes que falham**, no `test_brza_sessions.py`, com o mapa num diretório temporário: o `open` sem
+  `--rename` (sem `/rename` no `launch`, o `agentSession.rename` com o `--title` ou o `<nome>`, a linha `open`); o
+  `--rename`, com o `/rename` de hoje; o `--wait` nos dois modos e no prazo vencido; o `open` que pula o nome aberto
+  pelo mapa; o `list` com `source` `map` e `transcript` e o `opened`; o `send` e o `close` pelo mapa; o `close` e o
+  `title` gravando a linha deles; a dobra com o nome reaberto depois de um `close`.
+- [ ] **3. Implementar** no `scripts/brza/brza-sessions`; o `.sessions/` no `.gitignore`; a ajuda com a regra do
+  correio (R13.4).
+- [ ] **4. Rodar e ver passar** — `python3 -m unittest discover -s scripts/brza/tests` —, e o C5 com Anderson.
+- [ ] **5. O texto de fora do script:** a memória de abrir sessão pelo `brza sessions` ganha o `--rename` para a sessão
+  de correio (R13.4); o `Retomar` do PLN-001 ganha a linha do `--rename` desligado e do P64 sem o mapa (R12.4), com o
+  `from=` medido no P9.1.
+- [ ] **6. Commit** — `feat(brza): o /rename opcional, o título da aba e o mapa de sessões (PLN-002/P9)`.
+
+**Evidência:** —
+
 ## Regressão
 
 - **O `brza-run`, o `brza-sessions open` e o `brza-install --chat-command` seguem iguais.** Como se confere:
   `python3 -m unittest discover -s scripts/brza/tests`, com os 21 testes de hoje entre os que passam, a cada passo.
+- **O `open` de hoje segue com o `--rename`.** As chamadas com `--wait` e sem `--rename` passam a esperar o
+  `claude_session`, e não o nome (R13.2). Como se confere: os casos do `open` no `test_brza_sessions.py`.
 - **Os links de hoje em `~/.local/bin` seguem `ok`.** Como se confere: `brza install`, depois do P1 e de cada passo.
 
 ## Desvios
@@ -346,10 +383,14 @@ Estimado: 2 h · Executado: 0,4 h
 | C1  | `Pedido 2`: o dev build sobe e para pelo `brza`  | `brza tree c1-prova`; `brza dev` nele; usar; `brza dev --stop`                               | janela visível com o chat ligado; o `--stop` fecha e libera     | 2026-10-28, `pln-002-p3`: o build subiu visível no pid 82861; "Sim, janela e chat ok" e "Sim, fechou", de Anderson | passou |
 | C2  | `Pedido 7` e `Pedido 0`: o app reinstalado       | app fechado; num terminal, `brza-app install`; abrir o app; `brza sessions --help` no chat e no terminal | o app abre na versão nova; a ajuda do `brza-sessions` responde nos dois | 2026-10-28, `pln-002-p5`: o app abriu na `…fb7eb5a90827`, a `origin/master`; a ajuda respondeu no terminal, colada por Anderson, e no chat, pelo `brza` do app | passou |
 | C3  | `Pedido 5`: o `close` fecha o chat por nome      | `brza sessions open c3-prova`; `brza sessions list`; `brza sessions close c3-prova`          | o chat some da lista e da tela, sem aba órfã                    | 2026-10-29, `pln-002-p7`: o `send` chegou, "Sim, respondeu ok"; o `close` no turno saiu 1; depois saiu 0, sumiu do `list` e do `listAll`, e "Sim, sumiu", de Anderson | passou |
+| C5  | `Pedido 8`: a aba nomeada e o mapa             | `brza sessions open c5-prova --title "PLN-002 P9: prova"`; `brza sessions list`; `brza sessions title c5-prova "PLN-002 P9: outra"`; `brza sessions send c5-prova "responda ok"`; `brza sessions close c5-prova` | a aba com o título, sem `/rename` no chat; o `list` com `c5-prova` e `source` `map`; o título trocado; a resposta; o chat some | — | — |
 | C4  | `Pedido 4`: o `doctor` no chat e no terminal     | `brza doctor` num chat do app e num terminal sem a função `claude`                           | 0 no chat; no terminal, os erros com o comando que conserta     | 2026-10-28, `pln-002-p8`: 0 no chat, tudo `ok`; no terminal, "Como o esperado", de Anderson: saída 1 com o ERRO de medição e o conserto | passou |
 
 ## Worklogs
 
+- 2026-10-29 — o pedido 8, o `/rename` opcional e o mapa de sessões: a R11 a R13, o D7 reescrito, o P9 e o C5, sem
+  código. A R9.1 e a R9.2 reabertas. O P9 espera a autorização de Anderson.
+  [O PLN-002, pedido 8: o /rename opcional e o mapa de sessões, desenhados](../../work/worklogs/2026-10-29-pln-002-pedido-8-o-mapa-de-sessoes.md)
 - 2026-10-29 — P7, o `brza sessions list|send|close`, em `brza-workspace@9daa020` e `88d8a3a`, com o C3 passado; a
   R5.2 reaberta pela PLN-003/R6.1, a R9 na combinação do D7, a R10 tirando a trava do `send`, X11. Nada travou; o
   plano vai à revisão.

@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: "sim — o P59 e o P60 do pedido 31, em execução, o P62 ao P64 do pedido 32 e o P66 do pedido 33, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
 estimate_h: 164.6
-executed_h: 20.1
-remaining_h: 33.4
+executed_h: 21.0
+remaining_h: 29.4
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -19,14 +19,14 @@ tags:
 - **Retomar:** o pedido 31 entrou em 2026-10-29, com a R48 e a R49, o D45 ao D47 e o P58 ao P61, e o pedido 32 no
   mesmo dia, com a R50 e a R51, o D48 ao D50 e o P62 ao P65. O P58 fechou em `brza-studio@9c7fcdebbb0`, com o
   resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`; rodam em paralelo, autorizados por
-  Anderson, o P59 e o P60, nas sessões `pln-001-p59` e `pln-001-p60`, cada uma no seu worktree, e o P62 ao P64, na
-  sessão `pln-001-pedido-32`; o P66 do pedido 33, na sessão `pln-001-pedido-33`, noutro worktree. Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
+  Anderson, o P59 e o P60, nas sessões `pln-001-p59` e `pln-001-p60`, cada uma no seu worktree, e o P63 e o P64, na
+  sessão `pln-001-pedido-32`, depois do P62, fechado em `brza-studio@21f9cfe90bb`; o P66 do pedido 33, na sessão `pln-001-pedido-33`, noutro worktree. Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
   C17 depois do P60 o C18 ao C20 depois do P64 e o C21 depois do P66), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
   sessão entra no correio com o nome automático `brza-workspace-<hex>`. O P64 não lê o mapa de sessões do PLN-002 e
   casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
   `<cross-session-message from="uds:/tmp/cc-socks/60775.sock" from-name="brza-workspace-5b" from-mode="prompting">`,
-  com o `origin.name` na linha do JSONL; o nome está no `from-name=`, e não no `from=` do `<agent-message>` do D48.
+  com o `origin.name` na linha do JSONL; o nome está no `from-name=`, e não no `from=` do `<agent-message>` do D48; o P62 lê os dois (X34).
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
@@ -2048,21 +2048,58 @@ Depois do P59 e do P60.
 
 Executa D48 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-32`
 
-Estimado: 4 h · Executado: — h
+Estimado: 4 h · Executado: 0,9 h
 
 Primeiro do pedido 32; em paralelo com o pedido 31 (R51.2).
 
-- [ ] **1.** Teste que falha, junto de `transcript-reader.test.ts`: o turno `isMeta` com "Another Claude session sent a
+- [x] **1.** Teste que falha, junto de `transcript-reader.test.ts`: o turno `isMeta` com "Another Claude session sent a
       message:" e `<agent-message from="revisor">oi</agent-message>` vira uma mensagem do usuário com o `from` do
       remetente "revisor" e o texto "oi", sem o envelope; o de "[Subagent hand-back]" vira o mesmo, marcado como
       devolução; os outros turnos `isMeta` seguem descartados
-- [ ] **2.** O leitor do BrzA, ligado por uma linha no `transcript-line-decoders-claude.ts:108`, e o mesmo no caminho
+- [x] **2.** O leitor do BrzA, ligado por uma linha no `transcript-line-decoders-claude.ts:108`, e o mesmo no caminho
       ao vivo; o rótulo "Mensagem de" e o "Devolução de" no `pt.json` e no `en.json`. Os pontos "A conferir no passo"
       do D48
-- [ ] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C18
 
-**Evidência:** —
+**Evidência:** commit [`21f9cfe90bb`](https://github.com/brz-anderson/brza-studio/commit/21f9cfe90bb), na `master` do
+`brza-studio`, pela sessão `pln-001-pedido-32`, no worktree `.worktrees/pln-001-pedido-32`, autorizada por Anderson em
+2026-10-29 ("Agora, em paralelo", R51.2). O leitor é o `src/main/native-chat/brza/brza-claude-peer-message.ts`: lê
+primeiro o `origin` da linha (`kind: 'peer'`, `name`, `body`, `senderTaskId`) e, sem ele, o
+`<agent-message from="…">` e o `<cross-session-message from="…" from-name="…">`, ambos depois de "Another Claude session
+sent a message:" e só com a tag de fechamento (X34). A devolução é o corpo que abre com "[Subagent hand-back]": fica só o
+relatório depois de "The report follows:", sem o recuo de dois espaços do harness. O remetente vai num
+`AgentMessageSource` do upstream, com o tipo no endereço — `claude-peer:` ou `claude-hand-back:` —, em
+`src/shared/native-chat/brza/brza-claude-peer-sender.ts` (X35).
+
+**As ligações.** No `transcript-line-decoders-claude.ts`, uma chamada antes do descarte do `isMeta`; no
+`journal-legacy-import.ts`, o `legacyItemBody` passa a levar o `from` (X36); no caminho ao vivo, o
+`claude-message-journaling.ts` grava a mesma linha, com a mesma identidade, no escopo da thread. Na linha do remetente
+(`NativeChatAgentMessageSenders.tsx`), o "Hand-back from" quando todo remetente é devolução, e o nome sem botão para o
+remetente do Claude Code (X37). O `handBackFrom` entrou no `en.json` ("Hand-back from") e no `pt.json` ("Devolução de");
+o `messageFrom` do `pt.json` já existia.
+
+**A conferir no passo (D48).** O caminho ao vivo: o chat sobe o `claude` com `--replay-user-messages`
+(`claude-structured-launch-resolution.ts:76`), e o eco do turno passa pelo `journalClaudeMessage`, que descartava todo
+texto de usuário; se o CLI ecoa o turno `isMeta` do correio, só o C18 mostra. O tipo devolução: no endereço, sem mudar o
+contrato do upstream (X35).
+
+**Os testes.** O `brza-claude-peer-message.test.ts`, com 5 casos: o `<agent-message>`, o `<cross-session-message>` com e
+sem `origin`, a devolução com e sem `origin`, os outros `isMeta` descartados, e o `from` na linha do journal pela
+importação e pelo eco ao vivo. O `brza-claude-peer-sender.test.tsx`: o "Message from", o "Hand-back from" e o nome sem
+botão. Antes do leitor, 3 dos 4 primeiros casos falharam pela asserção. O caso de `transcript-reader.test.ts:107`, do
+upstream, segue intacto e passa. Depois do rebase em `9c7fcdebbb0`:
+`node config/scripts/run-vitest.mjs run --config config/vitest.config.ts` sobre os testes do P62, do leitor, da tradução
+ao vivo, da importação, das linhas do remetente e do i18n → 16 arquivos, 101 passed.
+
+`pnpm check:changed --base=origin/master --maxWorkers=2` → 22 de 26, em 1514 s. O format, nos três arquivos novos, saiu
+no `oxfmt` antes do commit. Os outros três vermelhos são preexistentes: o typecheck, só em
+`src/main/updater/updater-enabled.test.ts:20`, do `8e708f9790d` (P26.4); o import boundaries, na issue das Pendências; e
+5 testes em 3 arquivos — `runtime-workspace-launch-contracts.test.ts`, `open-uncommitted-entry.test.ts` e
+`cross-version-agent-session-wire.unit.test.ts` —, que falham igual num worktree da `origin/master` em `9c7fcdebbb0`. O
+`claude-stop-ack-race.test.ts` também falha sem o P62 (4 de 4).
+
+Desvios X34 ao X37. A conferência no app é o C18, com o P65.
 
 ### P63 — O cartão do Orca para as mensagens entre agentes (pedido 32)
 
@@ -2258,6 +2295,17 @@ da linha quando o teste entra.
   `src/shared/native-chat-theme.test.ts`; o `resolveNativeChatThemePair` e o `ChatThemePairPicker`, com `disabled`,
   servem ao par próprio do Markdown (P60); o "Tema claro separado" é um interruptor direto, e não o "Match dark mode"
   invertido do terminal; afeta P58.
+- **X34 — O correio de hoje vem no `<cross-session-message>`, com o `origin` na linha, e o nome no `from-name=`.** O
+  D48 esperava o `<agent-message from="…">`, que segue só na devolução, com o ID do subagente. O leitor lê o `origin`
+  primeiro e os dois envelopes depois, só com a tag de fechamento; o nome da devolução é o `origin.name`, o tipo do
+  subagente (`general-purpose`), e o ID só sem `origin`. Medido em 286 linhas dos transcripts locais e no PLN-002/P9.1;
+  afeta P62 e D48.
+- **X35 — O tipo devolução vai no endereço do remetente, e não num campo.** O `AgentMessageSource` do upstream não
+  muda: o endereço é `claude-peer:<socket>` ou `claude-hand-back:<tarefa>`; afeta P62, e o D48 não muda.
+- **X36 — O `legacyItemBody` do upstream ganhou o `from`.** Sem ele, a importação do transcript para o journal perdia o
+  remetente; uma linha em `journal-legacy-import.ts`; afeta P62.
+- **X37 — No P62, o nome do remetente do Claude Code é texto, sem botão.** O `openAgentMessageSender` não acha a sessão
+  pelo endereço do BrzA; o clique entra no P64; afeta P62.
 
 ## Worklogs
 
@@ -2362,6 +2410,8 @@ da linha quando o teste entra.
   `pln-001-p60`. Vermelhos preexistentes no check: `updater-enabled.test.ts` e `open-uncommitted-entry.test.ts`.
 - 2026-10-29 — [O pedido 33 do PLN-001, o "Pensou" como o "Perguntou"](../../work/worklogs/2026-10-29-pln-001-pedido-33-pensou-como-perguntou.md):
   o pedido 33, a R52, o D51 e o P66, sem código; o P66 em paralelo com os pedidos 31 e 32.
+- 2026-10-29 — [O P62 ao P64 do PLN-001, as mensagens entre sessões no chat](../../work/worklogs/2026-10-29-pln-001-p62-a-p64-mensagens-entre-sessoes.md):
+  o P62 em `brza-studio@21f9cfe90bb`, com os X34 ao X37.
 
 ## Decisões
 

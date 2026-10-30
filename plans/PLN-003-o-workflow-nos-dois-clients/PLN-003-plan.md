@@ -20,6 +20,10 @@ tags:
 - **Mudou a norma (2026-10-29):** a trava de retomada saiu, e a sessão passou a ser por frente, não por tarefa
   ([Uma sessão por frente de trabalho, sem trava de retomada e com o cache de 1 h](../../work/decisions/uma-sessao-por-frente-e-sem-trava-de-retomada.md)). O Desenho ainda conta com a
   trava no roteador (M2) e na tabela de conflitos (`PLN-003-design.md:181-182`): ajustar antes dos itens `D`.
+- **Mudou a norma (2026-10-30):** as notas saíram da `master`, que guarda só a norma, para as branches
+  `workstream/<nome>`, com worktree em `.worktrees/<nome>`, e o `brza note` ganhou o `workstream` e o `sync`
+  ([As notas moram em workstreams, e a `master` guarda só a norma](../../work/decisions/as-notas-moram-em-workstreams-e-a-master-guarda-so-a-norma.md)).
+  O Desenho que conta com as notas na `master` ou com o `brza note` de antes se ajusta antes dos itens `D`.
 - **Dividido:** [PLN-003 — Entrevista](PLN-003-interview.md) · [PLN-003 — Desenho](PLN-003-design.md)
 
 ## Pedido

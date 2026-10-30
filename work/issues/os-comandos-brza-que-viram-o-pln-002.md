@@ -1,15 +1,20 @@
 ---
-status: open
+status: done
 scope:
   - workspace
   - brza-studio
 opened: 2026-10-28
+completed: 2026-10-29
 priority: medium
 tags:
   - tooling
 ---
 
 # Os comandos `brza` que viram o PLN-002
+
+**Resolvida em 2026-10-29** pelo
+[PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`](../../plans/PLN-002-os-comandos-brza/PLN-002-plan.md),
+fechado com os oito comandos, o despacho do P0, o pedido 8 e as correções da revisão.
 
 Em 2026-10-28, a sessão `brza-comandos-lacunas` levantou os passos manuais que se repetem entre sessões e que um
 `brza <sub>` resolveria. Anderson escolheu em duas rodadas os que entram. Eles serão executados num plano, o PLN-002, com

@@ -592,3 +592,27 @@ Respondida em 2026-10-29, na sessão `pln-002-sessions-rename`.
    - issue. Custo: 0,1 h agora; o esqueleto segue com `<a escrever>`. Se paga: se o `brza note new` for pouco usado.
 
    **Decidido — corrigir aqui, no P10.**
+
+### Rodada 16 — o Fechamento (enviada 2026-10-29)
+
+**Apresentado antes:** o P0 ao P10 com evidência, os seis achados com destino, nada a publicar fora do git, e a
+`## Documentação` e o `wiki/guides/` vazios.
+
+Respondida em 2026-10-29, na sessão `pln-002-sessions-rename`.
+
+1. **Onde fica o "como usar" dos comandos `brza`?** Opções:
+   - na ajuda dos scripts, com a `## Documentação` apontando a ajuda e o `CLAUDE.md` (recomendada). Custo: nenhum; sem
+     índice fora do `--help`. Se paga: agora;
+   - um guia em `wiki/guides/`. Custo: ~0,3 h e um texto a manter. Se paga: quando se procurar um comando sem saber o
+     nome.
+
+   **Decidido — na ajuda dos scripts.**
+
+2. **Alguma rodada vira nota de `work/decisions/`?** Opções:
+   - nenhuma; a casa dona da interface é a ajuda (recomendada). Custo: nenhum. Se paga: agora;
+   - a R13.4, o `--rename` para o correio. Custo: ~0,2 h. Se paga: quando outro runtime, que não lê a memória, abrir
+     sessão pelo `brza sessions`.
+
+   **Decidido — a R13.4.** O texto da nota foi aprovado com "2.1", à opção "Decidido, pode gravar (Recomendado)",
+   com o texto inteiro na mensagem. A primeira aprovação, na caixa de perguntas, foi dada sem o texto à vista
+   ("o texto não está aparecendo no chat, pra mim poder ler pra decidir") e desfeita antes do push.

@@ -1,9 +1,9 @@
 ---
-status: in_review
-phase: review
+status: done
+phase: closed
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: sim — todo passo feito e todo achado com destino; falta o Fechamento
+ready: sim — fechado
 estimate_h: 22.6
 executed_h: 3.5
 remaining_h: 0.0
@@ -11,6 +11,7 @@ scope:
   - workspace
   - brza-studio
 opened: 2026-10-28
+completed: 2026-10-29
 owner: Anderson
 tags:
   - tooling
@@ -18,9 +19,8 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** o P0 ao P10 estão feitos; o último, o P10, com as correções da revisão, em `brza-workspace@82ff848`.
-  Todo achado tem destino: o A1 ao A4 e o A6 no P10, o A5 na issue. Vem o Fechamento, pela `references/close.md` da
-  plan-runner.
+- **Retomar:** fechado em 2026-10-29. O P0 ao P10 estão feitos, a revisão fechou com todo achado com destino, e a
+  R13.4 virou decisão. Pendente fora do plano: a issue do A5, em `## Pendências conhecidas`.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -431,6 +431,8 @@ Estimado: 2,1 h · Executado: 0,3 h
 
 ## Worklogs
 
+- 2026-10-29 — o Fechamento: a R16, a nota de decisão da R13.4, a `## Documentação` e a issue de origem fechada.
+  [O PLN-002 fechado](../../work/worklogs/2026-10-29-pln-002-fechado.md)
 - 2026-10-29 — P10, as correções do A1 ao A4 e do A6, em `brza-workspace@82ff848`. Nada travou; falta o Fechamento.
   [O PLN-002/P10: as correções da revisão](../../work/worklogs/2026-10-29-pln-002-p10-as-correcoes-da-revisao.md)
 - 2026-10-29 — a revisão da entrega do P0 ao P9, por um subagente da camada alta: seis achados, a R14 e a R15 com os
@@ -471,6 +473,18 @@ Estimado: 2,1 h · Executado: 0,3 h
   aceito na R7.4.
   [O PLN-002 escrito: os comandos brza, com as rodadas de desenho](../../work/worklogs/2026-10-28-pln-002-comandos-brza.md)
 
+## Decisões
+
+- [A sessão que conversa por correio abre com o `--rename`](../../work/decisions/a-sessao-de-correio-abre-com-rename.md)
+  — `done`, decidida em R13.4 e gravada no Fechamento (R16.2).
+
+## Documentação
+
+- A ajuda dos scripts de `scripts/brza/` (`brza_runtime.py`, `brza-install`, `brza-tree`, `brza-dev`, `brza-test`,
+  `brza-app`, `brza-note`, `brza-sessions`, `brza-doctor`), a docstring que o `--help` mostra — escrita do P1 ao P10;
+  é a casa dona do "como usar" (R16.1).
+- `CLAUDE.md`, o `brza install` no lugar do `brza-install` — emendado em P5, em `brza-workspace@e67a3c0`.
+
 ## Revisões
 
 - [REV: a entrega do PLN-002, do P0 ao P9](../../work/reviews/pln-002-os-comandos-brza.md) — 2026-10-29, a revisão
@@ -485,7 +499,8 @@ Estimado: 2,1 h · Executado: 0,3 h
 
 ## Fechamento
 
-- [ ] Todo passo `[x]` com evidência, ou `[-]` com motivo.
-- [ ] Todo achado com destino que existe.
-- [ ] O durável saiu para a casa dona e está em `## Documentação`: a ajuda dos scripts e o `CLAUDE.md`.
-- [ ] `status: done`, `phase: closed` e `completed` no frontmatter.
+- [x] Todo passo `[x]` com evidência, ou `[-]` com motivo.
+- [x] Todo achado com destino que existe.
+- [x] O durável saiu para a casa dona e está em `## Decisões` e `## Documentação`: a ajuda dos scripts, o `CLAUDE.md` e
+  a nota da R13.4.
+- [x] `status: done`, `phase: closed` e `completed` no frontmatter.

@@ -2655,9 +2655,9 @@ da linha quando o teste entra.
 
 Notas de decisão do workspace da projeto-externo, ao lado deste clone:
 
-- [O Orca da projeto-externo substitui o original, sem atualizador, sincroniza por tag e guarda o código da projeto-externo em pasta própria](../../../projeto-externo/work/decisions/orca-da-projeto-externo-substitui-o-original-e-sincroniza-por-tag.md)
+- O Orca da projeto-externo substitui o original, sem atualizador, sincroniza por tag e guarda o código da projeto-externo em pasta própria, no workspace da projeto-externo: `work/decisions/orca-da-projeto-externo-substitui-o-original-e-sincroniza-por-tag.md`
   — PLN-025/R10 da projeto-externo, `done`.
-- [O orca-dev commita com o noreply do brz-anderson, pela chave personal, com push direto na main](../../../projeto-externo/work/decisions/orca-dev-commita-como-brz-anderson-com-push-na-main.md)
+- O orca-dev commita com o noreply do brz-anderson, pela chave personal, com push direto na main, no workspace da projeto-externo: `work/decisions/orca-dev-commita-como-brz-anderson-com-push-na-main.md`
   — PLN-025/R14 da projeto-externo, `done`.
 
 ## Pendências conhecidas

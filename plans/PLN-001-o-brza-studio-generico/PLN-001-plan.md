@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P59 do pedido 31, em execução, o P62 ao P64 do pedido 32 e o P66 do pedido 33, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
+ready: "sim — o P62 ao P64 do pedido 32 e o P66 do pedido 33, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
 estimate_h: 164.6
-executed_h: 22.5
-remaining_h: 21.4
+executed_h: 24.0
+remaining_h: 17.4
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -18,9 +18,9 @@ tags:
 
 - **Retomar:** o pedido 31 entrou em 2026-10-29, com a R48 e a R49, o D45 ao D47 e o P58 ao P61, e o pedido 32 no
   mesmo dia, com a R50 e a R51, o D48 ao D50 e o P62 ao P65. O P58 fechou em `brza-studio@9c7fcdebbb0`, com o
-  resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`, e o P60 em `brza-studio@a44e84add32`, com
-  a R53 e os X38 ao X40; rodam em paralelo, autorizados por Anderson, o P59, na sessão `pln-001-p59`, no seu worktree,
-  e o P63 e o P64, na
+  resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`, o P60 em `brza-studio@a44e84add32`, com a
+  R53 e os X38 ao X40, e o P59 em `brza-studio@697ee59c0bf`, com os X41 ao X44: o pedido 31 espera só o P61 e o C15
+  ao C17, num build, com Anderson. Rodam em paralelo, autorizados por Anderson, o P63 e o P64, na
   sessão `pln-001-pedido-32`, depois do P62, fechado em `brza-studio@21f9cfe90bb`; o P66 do pedido 33, na sessão `pln-001-pedido-33`, noutro worktree. Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
   C17 depois do P60 o C18 ao C20 depois do P64 e o C21 depois do P66), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
@@ -2014,20 +2014,47 @@ testes unitários, pelos 2 casos de `open-uncommitted-entry.test.ts` (`'preview'
 
 Executa D46 · executor: sessão do `brza-studio`
 
-Estimado: 4 h · Executado: — h
+Estimado: 4 h · Executado: 1,5 h
 
 Depois do P58; não depende do P60.
 
-- [ ] **1.** Teste que falha, junto de `terminal-theme.test.ts`: com o "Seguir o chat" ligado, o tema do xterm tem o
+- [x] **1.** Teste que falha, junto de `terminal-theme.test.ts`: com o "Seguir o chat" ligado, o tema do xterm tem o
       fundo do canvas do chat e as cores ANSI do tema do chat, e a fonte e o tamanho do terminal; desligado, o tema de
-      hoje, com os overrides e a opacidade
-- [ ] **2.** O campo do interruptor nas configurações globais, ligado por padrão; a escolha do tema em
+      hoje, com os overrides e a opacidade — 2 casos em
+      `src/renderer/src/components/terminal-pane/terminal-appearance.test.ts`, onde o harness do xterm já estava: o
+      "Padrão do BrzA" dá `#161616` com as ANSI do Ghostty, o Dracula do chat dá o fundo e o vermelho dele, a opacidade
+      vale por cima, e a fonte e o tamanho são os do terminal; antes → 1 failed | 30 passed, pelo fundo do tema próprio;
+      depois → 31 passed. Mais 1 caso em `terminal-theme.test.ts`, do modo e do divisor (X41)
+- [x] **2.** O campo do interruptor nas configurações globais, ligado por padrão; a escolha do tema em
       `terminal-theme-selection.ts` e a aplicação em `terminal-appearance.ts` lendo o resolvedor do P58; o interruptor
-      em `TerminalThemeSections.tsx`, com o seletor de hoje desabilitado enquanto ligado
-- [ ] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push. A conferência no
-      app é o C16
+      em `TerminalThemeSections.tsx`, com o seletor de hoje desabilitado enquanto ligado — o `terminalFollowsChatTheme`
+      (X44); o `resolveTerminalChatTheme`, em `src/shared/terminal-chat-theme.ts`, lido pelo
+      `resolveEffectiveTerminalAppearance`, por onde passam o `applyTerminalAppearance` e as outras superfícies (X43); o
+      "Seguir o chat" em `TerminalThemeSections.tsx`, com o `ThemePicker` inerte e o "Match dark mode" desabilitado,
+      e o caso dele em `TerminalThemeSections.lifecycle.test.ts` — `brza-studio@697ee59c0bf`
+- [x] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push. A conferência no
+      app é o C16 — os 9 diretórios que leem o tema do terminal e as configurações → 5 failed | 3563 passed, em
+      arquivos, com 20 casos vermelhos: 19 do tema próprio do upstream, ajustados (X44), e 1 preexistente em
+      `runtime-environment-store.test.ts` (o "this Orca itself" do rebrand); depois do rebase sobre o P60 e o P62, 803
+      arquivos → 7492 passed; o check, abaixo
 
-**Evidência:** —
+**Evidência:** commit [`697ee59c0bf`](https://github.com/brz-anderson/brza-studio/commit/697ee59c0bf), na `master` do
+`brza-studio`, pela sessão `pln-001-p59`, autorizada por Anderson em 2026-10-29, na sessão do `brza-workspace` que
+gravou o pedido 31 ("e já execute os passos em paralelo"). O resolvedor do P58 não mudou.
+
+**Como ficou.** Ligado, o tema do xterm é o `palette` do `resolveNativeChatTheme` com o `background` trocado pelo
+`canvas`; o `composeActiveTerminalTheme` aplica por cima os overrides e a opacidade, como antes. A fonte, o tamanho, o
+peso e a altura de linha continuam do terminal. Desligado, nada muda. A semente do OSC 10/11 no main, antes de o
+renderer publicar, usa o `resolveSavedTerminalColors`, que segue o chat do mesmo jeito. As traduções novas entraram no
+`en` e no `pt`, e a busca das configurações acha o "Seguir o chat". O mobile recebe o tema pelo
+`resolveMobileTerminalTheme`, que lê a mesma função, e não ganha o interruptor.
+
+**O check.** O `pnpm check:changed --base=origin/master --maxWorkers=2` deu 21 de 26, em 1781 s. O oxlint e o gate de
+qualidade apontaram um `as () => void` num teste novo, trocado por checagem de tipo antes do commit
+(`check-changed-code-quality.mjs` → passed; `oxlint` → exit 0). Os outros três vermelhos são os do P58 e do P60, já na
+`master` sem esta mudança: o typecheck, por `src/main/updater/updater-enabled.test.ts:20`; o import boundaries, pelo
+`external-subcommand.ts`; e os testes unitários, pelos 2 casos de `open-uncommitted-entry.test.ts` e pelos 2 de
+`cross-version-agent-session-wire.unit.test.ts`, que dão 4 failed | 43 passed num worktree limpo da `origin/master`.
 
 ### P60 — O visualizador de Markdown segue o chat (pedido 31)
 
@@ -2366,6 +2393,21 @@ da linha quando o teste entra.
   `normalizeNativeChatThemePair` serve ao chat e ao Markdown; o `sanitizeChatThemeSettingsUpdate` junta os dois no main
   e no store, porque o `settings-update.ts` bate no limite de 300 linhas. O contrato do resolvedor não mudou. Afeta P60.
 
+- **X41 — O modo e o divisor do terminal seguem o esquema do tema do chat, e não o modo do app.** Com um tema claro do
+  catálogo no app escuro, o terminal diz "claro" aos TUIs (modo 2031) e usa o divisor claro; no "Padrão do BrzA", os
+  dois coincidem. O D46 não fixava; afeta P59.
+- **X42 — A frente do terminal é a do tema do chat, sem a mistura do contraste.** O contraste do chat clareia ou
+  escurece o texto do chat, e não o do terminal, que tem o piso de contraste próprio; o "com o contraste" do D46 ficou
+  no canvas. Afeta P59.
+- **X43 — Seguir o chat vale em toda superfície de terminal, e não só no painel.** A troca entrou no
+  `resolveEffectiveTerminalAppearance`, que o painel, a prévia das configurações, a prévia do agente, o SSH simples, a
+  barra lateral em "igualar ao terminal" e o tema do terminal do mobile leem, e a semente do OSC 10/11 no main também
+  segue. Afeta P59.
+- **X44 — O campo é o `terminalFollowsChatTheme`, no `NativeChatGlobalSettings`, e os testes do tema próprio o
+  desligam.** Fica fora do `global-settings-types.ts`, como no X6. Os 19 casos do upstream, em 4 arquivos, que provavam
+  o tema próprio com as configurações padrão ganharam `terminalFollowsChatTheme: false`, e o teste da tela acha o
+  "Match dark mode" pelo rótulo. Afeta P59.
+
 ## Worklogs
 
 - 2026-10-26 — nasceu da divisão do PLN-025, na R28 de lá, com os passos P1, P2, P6, P25 a P27 e P33 a P41, os itens
@@ -2473,6 +2515,8 @@ da linha quando o teste entra.
   o P62 em `brza-studio@21f9cfe90bb`, com os X34 ao X37.
 - 2026-10-29 — [O P60 do PLN-001, o Markdown segue o chat](../../work/worklogs/2026-10-29-pln-001-p60-markdown-segue-o-chat.md):
   o P60 em `brza-studio@a44e84add32`, com a R53 e os X38 ao X40; o C17 espera o build do pedido 31, com Anderson.
+- 2026-10-29 — [O P59 do PLN-001, o terminal segue o chat](../../work/worklogs/2026-10-29-pln-001-p59-o-terminal-segue-o-chat.md):
+  o P59 em `brza-studio@697ee59c0bf`, com os X41 ao X44; o C16 e o P61 esperam o build do pedido 31, com Anderson.
 
 ## Decisões
 

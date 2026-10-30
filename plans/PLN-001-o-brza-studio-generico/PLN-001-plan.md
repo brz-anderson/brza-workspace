@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P59 e o P60 do pedido 31, em execução, o P62 ao P64 do pedido 32 e o P66 do pedido 33, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
+ready: "sim — o P59 do pedido 31, em execução, o P62 ao P64 do pedido 32 e o P66 do pedido 33, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
 estimate_h: 164.6
-executed_h: 21.0
-remaining_h: 29.4
+executed_h: 22.5
+remaining_h: 21.4
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -18,8 +18,9 @@ tags:
 
 - **Retomar:** o pedido 31 entrou em 2026-10-29, com a R48 e a R49, o D45 ao D47 e o P58 ao P61, e o pedido 32 no
   mesmo dia, com a R50 e a R51, o D48 ao D50 e o P62 ao P65. O P58 fechou em `brza-studio@9c7fcdebbb0`, com o
-  resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`; rodam em paralelo, autorizados por
-  Anderson, o P59 e o P60, nas sessões `pln-001-p59` e `pln-001-p60`, cada uma no seu worktree, e o P63 e o P64, na
+  resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`, e o P60 em `brza-studio@a44e84add32`, com
+  a R53 e os X38 ao X40; rodam em paralelo, autorizados por Anderson, o P59, na sessão `pln-001-p59`, no seu worktree,
+  e o P63 e o P64, na
   sessão `pln-001-pedido-32`, depois do P62, fechado em `brza-studio@21f9cfe90bb`; o P66 do pedido 33, na sessão `pln-001-pedido-33`, noutro worktree. Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
   C17 depois do P60 o C18 ao C20 depois do P64 e o C21 depois do P66), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
@@ -872,6 +873,24 @@ AskUserQuestion. Os custos são estimativa.
 4. **R52.4 — Quando roda.** Seleção única. Opções: agora, em paralelo, num worktree (recomendada); depois dos pedidos
    31 e 32.
    **Decidido — "Agora, em paralelo (Recomendado)".** É a autorização do P66.
+
+### Rodada 53 — o modo código do Markdown com o esquema oposto ao do app (enviada 2026-10-29)
+
+> **Apresentado antes:** o tema do Monaco é global: o `monaco.editor.setTheme` vale para todos os editores abertos, e o
+> Monaco 0.55.1 escreve as cores em `.monaco-editor, .monaco-diff-editor, .monaco-component`
+> (`standaloneThemeService.js:339`). O fundo dá para trocar só no Markdown, por variável CSS no contêiner; o esquema da
+> sintaxe, Islands Dark ou `vs`, não. Esbarra quando o tema do chat, ou o próprio do Markdown, é claro com o app escuro,
+> ou o contrário. Muda o R49.4 nesse caso.
+
+Respondida em 2026-10-29, por Anderson na sessão `pln-001-p60` do `brza-studio`, pelo AskUserQuestion. Os custos são
+estimativa.
+
+1. **R53.1 — O Monaco no caso misto.** Seleção única. Opções: fica como hoje — no caso misto, o modo código mantém o
+   Islands Dark ou o `vs` com o fundo do app, e com o mesmo esquema segue o fundo do chat (recomendada) — custo: ~0 h;
+   se paga: na hora, só perde o caso misto; troca o tema global enquanto o código do Markdown está na tela — custo: 1 a
+   2 h; se paga: só sem outro editor de código visível ao mesmo tempo; CSS de tokens por instância, pelas classes
+   `mtkN` — custo: 6 a 10 h; se paga: nunca com folga, quebra em atualização do Monaco.
+   **Decidido — "Fica como hoje (Recomendado)".** Vai ao D47 e ao P60 (X38).
 
 ## Passos
 
@@ -2014,21 +2033,49 @@ Depois do P58; não depende do P60.
 
 Executa D47 · executor: sessão do `brza-studio`
 
-Estimado: 8 h · Executado: — h
+Estimado: 8 h · Executado: 1,5 h
 
 Depois do P58; não depende do P59.
 
-- [ ] **1.** Teste que falha, com o "Seguir o chat" ligado: o olho e o lápis têm o fundo do canvas do chat, a fonte e o
+- [x] **1.** Teste que falha, com o "Seguir o chat" ligado: o olho e o lápis têm o fundo do canvas do chat, a fonte e o
       tamanho do chat, e o esquema do chat; o modo código tem o fundo do chat e o tema de sintaxe do esquema do chat;
-      desligado, os três têm o fundo e o esquema do tema próprio escolhido
-- [ ] **2.** O fundo explícito no olho (`markdown-preview.css` ou `MarkdownPreviewSurface.tsx`), o do lápis no lugar do
-      `--editor-surface`, e um tema do Monaco derivado do Islands Dark e do light-plus com o fundo trocado
-- [ ] **3.** O hook do esquema do Markdown no lugar do `useDocumentDarkTheme` (`use-document-dark-theme.ts:4-8`), o
-      interruptor e o seletor de tema próprio nas configurações do editor, ao lado do `EditorFontFamilySetting`
-- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push. A conferência no
-      app é o C17
+      desligado, os três têm o fundo e o esquema do tema próprio escolhido —
+      `src/renderer/src/components/editor/markdown-surface-theme.test.ts`, 4 casos, sobre a função pura
+      `markdownSurfaceTheme`; falhou antes pelo módulo ausente, e depois → 4 passed. O modo código no esquema oposto ao
+      do app fica como antes (R53.1, X38)
+- [x] **2.** O fundo explícito no olho (`markdown-preview.css` ou `MarkdownPreviewSurface.tsx`), o do lápis no lugar do
+      `--editor-surface`, e um tema do Monaco derivado do Islands Dark e do light-plus com o fundo trocado — o olho e o
+      lápis levam o estilo na raiz (`MarkdownPreviewSurface.tsx`, `RichMarkdownEditorSurface.tsx`), com o
+      `backgroundColor` e o `--editor-surface` no canvas; o Monaco não ganha tema derivado, e a classe
+      `.markdown-code-canvas` troca o `--vscode-editor-background` só no contêiner do Markdown (`main.css`; X38, X39) —
+      `brza-studio@a44e84add32`
+- [x] **3.** O hook do esquema do Markdown no lugar do `useDocumentDarkTheme` (`use-document-dark-theme.ts:4-8`), o
+      interruptor e o seletor de tema próprio nas configurações do editor, ao lado do `EditorFontFamilySetting` — o
+      `useMarkdownSurfaceTheme`, no olho, no bloco de código do lápis e na fonte do Monaco do Markdown; o
+      `MarkdownThemeSetting`, com o `ChatThemePairPicker` inerte enquanto segue o chat, e o teste dele
+      (`MarkdownThemeSetting.test.tsx` → 1 passed) — `brza-studio@a44e84add32`
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push. A conferência no
+      app é o C17 — os 61 arquivos de teste das áreas tocadas → 509 passed; depois do rebase sobre o P62, com os de i18n,
+      70 arquivos → 555 passed; o check, abaixo
 
-**Evidência:** —
+**Evidência:** commit [`a44e84add32`](https://github.com/brz-anderson/brza-studio/commit/a44e84add32), na `master` do
+`brza-studio`, pela sessão `pln-001-p60`, autorizada por Anderson em 2026-10-29, na sessão do `brza-workspace` que
+gravou o pedido 31 ("e já execute os passos em paralelo"). O resolvedor do P58 não mudou.
+
+**Como ficou.** O campo é o `markdownTheme` das configurações globais, `{ followChat?, themeDark?,
+useSeparateLightTheme?, themeLight? }`, em `src/shared/markdown-theme-settings.ts`; a ausência segue o chat com o
+"Padrão do BrzA" no tema próprio, e o padrão não é gravado. O `resolveMarkdownTheme` chama o `resolveNativeChatTheme`
+com o interruptor ligado e o `resolveNativeChatThemePair`, no contraste 100, com ele desligado. O
+`markdownSurfaceTheme` (`src/renderer/src/components/editor/markdown-surface-theme.ts`) monta o estilo: o canvas, o
+remapeamento das variáveis do app com tema do catálogo, e, seguindo o chat, a fonte e o tamanho do texto do chat e o
+`--font-mono` na fonte de código do chat. O tamanho soma o zoom do editor. A normalização é a mesma no main, no store,
+no web e na carga (X40). As traduções novas entraram no `en` e no `pt`. O mobile não lê o visualizador e não muda.
+
+**O check.** O `pnpm check:changed --base=origin/master --maxWorkers=2` deu 24 de 27, em 1047 s. O primeiro, interrompido
+pelo reinício do app, apontou o `anti-slop(no-object-parameters)` no `normalizeNativeChatThemePair(value: object)`,
+corrigido com um tipo nomeado antes do commit. Os três vermelhos são os do P58, já na `master` sem esta mudança: o
+typecheck, por `src/main/updater/updater-enabled.test.ts:20`; o import boundaries, pelo `external-subcommand.ts`; e os
+testes unitários, pelos 2 casos de `open-uncommitted-entry.test.ts` (`'preview'` em vez de `'rich-editor'`).
 
 ### P61 — A conferência do tema do chat nos três (pedido 31)
 
@@ -2307,6 +2354,18 @@ da linha quando o teste entra.
 - **X37 — No P62, o nome do remetente do Claude Code é texto, sem botão.** O `openAgentMessageSender` não acha a sessão
   pelo endereço do BrzA; o clique entra no P64; afeta P62.
 
+- **X38 — O modo código do Markdown segue o chat só no esquema do app.** O tema do Monaco é global (R53.1): com o
+  esquema do tema igual ao do app, o código leva o canvas, pela variável `--vscode-editor-background` no contêiner, e a
+  fonte de código do chat; no esquema oposto, fica como antes. Afeta P60 e D47.
+- **X39 — A sintaxe clara é o `vs`, e não o light-plus, e o Monaco não ganha tema derivado.** O `vs` é o tema claro que
+  o app já usa (`monacoThemeName`, `islands-dark-theme.ts:30`), e a R49.4 manda a sintaxe não mudar; o fundo vem da
+  variável CSS, sem `defineTheme` novo. Afeta P60 e D47.
+- **X40 — O remapeamento de cores do chat e a normalização do par viraram funções compartilhadas.** O
+  `nativeChatThemeSurfaceStyle` (`src/renderer/src/lib/native-chat-theme-surface-style.ts`) pinta o chat e o
+  Markdown, com a classe `native-chat-theme-surface` na reavaliação das cores do `main.css`; o
+  `normalizeNativeChatThemePair` serve ao chat e ao Markdown; o `sanitizeChatThemeSettingsUpdate` junta os dois no main
+  e no store, porque o `settings-update.ts` bate no limite de 300 linhas. O contrato do resolvedor não mudou. Afeta P60.
+
 ## Worklogs
 
 - 2026-10-26 — nasceu da divisão do PLN-025, na R28 de lá, com os passos P1, P2, P6, P25 a P27 e P33 a P41, os itens
@@ -2412,6 +2471,8 @@ da linha quando o teste entra.
   o pedido 33, a R52, o D51 e o P66, sem código; o P66 em paralelo com os pedidos 31 e 32.
 - 2026-10-29 — [O P62 ao P64 do PLN-001, as mensagens entre sessões no chat](../../work/worklogs/2026-10-29-pln-001-p62-a-p64-mensagens-entre-sessoes.md):
   o P62 em `brza-studio@21f9cfe90bb`, com os X34 ao X37.
+- 2026-10-29 — [O P60 do PLN-001, o Markdown segue o chat](../../work/worklogs/2026-10-29-pln-001-p60-markdown-segue-o-chat.md):
+  o P60 em `brza-studio@a44e84add32`, com a R53 e os X38 ao X40; o C17 espera o build do pedido 31, com Anderson.
 
 ## Decisões
 

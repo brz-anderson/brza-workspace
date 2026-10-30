@@ -491,7 +491,7 @@ ferramenta não (P52, resposta de 2026-10-27).
 
 ### D47 — O visualizador de Markdown segue o chat — `brza-studio/src/renderer/src/components/editor/` e `src/renderer/src/assets/` (P60)
 
-- **Origem:** pedido 31, R48.2, R48.3, R49.1, R49.4
+- **Origem:** pedido 31, R48.2, R48.3, R49.1, R49.4, R53.1
 - **Contexto:** o olho não declara fundo e herda o `bg-background` do `body`, `#0a0a0a` no escuro
   (`markdown-preview.css:1-8`, `MarkdownPreviewSurface.tsx:86`, `main.css:662`); o lápis usa o `--editor-surface`,
   `#1e1e1e` (`rich-markdown-editor.css:9,18`); o modo código, o Islands Dark, `#191A1C` (`MonacoEditor.tsx:277`,
@@ -501,14 +501,17 @@ ferramenta não (P52, resposta de 2026-10-27).
 
 #### Como fica
 
-- **O interruptor e o tema próprio.** Um campo booleano "Seguir o chat", ligado por padrão, e um par de temas próprio
-  do Markdown, na forma do D45, nas configurações do editor, ao lado do `EditorFontFamilySetting`. O seletor só fica
-  ativo com o interruptor desligado (R49.1).
+- **O interruptor e o tema próprio.** O campo `markdownTheme` das configurações globais guarda o "Seguir o chat"
+  (`followChat`, ligado por padrão) e um par de temas próprio do Markdown, na forma do D45; fica nas configurações do
+  editor, ao lado do `EditorFontFamilySetting`. O seletor só fica ativo com o interruptor desligado (R49.1).
 - **O esquema.** Um hook do Markdown no lugar do `useDocumentDarkTheme` dá o esquema do chat com o interruptor ligado,
-  e o do tema próprio com ele desligado. O `markdown-dark`/`markdown-light` do olho e o tema do Monaco leem esse hook.
+  e o do tema próprio com ele desligado. O `markdown-dark`/`markdown-light` do olho e o bloco de código do lápis leem
+  esse hook; o Monaco segue no tema global do app (R53.1).
 - **O fundo.** Ligado, os três modos usam o canvas efetivo do chat; desligado, o fundo do tema próprio. O olho ganha
-  fundo explícito, o lápis troca o `--editor-surface` pelo mesmo valor, e o Monaco usa um tema derivado do Islands
-  Dark ou do light-plus com o fundo trocado. A sintaxe não muda (R49.4).
+  fundo explícito, o lápis troca o `--editor-surface` pelo mesmo valor, e um tema do catálogo remapeia as variáveis
+  do app como no chat. O tema do Monaco é global: o modo código leva o canvas por variável CSS no contêiner, só quando
+  o esquema do tema é o do app, e no esquema oposto fica como antes (R53.1). A sintaxe não muda: Islands Dark ou `vs`
+  (R49.4).
 - **A tipografia.** Ligado, o olho e o lápis usam a fonte e o tamanho do texto do chat (`--chat-font-family`,
   `--chat-font-size`), e o código dentro deles, a fonte de código do chat. O modo código usa a fonte de código do
   chat, que é a do terminal, e mantém o tamanho do editor (R48.3). O zoom do editor continua somando ao tamanho.

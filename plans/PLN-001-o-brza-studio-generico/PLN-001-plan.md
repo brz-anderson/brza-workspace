@@ -21,7 +21,12 @@ tags:
   resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`; rodam em paralelo, autorizados por
   Anderson, o P59 e o P60, nas sessões `pln-001-p59` e `pln-001-p60`, cada uma no seu worktree, e o P62 ao P64, na
   sessão `pln-001-pedido-32`. Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
-  C17 depois do P60 e o C18 ao C20 depois do P64), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37.
+  C17 depois do P60 e o C18 ao C20 depois do P64), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
+  para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
+  sessão entra no correio com o nome automático `brza-workspace-<hex>`. O P64 não lê o mapa de sessões do PLN-002 e
+  casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
+  `<cross-session-message from="uds:/tmp/cc-socks/60775.sock" from-name="brza-workspace-5b" from-mode="prompting">`,
+  com o `origin.name` na linha do JSONL; o nome está no `from-name=`, e não no `from=` do `<agent-message>` do D48.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas

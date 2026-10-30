@@ -353,14 +353,14 @@ Respondida em 2026-10-29, na sessão `pln-002-p7`.
    - o título da aba, com o `open` chamando o `agentSession.rename`. Custo: o chat renomeado só pelo `/rename` não é
      achado. Se paga: nunca sozinho.
 
-   **Decidido — o transcript.**
+   **Decidido — o transcript.** → reaberta em R12.3.
 
 2. **O `open` também troca o título da aba pelo nome?** Opções:
    - não agora; o `list` mostra o nome e o título lado a lado (recomendada). Custo: a aba segue com o título
      automático. Se paga: agora, sem mudar o escopo;
    - sim, no `open`. Custo: ~0,3 h e o fim do título automático. Se paga: quando o nome for procurado na tela.
 
-   **Decidido — não agora.**
+   **Decidido — não agora.** → reaberta em R11.4.
 
 3. **O que o `send` faz quando a trava barraria o destino?** Opções:
    - recusa com saída 3 e a conta da trava, também no `--json`; o `--wake` grava a passagem no `guard.json`, como o
@@ -396,3 +396,141 @@ Respondida em 2026-10-29, na sessão `pln-002-p7`.
    - manter até o "decidido" da b7. Custo: o `send` recusa o que o hook já não barra. Se paga: só se a b7 voltar atrás.
 
    **Decidido — tirar a trava do `send`.**
+
+### Rodada 11 — o pedido 8: o destino, a revisão, a flag e o título (enviada 2026-10-29)
+
+**Apresentado antes**, lido nesta sessão:
+- **Hoje o nome é o `/rename`.** O `open` manda `/rename <nome>` como primeiro prompt (`scripts/brza/brza-sessions:249-250`);
+  o `list`, o `send` e o `close` acham o chat pelo `custom-title` do transcript (`:113-131`); o `running()`, que pula o
+  nome que já roda, e o `--wait` leem o mesmo nome.
+- **Sem o `/rename`, esse caminho some** para a sessão nova, e o mapa vira a fonte do par nome e chat, o que reabre a
+  R9.1, que descartou "o registro nome e id gravado pelo `open`".
+- **O título da aba sai do `agentSession.rename`**, o nome único do chat no app
+  (`brza-studio/src/main/runtime/rpc/methods/structured-agent-session-rename.ts:1-2`).
+- **O correio endereça pelo nome da sessão do Claude** (`CLAUDE.md`, a tabela do vocabulário), que só o `/rename` dá.
+
+Respondida em 2026-10-29, na sessão `pln-002-sessions-rename`.
+
+1. **Onde entra o pedido do `/rename` opcional e do mapa de sessões?** Opções:
+   - pedido 8 do PLN-002: o D7 reescrito no lugar e o P9; o plano volta à execução (recomendada). Custo: ~0,3 h de
+     registro e o plano reaberto. Se paga: agora, porque o D7 e o `--json` do `list` são contrato deste plano e do
+     roteador do PLN-003;
+   - um PLN-004 próprio. Custo: ~0,5 h de arranque, um Terreno que repete o do D7 e dois planos no mesmo script. Se
+     paga: só se o mapa crescer além do `brza sessions`;
+   - uma issue para depois. Custo: os pedidos 31 e 32 do PLN-001 seguem com o `/rename` e o `--wait` de hoje. Se paga:
+     se não houver pressa.
+
+   **Decidido — pedido 8 do PLN-002.**
+
+2. **A revisão da entrega (P0 ao P8) vem quando?** Opções:
+   - uma só, depois do P9 (recomendada). Custo: a revisão espera o P9, de 2 a 3 h. Se paga: no fim do P9, com uma
+     corrida de revisor em vez de duas, sem revisar um D7 que vai mudar;
+   - agora, em paralelo ao P9. Custo: duas revisões, e a primeira lê um D7 a reescrever. Se paga: se o P9 for demorar
+     dias.
+
+   **Decidido — uma só, depois do P9.**
+
+3. **Qual o nome da flag que liga o `/rename`, desligado por padrão?** Opções:
+   - `--rename` (recomendada). Custo: nenhum além do nome. Se paga: agora;
+   - `--claude-name`. Custo: mais longo, e confunde com o `--name` do `claude`, que o chat não tem. Se paga: só se surgir
+     outro jeito de dar o nome.
+
+   **Decidido — `--rename`.**
+
+4. **De onde sai o título da aba?** Opções:
+   - `--title` opcional; sem ele, o `<nome>`. O `<nome>` curto segue como chave do `send` e do `close`, e o título vai ao
+     `agentSession.rename` (recomendada). Custo: ~0,3 h e uma flag a mais na abertura com título. Se paga: agora, sem
+     aspas nem espaço no `send` e no `close`;
+   - `--title` obrigatório. Custo: quebra as chamadas de hoje. Se paga: nunca, a não ser que a aba sem título vire
+     problema;
+   - o `<nome>` já é o título, e o mapa usa o título como chave. Custo: aspas em todo `send` e `close`, e chave com espaço
+     e dois-pontos. Se paga: se só humanos chamarem o comando.
+
+   **Decidido — `--title` opcional; sem ele, o `<nome>`.**
+
+### Rodada 12 — o mapa, a leitura, a busca e o D50 do PLN-001 (enviada 2026-10-29)
+
+**Apresentado antes:**
+- **O `--wait` dos pedidos 31 e 32 do PLN-001** espera o `/rename` em `<config>/sessions/<pid>.json`
+  (`brza-sessions:95-101`); sem o `--rename`, não tem o que esperar.
+- **O `brza-studio` é o app genérico do PLN-001**; o mapa é arquivo de script do workspace, e o renderer do P64 não chama
+  a CLI.
+- **O remetente do D48 é o `from=` do correio**, o nome da sessão do Claude (`PLN-001-design.md:515-529`). O `from=` de
+  uma sessão sem `/rename` não foi medido; fica para a combinação do P9.
+
+Respondida em 2026-10-29, na sessão `pln-002-sessions-rename`.
+
+1. **Onde mora o mapa, e em que formato?** Opções:
+   - JSON em `.sessions/sessions.json` do workspace, um objeto por nome (recomendada). Custo: ~0,5 h; a entrada da aba
+     fechada à mão fica velha. Se paga: no primeiro `send` a uma sessão aberta sem `--rename`;
+   - JSONL só de acréscimo, uma linha por evento (`open`, `title`, `close`). Custo: quem lê reconstrói o estado a cada
+     leitura; ~0,2 h a mais. Se paga: quando se quiser o histórico das sessões;
+   - no `userData` do app. Custo: o dev build tem outro `userData` e outro mapa. Se paga: só se o app for ler o mapa.
+
+   **Decidido — JSONL só de acréscimo.** O lugar foi à R13.1.
+
+2. **Como o orquestrador ou o coordenador lê o mapa?** Opções:
+   - pelo `brza sessions list --json`, que junta o mapa ao estado do app; o arquivo é detalhe interno, e o contrato só
+     cresce com `opened` e `source` (recomendada). Custo: ~0,2 h. Se paga: agora, com um contrato só para o roteador do
+     PLN-003;
+   - o arquivo direto. Custo: dois contratos, e o arquivo não sabe se a aba segue aberta. Se paga: só se o leitor não
+     puder chamar a CLI.
+
+   **Decidido — pelo `list --json`.**
+
+3. **Como o `list`, o `send`, o `close` e o `open` acham o nome?** Opções:
+   - o mapa primeiro e o `custom-title` do transcript depois; o `open` pula o nome que o mapa tem com o chat ainda no
+     `listAll` (recomendada). Custo: ~0,5 h, e reabre a R9.1. Se paga: agora, com o chat renomeado à mão ainda achado;
+   - só o mapa. Custo: o chat aberto à mão com `/rename` deixa de ser achado. Se paga: nunca, enquanto houver chat aberto
+     fora do `brza sessions`.
+
+   **Decidido — o mapa primeiro, o `/rename` depois.**
+
+4. **O mapa serve também ao P64 do PLN-001 (D50)?** Opções:
+   - não; o P64 usa o que o app guarda, e o PLN-002 grava uma linha no `Retomar` do PLN-001 sobre o `--rename`
+     desligado (recomendada). Custo: o P64 resolve o nome sozinho, no app. Se paga: agora, sem o app genérico depender
+     de um arquivo do workspace;
+   - sim, o app lê o mapa. Custo: o mapa vai ao `userData` do app e só cobre as sessões abertas pelo script; ~1 h a mais
+     no P64. Se paga: se toda sessão for aberta pelo `brza sessions`.
+
+   **Decidido — não; o P64 usa o que o app guarda.**
+
+### Rodada 13 — o lugar do mapa, o `--wait`, o verbo `title` e o correio (enviada 2026-10-29)
+
+**Apresentado antes:** a opção do JSONL, na R12.1, não dizia o lugar. Pelo `CLAUDE.md`, o correio endereça a sessão pelo
+nome dela, que hoje só o `/rename` dá.
+
+Respondida em 2026-10-29, na sessão `pln-002-sessions-rename`.
+
+1. **Onde mora o JSONL?** Opções:
+   - `.sessions/sessions.jsonl` na raiz do `brza-workspace`, fora do git como o `.measurements/`; as sessões do
+     `brza-studio` gravam ali pela `WORKSPACE` do runtime (recomendada). Custo: uma linha no `.gitignore`. Se paga: agora;
+   - `~/.local/state/brza/sessions.jsonl`. Custo: entra no `## Fora do workspace`, e o backup do workspace não o leva. Se
+     paga: só se os scripts forem usados fora do workspace.
+
+   **Decidido — `.sessions/sessions.jsonl` do workspace.**
+
+2. **O que o `--wait` espera com o `/rename` desligado?** Opções:
+   - o `claude_session` do chat: sem `--rename`, espera o `agentSession.history` dar o `providerSession.id` e o grava no
+     mapa; com `--rename`, espera também o nome (recomendada). Custo: ~0,3 h; o id talvez só apareça depois do primeiro
+     turno, a conferir no P9. Se paga: no primeiro `send` do coordenador logo depois do `open`;
+   - o `--wait` exige `--rename`. Custo: os pedidos 31 e 32 e a memória passam a `--rename --wait`. Se paga: se só o
+     nome do Claude importar;
+   - o `--wait` sai. Custo: quebra as chamadas de hoje. Se paga: nunca, enquanto houver chamada com `--wait`.
+
+   **Decidido — o `claude_session` do chat.**
+
+3. **Entra um verbo para trocar o título da aba depois de aberta?** Opções:
+   - não agora (recomendada). Custo: retitular pede o app. Se paga: agora, sem crescer o escopo;
+   - sim, `brza sessions title <nome> "<título>"`, com o `agentSession.rename` e uma linha `title` no mapa. Custo: ~0,3 h
+     e um teste. Se paga: quando o coordenador mudar a fase de uma sessão.
+
+   **Decidido — sim, `brza sessions title`.**
+
+4. **Quem abre sessão que conversa por correio passa `--rename`?** Opções:
+   - sim, e a regra vai à ajuda do `brza sessions` e à memória de abrir sessão; o resto usa o `brza sessions send`
+     (recomendada). Custo: ~0,1 h de texto. Se paga: no primeiro `SendMessage` para uma sessão aberta pelo script;
+   - não; entre sessões abertas pelo script, o canal passa a ser o `send`. Custo: o `SendMessage` para essas sessões não
+     acha o destino, e o remetente do D48 fica sem nome. Se paga: se o correio do runtime cair em desuso.
+
+   **Decidido — sim, e a regra vai à ajuda e à memória.**

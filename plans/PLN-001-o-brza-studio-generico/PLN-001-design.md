@@ -573,22 +573,26 @@ ferramenta não (P52, resposta de 2026-10-27).
 - De onde vem o nome da aba: o `/rename` que o `brza-sessions --wait` espera, o `--name` do Claude Code, ou o título da
   aba. A busca usa o que o app guardar.
 
-### D51 — O "Pensou" com o texto na linha — `brza-studio/src/renderer/src/components/native-chat/NativeChatReasoningRow.tsx` (P66)
+### D51 — O "Pensou" com o texto na linha — `brza-studio/src/renderer/src/components/native-chat/NativeChatReasoningRow.tsx` e `brza-studio/mobile/src/session/native-chat/transcript/MobileNativeChatReasoningRow.tsx` (P66)
 
-- **Origem:** pedido 33, R52.1, R52.2, R52.3
+- **Origem:** pedido 33, R52.1, R52.2, R52.3, R54.1, R54.2
 - **Contexto:** a linha da pergunta mostra o texto cortado ao lado do rótulo e o tira da linha quando aberta
-  (`NativeChatAwaitingInputRow.tsx:62-90`). A do raciocínio mostra só o rótulo com a duração
-  (`NativeChatReasoningRow.tsx`, `translatedHeadline`), e o corpo é o `NativeChatReasoningBody`, recolhido.
+  (`NativeChatAwaitingInputRow.tsx:62-90`), e o celular faz o mesmo (`MobileNativeChatAwaitingInputRow.tsx`). A do
+  raciocínio mostrava só o rótulo com a duração, e o corpo é o `NativeChatReasoningBody`, recolhido.
 
 #### Como fica
 
 - **Fechada.** Ícone `brain`, o rótulo com dois-pontos ("Pensou por 3s:", ou "Pensou:" sem duração) e o começo do
-  raciocínio em texto corrido, numa linha, cortado com reticências, no `text-chat-foreground-faint`, e a seta.
+  raciocínio em texto corrido, numa linha, cortado com reticências, no `text-chat-foreground-faint`, e a seta. O rótulo
+  não encolhe; quem leva as reticências é o texto.
 - **Aberta.** O texto sai da linha, que fica só com o rótulo, como no "Perguntou", e o corpo de hoje aparece.
-- **O texto corrido** é o Markdown do raciocínio sem marcação, com as quebras viradas em espaço.
-
-#### A conferir no passo
-
-- Enquanto o raciocínio chega em streaming, a linha mostra o começo do que já chegou, e o rótulo segue o de hoje.
-- O rótulo sem dois-pontos ainda é usado em outro lugar (`thought`, `thoughtForDuration`): a chave nova não quebra
-  esses usos.
+- **O texto corrido** é o `nativeChatReasoningPreview`, em `src/shared/native-chat-reasoning-row.ts`: o Markdown do
+  raciocínio sem marcação, com as quebras viradas em espaço, lido do primeiro milhar de caracteres. Raciocínio que é só
+  marcação fica com o rótulo de hoje, sem dois-pontos.
+- **Os rótulos.** No desktop, as chaves `reasoningLabel`, `thoughtLabel` e `thoughtForDurationLabel`, nos 7 catálogos,
+  ao lado das de hoje, que seguem para o rótulo sem texto; no celular, que não tem catálogo, o
+  `nativeChatReasoningLabelText`, o rótulo em inglês com dois-pontos.
+- **No celular** (R54.1), a mesma linha: o rótulo e o texto em dois `Text` de uma linha, o do texto com as reticências.
+- **No streaming** (R54.2), o começo do texto aparece só na linha do raciocínio, que em andamento é a de um subagente
+  que roda: "Raciocínio: <começo>". A linha ao vivo do turno principal (`NativeChatTurnActivityLine.tsx`) segue com o
+  spinner, "Pensando" ou a atividade, e a seta.

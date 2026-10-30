@@ -17,6 +17,7 @@ mecânica própria do Claude.
 | camada alta, média, rápida | Opus, Sonnet, Haiku — o `haiku` é o Haiku 5.5, pelo `env` do `settings.json`                     |
 | scratch                    | o scratchpad da sessão, anunciado no arranque, em `/private/tmp/claude-501/…`                    |
 | sessão nova                | `/exit` e `claude --name <nome>` no mesmo terminal, sem `--resume`, `--continue` nem `--rc`       |
+| compactação                | `/compact`; o runtime também compacta sozinho perto do limite da janela                          |
 
 O comando que a sessão passa a Anderson para abrir uma sessão nova com prompt é `claude --name <nome> "<prompt>"`.
 **Não use `--rc`**: com ele, o prompt entre aspas não funciona. Não use `/clear` no lugar da sessão nova, porque ele
@@ -33,7 +34,7 @@ O chat do BrzA Studio não passa pelo zsh de login: o app roda no lugar do `clau
 o `~/.local/bin/claude-brza` (`scripts/brza/claude-brza`, instalado pelo `brza install --chat-command`). Ele faz o mesmo
 que a função, no `brza-workspace`, no `brza-studio` e nos worktrees que o app cria em `~/orca/workspaces/…`, achados
 pelo `git --git-common-dir`. A sessão aberta sem nenhum dos dois — numa IDE, ou no app com o override vazio — sobe sem
-os hooks, sem a trava e sem a identidade abaixo.
+os hooks e sem a identidade abaixo.
 
 ## A identidade é a do brz-anderson, pelo `env`
 
@@ -64,7 +65,6 @@ O `.claude/hooks/measure.py`, ligado no `settings.json`, grava uma linha JSON po
 | `command`  | `/nome` digitado, que não passa pela `Skill`      | o nome, os argumentos e a origem                                                                                                                   |
 | `failure`  | `StopFailure`                                     | o erro de API que encerrou o turno, como o limite de uso                                                                                           |
 | `mcp`      | toda chamada `mcp__*`                             | o servidor, a ferramenta, a duração e a falha                                                                                                      |
-| `guard`    | `UserPromptSubmit`, pela trava de retomada        | a decisão (`blocked`, `released`, `skipped`), os minutos parada, o TTL, o contexto e o custo estimado da regravação                                 |
 
 - **Só o trecho novo do transcript:** retomada e turno medem só o que veio depois da última leitura.
 - **Onde grava:** sempre no `.measurements/` daqui, também nas sessões do `brza-studio`. O comando acha o script pela
@@ -76,13 +76,11 @@ O `.claude/hooks/measure.py`, ligado no `settings.json`, grava uma linha JSON po
 - **Resumo:** `python3 scripts/summarize_measurements.py`.
 - **Testes:** em `.claude/hooks/tests/`.
 
-## A trava de retomada de cache
-
-O `.claude/hooks/resume_guard.py`, ligado no `UserPromptSubmit`, barra o prompt que acorda uma sessão parada além do TTL
-do cache e com 150 mil tokens ou mais de contexto no último turno. Esse pedido regravaria o contexto inteiro.
-- **A mensagem** diz o tempo parado, o TTL, o contexto e o custo estimado da regravação, e manda abrir sessão nova e
-  retomar pelo `Retomar` do plano ou pela issue.
-- **Reenviar o mesmo prompt em até 2 min passa**, e o correio entre sessões nunca é barrado.
+## O cache da sessão principal dura 1 h
 
 O mesmo `settings.json` põe o cache da sessão principal em 1 h (`promptCacheTtl`) e o do resto — subagentes, workflows,
-pedidos auxiliares — em 5 min (`subagentPromptCacheTtl`).
+pedidos auxiliares — em 5 min (`subagentPromptCacheTtl`). Na medição de 2026-10-27 a 2026-10-29, o cache de 1 h custou
+US$ 11 a mais na escrita e evitou US$ 19 de regravação, em 32 pausas de 5 a 60 min.
+
+Não há trava de retomada. O `resume_guard.py` barrava o prompt que acordava uma sessão grande parada além do TTL, mas em
+dois dias barrou uma vez só, e saiu do `UserPromptSubmit` com a norma de uma sessão por frente do `AGENTS.md`.

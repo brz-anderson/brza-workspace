@@ -46,17 +46,6 @@
         ]
       }
     ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${BRZA_PYTHON:-python3} \"${BRZA_WORKSPACE:-$CLAUDE_PROJECT_DIR}/.claude/hooks/resume_guard.py\" || true",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
     "UserPromptExpansion": [
       {
         "hooks": [

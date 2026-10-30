@@ -127,7 +127,10 @@ class CommandTest(unittest.TestCase):
         self.transcript('uuid-a', 'primeiro', 'pln-002-p7')
         self.transcript('uuid-b', 'pln-003')
         self.transcript('uuid-c')
-        patcher = patch.dict(GLOBALS, {'config_dirs': lambda: [self.config], 'rpc': self.app.rpc})
+        self.map = self.config / '.sessions' / 'sessions.jsonl'
+        self.launches = []
+        patcher = patch.dict(GLOBALS, {'config_dirs': lambda: [self.config], 'rpc': self.app.rpc,
+                                       'SESSION_MAP': self.map, 'brza': self.launch})
         patcher.start()
         self.addCleanup(patcher.stop)
         sent = patch.object(sys.modules['brza_runtime'], 'rpc', self.app.rpc)
@@ -140,6 +143,22 @@ class CommandTest(unittest.TestCase):
         lines = [{'type': 'user', 'message': {'content': 'custom-title no texto não conta'}}]
         lines += [{'type': 'custom-title', 'customTitle': name, 'sessionId': claude_id} for name in names]
         (folder / f'{claude_id}.jsonl').write_text(''.join(json.dumps(line) + '\n' for line in lines))
+
+    def launch(self, *args):
+        self.launches.append(args)
+        return {'outcome': {'kind': 'structured', 'sessionId': 'claude_n'}}
+
+    def write_map(self, *events: dict):
+        self.map.parent.mkdir(parents=True, exist_ok=True)
+        with self.map.open('a') as f:
+            for event in events:
+                f.write(json.dumps({'at': '2026-10-29T12:00:00-03:00', **event}) + '\n')
+
+    def read_map(self) -> list[dict]:
+        return [json.loads(line) for line in self.map.read_text().splitlines()] if self.map.exists() else []
+
+    def calls(self, method: str) -> list[dict]:
+        return [params for m, params in self.app.calls if m == method]
 
     def run_main(self, *argv) -> tuple[int, str]:
         out = io.StringIO()
@@ -154,7 +173,7 @@ class CommandTest(unittest.TestCase):
         self.assertEqual([s['name'] for s in sessions], ['pln-002-p7', 'pln-003', None])
         self.assertEqual(sessions[0], {'name': 'pln-002-p7', 'title': 'PLN-002 P7: renomear chat', 'chat': 'claude_a',
                                        'claude_session': 'uuid-a', 'worktree': '/Users/x/brza-workspace',
-                                       'state': 'working'})
+                                       'state': 'working', 'source': 'transcript', 'opened': None})
         self.assertIsNone(sessions[2]['state'])
 
     def test_list_prints_one_line_per_chat_with_a_dash_for_no_name(self):
@@ -228,6 +247,123 @@ class CommandTest(unittest.TestCase):
             code, out = self.run_main(*argv)
             self.assertEqual(code, 0)
             self.assertIn('abriria:  c3-prova', out)
+
+    # O pedido 8 (PLN-002/P9): o /rename opcional, o título da aba e o mapa de sessões.
+
+    def test_open_without_rename_titles_the_tab_and_records_the_map(self):
+        code, out = self.run_main('open', 'pln-009', '--title', 'PLN-002 P9: prova')
+        self.assertEqual(code, 0)
+        self.assertIn('open:     pln-009', out)
+        (launch,) = self.launches
+        self.assertNotIn('--prompt', launch)
+        self.assertEqual(self.calls('agentSession.rename'), [{'sessionId': 'claude_n', 'name': 'PLN-002 P9: prova'}])
+        (event,) = self.read_map()
+        self.assertEqual({k: v for k, v in event.items() if k != 'at'},
+                         {'event': 'open', 'name': 'pln-009', 'title': 'PLN-002 P9: prova', 'chat': 'claude_n',
+                          'checkout': str(GLOBALS['WORKSPACE']), 'renamed': False})
+        self.assertRegex(event['at'], r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$')
+
+    def test_open_without_title_titles_the_tab_with_the_name(self):
+        self.run_main('pln-009')
+        self.assertEqual(self.calls('agentSession.rename'), [{'sessionId': 'claude_n', 'name': 'pln-009'}])
+        self.assertEqual(self.read_map()[0]['title'], 'pln-009')
+
+    def test_open_without_rename_launches_with_the_task_prompt(self):
+        self.run_main('pln-009', '--prompt', 'faça o P9')
+        (launch,) = self.launches
+        self.assertEqual(launch[launch.index('--prompt') + 1], 'faça o P9')
+        self.assertEqual(self.calls('agentSession.send'), [])
+
+    def test_open_with_rename_sends_the_rename_first_and_the_prompt_after(self):
+        code, _ = self.run_main('pln-009', '--rename', '--prompt', 'faça o P9')
+        self.assertEqual(code, 0)
+        (launch,) = self.launches
+        self.assertEqual(launch[launch.index('--prompt') + 1], '/rename pln-009')
+        (sent,) = self.calls('agentSession.send')
+        self.assertEqual(sent['body']['blocks'][0]['text'], 'faça o P9')
+        self.assertTrue(self.read_map()[0]['renamed'])
+
+    def test_wait_records_the_claude_session(self):
+        self.app.providers['claude_n'] = 'uuid-n'
+        code, _ = self.run_main('pln-009', '--wait')
+        self.assertEqual(code, 0)
+        self.assertEqual([(e['event'], e.get('claude_session')) for e in self.read_map()],
+                         [('open', None), ('session', 'uuid-n')])
+
+    def test_wait_with_rename_also_waits_for_the_name(self):
+        self.app.providers['claude_n'] = 'uuid-n'
+        waited = []
+        with patch.dict(GLOBALS, {'wait_for_name': lambda name: waited.append(name) or True}):
+            code, _ = self.run_main('pln-009', '--rename', '--wait')
+        self.assertEqual((code, waited), (0, ['pln-009']))
+
+    def test_wait_without_the_claude_session_in_time_exits_one(self):
+        with patch.dict(GLOBALS, {'WAIT_SECONDS': 0}):
+            code, out = self.run_main('pln-009', '--wait')
+        self.assertEqual(code, 1)
+        self.assertIn('CHECK:', out)
+        self.assertEqual([e['event'] for e in self.read_map()], ['open'])
+
+    def test_open_skips_a_name_the_map_holds_with_the_chat_still_open(self):
+        self.write_map({'event': 'open', 'name': 'pln-coord', 'title': 'PLN-001: Coordenador', 'chat': 'claude_c',
+                        'checkout': '/x', 'renamed': False},
+                       {'event': 'open', 'name': 'pln-velho', 'title': 'x', 'chat': 'claude_fechado',
+                        'checkout': '/x', 'renamed': False})
+        code, out = self.run_main('pln-coord')
+        self.assertEqual((code, out.strip()), (0, 'running:  pln-coord'))
+        self.assertEqual(self.launches, [])
+        code, out = self.run_main('pln-velho', '--dry-run')
+        self.assertIn('abriria:  pln-velho', out)
+
+        def down(method, params=None):
+            raise GLOBALS['BrzaError']('session.tabs.listAll: o runtime não respondeu')
+
+        with patch.dict(GLOBALS, {'rpc': down}):
+            code, out = self.run_main('pln-coord', '--dry-run')
+        self.assertIn('abriria:  pln-coord', out)
+
+    def test_list_takes_the_name_from_the_map_before_the_transcript(self):
+        self.write_map({'event': 'open', 'name': 'pln-coord', 'title': 'PLN-001: Coordenador', 'chat': 'claude_c',
+                        'checkout': '/x', 'renamed': False},
+                       {'event': 'open', 'name': 'outro', 'title': 'Config', 'chat': 'claude_b', 'checkout': '/x',
+                        'renamed': True})
+        sessions = json.loads(self.run_main('list', '--json')[1])['sessions']
+        self.assertEqual([(s['name'], s['source'], s['opened']) for s in sessions],
+                         [('pln-002-p7', 'transcript', None), ('outro', 'map', '2026-10-29T12:00:00-03:00'),
+                          ('pln-coord', 'map', '2026-10-29T12:00:00-03:00')])
+
+    def test_send_title_and_close_find_the_chat_by_the_map(self):
+        self.write_map({'event': 'open', 'name': 'pln-coord', 'title': 'Sem nome', 'chat': 'claude_c',
+                        'checkout': '/x', 'renamed': False})
+        self.assertEqual(self.run_main('send', 'pln-coord', 'oi')[0], 0)
+        self.assertEqual(self.calls('agentSession.send')[-1]['envelope']['sessionId'], 'claude_c')
+        code, out = self.run_main('title', 'pln-coord', 'PLN-001: Coordenador', '--json')
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(out), {'titled': True, 'name': 'pln-coord', 'chat': 'claude_c',
+                                           'title': 'PLN-001: Coordenador'})
+        self.assertEqual(self.calls('agentSession.rename'),
+                         [{'sessionId': 'claude_c', 'name': 'PLN-001: Coordenador'}])
+        self.assertEqual(self.run_main('close', 'pln-coord')[0], 0)
+        self.assertEqual([(e['event'], e.get('title')) for e in self.read_map()],
+                         [('open', 'Sem nome'), ('title', 'PLN-001: Coordenador'), ('close', None)])
+
+    def test_the_map_folds_a_name_reopened_after_a_close(self):
+        self.write_map({'event': 'open', 'name': 'x', 'title': 'x', 'chat': 'claude_velho', 'checkout': '/x',
+                        'renamed': False},
+                       {'event': 'close', 'name': 'x', 'chat': 'claude_velho'},
+                       {'event': 'open', 'name': 'x', 'title': 'x', 'chat': 'claude_b', 'checkout': '/x',
+                        'renamed': False},
+                       {'event': 'title', 'name': 'x', 'chat': 'claude_b', 'title': 'X novo'},
+                       {'event': 'session', 'name': 'x', 'chat': 'claude_b', 'claude_session': 'uuid-b'})
+        folded = SESSIONS['session_map']()
+        self.assertEqual(list(folded), ['claude_b'])
+        self.assertEqual((folded['claude_b']['title'], folded['claude_b']['claude_session']), ('X novo', 'uuid-b'))
+
+    def test_a_broken_map_line_is_skipped(self):
+        self.map.parent.mkdir(parents=True)
+        self.map.write_text('{quebrada\n' + json.dumps({'event': 'open', 'at': 'a', 'name': 'pln-coord', 'title': 't',
+                                                         'chat': 'claude_c', 'checkout': '/x', 'renamed': False}) + '\n')
+        self.assertEqual(list(SESSIONS['session_map']()), ['claude_c'])
 
 
 if __name__ == '__main__':

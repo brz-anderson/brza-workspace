@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: "sim — o P62 ao P64 do pedido 32, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
 estimate_h: 164.6
-executed_h: 27.5
-remaining_h: 5.9
+executed_h: 28.0
+remaining_h: 3.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -20,8 +20,8 @@ tags:
   mesmo dia, com a R50 e a R51, o D48 ao D50 e o P62 ao P65. O P58 fechou em `brza-studio@9c7fcdebbb0`, com o
   resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`, o P60 em `brza-studio@a44e84add32`, com a
   R53 e os X38 ao X40, e o P59 em `brza-studio@697ee59c0bf`, com os X41 ao X44: o pedido 31 espera só o P61 e o C15
-  ao C17, num build, com Anderson. Roda, autorizado por Anderson, o P64, na
-  sessão `pln-001-pedido-32`, depois do P62 e do P63, fechados em `brza-studio@21f9cfe90bb` e `9564eff9368`. O P66 do pedido 33 fechou em `brza-studio@9118f60672b`, com a R54 e os X45 ao
+  ao C17, num build, com Anderson. O pedido 32 fechou o P62, o P63 e o P64, na
+  sessão `pln-001-pedido-32`, em `brza-studio@21f9cfe90bb`, `9564eff9368` e `ba4102b5c95`, e espera só o P65, com o C18 ao C20, num build, com Anderson. O P66 do pedido 33 fechou em `brza-studio@9118f60672b`, com a R54 e os X45 ao
   X48, e espera só o C21; sete arquivos de teste do transcript do mobile não carregam desde o P43 (X47). Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
   C17 depois do P60 o C18 ao C20 depois do P64 e o C21), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
@@ -2252,18 +2252,41 @@ Desvios X49 ao X55. A conferência no app é o C19, com o P65.
 
 Executa D50 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-32`
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0,5 h
 
 Depois do P63.
 
-- [ ] **1.** Teste que falha: o clique no nome de uma sessão do Claude Code aberta no app foca a aba de chat dela; o
+- [x] **1.** Teste que falha: o clique no nome de uma sessão do Claude Code aberta no app foca a aba de chat dela; o
       nome que não casa com nenhuma aba aberta fica sem ação, com o cursor normal
-- [ ] **2.** A busca da aba pelo nome da sessão, no lugar do `openAgentMessageSender` quando o remetente é do Claude
+- [x] **2.** A busca da aba pelo nome da sessão, no lugar do `openAgentMessageSender` quando o remetente é do Claude
       Code. Os pontos "A conferir no passo" do D50
-- [ ] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C20
 
-**Evidência:** —
+**Evidência:** commit [`ba4102b5c95`](https://github.com/brz-anderson/brza-studio/commit/ba4102b5c95), na `master` do
+`brza-studio`, pela sessão `pln-001-pedido-32`. O componente é o `BrzaClaudePeerSenderName`, em
+`src/renderer/src/components/native-chat/brza/BrzaClaudePeerSenderName.tsx`: procura, entre as abas `agent-session`
+abertas em qualquer workspace, a única cujo `customLabel` ou `label` é o nome do remetente, e o clique a revela pelo
+`activateAiVaultStructuredSession`, o mesmo caminho que abre um chat pelo histórico. Sem aba, ou com duas do mesmo nome,
+o nome fica texto, sem botão e com o cursor normal (X56). A devolução de subagente nunca abre. Em
+`NativeChatAgentMessageSenders.tsx`, o `SenderName` passa ao componente do BrzA quando o remetente é do Claude Code, no
+lugar do `openAgentMessageSender`.
+
+**A conferir no passo (D50).** O nome da aba: o `label` da aba de chat é o título que o host lista
+(`frame-drawn-chat-tabs.ts:23`), que o `agentSession.rename` do `brza sessions --title` troca, e o `customLabel` é o nome
+que a pessoa dá. O `/rename` do Claude Code grava o `custom-title` e o `agent-name` no transcript, que o app não lê; o
+nome automático `brza-workspace-<hex>` não casa com aba nenhuma e fica sem ação (X56). O mobile não abre remetente
+nenhum, nem o do Orca: a linha dele é texto.
+
+**Os testes.** O `BrzaClaudePeerSenderName.test.tsx`: o clique no nome de uma sessão com aba aberta chama a ativação
+com o workspace e a sessão da aba; o nome sem aba fica sem botão. Antes do componente, o primeiro caso falhou (sem
+botão). Depois do rebase: `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts` sobre os testes do
+BrzA no chat, a linha do remetente e o cartão → 15 arquivos, 52 passed; `pnpm tc:web` → exit 0.
+
+`pnpm check:changed --base=origin/master --maxWorkers=2` → 20 de 21, em 108 s. O vermelho é o import boundaries,
+preexistente, na issue das Pendências.
+
+Desvio X56. A conferência no app é o C20, com o P65.
 
 ### P65 — A conferência das mensagens entre sessões (pedido 32)
 
@@ -2510,6 +2533,10 @@ da linha quando o teste entra.
   P63 e D49.
 - **X55 — O `pt.json` ganhou as 5 chaves do cartão.** "Ir para o agente", "Mensagem do seu coordenador", "Mostrar mais",
   "Tarefa do seu coordenador" e "Atualização do seu worker"; afeta P63.
+- **X56 — O nome casa com o rótulo da aba, e só quando uma aba o tem.** O `customLabel` ou o `label` da aba de chat,
+  o título do host; o `/rename` do Claude Code não chega ao app, e o nome automático `brza-workspace-<hex>` fica sem
+  ação. Com duas abas do mesmo nome, o nome também fica sem ação, e a devolução de subagente nunca abre; afeta P64, e o
+  D50 não muda.
 
 ## Worklogs
 
@@ -2615,7 +2642,8 @@ da linha quando o teste entra.
 - 2026-10-29 — [O pedido 33 do PLN-001, o "Pensou" como o "Perguntou"](../../work/worklogs/2026-10-29-pln-001-pedido-33-pensou-como-perguntou.md):
   o pedido 33, a R52, o D51 e o P66, sem código; o P66 em paralelo com os pedidos 31 e 32.
 - 2026-10-29 — [O P62 ao P64 do PLN-001, as mensagens entre sessões no chat](../../work/worklogs/2026-10-29-pln-001-p62-a-p64-mensagens-entre-sessoes.md):
-  o P62 em `brza-studio@21f9cfe90bb`, com os X34 ao X37, e o P63 em `brza-studio@9564eff9368`, com os X49 ao X55.
+  o P62 em `brza-studio@21f9cfe90bb`, com os X34 ao X37, o P63 em `brza-studio@9564eff9368`, com os X49 ao X55, e o P64 em
+  `brza-studio@ba4102b5c95`, com o X56; o pedido 32 espera só o P65.
 - 2026-10-29 — [O P60 do PLN-001, o Markdown segue o chat](../../work/worklogs/2026-10-29-pln-001-p60-markdown-segue-o-chat.md):
   o P60 em `brza-studio@a44e84add32`, com a R53 e os X38 ao X40; o C17 espera o build do pedido 31, com Anderson.
 - 2026-10-29 — [O P59 do PLN-001, o terminal segue o chat](../../work/worklogs/2026-10-29-pln-001-p59-o-terminal-segue-o-chat.md):

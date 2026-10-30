@@ -45,6 +45,17 @@ Commit `brza-studio@9564eff9368`, com `git cherry-pick -x 7321b066e83`.
 - **Os testes.** O caso de escala do cartão conta duas enumerações, e não três, sem a "aquisição de autoridade
   visível" do store do upstream (X53). Depois do rebase: `pnpm tc` → exit 0; 156 arquivos → 1263 passed.
 
+## O P64 — o clique no remetente
+
+Commit `brza-studio@ba4102b5c95`.
+
+- **A busca.** Entre as abas de chat abertas, a única cujo rótulo próprio ou título do host é o nome do remetente; o
+  clique a revela pelo mesmo caminho que abre um chat pelo histórico. Sem aba, ou com duas, o nome fica texto (X56).
+- **O nome que o app guarda.** O título da aba é o que o `brza sessions --title` dá pelo `agentSession.rename`; o
+  `/rename` do Claude Code fica só no transcript, e o nome automático `brza-workspace-<hex>` não casa.
+- **Os testes.** O clique foca a aba da sessão; o nome sem aba fica sem botão. Antes do componente, o primeiro caso
+  falhou; depois, 15 arquivos → 52 passed.
+
 ## O check
 
 O `pnpm check:changed --base=origin/master --maxWorkers=2` do P62 rodou a suíte inteira, em 1514 s, e deu 22 de 26. O
@@ -56,7 +67,9 @@ O do P63 deu 23 de 26, em 1851 s: o typecheck do mesmo teste, já corrigido na `
 boundaries e os 2 casos do `open-uncommitted-entry.test.ts`, todos preexistentes. No mobile, o "words a host-restart
 returned card" espera "Orca restarted" e falha igual sem o P63.
 
+O do P64 deu 20 de 21, em 108 s; o vermelho é o import boundaries.
+
 ## O que fica
 
-- O P64, nesta sessão.
-- O C18 e o C19, com Anderson, no build depois do P64.
+- O P65, com Anderson: o C18 ao C20 num build. O C18 mostra também se o CLI ecoa ao vivo o turno do correio.
+- O worktree `.worktrees/pln-001-pedido-32` e a branch `feat/pln-001-pedido-32` saíram do `brza-studio`.

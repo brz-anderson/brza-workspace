@@ -1,12 +1,12 @@
 ---
-status: in_progress
-phase: execution
+status: in_review
+phase: review
 origin: issue
 origin_ref: os-comandos-brza-que-viram-o-pln-002
-ready: sim — o P10 espera a autorização de Anderson
+ready: sim — todo passo feito e todo achado com destino; falta o Fechamento
 estimate_h: 22.6
-executed_h: 3.2
-remaining_h: 2.1
+executed_h: 3.5
+remaining_h: 0.0
 scope:
   - workspace
   - brza-studio
@@ -18,9 +18,9 @@ tags:
 
 # PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`
 
-- **Retomar:** a revisão da entrega do P0 ao P9 fechou em 2026-10-29, com seis achados e destino para todos (R14,
-  R15). Vem o P10, que corrige o A1 ao A4 e o A6, e espera a autorização de Anderson; o A5 foi a issue. Depois do P10,
-  o Fechamento.
+- **Retomar:** o P0 ao P10 estão feitos; o último, o P10, com as correções da revisão, em `brza-workspace@82ff848`.
+  Todo achado tem destino: o A1 ao A4 e o A6 no P10, o A5 na issue. Vem o Fechamento, pela `references/close.md` da
+  plan-runner.
 - **Dividido:** [PLN-002 — Entrevista](PLN-002-interview.md) · [PLN-002 — Desenho](PLN-002-design.md)
 
 ## Pedido
@@ -347,23 +347,32 @@ Estimado: 2,5 h · Executado: 0,3 h
 ### P10 — As correções da revisão: o A1 ao A4 e o A6
 
 Executa D2, D4, D5 e D6, nos achados da [REV: a entrega do PLN-002, do P0 ao P9](../../work/reviews/pln-002-os-comandos-brza.md)
-· executor: sessão `pln-002-sessions-rename`, só com a autorização de Anderson
+· executor: sessão `pln-002-sessions-rename`, autorizada por Anderson ("sim")
 
-Estimado: 2,1 h · Executado: — h
+Estimado: 2,1 h · Executado: 0,3 h
 
-- [ ] **1. Testes que falham**, um por achado:
+- [x] **1. Testes que falham**, um por achado:
   - A1: o `brza test` no checkout principal sai com a recusa do `brza dev`, sem rodar o `PRELUDE`;
   - A2: o `--rm` do vazio recusa sem `--empty` e remove com ele; o `--force` sozinho recusa o vazio; o `--force` no sujo
     imprime `descartado:` com a razão; o `--empty` não passa por cima do sujo;
   - A3: o `note commit` sem nada novo na origin não faz o `pull`, e com a origin à frente faz;
   - A4: o `OSError` e o `KeyboardInterrupt` depois do `rmtree(APP)` mantêm o worktree temporário e imprimem o caminho;
   - A6: o esqueleto do worklog leva o nome do mapa pelo `ORCA_AGENT_SESSION_ID`, e o do transcript sem entrada.
-- [ ] **2. Implementar** no `brza-test`, no `brza-tree`, no `brza-note` e no `brza-app`, e a ajuda de cada um. O A6 usa
+- [x] **2. Implementar** no `brza-test`, no `brza-tree`, no `brza-note` e no `brza-app`, e a ajuda de cada um. O A6 usa
   as funções do `brza-sessions`, sem copiá-las.
-- [ ] **3. Rodar e ver passar** — `env -u TERM_PROGRAM python3 -m unittest discover -s scripts/brza/tests`.
-- [ ] **4. Commit** — `fix(brza): as correções da revisão do PLN-002 (PLN-002/P10)`.
+- [x] **3. Rodar e ver passar** — `env -u TERM_PROGRAM python3 -m unittest discover -s scripts/brza/tests`.
+- [x] **4. Commit** — `fix(brza): as correções da revisão do PLN-002 (PLN-002/P10)`.
 
-**Evidência:** —
+**Evidência:** `brza-workspace@82ff848`, com push na `master`.
+- Antes do código, módulo a módulo: `test_brza_test` → `FAILED (failures=1)`; `test_brza_tree` → `FAILED
+  (failures=4)`; `test_brza_note` → `FAILED (failures=3)`; `test_brza_app` → a corrida inteira caiu no
+  `KeyboardInterrupt` do caso novo do A4 (saída 130). Depois: os quatro → `OK` (15, 15, 18 e 16 casos), e `env -u
+  TERM_PROGRAM python3 -m unittest discover -s scripts/brza/tests` → `Ran 158 tests … OK`; eram 151.
+  `python3 -m unittest discover -s .claude/hooks/tests` → `OK`.
+- O A6 de verdade, neste chat: o `session_name()` do `brza-note`, pelo `ORCA_AGENT_SESSION_ID`, devolveu
+  `pln-002-sessions-rename`, o `/rename` do transcript.
+- Nenhum guia, norma ou memória cita o `tree --rm` fora das notas do PLN-002 (`grep -rln -- 'tree --rm' wiki AGENTS.md
+  CLAUDE.md README.md` e a norma do `brza-studio` → vazio).
 
 ## Regressão
 
@@ -422,6 +431,8 @@ Estimado: 2,1 h · Executado: — h
 
 ## Worklogs
 
+- 2026-10-29 — P10, as correções do A1 ao A4 e do A6, em `brza-workspace@82ff848`. Nada travou; falta o Fechamento.
+  [O PLN-002/P10: as correções da revisão](../../work/worklogs/2026-10-29-pln-002-p10-as-correcoes-da-revisao.md)
 - 2026-10-29 — a revisão da entrega do P0 ao P9, por um subagente da camada alta: seis achados, a R14 e a R15 com os
   destinos, a R1.4 reaberta pela R14.2, o D2 e o D6 reescritos, o P10 e a issue do A5. O plano volta à execução.
   [A revisão da entrega do PLN-002, do P0 ao P9](../../work/worklogs/2026-10-29-pln-002-revisao-da-entrega.md)

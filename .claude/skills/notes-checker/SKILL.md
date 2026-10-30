@@ -67,6 +67,12 @@ Sai com 0 sem erro, com 1 com erro. O corte é **o que quebra consulta ou pontei
   `work/worklogs/`, `work/reviews/`, `work/decisions/` ou `work/issues/` que linka um plano aberto e falta na seção de
   ponteiro dele (`backlink-missing`).
 
+**Link para nota de outro workstream:** o alvo que não está na árvore se procura nas branches `workstream/*`, as locais
+e as de `origin`, pelo `git ls-tree` de cada uma, calculado uma vez; só o que não existe em nenhuma é `unresolved-link`.
+O `origin_ref` de plano que aponta para issue, decisão ou plano (`PLN-NNN`) fora da árvore se procura do mesmo jeito.
+Fora de repositório git, ou sem branch `workstream/*`, só vale a árvore. O `move_note.py` reescreve só os links da
+árvore atual.
+
 **Nome repetido continua proibido**: dois arquivos com o mesmo nome confundem buscas e referências no acervo. A exceção
 é o `README.md`, que é a norma de cada zona, nunca nota — o `work/README.md` e o `plans/README.md` repetem o nome por
 construção.

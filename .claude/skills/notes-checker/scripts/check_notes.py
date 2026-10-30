@@ -4,13 +4,15 @@
 Confere a forma das notas contra a norma do work/README.md e do plans/README.md. Adaptado do checador do workspace da
 Fixfy, sem o que é só de lá (o fixfy-vault, o painel, as origens sprint e card, o campo ticket, as tags da Fixfy):
 
-  erro   nome de arquivo duplicado; link Markdown relativo quebrado; [[wikilink]] fora de código;
+  erro   nome de arquivo duplicado; link Markdown relativo quebrado — o que existe em outra branch workstream/* não
+         está quebrado, e o origin_ref de plano também se procura lá; [[wikilink]] fora de código;
          status fora do vocabulário; campo obrigatório ausente em nota datada de CUTOFF em diante;
          plano aberto fora do molde do plans/README.md — o frontmatter, o Retomar e as seções (plan_findings)
   aviso  o mesmo campo ausente em nota sem data nenhuma; type redundante; tag fora do vocabulário; achado de um parecer
          de work/reviews/ sem **Evidência:**; nota de work/ que linka um plano aberto e falta na seção de ponteiro dele
 
-Só biblioteca padrão. Não altera nada. Sai com 1 se houver erro, 2 se não achar as notas.
+Só biblioteca padrão (e o git, para as branches workstream/*). Não altera nada. Sai com 1 se houver erro, 2 se não
+achar as notas.
 
 Uso:
   check_notes.py [--root DIR] [--json] [--detail]
@@ -24,6 +26,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 from collections import defaultdict
 from urllib.parse import unquote
@@ -163,10 +166,61 @@ def md_link_targets(text):
             yield href, path_part
 
 
-def resolves_md_link(path_part, src_full, full_paths):
+class WorkstreamIndex:
+    """Os arquivos das branches workstream/* do repositório da raiz — as locais e as de origin/workstream/* —, para o
+    link e o origin_ref que apontam para a nota de outro workstream. A lista de cada ref sai de um `git ls-tree` só, na
+    primeira consulta, e não há chamada ao git por link. Fora de repositório git, ou sem branch workstream, não acha
+    nada."""
+
+    def __init__(self, root):
+        self.root = os.path.realpath(root)
+        self._paths = None
+        self._base = None
+
+    def _load(self):
+        self._paths, self._base = set(), self.root
+        try:
+            top = self._git("rev-parse", "--show-toplevel").strip()
+            refs = self._git("for-each-ref", "--format=%(refname)", "refs/heads/workstream/",
+                             "refs/remotes/origin/workstream/").split()
+        except (OSError, subprocess.CalledProcessError):
+            return
+        self._base = os.path.realpath(top)
+        for ref in refs:
+            try:
+                names = self._git("ls-tree", "-r", "-z", "--name-only", ref).split("\0")
+            except subprocess.CalledProcessError:
+                continue
+            self._paths.update(n for n in names if n)
+
+    def _git(self, *args):
+        return subprocess.run(["git", "-C", self.root, *args], capture_output=True, text=True, check=True).stdout
+
+    def _repo_path(self, full):
+        """O caminho de `full` relativo à raiz do repositório, ou None quando cai fora dele."""
+        rel = os.path.relpath(os.path.realpath(full), self._base).replace(os.sep, "/")
+        return None if rel == ".." or rel.startswith("../") else rel
+
+    def has(self, full):
+        """Há o arquivo `full` (caminho no disco, que pode não existir) em alguma branch workstream/*."""
+        if self._paths is None:
+            self._load()
+        rel = self._repo_path(full)
+        return rel is not None and rel in self._paths
+
+    def has_prefix(self, full_prefix):
+        """Há arquivo em alguma branch workstream/* cujo caminho começa por `full_prefix`."""
+        if self._paths is None:
+            self._load()
+        rel = self._repo_path(full_prefix)
+        return rel is not None and any(p.startswith(rel) for p in self._paths)
+
+
+def resolves_md_link(path_part, src_full, full_paths, workstreams=None):
     target_full = os.path.normpath(os.path.join(os.path.dirname(src_full), path_part))
-    # Aceita também arquivo existente fora do acervo, como o molde do plano
-    return target_full in full_paths or os.path.isfile(target_full)
+    # Aceita também arquivo existente fora do acervo, como o molde do plano, e o de outra branch workstream/*
+    return (target_full in full_paths or os.path.isfile(target_full)
+            or bool(workstreams and workstreams.has(target_full)))
 
 
 def findings_without_evidence(text):
@@ -220,19 +274,22 @@ def as_list(value):
     return [value] if value else []
 
 
-def origin_ref_found(root, origin, ref):
-    """O origin_ref aponta para o que existe: a issue, a decisão ou a pasta do plano em plans/. O /A<n> não se
-    confere."""
+def origin_ref_found(root, origin, ref, workstreams=None):
+    """O origin_ref aponta para o que existe: a issue, a decisão ou a pasta do plano em plans/, na árvore ou numa branch
+    workstream/*. O /A<n> não se confere."""
     if origin in ("issue", "decision"):
-        return os.path.isfile(os.path.join(root, "work", f"{origin}s", f"{ref}.md"))
+        path = os.path.join(root, "work", f"{origin}s", f"{ref}.md")
+        return os.path.isfile(path) or bool(workstreams and workstreams.has(path))
     if origin == "plan":
         number = ref.split("/", 1)[0]
         folder = os.path.join(root, "plans")
-        return os.path.isdir(folder) and any(n.startswith(number + "-") for n in os.listdir(folder))
+        if os.path.isdir(folder) and any(n.startswith(number + "-") for n in os.listdir(folder)):
+            return True
+        return bool(workstreams and workstreams.has_prefix(os.path.join(folder, number + "-")))
     return True
 
 
-def plan_findings(root, rel, full, fm, text, linking):
+def plan_findings(root, rel, full, fm, text, linking, workstreams=None):
     """(erros, avisos) do -plan.md aberto contra o molde do plans/README.md: o frontmatter, o Retomar e as seções de
     ponteiro. O plano done ou dropped não passa por aqui."""
     errors, warnings = [], []
@@ -256,7 +313,7 @@ def plan_findings(root, rel, full, fm, text, linking):
             errors.append(("origin-ref-on-request", rel, ref))
     elif not ref:
         errors.append(("origin-ref-missing", rel, origin))
-    elif not origin_ref_found(root, origin, ref):
+    elif not origin_ref_found(root, origin, ref, workstreams):
         errors.append(("origin-ref-not-found", rel, f"{origin} {ref}"))
 
     if not fm.get("ready"):
@@ -310,6 +367,7 @@ def check(root):
     errors, warnings, broken = [], [], []
     open_plans, linking = [], defaultdict(list)
     full_paths = {os.path.normpath(p) for p in on_disk.values()}
+    workstreams = WorkstreamIndex(root)
 
     names = defaultdict(list)
     for rel in all_files:
@@ -332,7 +390,7 @@ def check(root):
         for wl in wikilink_targets(linked):
             errors.append(("wikilink-forbidden", rel, f"[[{wl}]]"))
         for href, path_part in md_link_targets(linked):
-            if not resolves_md_link(path_part, src_full, full_paths):
+            if not resolves_md_link(path_part, src_full, full_paths, workstreams):
                 broken.append((rel, href))
 
         genre = genre_of(rel)
@@ -388,7 +446,7 @@ def check(root):
                 warnings.append(("tag-out-of-vocabulary", rel, tag))
 
     for rel, full, fm, text in open_plans:
-        found_errors, found_warnings = plan_findings(root, rel, full, fm, text, linking)
+        found_errors, found_warnings = plan_findings(root, rel, full, fm, text, linking, workstreams)
         errors.extend(found_errors)
         warnings.extend(found_warnings)
 

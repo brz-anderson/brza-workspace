@@ -14,13 +14,13 @@ worklog.
 
 | Regra | Como |
 | :---- | :--- |
-| Pasta | Uma por plano, mesmo com um arquivo só: `plans/PLN-001-assunto/`. O número é sequencial, não se reusa, e a linha "Último PLN usado" acima sobe no mesmo commit que abre o plano |
+| Pasta | Uma por plano, mesmo com um arquivo só: `plans/PLN-001-assunto/`, no workstream da sessão que o abre, e nunca na `master`. O número é sequencial e não se reusa. A linha "Último PLN usado" acima sobe na `master`, num commit de norma, antes de o plano ser gravado |
 | Arquivos | `PLN-001-plan.md` sempre; `-interview.md` e `-design.md` quando o plano passa de ~400 linhas ou o desenho de ~800. O `-plan` é o arquivo lido para retomar |
 | IDs | `R3.2` rodada e pergunta, só cresce · `D3` item do Desenho, reescrito no lugar · `P3` passo · `X1` desvio · `A1` achado · `C1` caso manual. Citação de fora: `PLN-001/D3` |
 | Estado | Frontmatter **só no `-plan.md`**: `status`, `phase`, `origin`, `origin_ref`, `ready` e as três horas, na forma do molde; o `Retomar` é a primeira linha abaixo do H1 |
 | Origem | `origin` em `issue` · `decision` · `plan` · `request`; `origin_ref` com o nome da nota sem `.md`, `PLN-NNN` ou `PLN-NNN/A<n>`, ausente com `request`. Uma origem por plano: com mais de uma, vale a ordem `issue` > `plan` > `decision`, e as outras ficam na linha `- **Origem:**` do Pedido. Plano que veio de outro workspace é `request`, com a procedência na linha `- **Origem:**` |
 | Seções de ponteiro | `## Worklogs`, sempre; `## Revisões`, `## Decisões`, `## Pendências conhecidas` e `## Documentação` quando há o que apontar, depois dos Desvios. À mão; o checador avisa a nota de `work/` que linka o plano e falta na seção, e a `plan-runner` acerta ao retomar |
-| Branch | O trabalho de plano no `brza-studio` leva o plano no nome da branch: `<tipo>/pln-NNN-<slug>`; um worktree em `<repo>/.worktrees/` e uma sessão por entrega. As notas do plano seguem neste repositório |
+| Branch | O plano mora no workstream da frente, onde fica também depois de fechar. O trabalho de plano no `brza-studio` leva o plano no nome da branch: `<tipo>/pln-NNN-<slug>`, com um worktree em `<repo>/.worktrees/` e uma sessão por entrega. Ali, o `brza note` acha o workstream procurando o `plans/PLN-NNN-*` nas branches `workstream/*` |
 | Rodadas | Gravadas na hora em que fecham, com o que foi apresentado antes, todas as opções com custo e quando se pagam, e a resposta |
 | Evidência | `[x]` sem evidência não conta: o commit, o comando e o resultado, `arquivo:linha` |
 | Estimativa | Todo passo que executa algo leva `Estimado: N h · Executado: — h`; o frontmatter soma `estimate_h`, `executed_h` e `remaining_h` |

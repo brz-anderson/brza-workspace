@@ -3,6 +3,10 @@
 O workspace pessoal de Anderson para o **BrzA Studio** (`~/Projects/brza-studio`, o fork do Orca que antes se chamava
 `orca-dev`): os planos, o registro do que foi feito e as decisões ficam aqui, e o código fica no `brza-studio`.
 
+As pastas de notas não moram na `master`, que guarda só a norma: cada frente de trabalho é uma branch
+`workstream/<nome>`, com worktree em `.worktrees/<nome>`. Os de agora são o `studio` (o app), o `tools-kit` (o `brza`,
+os scripts e os plugins) e o `workspace` (a própria norma).
+
 | Pasta | O que guarda |
 | :---- | :----------- |
 | `plans/` | Os planos, uma pasta por plano (`plans/PLN-001-…/`), com a norma no [`plans/README.md`](plans/README.md) |
@@ -16,8 +20,11 @@ O workspace pessoal de Anderson para o **BrzA Studio** (`~/Projects/brza-studio`
 A norma de escrita das notas está no [`work/README.md`](work/README.md). Os comandos rodam da raiz deste repositório.
 
 ```bash
-# Conferir as notas antes de commitar
+# Conferir as notas antes de commitar, no worktree do workstream
 python3 .claude/skills/notes-checker/scripts/check_notes.py
+
+# Levar a norma da master a cada worktree de workstream
+brza note sync
 
 # Testar os hooks de medição
 python3 -m unittest discover -s .claude/hooks/tests
@@ -27,7 +34,8 @@ python3 scripts/summarize_measurements.py
 ```
 
 A norma de agente está no [`AGENTS.md`](AGENTS.md), e o adaptador do Claude Code no [`CLAUDE.md`](CLAUDE.md). O commit
-é com o `brz-anderson`, pelo `env` do `.claude/settings.json`, e o push vai direto na `master`, pela chave `personal`.
+é com o `brz-anderson`, pelo `env` do `.claude/settings.json`, e o push vai pela chave `personal`: a norma à `master`, e
+as notas à branch do workstream.
 
 ## Funções do shell
 

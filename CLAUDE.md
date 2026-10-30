@@ -16,7 +16,7 @@ mecânica própria do Claude.
 | estágio de workflow        | cada `agent()` de um workflow                                                                    |
 | camada alta, média, rápida | Opus, Sonnet, Haiku — o `haiku` é o Haiku 5.5, pelo `env` do `settings.json`                     |
 | scratch                    | o scratchpad da sessão, anunciado no arranque, em `/private/tmp/claude-501/…`                    |
-| sessão nova                | `/exit` e `claude --name <nome>` no mesmo terminal, sem `--resume`, `--continue` nem `--rc`       |
+| sessão nova                | `/exit` e `claude --name <nome>` no worktree do workstream, `.worktrees/<nome>`, sem `--resume`, `--continue` nem `--rc`; pelo `brza sessions`, com `--checkout .worktrees/<nome>` |
 | compactação                | `/compact`; o runtime também compacta sozinho perto do limite da janela                          |
 
 O comando que a sessão passa a Anderson para abrir uma sessão nova com prompt é `claude --name <nome> "<prompt>"`.
@@ -83,4 +83,4 @@ pedidos auxiliares — em 5 min (`subagentPromptCacheTtl`). Na medição de 2026
 US$ 11 a mais na escrita e evitou US$ 19 de regravação, em 32 pausas de 5 a 60 min.
 
 Não há trava de retomada. O `resume_guard.py` barrava o prompt que acordava uma sessão grande parada além do TTL, mas em
-dois dias barrou uma vez só, e saiu do `UserPromptSubmit` com a norma de uma sessão por frente do `AGENTS.md`.
+dois dias barrou uma vez só, e saiu do `UserPromptSubmit` com a norma de uma sessão por workstream do `AGENTS.md`.

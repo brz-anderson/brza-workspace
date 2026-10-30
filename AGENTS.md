@@ -11,33 +11,47 @@ delegação a _subagente_. Identificador, comando, caminho e chave de configura�
 quando cada um roda sozinho —, nunca em cerca sem linguagem. O chat do BrzA Studio só mostra o ▶, que roda o bloco
 num terminal do worktree do chat, nas cercas `sh`, `bash`, `zsh`, `shell` e `console`.
 
-## Planos vivem em `plans/`, e as execuções em `work/`
+## Cada workstream mora numa branch, e a `master` guarda só a norma
 
 Os planos ficam em `plans/`, uma pasta por plano, com a norma no [`plans/README.md`](plans/README.md). O resto do estado
 de trabalho fica em `work/`, uma pasta por gênero de nota, e os guias em `wiki/guides/`. **A pasta diz o gênero; o estado
 está no campo `status` do frontmatter.** A norma de escrita de cada pasta está no [`work/README.md`](work/README.md).
 
+**Essas notas não moram na `master`.** Cada _workstream_ — uma frente de trabalho — é uma branch `workstream/<nome>`,
+nascida da `master`, com um worktree em `.worktrees/<nome>`:
+- **Na `master`:** só a norma — este arquivo, o `CLAUDE.md`, o `README.md`, o `plans/README.md`, o `work/README.md`, o
+  `.claude/`, o `scripts/` e o `.gitignore`.
+- **No workstream:** a norma, que chega pelo `git merge` da `master`, e as notas da frente, com os planos dela, abertos
+  e fechados. A branch nunca volta à `master`.
+- **Os de agora:** o `studio`, o app; o `tools-kit`, o `brza`, os scripts e os plugins; o `workspace`, a própria norma.
+  **Workstream novo só nasce por pedido de Anderson**, pelo `brza note workstream <nome>`.
+- **Workstream encerrado** perde o worktree e fica com a branch.
+
 Antes de começar qualquer trabalho aqui, leia as notas com **`blocks`** preenchido e `status` diferente de `done` e
-`dropped`. É onde ficam os bloqueios em vigor, em qualquer pasta:
+`dropped`, em todos os workstreams. É onde ficam os bloqueios em vigor:
 
 ```bash
-grep -rl '^blocks:' work plans wiki | xargs grep -LE '^status: (done|dropped)'
+for b in $(git for-each-ref --format='%(refname:short)' refs/heads/workstream/); do git grep -l '^blocks:' "$b" -- work plans wiki | while read -r f; do git show "$f" | grep -qE '^status: (done|dropped)' || echo "$f"; done; done
 ```
 
-Link entre notas é Markdown relativo, com o H1 da nota de destino como rótulo, sem `[[wikilinks]]`.
-- **Conferir:** `python3 .claude/skills/notes-checker/scripts/check_notes.py`.
-- **Mover ou renomear:** o `move_note.py` ao lado, que reescreve os links.
+Link entre notas é Markdown relativo, com o H1 da nota de destino como rótulo, sem `[[wikilinks]]`, também para a nota
+de outro workstream.
+- **Conferir:** `python3 .claude/skills/notes-checker/scripts/check_notes.py`, que procura nos outros workstreams o alvo
+  que falta na árvore.
+- **Mover ou renomear:** o `move_note.py` ao lado, que reescreve os links do workstream em que roda.
 - **Nome acompanha o foco:** quando o foco de uma nota ou de um plano muda, o nome do arquivo, o H1 e os links mudam
   junto, com `move_note.py <origem> <destino> --title "<H1 novo>"`.
 
-Nota se grava direto na `master`, com `git add` por caminho e `git pull --rebase` quando outro push corre junto.
+**Nota se grava na branch do workstream, pelo `brza note commit`**, que recusa a `master` e dá o push no workstream.
+**Norma se grava na `master`**, com `git add` por caminho e `git pull --rebase` quando outro push corre junto, e chega
+aos workstreams pelo `brza note sync`, que faz o `git merge` da `master` em cada worktree.
 
 ## Quem commita é o brz-anderson
 
 Os commits deste repositório e do `brza-studio` saem com o noreply do `brz-anderson`
 (`240569289+brz-anderson@users.noreply.github.com`) e vão ao GitHub pela chave `personal`. A identidade vem do ambiente
-da sessão, como diz o adaptador do runtime, e não depende do `.git/config`. O push vai direto na `master`, daqui e do
-`brza-studio`, sem PR.
+da sessão, como diz o adaptador do runtime, e não depende do `.git/config`. O push vai direto, sem PR: daqui, a norma
+na `master` e as notas na branch do workstream; do `brza-studio`, na `master`.
 
 ## O uso é medido
 
@@ -58,16 +72,16 @@ Arquivo criado ou alterado fora deste repositório e do `brza-studio` — o `~/.
 runtime… — entra no worklog do dia, na seção `## Fora do workspace`, na forma do [`work/README.md`](work/README.md). O
 mesmo vale para comando que muda estado fora deles: daemon, login, `kill`, app instalado. Leitura pura fica de fora.
 
-## Uma frente, uma sessão; uma tarefa, um worklog
+## Um workstream, uma sessão; uma tarefa, um worklog
 
-**A sessão acompanha a frente de trabalho — o plano ou o assunto —, e não a tarefa.** A tarefa encadeada na mesma frente
-segue na sessão que já tem o contexto. Sessão nova relê a norma, o plano e as notas: na medição de 2026-10-27 a
+**A sessão acompanha o workstream — a frente de trabalho —, e não a tarefa, e roda no worktree dele.** A tarefa
+encadeada no mesmo workstream segue na sessão que já tem o contexto. Sessão nova relê a norma, o plano e as notas: na medição de 2026-10-27 a
 2026-10-29, esse arranque foi metade do gasto da sessão principal, e retomar uma sessão de 175 mil tokens com o cache
 vencido custou o mesmo que abrir uma nova.
 
 **Sessão nova abre quando:**
-- muda o plano ou o assunto;
-- o contexto passa de ~200 mil tokens — antes disso, a _compactação_ enxuga a sessão sem perder a frente;
+- muda o workstream, o plano ou o assunto;
+- o contexto passa de ~200 mil tokens — antes disso, a _compactação_ enxuga a sessão sem perder o workstream;
 - quem pediu pede.
 
 **A tarefa fecha num worklog na hora em que fecha**, com o contexto ainda quente:
@@ -77,7 +91,7 @@ vencido custou o mesmo que abrir uma nova.
 O corte de tarefa segue os três testes da norma de `work/worklogs/`: mudou o assunto, virou o dia ou houve decisão. **O
 corte fecha o worklog, não a sessão.**
 
-**Pedido de outra frente abre sessão nova**, e nunca entra na sessão em que quem pediu trabalha. O pedido que fica para
+**Pedido de outro workstream abre sessão nova**, e nunca entra na sessão em que quem pediu trabalha. O pedido que fica para
 depois vai ao `Retomar` do plano ou a uma issue.
 
 **Devolução e aviso vão a arquivo**: o worklog, o `Retomar` ou a issue. "Recebido" não se manda, e o _correio_ de volta
@@ -173,3 +187,5 @@ O vocabulário deste arquivo. A tradução para cada runtime está no adaptador 
 - _camada_ alta, média ou rápida — o nível de modelo, da que julga à que coleta.
 - _scratch_ — o diretório temporário da sessão, fora do repositório, para o que não vai ao git.
 - _compactação_ — o resumo que o runtime faz da conversa, no lugar dela, para a sessão seguir com menos contexto.
+- _workstream_ — a frente de trabalho, como o `studio` ou o `tools-kit`, com os planos e as notas dela. Mora numa branch
+  `workstream/<nome>` e num worktree em `.worktrees/<nome>`.

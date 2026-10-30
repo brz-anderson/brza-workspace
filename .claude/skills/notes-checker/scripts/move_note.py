@@ -13,6 +13,10 @@ A origem é uma nota ou a pasta de um plano, que se move inteira:
 
 Quando o foco da nota muda, o nome, o H1 e os links mudam juntos (work/README.md, "Como funciona").
 
+O script lê e reescreve só a árvore atual. O link de uma nota de outro workstream (outra branch `workstream/*`, que o
+check_notes.py aceita) não é reescrito aqui: o rótulo e o caminho dele mudam na branch do outro workstream, com o
+move_note.py rodado no worktree dele, e quem aponta de fora para a nota movida acusa `unresolved-link` até lá.
+
 Uso:
   python3 .claude/skills/notes-checker/scripts/move_note.py <origem> <destino> [--title "H1 novo"] [--root DIR] [--dry-run]
 """

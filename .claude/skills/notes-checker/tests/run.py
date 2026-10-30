@@ -68,6 +68,7 @@ def main():
         fails = (check_rules(tmp) + check_template_and_empty_root(tmp) + check_move_note(tmp)
                  + check_move_plan(tmp) + check_plans_at_root(tmp))
         fails += check_plan_rules()
+        fails += check_workstream_links()
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     sys.exit(1 if fails else 0)
@@ -426,6 +427,119 @@ def check_plan_rules():
     expect("backlink-missing nunca é erro", not any(r == "backlink-missing" for r, _, _ in errors))
     expect("sem a data, a linha sem link do Worklogs não é cobrada",
            "worklog-line-without-link" not in rules(errors_without_date, "plans/PLN-922-caso/PLN-922-plan.md"))
+    return fails
+
+
+GIT_ENV = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
+           "GIT_COMMITTER_EMAIL": "t@t", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull}
+
+
+def git(cwd, *args):
+    return subprocess.run(["git", "-C", cwd, *args], check=True, capture_output=True, text=True, env=GIT_ENV).stdout
+
+
+def commit_branch(repo, branch, notes, start="master"):
+    """Cria `branch` a partir de `start` (None: no lugar, para o primeiro commit) no `repo`, grava `notes` nela e
+    commita; deixa o repositório na branch."""
+    git(repo, "checkout", "-q", "-B", branch, *([start] if start else []))
+    write_notes(repo, notes)
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", branch)
+
+
+WORKSTREAM_STUDIO = {
+    "work/issues/issue-do-workstream.md": "---\nstatus: open\nopened: 2026-10-27\n---\n# Issue do workstream\n",
+    "work/decisions/decisao-do-workstream.md": "---\nstatus: open\nopened: 2026-10-27\ntrigger: quando vier\n---\n# Decisão do workstream\n",
+    "plans/PLN-810-do-workstream/PLN-810-plan.md": "# PLN-810: Do workstream\n",
+}
+# O plano aberto cujo origin_ref aponta para o que o workstream studio tem ou não tem
+WORKSTREAM_PLANS = {"801": "origin: issue\norigin_ref: issue-do-workstream", "802": "origin: decision\norigin_ref: decisao-do-workstream",
+               "803": "origin: plan\norigin_ref: PLN-810/A1", "804": "origin: issue\norigin_ref: issue-em-lugar-nenhum",
+               "805": "origin: plan\norigin_ref: PLN-899", "806": "origin: issue\norigin_ref: issue-so-no-origin"}
+
+
+def check_workstream_links():
+    """Link e origin_ref que apontam para nota de outro workstream: o checador procura nas branches workstream/*, as locais e as de
+    origin/workstream/*, com um git ls-tree por ref; sem repositório git ou sem branch workstream, vale só a árvore."""
+    tmp = os.path.realpath(tempfile.mkdtemp())
+    fails = 0
+
+    def expect(label, ok, detail=""):
+        nonlocal fails
+        print(("  ok  " if ok else "FALHA ") + label + ("" if ok else f": {detail}"))
+        fails += not ok
+
+    try:
+        origin, repo = os.path.join(tmp, "origin.git"), os.path.join(tmp, "ws")
+        subprocess.run(["git", "init", "-q", "--bare", "-b", "master", origin], check=True)
+        subprocess.run(["git", "clone", "-q", origin, repo], check=True, capture_output=True, env=GIT_ENV)
+        commit_branch(repo, "master", {"work/README.md": "# Norma\n"}, start=None)
+        git(repo, "push", "-q", "origin", "master")
+        commit_branch(repo, "workstream/studio", WORKSTREAM_STUDIO)
+        # Só no origin: a branch local é apagada depois do push
+        commit_branch(repo, "workstream/so-origin", {"work/issues/issue-so-no-origin.md":
+                                                "---\nstatus: open\nopened: 2026-10-27\n---\n# Só no origin\n"})
+        git(repo, "push", "-q", "origin", "workstream/so-origin")
+        notes = {
+            "work/issues/link-de-outro-workstream.md": "---\nstatus: open\nopened: 2026-10-27\n---\n"
+                                                  "[a](issue-do-workstream.md) [b](../decisions/decisao-do-workstream.md#x) "
+                                                  "[c](../../plans/PLN-810-do-workstream/PLN-810-plan.md)\n",
+            "work/issues/link-so-no-origin.md": "---\nstatus: open\nopened: 2026-10-27\n---\n[d](issue-so-no-origin.md)\n",
+            "work/issues/link-em-lugar-nenhum.md": "---\nstatus: open\nopened: 2026-10-27\n---\n[e](nao-esta-em-workstream.md)\n",
+            "work/issues/link-fora-do-repo.md": "---\nstatus: open\nopened: 2026-10-27\n---\n[f](../../../fora.md)\n",
+        }
+        for number, ref in WORKSTREAM_PLANS.items():
+            text = PLAN.replace("PLN-900: Conforme", f"PLN-{number}: Caso")
+            text = text.replace("origin: issue\norigin_ref: uma-issue", ref)
+            notes[f"plans/PLN-{number}-caso/PLN-{number}-plan.md"] = text
+        commit_branch(repo, "workstream/tools-kit", notes)
+        git(repo, "branch", "-q", "-D", "workstream/so-origin")
+        git(repo, "fetch", "-q", "origin")
+
+        calls = []
+        real_run = subprocess.run
+
+        def spy(cmd, *a, **k):
+            calls.append(cmd)
+            return real_run(cmd, *a, **k)
+
+        cn.subprocess.run = spy
+        try:
+            _, errors, _, broken = cn.check(repo)
+        finally:
+            cn.subprocess.run = real_run
+        broken_links = {(w, h) for w, h in broken}
+        i = "work/issues/"
+        expect("link para nota de outro workstream local resolve",
+               not any(w == i + "link-de-outro-workstream.md" for w, _ in broken_links), broken_links)
+        expect("link para nota que só está em origin/workstream/* resolve",
+               not any(w == i + "link-so-no-origin.md" for w, _ in broken_links), broken_links)
+        expect("link para o que nenhum workstream tem continua quebrado",
+               (i + "link-em-lugar-nenhum.md", "nao-esta-em-workstream.md") in broken_links, broken_links)
+        expect("link que sai da raiz do repositório continua quebrado",
+               (i + "link-fora-do-repo.md", "../../../fora.md") in broken_links, broken_links)
+        found = {n: {r for r, w, _ in errors if w == f"plans/PLN-{n}-caso/PLN-{n}-plan.md"} for n in WORKSTREAM_PLANS}
+        for number, ref in WORKSTREAM_PLANS.items():
+            lost = number in ("804", "805")
+            expect(f"origin_ref {ref.split(chr(10))[1].split(': ')[1]} "
+                   f"{'não achado é erro' if lost else 'em outro workstream resolve'}",
+                   ("origin-ref-not-found" in found[number]) == lost, found[number])
+        trees = [c for c in calls if "ls-tree" in c]
+        refs = git(repo, "for-each-ref", "--format=%(refname)", "refs/heads/workstream/", "refs/remotes/origin/workstream/").split()
+        expect("um ls-tree por ref, e não um git por link", len(trees) == len(refs) > 2, (len(trees), refs))
+
+        # Repositório sem branch workstream/*: só vale a árvore
+        solo = os.path.join(tmp, "solo")
+        git(tmp, "init", "-q", "-b", "master", solo)
+        write_notes(solo, {"work/issues/a.md": "---\nstatus: open\nopened: 2026-10-27\n---\n[x](b.md)\n"})
+        git(solo, "add", ".")
+        git(solo, "commit", "-q", "-m", "um")
+        _, _, _, broken_solo = cn.check(solo)
+        expect("repositório sem branch workstream/* mantém o comportamento", broken_solo == [("work/issues/a.md", "b.md")],
+               broken_solo)
+    finally:
+        cn.subprocess.run = subprocess.run
+        shutil.rmtree(tmp, ignore_errors=True)
     return fails
 
 

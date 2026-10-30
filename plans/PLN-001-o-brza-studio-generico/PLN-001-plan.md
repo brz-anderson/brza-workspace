@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P57 do pedido 30 e os casos manuais, com Anderson"
-estimate_h: 124.5
+ready: "sim — o P58 ao P60 do pedido 31, cada um com a autorização de Anderson; o P57, o P61 e os casos manuais com Anderson"
+estimate_h: 146.8
 executed_h: 19.3
-remaining_h: 3.3
+remaining_h: 25.6
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -16,10 +16,10 @@ tags:
 
 # PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat
 
-- **Retomar:** o P56 e os testes do P26.4, do P43.4 e do P44.4 feitos em 2026-10-29 (`brza-studio@fc43b03b9ef`,
-  `8e708f9790d`, `2e263df152f` e `8850460267c`); a próxima tarefa é o P57, com Anderson, junto dos casos manuais (C1 ao
-  C7, C10, C11, C12 e C14, num build só); esperam Anderson também o X10, o X20 e o P27.2 e o P27.3; aberto desde a
-  Fixfy, o P37.
+- **Retomar:** o pedido 31 entrou em 2026-10-29, com a R48 e a R49, o D45 ao D47 e o P58 ao P61; a próxima tarefa é
+  o P58, com a autorização de Anderson, numa sessão do `brza-studio`, e depois o P59 e o P60, que não dependem um do
+  outro; esperam Anderson o P57 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, e o C15 ao C17 do pedido
+  31, depois do P60), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
@@ -77,6 +77,9 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 - **Pedido 29 (2026-10-27, sessão `fixfy-9b` da Fixfy):** "e links no chat, na cor azul padrão de link, mais clarinho"
 - **Pedido 30 (2026-10-28, sessão do `brza-workspace` que orquestrou o P42 e o P43):** "seria mto bom se conseguicemos
   adicionar image preview no chat"
+- **Pedido 31 (2026-10-29, sessão do `brza-workspace` que orquestrou o P54 ao P56):** "o fundo do visualizador de
+  markdown ficou mto escuro, deixe da mesma cor que o fundo do chat, deixe com o mesmo tema/tipografia que o chat - o
+  terminal igual ao chat tbm -, trocar o tema do chat, troca de todos, trocar o tema dos outros troca só deles"
 
 ### Cobertura
 
@@ -110,6 +113,10 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 30` | A linha da ferramenta mostra, fechada, até 4 miniaturas de ~96 px e um "+N" que abre a linha; o clique amplia (R36.3, R39.4, R42.1) | P55 | teste do componente (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 30` | O caminho ou a URL de imagem solto no texto ganha a miniatura abaixo do parágrafo, uma vez por mensagem, só se abre e só com a mensagem terminada (R39.2, R39.3, R42.2) | P56 | teste do plugin (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 30` | O `![]()`, o anexo enviado e o ampliar ao clicar, que já existem, funcionam no BrzA Studio (R36.1) | P57 | conferência no BrzA Studio (manual) |
+| `Pedido 31` | O chat tem um tema próprio, um par escuro e claro do catálogo do terminal, com o "Padrão do BrzA" de hoje como padrão; o "igualar ao terminal" sai, e quem o tinha ligado não vê mudança (R48.1, R48.4, R49.2, R49.3) | P58 | teste do resolvedor, da migração e da seção (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 31` | O terminal tem o interruptor "Seguir o chat", ligado por padrão: ligado, o fundo e as cores são os do chat, com a fonte do terminal; desligado, o tema próprio de hoje (R48.2, R48.3) | P59 | teste da aparência do terminal (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 31` | O visualizador de Markdown tem o interruptor "Seguir o chat", ligado por padrão: ligado, os três modos têm o fundo e o claro/escuro do chat, e o olho e o lápis, a fonte e o tamanho do chat; desligado, um seletor de tema próprio (R48.2, R48.3, R49.1, R49.4) | P60 | teste do fundo e da tipografia nos três modos (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 31` | Trocar o tema do chat troca os três que o seguem; trocar o do terminal ou o do Markdown troca só ele | P61 | conferência no BrzA Studio (manual) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
 
@@ -729,6 +736,64 @@ deixava "a perguntar a Anderson com opções". As opções e o preço não foram
    e as linhas do `NativeChatDiffCard`) e os diagramas e visuais (o Mermaid e o `NativeChatInlineVisual`) seguem a
    regra; a saída de ferramenta não. Vai ao P52.
 
+### Rodada 48 — o tema do chat manda no Markdown e no terminal (enviada 2026-10-29)
+
+> **Apresentado antes:** o levantamento de um subagente Sonnet, só leitura, no `brza-studio`. O chat não tem tema
+> próprio: o `NativeChatAppearanceSettings` não tem campo de tema (`src/shared/native-chat-appearance-settings.ts:3-16`)
+> e segue o claro/escuro do app, ou, com o `matchTerminalInterface`, o tema do terminal
+> (`native-chat-appearance-style.ts:105-158`): a herança vai do terminal ao chat. O olho do Markdown não declara fundo
+> e herda o `bg-background` do `body`, `#0a0a0a` no escuro (`main.css:304`, `:662`; inferência, não conferida no app);
+> o lápis usa `--editor-surface`, `#1e1e1e` (`rich-markdown-editor.css:9`); o modo código, o Islands Dark, `#191A1C`
+> (`islands-dark-theme.ts:9`); o chat, `#161616`, calculado (`main.css:576-584`); e o terminal, o Ghostty Default Style
+> Dark, `#282c34` (`src/shared/terminal-themes/defaults.ts:6-7`). O Markdown não tem tema configurável.
+
+Respondida em 2026-10-29, por Anderson na sessão do `brza-workspace` que orquestrou o P54 ao P56, pelo AskUserQuestion.
+Os custos são estimativa do levantamento, não medidos.
+
+1. **R48.1 — O que passa a ser o tema do chat.** Seleção única. Opções: seletor novo, com o catálogo de temas do
+   terminal (recomendada) — custo: 6 a 9 h; se paga: na hora, é o único jeito de "trocar o tema do chat troca todos";
+   o tema do app, com o fundo de hoje do chat — custo: 2 a 3 h; se paga: na hora para o fundo, nunca para trocar o
+   tema só do chat.
+   **Decidido — "Seletor novo (Recomendado)".** Vai ao D45 e ao P58.
+2. **R48.2 — Como o Markdown e o terminal guardam "segue o chat" ou "tema próprio".** Seleção única. Opções: campo
+   por superfície, que passa a "próprio" ao escolher um tema (recomendada) — custo: 5 a 7 h; se paga: na hora;
+   interruptor por superfície, com o seletor desabilitado enquanto ligado — custo: 4 a 6 h; se paga: na hora, com dois
+   cliques para trocar.
+   **Decidido — "Interruptor por superfície".** Vai ao D46, ao D47, ao P59 e ao P60.
+3. **R48.3 — A tipografia do chat no terminal e no modo código.** Seleção única. Opções: só no texto — o olho e o
+   lápis levam a fonte e o tamanho do chat, e o terminal e o modo código, só as cores e o fundo, com a fonte de código
+   do chat, que já é a do terminal (recomendada) — custo: 3 a 4 h; se paga: na hora; em tudo — custo: 5 a 7 h; se
+   paga: nunca com fonte proporcional, que desalinha o terminal.
+   **Decidido — "Só no texto (Recomendado)".** Vai ao D46, ao D47, ao P59 e ao P60.
+4. **R48.4 — O "igualar ao terminal" de hoje.** Seleção única. Opções: remover e migrar — quem o tinha ligado fica com
+   o tema do terminal como tema do chat, e o terminal segue o chat, sem mudar a tela (recomendada) — custo: 3 a 4 h;
+   se paga: na hora; manter os dois sentidos — custo: 5 a 8 h; se paga: nunca, se ninguém usar, com o ciclo chat →
+   terminal → chat.
+   **Decidido — "Remover e migrar (Recomendado)".** Vai ao D45 e ao P58.
+
+### Rodada 49 — o tema próprio do Markdown, o par claro/escuro, o padrão e o modo código (enviada 2026-10-29)
+
+Respondida em 2026-10-29, por Anderson na mesma sessão, pelo AskUserQuestion, logo depois da R48. Os custos são
+estimativa, não medidos.
+
+1. **R49.1 — O tema do Markdown com o "Seguir o chat" desligado.** Seleção única. Opções: seletor próprio, com o
+   catálogo do chat e do terminal, ativo só com o interruptor desligado (recomendada) — custo: uns 2 h a mais; se paga:
+   na hora; o de hoje, o claro/escuro do app — custo: nenhum; se paga: nunca para trocar o tema só do Markdown.
+   **Decidido — "Seletor próprio (Recomendado)".** Vai ao D47 e ao P60.
+2. **R49.2 — Um tema do chat, ou um par escuro e claro.** Seleção única. Opções: par, como o terminal, pelo
+   claro/escuro do app (recomendada) — custo: uns 1 a 2 h a mais; se paga: na hora; um só — custo: nenhum; se paga: na
+   hora, só para quem usa o escuro.
+   **Decidido — "Par, como o terminal (Recomendado)".** Vai ao D45 e ao P58.
+3. **R49.3 — O tema padrão do chat.** Seleção única. Opções: o visual de hoje, numa entrada "Padrão do BrzA" do
+   catálogo, com o fundo de hoje do chat e as cores do terminal (recomendada) — custo: uns 1 h; se paga: na hora, o
+   chat não muda e os outros ficam iguais a ele; o tema de hoje do terminal, `#282c34` — custo: nenhum; se paga: na
+   hora, mas o chat muda de cor.
+   **Decidido — "Visual atual do chat (Recomendado)".** Vai ao D45 e ao P58.
+4. **R49.4 — O modo código do Markdown com o "Seguir o chat".** Seleção única. Opções: o fundo e o claro/escuro seguem
+   o chat, e a sintaxe fica Islands Dark e light-plus (recomendada) — custo: 2 a 3 h; se paga: na hora, os três modos
+   com o mesmo fundo; nada, fica Islands Dark — custo: nenhum; se paga: na hora, com o modo código diferente.
+   **Decidido — "Fundo e claro/escuro (Recomendado)".** Vai ao D47 e ao P60.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -741,7 +806,8 @@ outro plano (R28.2); os P42 em diante são novos, daqui.
 A ordem é a de execução, e não a do número: o P34 vem antes do P33 e do P35, porque leva o id da mensagem à barra; o P40
 vem depois do P36, de que reaproveita a troca, e o P41 não depende dele; o P43 vem antes do P44 ao P51, porque monta a
 base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum; o P54 ao P57 vêm depois do P44 ao P50 (R42.4), o P54
-antes do P55, o P56 independente e o P57 por último.
+antes do P55, o P56 independente e o P57 por último; o P58 vem antes do P59 e do P60, que não dependem um do outro, e
+o P61 por último.
 
 **Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com "indicado". É
 leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a pedido, numa sessão
@@ -1781,6 +1847,83 @@ Depois do P55 e do P56.
 
 **Evidência:** —
 
+### P58 — O tema do chat, com o "igualar ao terminal" migrado (pedido 31)
+
+Executa D45 · executor: sessão do `brza-studio`
+
+Estimado: 10 h · Executado: — h
+
+Primeiro do pedido 31; o P59 e o P60 dependem dele.
+
+- [ ] **1.** Teste que falha, junto de `native-chat-appearance-style.test.ts`: o resolvedor do tema do chat devolve o
+      fundo, a frente, a paleta e o esquema do tema escuro com o app escuro e do claro com o app claro, quando o par
+      claro está ligado; o "Padrão do BrzA" dá o canvas de hoje (`#161616` no escuro, `#fff` no claro); um tema do
+      catálogo dá o fundo dele com o contraste aplicado pela fórmula do `--chat-canvas`
+- [ ] **2.** Teste que falha da migração, em `normalize-loaded-global-settings.test.ts`: com o `matchTerminalInterface`
+      ligado, o par de temas do terminal vira o do chat, a fonte e o tamanho do terminal viram os do chat, o contraste
+      fica em 100, o terminal fica seguindo o chat e a chave sai; desligado, o chat fica no "Padrão do BrzA"
+- [ ] **3.** O campo do tema do chat no `NativeChatAppearanceSettings`, com a normalização no renderer e no main; o
+      resolvedor; o `nativeChatAppearanceStyle` lendo o tema do chat no lugar do terminal; a migração; a seção do chat
+      com o seletor no lugar do interruptor, e os controles de fonte, tamanho e contraste sempre ativos. Os pontos "A
+      conferir no passo" do D45
+- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push. A conferência no
+      app é o C15, no build do pedido 31
+
+**Evidência:** —
+
+### P59 — O terminal segue o chat (pedido 31)
+
+Executa D46 · executor: sessão do `brza-studio`
+
+Estimado: 4 h · Executado: — h
+
+Depois do P58; não depende do P60.
+
+- [ ] **1.** Teste que falha, junto de `terminal-theme.test.ts`: com o "Seguir o chat" ligado, o tema do xterm tem o
+      fundo do canvas do chat e as cores ANSI do tema do chat, e a fonte e o tamanho do terminal; desligado, o tema de
+      hoje, com os overrides e a opacidade
+- [ ] **2.** O campo do interruptor nas configurações globais, ligado por padrão; a escolha do tema em
+      `terminal-theme-selection.ts` e a aplicação em `terminal-appearance.ts` lendo o resolvedor do P58; o interruptor
+      em `TerminalThemeSections.tsx`, com o seletor de hoje desabilitado enquanto ligado
+- [ ] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push. A conferência no
+      app é o C16
+
+**Evidência:** —
+
+### P60 — O visualizador de Markdown segue o chat (pedido 31)
+
+Executa D47 · executor: sessão do `brza-studio`
+
+Estimado: 8 h · Executado: — h
+
+Depois do P58; não depende do P59.
+
+- [ ] **1.** Teste que falha, com o "Seguir o chat" ligado: o olho e o lápis têm o fundo do canvas do chat, a fonte e o
+      tamanho do chat, e o esquema do chat; o modo código tem o fundo do chat e o tema de sintaxe do esquema do chat;
+      desligado, os três têm o fundo e o esquema do tema próprio escolhido
+- [ ] **2.** O fundo explícito no olho (`markdown-preview.css` ou `MarkdownPreviewSurface.tsx`), o do lápis no lugar do
+      `--editor-surface`, e um tema do Monaco derivado do Islands Dark e do light-plus com o fundo trocado
+- [ ] **3.** O hook do esquema do Markdown no lugar do `useDocumentDarkTheme` (`use-document-dark-theme.ts:4-8`), o
+      interruptor e o seletor de tema próprio nas configurações do editor, ao lado do `EditorFontFamilySetting`
+- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; commit e push. A conferência no
+      app é o C17
+
+**Evidência:** —
+
+### P61 — A conferência do tema do chat nos três (pedido 31)
+
+Executa D45, D46 e D47 · executor: Anderson, com a sessão que conduz
+
+Estimado: 0,3 h · Executado: — h
+
+Depois do P59 e do P60.
+
+- [ ] **1.** No BrzA Studio, o C15 ao C17: trocar o tema do chat troca o terminal e o Markdown; desligar o "Seguir o
+      chat" de um e trocar o tema dele não muda os outros
+- [ ] **2.** O Observado e o veredito na linha de cada caso
+
+**Evidência:** —
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -1995,6 +2138,8 @@ da linha quando o teste entra.
 - 2026-10-29 — [O P56 do PLN-001 e os testes de regressão do P26.4, do P43.4 e do P44.4](../../work/worklogs/2026-10-29-pln-001-p56-miniatura-do-texto-solto-e-testes-de-regressao.md):
   o P56, com o commit `fc43b03b9ef`, os X29 ao X31 e os testes em `8e708f9790d`, `2e263df152f` e `8850460267c`, todos
   verdes com o código de hoje. O C12 entra no build único dos casos manuais; espera o P57.
+- 2026-10-29 — [O pedido 31 do PLN-001, o tema do chat no Markdown e no terminal](../../work/worklogs/2026-10-29-pln-001-pedido-31-tema-do-chat.md):
+  o pedido 31, a R48 e a R49, o D45 ao D47 e o P58 ao P61, sem código; o P58, depois o P59 e o P60 em paralelo.
 
 ## Decisões
 
@@ -2030,11 +2175,15 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C12 | `Pedido 30`: a miniatura do caminho ou da URL solta no texto (P56.3) | Uma resposta com um print por caminho em código inline e outra com uma URL de imagem | A miniatura abaixo do parágrafo, uma vez por mensagem, com a mensagem terminada | | |
 | C13 | `Pedido 30`: o que já existia funciona no BrzA Studio (P57.1, R36.1) | Um `![]()` local e um remoto; uma imagem colada e uma arrastada | A miniatura na mensagem enviada, e o clique amplia com pan e zoom nos quatro casos | | |
 | C14 | `Pedido 26`: o Continuar em outra conta no aviso de limite (P40) | No aviso "Claude atingiu seu limite de sessão", abrir o "Continuar em outra conta" e escolher a outra conta | O menu com as outras contas, também com uma só; a troca, o divisor "Conta trocada - <conta>" e só então o Continuar | | |
+| C15 | `Pedido 31`: o tema do chat e a migração (P58.4) | Trocar o tema do chat entre o "Padrão do BrzA" e um do catálogo, no app escuro e no claro | O chat com o fundo e as cores do tema; no "Padrão do BrzA", o visual de antes | | |
+| C16 | `Pedido 31`: o terminal segue o chat (P59.3) | Com o "Seguir o chat" ligado, trocar o tema do chat; depois desligar e escolher outro tema no terminal | Ligado, o terminal com o fundo e as cores do chat e a fonte dele; desligado, só o terminal muda | | |
+| C17 | `Pedido 31`: o Markdown segue o chat (P60.4) | Um `.md` no olho, no lápis e no código, com o "Seguir o chat" ligado e desligado | Ligado, os três com o fundo do chat, e o olho e o lápis com a fonte do chat; desligado, o tema próprio | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,
 Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14. O C11
-entra no mesmo build, pelo pedido do P55 (2026-10-28), e o C12, pelo do P56 (2026-10-29).
+entra no mesmo build, pelo pedido do P55 (2026-10-28), e o C12, pelo do P56 (2026-10-29). O C15 ao C17 são do
+pedido 31 e vão a um build depois do P60, com o P61.
 
 ## Fechamento
 

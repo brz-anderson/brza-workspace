@@ -3,7 +3,7 @@
 O desenho do [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](PLN-001-plan.md). O
 que este desenho assume e o Terreno medido em 2026-10-24 estão no desenho do PLN-025 do workspace da Fixfy
 (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-design.md`); os itens D1 a D35 vieram de lá, pelo PLN-029 da Fixfy,
-com os IDs de antes (PLN-025/R28.2), e os D36 a D44 são daqui, de 2026-10-27 e 2026-10-28. Nos itens D1 a D35, o nome do
+com os IDs de antes (PLN-025/R28.2), e os D36 a D47 são daqui, de 2026-10-27 a 2026-10-29. Nos itens D1 a D35, o nome do
 repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do rebrand.
 
 ### O que este desenho assume
@@ -49,6 +49,15 @@ repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do 
 - **R43.2:** o Confluence ganha o lucide `file-text`, novo nas tabelas de glifos do desktop e do mobile.
 - **R44.1:** o chip do Confluence lê título e URL de forma defensiva; a URL pelo id e a saída do `getConfluencePage` são
   suposição até a conferência.
+- **R48.1:** o chat ganha um seletor de tema, com o catálogo de temas do terminal.
+- **R48.2:** o Markdown e o terminal têm um interruptor "Seguir o chat" cada um.
+- **R48.3:** a fonte e o tamanho do chat valem no olho e no lápis; o terminal e o modo código levam só as cores e o
+  fundo.
+- **R48.4:** o "igualar ao terminal" sai, migrado sem mudar a tela.
+- **R49.1:** o Markdown com o "Seguir o chat" desligado tem um seletor de tema próprio.
+- **R49.2:** o tema do chat é um par escuro e claro, pelo claro/escuro do app, como o do terminal.
+- **R49.3:** o padrão do chat é o "Padrão do BrzA", o visual de hoje.
+- **R49.4:** o modo código segue o fundo e o claro/escuro do chat, com a sintaxe Islands Dark e light-plus.
 
 ### D1 — O build local, assinado — `brza-studio/config/scripts/build-mac-local.mjs` (P1, PLN-028/P5)
 
@@ -417,3 +426,84 @@ ferramenta não (P52, resposta de 2026-10-27).
   o "Preview unavailable". A URL remota carrega sozinha, como o `![]()` (R39.3).
 - **O bloco de código cercado fica de fora**, e a mensagem em streaming só ganha a miniatura ao terminar, como o Mermaid
   (`NativeChatMarkdown.tsx:141`, `renderMermaid={!streaming}`; R42.2).
+
+### D45 — O tema do chat — `brza-studio/src/shared/native-chat-appearance-settings.ts` e `…/native-chat/native-chat-appearance-style.ts` (P58)
+
+- **Origem:** pedido 31, R48.1, R48.4, R49.2, R49.3
+- **Contexto:** o chat não tem tema próprio. O `NativeChatAppearanceSettings` tem a fonte, os tamanhos, a largura, o
+  contraste e o `matchTerminalInterface` (`src/shared/native-chat-appearance-settings.ts:3-16`). Com essa chave ligada,
+  o `nativeChatAppearanceStyle` lê o tema do terminal, fixa o esquema e remapeia `--background`, `--card` e `--border`
+  a partir do canvas (`native-chat-appearance-style.ts:105-158`). O canvas é `color-mix` da frente sobre o fundo, a
+  `--chat-canvas-mix` (`main.css:576-584`). O terminal escolhe o par escuro e claro pelo tema do app
+  (`src/shared/terminal-theme-selection.ts:25-35`).
+
+#### Como fica
+
+- **O campo.** O `NativeChatAppearanceSettings` ganha o par de temas, na forma do terminal: um tema escuro, o claro
+  ligado ou não, e o tema claro (`terminalThemeDark`, `terminalUseSeparateLightTheme` e `terminalThemeLight`,
+  `global-settings-types.ts:123-127`). O valor é o nome de um tema do catálogo do terminal, incluídos os temas
+  personalizados, ou o "Padrão do BrzA", que é o padrão (R49.3).
+- **O resolvedor.** Uma função compartilhada, no `src/shared/`, devolve o tema efetivo do chat: o fundo, a frente, as
+  cores ANSI e o esquema. A escolha entre o escuro e o claro segue a regra do `selectTerminalTheme`. O "Padrão do BrzA"
+  dá o fundo e a frente de hoje do app (`--background` e `--foreground`, `main.css:192-195` e `:304-306`) e as cores
+  ANSI do tema padrão do terminal. O P59 e o P60 leem só esta função.
+- **O estilo.** O caminho de hoje do "igualar ao terminal" passa a ler o resolvedor no lugar do terminal: o esquema,
+  pelo `isTerminalBackgroundLight` do fundo, e o remapeamento das variáveis. O "Padrão do BrzA" não fixa esquema e
+  segue a raiz, como hoje. O contraste continua valendo, pela mesma fórmula do canvas; a fonte e o tamanho do chat
+  deixam de ser os do terminal.
+- **A migração.** Na carga das configurações (`normalize-loaded-global-settings.ts:72`), o `matchTerminalInterface`
+  ligado vira: o par de temas do terminal como o do chat, a fonte e o tamanho do terminal como os do chat, o contraste
+  em 100 e o terminal seguindo o chat (D46). A chave sai. Desligado, o chat fica no "Padrão do BrzA".
+- **A tela.** Na seção do chat (`AppearanceChatSection.tsx`), o interruptor "igualar ao terminal"
+  (`AppearanceChatContrastControls.tsx:34-39`) dá lugar ao seletor do tema escuro, ao "Tema claro separado" e ao
+  seletor do claro, como no terminal (`TerminalThemeSections.tsx:91-103`). A fonte, os tamanhos e o contraste ficam
+  sempre ativos, sem o "Set by terminal interface" (`AppearanceChatSection.tsx:72-76`, `:90-96`).
+
+#### A conferir no passo
+
+- O web e o mobile leem o `nativeChatAppearance` (`src/renderer/src/web/web-native-chat-appearance-settings.test.ts`).
+  O campo novo não pode quebrá-los, e o mobile não ganha o tema agora.
+- O atalho Cmd +/- do tamanho do chat (`native-chat-font-size.ts:15-17`) era ignorado com o "igualar"; sem a chave,
+  ele volta a valer sempre.
+
+### D46 — O terminal segue o chat — `brza-studio/src/shared/terminal-theme-selection.ts` e `…/terminal-pane/terminal-appearance.ts` (P59)
+
+- **Origem:** pedido 31, R48.2, R48.3
+- **Contexto:** o tema do xterm sai do `selectTerminalTheme` e do `resolveConfiguredTerminalColors`
+  (`terminal-theme-selection.ts:25-35`, `:62-74`), e o `applyTerminalAppearance` escreve o tema, a fonte e o fundo do
+  painel (`terminal-appearance.ts:135-232`) a cada mudança das configurações (`use-terminal-pane-lifecycle.ts:93-117`).
+
+#### Como fica
+
+- **O interruptor.** Um campo booleano nas configurações globais, "Seguir o chat", ligado por padrão, com o
+  interruptor em `TerminalThemeSections.tsx`. Ligado, os seletores de tema do terminal ficam desabilitados e guardam a
+  escolha de antes.
+- **Ligado.** O tema do xterm é o do resolvedor do D45: as cores ANSI do tema do chat e o fundo do canvas efetivo do
+  chat, com o contraste. A fonte, o tamanho, o peso e a altura de linha são os do terminal (R48.3). Os overrides de cor
+  e a opacidade do fundo continuam valendo por cima.
+- **Desligado.** O terminal de hoje, sem mudança.
+
+### D47 — O visualizador de Markdown segue o chat — `brza-studio/src/renderer/src/components/editor/` e `src/renderer/src/assets/` (P60)
+
+- **Origem:** pedido 31, R48.2, R48.3, R49.1, R49.4
+- **Contexto:** o olho não declara fundo e herda o `bg-background` do `body`, `#0a0a0a` no escuro
+  (`markdown-preview.css:1-8`, `MarkdownPreviewSurface.tsx:86`, `main.css:662`); o lápis usa o `--editor-surface`,
+  `#1e1e1e` (`rich-markdown-editor.css:9,18`); o modo código, o Islands Dark, `#191A1C` (`MonacoEditor.tsx:277`,
+  `islands-dark-theme.ts:9,30`). Os três seguem o claro/escuro do app pelo `useDocumentDarkTheme`
+  (`use-document-dark-theme.ts:4-8`). A fonte do olho e do lápis é a do app, no tamanho do editor
+  (`use-markdown-preview-source-foundation.ts:153`, `rich-markdown-editor.css:498`).
+
+#### Como fica
+
+- **O interruptor e o tema próprio.** Um campo booleano "Seguir o chat", ligado por padrão, e um par de temas próprio
+  do Markdown, na forma do D45, nas configurações do editor, ao lado do `EditorFontFamilySetting`. O seletor só fica
+  ativo com o interruptor desligado (R49.1).
+- **O esquema.** Um hook do Markdown no lugar do `useDocumentDarkTheme` dá o esquema do chat com o interruptor ligado,
+  e o do tema próprio com ele desligado. O `markdown-dark`/`markdown-light` do olho e o tema do Monaco leem esse hook.
+- **O fundo.** Ligado, os três modos usam o canvas efetivo do chat; desligado, o fundo do tema próprio. O olho ganha
+  fundo explícito, o lápis troca o `--editor-surface` pelo mesmo valor, e o Monaco usa um tema derivado do Islands
+  Dark ou do light-plus com o fundo trocado. A sintaxe não muda (R49.4).
+- **A tipografia.** Ligado, o olho e o lápis usam a fonte e o tamanho do texto do chat (`--chat-font-family`,
+  `--chat-font-size`), e o código dentro deles, a fonte de código do chat. O modo código usa a fonte de código do
+  chat, que é a do terminal, e mantém o tamanho do editor (R48.3). O zoom do editor continua somando ao tamanho.
+  Desligado, a tipografia de hoje.

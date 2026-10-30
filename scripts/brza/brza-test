@@ -177,6 +177,8 @@ def main(argv: list[str] | None = None) -> int:
     root = worktree_root(Path(args.worktree or '.').resolve())
     if root is None:
         ap.error(f'{args.worktree or Path.cwd()} não é um worktree do brza-studio ({runtime.STUDIO})')
+    if not (root / '.git').is_file():
+        ap.error(f'{root} é o checkout principal, que o brza test não toca; crie um com brza tree <nome>')
 
     try:
         try:

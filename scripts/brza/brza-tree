@@ -5,14 +5,17 @@
       cria ~/Projects/brza-studio/.worktrees/<nome> na branch <tipo>/<nome> (tipo padrão feat), a partir da
       origin/master depois de git fetch origin, ou de --base; instala com pnpm install --offline --frozen-lockfile e
       imprime o caminho. --chat abre a sessão no worktree pelo brza-sessions --checkout.
-  brza-tree --rm <nome> [--force]
+  brza-tree --rm <nome> [--empty] [--force]
       remove o worktree e a branch quando o HEAD é ancestral da origin/master e o worktree está limpo. A branch sem
-      commit próprio pede --force, porque "na origin/master" vale também para ela. Diretório em .worktrees/ sem registro
-      no git worktree list é órfão: remove com --force, depois de listar o que há nele.
+      commit próprio pede --empty, porque "na origin/master" vale também para ela. O sujo, o não mergeado e o órfão
+      pedem --force, que imprime como `descartado:` cada razão por cima da qual passou. O --force não cobre o vazio, e o
+      --empty não cobre o sujo: o worktree de prova sai com --empty, sem pôr o --force na rotina. Diretório em
+      .worktrees/ sem registro no git worktree list é órfão: remove com --force, depois de listar o que há nele.
   brza-tree --list
       os worktrees de .worktrees/, cada um com a branch, os commits à frente da origin/master, se está limpo e os órfãos.
 
-Saídas: 0 feito; 1 recusado (sujo, não mergeado, sem commit próprio, órfão sem --force) ou falhou; 2 uso errado. O
+Saídas: 0 feito; 1 recusado (sujo, não mergeado ou órfão sem --force; sem commit próprio sem --empty) ou falhou; 2 uso
+errado. O
 install offline que falha não apaga o worktree: imprime o caminho e o pnpm install --frozen-lockfile a rodar lá, e sai
 com 1.
 
@@ -116,7 +119,7 @@ def create(name: str, kind: str, base: str | None, chat: str | None) -> int:
     return 0
 
 
-def remove(name: str, force: bool) -> int:
+def remove(name: str, force: bool, empty: bool) -> int:
     path = trees_dir() / name
     trees = registered()
     resolved = path.resolve()
@@ -128,25 +131,34 @@ def remove(name: str, force: bool) -> int:
         if not force:
             print('recusado: confira o que há nele e repita com --force para apagar')
             return 1
+        print(f'descartado: o órfão {path}')
         shutil.rmtree(path)
         print(f'removido: {path}')
         return 0
 
     branch = trees[resolved]
     fetch()
-    refusals = []
+    # O --force passa pelo que perde trabalho; o --empty, só pela branch vazia, que é o worktree de prova.
+    forced, emptied = [], []
     if dirty(path):
-        refusals.append('o worktree está sujo')
+        forced.append('o worktree está sujo')
     if not merged(path):
-        refusals.append('o HEAD não está na origin/master')
+        forced.append('o HEAD não está na origin/master')
     elif branch and not own_commits(branch):
-        refusals.append(f'a branch {branch} está sem commit próprio, e pode ser trabalho que nem começou')
-    if refusals and not force:
-        for reason in refusals:
-            print(f'recusado: {reason}')
-        print(f'          repita com --force para remover {path}{f" e a branch {branch}" if branch else ""} assim mesmo')
+        emptied.append(f'a branch {branch} está sem commit próprio, e pode ser trabalho que nem começou')
+    target = f'{path}{f" e a branch {branch}" if branch else ""}'
+    refused = False
+    for reasons, allowed, flag in ((forced, force, '--force'), (emptied, empty, '--empty')):
+        if reasons and not allowed:
+            for reason in reasons:
+                print(f'recusado: {reason}')
+            print(f'          repita com {flag} para remover {target} assim mesmo')
+            refused = True
+    if refused:
         return 1
-    runtime.git('worktree', 'remove', *(('--force',) if force else ()), str(path))
+    for reason in forced + emptied:
+        print(f'descartado: {reason}')
+    runtime.git('worktree', 'remove', *(('--force',) if forced else ()), str(path))
     print(f'removido: {path}')
     if branch:
         runtime.git('branch', '-D', branch)
@@ -185,6 +197,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument('--chat', metavar='SESSÃO', help='abre a sessão no worktree pelo brza-sessions --checkout')
     ap.add_argument('--rm', metavar='NOME', help='remove o worktree e a branch')
     ap.add_argument('--force', action='store_true', help='com --rm: remove o sujo, o não mergeado e o órfão')
+    ap.add_argument('--empty', action='store_true', help='com --rm: remove a branch sem commit próprio')
     ap.add_argument('--list', action='store_true', help='lista os worktrees de .worktrees/ e os órfãos')
     args = ap.parse_args(argv)
 
@@ -192,8 +205,8 @@ def main(argv: list[str] | None = None) -> int:
         ap.error('use um de: <nome>, --rm <nome> ou --list')
     if (args.type or args.base or args.chat) and args.name is None:
         ap.error('--type, --base e --chat valem só para criar')
-    if args.force and args.rm is None:
-        ap.error('--force vale só com --rm')
+    if (args.force or args.empty) and args.rm is None:
+        ap.error('--force e --empty valem só com --rm')
     name = args.name or args.rm
     if name is not None and not NAME.fullmatch(name):
         ap.error(f'nome inválido: {name}; use minúsculas, dígitos, ponto, hífen e sublinhado')
@@ -202,7 +215,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.list:
             return list_trees()
         if args.rm is not None:
-            return remove(args.rm, args.force)
+            return remove(args.rm, args.force, args.empty)
         return create(args.name, args.type or 'feat', args.base, args.chat)
     except runtime.BrzaError as e:
         print(f'falhou:   {e}')

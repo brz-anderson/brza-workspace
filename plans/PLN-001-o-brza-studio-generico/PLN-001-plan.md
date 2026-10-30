@@ -2655,9 +2655,9 @@ da linha quando o teste entra.
 
 Notas de decisão do workspace da Fixfy, ao lado deste clone:
 
-- [O Orca da Fixfy substitui o original, sem atualizador, sincroniza por tag e guarda o código da Fixfy em pasta própria](../../../fixfy/work/decisions/orca-da-fixfy-substitui-o-original-e-sincroniza-por-tag.md)
+- O Orca da Fixfy substitui o original, sem atualizador, sincroniza por tag e guarda o código da Fixfy em pasta própria, no workspace da Fixfy: `work/decisions/orca-da-fixfy-substitui-o-original-e-sincroniza-por-tag.md`
   — PLN-025/R10 da Fixfy, `done`.
-- [O orca-dev commita com o noreply do brz-anderson, pela chave personal, com push direto na main](../../../fixfy/work/decisions/orca-dev-commita-como-brz-anderson-com-push-na-main.md)
+- O orca-dev commita com o noreply do brz-anderson, pela chave personal, com push direto na main, no workspace da Fixfy: `work/decisions/orca-dev-commita-como-brz-anderson-com-push-na-main.md`
   — PLN-025/R14 da Fixfy, `done`.
 
 ## Pendências conhecidas

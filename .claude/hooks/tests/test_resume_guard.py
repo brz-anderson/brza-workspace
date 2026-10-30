@@ -82,21 +82,6 @@ class GuardTest(unittest.TestCase):
         with open(self.guard.STATE, encoding="utf-8") as f:
             self.assertEqual(json.load(f), {})
 
-    def test_pending_tells_what_the_next_prompt_would_meet_without_writing(self):
-        self.log(turn(30), turn(30, context=1000, session="s2"))
-        self.assertEqual(self.guard.pending("s1", NOW.timestamp()),
-                         {"idle_min": 30, "ttl_min": 5, "context": 200_000, "model": "claude-opus-5-5"})
-        self.assertIsNone(self.guard.pending("s2", NOW.timestamp()))
-        self.assertIsNone(self.guard.pending("s3", NOW.timestamp()))
-        self.assertEqual(self.logged(), [])
-
-    def test_a_held_prompt_passes_at_the_first_try(self):
-        self.log(turn(30))
-        self.guard.hold("s1", " segue ", NOW.timestamp())
-        self.assertIsNone(self.ask("segue", at=NOW + timedelta(seconds=5)))
-        self.assertIsNotNone(self.ask("outro", at=NOW + timedelta(seconds=10)))
-        self.assertEqual([r["decision"] for r in self.logged()], ["released", "blocked"])
-
     def test_state_keeps_the_hash_and_never_the_prompt(self):
         self.log(turn(30))
         self.ask("texto secreto")

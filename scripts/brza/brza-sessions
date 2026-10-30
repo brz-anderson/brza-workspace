@@ -16,9 +16,6 @@ O list, o send e o close acham o chat pelo nome: para cada aba de chat do app, o
 sessão do Claude, e o nome é o último /rename gravado no transcript dela (<config>/projects/*/<id>.jsonl). O título da
 aba é outro: é o nome do chat no app. Chat sem /rename não tem nome e não é achado.
 
-O send respeita a trava de retomada (.claude/hooks/resume_guard.py): a sessão parada além do TTL do cache e com 150 mil
-tokens ou mais não recebe nada sem --wake, que grava a passagem na trava e manda uma vez.
-
 Uso:
   brza sessions <nome>                                  # abre o chat no brza-workspace; o `open` é opcional
   brza sessions <nome> --prompt "<tarefa>"              # e manda a tarefa depois do /rename
@@ -26,20 +23,19 @@ Uso:
   brza sessions <nome> --checkout <caminho>             # noutro checkout, como um worktree do brza-studio
   brza sessions <nome> --wait                           # só anuncia depois que o /rename registra o nome
   brza sessions <nome> --dry-run                        # só mostra o que faria
-  brza sessions list [--json]                           # os chats do app: nome, estado, chat, worktree, trava
-  brza sessions send <nome> <texto> [--wake] [--json]   # manda ao chat, na fila se ele estiver num turno
+  brza sessions list [--json]                           # os chats do app: nome, estado, chat, worktree, título
+  brza sessions send <nome> <texto> [--json]            # manda ao chat, na fila se ele estiver num turno
   brza sessions close <nome> [--force] [--json]         # fecha o chat e a aba; o chat num turno pede --force
 
 As linhas de saída do open são `open:     <nome>  (chat, <caminho>, <sessionId>)`, `running:  <nome>` e `CHECK:    …`.
-Saídas: 0 feito; 1 nome ausente ou repetido, chat num turno sem --force, ou o app sem resposta; 3 o send recusado pela
-trava. O --json do list, do send e do close é o contrato do roteador do PLN-003:
-  list   {"sessions": [{"name", "title", "chat", "claude_session", "worktree", "state", "guard"}]}
-  send   {"sent": true, "name", "chat"}; na trava, {"sent": false, "name", "chat", "guard": {…}}
+Saídas: 0 feito; 1 nome ausente ou repetido, chat num turno sem --force, ou o app sem resposta. O --json do list, do
+send e do close é o contrato do roteador do PLN-003:
+  list   {"sessions": [{"name", "title", "chat", "claude_session", "worktree", "state"}]}
+  send   {"sent": true, "name", "chat"}
   close  {"closed": true, "name", "chat"}; num turno, {"closed": false, "name", "chat", "state"}
   erro   {"error": "<motivo>"}
 """
 import argparse
-import importlib
 import json
 import os
 import sys
@@ -51,7 +47,6 @@ from brza_runtime import (WORKSPACE, BrzaError, brza, canonicalize, rpc, send_to
                           user_data)
 
 CHAT_COMMAND = 'claude-brza'
-HOOKS = WORKSPACE / '.claude' / 'hooks'
 VERBS = ('open', 'list', 'send', 'close')
 
 
@@ -136,28 +131,6 @@ def chat_name(claude_session: str) -> str | None:
     return name
 
 
-def guard_module():
-    if str(HOOKS) not in sys.path:
-        sys.path.insert(0, str(HOOKS))
-    return importlib.import_module('resume_guard')
-
-
-def pending_guard(claude_session: str) -> dict | None:
-    """O que a trava diria de um prompt à sessão agora: None quando passa; senão os minutos parada, o TTL, o contexto
-    e o custo estimado da regravação."""
-    guard = guard_module()
-    found = guard.pending(claude_session, time.time())
-    if not found:
-        return None
-    cost = guard.rewrite_cost(found['model'], found['context'], found['ttl_min'])
-    return {'idle_min': found['idle_min'], 'ttl_min': found['ttl_min'], 'context': found['context'],
-            'cost_usd': round(cost, 2) if cost is not None else None}
-
-
-def hold_guard(claude_session: str, text: str):
-    guard_module().hold(claude_session, text, time.time())
-
-
 def chats() -> list[dict]:
     """Os chats abertos no app, na ordem das abas; `tab` e `selector` ficam fora do --json."""
     found = []
@@ -190,36 +163,19 @@ def emit(as_json: bool, data: dict, line: str):
     print(json.dumps(data, ensure_ascii=False) if as_json else line)
 
 
-def describe(guard: dict) -> str:
-    cost = f', cerca de US$ {guard["cost_usd"]:.2f}'.replace('.', ',') if guard.get('cost_usd') is not None else ''
-    context = f'{guard["context"]:,}'.replace(',', '.')
-    return (f'parada há {guard["idle_min"]} min, e o cache dura {guard["ttl_min"]} min: o próximo pedido regrava '
-            f'{context} tokens{cost}')
-
-
 def list_command(args) -> int:
-    found = [dict(chat, guard=pending_guard(chat['claude_session']) if chat['claude_session'] else None)
-             for chat in chats()]
+    found = chats()
     if args.json:
         print(json.dumps({'sessions': [public(chat) for chat in found]}, ensure_ascii=False))
         return 0
     for chat in found:
         print(f'{chat["name"] or "-":<24} {chat["state"] or "-":<9} {chat["chat"]}  {chat["worktree"]}  '
               f'{chat["title"]}')
-        if chat['guard']:
-            print(f'{"":<24} trava: {describe(chat["guard"])}')
     return 0
 
 
 def send_command(args) -> int:
     chat = find(args.name)
-    guard = pending_guard(chat['claude_session'])
-    if guard and not args.wake:
-        emit(args.json, {'sent': False, 'name': chat['name'], 'chat': chat['chat'], 'guard': guard},
-             f'GUARD:    {chat["name"]}: {describe(guard)}. Abra sessão nova, ou repita com --wake para acordá-la.')
-        return 3
-    if guard:
-        hold_guard(chat['claude_session'], args.text)
     send_to_chat(chat['chat'], args.text)
     emit(args.json, {'sent': True, 'name': chat['name'], 'chat': chat['chat']},
          f'sent:     {chat["name"]}  ({chat["chat"]})')
@@ -248,7 +204,6 @@ def by_name(argv: list[str]) -> int:
     send = verbs.add_parser('send', help='manda o texto ao chat')
     send.add_argument('name')
     send.add_argument('text')
-    send.add_argument('--wake', action='store_true', help='acorda a sessão que a trava de retomada barraria')
     send.add_argument('--json', action='store_true')
     close = verbs.add_parser('close', help='fecha o chat e a aba, sem --resume')
     close.add_argument('name')

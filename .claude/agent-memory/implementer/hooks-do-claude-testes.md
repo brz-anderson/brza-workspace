@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-- Gate dos hooks: `cd <repo> && python3 -m unittest discover -s .claude/hooks/tests` (147 testes em 2026-10-31, com `test_fact_audit.py` e `test_fact_outcome.py`, ~11 s). Um arquivo só: `discover -s .claude/hooks/tests -p test_x.py` (o `unittest caminho.py` falha com "Empty module name").
+- Gate dos hooks: `cd <repo> && python3 -m unittest discover -s .claude/hooks/tests` (176 testes em 2026-10-31, ~12 s). Um arquivo só: `discover -s .claude/hooks/tests -p test_x.py` (o `unittest caminho.py` falha com "Empty module name").
 - Script novo que importa do `measure.py`: carregue por `importlib.spec_from_file_location` do mesmo diretório e exponha o
   módulo (`fact_audit.measure`). O `MEASURE_DIR` é lido na importação: o teste seta a variável **antes** de carregar o
   script. Para não esperar o `settle`, o teste faz `module.measure.settle = lambda path, **_: None`.
@@ -30,3 +30,12 @@ metadata:
   pela mesma raiz do `summarize_measurements.py`; expõe `main(argv)` que devolve o código, e o teste chama `main` capturando
   `SystemExit` (o `parser.error` sai com 2) e stub em `module.measure.workstream_of`. Log que é diretório no lugar do arquivo
   simula erro de leitura. `measure.write` não segura trava: só anexa linha.
+- **`summarize_measurements.py`** carrega no teste por `spec_from_file_location` (função `load()` do
+  `test_summarize_measurements.py`); o teste monta o log em tmp e chama `main()` com `sys.argv` mockado. `--facts` lê o
+  log sem o `--since` (`read_log(..., "")`) e filtra no `aggregate_facts`, porque o desfecho que chega depois da data vale.
+  `parser.error` sai com `SystemExit(2)`: o teste captura `stderr` com `redirect_stderr`. O log real (`.measurements/`)
+  ganha eventos `fact` a cada subagente `collector`/`designer`: não fixe número dele em teste.
+- **Marca do `fact_audit.py`** (`MARK`/`REFERENCE`): valide a expressão contra o transcript real do subagente antes de fechar,
+  chamando `marks_of(sources_of(lines))` por `spec_from_file_location` com `MEASURE_DIR` num tmp: o que a especificação cita
+  é um recorte, e o real tem outras formas. O teto do `--max-budget-usd` sai de `budget_usd(len(facts))`; o teste do espião
+  regrava o arquivo da rodada a cada `subTest`, porque o `run` o apaga.

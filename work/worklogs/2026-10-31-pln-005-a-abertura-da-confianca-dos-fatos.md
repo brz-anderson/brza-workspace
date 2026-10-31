@@ -59,6 +59,17 @@ O `implementer` fez o `scripts/fact_outcome.py`, com 28 testes: registrar o desf
 desfecho leva o `workstream` do fato, e não o do cwd (X2), porque chega em outra sessão. A R8 fechou duas escolhas dele,
 ambas na recomendada.
 
+## O resumo, a norma e a primeira auditoria real (P6, P7, P8, P10)
+
+A R9 separou fato de custo no `--facts`, e o `implementer` fez o resumo com 25 testes; a sessão gravou a norma — o
+`close-task`, o `CLAUDE.md` e o `README.md`. A prova do P8 veio sozinha: um `collector` do `studio` devolveu 25 fatos
+marcados, e a auditoria conferiu 24 em 92 s, por US$ 0,157 — 21 `holds`, 3 `unknown`, 4 `cite: off`. A primeira
+leitura é de humildade, não de excesso: a faixa 90+ do `lido` acertou 17 de 17, com distância de -7,2.
+
+O mesmo `collector` escreveu 10 marcas fora da forma, e 7 fatos se perderam. A R10 decidiu o parser tolerante e a regra
+mais clara nos papéis (P10), o teto da auditoria por fato, a dica dos pendentes com `--workstream all` e o erro de uso
+do `--facts` com outro flag. Com a expressão nova, o transcript real dá F1–F28, sem malformada.
+
 ## Na master
 
 - `2e8ea67` — "Último PLN usado" passa a 005 no `plans/README.md`.
@@ -66,3 +77,7 @@ ambas na recomendada.
 - `8d22660` — o `fact_audit.py stop` e os testes (P3).
 - `3e123f0` — o `fact_audit.py run`, o `turn` marcado, o resumo e o `settings.json` (P4).
 - `98a60d3` — o `fact_outcome.py` e os testes (P5).
+- `72f684a` — o `--facts` do resumo (P6).
+- `4c92097` — a auditoria no `CLAUDE.md`, no `README.md` e no `close-task` (P7).
+- `b3e3efd` — a premissa fora da marca e o resumo que cita só o id, nos papéis (R10.1).
+- `13a291a` — a marca tolerante e o teto por fato (P10).

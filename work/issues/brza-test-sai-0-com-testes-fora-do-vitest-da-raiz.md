@@ -31,3 +31,9 @@ relatório vazio, o `if results else []` da `:228` esconde até o "não rodou".
 3. Só avisar numa linha `CHECK:`, saindo 0. Custo: 0,2 h. Se paga: só se quem chama ler a saída.
 
 **Gatilho:** a primeira sessão que mexer em `mobile/` ou `cloud/`.
+
+**O gatilho disparou em 2026-10-31**, com o P68 do PLN-001, que rodou o vitest do `mobile/` no worktree
+`pln-001-p68`. A rodada das opções acima fica para depois, por resposta de Anderson: "Registrar o gatilho
+(Recomendado)". O `brza tree` já instala o `mobile/`, como diz
+[O brza tree diz "install: ok" e o worktree sai sem o mobile/node_modules](brza-tree-sai-sem-o-mobile-node-modules.md);
+falta o `brza test` rodar o teste de lá.

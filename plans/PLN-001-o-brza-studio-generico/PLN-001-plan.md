@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P69 do pedido 34, autorizado por Anderson (R60.4); o P57, o P61, o P65 e os casos manuais com Anderson"
+ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
 estimate_h: 170.8
-executed_h: 29.8
-remaining_h: 7.4
+executed_h: 31.3
+remaining_h: 3.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -24,9 +24,9 @@ tags:
   sessão `pln-001-pedido-32`, em `brza-studio@21f9cfe90bb`, `9564eff9368` e `ba4102b5c95`, e espera só o P65, com o C18 ao C20, num build, com Anderson. O P66 do pedido 33 fechou em `brza-studio@9118f60672b`, com a R54 e os X45 ao
   X48, e espera só o C21; o P67, que fecha o X20 com a R55 e a R56, fechou em `brza-studio@97a93f6ff57` e se
   confere junto do C6; sete arquivos de teste do transcript do mobile não carregam desde o P43 (X47). Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
-  C17 depois do P60 o C18 ao C20 depois do P64 e o C21), o X10 e o P27.2 e o P27.3; o P37 fechou sem código
+  C17 depois do P60 o C18 ao C20 depois do P64, o C21 e o C22), o X10 e o P27.2 e o P27.3; o P37 fechou sem código
   (R59.4), e o P68 fechou o X47 em `brza-studio@7be19418c8f`. O pedido 34 entrou em 2026-10-31, com a R60, a R61, o D52
-  e o P69, autorizado (R60.4), na sessão `pln-001-pedido-34`; a conferência é o C22. Do PLN-002/P9 (R12.4, R13.4),
+  e o P69, que fechou em `brza-studio@a0eefa646e4`, com os X57 e X58, e espera só o C22, num build, com Anderson. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
   sessão entra no correio com o nome automático `brza-workspace-<hex>`. O P64 não lê o mapa de sessões do PLN-002 e
   casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
@@ -2568,11 +2568,11 @@ fronteiras de import. O `rpc-recording/family-recordings.test.ts` falha em 2 cas
 
 Executa D52 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-34`
 
-Estimado: 3,5 h · Executado: —
+Estimado: 3,5 h · Executado: 1,5 h
 
 Agora, em paralelo com o que espera build (R60.4).
 
-- [ ] **1.** Testes que falham: no `NativeChatStructuredSession.test.tsx`, com pergunta pendente, a seta recolhe o
+- [x] **1.** Testes que falham: no `NativeChatStructuredSession.test.tsx`, com pergunta pendente, a seta recolhe o
       cartão, que fica montado e escondido, a `NativeChatPromptStrip` aparece com o título e o `structured-composer`
       volta; a seta da faixa reabre o cartão com a opção marcada antes; o mesmo com a aprovação; pergunta nova abre
       aberta. No `NativeChatApprovalCard.test.tsx`, o X e a seta juntos quando há `onCancel` e `onCollapse`. No
@@ -2580,13 +2580,31 @@ Agora, em paralelo com o que espera build (R60.4).
       `use-structured-agent-session.queued-gating.test.tsx`, a fila ligada com `question` pendente; no host, o
       `queue-if-active` atrás de pergunta pendente enfileira e deixa o prompt pendente, no rig de
       `structured-agent-session-queued-gate.test.ts`
-- [ ] **2.** O recolher em `NativeChatStructuredSession.tsx`: o estado por `itemId` e `revision`, o `onCollapse` nos
+- [x] **2.** O recolher em `NativeChatStructuredSession.tsx`: o estado por `itemId` e `revision`, o `onCollapse` nos
       dois cartões, a faixa e o `composerShown` com o cartão recolhido; o `onCollapse` passa pelo
       `NativeChatStructuredQuestionCard`; o `NativeChatApprovalCard` mostra o X e a seta juntos. Os pontos "A conferir no
       passo" do D52
-- [ ] **3.** O "Steer" e o Cmd+Enter desabilitados com pergunta pendente (R61.1)
-- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **3.** O "Steer" e o Cmd+Enter desabilitados com pergunta pendente (R61.1)
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C22
+
+**Evidência:** commit [`a0eefa646e4`](https://github.com/brz-anderson/brza-studio/commit/a0eefa646e4), na `master` do
+`brza-studio`, pela sessão do `brza-studio` no worktree `.worktrees/pln-001-pedido-34`, com o push direto. O recolher
+mora em `NativeChatStructuredPromptCard.tsx`: o `useStructuredPromptCollapse` guarda a chave `itemId:revision` do prompt
+recolhido, e o componente monta os dois cartões num invólucro com `hidden` e `inert` e a `NativeChatPromptStrip`, que
+agora recebe o `title` pronto (`nativeChatPromptCardTitle` no chat do terminal). Na sessão, o `composerShown` inclui o
+cartão recolhido; o foco ao composer sai do `useNativeChatComposerRevealFocus`, que já age quando o `composerReady`
+vira, e a volta ao cartão do `useNativeChatPromptCardFocus`, com o `shouldFocus` religado. O
+`NativeChatStructuredQuestionCard` repassa o `onCollapse`; o `NativeChatApprovalCard` mostra a seta e o X, e o Esc
+recolhe quando há seta (X57). O hook da fila expõe o `steerHeld` pelo `hasPendingPrompt`, que a lista soma ao de hoje,
+e o `steerNewest` devolve `false` com prompt pendente. Antes do código: o `NativeChatStructuredSession.prompt-collapse.test.tsx`
+(novo, X58), o `NativeChatApprovalCard.test.tsx`, o `NativeChatQueuedMessageList.test.tsx`, o
+`use-structured-agent-session.queued-gating.test.tsx` e o `structured-agent-session-queued-gate.test.ts` → 5 failed, 98
+passed; o caso do host passou já antes, porque fixa o comportamento medido na R61. Depois: os mesmos e os vizinhos da
+sessão estruturada, dos cartões, da fila, do `NativeChatResolvedView`, do keydown do composer e do gate do host → 112
+arquivos, 1.138 passed; `pnpm check:changed --base=origin/master --maxWorkers=2` → 24 de 25 verdes, só o vermelho de
+antes, o `external-subcommand.ts` nas fronteiras de import. A `origin/master` não andou entre o início e o push. O
+worktree e a branch saíram depois do push. A conferência no app é o C22.
 
 ## Regressão
 
@@ -2793,6 +2811,15 @@ da linha quando o teste entra.
   o título do host; o `/rename` do Claude Code não chega ao app, e o nome automático `brza-workspace-<hex>` fica sem
   ação. Com duas abas do mesmo nome, o nome também fica sem ação, e a devolução de subagente nunca abre; afeta P64, e o
   D50 não muda.
+- **X57 — Com o X e a seta, o Esc recolhe a aprovação, e não cancela.** O D52 deixou o Esc para o passo; hoje ele
+  cancelava quando havia X (`NativeChatApprovalCard.tsx:57`). A dica da seta já mostra o Esc, e o cartão de pergunta
+  recolhe pelo Esc; o cancelar fica no X. Sem seta, o Esc cancela como antes; com a resposta a caminho, não faz nada.
+  O foco seguiu o D52: vai ao composer ao recolher e volta ao cartão ao reabrir. Afeta P69 e D52.
+- **X58 — O cartão e a faixa num componente à parte, e o teste da sessão num arquivo irmão.** A sessão passou do
+  `max-lines` de 400, e o bloco foi para o `NativeChatStructuredPromptCard.tsx`; a faixa recebe o título pronto, e o
+  `NativeChatResolvedView.tsx` mudou uma linha. O teste da P69.1 foi para o
+  `NativeChatStructuredSession.prompt-collapse.test.tsx`, com os cartões reais, porque o
+  `NativeChatStructuredSession.test.tsx` os simula e não mostra a opção marcada. Afeta P69.
 
 ## Worklogs
 
@@ -2912,6 +2939,8 @@ da linha quando o teste entra.
   o P68 em `brza-studio@7be19418c8f`, com a R57 e a R59, fecha o X47; o P37 fecha sem código, pela R58 e pela R59.4.
 - 2026-10-31 — [O pedido 34 do PLN-001, recolher a pergunta no chat estruturado](../../work/worklogs/2026-10-31-pln-001-pedido-34-recolher-a-pergunta.md):
   o pedido 34, a R60, a R61, o D52 e o P69, sem código; o P69 vai à sessão `pln-001-pedido-34`.
+- 2026-10-31 — [O P69 do PLN-001, recolher a pergunta e a aprovação no chat estruturado](../../work/worklogs/2026-10-31-pln-001-p69-recolher-a-pergunta-e-a-aprovacao.md):
+  o P69 em `brza-studio@a0eefa646e4`, com os X57 e X58; o C22 espera o build, com Anderson.
 
 ## Decisões
 

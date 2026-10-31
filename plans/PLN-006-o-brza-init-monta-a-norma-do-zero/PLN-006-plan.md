@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 27
-executed_h: 0
-remaining_h: 27
+executed_h: 0.3
+remaining_h: 25.5
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,7 +16,8 @@ tags:
 
 # PLN-006: O `brza init` monta a norma num workspace do zero
 
-- **Retomar:** aceito na R9, com a execução em paralelo pedida. Em curso: o P1; depois, P2, P3 e P4 juntos.
+- **Retomar:** P1 feito (`brza-workflow@83fce24`). Em curso: P2, P3 e P4 juntos, cada um num worktree do
+  `brza-workflow`; depois, P5, P6 e P7. Pontos novos vão na recomendada, pela regra de Anderson após a R10.
 - **Dividido:** [PLN-006 — Desenho](PLN-006-design.md)
 
 ## Pedido
@@ -457,6 +458,48 @@ Respondida em 2026-10-31.
    em 2026-10-31, e a execução pedida, em paralelo onde a dependência deixa: o P1 antes de todos; P2, P3 e P4 juntos;
    P5, P6 e P7 depois deles; o P8 e o P9 no fim.
 
+### Rodada 10 — as fronteiras que o P1 achou (enviada 2026-10-31)
+
+**Apresentado antes:** a devolução do `implementer` do P1 — as três suítes verdes no `brza-workflow`, dois skips, e
+quatro escolhas que o D1 e o D3 não fixaram.
+
+Respondida em 2026-10-31.
+
+1. **O `brza-note` sem o pacote do cliente.** Opções:
+   - `session_name()` devolve `None` sem o `brza-sessions` (recomendada) — custo: ~30 min e 1 teste, no P6; se paga: no
+     primeiro workspace sem o pacote;
+   - a lógica vai ao `brza_runtime` — custo: ~1,5 h; se paga: só com o nome da sessão obrigatório no núcleo;
+   - documentar e deixar — custo: 0; se paga: nunca.
+
+   **Decidido — "Devolve None sem o pacote (Recomendado)".**
+
+2. **Como o cliente acha o `brza_runtime`.** Opções:
+   - pelo checkout do `brza-workflow`, como a R3.2 (recomendada) — custo: ~0 h; se paga: já;
+   - uma cópia do runtime levada pelo sync — custo: ~1 h no P7, contra a R3.2; se paga: só com o cliente fora do
+     checkout;
+   - o runtime em `core/` — custo: ~2 h e muda o D1; se paga: se o hook precisar dele.
+
+   **Decidido — "Pelo checkout, como a R3.2 (Recomendado)".**
+
+3. **Quem cria o `core/.claude/settings.hooks.json`.** Opções:
+   - o P3, com o render e o merge da chave `hooks` (recomendada) — custo: ~20 min; se paga: no P3;
+   - o P5 — custo: o teste em skip até lá; se paga: no P5.
+
+   **Decidido — "O P3 (Recomendado)".**
+
+4. **O `.gitignore` da raiz do `brza-workflow`.** Opções:
+   - agora, no P1 — custo: 1 min; se paga: já (recomendada);
+   - no P9 — custo: 0 e o risco de commit sujo; se paga: nunca melhor.
+
+   **Decidido — "Agora, no P1 (Recomendado)".**
+
+### A regra do resto do plano (2026-10-31)
+
+Depois da R10, Anderson: "o restante dos passos, escolha sempre o recomendado, até o fim desse plano, vamos medir o
+resultado". Daqui ao fechamento, cada ponto sem lastro vira rodada gravada aqui, com as opções e o preço, e
+**decidida pela regra** na recomendada, sem ir à pergunta. A nota de `work/decisions/` segue nascendo como proposta:
+a regra escolhe opção de rodada, e não é a frase explícita que transforma texto em decisão.
+
 ## Desenho
 
 O Desenho, D1–D12, está em [PLN-006 — Desenho](PLN-006-design.md), por passar de 400 linhas.
@@ -470,12 +513,16 @@ O Desenho, D1–D12, está em [PLN-006 — Desenho](PLN-006-design.md), por pass
 
 Executa D1, D3 · executor: `implementer`; o `gh repo create brz-anderson/brza-workflow --public` pela sessão
 
-Estimado: 1,5 h · Executado: — h
+Estimado: 1,5 h · Executado: 0,3 h
 
-- [ ] **1. Criar o repositório** e o layout do D1
-- [ ] **2. Copiar** o núcleo, o CLI e os testes pela fronteira do D3, sem os scripts locais nem o `resume_guard`
-- [ ] **3. Rodar** as três suítes lá — `scripts/brza/tests`, `.claude/hooks/tests`, `notes-checker` — e ver passar
-- [ ] **4. Commit e push** no `brza-workflow`
+- [x] **1. Criar o repositório** e o layout do D1
+- [x] **2. Copiar** o núcleo, o CLI e os testes pela fronteira do D3, sem os scripts locais nem o `resume_guard`
+- [x] **3. Rodar** as três suítes lá — `scripts/brza/tests`, `.claude/hooks/tests`, `notes-checker` — e ver passar
+- [x] **4. Commit e push** no `brza-workflow`
+
+**Evidência:** `brza-workflow@83fce24`, a partir de `brza-workspace@d85c783` · `python3 -m unittest discover -s
+tests/hooks` → 159 OK, 1 skip (P3) · `-s tests/cli` → 165 OK, 1 skip (P7) · `tests/notes-checker/run.py` → saída 0;
+hooks e checador passam também no `/usr/bin/python3` 3.9.6. Desvios X1–X6.
 
 ### P2 — A raiz sai do cwd e do registro, no CLI e nos hooks
 
@@ -581,6 +628,20 @@ Estimado: 1,5 h · Executado: — h
   manual com nota sem commit.
 - **As sessões do `brza-studio` acham o workspace.** Como se confere: o `brza where` e o `measure.py` de um checkout do
   `brza-studio`, pelo registro.
+
+## Desvios
+
+- **X1 — `tests/` em subpastas** `cli/`, `hooks/` e `notes-checker/`, onde o D1 diz só `tests/`. Separa as três suítes e
+  os caminhos relativos de cada uma; afeta P1.
+- **X2 — O `brza-note` do núcleo chama o `brza-sessions` do pacote do cliente** para o nome da sessão. A R10.1 decidiu
+  que ele devolve `None` sem o pacote; afeta P6.
+- **X3 — O pacote do cliente acha o `brza_runtime` pelo `sys.path` do checkout.** A R10.2 confirmou que é o desenho da
+  R3.2; o P7 só garante o link.
+- **X4 — Dois testes em skip**: o `SettingsTest` do `fact_audit`, até o P3 criar o `core/.claude/settings.hooks.json`
+  (R10.3), e o do installer, até o P7.
+- **X5 — Um `.gitignore` na raiz do `brza-workflow`**, que o D1 não lista (R10.4).
+- **X6 — O CLI segue exigindo Python 3.10 ou mais** (`str | None`), como na origem; só os hooks e o `brza_root`
+  rodam no 3.9. Vai ao README no P9.
 
 ## Worklogs
 

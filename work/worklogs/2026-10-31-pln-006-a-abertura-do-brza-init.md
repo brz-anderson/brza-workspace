@@ -52,3 +52,21 @@ Duas respostas saíram da recomendada:
 O resto da R4 e a R6 inteira na recomendada: os scripts do `brza-studio` como camada local; `@AGENTS.md` no
 `CLAUDE.md`; `{{tabela.chave}}` por regex; o sync recusa o arquivo editado; segue a branch, com o sha no lock; a
 migração em estágios.
+
+## O fechamento do desenho e o aceite
+
+A revisão do `designer` com a R4–R6 abriu cinco pontos de detalhe do registro e do índice, e o rascunho trazia três
+escolhas marcadas "sem lastro" que não tinham ido à rodada. A R7 e a R8 fecharam os oito, todos na recomendada: o
+registro guarda o par raiz + código, pelo `brza register`; o índice é `.brza/index.jsonl`, com um campo `description`
+no frontmatter e a linha levada à `master` por commit sem checkout; o id de issue e decisão é `kind:slug`; a Fixfy sai
+do núcleo; a medição datada fica como o porquê; a exceção ao índice vai numa decisão nova.
+
+O Desenho foi ao `PLN-006-design.md` (D1–D12, 580 linhas), e os Passos, P1–P9, somam 27 h. Na R9, Anderson aceitou o
+corte: "aceito e pode iniciar os passos em paralelo". O P1 começou.
+
+## Fora do workspace
+
+- **O repositório `brz-anderson/brza-workflow`, público, no GitHub**, criado pelo `gh repo create`, e o checkout dele
+  em `~/Projects/brza-workflow`, com o `origin` em `git@personal:brz-anderson/brza-workflow.git`. **Risco:** o que for
+  ao push fica público; o núcleo não pode levar nada pessoal (R2.2, R8.2). **Estado:** ativo; o P1 o povoa. **Como
+  desfazer:** `gh repo delete brz-anderson/brza-workflow` e apagar a pasta.

@@ -249,6 +249,44 @@ class FactAuditTest(Base):
         c = self.events("fact_capture")[0]
         self.assertEqual((c["facts"], c["malformed"]), (1, 3))
 
+    def test_tolerant_marks_of_a_real_collector_are_valid_and_the_grouped_references_are_ignored(self):
+        # as 10 marcas do collector de 2026-10-31 que a expressão antiga contava como malformadas
+        self.append(user("x"), assistant(text("\n".join([
+            "- a rolagem [F3 · lido · 80; a causa da rolagem é inferência sobre o layout]",
+            "- o grep [F6 · rodado (grep) · 85]",
+            "- herança [F9 · lido · 85; \"não herda\" é inferência sobre o pai]",
+            "- outro grep [F10 · rodado (grep) · 90]",
+            "- premissa [F20 · lido · 80; premissa: `innerText` de um nó oculto]",
+            "- o \"some\" [F21 · lido · 78, o \"some\" é inferência sob o foco]",
+            "- listagem [F26 · rodado (ls/head) · 90]",
+            "- junto [F3, F25 · lido · 80-90]",
+            "- faixa [F7-F9 · lido · 85-95]",
+            "- faixa longa [F18\u2013F19 · lido · 90-95]"]))))
+        self.run_hook()
+        facts = self.events("fact")
+        self.assertEqual([(f["fact_id"], f["kind"], f["confidence"]) for f in facts],
+                         [("F3", "lido", 80), ("F6", "rodado", 85), ("F9", "lido", 85), ("F10", "rodado", 90),
+                          ("F20", "lido", 80), ("F21", "lido", 78), ("F26", "rodado", 90)])
+        self.assertEqual(facts[0]["text"], "- a rolagem [F3 · lido · 80; a causa da rolagem é inferência sobre o layout]")
+        c = self.events("fact_capture")[0]
+        self.assertEqual((c["facts"], c["malformed"]), (7, 0))
+        self.assertNotIn("unmarked", c)
+
+    def test_a_grouped_reference_alone_is_neither_a_fact_nor_malformed(self):
+        self.append(user("x"), assistant(text("[F3, F25 · lido · 80-90] [F7-F9 · lido · 85-95] [C1 - C2 · doc · 70]")))
+        self.run_hook()
+        self.assertEqual(self.events("fact"), [])
+        c = self.events("fact_capture")[0]
+        self.assertEqual((c["facts"], c["malformed"]), (0, 0))
+
+    def test_tolerance_does_not_leak_into_the_still_malformed_marks(self):
+        self.append(user("x"), assistant(text(
+            "[F4 · lido] [F5 · visto · 90] [F6 · lido · 120] [F7 · lido · 80-90] [F8 · lido · 90 ok] "
+            "[F9 · rodado (grep · 90] [F11 · lido · 1000; x] [F12 · lido · ] [F13 · lido · 90]")))
+        self.run_hook()
+        self.assertEqual([f["fact_id"] for f in self.events("fact")], ["F13"])
+        self.assertEqual(self.events("fact_capture")[0]["malformed"], 8)
+
     def test_confidence_bounds(self):
         self.append(user("x"), assistant(text("[F1 · lido · 0] [F2 · lido · 100] [F3 · lido · 101] [F4 · lido · 1000]")))
         self.run_hook()
@@ -493,6 +531,20 @@ class RunTest(Base):
         self.assertEqual(seen["audit"], "1")
         self.assertEqual(seen["file"]["agent_id"], "a1")  # o arquivo existia quando o espião rodou
         self.assertFalse(os.path.exists(self.path))
+
+    def test_budget_is_twelve_thousandths_per_fact_with_a_floor_of_25_cents(self):
+        for count, expected in ((3, "0.25"), (20, "0.25"), (22, "0.26"), (24, "0.29"), (50, "0.60")):
+            with self.subTest(facts=count):
+                facts = [{"id": f"F{i}", "kind": "lido", "confidence": 90, "text": f"t{i}", "source": "reply"}
+                         for i in range(1, count + 1)]
+                with open(self.path, "w", encoding="utf-8") as f:
+                    json.dump({"agent_id": "a1", "agent_type": "designer", "session_id": "s1", "workstream": "workspace",
+                               "cwd": self.cwd, "facts": facts, "runs": []}, f)
+                self.spy(json.dumps(RESULT_OK))
+                self.run_audit()
+                args = self.recorded()["args"]
+                self.assertEqual(args[args.index("--max-budget-usd") + 1], expected)
+        self.assertEqual((self.fa.BUDGET_PER_FACT, self.fa.BUDGET_MIN), (0.012, 0.25))
 
     def test_prompt_states_the_criteria(self):
         for word in ("holds", "fails", "unknown", "cite", "off", "rodado", "lido", "doc", "runs", "{arquivo}"):

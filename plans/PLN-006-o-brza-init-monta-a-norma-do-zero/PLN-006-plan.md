@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 27
-executed_h: 2.4
-remaining_h: 7.5
+executed_h: 2.8
+remaining_h: 4.5
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,9 +16,9 @@ tags:
 
 # PLN-006: O `brza init` monta a norma num workspace do zero
 
-- **Retomar:** P1–P4, P6 e P7 feitos (`brza-workflow@9356995`). Em curso: o P5, em `.worktrees/p5`, que chama a
-  camada 1 do sync e reconcilia o bloco do shell (X18); então P8 e P9. Pontos novos vão na recomendada, pela regra de
-  Anderson após a R10.
+- **Retomar:** P1–P7 feitos (`brza-workflow@b9210a6`). Falta o P8, a migração do `brza-workspace`, que espera a
+  confirmação de Anderson da proposta do índice (R8.4) e mexe no `~/.zshrc`, no `~/.local/bin` e no `~/.config/brza`;
+  e o P9. Pontos novos vão na recomendada, pela regra de Anderson após a R10.
 - **Dividido:** [PLN-006 — Desenho](PLN-006-design.md)
 
 ## Pedido
@@ -604,6 +604,26 @@ a regra escolhe opção de rodada, e não é a frase explícita que transforma t
    separada, sem a flag — custo: ~0,3 h; se paga: só se ela ficar sempre à parte. **Decidido pela regra — a camada
    2.**
 
+### Rodada 16 — os pontos do P5 (decidida pela regra, 2026-10-31)
+
+**Apresentado antes:** a devolução do `implementer` do P5, com cinco escolhas que o D8 não fixava.
+
+1. **O pacote do cliente por padrão.** Opções: opt-in, por `--package client` (recomendada) — custo: uma flag para quem
+   o quer; se paga: já · `["client"]` por padrão, com `--no-package` — custo: o cliente chega a quem não usa; se paga:
+   só se quase todo workspace usar. **Decidido pela regra — opt-in.**
+2. **O `title`, o `owner` e o `code.github` que faltam.** Opções: o `--name`, o nome do autor e o `origin` do código
+   (recomendada) — custo: o README sai com o nome como título até editar o manifesto; se paga: já · as três flags
+   obrigatórias — custo: o comando mais longo; se paga: só depois de um padrão errado custar uma correção. **Decidido
+   pela regra — os padrões.**
+3. **A branch e o remote do código.** Opções: a branch atual do checkout, `--code-branch` vencendo, e `origin`
+   (recomendada) — custo: outro remote pede editar o manifesto; se paga: já · `master` e `origin` sempre — custo: erra
+   quem usa `main`; se paga: nunca. **Decidido pela regra — a branch atual.**
+4. **O `--name`.** Opções: obrigatório, como o D8 (recomendada) — custo: um argumento; se paga: já · o nome do
+   diretório — custo: nome errado; se paga: nunca. **Decidido pela regra — obrigatório.**
+5. **O diretório com só um `.git` ou o README do `gh repo create`.** Opções: recusar tudo que não é vazio, como o D8
+   (recomendada) — custo: esvaziar o clone antes; se paga: já · aceitar um `.git` sem commits — custo: um caminho a
+   mais de teste; se paga: se "criar no GitHub, clonar, init" virar o comum. **Decidido pela regra — recusar.**
+
 ## Desenho
 
 O Desenho, D1–D12, está em [PLN-006 — Desenho](PLN-006-design.md), por passar de 400 linhas.
@@ -690,12 +710,19 @@ Estimado: 5 h · Executado: 0,6 h
 
 Executa D8 · executor: `implementer`
 
-Estimado: 3 h · Executado: — h
+Estimado: 3 h · Executado: 0,4 h
 
-- [ ] **1. Teste de aceite que falha**: o init num diretório temporário, com o checador verde e sem caminho fixo
-- [ ] **2. Implementar**
-- [ ] **3. Rodar e ver passar**
-- [ ] **4. Commit**
+- [x] **1. Teste de aceite que falha**: o init num diretório temporário, com o checador verde e sem caminho fixo
+- [x] **2. Implementar**
+- [x] **3. Rodar e ver passar**
+- [x] **4. Commit**
+
+**Evidência:** `brza-workflow@b9210a6` · `tests/cli` → 372 OK (51 do `test_brza_init.py`, 3 novos do shell) ·
+`tests/hooks` → 244 OK · checador → saída 0 · o `test_brza_init.py` falhou sem o `bin/brza-init`, e o do shell, contra
+o `brza.zsh` antigo · 8 mutações do `brza-init`, todas mortas · fumaça por processo, com `HOME`, `GIT_CONFIG_GLOBAL` e
+registro temporários: `brza-init <dir> --name acme-notes --code <código> --title Acme --package client` → saída 0, um
+commit local com o autor do manifesto, `check_notes.py --root <dir>` → 0 erros, 0 avisos, e o registro com o par. O X18
+e o X20 foram consertados no mesmo commit. Desvios X24–X26; pontos R16.
 
 ### P6 — O `brza sync`, camada 1
 
@@ -815,6 +842,13 @@ Estimado: 1,5 h · Executado: — h
   o commit local não empurrado não entra no workspace. O `--ref` não grava no manifesto.
 - **X23 — O `resume_guard.py` e o teste dele saem no primeiro sync**, mesmo fora do lock, por uma lista `RETIRED`; os
   `.claude/hooks/tests/*` e o `notes-checker/tests/run.py` do `brza-workspace` saem por `git rm` no P8 (R15.3).
+- **X24 — O `brza init` registra por último**: confere (8), commita (9) e só então grava o registro (7), para a falha da
+  conferência não deixar entrada no único arquivo fora do diretório. A conferência varre os cinco termos —
+  `brza-workspace`, `brza-studio`, `Anderson`, `brz-anderson`, `Fixfy` —, salvo o que o manifesto traz.
+- **X25 — O `brza init` ganhou `--code-github`**, e grava o checkout principal quando o `--code` é um worktree; com o
+  `brza-workflow` em detached, o `core.ref` cai no `master`.
+- **X26 — Sobrou um nome pessoal no CLI do núcleo**: o molde de issue do `bin/brza-note:117` diz "O pedido de Anderson".
+  O `bin/` não é renderizado; vai à revisão do P9.
 
 ## Decisões
 

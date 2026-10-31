@@ -67,3 +67,12 @@ metadata:
 - Validei os testes do sync por mutação em cópia (`cp -R bin core tests packages` num `mktemp -d`): sobrescrever o editado,
   tratar lock quebrado como ausente, o dry-run aplicar, apagar o editado e pular o pull — cada um derruba pelo menos 1 teste.
   A suíte de `tests/cli` leva ~130 s: rode em background ou com timeout alto (o limite do Bash é 120 s por padrão).
+- **P5 (`bin/brza-init`):** tests/cli 372 (51 em `test_brza_init.py`), hooks 244 (5 skips no 3.9), em 2026-10-31. O init carrega o
+  `brza-sync` por `runpy.run_path` e usa `flow_dir()` dele para os templates e para o `sync_core(with_git=False)`. O teste monta
+  um brza-workflow de mentira no `setUpClass` (cópia de `core/`, `packages/`, `templates/` num repo git) e põe `BRZA_WORKFLOW`,
+  `HOME`, `GIT_CONFIG_GLOBAL`, `BRZA_REGISTRY` por `patch.dict`; o checador roda por `sys.executable` no workspace criado.
+  Fluxo do init: recusas, autor, build (git init, manifesto por `dump_manifest(with_defaults(...))`, templates, sync), conferência,
+  commit e, **por último**, o registro (desvio do D8: assim a falha da conferência não deixa entrada no registro). Mutação em
+  cópia (`cp -R bin core tests packages templates`): 8 mutantes mortos; a suíte de init leva ~35 s, e o loop passa de 120 s:
+  rode em background. Rodar a suíte inteira em background com `( ... ) &` solta a notificação cedo: espere um arquivo-marca.
+

@@ -5,11 +5,21 @@ feito, as decisões, a norma de agente e a configuração das sessões. O códig
 (`brz-anderson/brza-studio`), ao lado deste clone. Os termos em itálico estão no [Glossário](#glossário).
 
 Toda prosa para quem pediu — resposta, pergunta, opção, plano, revisão, documento — é em português do Brasil, também na
-delegação a _subagente_. Identificador, comando, caminho e chave de configuração ficam na forma original.
+delegação a _subagente_. Identificador, comando, caminho e chave de configuração ficam na forma original. **Nome de
+agente, de _subagente por papel_ e de skill nasce em inglês**, em kebab-case, como `plan-runner` e `collector`; a
+descrição e o corpo seguem em português.
 
 **Comando para quem pediu rodar vai em bloco cercado com a linguagem de shell** — ` ```bash `, um comando por bloco
 quando cada um roda sozinho —, nunca em cerca sem linguagem. O chat do BrzA Studio só mostra o ▶, que roda o bloco
 num terminal do worktree do chat, nas cercas `sh`, `bash`, `zsh`, `shell` e `console`.
+
+**Arquivo gravado na norma, em `plans/`, `wiki/`, `work/` ou `memory/` aparece na resposta**, criado ou editado, com o
+caminho. A chamada de ferramenta pode ficar recolhida, e o que vai ao git precisa estar à vista de quem pediu.
+
+**Cada arquivo vai num bloco recolhido**, `<details>` com o caminho no `<summary>`:
+- **Novo:** o Markdown renderizado, com o frontmatter em cerca `yaml` e o corpo sem cerca.
+- **Edição:** o trecho alterado em cerca `diff`.
+- **Mais de um arquivo:** um separador `---` entre eles, fora dos blocos.
 
 ## Cada workstream mora numa branch, e a `master` guarda só a norma
 

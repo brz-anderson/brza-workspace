@@ -3,8 +3,8 @@ status: in_progress
 phase: execution
 origin: request
 ready: "sim — o P62 ao P64 do pedido 32, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 166.6
-executed_h: 28.5
+estimate_h: 167.3
+executed_h: 29.8
 remaining_h: 3.9
 scope:
   - brza-studio
@@ -24,7 +24,8 @@ tags:
   sessão `pln-001-pedido-32`, em `brza-studio@21f9cfe90bb`, `9564eff9368` e `ba4102b5c95`, e espera só o P65, com o C18 ao C20, num build, com Anderson. O P66 do pedido 33 fechou em `brza-studio@9118f60672b`, com a R54 e os X45 ao
   X48, e espera só o C21; o P67, que fecha o X20 com a R55 e a R56, fechou em `brza-studio@97a93f6ff57` e se
   confere junto do C6; sete arquivos de teste do transcript do mobile não carregam desde o P43 (X47). Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
-  C17 depois do P60 o C18 ao C20 depois do P64 e o C21), o X10 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
+  C17 depois do P60 o C18 ao C20 depois do P64 e o C21), o X10 e o P27.2 e o P27.3; o P37 fechou sem código
+  (R59.4), e o P68 fechou o X47 em `brza-studio@7be19418c8f`. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
   sessão entra no correio com o nome automático `brza-workspace-<hex>`. O P64 não lê o mapa de sessões do PLN-002 e
   casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
@@ -958,6 +959,71 @@ custos são estimativa.
    dica perde o texto; se paga: só com busca enorme na prática.
    **Decidido — "Inteira, sem cortar (Recomendado)".** Fica no P67.
 
+### Rodada 57 — o próximo passo e o mock do lucide no mobile (enviada 2026-10-31)
+
+> **Apresentado antes:** cada um dos sete testes do X47 declara o próprio `vi.mock('lucide-react-native', …)` com a
+> lista de ícones à mão, e nenhuma tem os 12 que o `brza-mobile-tool-glyphs.ts` importa desde o P43; o X46 só acrescentou
+> os nomes ao teste do raciocínio.
+
+Respondida em 2026-10-31, por Anderson na sessão do workstream `studio` do `brza-workspace`, pelo AskUserQuestion. Os
+custos são estimativa.
+
+1. **R57.1 — Qual é o próximo passo?** Seleção única. Opções: o X47, os testes do mobile (recomendada) — custo: ~0,5 h,
+   sem Anderson; se paga: agora, pela cobertura das linhas do P43 ao P50 e do P67; as conferências num build — custo:
+   ~1 a 1,5 h, com Anderson; se paga: ao fechar o PLN-001; o P37.1 — custo: ~5 min de Anderson, e ~1 h se pedir
+   conserto; se paga: agora; o Codex como subagente — custo: ~0,5 h de rodadas; se paga: só na implementação.
+   **Decidido — "X47: os testes do mobile (Recomendado)".** Vai ao P68.
+2. **R57.2 — Como corrigir os mocks do lucide?** Seleção única. Opções: um mock compartilhado, que devolve um componente
+   simulado para qualquer ícone (recomendada) — custo: ~0,7 h, em 8 testes e um arquivo novo; se paga: no próximo glifo
+   novo, que já quebrou os testes duas vezes (X46, X47); acrescentar os nomes, como no X46 — custo: ~0,3 h agora e de
+   novo a cada glifo; se paga: agora, mas volta a custar.
+   **Decidido — "Mock compartilhado (Recomendado)".** Vai ao P68.
+
+### Rodada 58 — o P37 em paralelo com o P68 (enviada 2026-10-31)
+
+> **Apresentado antes:** o menu nativo do processo principal monta as sugestões do `dictionarySuggestions` do Electron
+> (`editable-context-menu.ts:208-219`), e o app não configura idioma no corretor, que no macOS é o do sistema. Uma sonda
+> com o Electron 43.8.1 do `brza-studio`, num `textarea` e num `contenteditable`, com o `lang` do documento em `en` e em
+> `pt-BR`, deu `ortogrfia` → "ortografia", "ortografai" e `refrence` → "refresque"; o `excessão` e o "ortografai"
+> sugeridos na primeira conferência não saem marcados nela.
+
+Respondida em 2026-10-31, por Anderson na sessão do workstream `studio` do `brza-workspace`, pelo AskUserQuestion, em
+quatro perguntas seguidas. Os custos são estimativa.
+
+1. **R58.1 — O que se faz enquanto o P68 roda?** Opções: o P37.1 (recomendada), a entrevista do Codex como subagente,
+   esperar o P68. **Decidido — "P37.1: ortografia (Recomendado)".**
+2. **R58.2 — O que apareceu no botão direito sobre a palavra errada?** Opções: sugestões em pt-BR; sublinha, mas sem
+   sugestões; sugestões em inglês; nem sublinha. **Resposta — "Sublinha, mas sem sugestões".**
+3. **R58.3 — Qual menu abriu?** Opções: o do sistema, em inglês; o do app, no tema do chat; não lembro.
+   **Resposta — "Menu do sistema, em inglês".**
+4. **R58.4 — Aparecia o "Add to dictionary"?** Opções: não, só Cut/Copy/Paste; sim, mas sem sugestões acima; vou olhar.
+   **Resposta — "Sim, mas sem sugestões acima".** Levou à sonda com o `ortogrfia` e à R59.4.
+
+### Rodada 59 — o fim do P68 e o reteste do P37 (enviada 2026-10-31)
+
+> **Apresentado antes:** com o mock compartilhado, os sete arquivos do X47 carregam, e dois testes antigos falham pelo
+> comportamento do P43: o `npm test` de `MobileNativeChatMessage.test.ts:697` ganha o `FlaskConical`, e o
+> `pnpm vitest run` de `MobileNativeChatToolRun.test.tsx:134` vira "vitest — passou".
+
+Respondida em 2026-10-31, por Anderson na sessão do workstream `studio` do `brza-workspace`, pelo AskUserQuestion. Os
+custos são estimativa.
+
+1. **R59.1 — Como acertar os 2 testes?** Seleção única. Opções: trocar por comandos neutros, fora das categorias do
+   BrzA, mantendo o que cada teste prova (recomendada) — custo: ~15 min; se paga: agora; afirmar o comportamento novo —
+   custo: ~15 min e de novo a cada mudança da linha de teste; se paga: só sem teste próprio da linha, que o P46 já tem;
+   deixar vermelho, com issue — custo: 2 falhas conhecidas; se paga: nunca.
+   **Decidido — "Trocar por comandos neutros (Recomendado)".** Vai ao P68.
+2. **R59.2 — Os outros ~40 mocks à mão do `mobile/` migram?** Opções: sob demanda, quando quebrarem (recomendada) —
+   custo: nenhum agora; todos agora — custo: ~1 h. **Decidido — "Sob demanda (Recomendado)".**
+3. **R59.3 — O helper responde só a nomes de ícone?** Opções: só ícones, em PascalCase (recomendada) — custo: nenhum;
+   qualquer nome — custo: ~5 min, e esconde export que não é ícone. **Decidido — "Só ícones (Recomendado)".**
+4. **R59.4 — Com `ortogrfia` no BrzA Studio, vieram sugestões?** Opções: sim, "ortografia" no topo — o P37 fecha sem
+   código; não, só "Add to dictionary" — o P37.2 investiga. Primeira resposta, "Sim, \"ortografia\" no topo",
+   corrigida por Anderson em texto livre: "digitei errado" e "ortografia não acusa como erro" — a palavra digitada foi a
+   certa, e o reteste não valeu. O reteste foi de novo à rodada, com a palavra soletrada: "Com \"ortogrfia\" sublinhada na
+   caixa do chat, o que o botão direito mostrou?" — opções: "ortografia" no topo; só "Add to dictionary"; nem
+   sublinhou. **Resposta — "\"ortografia\" no topo".** Fecha o P37.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -1347,16 +1413,21 @@ Sem `.app` aberto; a troca `claude` → `adm` no Orca se confere com o PLN-028/P
 
 Executa D31 · executor: sessão do `brza-studio`
 
-Estimado: 2 h · Executado: 0,5 h h
+Estimado: 2 h · Executado: 0,8 h
 
-- [ ] **1.** Conferir, no `orca-dev` aberto, o botão direito numa palavra errada da caixa do chat, em pt-BR; se as
+- [x] **1.** Conferir, no `orca-dev` aberto, o botão direito numa palavra errada da caixa do chat, em pt-BR; se as
       sugestões aparecem, o passo fecha sem código
-- [ ] **2.** Se não, a correção do idioma ou do menu do chat, com teste; commit e push
+- [-] **2.** Se não, a correção do idioma ou do menu do chat, com teste; commit e push — sem código: as sugestões
+      aparecem (R59.4)
 
 **Rodada:** R46.1 — o 1 se confere agora, no build instalado `de3fb921ad1`; o menu do Chromium com as sugestões do
 corretor já é tratado em `use-native-chat-context-menu.tsx:347`.
 
-**Evidência:** —
+**Evidência:** conferido por Anderson no BrzA Studio instalado, em 2026-10-31: `ortogrfia` na caixa do chat, com o botão
+direito, traz "ortografia" no topo do menu do sistema (R59.4). A primeira conferência usou `excessão`, que o corretor do
+macOS marca sem sugestão, e pareceu defeito (R58.2 a R58.4); um primeiro reteste saiu com a palavra certa digitada e
+não valeu. A sonda com o Electron 43.8.1 do `brza-studio`, fora do app, deu as mesmas sugestões num `textarea` e num
+`contenteditable`, com o `lang` em `en` e em `pt-BR` (R58).
 
 ### P38 — O Markdown na caixa de texto (pedido 24)
 
@@ -2407,6 +2478,33 @@ passed; `src/shared/native-chat` → 81 arquivos, 1.182 passed; `pnpm tc` e o `t
 `pnpm check:changed --base=origin/master --maxWorkers=2` → só o vermelho de antes, o `external-subcommand.ts` nas
 fronteiras de import. O worktree e a branch saíram depois do push. A conferência no app vai junto do C6.
 
+### P68 — Os testes do transcript do mobile com o mock compartilhado do lucide (X47)
+
+Executa X47 · executor: `implementer` da sessão do workstream `studio`, no worktree `.worktrees/pln-001-p68` do
+`brza-studio`
+
+Estimado: 0,7 h · Executado: 0,5 h
+
+- [x] **1.** Os sete arquivos do X47 rodam e falham no carregamento, com o erro do `GitBranch`, antes da mudança
+- [x] **2.** Um helper de teste no `mobile/` monta o mock do `lucide-react-native` com um componente simulado para
+      qualquer ícone; os sete arquivos e o `MobileNativeChatMessage.reasoning.test.ts` passam a usá-lo, no lugar das
+      listas à mão (R57.2)
+- [x] **3.** Os testes do transcript do mobile, o `typecheck` do `mobile/` e o `pnpm check:changed --base=origin/master`;
+      rebase na `origin/master` e push
+
+**Evidência:** commit [`7be19418c8f`](https://github.com/brz-anderson/brza-studio/commit/7be19418c8f), na `master` do
+`brza-studio`, pelo `implementer` (Sonnet) da sessão do workstream `studio`, no worktree `.worktrees/pln-001-p68`, com
+o commit e o push pela sessão. O helper é o `lucideMock`, em `mobile/src/test-support/lucide-react-native-mock.ts`: um
+`Proxy` que responde a qualquer nome em PascalCase com o próprio nome, que os testes procuram como tipo do nó, e aceita
+sobrescritas (R59.3); os oito arquivos o usam por `import` dinâmico no `vi.mock`, com 194 linhas a menos. Com os
+arquivos carregando, dois testes antigos falharam pelo P43, e trocaram de comando para `ls -la` e um `find` longo, fora
+das categorias do BrzA (R59.1). Os outros ~40 mocks à mão do `mobile/` migram quando quebrarem (R59.2). Antes:
+`transcript/` → 7 arquivos falhando no carregamento, 20 passando, 132 testes. Depois: `transcript/` e o teste do helper
+→ 28 arquivos, 224 passed; `pnpm typecheck` e `pnpm typecheck:tests` do `mobile/` → exit 0, com o baseline vazio;
+`pnpm check:changed --base=origin/master --maxWorkers=2` → só o vermelho de antes, o `external-subcommand.ts` nas
+fronteiras de import. O `rpc-recording/family-recordings.test.ts` falha em 2 casos ("Recording differs") também na
+`origin/master` `97a93f6ff57`, fora desta mudança. O worktree e a branch saíram depois do push.
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -2582,7 +2680,8 @@ da linha quando o teste entra.
 - **X47 — Sete arquivos de teste do transcript do mobile seguem sem carregar, pela mesma causa do X46.** O
   `MobileNativeChatMessage.test.ts`, o `.android`, o `.subagent-group`, o `.tool-result-availability` e o `.work-run`, o
   `MobileNativeChatToolRun.test.tsx` e o `.identity` dão `No "GitBranch" export is defined on the "lucide-react-native"
-  mock`, desde o P43; ficaram fora do P66, que não os toca. Afeta P43.
+  mock`, desde o P43; ficaram fora do P66, que não os toca. Fechado no P68 (`brza-studio@7be19418c8f`), com o mock compartilhado da R57.2. Afeta
+  P43.
 - **X48 — O tipo do `getVersion` simulado do teste do atualizador, num commit à parte.** O `updater-enabled.test.ts:20`
   quebrava o typecheck da `master` desde o `brza-studio@8e708f9790d` (P2), porque o `vi.hoisted` inferia o literal
   `'1.4.242'`; o `brza-studio@586f4f69eb7` tipa o retorno como `string`. Afeta P2.
@@ -2726,6 +2825,8 @@ da linha quando o teste entra.
   o P66 em `brza-studio@9118f60672b`, com a R54 e os X45 ao X48; o C21 espera o build, com Anderson.
 - 2026-10-31 — [O P67 do PLN-001, as meta-ferramentas da Atlassian com ícone e título](../../work/worklogs/2026-10-31-pln-001-p67-meta-ferramentas-da-atlassian.md):
   o P67 em `brza-studio@97a93f6ff57`, com a R55 e a R56, fecha o X20; a conferência vai junto do C6, com Anderson.
+- 2026-10-31 — [O P68 e o P37 do PLN-001, o mock compartilhado do lucide e a ortografia conferida](../../work/worklogs/2026-10-31-pln-001-p68-mock-do-lucide-e-p37-ortografia.md):
+  o P68 em `brza-studio@7be19418c8f`, com a R57 e a R59, fecha o X47; o P37 fecha sem código, pela R58 e pela R59.4.
 
 ## Decisões
 

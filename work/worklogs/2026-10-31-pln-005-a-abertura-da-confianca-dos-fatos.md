@@ -26,7 +26,7 @@ Três rodadas, gravadas na Entrevista do plano:
 - **R3:** o disparo mora num `fact_audit.py` separado do `measure.py`; o parser lê a devolução e os arquivos gravados;
   o `close-task` lista os pendentes.
 
-O Desenho (D1–D6) e os Passos (P1–P9, 9 h) foram escritos e esperam o aceite, na R4.
+O Desenho (D1–D6) e os Passos (P1–P9, 9 h) foram escritos e aceitos na R4 ("1"). A execução começa pelo P1, a pedido.
 
 ## Na master
 

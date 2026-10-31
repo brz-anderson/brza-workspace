@@ -1,8 +1,8 @@
 ---
-status: open
-phase: design
+status: in_progress
+phase: execution
 origin: request
-ready: "não — falta o aceite do corte em passos"
+ready: sim
 estimate_h: 9
 executed_h: 0
 remaining_h: 9
@@ -16,8 +16,7 @@ tags:
 
 # PLN-005: A confiança dos fatos do desenho se mede contra o que se sustentou
 
-- **Retomar:** R1–R3 respondidas, D1–D6 e P1–P9 escritos; falta o aceite do Desenho e do corte em passos (R4), e o P1,
-  a sonda do `claude -p`, abre a execução.
+- **Retomar:** Desenho e corte aceitos na R4; o próximo é o P1, a sonda do `claude -p`, a pedido de Anderson.
 
 ## Pedido
 
@@ -160,6 +159,21 @@ Respondida em 2026-10-31.
    - sem lembrete — custo: zero; se paga: nunca para os custos, cujo desfecho chega em outra sessão.
 
    **Decidido — "O close-task lista os pendentes (Recomendado)".**
+
+### Rodada 4 — o aceite do Desenho e do corte (enviada 2026-10-31)
+
+**Apresentado antes:** o plano inteiro, na mensagem, com D1–D6, P1–P9 e a Regressão.
+
+Respondida em 2026-10-31.
+
+1. **Aceite.** Opções:
+   - aceitar D1–D6 e P1–P9 como estão (recomendada) — custo: 9 h estimadas e uns US$ 0,02–0,05 por devolução
+     auditada, a confirmar no P1; se paga: em umas duas semanas, com ~100 fatos medidos, e o commit sai por passo verde;
+   - juntar P3–P6 numa entrega só do `implementer` — custo: um passo de 6 h revisado de uma vez, sem commit por parte;
+     se paga: agora, em menos ida e volta, mas a falha do P4 segura o P5 e o P6;
+   - só o P1 agora, e o corte depois da sonda — custo: uma rodada a mais; se paga: só se a sonda desmentir o D2.
+
+   **Decidido — "1"**: o plano está aceito em 2026-10-31. A execução segue passo a passo, a pedido.
 
 ## Desenho
 
@@ -402,5 +416,5 @@ Estimado: 1 h · Executado: — h
 
 ## Worklogs
 
-- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Parou no aceite (R4).
+- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; parou antes do P1.
   [PLN-005: a abertura da confiança dos fatos do desenho](../../work/worklogs/2026-10-31-pln-005-a-abertura-da-confianca-dos-fatos.md)

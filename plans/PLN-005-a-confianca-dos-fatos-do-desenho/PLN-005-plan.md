@@ -372,7 +372,7 @@ Estimado: 0.5 h · Executado: 0.2 h
 - [x] **2.** A marca vai "logo depois do que afirma", e não "no fim da linha" do D1, porque o custo e o "se paga" de uma
   opção dividem a linha `Custo: … Se paga: …`; no `collector`, a regra substitui "Fato sem fonte é inferência".
 
-**Evidência:** `master@68a925c` — `.claude/agents/designer.md:19-30` e `.claude/agents/collector.md:15-24`; a expressão
+**Evidência:** `master@68a925c` — `.claude/agents/designer.md:19-29` e `.claude/agents/collector.md:15-24`; a expressão
 do D2 casa o exemplo `[F3 · lido · 90]` dos dois arquivos, e a maior linha tem 118 colunas; `brza note sync` →
 `studio`, `tools-kit` e `workspace` mesclados e enviados.
 

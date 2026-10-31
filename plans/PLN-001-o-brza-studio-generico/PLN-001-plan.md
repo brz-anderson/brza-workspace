@@ -3,8 +3,8 @@ status: in_progress
 phase: execution
 origin: request
 ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 170.8
-executed_h: 31.3
+estimate_h: 172.3
+executed_h: 32.3
 remaining_h: 3.9
 scope:
   - brza-studio
@@ -26,7 +26,9 @@ tags:
   confere junto do C6; sete arquivos de teste do transcript do mobile não carregam desde o P43 (X47). Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
   C17 depois do P60 o C18 ao C20 depois do P64, o C21 e o C22), o X10 e o P27.2 e o P27.3; o P37 fechou sem código
   (R59.4), e o P68 fechou o X47 em `brza-studio@7be19418c8f`. O pedido 34 entrou em 2026-10-31, com a R60, a R61, o D52
-  e o P69, que fechou em `brza-studio@a0eefa646e4`, com os X57 e X58, e espera só o C22, num build, com Anderson. Do PLN-002/P9 (R12.4, R13.4),
+  e o P69, que fechou em `brza-studio@a0eefa646e4`, com os X57 e X58, e espera só o C22, num build, com Anderson. O pedido 35
+  entrou no mesmo dia, com o D53 e o P70, que fechou em `brza-studio@4eaac80df53`, com os X59 e X60, e espera só o C23, no
+  build do C22, com Anderson. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
   sessão entra no correio com o nome automático `brza-workspace-<hex>`. O P64 não lê o mapa de sessões do PLN-002 e
   casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
@@ -98,6 +100,11 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   no chat igual ao "Perguntou" com >"
 - **Pedido 34 (2026-10-31, sessão do workstream `studio` do `brza-workspace`):** "ferramenta de pergunta do chat deve
   poder ser minimizada, para que eu possa ler a conversa no chat"
+- **Pedido 35 (2026-10-31, sessão do workstream `workspace` do `brza-workspace`, no chat do BrzA Studio):** na rodada de
+  teste dos artboards do chat, a alternativa C — Ícone e ação para a faixa recolhida do pedido 34: "C e já coloque na
+  fila pra implementar"; depois, "siga". Chegou a esta sessão pelo pedido da sessão do `workspace`, com a resposta
+  literal e a data, e a issue
+  [A faixa recolhida da pergunta e da aprovação com ícone e ação](../../work/issues/a-faixa-recolhida-com-icone-e-acao.md)
 
 ### Cobertura
 
@@ -140,6 +147,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 32` | O clique no nome do remetente abre a aba de chat da sessão dele, se aberta no app (R50.3) | P64 | teste da busca da aba (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 33` | A linha do raciocínio, fechada, mostra "Pensou por 3s:" e o começo do texto, cortado, no tom apagado, com a seta que abre o texto inteiro; o rótulo da pergunta passa a "Perguntou:" (R52.1 a R52.3) | P66 | teste da linha (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 34` | No chat estruturado do desktop, o cartão de pergunta e o de aprovação recolhem a uma faixa acima do composer, que fica usável; a seta da faixa reabre o cartão com a resposta pela metade; o "Steer" da fila espera a resposta (R60.1 a R60.3, R61.1) | P69 | teste da sessão estruturada e do cartão de aprovação (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 35` | A faixa recolhida tem a barra de 3 px e o ícone do tipo em `--primary` à esquerda e, à direita, o botão "Responder" ou "Revisar" com a seta, que reabre o cartão; a seta do cartão aberto não muda | P70 | teste da sessão estruturada e do chat do terminal (unidade); conferência no BrzA Studio (manual) |
 | `X20` | O `executeRead`, o `executeWrite` e o `executeDestructive` do MCP da Atlassian ganham o ícone do produto do `name` e o título com a ferramenta interna; o `discover` ganha o ícone do produto citado na busca, e o título com a busca entre aspas (R55.1, R55.2) | P67 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual, com o C6) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
@@ -1097,7 +1105,7 @@ base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum; o P54 ao P57 v
 antes do P55, o P56 independente e o P57 por último; o P58 vem antes do P59 e do P60, que não dependem um do outro, e
 o P61 por último; o pedido 32 roda em paralelo com o 31 (R51.2), o P62 antes do P63, o P64 depois do P63 e o P65 por
 último; o P66 do pedido 33 roda em paralelo com os dois (R52.4), e o P69 do pedido 34, agora, em paralelo com o que espera
-build (R60.4).
+build (R60.4), e o P70 do pedido 35 depois do P69, que criou a faixa.
 
 **Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com "indicado". É
 leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a pedido, numa sessão
@@ -2606,6 +2614,36 @@ arquivos, 1.138 passed; `pnpm check:changed --base=origin/master --maxWorkers=2`
 antes, o `external-subcommand.ts` nas fronteiras de import. A `origin/master` não andou entre o início e o push. O
 worktree e a branch saíram depois do push. A conferência no app é o C22.
 
+### P70 — A faixa recolhida com ícone e ação (pedido 35)
+
+Executa D53 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-35`
+
+Estimado: 1,5 h · Executado: 1 h
+
+Depois do P69, que criou a faixa; o pedido 35 é a autorização ("siga").
+
+- [x] **1.** Testes que falham: no `NativeChatStructuredSession.prompt-collapse.test.tsx`, a faixa da pergunta com o
+      tipo `question`, o ícone da pergunta e o botão "Answer", e a da aprovação com o tipo `approval`, o ícone da
+      aprovação e o botão "Review"; no `NativeChatResolvedView.prompt-card-input.test.tsx`, o mesmo botão no chat do
+      terminal
+- [x] **2.** A `NativeChatPromptStrip` recebe o `kind`: a borda esquerda de 3 px e o ícone (`CircleHelp` ou `Shield`)
+      em `--primary`, e o botão com o rótulo e a seta para cima no lugar do `NativeChatPromptCollapseToggle`, que fica
+      só no cartão aberto; as chaves `components.native-chat.prompt.answer` e `.review` nos sete locales
+- [x] **3.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C23
+
+**Evidência:** commit [`4eaac80df53`](https://github.com/brz-anderson/brza-studio/commit/4eaac80df53), na `master` do
+`brza-studio`, por esta sessão no worktree `.worktrees/pln-001-pedido-35`, com o push direto. A faixa mora no
+`NativeChatPromptCollapse.tsx`: a borda `border-l-[3px] border-l-primary`, o ícone com `text-primary` e o
+`data-native-chat-prompt-strip-icon`, e o botão `ghost` `xs` com o rótulo e o `ChevronUp`; o
+`NativeChatStructuredPromptCard.tsx` passa o tipo pelo `prompt.body.kind`, e o `NativeChatResolvedView.tsx`, pelo
+`collapsedCard.kind` (X59). Antes do código: o `NativeChatStructuredSession.prompt-collapse.test.tsx` e o
+`NativeChatResolvedView.prompt-card-input.test.tsx` → 4 failed, 7 passed. Depois: os mesmos e os vizinhos da sessão
+estruturada, do chat do terminal, dos cartões e do i18n → 33 arquivos, 269 passed; `pnpm check:changed
+--base=origin/master --maxWorkers=2` → 20 de 21 verdes, só o vermelho de antes, os 2 casos do
+`open-uncommitted-entry.test.ts`, depois do ajuste do botão e do teste (X59, X60). A `origin/master` não andou entre o
+início e o push. O worktree e a branch saíram depois do push. A conferência no app é o C23.
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -2820,6 +2858,14 @@ da linha quando o teste entra.
   `NativeChatResolvedView.tsx` mudou uma linha. O teste da P69.1 foi para o
   `NativeChatStructuredSession.prompt-collapse.test.tsx`, com os cartões reais, porque o
   `NativeChatStructuredSession.test.tsx` os simula e não mostra a opção marcada. Afeta P69.
+- **X59 — A faixa muda também no chat do terminal.** A `NativeChatPromptStrip` é a mesma do chat do terminal
+  (`NativeChatResolvedView.tsx:391`), que já sabe o tipo pelo `collapsedCard.kind`; a faixa recebe o `kind` nos dois, e
+  o `NativeChatResolvedView.tsx` mudou mais uma linha. O botão da faixa fica no `ghost` sem cor própria, porque a
+  regra `shadcn(no-restyle)` do `check:changed` recusa cor no `<Button>`, e sai sem a dica com o Esc, porque o rótulo
+  já está à vista. Afeta P70 e D53.
+- **X60 — A espera de 100 ms do teste do P69 virou `vi.waitFor`.** O `flaky-test-pattern-ratchet` do `check:changed`
+  recusa o `setTimeout` do `settleFocus` no `NativeChatStructuredSession.prompt-collapse.test.tsx`, que o P70 tocou; o
+  teste agora espera o foco no composer. Afeta P70.
 
 ## Worklogs
 
@@ -2941,6 +2987,8 @@ da linha quando o teste entra.
   o pedido 34, a R60, a R61, o D52 e o P69, sem código; o P69 vai à sessão `pln-001-pedido-34`.
 - 2026-10-31 — [O P69 do PLN-001, recolher a pergunta e a aprovação no chat estruturado](../../work/worklogs/2026-10-31-pln-001-p69-recolher-a-pergunta-e-a-aprovacao.md):
   o P69 em `brza-studio@a0eefa646e4`, com os X57 e X58; o C22 espera o build, com Anderson.
+- 2026-10-31 — [O P70 do PLN-001, a faixa recolhida com ícone e ação](../../work/worklogs/2026-10-31-pln-001-p70-faixa-com-icone-e-acao.md):
+  o pedido 35, o D53 e o P70 em `brza-studio@4eaac80df53`, com os X59 e X60; o C23 espera o build do C22, com Anderson.
 
 ## Decisões
 
@@ -2984,12 +3032,13 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C20 | `Pedido 32`: o clique no remetente (P64.3) | Clicar no nome de uma sessão aberta e no de uma fechada | A aba da sessão aberta em foco; a fechada sem ação | | |
 | C21 | `Pedido 33`: o "Pensou" com o texto na linha (P66.3) | Uma resposta com raciocínio, entre comandos e fora deles, no desktop e no app do celular (R54.1); abrir e fechar a linha | "Pensou por Xs:" e o começo do texto, apagado, cortado; aberta, o texto inteiro abaixo; a pergunta com "Perguntou:" | | |
 | C22 | `Pedido 34`: recolher a pergunta e a aprovação no chat estruturado (P69.4) | Num chat do Claude, uma pergunta do AskUserQuestion com uma opção marcada e uma aprovação; recolher, rolar a conversa, mandar uma mensagem pelo composer e reabrir | A faixa com o título no lugar do cartão e o composer usável; a mensagem vai à fila, sem "Steer", e sai depois do turno; reaberto, o cartão com a opção marcada; repetido com o "enfileirar follow-ups" desligado, a pergunta segue pendente e respondível, ou o caso falha (R61.2) | | |
+| C23 | `Pedido 35`: a faixa com ícone e ação (P70.3) | No build do C22, recolher uma pergunta e uma aprovação, no tema claro e no escuro | A barra e o ícone do tipo à esquerda e "Responder" ou "Revisar" com a seta à direita, que reabre o cartão; o título cortado no que sobra. A barra e o ícone saem pretos no claro e brancos no escuro, pelo `--primary` neutro; se a falta de cor incomodar, a escolha do token vai a Anderson como rodada | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,
 Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14. O C11
 entra no mesmo build, pelo pedido do P55 (2026-10-28), e o C12, pelo do P56 (2026-10-29). O C15 ao C17 são do
-pedido 31 e vão a um build depois do P60, com o P61; o C18 ao C20, do pedido 32, a um build depois do P64, com o P65; o C21, do pedido 33, ao mesmo build; o C22, do pedido 34, ao build depois do P69.
+pedido 31 e vão a um build depois do P60, com o P61; o C18 ao C20, do pedido 32, a um build depois do P64, com o P65; o C21, do pedido 33, ao mesmo build; o C22, do pedido 34, ao build depois do P69, e o C23, do pedido 35, ao mesmo build.
 
 ## Fechamento
 

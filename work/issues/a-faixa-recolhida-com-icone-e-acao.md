@@ -1,8 +1,9 @@
 ---
-status: open
+status: done
 scope:
   - brza-studio
 opened: 2026-10-31
+completed: 2026-10-31
 tags:
   - chat
   - design
@@ -15,6 +16,11 @@ alternativa **C — Ícone e ação** para a faixa recolhida do chat estruturado
 implementar". A rodada está em
 [Os artboards na rodada de desenho de interface](../worklogs/2026-10-31-artboards-na-rodada-de-desenho.md),
 na seção "O teste no chat".
+
+**Resolvida em 2026-10-31, na sessão do workstream `studio`:** pedido 35 e P70 do PLN-001, em `brza-studio@4eaac80df53`, com a
+barra, o ícone e o botão "Responder"/"Revisar" como acima, também na faixa do chat do terminal; o `--primary` ficou o
+neutro, e a cor se confere no C23, em
+[O P70 do PLN-001, a faixa recolhida com ícone e ação](../worklogs/2026-10-31-pln-001-p70-faixa-com-icone-e-acao.md).
 
 ![A alternativa C, com uma pergunta de título longo e uma aprovação, a 736 px no tema claro](a-faixa-recolhida-com-icone-e-acao.png)
 

@@ -46,8 +46,16 @@ O `implementer` fez o modo `stop` do `fact_audit.py`, com 24 testes. O teste num
 que a devolução não é texto: chega pelo `SubagentHandback`, e a especificação da sessão dizia o contrário (X1). O
 `implementer` corrigiu, e a R5 fechou as três escolhas que ele fez sem a especificação fixar, todas na recomendada.
 
+## A auditoria em segundo plano (P4)
+
+A R6 decidiu que a citação errada de um fato verdadeiro sai `holds` com `cite: off`. O `implementer` fez o `run`, o
+disparo no fim do `stop`, a marca no `turn` da sessão `-p` e a entrada no `settings.json`, com 22 testes; a R7 fechou
+as três escolhas dele, e a sessão aplicou a da cerca. Desde o `3e123f0`, toda devolução do `designer` e do
+`collector` com fato `rodado`, `lido` ou `doc` dispara a auditoria.
+
 ## Na master
 
 - `2e8ea67` — "Último PLN usado" passa a 005 no `plans/README.md`.
 - `68a925c` — a marca de confiança no `designer.md` e no `collector.md` (P2).
 - `8d22660` — o `fact_audit.py stop` e os testes (P3).
+- `3e123f0` — o `fact_audit.py run`, o `turn` marcado, o resumo e o `settings.json` (P4).

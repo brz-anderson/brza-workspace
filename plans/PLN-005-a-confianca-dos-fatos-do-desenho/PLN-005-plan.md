@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 9
-executed_h: 0.8
-remaining_h: 6
+executed_h: 1.4
+remaining_h: 4
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,7 +16,8 @@ tags:
 
 # PLN-005: A confiança dos fatos do desenho se mede contra o que se sustentou
 
-- **Retomar:** P1–P3 feitos; o próximo é o P4, a auditoria em segundo plano, pelo `implementer`, a pedido de Anderson.
+- **Retomar:** P1–P4 feitos, e o hook já audita; o próximo é o P5, o `fact_outcome.py`, pelo `implementer`, a pedido
+  de Anderson.
 
 ## Pedido
 
@@ -205,12 +206,56 @@ Respondida em 2026-10-31.
 
    **Decidido — "Por ocorrência (Recomendado)".**
 
+### Rodada 6 — a citação errada de um fato verdadeiro (enviada 2026-10-31)
+
+**Apresentado antes:** na sonda do P1, o Haiku deu `holds` ao F1, de conteúdo certo e linha errada (`measure.py:22`, o
+texto na 23); o prompt da auditoria, que o P4 escreve, precisa dizer o que fazer nesse caso.
+
+Respondida em 2026-10-31.
+
+1. **A citação errada.** Opções:
+   - `holds` e um campo `cite: ok|off` (recomendada) — custo: um campo a mais na linha do auditor, no `fact_check` e
+     numa coluna do `--facts`; se paga: na primeira leitura do resumo, que separa fato errado de citação errada, e a
+     sessão segue a citação para conferir;
+   - `holds`, com a nota no `why` — custo: nenhum; se paga: agora, mas a citação errada nunca vira número;
+   - `fails` — custo: pune o fato verdadeiro, e a faixa 90+ parece pior do que é; se paga: só se o alvo for a disciplina
+     de citação, e não a verdade do fato.
+
+   **Decidido — "holds + campo cite (Recomendado)".**
+
+### Rodada 7 — as escolhas do `implementer` no P4 (enviada 2026-10-31)
+
+**Apresentado antes:** a devolução do `implementer` no P4, com três escolhas que a especificação não fixou.
+
+Respondida em 2026-10-31.
+
+1. **A cerca na resposta do Haiku.** Opções:
+   - ignorar a linha de cerca sem contar (recomendada) — custo: 2 linhas e 1 teste ajustado; se paga: no P8, porque sem
+     isso o `ignored` de toda resposta cercada nasce poluído;
+   - contar a cerca no `ignored` — custo: nenhum agora; se paga: só para medir se o Haiku obedece ao formato.
+
+   **Decidido — "Ignorar a cerca sem contar (Recomendado)".**
+
+2. **O id repetido na resposta.** Opções:
+   - a primeira vale, e a repetida vai ao `ignored` (recomendada) — custo: nenhum; se paga: agora, porque dois
+     `fact_check` do mesmo fato inflariam o acerto por faixa;
+   - a última vale — custo: 3 linhas e 1 teste; se paga: só se o Haiku costumar se corrigir no fim, o que não se mediu.
+
+   **Decidido — "A primeira vale (Recomendado)".**
+
+3. **Os `runs` sem fato `rodado`.** Opções:
+   - só com fato `rodado` (recomendada) — custo: nenhum; se paga: agora, no tamanho do arquivo e no que o Haiku lê;
+   - sempre — custo: arquivo maior e mais tokens; se paga: só se o `lido` ou o `doc` dependerem de saída gravada.
+
+   **Decidido — "Só com fato 'rodado' (Recomendado)".**
+
 ## Desenho
 
 ### O que este desenho assume
 
 - **R1.1:** levam a marca os fatos do `designer`, os do `collector` e os custos e "se paga" das opções do `designer`.
 - **R1.2:** a marca é número e tipo, na régua do `reviewer`.
+- **R6:** o veredito diz se o fato é verdadeiro; o `cite: ok|off`, se a fonte aponta o lugar certo.
 - **R1.3:** um Haiku refaz a evidência dos fatos `rodado`, `lido` e `doc`; a sessão registra o desfecho dos `inferido`,
   dos abaixo de 80 e dos custos.
 - **R2.1, R3.1:** o disparo é do hook, em segundo plano, num `fact_audit.py` separado do `measure.py`.
@@ -312,8 +357,9 @@ O script tem dois modos e importa do `measure.py` o `agent_transcript`, o `read_
   1. roda, no `cwd` do subagente, com `BRZA_FACT_AUDIT=1` e limite de 10 min:
      `claude -p --model haiku --tools Read,Grep,Glob,WebFetch --add-dir <dir do arquivo> --output-format json --max-budget-usd 0.25 "<prompt>"`;
   2. o prompt manda refazer a evidência de cada fato — abrir o `arquivo:linha`, a URL, ou ler a saída gravada do
-     comando — e devolver uma linha JSON por fato: `{"id": "F3", "verdict": "holds|fails|unknown", "why": "…"}`;
-  3. grava um `fact_check` por veredito e um `fact_audit` por rodada, com o custo e a duração do JSON de saída, o número
+     comando — e devolver uma linha JSON por fato: `{"id": "F3", "verdict": "holds|fails|unknown", "cite": "ok|off", "why": "…"}`
+     — `cite: off` quando a fonte não aponta o lugar em que o fato se confere, mesmo verdadeiro (R6);
+  3. grava um `fact_check` por veredito, com o `cite`, e um `fact_audit` por rodada, com o custo e a duração do JSON de saída, o número
      de fatos e o erro, quando houver. A falha nunca levanta: vira `fact_audit` com `error`.
 
 ### D3 — O desfecho da sessão — `scripts/fact_outcome.py` (P5)
@@ -340,8 +386,8 @@ python3 scripts/fact_outcome.py --list <agent_id>
 
 #### Como fica
 
-Uma tabela por papel, faixa (90+, 80–89, <80) e tipo: fatos, com desfecho, `holds` em %, a confiança média e a
-distância entre as duas. O desfecho da sessão vence o do Haiku; `unknown` conta à parte e fica fora do acerto. Abaixo,
+Uma tabela por papel, faixa (90+, 80–89, <80) e tipo: fatos, com desfecho, `holds` em %, a confiança média, a
+distância entre as duas e o `cite: off` em % (R6). O desfecho da sessão vence o do Haiku; `unknown` conta à parte e fica fora do acerto. Abaixo,
 as devoluções sem marca, as marcas malformadas e o custo somado das auditorias. Com `--json`, o mesmo em JSON.
 
 ### D5 — O lembrete — `.claude/skills/close-task/SKILL.md` (P7)
@@ -429,13 +475,21 @@ Estimado: 2 h · Executado: 0.4 h
 
 Executa D2 (o arquivo, o disparo e o `run`) e D6 (o `turn` marcado) · executor: `implementer`
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0.6 h
 
-- [ ] **1. Teste que falha:** com o `claude` trocado por um espião no `PATH`, o `stop` volta antes do espião terminar,
+- [x] **1. Teste que falha:** com o `claude` trocado por um espião no `PATH`, o `stop` volta antes do espião terminar,
   e o `run` grava um `fact_check` por linha do espião e o `fact_audit` com o custo; com o espião falhando, só o
   `fact_audit` com `error`.
-- [ ] **2. Implementar**, com a entrada no `.claude/settings.json`.
-- [ ] **3. Rodar** — `python3 -m unittest discover .claude/hooks/tests`.
+- [x] **2. Implementar**, com a entrada no `.claude/settings.json`, o `cite` da R6 e as escolhas da R7.
+- [x] **3. Rodar** — `python3 -m unittest discover .claude/hooks/tests`.
+
+**Evidência:** `master@3e123f0` — `.claude/hooks/fact_audit.py` (`stop` solta o `run`; `run` com o `PROMPT` do
+auditor), `.claude/hooks/measure.py` (`fact_audit: true` no `turn`), `scripts/summarize_measurements.py` (o `turn` de
+auditoria fora dos agregados) e a segunda entrada do `SubagentStop` no `.claude/settings.json`. Antes do código, 6
+falhas e 16 erros em 119; `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 119 tests … OK`. O `stop` volta
+em menos de 1 s com o espião dormindo 2 s. Na primeira rodada dos testes, o `Popen` dos testes antigos ainda não
+estava trocado e pode ter chamado o `claude` real: nenhum transcript com o prompt do auditor nem `turn` em Haiku além
+do P1 apareceu, e nenhum processo ficou vivo.
 
 ### P5 — O desfecho da sessão
 
@@ -485,5 +539,6 @@ Estimado: 1 h · Executado: — h
 
 ## Worklogs
 
-- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2; P2 e P3 feitos, com o X1 e a R5. Parou antes do P4.
+- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2; P2–P4 feitos, com o X1, a R5, a R6 e a R7. Parou antes do
+  P5.
   [PLN-005: a abertura da confiança dos fatos do desenho](../../work/worklogs/2026-10-31-pln-005-a-abertura-da-confianca-dos-fatos.md)

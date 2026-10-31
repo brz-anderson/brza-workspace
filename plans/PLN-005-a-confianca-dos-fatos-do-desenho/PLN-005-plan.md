@@ -1,14 +1,15 @@
 ---
-status: in_progress
-phase: execution
+status: done
+phase: closed
 origin: request
 ready: sim
-estimate_h: 9.5
-executed_h: 3
-remaining_h: 1
+estimate_h: 10.5
+executed_h: 4.1
+remaining_h: 0
 scope:
   - workspace
 opened: 2026-10-31
+completed: 2026-10-31
 owner: Anderson
 tags:
   - tooling
@@ -16,7 +17,7 @@ tags:
 
 # PLN-005: A confiança dos fatos do desenho se mede contra o que se sustentou
 
-- **Retomar:** P1–P8 e P10 feitos; falta o P9, a revisão do `reviewer`.
+- **Retomar:** fechado em 2026-10-31; o acerto se lê com `python3 scripts/summarize_measurements.py --facts`.
 
 ## Pedido
 
@@ -37,8 +38,10 @@ tags:
 ### Fora de escopo
 
 - **A marca nos achados do `reviewer`.** Ele já dá a confiança em número (`.claude/agents/reviewer.md:17`); medir o
-  acerto dele fica para depois que este mecanismo tiver amostra.
-- **A marca nos agentes do Codex e do `agy`.** Os papéis deles são do PLN-004.
+  acerto dele fica para depois que este mecanismo tiver amostra:
+  [A confiança dos achados do reviewer se mede contra o desfecho deles](../../work/issues/a-confianca-do-reviewer-medida-contra-o-desfecho.md).
+- **A marca nos agentes do Codex e do `agy`.** Os papéis deles são do
+  [PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude](../PLN-004-o-codex-e-o-agy-no-fluxo/PLN-004-plan.md).
 
 ## Entrevista
 
@@ -323,6 +326,79 @@ Respondida em 2026-10-31.
 
    **Decidido — "Erro de uso, saída 2 (Recomendado)".**
 
+### Rodada 11 — os destinos da revisão (enviada 2026-10-31)
+
+**Apresentado antes:** o parecer do `reviewer` (P9), com dez achados reais e cinco falsos; a sessão refez a evidência
+do A1 (22 dos 115 `fact` do log cortados em 300 caracteres, sem a marca), do A2 (o F28 com `holds` e nenhuma das 14
+chamadas do auditor ao arquivo citado), do A3 e do A4 (o `CLAUDE.md:125` com 161 colunas e o teto fixo), do A6 e do
+A7 (o `--pending` silencioso da `master` e de um terminal sem a `BRZA_WORKSPACE`) e do A10 (a segunda auditoria a
+US$ 0,0098 por fato).
+
+Respondida em 2026-10-31.
+
+1. **O texto do fato (A1).** Opções:
+   - o parágrafo inteiro da marca ao auditor, e no log os 300 caracteres que terminam nela (recomendada) — custo: umas
+     10 linhas e 2 testes, e mais tokens nos fatos longos; se paga: na próxima devolução do `collector`;
+   - os 300 que terminam na marca, nos dois — custo: 3 linhas; se paga: agora, mas o fato longo segue cortado;
+   - manter — custo: nenhum; se paga: nunca.
+
+   **Decidido — "Parágrafo inteiro ao auditor (Recomendado)".**
+
+2. **O `holds` sem leitura (A2).** Opções:
+   - conferir a leitura: o Haiku devolve o `read`, o `run` confere no `stream-json`, e sem casar o veredito vira
+     `unknown` (recomendada) — custo: umas 40 linhas e 4 testes; se paga: na próxima leitura do `--facts`;
+   - só endurecer o prompt — custo: 2 linhas; se paga: só se o Haiku obedecer;
+   - anotar o viés e manter — custo: 1 linha; se paga: nunca para a calibração.
+
+   **Decidido — "Conferir a leitura (Recomendado)".**
+
+3. **O teto (A10).** Opções:
+   - US$ 0,02 por fato, mínimo 0,25 (recomendada) — custo: 1 linha, e uma auditoria em laço de 21 fatos gasta até
+     US$ 0,42; se paga: na primeira devolução acima de 0,0119 por fato;
+   - manter US$ 0,012 — custo: nenhum agora, e a rodada cortada perde tudo; se paga: só se o corte nunca vier.
+
+   **Decidido — "US$ 0,02 por fato, mínimo 0,25 (Recomendado)".** A R10.2 fica substituída.
+
+4. **Os achados menores**, seleção múltipla; o que não fosse marcado iria a issue. Opções:
+   - A3 e A4, o `CLAUDE.md` (recomendada) — custo: 2 linhas; se paga: agora;
+   - A5, os desvios no Desenho, reescritos com a origem nova e aceitos nesta rodada (recomendada) — custo: uns 10 min;
+     se paga: agora;
+   - A6 e A7, o aviso no stderr e a raiz pelo `git --git-common-dir` (recomendada) — custo: umas 15 linhas e 4 testes;
+     se paga: na primeira vez que o comando rodar do lugar errado;
+   - A8 e A9, o teste do timeout e a Regressão (recomendada) — custo: 1 teste e a Regressão reescrita; se paga: no
+     primeiro conserto do `run`.
+
+   **Decidido — as quatro.** O X1, o X2 e o X4 ficam aceitos aqui, e o D1 a D3 declaram a origem nova.
+
+### Rodada 12 — as escolhas do `implementer` no P11 (enviada 2026-10-31)
+
+**Apresentado antes:** a devolução do `implementer` no P11 e três auditorias reais novas, entre elas o primeiro
+`designer` (`af143be9`), com 27 e 21 marcas malformadas — quase todas o id solto (`[F5].`), que a regra dos papéis
+manda usar para citar um fato já marcado; a sessão passou a tratá-lo como referência, pela R10.1.
+
+Respondida em 2026-10-31.
+
+1. **O `:linha` no `read`.** Opções:
+   - tolerar (recomendada) — custo: uma expressão; se paga: na primeira auditoria, sem rebaixar `holds` verdadeiro pelo
+     formato;
+   - exigir o caminho puro — custo: nenhum; se paga: só se o Haiku obedecer.
+
+   **Decidido — "Tolerar o ':linha' (Recomendado)".**
+
+2. **O `Grep` sem `path`.** Opções:
+   - não conta como leitura (recomendada) — custo: nenhum; se paga: agora, e o caso aparece no `downgraded`;
+   - conta como busca no cwd — custo: 2 linhas e 1 teste, e afrouxa a conferência; se paga: só se o `downgraded`
+     mostrar `Grep` legítimo caindo.
+
+   **Decidido — "Não conta (Recomendado)".**
+
+3. **Os rebaixados no `--facts`.** Opções:
+   - a coluna agora (recomendada) — custo: umas 15 linhas e um teste; se paga: na próxima leitura do `--facts`;
+   - issue para depois — custo: nenhum agora, e o rebaixado fica escondido no `unknown`; se paga: quando a issue for
+     feita.
+
+   **Decidido — "Coluna agora (Recomendado)".**
+
 ## Desenho
 
 ### O que este desenho assume
@@ -376,35 +452,37 @@ Respondida em 2026-10-31.
 
 ### D1 — A marca — `.claude/agents/designer.md`, `.claude/agents/collector.md` (P2)
 
-- **Origem:** R1.1, R1.2, R3.2
+- **Origem:** R1.1, R1.2, R3.2, R10.1; a marca "logo depois do que afirma" é o X4, aceito na R11.4
 - **Contexto:** o hook só mede o que acha escrito numa forma fixa; a régua é a do `reviewer`, para que as duas
   confianças se leiam igual.
 
 #### Como fica
 
 No `designer.md`, depois de "A recomendação leva o argumento…"; no `collector.md`, no lugar de "Cada fato vai com a
-fonte…", sem a parte dos custos:
+fonte…", sem a parte dos custos. O texto como está em disco, no `designer.md`:
 
 ```markdown
-- **Cada fato e cada custo levam a marca no fim da linha**, `[F3 · lido · 90]`, também no agregado do scratch:
-  - o id: `F` para fato, `C` para custo ou "se paga", numerados na devolução e continuados na retomada;
-  - o tipo de evidência: `rodado`, o comando rodou nesta execução; `lido`, o `arquivo:linha` foi aberto nesta execução;
-    `doc`, a URL ou a documentação foi lida nesta execução; `inferido`, sem fonte direta;
-  - a confiança, de 0 a 100, na régua do `reviewer`: 90 ou mais, verificado direto; de 80 a 89, com a premissa
-    escrita na frase do fato, fora da marca; abaixo de 80, a conferir. O `inferido` fica abaixo de 80.
+- **Cada fato e cada custo levam a marca** `[F3 · lido · 90]` logo depois do que afirmam, também no rascunho e no
+  agregado do scratch:
+  - o id: `F` para fato, `C` para o custo e para o "se paga" de cada opção, numerados na devolução e continuados na
+    retomada;
+  - o tipo de evidência: `rodado`, o comando rodou nesta execução; `lido`, o `arquivo:linha` foi aberto nesta
+    execução; `doc`, a URL ou a documentação foi lida nesta execução; `inferido`, sem fonte direta;
+  - a confiança, de 0 a 100: 90 ou mais, verificado direto; de 80 a 89, com a premissa escrita na frase do fato,
+    fora da marca; abaixo de 80, a conferir. O `inferido` fica abaixo de 80.
 
   Uma marca por fato, só com o id, o tipo e o número: o resumo que retoma fatos já marcados cita o id sem a marca.
 
-  Um Haiku refaz a evidência dos `rodado`, `lido` e `doc` depois da devolução; o desfecho dos outros vem da sonda ou da
-  rodada. O acerto por faixa se mede.
+  Um Haiku refaz a evidência dos `rodado`, `lido` e `doc` depois da devolução, e a sessão registra o desfecho dos
+  outros quando a sonda ou a rodada responde: o acerto de cada faixa se mede, e a marca fora dessa forma não conta.
 ```
 
-A redação final passa pela `agent-instructions-writer`, que decide se a régua sobe ao `AGENTS.md`, em "A devolução do
-subagente", e os papéis só apontam.
+A régua ficou nos papéis, sem subir ao `AGENTS.md`, que carrega em toda sessão (P2).
 
 ### D2 — A captura e a auditoria — `.claude/hooks/fact_audit.py` (P3, P4)
 
-- **Origem:** R1.3, R2.1, R3.1, R3.2
+- **Origem:** R1.3, R2.1, R3.1, R3.2, R6, R7, R10.1, R10.2, R11.1–R11.3; a devolução pelo `SubagentHandback` é o X1,
+  aceito na R11.4
 - **Contexto:** o hook não pode segurar o fim do subagente; a auditoria leva minutos.
 
 #### Como fica
@@ -445,7 +523,7 @@ O script tem dois modos e importa do `measure.py` o `agent_transcript`, o `read_
 
 ### D3 — O desfecho da sessão — `scripts/fact_outcome.py` (P5)
 
-- **Origem:** R1.3, R2.2, R3.3
+- **Origem:** R1.3, R2.2, R3.3, R8, R11.4; o `workstream` do fato é o X2, aceito na R11.4
 
 #### Como fica
 
@@ -651,12 +729,42 @@ malformada; duas marcas num colchete não apareceram nas 46 reais.
 
 Executa D1–D6 · executor: `reviewer`, com o parecer em `work/reviews/pln-005-a-confianca-dos-fatos.md`
 
-Estimado: 1 h · Executado: — h
+Estimado: 1 h · Executado: 0.3 h
+
+- [x] **1.** O parecer, com dez achados reais e cinco falsos; a sessão refez a evidência dos que pesavam, e a R11 deu
+  o destino de cada um: todos `corrigido aqui`.
+
+**Evidência:** [REV: PLN-005 — a confiança dos fatos do desenho](../../work/reviews/pln-005-a-confianca-dos-fatos.md).
+
+### P11 — As correções da revisão
+
+Executa D2, D3 e D6 (A1, A2, A6, A7, A8, A10) · executor: `implementer` (o código) e a sessão (A3, A4, A5, A9)
+
+Estimado: 1 h · Executado: 0.8 h
+
+- [x] **1.** A5: o D1 com o texto em disco, as origens do D1 ao D3 e o X4; A9: a Regressão reescrita.
+- [x] **2.** A3 e A4: o `CLAUDE.md` com o teto por fato, a leitura conferida e a linha de 161 colunas quebrada.
+- [x] **3.** A1, A2, A6, A7, A8 e A10, pelo `implementer`, com testes; e o id solto (`[F5]`) como referência, pela
+  sessão.
+- [x] **4.** A coluna `rebaixados` do `--facts` (R12.3), pelo `implementer` — `master@cfa058e`,
+  `Ran 213 tests … OK`; no log real, 0 rebaixados, porque as 5 auditorias são anteriores ao `read_ok`.
+
+**Evidência:** `master@2c9a546` — `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 208 tests … OK` (eram
+176). A1: no transcript do `collector` `ab5aa7e0d74df08e7`, as 28 marcas têm o `text` terminando na marca (eram 24
+cortadas), e o maior `context` tem 2.000 caracteres. A2: o `run` lê o `stream-json` e rebaixa a `unknown` o veredito sem
+leitura casada. A8: numa cópia, trocar o `killpg` por `process.kill()` ou tirar o `start_new_session` faz o teste novo
+levar 25 s e falhar; o original passa em 2 s. A10: `budget_usd(21)` → `0.42`. A6: da raiz da `master`, o `--pending`
+escreve "lendo …/measurements.jsonl; workstream master" e o aviso. A7: do worktree, sem a `BRZA_WORKSPACE`, o script
+lê o log da `master` e lista 67 pendentes. O id solto: no transcript do `designer` `af143be9be6175443`, 80 marcas e 0
+malformadas; sem o ramo novo da `REFERENCE`, o teste `test_a_bare_id_cites_a_marked_fact_and_is_not_malformed` falha.
+O `implementer` fez uma chamada real ao `claude` (Haiku, US$ 0,002) para ver a forma do `stream-json`.
 
 ## Regressão
 
-- **O `measure.py` segue só medindo** e o `SubagentStop` dele não muda de duração. Como se confere: os testes de
-  `.claude/hooks/tests/test_measure.py` e um `subagent` real com `duration_s` igual ao de antes.
+- **O `measure.py` segue só medindo, e o `stop` não segura o fim do subagente.** Como se confere: os testes de
+  `.claude/hooks/tests/test_measure.py`; o teste do `stop` que volta em menos de 1 s com o espião dormindo; e, nas
+  devoluções reais, o `fact_capture` no mesmo segundo, ou no seguinte, da linha `subagent` do mesmo agente. O
+  `duration_s` não serve: é a duração do subagente, tirada do transcript (A9).
 - **O resumo sem `--facts` não muda.** Como se confere: `test_summarize_measurements.py`.
 
 ## Desvios
@@ -664,15 +772,48 @@ Estimado: 1 h · Executado: — h
 - **X1 — A devolução mora no `SubagentHandback`.** A especificação dizia "a última mensagem de texto", sem conferir:
   nos 40 transcripts de subagente mais recentes, 4 de 4 devoluções do `designer` e 4 de 5 do `collector` chegam como
   `tool_use` `SubagentHandback`, com o texto em `input.message`. O parser lê o handback e cai no `text` sem ele. Afeta
-  P3 e D2; não muda a R3.2, que diz "a devolução", e por isso não voltou à Entrevista.
+  P3 e D2; aceito na R11.4 (A5).
 - **X2 — O desfecho leva o `workstream` do fato, e não o do cwd.** O desfecho chega em outra sessão, às vezes em outro
-  worktree; com o do cwd, o `--pending` do workstream dono nunca o veria. Afeta D3 e P5.
+  worktree; com o do cwd, o `--pending` do workstream dono nunca o veria. Afeta D3 e P5; aceito na R11.4 (A5).
 - **X3 — A prova do P8 veio de um `collector`, e não de um `designer`.** O primeiro subagente marcado depois do P4 foi
   um `collector` de outra sessão; o caminho do `designer` só difere no filtro do `agent_type` e nas marcas `C`, que os
   testes do P3 e do P6 cobrem. Afeta P8.
+- **X4 — A marca vai "logo depois do que afirma", e não "no fim da linha".** O custo e o "se paga" de uma opção
+  dividem a linha `Custo: … Se paga: …`, e cada um leva a sua marca. Afeta D1 e P2; aceito na R11.4 (A5). É o que
+  levou ao A1: a marca no meio de linha longa ficava além dos 300 caracteres.
+
+## Revisões
+
+- [REV: PLN-005 — a confiança dos fatos do desenho](../../work/reviews/pln-005-a-confianca-dos-fatos.md) — 2026-10-31,
+  dez achados e cinco falsos, todos com destino (R11).
+
+## Pendências conhecidas
+
+- [A confiança dos achados do reviewer se mede contra o desfecho deles](../../work/issues/a-confianca-do-reviewer-medida-contra-o-desfecho.md)
+  — do `### Fora de escopo`; espera amostra no `--facts`.
+
+## Documentação
+
+- `.claude/agents/designer.md` e `.claude/agents/collector.md` — a marca de confiança, em P2 e P10 (`68a925c`,
+  `b3e3efd`).
+- `CLAUDE.md`, "A auditoria da confiança dos fatos" e o "Resumo" do hook de medição — em P7 e P11 (`4c92097`,
+  `2c9a546`).
+- `README.md`, os comandos do `--facts` e do `fact_outcome.py` — em P7 (`4c92097`).
+- `.claude/skills/close-task/SKILL.md`, "Os fatos a conferir" — em P7 (`4c92097`).
 
 ## Worklogs
 
-- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2; P2–P8 e P10 feitos, com o X1–X3 e as R5–R10. Parou antes do
-  P9.
+- 2026-10-31 — aberto, conduzido e fechado: R1–R12; D1–D6; P1–P11; X1–X4; a revisão com dez achados, todos
+  corrigidos no P11.
   [PLN-005: a abertura da confiança dos fatos do desenho](../../work/worklogs/2026-10-31-pln-005-a-abertura-da-confianca-dos-fatos.md)
+
+## Fechamento
+
+- [x] Todo passo `[x]` com evidência: P1–P11.
+- [x] Todo achado com destino que existe: A1–A10 corrigidos no P11; A11–A15 `→ falso` no parecer.
+- [x] Sem resumo a publicar: a entrega são commits diretos na `master` do `brza-workspace`, sem pull request.
+- [x] O durável saiu para a casa dona e está em `## Documentação`: a marca nos papéis, a auditoria no `CLAUDE.md`, os
+      comandos no `README.md` e o lembrete no `close-task`. Nenhuma rodada decidiu algo além do plano que peça nota em
+      `work/decisions/`.
+- [x] Nenhuma decisão de `work/decisions/` foi respondida pelo plano.
+- [x] `status: done`, `phase: closed` e `completed` no frontmatter.

@@ -15,8 +15,9 @@ tags:
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
 - **Retomar:** o Desenho está em rascunho no scratch da sessão `workspace` (`pln-004-design-rascunho.md`, D1 a D14), com
-  a R6 fechada. O próximo são as sondas da R6.1, pelo `collector`, com um `/hooks` de Anderson, e depois a rodada 7 —
-  o `--approve-for-me` do app, a memória por caminho relativo, a função da Fixfy no shell e a issue do `studio`.
+  a R6 fechada e as sondas dela feitas (`pln-004-sondas-r6.md`). O próximo é a rodada 7 — o `--approve-for-me` do app,
+  a memória por caminho relativo, a função da Fixfy no shell e a issue do `studio` — e o `/hooks` de Anderson no
+  worktree da sonda.
 
 ## Pedido
 
@@ -61,6 +62,9 @@ As frentes do pedido, pela R1.2, numeradas para a Cobertura:
 - **O que é só da Fixfy** — as contas `fixfy-*`, o `fixfy-plugin`, a guarda —, pela R1.3. Fica no PLN-011 de lá.
 - **O código do `brza`** — o `brza sessions`, o `claude-brza` —, pela R1.1. Vai como pedido ao `tools-kit`, que o
   executa numa sessão dele.
+- **O chat Antigravity do BrzA Studio.** É um servidor ACP gerenciado pelo app, que não é o `agy` e ignora o
+  `agentCmdOverrides` (`brza-studio/src/main/acp/acp-launch-specs.ts:261-265`); o `agy` deste plano é o do terminal e o
+  do `brza sessions`.
 - **O Codex como cartão de subagente no chat do BrzA Studio.** Fica na issue do `studio`, ligada a este plano pela R1.2.
 
 ## Entrevista
@@ -357,3 +361,5 @@ Respondida em 2026-10-30, na sessão `workspace`: "6.1.1 / 6.2.1 / 6.3.1 / 6.4.1
 - 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4; as sondas; R5; o rascunho
   do Desenho, pelo `designer`; R6. Parou nas sondas da R6.1.
   [O PLN-004: a abertura do Codex e do agy no fluxo](../../work/worklogs/2026-10-30-pln-004-a-abertura-do-codex-e-do-agy-no-fluxo.md)
+- 2026-10-31 — as sondas da R6.1. Parou na R7 e no `/hooks` de Anderson.
+  [O PLN-004: as sondas da R6 e o Desenho do Codex e do agy](../../work/worklogs/2026-10-31-pln-004-as-sondas-e-o-desenho.md)

@@ -23,4 +23,13 @@ Aprendido nas sondas do PLN-004 (2026-10-30); confira com `codex --version` e `a
 - Transcript do agy: `BR/<conversationId>/.system_generated/logs/transcript_full.jsonl`; o `--output-format json` do `-p` já traz `usage` (in/out/thinking/cache_read) e `conversation_id`.
 - `agy agents` só lista os agentes do worktree com `--add-dir <worktree>` (worktree não confiado); `tools:` do frontmatter aceita os nomes velhos (`view_file`…) e os novos (`read_file`…) e o subagente recebe a família nomeada.
 
+**Aprendido na R6 do PLN-004 (2026-10-31)**
+- `agy -p` NÃO exige trust: regra, skill, `--agent` e hook de `.agents/` (symlink inclusive) carregam em worktree não confiado. Só o subcomando `agy agents` (sem modelo) exige trust; `--settings '{"trustedWorkspaces":["<wt>"]}'` funde com o `settings.json` e o satisfaz sem gravar nada.
+- O cwd do hook do `agy` é o diretório que contém o `hooks.json` (`<wt>/.agents`), não a raiz. Espião de hook: grave `os.getcwd()`, env e as chaves do payload.
+- Nomes do `agy` 1.4.12: o agente principal só tem `search_web` (sem grep/find/list_dir/read_url); os velhos (`grep_search`, `find_by_name`, `list_dir`, `read_url_content`, `view_file`) só chegam a subagente cujo `tools:` os nomeia.
+- `codex exec -s read-only` não grava trust do projeto e então `.codex/agents` não carrega; com `workspace-write` grava e carrega (por symlink também). Hook: pulado em silêncio nos dois.
+- Para provar efeito de `--sandbox` do `agy` seria preciso desligar o sandbox: o classificador nega; o `printenv | grep -c exebox` (10 = ativo) é o indicador de sandbox ligado.
+- App (`~/Projects/brza-studio`): override de chat do Codex é um executável literal sem argumentos e roda `<override> app-server`; o chat do `antigravity` é ACP gerenciado e ignora o override (`src/main/acp/acp-launch-specs.ts:265`); o app pré-confia worktree (`src/main/agent-trust-presets.ts:67-142`). A configuração do app mora em `profiles/local-default/profile-state.db` (sqlite), não em JSON.
+- Skill no `agy` = ler o `SKILL.md` (não há ferramenta de skill); `${CLAUDE_SKILL_DIR}` não existe lá.
+
 Ver também [[reference-fixfy-pln-011-onde-mora]].

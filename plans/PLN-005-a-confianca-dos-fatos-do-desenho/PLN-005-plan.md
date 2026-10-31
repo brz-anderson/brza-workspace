@@ -3,9 +3,9 @@ status: in_progress
 phase: execution
 origin: request
 ready: sim
-estimate_h: 9
-executed_h: 1.8
-remaining_h: 3
+estimate_h: 9.5
+executed_h: 3
+remaining_h: 1
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,8 +16,7 @@ tags:
 
 # PLN-005: A confiança dos fatos do desenho se mede contra o que se sustentou
 
-- **Retomar:** P1–P5 feitos, e o hook já audita; o próximo é o P6, o `--facts` do resumo, pelo `implementer`, a pedido
-  de Anderson.
+- **Retomar:** P1–P8 e P10 feitos; falta o P9, a revisão do `reviewer`.
 
 ## Pedido
 
@@ -272,6 +271,58 @@ Respondida em 2026-10-31.
 
    **Decidido — "Recusar com saída 2 (Recomendado)".**
 
+### Rodada 9 — os custos no resumo (enviada 2026-10-31)
+
+**Apresentado antes:** o D4 agrupa por papel, faixa e tipo; os custos (`C…`), quase sempre `inferido`, cairiam na
+mesma linha dos fatos inferidos, e o erro que motivou o pedido foi uma estimativa de custo.
+
+Respondida em 2026-10-31.
+
+1. **Os custos no `--facts`.** Opções:
+   - uma coluna classe, `fato` ou `custo` (recomendada) — custo: uma coluna e um teste a mais no P6, e o D4 reescrito;
+     se paga: na primeira leitura em que um custo tiver desfecho, com o acerto das estimativas à parte;
+   - como o D4 estava — custo: nenhum; se paga: nunca para os custos, que somem na média dos inferidos.
+
+   **Decidido — "Coluna classe: fato ou custo (Recomendado)".**
+
+### Rodada 10 — o que a primeira auditoria real mostrou (enviada 2026-10-31)
+
+**Apresentado antes:** um `collector` do workstream `studio` (agente `ab5aa7e0d74df08e7`, 10:05) devolveu 25 fatos
+marcados e 10 marcas fora da forma — a premissa dentro da marca, um qualificador no tipo e referências agrupadas no
+resumo —, e 7 fatos se perderam; a auditoria dele custou US$ 0,157 por 24 fatos, e com o teto fixo de US$ 0,25 uma
+devolução de mais de ~38 fatos seria cortada com o `result` nulo. Do P6, duas escolhas do `implementer`.
+
+Respondida em 2026-10-31.
+
+1. **As marcas fora da forma.** Opções:
+   - parser tolerante e regra mais clara (recomendada) — custo: a expressão e uns 6 testes, e 2 linhas nos papéis; se
+     paga: agora, recuperando os 7 fatos perdidos e os próximos;
+   - só a regra mais clara — custo: 2 linhas; se paga: na próxima devolução, se o modelo obedecer;
+   - só o parser tolerante — custo: a expressão e os testes; se paga: agora, mas a forma segue variando.
+
+   **Decidido — "Parser tolerante + regra clara (Recomendado)".**
+
+2. **O teto da auditoria.** Opções:
+   - US$ 0,012 por fato, mínimo 0,25 (recomendada) — custo: uma linha e um teste; se paga: na primeira devolução com
+     mais de ~38 fatos;
+   - fixo em US$ 1 — custo: uma linha, e uma auditoria em laço gasta até US$ 1; se paga: igual;
+   - manter US$ 0,25 — custo: nenhum; se paga: nunca para as devoluções grandes.
+
+   **Decidido — "US$ 0,012 por fato, mínimo 0,25 (Recomendado)".**
+
+3. **A dica dos pendentes no `--facts`.** Opções:
+   - a dica com `--workstream all`, que bate com a contagem global (recomendada) — custo: uma linha; se paga: agora;
+   - contar só o workstream do cwd — custo: o resumo passa a depender do cwd; se paga: só se for lido sempre de dentro
+     de um workstream.
+
+   **Decidido — "Dica com --workstream all (Recomendado)".**
+
+4. **O `--facts` com `--by-workstream` ou `--denials`.** Opções:
+   - erro de uso, saída 2 (recomendada) — custo: nenhum; se paga: agora;
+   - o `--facts` vence — custo: o outro flag some em silêncio; se paga: nunca.
+
+   **Decidido — "Erro de uso, saída 2 (Recomendado)".**
+
 ## Desenho
 
 ### O que este desenho assume
@@ -313,6 +364,9 @@ Respondida em 2026-10-31.
     US$ 0,001).
   - **Os hooks do projeto rodam** na sessão `-p` e enxergam o `BRZA_FACT_AUDIT=1`; o `Stop` dela gravou um `turn`
     `claude-haiku-5-5` de US$ 0,01 no `workstream` `workspace` — o custo em dobro que o D6 tira do resumo.
+- **A primeira auditoria real**, de um `collector` do `studio` em 2026-10-31 (agente `ab5aa7e0d74df08e7`): 24 fatos
+  enviados e 24 conferidos em 92 s e 15 turnos, por US$ 0,157 — uns US$ 0,0065 por fato, acima dos US$ 0,02–0,05 por
+  auditoria da R1.3 quando a devolução é grande. 21 `holds`, 3 `unknown`, nenhum `fails`; 4 `cite: off`.
 
 #### Os papéis e a skill
 
@@ -337,7 +391,9 @@ fonte…", sem a parte dos custos:
   - o tipo de evidência: `rodado`, o comando rodou nesta execução; `lido`, o `arquivo:linha` foi aberto nesta execução;
     `doc`, a URL ou a documentação foi lida nesta execução; `inferido`, sem fonte direta;
   - a confiança, de 0 a 100, na régua do `reviewer`: 90 ou mais, verificado direto; de 80 a 89, com a premissa
-    escrita; abaixo de 80, a conferir. O `inferido` fica abaixo de 80.
+    escrita na frase do fato, fora da marca; abaixo de 80, a conferir. O `inferido` fica abaixo de 80.
+
+  Uma marca por fato, só com o id, o tipo e o número: o resumo que retoma fatos já marcados cita o id sem a marca.
 
   Um Haiku refaz a evidência dos `rodado`, `lido` e `doc` depois da devolução; o desfecho dos outros vem da sonda ou da
   rodada. O acerto por faixa se mede.
@@ -368,8 +424,9 @@ O script tem dois modos e importa do `measure.py` o `agent_transcript`, o `read_
   2. lê o trecho novo do transcript, pelo offset próprio em `.measurements/fact-audit-state.json`;
   3. tira as marcas da devolução — o `input.message` do último `SubagentHandback` do trecho, ou, sem ele, a última
      mensagem com bloco `text` (X1) — e do `content` de cada `Write` do trecho, pela expressão
-     `\[([FC])(\d+) · (rodado|lido|doc|inferido) · (\d{1,3})\]`; o `[F` ou `[C` seguido de dígito que não casa conta
-     como marca malformada;
+     `\[([FC])(\d+) · (rodado|lido|doc|inferido)(?: \([^)\]\n]*\))? · (\d{1,3})(?:[;,][^\]\n]*)?\]`, que aceita um
+     parêntese depois do tipo e um texto de `;` ou `,` depois do número (R10.1); a referência agrupada,
+     `\[[FC]\d+\s*[,\-–]\s*[FC]\d+`, é ignorada; o resto que começa por `[F` ou `[C` e dígito é marca malformada;
   4. grava um evento `fact` por marca — `agent_id`, `agent_type`, `session_id`, `workstream`, `fact_id`, `kind`,
      `confidence`, `text` (a linha da marca, até 300 caracteres), `source` (`reply` ou o caminho do arquivo) — e um
      `fact_capture` por trecho, com o total, as malformadas e se a devolução veio sem marca;
@@ -378,7 +435,8 @@ O script tem dois modos e importa do `measure.py` o `agent_transcript`, o `read_
      solta `fact_audit.py run <arquivo>` com `start_new_session=True` e a saída no `/dev/null`. Sai.
 - **`run`**, em segundo plano:
   1. roda, no `cwd` do subagente, com `BRZA_FACT_AUDIT=1` e limite de 10 min:
-     `claude -p --model haiku --tools Read,Grep,Glob,WebFetch --add-dir <dir do arquivo> --output-format json --max-budget-usd 0.25 "<prompt>"`;
+     `claude -p --model haiku --tools Read,Grep,Glob,WebFetch --add-dir <dir do arquivo> --output-format json --max-budget-usd <teto> "<prompt>"`,
+     com o teto `max(0.25, 0.012 × fatos)` (R10.2);
   2. o prompt manda refazer a evidência de cada fato — abrir o `arquivo:linha`, a URL, ou ler a saída gravada do
      comando — e devolver uma linha JSON por fato: `{"id": "F3", "verdict": "holds|fails|unknown", "cite": "ok|off", "why": "…"}`
      — `cite: off` quando a fonte não aponta o lugar em que o fato se confere, mesmo verdadeiro (R6);
@@ -406,13 +464,15 @@ python3 scripts/fact_outcome.py --list <agent_id>
 
 ### D4 — O acerto por faixa — `scripts/summarize_measurements.py --facts` (P6)
 
-- **Origem:** Pedido 1, R1.2
+- **Origem:** Pedido 1, R1.2, R6, R9
 
 #### Como fica
 
-Uma tabela por papel, faixa (90+, 80–89, <80) e tipo: fatos, com desfecho, `holds` em %, a confiança média, a
+Uma tabela por papel, classe (`fato` para `F…`, `custo` para `C…`), faixa (90+, 80–89, <80) e tipo: fatos, com desfecho, `holds` em %, a confiança média, a
 distância entre as duas e o `cite: off` em % (R6). O desfecho da sessão vence o do Haiku; `unknown` conta à parte e fica fora do acerto. Abaixo,
-as devoluções sem marca, as marcas malformadas e o custo somado das auditorias. Com `--json`, o mesmo em JSON.
+as devoluções sem marca, as marcas malformadas, o custo somado das auditorias e os pendentes, com a dica
+`fact_outcome.py --pending --workstream all` (R10.3). Com `--json`, o mesmo em JSON. Com `--by-workstream` ou
+`--denials`, erro de uso (R10.4).
 
 ### D5 — O lembrete — `.claude/skills/close-task/SKILL.md` (P7)
 
@@ -534,22 +594,58 @@ Estimado: 1 h · Executado: 0.4 h
 
 Executa D4 · executor: `implementer`, nos testes de `test_summarize_measurements.py`
 
-Estimado: 1 h · Executado: — h
+Estimado: 1 h · Executado: 0.4 h
+
+- [x] **1.** Testes antes (22 de 34 com erro, `aggregate_facts` ausente), o `--facts`, a classe da R9 e a dica da
+  R10.3, aplicada pela sessão.
+
+**Evidência:** `master@72f684a` — `scripts/summarize_measurements.py` e `test_summarize_measurements.py` (25 testes
+novos); `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 172 tests … OK`; contra o log real,
+`summarize_measurements.py --facts` → saída 0, com a linha `collector fato 90+ lido`: 31 fatos, 17 com desfecho,
+`holds` 100%, confiança média 92,8, distância -7,2, `cite off` 11,8%.
 
 ### P7 — O lembrete e a norma
 
 Executa D5 e D6 (o `CLAUDE.md`) · executor: a sessão que conduz, pela `agent-instructions-writer`, na `master`
 
-Estimado: 0.5 h · Executado: — h
+Estimado: 0.5 h · Executado: 0.3 h
+
+- [x] **1.** O `close-task` ganhou "Os fatos a conferir" no `## 3. O pendente`; o `CLAUDE.md`, a seção "A auditoria da
+  confiança dos fatos", com os cinco eventos, e o `--facts` no "Resumo"; o `README.md`, os três comandos. O `AGENTS.md`
+  ficou de fora: a mecânica é do runtime, e a marca mora nos papéis.
+
+**Evidência:** `master@4c92097` — `CLAUDE.md`, `README.md` e `.claude/skills/close-task/SKILL.md`; nenhuma linha nova
+de prosa passa de 120 colunas; `brza note sync` → os três workstreams mesclados.
 
 ### P8 — A prova numa devolução real
 
 Executa D1–D4 · executor: a sessão que conduz
 
-Estimado: 0.5 h · Executado: — h
+Estimado: 0.5 h · Executado: 0.2 h
 
-- [ ] **1.** Uma devolução do `designer` com marcas gera os `fact`, e em até 10 min os `fact_check` e o `fact_audit`;
-  o `--facts` mostra a linha dela.
+- [x] **1.** Uma devolução do `designer` com marcas gera os `fact`, e em até 10 min os `fact_check` e o `fact_audit`;
+  o `--facts` mostra a linha dela. Provado com um `collector` (X3).
+
+**Evidência:** a devolução do `collector` `ab5aa7e0d74df08e7`, da sessão `46242dd1` do `studio`, às 10:05:07 →
+`fact_capture` com 25 fatos e 10 malformadas (10:05:08); `fact_audit` às 10:06:40 com 24 enviados, 24 conferidos, 0
+ignorados, US$ 0,157, 92,3 s, `success`; nenhum arquivo sobrou em `.measurements/fact-audit/`; o `--facts` mostra a
+linha do `collector`. As malformadas abriram a R10 e o P10.
+
+### P10 — A marca tolerante e o teto por fato
+
+Executa D2 (R10.1, R10.2) e D1 (a regra) · executor: `implementer` (o parser e o teto) e a sessão (os papéis)
+
+Estimado: 0.5 h · Executado: 0.3 h
+
+- [x] **1.** Os papéis: a premissa vai na frase do fato, fora da marca, e o resumo cita só o id — `master@b3e3efd`.
+- [x] **2.** O parser aceita `; …` depois do número e um parêntese depois do tipo, e ignora a referência agrupada;
+  o teto é `max(0.25, 0.012 × fatos)`; testes com as 10 marcas do `collector` real.
+
+**Evidência:** `master@13a291a` — `.claude/hooks/fact_audit.py` e `test_fact_audit.py` (4 testes novos; antes, 5 falhas e 1
+erro); `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 176 tests … OK`; `marks_of(sources_of(…))` sobre o
+transcript real do `collector` `ab5aa7e0d74df08e7` → F1–F28, 0 malformadas (eram 10); `budget_usd(3)` → `0.25`,
+`budget_usd(50)` → `0.60`. Os dois pontos do `implementer` têm lastro na R10.1: `F7-9` não é "outro id" e segue
+malformada; duas marcas num colchete não apareceram nas 46 reais.
 
 ### P9 — A revisão
 
@@ -569,11 +665,14 @@ Estimado: 1 h · Executado: — h
   nos 40 transcripts de subagente mais recentes, 4 de 4 devoluções do `designer` e 4 de 5 do `collector` chegam como
   `tool_use` `SubagentHandback`, com o texto em `input.message`. O parser lê o handback e cai no `text` sem ele. Afeta
   P3 e D2; não muda a R3.2, que diz "a devolução", e por isso não voltou à Entrevista.
-
 - **X2 — O desfecho leva o `workstream` do fato, e não o do cwd.** O desfecho chega em outra sessão, às vezes em outro
   worktree; com o do cwd, o `--pending` do workstream dono nunca o veria. Afeta D3 e P5.
+- **X3 — A prova do P8 veio de um `collector`, e não de um `designer`.** O primeiro subagente marcado depois do P4 foi
+  um `collector` de outra sessão; o caminho do `designer` só difere no filtro do `agent_type` e nas marcas `C`, que os
+  testes do P3 e do P6 cobrem. Afeta P8.
 
 ## Worklogs
 
-- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2; P2–P5 feitos, com o X1, o X2 e as R5–R8. Parou antes do P6.
+- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2; P2–P8 e P10 feitos, com o X1–X3 e as R5–R10. Parou antes do
+  P9.
   [PLN-005: a abertura da confiança dos fatos do desenho](../../work/worklogs/2026-10-31-pln-005-a-abertura-da-confianca-dos-fatos.md)

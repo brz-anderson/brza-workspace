@@ -1,0 +1,423 @@
+#!/usr/bin/env python3
+"""Converte em PNG o artboard de uma rodada de desenho, como o chat do BrzA Studio o mostra no tema padrão.
+
+  brza shot <arquivo.html> <destino.png> [--theme light|dark] [--width 1280] [--scale 2] [--wait 500] [--force]
+
+O `.html` é o do `::orca-visual`, gravado no ORCA_CHAT_SCRATCH_DIR. Fora do app ele sai sem cor, porque o chat o monta
+dentro de um shell que injeta o tema; o brza shot monta o mesmo shell, com o mesmo CSP, e captura a página inteira no
+Chrome sem janela, pelo protocolo de depuração num pipe, sem dependência.
+
+  --theme    light (padrão) ou dark: os tokens saem do :root e do .dark do main.css do brza-studio, com as cores do
+             Tailwind do node_modules dele. Um tema personalizado do app não entra.
+  --width    a largura da janela em px (padrão 1280); a altura é a do conteúdo, medida depois das fontes.
+  --scale    a densidade de pixel (padrão 2, a da tela Retina): o PNG sai com width × scale de largura.
+  --wait     a espera em ms depois do carregamento e das fontes, para o script que desenha depois (padrão 500).
+  --force    sobrescreve o destino; sem ele, o destino que já existe é recusado.
+
+O que o shell lê do brza-studio — a lista de tokens, as CDNs do CSP e o CSS de base — vem do código dele, de
+src/shared/native-chat/native-chat-visual-shell.ts e src/shared/plugins/plugin-panel-shell.ts; quando o código muda de
+forma, o comando para e diz o que não achou. O brza-studio é o de BRZA_STUDIO, ou ~/Projects/brza-studio. O Chrome é o
+de BRZA_CHROME, ou o /Applications/Google Chrome.app.
+"""
+import argparse
+import base64
+import fcntl
+import json
+import os
+import re
+import select
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import brza_runtime as runtime  # noqa: E402
+
+CHROME = Path('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
+MAIN_CSS = 'src/renderer/src/assets/main.css'
+TAILWIND_THEME = 'node_modules/tailwindcss/theme.css'
+VISUAL_SHELL = 'src/shared/native-chat/native-chat-visual-shell.ts'
+PANEL_SHELL = 'src/shared/plugins/plugin-panel-shell.ts'
+# O chat lê alguns tokens no escopo de aparência dele (SCOPED_SOURCES, em use-native-chat-visual-theme.ts).
+SCOPED_SOURCES = {
+    '--background': ('--chat-canvas', '--background'),
+    '--foreground': ('--chat-foreground', '--foreground'),
+    '--font-mono': ('--chat-code-font-family', '--font-mono'),
+}
+TIMEOUT = 30.0
+
+
+class ShotError(RuntimeError):
+    """O brza-studio, o Chrome ou o artboard não deu o que o comando precisa."""
+
+
+# --- O tema, do main.css -------------------------------------------------------------------------------------------
+
+def strip_comments(css: str) -> str:
+    return re.sub(r'/\*.*?\*/', '', css, flags=re.S)
+
+
+def top_level_rules(css: str) -> list[tuple[str, str]]:
+    """Cada regra de primeiro nível, como (prelúdio, corpo); at-rule sem bloco fica de fora, a com bloco entra."""
+    css, rules, i = strip_comments(css), [], 0
+    while i < len(css):
+        brace, semi = css.find('{', i), css.find(';', i)
+        if brace < 0:
+            break
+        if 0 <= semi < brace:  # @import e afins
+            i = semi + 1
+            continue
+        depth, j = 1, brace + 1
+        while j < len(css) and depth:
+            depth += {'{': 1, '}': -1}.get(css[j], 0)
+            j += 1
+        rules.append((css[i:brace].strip(), css[brace + 1:j - 1]))
+        i = j
+    return rules
+
+
+def declarations(body: str) -> dict[str, str]:
+    """As propriedades personalizadas do corpo de uma regra, com o valor numa linha só."""
+    out = {}
+    for m in re.finditer(r'(--[\w-]+)\s*:\s*([^;{}]*)', body):
+        value = ' '.join(m.group(2).split())
+        out[m.group(1)] = re.sub(r'\s+\)', ')', re.sub(r'\(\s+', '(', value))
+    return out
+
+
+def theme_variables(main_css: str, tailwind_css: str, scheme: str) -> dict[str, str]:
+    """As variáveis no <html> do app no esquema dado: as do Tailwind, depois cada regra de :root (e de .dark, no escuro),
+    na ordem do arquivo. :root e .dark têm a mesma especificidade, e a ordem decide, como no navegador."""
+    variables = {}
+    for prelude, body in top_level_rules(tailwind_css):
+        if prelude.startswith('@theme'):
+            variables.update(declarations(body))
+    wanted = {':root', '.dark'} if scheme == 'dark' else {':root'}
+    for prelude, body in top_level_rules(main_css):
+        if prelude.startswith('@'):
+            continue
+        if wanted & {s.strip() for s in prelude.split(',')}:
+            variables.update(declarations(body))
+    return variables
+
+
+def resolve(value: str, variables: dict[str, str], seen: frozenset = frozenset()) -> str | None:
+    """Substitui cada var() pelo valor, como o computed value de uma propriedade personalizada; None quando um var()
+    não tem definição nem fallback, que no navegador invalida a declaração."""
+    out, i = [], 0
+    while True:
+        start = value.find('var(', i)
+        if start < 0:
+            out.append(value[i:])
+            return ''.join(out)
+        depth, j = 1, start + 4
+        while j < len(value) and depth:
+            depth += {'(': 1, ')': -1}.get(value[j], 0)
+            j += 1
+        inner = value[start + 4:j - 1]
+        name, _, fallback = inner.partition(',')
+        name = name.strip()
+        if name in variables and name not in seen:
+            got = resolve(variables[name], variables, seen | {name})
+        else:
+            got = None
+        if got is None and fallback.strip():
+            got = resolve(fallback.strip(), variables, seen)
+        if got is None:
+            return None
+        out.append(value[i:start])
+        out.append(got)
+        i = j
+
+
+def theme_tokens(variables: dict[str, str], names: list[str]) -> dict[str, str]:
+    """Os tokens que o chat passa ao visual, lidos como readNativeChatVisualTheme os lê."""
+    tokens = {}
+    for name in names:
+        for source in SCOPED_SOURCES.get(name, (name,)):
+            if source in variables:
+                value = resolve(variables[source], variables)
+                if value:
+                    tokens[name] = value
+                    break
+    return tokens
+
+
+# --- O shell, do native-chat-visual-shell.ts -----------------------------------------------------------------------
+
+def array_literal(source: str, name: str, path: str) -> list[str]:
+    m = re.search(rf'{name}\s*=\s*\[(.*?)\]', source, re.S)
+    if not m:
+        raise ShotError(f'não achei {name} em {path}; o brza-studio mudou, e o brza-shot precisa acompanhar')
+    return re.findall(r"'([^']*)'", m.group(1))
+
+
+def string_concat(source: str, name: str, path: str) -> str:
+    m = re.search(rf'const {name}\s*=\s*((?:\s*\+?\s*\'[^\']*\')+)', source)
+    if not m:
+        raise ShotError(f'não achei {name} em {path}; o brza-studio mudou, e o brza-shot precisa acompanhar')
+    return ''.join(re.findall(r"'([^']*)'", m.group(1)))
+
+
+def shell_parts(studio: Path) -> dict:
+    """A lista de tokens, as CDNs do CSP e o CSS de base, lidos do código do brza-studio."""
+    visual, panel = studio / VISUAL_SHELL, studio / PANEL_SHELL
+    try:
+        visual_src, panel_src = visual.read_text(), panel.read_text()
+    except OSError as e:
+        raise ShotError(f'não li o shell dos visuais no brza-studio ({e})') from None
+    extras = array_literal(visual_src, 'NATIVE_CHAT_VISUAL_THEME_TOKENS', VISUAL_SHELL)
+    return {
+        'tokens': array_literal(panel_src, 'PANEL_DESIGN_TOKEN_ALLOWLIST', PANEL_SHELL) + extras,
+        'cdns': array_literal(visual_src, 'NATIVE_CHAT_VISUAL_CDN_ORIGINS', VISUAL_SHELL),
+        'base_css': string_concat(visual_src, 'BASE_CSS', VISUAL_SHELL),
+    }
+
+
+def csp(cdns: list[str]) -> str:
+    """O NATIVE_CHAT_VISUAL_CSP, com as CDNs do brza-studio."""
+    assets = f"'unsafe-inline' data: blob: {' '.join(cdns)}"
+    media = f"data: blob: {' '.join(cdns)}"
+    return '; '.join([
+        "default-src 'none'", f'script-src {assets}', f'style-src {assets}', f'font-src {media}',
+        f'img-src {media}', "connect-src 'none'", "frame-src 'none'", "child-src 'none'", "worker-src 'none'",
+        "object-src 'none'", "media-src 'none'", "manifest-src 'none'", "form-action 'none'", "base-uri 'none'",
+    ])
+
+
+def theme_css(scheme: str, tokens: dict[str, str]) -> str:
+    """O nativeChatVisualThemeCss: color-scheme e cada token, sem os caracteres que fecham o <style>."""
+    parts = [f'color-scheme:{scheme}']
+    for name, value in tokens.items():
+        clean = re.sub(r'[{}<>;\\]', '', value).strip()
+        if re.fullmatch(r'--[a-z0-9-]+', name) and clean:
+            parts.append(f'{name}:{clean}')
+    return ':root{' + ';'.join(parts) + '}'
+
+
+def build_document(html: str, scheme: str, tokens: dict[str, str], parts: dict) -> str:
+    """O buildNativeChatVisualDocument, sem o script de ponte com o app: o artboard entra depois do </head>."""
+    return f'''<!doctype html>
+<html class="{scheme}">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="{csp(parts['cdns'])}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style id="orca-visual-theme">{theme_css(scheme, tokens)}</style>
+<style>{parts['base_css']}</style>
+</head>
+{html}'''
+
+
+def studio_theme(studio: Path, scheme: str) -> tuple[dict[str, str], dict, list[str]]:
+    """Os tokens, as partes do shell e os avisos: o token que o brza-studio lista e o main.css não resolve."""
+    parts = shell_parts(studio)
+    try:
+        main_css = (studio / MAIN_CSS).read_text()
+    except OSError as e:
+        raise ShotError(f'não li o main.css do brza-studio ({e})') from None
+    warnings = []
+    tailwind = studio / TAILWIND_THEME
+    if tailwind.is_file():
+        tailwind_css = tailwind.read_text()
+    else:
+        tailwind_css = ''
+        warnings.append(f'{tailwind} não existe (pnpm install no brza-studio); os tokens que usam as cores do Tailwind'
+                        ' ficam de fora')
+    tokens = theme_tokens(theme_variables(main_css, tailwind_css, scheme), parts['tokens'])
+    missing = [t for t in parts['tokens'] if t not in tokens]
+    if missing:
+        warnings.append(f'sem valor no tema {scheme}: {", ".join(missing)}')
+    return tokens, parts, warnings
+
+
+# --- O Chrome, pelo protocolo de depuração num pipe -----------------------------------------------------------------
+
+def high_fd(fd: int) -> int:
+    """O mesmo arquivo num fd de 10 para cima; o original fecha."""
+    high = fcntl.fcntl(fd, fcntl.F_DUPFD, 10)
+    os.close(fd)
+    return high
+
+
+class Chrome:
+    """O Chrome sem janela, com --remote-debugging-pipe: os comandos vão pelo fd 3 dele e as respostas voltam pelo fd 4,
+    em JSON terminado por NUL. Sem WebSocket, e por isso sem dependência."""
+
+    def __init__(self, binary: Path):
+        self.profile = tempfile.mkdtemp(prefix='brza-shot-')
+        to_chrome_r, self.to_chrome = os.pipe()
+        self.from_chrome, from_chrome_w = os.pipe()
+        # Acima do 4, para que o sh não feche o fd que acabou de ligar no 3 ou no 4.
+        to_chrome_r, from_chrome_w = (high_fd(to_chrome_r), high_fd(from_chrome_w))
+
+        args = [str(binary), '--headless', '--remote-debugging-pipe', f'--user-data-dir={self.profile}',
+                '--no-first-run', '--no-default-browser-check', '--hide-scrollbars', '--force-color-profile=srgb',
+                '--mute-audio', 'about:blank']
+        # O Chrome quer o pipe no fd 3 e no 4; o sh os põe lá e fecha os originais antes do exec.
+        r, w = to_chrome_r, from_chrome_w
+        wiring = f'exec "$@" 3<&{r} 4>&{w} {r}<&- {w}>&-'
+        try:
+            self.proc = subprocess.Popen(['/bin/sh', '-c', wiring, 'sh', *args], stdin=subprocess.DEVNULL,
+                                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, pass_fds=(r, w))
+        except OSError as e:
+            shutil.rmtree(self.profile, ignore_errors=True)
+            raise ShotError(f'não abri o Chrome em {binary} ({e})') from None
+        finally:
+            os.close(to_chrome_r)
+            os.close(from_chrome_w)
+        self.next_id, self.buffer, self.events = 0, b'', []
+
+    def _read(self, deadline: float) -> dict:
+        while b'\0' not in self.buffer:
+            left = deadline - time.monotonic()
+            if left <= 0 or not select.select([self.from_chrome], [], [], left)[0]:
+                raise ShotError('o Chrome não respondeu a tempo')
+            chunk = os.read(self.from_chrome, 1 << 20)
+            if not chunk:
+                raise ShotError('o Chrome fechou o pipe')
+            self.buffer += chunk
+        raw, self.buffer = self.buffer.split(b'\0', 1)
+        return json.loads(raw)
+
+    def send(self, method: str, params: dict | None = None, session: str | None = None) -> dict:
+        self.next_id += 1
+        message = {'id': self.next_id, 'method': method, 'params': params or {}}
+        if session:
+            message['sessionId'] = session
+        os.write(self.to_chrome, json.dumps(message).encode() + b'\0')
+        deadline = time.monotonic() + TIMEOUT
+        while True:
+            reply = self._read(deadline)
+            if reply.get('id') == self.next_id:
+                if 'error' in reply:
+                    raise ShotError(f'{method}: {reply["error"].get("message", reply["error"])}')
+                return reply.get('result', {})
+            self.events.append(reply)
+
+    def wait_event(self, method: str, session: str) -> dict:
+        deadline = time.monotonic() + TIMEOUT
+        while True:
+            for i, event in enumerate(self.events):
+                if event.get('method') == method and event.get('sessionId') == session:
+                    return self.events.pop(i)
+            self.events.append(self._read(deadline))
+
+    def close(self):
+        try:
+            self.send('Browser.close')
+        except (ShotError, OSError):
+            pass
+        try:
+            self.proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            self.proc.kill()
+        for fd in (self.to_chrome, self.from_chrome):
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        shutil.rmtree(self.profile, ignore_errors=True)
+
+
+# O measure() do shell do chat: a altura do documento, mais o que transborda de um body preso à janela.
+MEASURE = '''document.fonts.ready
+  .then(() => new Promise(r => setTimeout(r, %d)))
+  .then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))))
+  .then(() => {
+    let height = document.documentElement.getBoundingClientRect().height
+    const body = document.body
+    if (body && body.scrollHeight > body.clientHeight) height += body.scrollHeight - body.clientHeight
+    return Math.ceil(height)
+  })'''
+
+
+def capture(chrome: Chrome, url: str, scheme: str, width: int, scale: float, wait_ms: int) -> bytes:
+    target = chrome.send('Target.createTarget', {'url': 'about:blank'})['targetId']
+    session = chrome.send('Target.attachToTarget', {'targetId': target, 'flatten': True})['sessionId']
+    chrome.send('Page.enable', session=session)
+    metrics = {'width': width, 'height': 800, 'deviceScaleFactor': scale, 'mobile': False}
+    chrome.send('Emulation.setDeviceMetricsOverride', metrics, session)
+    chrome.send('Emulation.setEmulatedMedia', {'features': [{'name': 'prefers-color-scheme', 'value': scheme}]},
+                session)
+    chrome.send('Page.navigate', {'url': url}, session)
+    chrome.wait_event('Page.loadEventFired', session)
+    result = chrome.send('Runtime.evaluate', {'expression': MEASURE % wait_ms, 'awaitPromise': True,
+                                              'returnByValue': True}, session)
+    if 'exceptionDetails' in result:
+        raise ShotError(f'a medição da página falhou: {result["exceptionDetails"].get("text", "")}')
+    height = max(1, int(result['result']['value']))
+    chrome.send('Emulation.setDeviceMetricsOverride', {**metrics, 'height': height}, session)
+    shot = chrome.send('Page.captureScreenshot', {'format': 'png', 'fromSurface': True}, session)
+    return base64.b64decode(shot['data'])
+
+
+def png_size(data: bytes) -> tuple[int, int]:
+    """Largura e altura do IHDR de um PNG."""
+    if data[:8] != b'\x89PNG\r\n\x1a\n':
+        raise ShotError('o Chrome não devolveu um PNG')
+    return int.from_bytes(data[16:20], 'big'), int.from_bytes(data[20:24], 'big')
+
+
+def shot(source: Path, dest: Path, scheme: str, width: int, scale: float, wait_ms: int, studio: Path,
+         chrome_binary: Path) -> tuple[tuple[int, int], list[str]]:
+    tokens, parts, warnings = studio_theme(studio, scheme)
+    document = build_document(source.read_text(), scheme, tokens, parts)
+    # No temporário, e não ao lado do artboard: o chat também não resolve caminho relativo.
+    with tempfile.NamedTemporaryFile('w', suffix='.html', prefix='.brza-shot-', dir=tempfile.gettempdir(),
+                                     delete=False) as f:
+        f.write(document)
+        page = Path(f.name)
+    chrome = Chrome(chrome_binary)
+    try:
+        data = capture(chrome, page.as_uri(), scheme, width, scale, wait_ms)
+    finally:
+        chrome.close()
+        page.unlink(missing_ok=True)
+    size = png_size(data)
+    dest.write_bytes(data)
+    return size, warnings
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(
+        prog='brza shot',
+        description='Converte em PNG o artboard de uma rodada de desenho, como o chat do BrzA Studio o mostra.')
+    ap.add_argument('source', metavar='arquivo.html', help='o .html do ::orca-visual')
+    ap.add_argument('dest', metavar='destino.png', help='o PNG, em geral plans/PLN-NNN-…/PLN-NNN-<assunto>.png')
+    ap.add_argument('--theme', choices=('light', 'dark'), default='light', help='o tema do app (padrão: light)')
+    ap.add_argument('--width', type=int, default=1280, help='a largura da janela em px (padrão: 1280)')
+    ap.add_argument('--scale', type=float, default=2, help='a densidade de pixel (padrão: 2)')
+    ap.add_argument('--wait', type=int, default=500, metavar='MS',
+                    help='a espera em ms depois do carregamento e das fontes (padrão: 500)')
+    ap.add_argument('--force', action='store_true', help='sobrescreve o destino que já existe')
+    a = ap.parse_args(argv)
+    source, dest = Path(a.source), Path(a.dest)
+    if not source.is_file():
+        ap.error(f'{source} não existe')
+    if dest.suffix.lower() != '.png':
+        ap.error(f'{dest} não termina em .png')
+    if dest.exists() and not a.force:
+        ap.error(f'{dest} já existe; use --force para sobrescrever')
+    if not dest.parent.is_dir():
+        ap.error(f'a pasta {dest.parent} não existe')
+    if a.width < 1 or a.scale <= 0 or a.wait < 0:
+        ap.error('--width e --scale precisam ser positivos, e --wait não pode ser negativo')
+    chrome = Path(os.environ.get('BRZA_CHROME') or CHROME)
+    if not chrome.exists():
+        ap.error(f'não achei o Chrome em {chrome}; instale o Google Chrome ou aponte BRZA_CHROME')
+    try:
+        (w, h), warnings = shot(source, dest, a.theme, a.width, a.scale, a.wait, runtime.STUDIO, chrome)
+    except ShotError as e:
+        sys.exit(f'brza shot: {e}')
+    for warning in warnings:
+        print(f'aviso: {warning}', file=sys.stderr)
+    print(f'{dest}: {w}×{h} px, tema {a.theme}')
+
+
+if __name__ == '__main__':
+    main()

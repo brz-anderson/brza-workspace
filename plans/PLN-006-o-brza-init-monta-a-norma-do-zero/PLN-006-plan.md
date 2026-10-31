@@ -711,6 +711,11 @@ Estimado: 1,5 h · Executado: — h
 - **X13 — O `plan-open` não cria o arquivo do plano**: reserva o número, grava a linha e imprime o caminho; quem grava é
   a `plan-runner`. O `--no-push` não grava linha, e o `--rebuild` recolhe depois.
 
+## Decisões
+
+- [O índice de notas mora na `master`, a única exceção à regra da norma](../../work/decisions/o-indice-de-notas-mora-na-master.md)
+  — R8.4, `open`, como proposta, à espera da confirmação de Anderson.
+
 ## Worklogs
 
 - 2026-10-31 — aberto; R1–R8 respondidas, a R2.1 em texto livre e confirmada na R3.1, a R4.3 em texto livre e

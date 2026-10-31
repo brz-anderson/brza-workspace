@@ -15,9 +15,9 @@ tags:
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
 - **Retomar:** o Desenho está em rascunho no scratch da sessão `workspace` (`pln-004-design-rascunho.md`, D1 a D14), com
-  a R6 fechada e as sondas dela feitas (`pln-004-sondas-r6.md`). O próximo é a rodada 7 — o `--approve-for-me` do app,
-  a memória por caminho relativo, a função da Fixfy no shell e a issue do `studio` — e o `/hooks` de Anderson no
-  worktree da sonda.
+  a R6 e a R7 fechadas e as sondas da R6.1 feitas (`pln-004-sondas-r6.md`). O próximo é a rodada 8 — o hook do Codex
+  por symlink, que não rodou depois do `/hooks` de Anderson, e o scratch do Codex (D2) — e então o Desenho gravado em
+  `PLN-004-design.md`.
 
 ## Pedido
 
@@ -356,10 +356,52 @@ Respondida em 2026-10-30, na sessão `workspace`: "6.1.1 / 6.2.1 / 6.3.1 / 6.4.1
 
    **Decidido — no `brza agents --write|--check`.**
 
+### Rodada 7 — o Codex no app, a memória, o shell e a issue (enviada 2026-10-31, no chat)
+
+**Apresentado antes:** as sondas da R6.1, no scratch da sessão `workspace` (`pln-004-sondas-r6.md`): o `agy` segue o
+symlink da skill, da regra, do agente e do hook, e o hook roda com o cwd em `<worktree>/.agents`; os nomes de busca e
+web do `agy` são os velhos, só no `tools:` do subagente; o chat do Codex no app roda `<override> … app-server`
+(`brza-studio/src/main/codex/codex-structured-launch-resolution.ts:85`), e o chat Antigravity não é o `agy`
+(`brza-studio/src/main/acp/acp-launch-specs.ts:261-265`).
+
+Respondida em 2026-10-31, na sessão `workspace`: "7.1.1 / 7.2.1 / 7.3.1 / 7.4.1".
+
+1. **O app abre o Codex com `--approve-for-me`** (`agentDefaultArgs.codex`), que manda a aprovação ao revisor
+   automático e não a Anderson, contra a R5.3. Opções:
+   - o `codex-brza` tira a flag nos checkouts brza (recomendada) — custo: ~5 linhas e um teste, no pedido ao
+     `tools-kit`; se paga: no primeiro push numa sessão Codex do app;
+   - Anderson esvazia o `agentDefaultArgs.codex` no app — custo: vale também para a Fixfy; se paga: agora;
+   - aceitar o revisor automático no app — custo: reabre a R5.3; se paga: só com muitos pushes por sessão.
+
+   **Decidido — o `codex-brza` tira a flag nos checkouts brza.**
+
+2. **Como o bloco gerado do papel aponta a memória** (D7). Opções:
+   - caminho relativo à raiz do worktree (`git rev-parse --show-toplevel`), com os gerados versionados (recomendada) —
+     custo: nada além do bloco; se paga: agora, em todo worktree;
+   - caminho absoluto, gerado por worktree e fora do git, a leitura literal da R3.1 — custo: gerar a cada worktree e
+     perder o `--check` versionado; se paga: nunca, enquanto o relativo resolver.
+
+   **Decidido — caminho relativo à raiz do worktree.**
+
+3. **Como a função nova `codex`/`agy` convive com a da Fixfy no `~/.zshrc`** (D6). Opções:
+   - o bloco BrzA copia a função da Fixfy para `fixfy_codex`/`fixfy_agy` com `functions -c` e a redefine (recomendada)
+     — custo: 2 linhas, e o bloco vem depois do da Fixfy; se paga: agora, sem mexer na Fixfy;
+   - renomear as funções no README da Fixfy — custo: mexe em outro workspace, contra a R1.3; se paga: só se a Fixfy já
+     for mexer nesse bloco.
+
+   **Decidido — `functions -c` no bloco BrzA.**
+
+4. **Como a issue do `studio` se liga ao plano** (D14). Opções:
+   - um pedido à sessão do `studio`, que acrescenta a linha "Plano:" na issue, com o `brza delegate` do D11 no lugar do
+     `delegate.py` (recomendada) — custo: um pedido curto; se paga: quando o `brza delegate` existir;
+   - só o link que já está no Pedido do plano — custo: nenhum; se paga: agora, com a issue citando o `delegate.py`.
+
+   **Decidido — um pedido à sessão do `studio`.**
+
 ## Worklogs
 
 - 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4; as sondas; R5; o rascunho
   do Desenho, pelo `designer`; R6. Parou nas sondas da R6.1.
   [O PLN-004: a abertura do Codex e do agy no fluxo](../../work/worklogs/2026-10-30-pln-004-a-abertura-do-codex-e-do-agy-no-fluxo.md)
-- 2026-10-31 — as sondas da R6.1. Parou na R7 e no `/hooks` de Anderson.
+- 2026-10-31 — as sondas da R6.1; o `/hooks` de Anderson, sem o hook rodar; R7. Parou na R8.
   [O PLN-004: as sondas da R6 e o Desenho do Codex e do agy](../../work/worklogs/2026-10-31-pln-004-as-sondas-e-o-desenho.md)

@@ -28,12 +28,15 @@ na sessão `workspace`, depois da R6 de 2026-10-30. O dia anterior está em
     (`brza-studio/src/main/codex/codex-structured-launch-resolution.ts:85`); o chat Antigravity é um servidor ACP
     gerenciado, que não é o `agy` e ignora o override (`brza-studio/src/main/acp/acp-launch-specs.ts:261-265`).
 - **As memórias da sessão:** a edição renderizada, com o removido em callout, e o `---` depois de todo bloco de arquivo.
+- **O `/hooks` de Anderson**, numa sessão Codex interativa no worktree da sonda, com o prompt que chama o `papel`. O
+  papel carregou pelo `.codex/agents` em symlink e respondeu (rollout `01a18ff5-d9e7-…`), mas o espião do hook não
+  gravou nada, e o `~/.codex/config.toml` não ganhou `hooks.state` para o `sondas2`.
+- **A rodada 7**, no chat: o `codex-brza` tira o `--approve-for-me`; a memória do papel por caminho relativo; o
+  `functions -c` no bloco BrzA do shell; um pedido à sessão do `studio` para ligar a issue ao plano.
 
 ## O que ficou
 
-- **O `/hooks` de Anderson**, no worktree da sonda, para ver se o hook do Codex por symlink roda.
-- **A rodada 7**, no chat: o `--approve-for-me` do app, a memória do papel por caminho relativo, a função da Fixfy no
-  shell e a issue do `studio`.
+- **O que o `/hooks` mostrou**, para fechar o hook do Codex por symlink, e a rodada 8, com o scratch do Codex (D2).
 
 ## Fora do workspace
 
@@ -46,6 +49,11 @@ na sessão `workspace`, depois da R6 de 2026-10-30. O dia anterior está em
 - **Os rollouts das sondas**, em `~/.codex/sessions/2026/10/31/` — `01a18fe8-234a-7ad2-a8fc-02e0d7eae4e6` e
   `01a18fe8-95be-7ed2-a1c3-3f6891b33bfc` —, com os índices sqlite do Codex.
   - Risco: aparecem no histórico do Codex e numa medição que varra os rollouts.
+  - Estado: ativo.
+  - Como desfazer: `codex delete <id>` em cada um.
+- **Os rollouts da sessão do `/hooks`**, em `~/.codex/sessions/2026/10/31/` — `01a18ff5-d9e7-7aa0-a82f-ddb0bf3c3ea0`
+  e o do `papel`, `01a18ff7-6cc8-7c63-a445-262354977e72`.
+  - Risco: os mesmos dos rollouts das sondas.
   - Estado: ativo.
   - Como desfazer: `codex delete <id>` em cada um.
 - **Os transcripts das sondas do `agy`**, em `~/.gemini/antigravity-cli/brain/` — `11b4142a…`, `900bdb80…`,

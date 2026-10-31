@@ -2,7 +2,7 @@
 status: open
 phase: interview
 origin: request
-ready: "não — falta a entrevista: o levantamento do PLN-011 da Fixfy e a rodada 2"
+ready: "não — faltam o Desenho e os Passos"
 scope:
   - workspace
   - brza-studio
@@ -14,8 +14,8 @@ tags:
 
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** R1 a R4 fechadas; o levantamento do PLN-011 está no scratch da sessão `workspace`
-  (`pln-004-levantamento-pln-011.md`). O próximo são as três sondas (R4.2) e, com elas, o Terreno e os itens `D`.
+- **Retomar:** a Entrevista fechou nas rodadas 1 a 5, com o levantamento do PLN-011 e as sondas no scratch da sessão
+  `workspace` (`pln-004-levantamento-pln-011.md`, `pln-004-sondas.md`). O próximo é o Desenho: o Terreno e os itens `D`.
 
 ## Pedido
 
@@ -46,7 +46,9 @@ As frentes do pedido, pela R1.2, numeradas para a Cobertura:
 | Origem   | Critério de aceite                                                                                                                  | Passo | Teste (nível) |
 | :------- | :---------------------------------------------------------------------------------------------------------------------------------- | :---- | :------------ |
 | `R1.2` 1 | o `codex` e o `agy` abertos no brza-workspace, no brza-studio e nos worktrees deles leem a norma do `AGENTS.md` pelo adaptador próprio | —     | —             |
-| `R1.2` 1 | o commit feito numa sessão Codex ou `agy` sai com o noreply do `brz-anderson` e vai pela chave `personal` (R1.4)                      | —     | —             |
+| `R1.2` 1 | o commit feito numa sessão Codex, no worktree, sai com o noreply do `brz-anderson`, e o push vai pela chave `personal` com a aprovação de Anderson (R1.4, R5.3); o `agy` não comita (R5.1) | —     | —             |
+| `R3.3`   | a medição do Codex grava o `guardian_review` numa linha própria, ligada ao pai e fora da soma dele (R5.2)                           | —     | —             |
+| `R3.1`   | a memória gravada fora do Claude leva `metadata.runtime`, e o evento `memory` o carrega (R4.1)                                      | —     | —             |
 | `R1.2` 2 | os quatro papéis existem nos três runtimes, gerados de uma fonte só, e a geração acusa a divergência                                 | —     | —             |
 | `R1.2` 2 | o papel rodado no Codex ou no `agy` grava na memória do workstream da sessão                                                         | —     | —             |
 | `R1.2` 3 | a sessão Codex e a `agy` geram linhas em `.measurements/measurements.jsonl`, com o `runtime` e o `workstream`                        | —     | —             |
@@ -248,7 +250,61 @@ Respondida em 2026-10-30, na sessão `workspace`.
 
    **Decidido — "Agora, antes do Desenho (Recomendado)".**
 
+### Rodada 5 — o que as sondas abriram (enviada 2026-10-30)
+
+**Apresentado antes:** as três sondas da R4.2, pelo `collector`, num repositório descartável do scratch com um worktree;
+o detalhe está em `pln-004-sondas.md`, no scratch da sessão `workspace`.
+- **Codex, a identidade:** o `env` chega aos comandos; o commit sai com o noreply do `brz-anderson` como autor e
+  committer (`a1490f5`, conferido de fora com `git log`).
+- **Codex, o commit no worktree:** falha em `workspace-write` (`Unable to create '<repo>/.git/worktrees/wt/index.lock':
+  Operation not permitted`) — o sandbox protege todo diretório `.git`, e o `--add-dir` não resolve. Passa com
+  `-c 'sandbox_workspace_write.writable_roots=["<common>/worktrees/<wt>","<common>/objects","<common>/refs","<common>/logs"]'`.
+  O `workspace-write` não tem rede: o `git push` não passa dentro dele.
+- **Codex, o `guardian_review`:** dispara com `approval_policy=on-request` e `approvals_reviewer=auto_review`; liberou o
+  commit fora do sandbox (`682e434`). O rollout filho tem `thread_source: guardian_review` e o `parent_thread_id` do
+  pai; **os tokens do filho não entram no pai** — nos dois casos de 2026-10-28 e na reprodução, a soma do pai bate com
+  o total dele, e o filho fica à parte (~3% da entrada em 2026-10-28). Na Fixfy, 0 de 14 filhos têm linha na medição.
+  O evento de hook não foi observado: hook sem confiança é pulado em silêncio.
+- **`agy`, a identidade:** o `env` chega; o commit não passa — sem `--add-dir`, `not a git repository`; com ele,
+  `index.lock: Operation not permitted`. A candidata, `--settings '{"enableTerminalSandbox":false}'`, ficou sem teste.
+- **`agy`, as ferramentas:** o agente principal usa `read_file`, `write_file`, `edit_file` e `run_command`; o `tools:`
+  aceita a família antiga e a nova, e o subagente recebe a que o frontmatter nomeia; o `agy agents` não valida nomes.
+- **O `fixfy_where`** responde `root` em qualquer cwd quando a `FIXFY_WORKSPACE` está vazia (`~/.zshrc:17`, o
+  `cd ""` não falha): a função da Fixfy pega o `codex` fora dela.
+
+Respondida em 2026-10-30, na sessão `workspace`.
+
+1. **Como fica o commit do `agy`.** Opções:
+   - o `agy` não comita: lê e grava arquivos, e o commit fica com a sessão Claude ou com o Codex (recomendada) — custo:
+     o `agy` sem fluxo de commit; se paga: agora, na delegação só de leitura (R3.4);
+   - testar `--settings '{"enableTerminalSandbox":false}'` no scratch — custo: ~US$ 0,01, e o uso depois tira o
+     sandbox de terminal da sessão; se paga: só com o `agy` comitando no worktree;
+   - deixar a medir no Desenho — custo: um `D` aberto; se paga: quando o primeiro papel `agy` precisar gravar.
+
+   **Decidido — "agy não comita (Recomendado)".**
+
+2. **O que a medição faz com o `guardian_review`.** Opções:
+   - linha própria ligada ao pai: o `measure.py` acha os rollouts com o `parent_thread_id` do pai e grava
+     `event: subagent`, `agent_type: guardian`, sem somar ao pai (recomendada) — custo: ~30 linhas, uma fixture e o
+     preço do `codex-auto-review` no `API_PRICES`; se paga: no primeiro resumo com guardian real;
+   - ignorar e documentar a subcontagem de ~3% — custo: nenhum código; se paga: nunca, se o custo por turno for
+     métrica.
+
+   **Decidido — "Linha própria ligada ao pai (Recomendado)".**
+
+3. **Como a sessão Codex grava e envia.** Opções:
+   - o wrapper calcula e passa os `writable_roots` do worktree, e o push do `brza note commit` pede escalonamento
+     (`approval_policy=on-request`), aprovado por Anderson na sessão interativa (recomendada) — custo: uma aprovação por
+     push e o cálculo no wrapper, no pedido ao `tools-kit`; se paga: no primeiro commit de nota numa sessão Codex;
+   - push automático pelo `auto_review` — custo: um guardian por push (~7,5 mil tokens de entrada na sonda), e depende
+     de o modelo pedir o escalonamento; se paga: com muitos pushes por sessão;
+   - o Codex comita sem push (`--no-push`), e o push fica com a sessão Claude ou com Anderson — custo: um passo manual
+     por sessão; se paga: só se o push pelo Codex der problema.
+
+   **Decidido — "Wrapper libera o .git; push com aprovação (Recomendado)".**
+
 ## Worklogs
 
-- 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4. Parou nas sondas.
+- 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4; as sondas; R5. Parou antes do
+  Desenho.
   [O PLN-004: a abertura do Codex e do agy no fluxo](../../work/worklogs/2026-10-30-pln-004-a-abertura-do-codex-e-do-agy-no-fluxo.md)

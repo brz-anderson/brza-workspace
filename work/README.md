@@ -292,8 +292,8 @@ transcrição.
 ### `work/reviews/`
 
 Parecer sobre um artefato **numa versão**, citável por quem foi revisado, com o H1 `REV: …` e achados `### A<n>`, cada um
-com `**Evidência:**` — a forma está na `plan-runner`, em `references/conduct.md`. Fica `in_progress` enquanto é escrito e
-`done` quando o parecer está escrito.
+com a confiança e `**Evidência:**`, e o falso também com `**Por que é falso:**` — a forma está na `plan-runner`, em
+`references/conduct.md`. Fica `in_progress` enquanto é escrito e `done` quando o parecer está escrito.
 
 **Revisão que produz limite durável extrai o limite** para `work/decisions/`, e fica só com o achado datado,
 apontando para lá.

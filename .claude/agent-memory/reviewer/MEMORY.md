@@ -1,0 +1,2 @@
+- [Padrões de erro nas entregas](project_padroes-de-erro-nas-entregas.md) — corte que alimenta o auditor, veredito LLM sem prova, D sem rodada, raiz errada; o que cai
+- [O log de medição como dado](reference_o-log-de-medicao-como-dado.md) — onde ficam o log, o estado do fact_audit e os transcripts do auditor

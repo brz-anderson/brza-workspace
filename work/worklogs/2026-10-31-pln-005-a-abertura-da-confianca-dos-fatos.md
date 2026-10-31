@@ -70,6 +70,31 @@ O mesmo `collector` escreveu 10 marcas fora da forma, e 7 fatos se perderam. A R
 mais clara nos papéis (P10), o teto da auditoria por fato, a dica dos pendentes com `--workstream all` e o erro de uso
 do `--facts` com outro flag. Com a expressão nova, o transcript real dá F1–F28, sem malformada.
 
+## A revisão, as correções e o fechamento (P9, P11)
+
+O `reviewer` achou dez defeitos reais e derrubou cinco hipóteses
+([REV: PLN-005 — a confiança dos fatos do desenho](../reviews/pln-005-a-confianca-dos-fatos.md)). Os dois que pesavam
+estavam nos dados: o fato chegava ao auditor cortado nos 300 primeiros caracteres (A1), e o Haiku dava `holds` sem abrir
+o arquivo citado em 7 de uns 35 vereditos (A2). A R11 mandou corrigir todos aqui, e o P11 fez: o parágrafo inteiro ao
+auditor, a leitura conferida pelo `stream-json`, o teto de US$ 0,02 por fato, a raiz dos scripts pelo git e o aviso do
+`--pending`, e um teste do timeout que falha sem o `killpg`. A sessão tratou ainda o id solto (`[F5]`), que o primeiro
+`designer` medido usava para citar fatos, como referência, e a R12 pôs a coluna `rebaixados` no `--facts`.
+
+A primeira leitura do `--facts`, com cinco auditorias e uns 200 fatos: o `collector` é humilde (90+ `lido`, 95,1% de
+`holds` contra 92,9 de confiança), e o `designer` tem excesso na faixa 90+ `rodado` (87,5% contra 94,6, distância
++7,1) e cita fora do lugar em 79% dela. Os 62 custos do `designer` esperam desfecho, que vem da sessão do PLN-006.
+
+O plano fechou com 4,1 h executadas de 10,5 estimadas. A confiança do `reviewer`, deixada fora de escopo, virou
+[A confiança dos achados do reviewer se mede contra o desfecho deles](../issues/a-confianca-do-reviewer-medida-contra-o-desfecho.md).
+
+## Pendente fora do plano
+
+- **O `brza note commit` não commita arquivo apagado:** o `git add` do caminho falha com "pathspec did not match", e a
+  remoção da memória do separador foi por `git commit` direto (`d205495`). É do `tools-kit`, e fica para uma sessão de
+  lá.
+- **Candidato à norma, da memória do `reviewer`:** medida de largura de linha se refaz com o `len()` do Python, porque
+  o `awk length` do macOS conta bytes e acusa falso positivo em linha com acento.
+
 ## Na master
 
 - `2e8ea67` — "Último PLN usado" passa a 005 no `plans/README.md`.
@@ -81,3 +106,5 @@ do `--facts` com outro flag. Com a expressão nova, o transcript real dá F1–F
 - `4c92097` — a auditoria no `CLAUDE.md`, no `README.md` e no `close-task` (P7).
 - `b3e3efd` — a premissa fora da marca e o resumo que cita só o id, nos papéis (R10.1).
 - `13a291a` — a marca tolerante e o teto por fato (P10).
+- `2c9a546` — as correções da revisão (P11).
+- `cfa058e` — a coluna `rebaixados` no `--facts` (P11, R12.3).

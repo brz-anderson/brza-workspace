@@ -40,7 +40,14 @@ O `claude -p` em Haiku 5.5 auditou três fatos de fixture em 9,6 s, por US$ 0,00
 A régua ficou no `designer.md` e no `collector.md`, sem subir ao `AGENTS.md`, que carrega em toda sessão. A marca vai
 logo depois do que afirma, porque o custo e o "se paga" de uma opção dividem a mesma linha.
 
+## A captura (P3)
+
+O `implementer` fez o modo `stop` do `fact_audit.py`, com 24 testes. O teste num transcript real do `designer` mostrou
+que a devolução não é texto: chega pelo `SubagentHandback`, e a especificação da sessão dizia o contrário (X1). O
+`implementer` corrigiu, e a R5 fechou as três escolhas que ele fez sem a especificação fixar, todas na recomendada.
+
 ## Na master
 
 - `2e8ea67` — "Último PLN usado" passa a 005 no `plans/README.md`.
 - `68a925c` — a marca de confiança no `designer.md` e no `collector.md` (P2).
+- `8d22660` — o `fact_audit.py stop` e os testes (P3).

@@ -1,0 +1,1 @@
+- [Hooks do Claude: como testar e estender](hooks-do-claude-testes.md) — gate, carga por importlib, MEASURE_DIR, State com path

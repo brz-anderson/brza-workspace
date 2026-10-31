@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 9
-executed_h: 0.4
-remaining_h: 8
+executed_h: 0.8
+remaining_h: 6
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,7 +16,7 @@ tags:
 
 # PLN-005: A confiança dos fatos do desenho se mede contra o que se sustentou
 
-- **Retomar:** P1 e P2 feitos; o próximo é o P3, a captura, pelo `implementer`, a pedido de Anderson.
+- **Retomar:** P1–P3 feitos; o próximo é o P4, a auditoria em segundo plano, pelo `implementer`, a pedido de Anderson.
 
 ## Pedido
 
@@ -175,6 +175,36 @@ Respondida em 2026-10-31.
 
    **Decidido — "1"**: o plano está aceito em 2026-10-31. A execução segue passo a passo, a pedido.
 
+### Rodada 5 — as escolhas do `implementer` no P3 (enviada 2026-10-31)
+
+**Apresentado antes:** a devolução do `implementer` no P3, com quatro escolhas que a especificação não fixou; a quarta
+(a última mensagem de texto) caiu no X1.
+
+Respondida em 2026-10-31.
+
+1. **Quando o `unmarked` sai verdadeiro.** Opções:
+   - sem marca válida no trecho (recomendada) — custo: nenhum; se paga: agora, com o indicador fiel à devolução, e o
+     `malformed` separa quem marcou errado;
+   - literal, nenhum `fact` gravado — custo: a retomada que só repete ids conta como "sem marca"; se paga: nunca;
+   - a malformada não é "sem marca" — custo: uma regra a mais para o script e o resumo; se paga: só se for preciso
+     separar "não marcou" de "marcou errado" além do `malformed`.
+
+   **Decidido — "Sem marca válida no trecho (Recomendado)".**
+
+2. **Sem transcript.** Opções:
+   - sair sem gravar (recomendada) — custo: nenhum; se paga: agora, porque o `measure.py subagent` já grava o erro;
+   - gravar `fact_capture` com `error` — custo: uma linha e um teste; se paga: só se o `--facts` precisar contar a
+     devolução perdida sem cruzar com a linha `subagent`.
+
+   **Decidido — "Sair sem gravar (Recomendado)".**
+
+3. **A malformada repetida.** Opções:
+   - por ocorrência (recomendada) — custo: o número pode dobrar quando o `collector` repete o fato no resumo; se paga:
+     agora, porque o indicador é alerta, não taxa;
+   - deduplicar pelo texto da marca — custo: uma chave e um teste; se paga: só se o resumo usar as malformadas como taxa.
+
+   **Decidido — "Por ocorrência (Recomendado)".**
+
 ## Desenho
 
 ### O que este desenho assume
@@ -268,7 +298,8 @@ O script tem dois modos e importa do `measure.py` o `agent_transcript`, o `read_
   1. sai sem nada com `BRZA_FACT_AUDIT` no ambiente (a própria auditoria) ou com `agent_type` fora de `designer` e
      `collector`;
   2. lê o trecho novo do transcript, pelo offset próprio em `.measurements/fact-audit-state.json`;
-  3. tira as marcas da última mensagem de texto do assistente e do `content` de cada `Write` do trecho, pela expressão
+  3. tira as marcas da devolução — o `input.message` do último `SubagentHandback` do trecho, ou, sem ele, a última
+     mensagem com bloco `text` (X1) — e do `content` de cada `Write` do trecho, pela expressão
      `\[([FC])(\d+) · (rodado|lido|doc|inferido) · (\d{1,3})\]`; o `[F` ou `[C` seguido de dígito que não casa conta
      como marca malformada;
   4. grava um evento `fact` por marca — `agent_id`, `agent_type`, `session_id`, `workstream`, `fact_id`, `kind`,
@@ -381,12 +412,18 @@ do D2 casa o exemplo `[F3 · lido · 90]` dos dois arquivos, e a maior linha tem
 Executa D2 (`stop`, sem soltar o processo) · executor: `implementer`, com os testes em
 `.claude/hooks/tests/test_fact_audit.py`
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0.4 h
 
-- [ ] **1. Teste que falha:** um transcript de fixture com marcas na devolução e num `Write` gera os `fact` e o
+- [x] **1. Teste que falha:** um transcript de fixture com marcas na devolução e num `Write` gera os `fact` e o
   `fact_capture`; um papel fora da lista e o ambiente com `BRZA_FACT_AUDIT` não geram nada; a marca malformada conta.
-- [ ] **2. Implementar.**
-- [ ] **3. Rodar** — `python3 -m unittest discover .claude/hooks/tests`.
+- [x] **2. Implementar.** Com o X1, e as escolhas da R5.
+- [x] **3. Rodar** — `python3 -m unittest discover .claude/hooks/tests`.
+
+**Evidência:** `master@8d22660` — `.claude/hooks/fact_audit.py` (158 linhas; o `measure.py` intocado) e
+`.claude/hooks/tests/test_fact_audit.py` (24 testes). Antes do código, os 18 primeiros falharam com `FileNotFoundError`;
+`python3 -m unittest discover -s .claude/hooks/tests` → `Ran 97 tests … OK`. Sobre o transcript real
+`agent-a4e396c649819d3fd.jsonl`, do `designer`, anterior ao P2: `fact_capture` com `facts: 0`, `unmarked: true`,
+`segment: first`, saída 0.
 
 ### P4 — A auditoria em segundo plano
 
@@ -439,7 +476,14 @@ Estimado: 1 h · Executado: — h
   `.claude/hooks/tests/test_measure.py` e um `subagent` real com `duration_s` igual ao de antes.
 - **O resumo sem `--facts` não muda.** Como se confere: `test_summarize_measurements.py`.
 
+## Desvios
+
+- **X1 — A devolução mora no `SubagentHandback`.** A especificação dizia "a última mensagem de texto", sem conferir:
+  nos 40 transcripts de subagente mais recentes, 4 de 4 devoluções do `designer` e 4 de 5 do `collector` chegam como
+  `tool_use` `SubagentHandback`, com o texto em `input.message`. O parser lê o handback e cai no `text` sem ele. Afeta
+  P3 e D2; não muda a R3.2, que diz "a devolução", e por isso não voltou à Entrevista.
+
 ## Worklogs
 
-- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2; P2 feito. Parou antes do P3.
+- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2; P2 e P3 feitos, com o X1 e a R5. Parou antes do P4.
   [PLN-005: a abertura da confiança dos fatos do desenho](../../work/worklogs/2026-10-31-pln-005-a-abertura-da-confianca-dos-fatos.md)

@@ -7,6 +7,7 @@ import io
 import json
 import os
 import runpy
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -247,6 +248,54 @@ class CommandTest(unittest.TestCase):
             code, out = self.run_main(*argv)
             self.assertEqual(code, 0)
             self.assertIn('abriria:  c3-prova', out)
+
+    # O --checkout relativo parte da raiz do brza-workspace, e não do cwd (pedido da sessão workspace, 2026-10-31).
+
+    def workspace_clone(self) -> Path:
+        """Um brza-workspace num repositório temporário, com o worktree `.worktrees/workspace`."""
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        root = Path(temp.name).resolve() / 'brza-workspace'
+        (root / 'scripts' / 'brza').mkdir(parents=True)
+        (root / 'scripts' / 'brza' / 'brza-sessions').write_text('')
+        env = {**os.environ, 'GIT_AUTHOR_NAME': 't', 'GIT_AUTHOR_EMAIL': 't@t', 'GIT_COMMITTER_NAME': 't',
+               'GIT_COMMITTER_EMAIL': 't@t'}
+        for args in (('init', '-q', '-b', 'master'), ('add', '.'), ('commit', '-qm', 'norma'),
+                     ('worktree', 'add', '-q', '-b', 'workstream/workspace', '.worktrees/workspace')):
+            subprocess.run(['git', '-C', str(root), *args], check=True, capture_output=True, env=env)
+        return root
+
+    def run_in(self, cwd: Path, *argv) -> tuple[int, str]:
+        here = Path.cwd()
+        os.chdir(cwd)
+        try:
+            with patch.dict(GLOBALS, {'chat_blocker': lambda checkout: None}):
+                return self.run_main(*argv)
+        finally:
+            os.chdir(here)
+
+    def test_a_relative_checkout_from_a_worktree_starts_at_the_workspace_root(self):
+        root = self.workspace_clone()
+        code, out = self.run_in(root / '.worktrees' / 'workspace', 'tools-kit-shot', '--checkout',
+                                '.worktrees/tools-kit')
+        self.assertEqual(code, 0)
+        (launch,) = self.launches
+        self.assertIn(f'path:{root / ".worktrees" / "tools-kit"}', launch)
+        self.assertEqual(self.read_map()[0]['checkout'], str(root / '.worktrees' / 'tools-kit'))
+
+    def test_a_relative_checkout_outside_the_workspace_starts_at_the_workspace_variable(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        code, out = self.run_in(Path(temp.name), 'fora', '--checkout', '.worktrees/tools-kit', '--dry-run')
+        self.assertEqual(code, 0)
+        self.assertIn(f'(chat, {(GLOBALS["WORKSPACE"] / ".worktrees" / "tools-kit").resolve()})', out)
+
+    def test_an_absolute_checkout_stays_as_given(self):
+        root = self.workspace_clone()
+        target = Path(tempfile.gettempdir()).resolve() / 'outro-checkout'
+        code, out = self.run_in(root / '.worktrees' / 'workspace', 'abs', '--checkout', str(target), '--dry-run')
+        self.assertEqual(code, 0)
+        self.assertIn(f'(chat, {target})', out)
 
     # O pedido 8 (PLN-002/P9): o /rename opcional, o título da aba e o mapa de sessões.
 

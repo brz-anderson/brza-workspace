@@ -72,6 +72,18 @@ class ByWorkstreamTest(unittest.TestCase):
         self.assertEqual(self.summarize.mean(day["turns"]), "2.00")
         self.assertEqual(self.days[("studio", "2026-10-29")]["turns"]["n"], 1)
 
+    def test_audit_turn_stays_out_of_the_main_session_cost(self):
+        rows = [turn("2026-10-28", "studio", 1.0, model="claude-opus-5-5"),
+                turn("2026-10-28", "studio", 0.01, rounds=ROUNDS, model="claude-haiku-5-5", fact_audit=True,
+                     skills=["x"])]
+        days = self.summarize.aggregate_by_workstream(rows)
+        self.assertEqual((days[("studio", "2026-10-28")]["turns"]["n"], days[("studio", "2026-10-28")]["turns"]["cost"]),
+                         (1, 1.0))
+        self.assertEqual(days[("studio", "2026-10-28")]["rounds"]["questions"], 0)
+        agg = self.summarize.aggregate(rows)
+        self.assertEqual([k[0] for k in agg["turns"]], ["claude-opus-5-5"])
+        self.assertEqual(dict(agg["turns_by_skill"]), {})
+
     def test_old_line_without_workstream_goes_to_its_bucket(self):
         self.assertEqual(self.days[("(sem workstream)", "2026-10-28")]["turns"]["n"], 1)
 

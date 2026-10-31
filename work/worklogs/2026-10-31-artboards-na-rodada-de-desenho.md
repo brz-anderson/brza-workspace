@@ -74,3 +74,5 @@ estruturado (`NativeChatPromptStrip`, do `a0eefa646e4` no `brza-studio`).
 - **O `brza shot` a 736 px** saiu do `tools-kit` no `0dcc82d`.
 - **O `--checkout` relativo** (resposta "2. 1"): o `brza sessions` passa a resolvê-lo a partir da raiz do
   `brza-workspace`, pedido por correio à sessão `tools-kit-shot-736`. A norma não muda.
+- **A implementação da faixa C** foi pedida, com o "siga" de Anderson, à sessão `studio-faixa-c`, aberta pelo
+  `brza sessions` no worktree do `studio`, pelo caminho dos pedidos do PLN-001.

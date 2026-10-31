@@ -16,7 +16,9 @@ tags:
 
 - **Retomar:** o Desenho está em rascunho no scratch da sessão `workspace` (`pln-004-design-rascunho.md`, D1 a D14), com
   as rodadas 6 a 8 fechadas e as sondas da R6.1 feitas (`pln-004-sondas-r6.md`). O próximo é o `designer` aplicar a R6
-  a R8 ao rascunho e a aprovação do texto, na mensagem, antes de gravá-lo em `PLN-004-design.md`.
+  a R8 ao rascunho e a aprovação do texto, na mensagem, antes de gravá-lo em `PLN-004-design.md`. A frente 4 leva
+  também os três focos de revisão — simplicidade, defeito, convenção —, um por runtime, como Anderson escolheu na
+  triagem do porte da Fixfy, em 2026-10-31: "Com a frente 4".
 
 ## Pedido
 
@@ -466,3 +468,5 @@ proposto na mesma mensagem e aceito na mesma resposta.
 - 2026-10-31 — as sondas da R6.1; o `/hooks` de Anderson, sem o hook rodar; R7 e R8. Parou na
   aprovação do Desenho.
   [O PLN-004: as sondas da R6 e o Desenho do Codex e do agy](../../work/worklogs/2026-10-31-pln-004-as-sondas-e-o-desenho.md)
+- 2026-10-31 — fora do plano, a triagem do porte da Fixfy mandou à frente 4 os três focos de revisão.
+  [O porte das skills da Fixfy para o workspace](../../work/worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md)

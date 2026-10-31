@@ -507,6 +507,8 @@ def turn(p):
     line = {"event": "turn", "timestamp": now(), "session_id": p.get("session_id"),
             "bridge_session_id": bridge_session(), "cwd": p.get("cwd"), "workstream": workstream_of(p.get("cwd")),
             "account": account()}
+    if os.environ.get("BRZA_FACT_AUDIT"):  # o `Stop` da sessão `claude -p` da auditoria: o resumo o tira da sessão principal
+        line["fact_audit"] = True
     line.update(measured)
     line["effort"] = line["effort"] or effort_of(p)
     # Interrupção pelo usuário não dispara Stop: o turno interrompido cai no trecho do seguinte, com a espera entre

@@ -1,4 +1,5 @@
-"""Testes do fact_audit.py, modo `stop`: a captura das marcas de confiança na devolução e nos arquivos do subagente.
+"""Testes do fact_audit.py: o modo `stop` (a captura das marcas de confiança na devolução e nos arquivos do subagente, e o
+disparo da auditoria) e o modo `run` (a sessão `claude -p` da auditoria, trocada por um espião).
 
 Os transcripts são montados pelo próprio teste, em diretório temporário.
 
@@ -9,8 +10,11 @@ import importlib.util
 import io
 import json
 import os
+import stat
+import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest import mock
 
@@ -51,7 +55,9 @@ def user(value):
     return json.dumps({"type": "user", "message": {"role": "user", "content": value}})
 
 
-class FactAuditTest(unittest.TestCase):
+class Base(unittest.TestCase):
+    mock_popen = True
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
@@ -59,6 +65,13 @@ class FactAuditTest(unittest.TestCase):
         self.addCleanup(os.environ.pop, "BRZA_FACT_AUDIT", None)
         os.environ.pop("BRZA_FACT_AUDIT", None)
         self.fa = load_fact_audit(self.tmp.name)
+        # O `stop` solta o `run` de verdade, e o `run` chama o `claude` de verdade: por padrão o Popen é um mock, e o
+        # workstream_of, que chama o git pelo mesmo módulo, é um stub. Só quem testa o processo real o desliga.
+        self.fa.measure.workstream_of = lambda cwd: "workspace"
+        if self.mock_popen:
+            self.popen_patcher = mock.patch.object(self.fa.subprocess, "Popen")
+            self.popen = self.popen_patcher.start()
+            self.addCleanup(self.popen_patcher.stop)
         self.transcript = os.path.join(self.tmp.name, "agent-a1.jsonl")
         self.payload = {"session_id": "s1", "cwd": self.tmp.name, "agent_id": "a1", "agent_type": "designer",
                         "agent_transcript_path": self.transcript}
@@ -85,6 +98,9 @@ class FactAuditTest(unittest.TestCase):
     def events(self, name):
         return [e for e in self.logged() if e["event"] == name]
 
+
+
+class FactAuditTest(Base):
     def test_marks_in_the_reply_and_in_a_write_become_facts_with_their_source(self):
         self.append(
             user("desenhe"),
@@ -273,6 +289,312 @@ class FactAuditTest(unittest.TestCase):
     def test_missing_transcript_writes_nothing(self):
         self.run_hook()
         self.assertEqual(self.logged(), [])
+
+
+def tool_result(tool_use_id, content):
+    return json.dumps({"type": "user", "message": {"role": "user", "content": [
+        {"type": "tool_result", "tool_use_id": tool_use_id, "content": content}]}})
+
+
+def bash_tool(tool_use_id, command):
+    return {"type": "tool_use", "id": tool_use_id, "name": "Bash", "input": {"command": command}}
+
+
+def make_spy(directory, stdout, exit_code=0, sleep=0):
+    """O `claude` trocado: grava os argumentos, o cwd, o ambiente e o arquivo da rodada, dorme e imprime o JSON fixo."""
+    script = os.path.join(directory, "spy-claude")
+    config = os.path.join(directory, "spy-config.json")
+    with open(config, "w", encoding="utf-8") as f:
+        json.dump({"stdout": stdout, "exit": exit_code, "sleep": sleep, "record": os.path.join(directory, "spy.json")}, f)
+    with open(script, "w", encoding="utf-8") as f:
+        f.write(f"""#!{sys.executable}
+import json, os, re, sys, time
+cfg = json.load(open({config!r}))
+args = sys.argv[1:]
+seen = None
+for token in re.findall(r"\\S+\\.json", args[-1]):
+    if os.path.isfile(token):
+        seen = json.load(open(token))
+json.dump({{"args": args, "cwd": os.getcwd(), "audit": os.environ.get("BRZA_FACT_AUDIT"), "file": seen}},
+          open(cfg["record"], "w"))
+time.sleep(cfg["sleep"])
+sys.stdout.write(cfg["stdout"])
+sys.exit(cfg["exit"])
+""")
+    os.chmod(script, os.stat(script).st_mode | stat.S_IXUSR)
+    return script
+
+
+LINES = "\n".join([
+    json.dumps({"id": "F1", "verdict": "holds", "cite": "ok", "why": "a linha confere"}),
+    json.dumps({"id": "F2", "verdict": "holds", "cite": "off", "why": "verdadeiro, mas a linha citada é outra"}),
+    json.dumps({"id": "F3", "verdict": "fails", "cite": "ok", "why": "a saída gravada diz outra coisa"})])
+RESULT_OK = {"type": "result", "subtype": "success", "is_error": False, "result": LINES, "total_cost_usd": 0.0056,
+             "num_turns": 4, "duration_ms": 9600}
+
+
+class StopDispatchTest(Base):
+    def audit_files(self):
+        directory = os.path.join(self.fa.measure.DIR, "fact-audit")
+        return sorted(os.listdir(directory)) if os.path.isdir(directory) else []
+
+    def read_audit(self, name):
+        with open(os.path.join(self.fa.measure.DIR, "fact-audit", name), encoding="utf-8") as f:
+            return json.load(f)
+
+    def test_auditable_facts_write_the_file_and_start_the_process_without_waiting(self):
+        self.append(user("x"), assistant(text(
+            "a [F1 · lido · 90]\nb [F2 · doc · 75]\nc [F3 · rodado · 100]\nd [F4 · inferido · 40]\ne [C1 · lido · 60]")))
+        with mock.patch.object(self.fa.subprocess, "Popen") as popen:
+            self.run_hook()
+        self.assertEqual(self.audit_files(), ["a1-0.json"])
+        path = os.path.join(self.fa.measure.DIR, "fact-audit", "a1-0.json")
+        popen.assert_called_once_with([sys.executable, self.fa.__file__, "run", path], start_new_session=True,
+                                      stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.assertEqual(popen.return_value.method_calls, [])  # não espera o processo
+        data = self.read_audit("a1-0.json")
+        self.assertEqual((data["agent_id"], data["agent_type"], data["session_id"], data["cwd"]),
+                         ("a1", "designer", "s1", self.tmp.name))
+        self.assertIn("workstream", data)
+        self.assertEqual([(f["id"], f["kind"], f["confidence"], f["source"]) for f in data["facts"]],
+                         [("F1", "lido", 90, "reply"), ("F2", "doc", 75, "reply"), ("F3", "rodado", 100, "reply")])
+        self.assertEqual(data["facts"][0]["text"], "a [F1 · lido · 90]")
+        self.assertEqual(data["runs"], [])  # sem Bash no trecho
+
+    def test_the_file_name_carries_the_offset_where_the_segment_starts(self):
+        self.append(user("x"), assistant(text("[F1 · lido · 90]")))
+        with mock.patch.object(self.fa.subprocess, "Popen"):
+            self.run_hook()
+            offset = os.path.getsize(self.transcript)
+            self.append(user("y"), assistant(text("[F2 · lido · 80]")))
+            self.run_hook()
+        self.assertEqual(self.audit_files(), ["a1-0.json", f"a1-{offset}.json"])
+        self.assertEqual([f["id"] for f in self.read_audit(f"a1-{offset}.json")["facts"]], ["F2"])
+
+    def test_only_inferred_and_cost_marks_start_nothing(self):
+        self.append(user("x"), assistant(text("a [F1 · inferido · 40] b [C1 · rodado · 90] c [C2 · lido · 70]")))
+        with mock.patch.object(self.fa.subprocess, "Popen") as popen:
+            self.run_hook()
+        popen.assert_not_called()
+        self.assertEqual(self.audit_files(), [])
+        self.assertEqual(len(self.events("fact")), 3)  # a captura segue igual
+
+    def test_no_mark_and_other_agent_types_start_nothing(self):
+        self.append(user("x"), assistant(text("sem marca")))
+        with mock.patch.object(self.fa.subprocess, "Popen") as popen:
+            self.run_hook()
+            self.run_hook({**self.payload, "agent_type": "reviewer"})
+        popen.assert_not_called()
+        self.assertEqual(self.audit_files(), [])
+
+    def test_a_seen_fact_does_not_start_a_second_audit(self):
+        self.append(user("x"), assistant(text("[F1 · lido · 90]")))
+        with mock.patch.object(self.fa.subprocess, "Popen") as popen:
+            self.run_hook()
+            self.append(user("y"), assistant(text("[F1 · lido · 90]")))
+            self.run_hook()
+        self.assertEqual(popen.call_count, 1)
+
+    def test_runs_carry_each_bash_with_the_result_matched_by_the_id(self):
+        self.append(
+            user("x"),
+            assistant(text("rodando"), bash_tool("b1", "echo um"), bash_tool("b2", "echo dois")),
+            tool_result("b2", [{"type": "text", "text": "dois\n"}]),
+            tool_result("b1", "um\n"),
+            assistant(bash_tool("b3", "yes"), {"type": "tool_use", "id": "r1", "name": "Read", "input": {}}),
+            tool_result("b3", "z" * 5000),
+            assistant(bash_tool("b4", "sleep 1")),  # sem resultado no trecho
+            assistant(text("custo [F1 · rodado · 100]")))
+        with mock.patch.object(self.fa.subprocess, "Popen"):
+            self.run_hook()
+        runs = self.read_audit("a1-0.json")["runs"]
+        self.assertEqual([(r["command"], r["output"]) for r in runs[:2]], [("echo um", "um\n"), ("echo dois", "dois\n")])
+        self.assertEqual((runs[2]["command"], len(runs[2]["output"])), ("yes", 4000))
+        self.assertEqual(len(runs), 4)
+        self.assertEqual(runs[3]["output"], "")
+
+    def test_real_process_is_not_waited_for(self):
+        self.popen_patcher.stop()
+        spy = make_spy(self.tmp.name, stdout=json.dumps(RESULT_OK), sleep=2)
+        self.append(user("x"), assistant(text("[F1 · lido · 90]")))
+        with mock.patch.dict(os.environ, {"BRZA_FACT_AUDIT_CLAUDE": spy}):
+            started = time.monotonic()
+            self.run_hook()
+            took = time.monotonic() - started
+            deadline = time.monotonic() + 15
+            while not self.events("fact_audit") and time.monotonic() < deadline:
+                time.sleep(0.1)  # o processo solto termina sozinho, e só então o diretório do teste some
+        self.assertLess(took, 1.0)
+        self.assertEqual(len(self.events("fact_audit")), 1)
+
+
+class RunTest(Base):
+    mock_popen = False
+
+    def setUp(self):
+        super().setUp()
+        self.directory = os.path.join(self.fa.measure.DIR, "fact-audit")
+        os.makedirs(self.directory)
+        self.cwd = os.path.join(self.tmp.name, "work")
+        os.makedirs(self.cwd)
+        self.path = os.path.join(self.directory, "a1-0.json")
+        facts = [{"id": "F1", "kind": "lido", "confidence": 90, "text": "t1 [F1 · lido · 90]", "source": "reply"},
+                 {"id": "F2", "kind": "doc", "confidence": 70, "text": "t2 [F2 · doc · 70]", "source": "reply"},
+                 {"id": "F3", "kind": "rodado", "confidence": 100, "text": "t3 [F3 · rodado · 100]", "source": "reply"}]
+        with open(self.path, "w", encoding="utf-8") as f:
+            json.dump({"agent_id": "a1", "agent_type": "designer", "session_id": "s1", "workstream": "workspace",
+                       "cwd": self.cwd, "facts": facts, "runs": [{"command": "echo 1", "output": "1\n"}]}, f)
+
+    def spy(self, stdout, **kwargs):
+        script = make_spy(self.tmp.name, stdout, **kwargs)
+        patcher = mock.patch.dict(os.environ, {"BRZA_FACT_AUDIT_CLAUDE": script})
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def run_audit(self):
+        with mock.patch.object(sys, "argv", ["fact_audit.py", "run", self.path]):
+            with self.assertRaises(SystemExit) as raised:
+                self.fa.main()
+        self.assertEqual(raised.exception.code, 0)
+
+    def recorded(self):
+        with open(os.path.join(self.tmp.name, "spy.json"), encoding="utf-8") as f:
+            return json.load(f)
+
+    def test_success_writes_one_check_per_line_and_the_round_with_the_cost(self):
+        self.spy(json.dumps(RESULT_OK))
+        self.run_audit()
+        checks = self.events("fact_check")
+        self.assertEqual([(c["fact_id"], c["verdict"], c["cite"]) for c in checks],
+                         [("F1", "holds", "ok"), ("F2", "holds", "off"), ("F3", "fails", "ok")])
+        first = checks[0]
+        self.assertEqual((first["agent_id"], first["agent_type"], first["session_id"], first["workstream"],
+                          first["why"]), ("a1", "designer", "s1", "workspace", "a linha confere"))
+        self.assertIn("timestamp", first)
+        (audit,) = self.events("fact_audit")
+        self.assertEqual((audit["agent_id"], audit["agent_type"], audit["workstream"], audit["facts"], audit["checked"],
+                          audit["ignored"], audit["cost_usd"], audit["num_turns"], audit["subtype"], audit["error"]),
+                         ("a1", "designer", "workspace", 3, 3, 0, 0.0056, 4, "success", None))
+        self.assertIsInstance(audit["duration_s"], float)
+
+    def test_the_spy_gets_the_command_the_cwd_and_the_env_and_the_file_is_deleted_after(self):
+        self.spy(json.dumps(RESULT_OK))
+        self.run_audit()
+        seen = self.recorded()
+        args = seen["args"]
+        self.assertEqual(args[:1], ["-p"])
+        self.assertEqual(args[args.index("--model") + 1], "haiku")
+        self.assertEqual(args[args.index("--tools") + 1], "Read,Grep,Glob,WebFetch")
+        self.assertEqual(args[args.index("--add-dir") + 1], self.directory)
+        self.assertEqual(args[args.index("--output-format") + 1], "json")
+        self.assertEqual(args[args.index("--max-budget-usd") + 1], "0.25")
+        self.assertEqual(args[-1], self.fa.PROMPT.replace("{arquivo}", self.path))
+        self.assertEqual(os.path.realpath(seen["cwd"]), os.path.realpath(self.cwd))
+        self.assertEqual(seen["audit"], "1")
+        self.assertEqual(seen["file"]["agent_id"], "a1")  # o arquivo existia quando o espião rodou
+        self.assertFalse(os.path.exists(self.path))
+
+    def test_prompt_states_the_criteria(self):
+        for word in ("holds", "fails", "unknown", "cite", "off", "rodado", "lido", "doc", "runs", "{arquivo}"):
+            self.assertIn(word, self.fa.PROMPT)
+
+    def test_invalid_lines_are_ignored_and_counted(self):
+        lines = "\n".join([
+            json.dumps({"id": "F1", "verdict": "holds", "cite": "ok", "why": "x" * 400}),
+            "```json",
+            "isto não é JSON",
+            json.dumps({"id": "F9", "verdict": "holds", "cite": "ok", "why": "fora do arquivo"}),
+            json.dumps({"id": "F2", "verdict": "talvez", "cite": "ok", "why": "vocabulário"}),
+            json.dumps({"id": "F2", "verdict": "holds", "cite": "quase", "why": "vocabulário"}),
+            json.dumps(["F3"]),
+            json.dumps({"id": "F3", "verdict": "unknown", "cite": "ok", "why": "sem evidência"}),
+            "```"])
+        self.spy(json.dumps({**RESULT_OK, "result": lines}))
+        self.run_audit()
+        self.assertEqual([c["fact_id"] for c in self.events("fact_check")], ["F1", "F3"])
+        self.assertEqual(len(self.events("fact_check")[0]["why"]), 300)
+        (audit,) = self.events("fact_audit")
+        self.assertEqual((audit["facts"], audit["checked"], audit["ignored"], audit["error"]), (3, 2, 5, None))
+
+    def test_budget_error_with_exit_one_still_writes_the_round_with_the_cost(self):
+        out = {"type": "result", "subtype": "error_max_budget_usd", "is_error": True, "result": None,
+               "total_cost_usd": 0.2612, "num_turns": 9, "duration_ms": 50000}
+        self.spy(json.dumps(out), exit_code=1)
+        self.run_audit()
+        self.assertEqual(self.events("fact_check"), [])
+        (audit,) = self.events("fact_audit")
+        self.assertEqual((audit["error"], audit["subtype"], audit["cost_usd"], audit["checked"], audit["facts"]),
+                         ("error_max_budget_usd", "error_max_budget_usd", 0.2612, 0, 3))
+        self.assertFalse(os.path.exists(self.path))
+
+    def test_exit_nonzero_with_a_result_still_records_the_checks_and_the_error(self):
+        self.spy(json.dumps({**RESULT_OK, "subtype": "error_max_turns", "is_error": True}), exit_code=1)
+        self.run_audit()
+        self.assertEqual(len(self.events("fact_check")), 3)
+        self.assertEqual(self.events("fact_audit")[0]["error"], "error_max_turns")
+
+    def test_invalid_json_output_is_an_error(self):
+        self.spy("não é json")
+        self.run_audit()
+        (audit,) = self.events("fact_audit")
+        self.assertEqual((audit["error"], audit["checked"], audit["cost_usd"], audit["facts"]), ("invalid_json", 0, None, 3))
+        self.assertFalse(os.path.exists(self.path))
+
+    def test_missing_binary_is_an_error_and_exits_zero(self):
+        with mock.patch.dict(os.environ, {"BRZA_FACT_AUDIT_CLAUDE": os.path.join(self.tmp.name, "nao-existe")}):
+            self.run_audit()
+        (audit,) = self.events("fact_audit")
+        self.assertEqual((audit["error"], audit["checked"], audit["facts"]), ("binary_not_found", 0, 3))
+        self.assertFalse(os.path.exists(self.path))
+
+    def test_no_binary_on_the_path_is_an_error(self):
+        with mock.patch.dict(os.environ, {"PATH": self.tmp.name}):
+            os.environ.pop("BRZA_FACT_AUDIT_CLAUDE", None)
+            self.run_audit()
+        self.assertEqual(self.events("fact_audit")[0]["error"], "binary_not_found")
+
+    def test_timeout_is_an_error_and_exits_zero(self):
+        self.spy(json.dumps(RESULT_OK), sleep=30)
+        self.fa.RUN_TIMEOUT = 1
+        started = time.monotonic()
+        self.run_audit()
+        self.assertLess(time.monotonic() - started, 10)
+        (audit,) = self.events("fact_audit")
+        self.assertEqual((audit["error"], audit["checked"], audit["facts"]), ("timeout", 0, 3))
+        self.assertFalse(os.path.exists(self.path))
+
+    def test_unreadable_file_is_an_error_and_never_raises(self):
+        os.remove(self.path)
+        self.run_audit()
+        (audit,) = self.events("fact_audit")
+        self.assertIsNotNone(audit["error"])
+
+    def test_exception_in_the_write_of_a_check_becomes_the_error_of_the_round(self):
+        self.spy(json.dumps(RESULT_OK))
+        real = self.fa.measure.write
+
+        def flaky(line):
+            if line["event"] == "fact_check":
+                raise OSError("disco cheio")
+            real(line)
+        self.fa.measure.write = flaky
+        self.run_audit()
+        (audit,) = self.events("fact_audit")
+        self.assertIn("disco cheio", audit["error"])
+        self.assertFalse(os.path.exists(self.path))
+
+
+class SettingsTest(unittest.TestCase):
+    def test_subagent_stop_has_measure_then_fact_audit(self):
+        path = os.path.join(os.path.dirname(os.path.dirname(HERE)), "settings.json")
+        with open(path, encoding="utf-8") as f:
+            settings = json.load(f)
+        (group,) = settings["hooks"]["SubagentStop"]
+        commands = [(h["command"], h["timeout"]) for h in group["hooks"]]
+        self.assertEqual(len(commands), 2)
+        self.assertIn('measure.py" subagent || true', commands[0][0])
+        self.assertEqual(commands[1], ('${BRZA_PYTHON:-python3} "${BRZA_WORKSPACE:-$CLAUDE_PROJECT_DIR}'
+                                       '/.claude/hooks/fact_audit.py" stop || true', 10))
 
 
 if __name__ == "__main__":

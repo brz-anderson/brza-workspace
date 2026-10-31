@@ -620,3 +620,23 @@ ferramenta não (P52, resposta de 2026-10-27).
 - **A conferir no passo:** o Esc da aprovação, que hoje cancela quando há X (`NativeChatApprovalCard.tsx:57`), e o da
   pergunta (`NativeChatQuestionCard.tsx:205`); o foco ao recolher, que vai ao composer, e ao reabrir, que volta ao
   cartão.
+
+### D53 — A faixa recolhida com ícone e ação — `brza-studio/src/renderer/src/components/native-chat/NativeChatPromptCollapse.tsx` (P70)
+
+- **Origem:** pedido 35, a alternativa C da rodada de teste dos artboards do chat (sessão do workstream `workspace`,
+  2026-10-31)
+- **Contexto:** a `NativeChatPromptStrip` do P69 mostra só o título e a seta, sem rótulo
+  (`NativeChatPromptCollapse.tsx:50-70`); o `NativeChatPromptCollapseToggle` é a mesma seta do cartão aberto. A issue
+  [A faixa recolhida da pergunta e da aprovação com ícone e ação](../../work/issues/a-faixa-recolhida-com-icone-e-acao.md)
+  traz o PNG da alternativa.
+
+#### Como fica
+
+- **À esquerda**, a borda de 3 px e o ícone do tipo em `--primary`: `CircleHelp` na pergunta e `Shield` na aprovação.
+- **À direita**, um botão com o rótulo e a seta para cima, "Responder" na pergunta e "Revisar" na aprovação, pelo
+  `translate`, que reabre o cartão como a seta fazia.
+- **O título** segue cortado, no espaço que sobra.
+- **A faixa recebe o tipo**, `kind: 'question' | 'approval'`; o `NativeChatPromptCollapseToggle` fica só no cartão
+  aberto e não muda.
+- **A cor** é a do `--primary` do tema, neutro no padrão (`main.css:214`, `:326`): a barra e o ícone saem pretos no
+  claro e brancos no escuro, como no PNG. A troca do token é rodada com Anderson, no C23, se a falta de cor incomodar.

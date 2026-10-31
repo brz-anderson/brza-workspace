@@ -71,10 +71,13 @@ Cada turno, subagente, skill, comando digitado e chamada MCP vira uma linha com 
 `brza-studio` pela função do shell; **a sessão aberta sem ela não é medida**, e por isso falta de linha não quer dizer
 falta de uso.
 
-## O ferramental vive só no escopo do projeto
+## O ferramental vive no escopo do projeto ou do workstream
 
-Plugins e servidores MCP são habilitados só na configuração de projeto deste repositório. O único plugin é o `context7`,
-e não há servidor MCP próprio.
+Plugins e servidores MCP são habilitados só na configuração deste repositório, nunca na de usuário:
+- **Para todos os workstreams:** na configuração de projeto. O único plugin é o `context7`, e não há servidor MCP
+  próprio.
+- **Para um workstream só:** na configuração local do worktree dele, fora do git. Hoje, o `skill-creator`, no
+  `workspace`.
 
 ## O que muda fora do workspace vai para o worklog
 

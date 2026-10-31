@@ -1,6 +1,6 @@
 ---
 name: edicao-renderizada-com-o-removido-em-callout
-description: "Arquivo editado aparece na resposta com o diff e, abaixo, o trecho renderizado, com o removido em callout CAUTION"
+description: "Arquivo editado aparece na resposta só como o trecho renderizado, com o removido em callout CAUTION, sem a cerca diff"
 metadata:
   node_type: memory
   type: feedback
@@ -8,17 +8,18 @@ metadata:
   modified: 2026-10-31T05:02:59.004Z
 ---
 
-No `<details>` do arquivo editado, abaixo do `diff`, vai o mesmo trecho em Markdown renderizado. Cada bloco de linhas
-removidas fica no lugar em que estava, num callout `> [!CAUTION]` de título **Removido**.
+No `<details>` do arquivo editado vai só o trecho alterado em Markdown renderizado, sem a cerca `diff`. Cada bloco de
+linhas removidas fica no lugar em que estava, num callout `> [!CAUTION]` de título **Removido**.
 
 **Why:** Anderson pediu em 2026-10-30, no PLN-004: "no arquivo editado, renderize também como `Markdown`, com as linhas
 removidas como `>![<algum tip>]`". Na rodada de levar isso à norma, escolheu ficar só na memória do workstream: "faremos
 mais medições ao longo dos trabalhos, como a possibilidade de poluir a conversa". O tipo `CAUTION` foi escolha da
-sessão, e Anderson não o contestou.
+sessão, e Anderson não o contestou. Em 2026-10-31, a cerca saiu: "remova o bloco ```diff - o diff já aparece no
+`Trabalhou por Xs`", o resumo recolhido das chamadas de ferramenta.
 
 **How to apply:** em toda resposta deste workstream que grava em `plans/`, `wiki/`, `work/` ou `memory/`, e também na
 norma da `master` — `AGENTS.md`, `CLAUDE.md`, `README.md`. Em 2026-10-31, a edição do `AGENTS.md`, do `CLAUDE.md` e de
-um worklog saiu só com o `diff`, porque a sessão leu o índice e não abriu esta memória; Anderson: "pq vc não está o
+um worklog saiu sem o renderizado, porque a sessão leu o índice e não abriu esta memória; Anderson: "pq vc não está o
 mostrando o diff como `Mardown` renderizado?". Observe o
 peso: quando o renderizado repetir um trecho longo, como uma rodada inteira, anote o tamanho. A medição decide se a
 regra sobe à norma do `AGENTS.md` ou se é enxugada.

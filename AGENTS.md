@@ -19,7 +19,8 @@ caminho. A chamada de ferramenta pode ficar recolhida, e o que vai ao git precis
 **Cada arquivo vai num bloco recolhido**, `<details>` com o caminho no `<summary>`:
 - **Novo:** o Markdown renderizado, com o frontmatter em cerca `yaml` e o corpo sem cerca.
 - **Edição:** o trecho alterado em cerca `diff`.
-- **Mais de um arquivo:** um separador `---` entre eles, fora dos blocos.
+- **Separador:** um `---` fora dos blocos, entre um arquivo e o seguinte e depois do último quando a resposta segue,
+  para que o texto não cole no bloco recolhido.
 
 ## Cada workstream mora numa branch, e a `master` guarda só a norma
 

@@ -1,1 +1,2 @@
 - [Onde mora o PLN-011 da projeto-externo e a contraparte do brza-workspace](reference_projeto-externo-pln-011-onde-mora.md) — mapa de peças, atalhos para Codex/agy e fontes que envelhecem
+- [Sondar Codex/agy: armadilhas e atalhos](reference_codex-agy-sondas-armadilhas.md) — `command codex`, `codex sandbox`, `.git` protegido, guardian, nega do classificador

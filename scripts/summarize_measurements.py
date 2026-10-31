@@ -7,7 +7,7 @@ Agrega o subagente por agente, modelo e esforço, e por versão do plugin; o tur
 esforço, e pelas skills que entraram nele; os comandos digitados; as falhas por tipo de erro; o MCP por servidor; e as
 decisões das travas de retomada e do /compact. As negações de hook saem com o motivo.
 
-  python3 scripts/summarize_measurements.py                      lê o .measurements/ da $BRZA_WORKSPACE, ou de ..
+  python3 scripts/summarize_measurements.py                      lê o .measurements/ da $BRZA_WORKSPACE, ou da `master`
   python3 scripts/summarize_measurements.py --dir <diretório>    outro diretório com o log
   python3 scripts/summarize_measurements.py --since 2026-10-10   só os eventos a partir da data (AAAA-MM-DD)
   python3 scripts/summarize_measurements.py --denials            lista cada negação, com o agente, a data e o motivo
@@ -26,12 +26,41 @@ import collections
 import json
 import os
 import re
+import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# A raiz vem da BRZA_WORKSPACE, que a função do shell passa: rodado de um worktree, o `..` cairia em `.worktrees/`.
-# Sem a variável, vale o diretório acima de scripts/.
-WORKSPACE = os.environ.get("BRZA_WORKSPACE") or os.path.join(HERE, "..")
+
+
+def git_root(here):
+    """O pai do `git rev-parse --git-common-dir` de `here`, que é o checkout da `master` mesmo num worktree, ou None se o
+    git falha ou o diretório comum não é um `.git`. A mesma função do fact_outcome.py."""
+    try:
+        done = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"], cwd=here, text=True,
+                              capture_output=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    common = done.stdout.strip()
+    if done.returncode != 0 or os.path.basename(common) != ".git":
+        return None
+    return os.path.dirname(common)
+
+
+def workspace_root(here=HERE, env=None):
+    """A raiz vem da BRZA_WORKSPACE, que a função do shell passa. Sem ela e sem a MEASURE_DIR (a do teste), o checkout da
+    `master` pelo git: o terminal de um worktree leria o `.measurements/` velho do próprio worktree, e o `..` de um
+    worktree cairia em `.worktrees/`. Se o git falhar, vale o diretório acima de scripts/."""
+    env = os.environ if env is None else env
+    if env.get("BRZA_WORKSPACE"):
+        return env["BRZA_WORKSPACE"]
+    if not env.get("MEASURE_DIR"):
+        root = git_root(here)
+        if root:
+            return root
+    return os.path.join(here, "..")
+
+
+WORKSPACE = workspace_root()
 DEFAULT_DIR = os.path.normpath(os.path.join(WORKSPACE, ".measurements"))
 LOG = "measurements.jsonl"
 UNKNOWN = "—"

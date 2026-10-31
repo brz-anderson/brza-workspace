@@ -640,3 +640,44 @@ ferramenta não (P52, resposta de 2026-10-27).
   aberto e não muda.
 - **A cor** é a do `--primary` do tema, neutro no padrão (`main.css:214`, `:326`): a barra e o ícone saem pretos no
   claro e brancos no escuro, como no PNG. A troca do token é rodada com Anderson, no C23, se a falta de cor incomodar.
+
+### D54 — O expandir em todo bloco e a prévia do Markdown na tela cheia — `brza-studio/src/renderer/src/components/native-chat/brza/BrzaExpandLayer.tsx` (P71)
+
+- **Origem:** pedido 36, R62.1 a R62.3
+- **Contexto** (`brza-studio@046474ba49c`): o expandir é uma camada só, delegada pelo DOM a partir de
+  `[data-native-chat-root]`, e não um botão do bloco (`BrzaExpandLayer.tsx:31-103`); ele só aparece quando o
+  `[data-native-chat-code-content]` rola (`brzaBlockScrolls`, `:11-26`). O diff da linha de ferramenta tem
+  `overflow-hidden` e nunca rola (`NativeChatDiffView.tsx:9`), o do cartão de edição rola só acima de `max-h-72`
+  (`NativeChatDiffCard.tsx:105`), e a cerca `diff` ou `markdown` curta não rola. A tela cheia (`BrzaExpandOverlay`,
+  `:105-205`) clona o elemento e lê o `innerText` (`:115`, `:124-135`); a linguagem fica no DOM em
+  `data-code-language` (`NativeChatCodeBlock.tsx:56-59`), que ela não lê. O olho do editor tem o núcleo só de string,
+  `MarkdownPreviewBody` (`editor/MarkdownPreviewBody.tsx:7-24`), já usado fora do editor (`IpynbCellEditor.tsx:30-37`),
+  e o tema do P60 sai do `useMarkdownSurfaceTheme` (`editor/use-markdown-surface-theme.ts`); o seletor
+  `EditorViewToggle` é controlado e não depende de arquivo (`editor/EditorViewToggle.tsx:85-135`). O levantamento
+  inteiro ficou no scratch da sessão (`/private/tmp/brza-pedido-preview-md/levantamento.md`), fora do git.
+
+#### Como fica
+
+- **O expandir aparece em todo bloco**, role ou não (R62.2): o `brzaExpandTarget` deixa de exigir o
+  `brzaBlockScrolls`. Vale para a cerca de código, a cerca `diff`, o diff da linha de ferramenta e o do cartão de
+  edição, e para o que mais leva `data-native-chat-code-content` (a saída de ferramenta, a aprovação).
+- **A cerca `markdown` ou `md`** abre a tela cheia com o `EditorViewToggle` no cabeçalho, com os modos
+  `['preview', 'source']`, na prévia por padrão (R62.1). O tipo sai do `data-code-language` do bloco, por um helper
+  novo que reconhece `markdown` e `md`; `mdx` fica de fora, porque o parser não entende JSX. O `<>` mostra o cru de
+  hoje, com a quebra de linha; a quebra só vale no `<>`, e o copiar copia sempre o cru.
+- **A prévia** é o `MarkdownPreviewBody` na casca `markdown-preview-shell`, com o estilo do
+  `useMarkdownSurfaceTheme`, o mesmo do olho do editor, que segue o chat quando o "Seguir o chat" está ligado.
+- **O frontmatter** aparece na caixa "Front Matter" do editor, pelo `markdown-frontmatter.ts`, e sai do corpo
+  (R62.3).
+- **Link e imagem relativos** ficam sem ação, porque não há arquivo de base (R62.3); o link absoluto segue como no
+  olho do editor.
+- **O rótulo "N linhas"** continua contando o cru.
+- **Fora:** o lápis, porque o Tiptap exige arquivo e salvamento (`EditorMarkdownFileSurface.tsx:108-135`), e o app do
+  celular, que não tem o expandir de código (`mobile/src/components/mobile-markdown-blocks.tsx:68`).
+
+#### A conferir no passo
+
+- O `remarkFrontmatter` do `MarkdownPreviewBody` (`markdown-preview-plugins.ts:69`) some com o bloco: a caixa precisa
+  receber o frontmatter tirado antes, como faz o `MarkdownPreviewSurface.tsx:60-63`, `:118-127`.
+- A posição do botão no diff sem cabeçalho (`left: rect.right - 28 - 4`, `BrzaExpandLayer.tsx:61`) não cobre conteúdo.
+- O clique em link relativo não navega a janela do app.

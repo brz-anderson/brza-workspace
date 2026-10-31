@@ -1,1 +1,2 @@
 - [Caminho de envio do chat estruturado](reference_studio_structured_chat_send_path.md) — arquivos do composer ao host Claude, atalhos de grep e lacunas de teste
+- [Expandir do chat e prévia de Markdown](reference_studio_chat_expand_and_markdown_preview.md) — BrzaExpandLayer (DOM), MarkdownPreviewBody, EditorViewToggle, o que reaproveita

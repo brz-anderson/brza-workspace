@@ -1,1 +1,1 @@
-- [A edição renderizada, com o removido em callout](edicao-renderizada-com-o-removido-em-callout.md) — só o trecho renderizado, removido em CAUTION, sem a cerca diff; em medição
+- [A edição renderizada, com o removido em callout](edicao-renderizada-com-o-removido-em-callout.md) — só o trecho renderizado, removido em CAUTION, sem a cerca diff; em medição- [O separador depois do último bloco](separador-depois-do-ultimo-bloco.md) — `---` também abaixo do último `<details>` quando segue prosa; em medição

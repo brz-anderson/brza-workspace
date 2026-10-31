@@ -437,7 +437,7 @@ def aggregate_facts(measurements, since=""):
             verdict = haiku.get("verdict") if haiku.get("verdict") in ("holds", "fails", "unknown") else None
         bucket = buckets.setdefault((short_name(row.get("agent_type")), klass, fact_band(confidence), kind), {
             "facts": 0, "with_outcome": 0, "holds": 0, "fails": 0, "unknown": 0, "confidence_n": 0,
-            "confidence_sum": 0.0, "checked": 0, "cite_off": 0})
+            "confidence_sum": 0.0, "checked": 0, "cite_off": 0, "downgraded": 0})
         bucket["facts"] += 1
         if verdict == "unknown":
             bucket["unknown"] += 1
@@ -450,6 +450,10 @@ def aggregate_facts(measurements, since=""):
         if haiku:
             bucket["checked"] += 1
             bucket["cite_off"] += 1 if haiku.get("cite") == "off" else 0
+            # rebaixado: o último check teve o veredito do auditor trocado por `unknown` porque o `read` não casou; o
+            # check antigo, sem `read_ok`, não conta
+            if haiku.get("read_ok") is False and haiku.get("claimed") not in (None, "unknown"):
+                bucket["downgraded"] += 1
         if key not in outcomes and (kind == "inferido" or klass == "custo" or fact_band(confidence) == FACT_BANDS[2]):
             pending += 1
 
@@ -462,11 +466,11 @@ def aggregate_facts(measurements, since=""):
             "facts": b["facts"], "with_outcome": b["with_outcome"], "holds": b["holds"], "fails": b["fails"],
             "holds_pct": holds_pct, "mean_confidence": mean_confidence,
             "distance": mean_confidence - holds_pct if holds_pct is not None and mean_confidence is not None else None,
-            "unknown": b["unknown"], "checked": b["checked"], "cite_off": b["cite_off"],
+            "unknown": b["unknown"], "downgraded": b["downgraded"], "checked": b["checked"], "cite_off": b["cite_off"],
             "cite_off_pct": 100 * b["cite_off"] / b["checked"] if b["checked"] else None}
 
     captures = {}
-    audits = {"n": 0, "cost": 0.0, "failed": 0, "ignored": 0}
+    audits = {"n": 0, "cost": 0.0, "failed": 0, "ignored": 0, "downgraded": 0}
     for row in measurements:
         if not in_range(row, since):
             continue
@@ -480,6 +484,7 @@ def aggregate_facts(measurements, since=""):
             audits["cost"] += float(row.get("cost_usd") or 0)
             audits["failed"] += 1 if row.get("error") else 0
             audits["ignored"] += int(row.get("ignored") or 0)
+            audits["downgraded"] += int(row.get("downgraded") or 0)
     audits["cost"] = round(audits["cost"], 6)
     return {"rows": rows, "captures": dict(sorted(captures.items())), "audits": audits, "pending": pending}
 
@@ -497,11 +502,12 @@ def print_facts(facts):
     print_table("Fatos do desenho, por papel, classe, faixa de confiança e tipo — distância = confiança média menos "
                 "holds %, positiva é excesso de confiança",
                 ("papel", "classe", "faixa", "tipo", "fatos", "com desfecho", "holds %", "confiança média", "distância",
-                 "unknown", "cite off %"),
-                ("<", "<", "<", "<", ">", ">", ">", ">", ">", ">", ">"),
+                 "unknown", "rebaixados", "cite off %"),
+                ("<", "<", "<", "<", ">", ">", ">", ">", ">", ">", ">", ">"),
                 [(agent, klass, band, kind, r["facts"], r["with_outcome"], percent(r["holds_pct"]),
                   UNKNOWN if r["mean_confidence"] is None else f"{r['mean_confidence']:.1f}",
-                  UNKNOWN if r["distance"] is None else signed(r["distance"]), r["unknown"], percent(r["cite_off_pct"]))
+                  UNKNOWN if r["distance"] is None else signed(r["distance"]), r["unknown"], r["downgraded"],
+                  percent(r["cite_off_pct"]))
                  for (agent, klass, band, kind), r in facts["rows"].items()])
     if facts["captures"]:
         print("Por papel: " + "; ".join(f"{a}: lidas {c['read']}, sem marca {c['unmarked']}, malformadas {c['malformed']}"
@@ -509,7 +515,7 @@ def print_facts(facts):
     audits = facts["audits"]
     if audits["n"]:
         print(f"Auditorias: rodaram {audits['n']}, custo US$ {audits['cost']:.4f}, falharam {audits['failed']}, "
-              f"ignorados {audits['ignored']}")
+              f"ignorados {audits['ignored']}, rebaixados {audits['downgraded']}")
     if facts["rows"]:
         print(f"Pendentes: {facts['pending']} sem desfecho (inferido, abaixo de 80 ou custo) — {PENDING_HINT}")
 

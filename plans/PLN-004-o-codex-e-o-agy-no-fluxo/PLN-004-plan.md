@@ -424,6 +424,40 @@ Respondida em 2026-10-31, na sessão `workspace`: "8.1.1 / 8.2.1".
 
    **Decidido — `$TMPDIR/codex-scratch/<id da sessão>`.**
 
+### Rodada 9 — o que a aplicação da R6 a R8 abriu (enviada 2026-10-31, no chat)
+
+**Apresentado antes:** o rascunho do Desenho com a R6 a R8 aplicadas, pelo `designer`, em 551 linhas, e três escolhas
+que as rodadas não cobriram. Sem a `BRZA_WORKSPACE`, o `measure.py` e o `claude-brza` já caem em
+`~/Projects/brza-workspace` (`.claude/hooks/measure.py:88`, `scripts/brza/claude-brza:18-19`).
+
+Respondida em 2026-10-31, na sessão `workspace`: "todos recomendados".
+
+1. **Para onde o comando dos hooks aponta sem a `BRZA_WORKSPACE`** (D8); o hook do `agy` roda em `<worktree>/.agents`.
+   Opções:
+   - `${BRZA_WORKSPACE:-$HOME/Projects/brza-workspace}` nos dois hooks (recomendada) — custo: nada além do texto; se
+     paga: na primeira sessão aberta sem o wrapper;
+   - `..` no `agy` e `.` no Codex, como na Fixfy — custo: sem o wrapper, a medição vai ao worktree e, no brza-studio,
+     se perde; se paga: nunca.
+
+   **Decidido — `${BRZA_WORKSPACE:-$HOME/Projects/brza-workspace}`.**
+
+2. **O `agy-brza` passa `--settings '{"trustedWorkspaces":["<raiz do worktree>"]}'`** (D5). Opções:
+   - sim, quando a chamada não traz o próprio `--settings` (recomendada) — custo: ~5 linhas e um teste no `tools-kit`;
+     se paga: no primeiro `agy agents` ou numa TUI de worktree novo aberta fora do app;
+   - não; o worktree se confia pela TUI ou pelo app — custo: nenhum; se paga: agora, se ninguém listar papéis pelo CLI.
+
+   **Decidido — sim.**
+
+3. **O `brza install --chat-command` põe `agentCmdOverrides.antigravity = agy-brza`** (D5, D12); o override vale só na
+   aba de terminal do `agy` no app. Opções:
+   - sim (recomendada) — custo: uma chave a mais no `brza install`; se paga: na primeira aba de terminal do `agy` no app;
+   - não — custo: nenhum; se paga: só se o `agy` nunca abrir pelo app.
+
+   **Decidido — sim.**
+
+A aprovação do Desenho vai em três mensagens — o que assume, o Terreno e D1–D4; D5–D8; D9–D14 e a ordem —, como
+proposto na mesma mensagem e aceito na mesma resposta.
+
 ## Worklogs
 
 - 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4; as sondas; R5; o rascunho

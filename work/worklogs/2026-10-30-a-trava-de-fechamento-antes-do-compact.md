@@ -5,7 +5,7 @@ scope:
 
 # A trava de fechamento antes do /compact
 
-O pedido veio da sessão do PLN-004, depois da rodada que Anderson respondeu em 2026-10-30 com "siga com a 2" (o registro
+O pedido veio da sessão `workspace-75`, depois da rodada que Anderson respondeu em 2026-10-30 com "siga com a 2" (o registro
 está no [O /compact, o nome em inglês e o arquivo gravado à vista](2026-10-30-o-compact-o-nome-em-ingles-e-o-arquivo-gravado-a-vista.md)).
 A opção 2 era a skill de fechamento com uma trava no `PreCompact`, só no `manual`, mais um aviso depois da compactação
 automática. A norma foi para a `master` em `ec2b1f0` e chegou aos três workstreams pelo `brza note sync`.

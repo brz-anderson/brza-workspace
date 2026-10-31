@@ -5,8 +5,8 @@ scope:
 
 # O /compact, o nome em inglês e o arquivo gravado à vista
 
-Na sessão do PLN-004 (`workspace-75`), depois da rodada 5, Anderson mudou de assunto: "oq o comando /compact do claude
-code faz exatamente?" e, em seguida, "conseguimos fazer o compact chamar um script que grava o `Retomar` e `worklog`?".
+Numa sessão própria do `workspace` (`workspace-75`), aberta sem plano, Anderson perguntou: "oq o comando /compact do
+claude code faz exatamente?" e, em seguida, "conseguimos fazer o compact chamar um script que grava o `Retomar` e `worklog`?".
 A conversa deu na trava de fechamento, encomendada a outra sessão, e em três regras de norma.
 
 ## O que se levantou
@@ -47,5 +47,5 @@ saíram de `memory/`.
 
 ## A memória neste commit
 
-Vão juntas as memórias da parte do PLN-004 desta sessão, que estavam sem commit: `memory/rodada-do-desenho-vai-no-chat.md`
+Vão juntas as memórias que a sessão do PLN-004 (`workspace`) deixou sem commit e que a trava barrava: `memory/rodada-do-desenho-vai-no-chat.md`
 e, no `designer`, `feedback_mecanismo-nativo-do-runtime.md` e `feedback_medir-antes-de-desenhar.md`, com os índices.

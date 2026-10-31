@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 9
-executed_h: 1.4
-remaining_h: 4
+executed_h: 1.8
+remaining_h: 3
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,7 +16,7 @@ tags:
 
 # PLN-005: A confiança dos fatos do desenho se mede contra o que se sustentou
 
-- **Retomar:** P1–P4 feitos, e o hook já audita; o próximo é o P5, o `fact_outcome.py`, pelo `implementer`, a pedido
+- **Retomar:** P1–P5 feitos, e o hook já audita; o próximo é o P6, o `--facts` do resumo, pelo `implementer`, a pedido
   de Anderson.
 
 ## Pedido
@@ -249,6 +249,29 @@ Respondida em 2026-10-31.
 
    **Decidido — "Só com fato 'rodado' (Recomendado)".**
 
+### Rodada 8 — as escolhas do `implementer` no P5 (enviada 2026-10-31)
+
+**Apresentado antes:** a devolução do `implementer` no P5, com quatro escolhas que a especificação não fixou; duas sem
+alternativa defensável ficaram fora da rodada — o `fact` duplicado, que o `fact_audit.py` já não grava, e o id exato
+que é também prefixo de outro, que não é ambíguo.
+
+Respondida em 2026-10-31.
+
+1. **O `--pending` com o cwd fora de workstream.** Opções:
+   - avisar no stderr e filtrar o workstream vazio (recomendada) — custo: um aviso e uma lista quase sempre vazia; se
+     paga: agora, sem esconder nada e com a saída 0 que o `close-task` espera;
+   - tratar como `all` — custo: lista todos os workstreams sem aviso; se paga: só se o `--pending` rodar fora de
+     workstream de propósito.
+
+   **Decidido — "Avisar e filtrar o vazio (Recomendado)".**
+
+2. **O uso fora da especificação.** Opções:
+   - recusar com saída 2 (recomendada) — custo: o `--list` não aceita `--workstream`; se paga: agora, porque erro de
+     digitação não vira desfecho sem porquê nem filtro ignorado;
+   - aceitar e ignorar — custo: desfecho sem porquê e flag perdida sem aviso; se paga: nunca.
+
+   **Decidido — "Recusar com saída 2 (Recomendado)".**
+
 ## Desenho
 
 ### O que este desenho assume
@@ -375,7 +398,8 @@ python3 scripts/fact_outcome.py --list <agent_id>
 ```
 
 - **Registrar:** aceita o prefixo único do `agent_id`; recusa, com saída 2, o fato que não está no log; grava
-  `fact_outcome` com o `verdict` (`holds` ou `fails`), o porquê, a `ref` e o `workstream` do cwd.
+  `fact_outcome` com o `verdict` (`holds` ou `fails`), o porquê, a `ref` e o `workstream` do fato (X2). Registrar de
+  novo vale: o último desfecho conta.
 - **`--pending`:** os `fact` `inferido`, abaixo de 80 ou `C`, sem `fact_outcome`, do workstream do cwd por padrão, com
   o id, a data, a confiança e o texto.
 - **`--list`:** todos os fatos da devolução, com o veredito do Haiku e o da sessão.
@@ -495,7 +519,16 @@ do P1 apareceu, e nenhum processo ficou vivo.
 
 Executa D3 · executor: `implementer`, com os testes em `.claude/hooks/tests/test_fact_outcome.py`
 
-Estimado: 1 h · Executado: — h
+Estimado: 1 h · Executado: 0.4 h
+
+- [x] **1.** Testes antes (os 28 falharam com o script ausente), o script, e as escolhas da R8.
+
+**Evidência:** `master@98a60d3` — `scripts/fact_outcome.py` e `.claude/hooks/tests/test_fact_outcome.py` (28 testes);
+`python3 -m unittest discover -s .claude/hooks/tests` → `Ran 147 tests … OK`; contra o log real,
+`fact_outcome.py --pending --workstream all` → "nenhum fato a conferir", saída 0; num log temporário com `F1 lido 95`,
+`F2 inferido 70` e `C1 inferido 60`, o `--pending` lista F2 e C1, `abc:F2 fails … --ref PLN-004/R8.1` grava com o
+`workstream` do fato, o `--pending` fica só com C1, e o `--list` mostra `Haiku holds (cite off)` e
+`sessão fails (PLN-004/R8.1)`.
 
 ### P6 — O acerto por faixa
 
@@ -537,8 +570,10 @@ Estimado: 1 h · Executado: — h
   `tool_use` `SubagentHandback`, com o texto em `input.message`. O parser lê o handback e cai no `text` sem ele. Afeta
   P3 e D2; não muda a R3.2, que diz "a devolução", e por isso não voltou à Entrevista.
 
+- **X2 — O desfecho leva o `workstream` do fato, e não o do cwd.** O desfecho chega em outra sessão, às vezes em outro
+  worktree; com o do cwd, o `--pending` do workstream dono nunca o veria. Afeta D3 e P5.
+
 ## Worklogs
 
-- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2; P2–P4 feitos, com o X1, a R5, a R6 e a R7. Parou antes do
-  P5.
+- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2; P2–P5 feitos, com o X1, o X2 e as R5–R8. Parou antes do P6.
   [PLN-005: a abertura da confiança dos fatos do desenho](../../work/worklogs/2026-10-31-pln-005-a-abertura-da-confianca-dos-fatos.md)

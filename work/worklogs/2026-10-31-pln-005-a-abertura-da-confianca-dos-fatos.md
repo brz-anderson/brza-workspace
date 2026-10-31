@@ -53,9 +53,16 @@ disparo no fim do `stop`, a marca no `turn` da sessão `-p` e a entrada no `sett
 as três escolhas dele, e a sessão aplicou a da cerca. Desde o `3e123f0`, toda devolução do `designer` e do
 `collector` com fato `rodado`, `lido` ou `doc` dispara a auditoria.
 
+## O desfecho da sessão (P5)
+
+O `implementer` fez o `scripts/fact_outcome.py`, com 28 testes: registrar o desfecho, `--pending` e `--list`. O
+desfecho leva o `workstream` do fato, e não o do cwd (X2), porque chega em outra sessão. A R8 fechou duas escolhas dele,
+ambas na recomendada.
+
 ## Na master
 
 - `2e8ea67` — "Último PLN usado" passa a 005 no `plans/README.md`.
 - `68a925c` — a marca de confiança no `designer.md` e no `collector.md` (P2).
 - `8d22660` — o `fact_audit.py stop` e os testes (P3).
 - `3e123f0` — o `fact_audit.py run`, o `turn` marcado, o resumo e o `settings.json` (P4).
+- `98a60d3` — o `fact_outcome.py` e os testes (P5).

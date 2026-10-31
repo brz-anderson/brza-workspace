@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 9
-executed_h: 0
-remaining_h: 9
+executed_h: 0.2
+remaining_h: 8.5
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,7 +16,7 @@ tags:
 
 # PLN-005: A confiança dos fatos do desenho se mede contra o que se sustentou
 
-- **Retomar:** Desenho e corte aceitos na R4; o próximo é o P1, a sonda do `claude -p`, a pedido de Anderson.
+- **Retomar:** P1 feito, a sonda confirmou o D2; o próximo é o P2, a marca nos papéis, a pedido de Anderson.
 
 ## Pedido
 
@@ -193,7 +193,7 @@ Respondida em 2026-10-31.
 
 - **O evento `subagent` não guarda a devolução.** `.claude/hooks/measure.py:434-476` — soma tokens e custo do
   transcript, que acha por `agent_transcript` (`:425-431`), e lê a partir do offset do `.measurements/state.json`.
-- **O hook só mede.** `.claude/hooks/measure.py:22` — e engole toda exceção num `hook_error` (`:723-737`).
+- **O hook só mede.** `.claude/hooks/measure.py:23` — e engole toda exceção num `hook_error` (`:723-737`).
 - **O `SubagentStop` tem uma entrada só**, `measure.py subagent || true`, com `timeout: 30`
   (`.claude/settings.json`, `hooks.SubagentStop`).
 - **O resumo** lê o log de `DEFAULT_DIR` (`scripts/summarize_measurements.py:32`), com `--since`, `--json` e
@@ -203,10 +203,18 @@ Respondida em 2026-10-31.
 
 #### O `claude -p`
 
-- **As opções existem no CLI instalado** (`claude --help`, 2026-10-31): `--tools` restringe as ferramentas embutidas,
-  `--add-dir` libera diretório, `--output-format json`, `--max-budget-usd` (só com `--print`), `--model`,
-  `--permission-mode` e `--settings`. O formato do JSON de saída e se os hooks do projeto rodam na sessão `-p` não foram
-  conferidos: é a sonda do P1.
+- **A sessão `-p` da auditoria**, sondada no P1 com o `claude` 2.1.316, no worktree do `workspace`:
+  - **O modelo** é o `claude-haiku-5-5` com `--model haiku`.
+  - **As ferramentas** são as do `--tools` (`Glob`, `Grep`, `Read`, `WebFetch`) mais as duas do MCP do `context7`, que
+    o projeto habilita; todas são de leitura. O `permissionMode` herdado é `auto`.
+  - **O custo** de três fatos foi US$ 0,0056, em 4 turnos e 9,6 s — abaixo dos US$ 0,02–0,05 estimados na R1.3.
+  - **A saída** `--output-format json` é um objeto com `result`, `total_cost_usd`, `num_turns`, `duration_ms`,
+    `is_error`, `subtype` e `modelUsage`.
+  - **O `--max-budget-usd`** corta depois do pedido que passa do teto: saída 1, `subtype: error_max_budget_usd`,
+    `terminal_reason: budget_exhausted`, `result` nulo e o custo gasto no `total_cost_usd` (US$ 0,0029 num teto de
+    US$ 0,001).
+  - **Os hooks do projeto rodam** na sessão `-p` e enxergam o `BRZA_FACT_AUDIT=1`; o `Stop` dela gravou um `turn`
+    `claude-haiku-5-5` de US$ 0,01 no `workstream` `workspace` — o custo em dobro que o D6 tira do resumo.
 
 #### Os papéis e a skill
 
@@ -338,12 +346,20 @@ No `## 3. O pendente`, um item a mais:
 
 Executa D2 · executor: a sessão que conduz
 
-Estimado: 0.5 h · Executado: — h
+Estimado: 0.5 h · Executado: 0.2 h
 
-- [ ] **1.** No scratch, rodar a linha do D2 com um fato `lido` de fixture e conferir: o modelo é o Haiku 5.5, o JSON
+- [x] **1.** No scratch, rodar a linha do D2 com um fato `lido` de fixture e conferir: o modelo é o Haiku 5.5, o JSON
   traz o custo e o resultado, só as ferramentas dadas existem, o `--max-budget-usd` corta, e o `Stop` do projeto roda
   e enxerga `BRZA_FACT_AUDIT`.
-- [ ] **2.** O que divergir do D2 volta à Entrevista antes do P3.
+- [x] **2.** O que divergir do D2 volta à Entrevista antes do P3. Nada desmente o D2: o MCP do `context7` entra junto,
+  só de leitura, e a saída 1 do teto é a falha que o D2 já manda gravar como `fact_audit` com `error`.
+
+**Evidência:** fixture com três fatos em `/private/tmp/pln005-p1/facts.json` (`F1 lido` verdadeiro, `F2 lido` falso,
+`F3 rodado` com a saída gravada). `BRZA_FACT_AUDIT=1 claude -p --model haiku --tools Read,Grep,Glob,WebFetch --add-dir
+… --settings <espião do Stop> --output-format stream-json --verbose --max-budget-usd 0.25` → `success`, US$ 0,0056,
+`F1 holds`, `F2 fails` ("o timeout é 30, não 60"), `F3 holds` sem rodar o comando; espião: `audit=1`. O mesmo com
+`--max-budget-usd 0.001` → saída 1, `error_max_budget_usd`. O `F1` voltou `holds` com a nota "na linha 23 e não na
+22": a citação `measure.py:22` deste plano estava errada, e o Terreno foi corrigido.
 
 ### P2 — A marca nos papéis
 
@@ -416,5 +432,5 @@ Estimado: 1 h · Executado: — h
 
 ## Worklogs
 
-- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; parou antes do P1.
+- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2. Parou antes do P2.
   [PLN-005: a abertura da confiança dos fatos do desenho](../../work/worklogs/2026-10-31-pln-005-a-abertura-da-confianca-dos-fatos.md)

@@ -33,10 +33,14 @@ na sessão `workspace`, depois da R6 de 2026-10-30. O dia anterior está em
   gravou nada, e o `~/.codex/config.toml` não ganhou `hooks.state` para o `sondas2`.
 - **A rodada 7**, no chat: o `codex-brza` tira o `--approve-for-me`; a memória do papel por caminho relativo; o
   `functions -c` no bloco BrzA do shell; um pedido à sessão do `studio` para ligar a issue ao plano.
+- **A rodada 8**, no chat: a captura do `/hooks` mostrou só a tela do `PreToolUse`, com o hook do Orca, e não decidiu;
+  o `brza tree` copia o `.codex/hooks.json`, e o resto segue por symlink; o scratch do Codex em
+  `$TMPDIR/codex-scratch/<id da sessão>`.
 
 ## O que ficou
 
-- **O que o `/hooks` mostrou**, para fechar o hook do Codex por symlink, e a rodada 8, com o scratch do Codex (D2).
+- **O Desenho**: o `designer` aplica a R6 a R8 ao rascunho, e o texto vai à aprovação na mensagem antes de ir a
+  `PLN-004-design.md`.
 
 ## Fora do workspace
 

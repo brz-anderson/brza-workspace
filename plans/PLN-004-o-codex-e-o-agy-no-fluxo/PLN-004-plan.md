@@ -15,9 +15,8 @@ tags:
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
 - **Retomar:** o Desenho está em rascunho no scratch da sessão `workspace` (`pln-004-design-rascunho.md`, D1 a D14), com
-  a R6 e a R7 fechadas e as sondas da R6.1 feitas (`pln-004-sondas-r6.md`). O próximo é a rodada 8 — o hook do Codex
-  por symlink, que não rodou depois do `/hooks` de Anderson, e o scratch do Codex (D2) — e então o Desenho gravado em
-  `PLN-004-design.md`.
+  as rodadas 6 a 8 fechadas e as sondas da R6.1 feitas (`pln-004-sondas-r6.md`). O próximo é o `designer` aplicar a R6
+  a R8 ao rascunho e a aprovação do texto, na mensagem, antes de gravá-lo em `PLN-004-design.md`.
 
 ## Pedido
 
@@ -398,10 +397,38 @@ Respondida em 2026-10-31, na sessão `workspace`: "7.1.1 / 7.2.1 / 7.3.1 / 7.4.1
 
    **Decidido — um pedido à sessão do `studio`.**
 
+### Rodada 8 — o hook do Codex e o scratch (enviada 2026-10-31, no chat)
+
+**Apresentado antes:** o `/hooks` de Anderson, numa sessão Codex no worktree da sonda: o `papel` carregou pelo
+`.codex/agents` em symlink, mas o espião do hook não gravou nada, e o `~/.codex/config.toml` não ganhou `hooks.state`
+para o `sondas2`. A captura de Anderson mostrou a tela "PreToolUse hooks" só com o hook do Orca (`Source: User config -
+~/.codex/hooks.json`), que não decide, porque o hook da sonda é só `Stop` e `SubagentStop`. A única confiança de
+`hooks.json` por link na máquina, a da Fixfy, foi gravada pelo caminho resolvido (`~/.codex/config.toml:209`).
+
+Respondida em 2026-10-31, na sessão `workspace`: "8.1.1 / 8.2.1".
+
+1. **Como o `.codex/hooks.json` chega ao worktree do brza-studio** (D8, R6.3). Opções:
+   - o `brza tree` o copia, e o `.codex/agents` e o `.agents/` seguem por symlink (recomendada) — custo: ~5 linhas no
+     `brza tree`, no pedido ao `tools-kit`; a cópia envelhece quando o hook muda, e cada mudança pede um `/hooks`; se
+     paga: agora, sem mais sonda;
+   - Anderson olha a tela do `Stop` e do `SubagentStop` no `/hooks`, e o link fica se o hook aparecer — custo: ~2 min
+     de Anderson; se paga: só se o link funcionar.
+
+   **Decidido — o `brza tree` copia o `.codex/hooks.json`.** A conferência final em cada runtime prova que o hook roda.
+
+2. **Onde o Codex guarda o scratch** (D2). Opções:
+   - em `$TMPDIR/codex-scratch/<id da sessão>`, escrito no adaptador (recomendada) — custo: uma linha no
+     `developer_instructions`; se paga: no primeiro levantamento de um papel no Codex;
+   - sem scratch, com o agregado na devolução — custo: nenhum agora; se paga: nunca, quando o levantamento passa de uma
+     tela.
+
+   **Decidido — `$TMPDIR/codex-scratch/<id da sessão>`.**
+
 ## Worklogs
 
 - 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4; as sondas; R5; o rascunho
   do Desenho, pelo `designer`; R6. Parou nas sondas da R6.1.
   [O PLN-004: a abertura do Codex e do agy no fluxo](../../work/worklogs/2026-10-30-pln-004-a-abertura-do-codex-e-do-agy-no-fluxo.md)
-- 2026-10-31 — as sondas da R6.1; o `/hooks` de Anderson, sem o hook rodar; R7. Parou na R8.
+- 2026-10-31 — as sondas da R6.1; o `/hooks` de Anderson, sem o hook rodar; R7 e R8. Parou na
+  aprovação do Desenho.
   [O PLN-004: as sondas da R6 e o Desenho do Codex e do agy](../../work/worklogs/2026-10-31-pln-004-as-sondas-e-o-desenho.md)

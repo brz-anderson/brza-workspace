@@ -16,8 +16,7 @@ metadata:
 - `sed` do macOS não tem `\(a\|b\)`: edite com `python3` e `assert t.count(a) == 1`.
 - Os scripts do `packages/client/bin` importam `brza_runtime` do `bin/` por `parents[3] / 'bin'` (ou `parents[2]` no
   `brza-doctor`, que usa `HERE`); o `brza-note` roda o `brza-sessions` do cliente por `HERE.parent / 'packages/client/bin'`.
-- Skips marcados com o passo que os resolve: `SettingsTest` do `test_fact_audit` (P3, lê o `settings.json`) e
-  `test_the_installer_picks_it_up_as_a_command` (P7, o `brza-install` lista `WORKSPACE/scripts/brza`).
+- Skip marcado com o passo que o resolve: `SettingsTest` do `test_fact_audit` (P3, lê o `settings.json`). O do installer saiu no P7.
 - **Testes do `brza-note` que precisam do workspace de mentira herdam de `NoteFixture`** (`tests/cli/test_brza_note.py`, sem
   `test_*`), e não de `NoteTest`: o unittest reexecutaria os testes herdados. O `test_brza_note_index.py` (P4) é o exemplo.
 - **Índice da master (P4):** commit sem checkout por `plumb(...)` do próprio `brza-note` (o `runtime.git` não aceita `env` nem
@@ -40,3 +39,11 @@ metadata:
   entre duas leituras do mesmo cwd depois de mudar a branch.
 - Testes do `brza_root` batem o parser contra o `tomllib` (pula no 3.9: 4 skips no 3.9 = 3 do `tomllib` + P3). Os testes
   de `tests/cli` não coletam no 3.9 (`str | None`); só os scripts `brza-where`/`brza-register` são rodados lá, por subprocesso.
+- **P7 (install, doctor, claude-brza, bloco do shell):** tests/cli roda 264 testes, hooks 193 (1 skip P3), em 2026-10-31. O
+  `brza-install` lê o checkout por `BRZA_WORKFLOW` (ou o pai do `bin/` do arquivo) **a cada chamada**: o teste põe a variável
+  com `patch.dict(os.environ)` e `patch.object(runtime, 'LOCAL_BIN', tmp)`, sem tocar globais do `run_path`. Para provar link
+  de verdade rode o `bin/brza-install` por subprocesso com `HOME` trocado (e sem `ORCA_USER_DATA_PATH`). O `claude-brza` e o
+  `brza-doctor` testam por `run_path`; o doctor troca `GLOBALS` (`git_ident`, `git_config_email`, `which`, `APP`).
+- Teste de função de shell: `zsh -f -c 'source bloco; ...'` com `ZDOTDIR`/`HOME` temporários e PATH com um `python3` que é
+  `sys.executable` (o `/usr/bin/python3` 3.9 não roda o `brza-agents`, e ele falha calado). Use raiz com espaço no nome.
+- `brza_root.find` pede que o cwd exista (o git roda nele): teste de "subpasta do código" precisa criar a pasta.

@@ -63,8 +63,7 @@ de lá, porque o rascunho citava um comando que não é o dele.
 
 ## A medição da agent-instructions-writer
 
-A skill adaptada tem ~100 linhas, a partir das 237 da de lá. Ela está no scratch da sessão, e não no `.claude/skills/`,
-até a medição fechar. Três tarefas, cada uma num clone descartável, com a skill e sem ela, em Sonnet:
+A skill adaptada tem ~100 linhas, a partir das 237 da de lá. Três tarefas, cada uma num clone descartável, com a skill e sem ela, em Sonnet:
 
 | Tarefa | Com | Sem | O que separou |
 | :----- | :-- | :-- | :------------ |
@@ -75,6 +74,24 @@ até a medição fechar. Três tarefas, cada uma num clone descartável, com a s
 Ao todo, 88% contra 71%, com ~+4,8 mil tokens e ~+7 s por execução. Uma execução por tarefa: o ± é entre tarefas.
 O `collector` e uma execução copiaram o caminho do scratch sem o `0` final do hash; a execução parou e foi relançada
 por um link curto, `/private/tmp/aiw`.
+
+**O retorno de Anderson no visualizador**: no plugin, "a skill melhorou o resultado"; na revisão, "aqui sem a skill
+ficou melhor"; na memória, "os blocos expansiveis ficaram levemente melhores com a skill". A revisão sem a skill tinha
+56 linhas contra 112, e achou a configuração de usuário que carrega o `AGENTS.md` e uma frase quebrada; a com a skill
+seguiu a régua como roteiro e parou em "não conferi".
+
+**A versão 2** mandou ler o arquivo inteiro como quem vai segui-lo, com a régua como mínimo; seguir o ponteiro para fora
+do repositório, só lendo; dizer o que quebra; responder às perguntas do pedido em lista; e citar a escolha anterior
+que o pedido contraria. A iteração 2 deu 100% contra 87%, com ~+12 mil tokens e ~+16 s por execução. Na revisão, 8/8
+contra 5/8: só a versão com a skill achou o `~/.zshrc` sem o `--agents` e o `gh` na conta `anderson-fixfy`, os dois
+conferidos; a sem a skill afirmou que o `~/.zshrc` batia com o `README.md`. As outras duas tarefas empataram.
+
+Anderson: "tudo aprovado, segue". A skill entrou na `master` em `3f55576`, em `.claude/skills/agent-instructions-writer/`.
+A otimização da `description` pela `skill-creator` não rodou.
+
+**Candidato à norma:** o link curto para o scratch, na memória
+[O caminho do scratch vai por link curto](../../memory/caminho-do-scratch-vai-por-link-curto.md); o erro do hash vale
+para toda delegação, de todo workstream.
 
 ## A sessão paralela na Fixfy
 

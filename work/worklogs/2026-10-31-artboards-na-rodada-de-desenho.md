@@ -60,5 +60,11 @@ estruturado (`NativeChatPromptStrip`, do `a0eefa646e4` no `brza-studio`).
 - **O `--primary` do tema padrão é neutro** (`#171717` e `#e5e5e5`), e por isso o destaque da alternativa C saiu preto
   ou branco. O artboard não tem `--chat-canvas`: o shell repassa só a lista do painel de plugin, os `--chart-*` e as
   fontes (`native-chat-visual-shell.ts:59-68`).
-- **Não conferido pela sessão:** se o `::orca-visual` mostrou o `title` e a altura certa, e se os três empilhados ficaram
-  legíveis. A sessão não vê o chat renderizado; só Anderson.
+- **O que Anderson viu no chat:** o `title` e a altura saíram certos, e os três empilhados deram para comparar (1.1).
+- **A rodada da norma:** Anderson respondeu "1", e na pergunta que desfez a dúvida, "A opção 1 em todas":
+  - 2.1, a sessão confere cada artboard pelo PNG a 736 px antes da rodada;
+  - 3.1, o `brza shot` passa a 736 px por padrão, pedido à sessão `tools-kit-shot-736`, aberta pelo `brza sessions`;
+  - 4.1, o PNG da alternativa escolhida fica ao lado da issue, `a-faixa-recolhida-com-icone-e-acao.png`, gravado no
+    `studio` (`1c079c2`).
+- **O `--checkout` relativo falha fora da raiz:** `brza sessions … --checkout .worktrees/tools-kit`, rodado no worktree
+  do `workspace`, resolveu o caminho a partir do cwd e devolveu `selector_not_found`. Com o caminho absoluto, abriu.

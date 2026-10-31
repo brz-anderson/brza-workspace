@@ -86,6 +86,22 @@ rodar. No chat do app, o `claude-brza` roda ali o `claude` puro, sem a função 
 
 ## Fora do workspace
 
+- **A conta ativa do `gh` no perfil padrão**, trocada de `anderson-projeto-externo` para `brz-anderson` com
+  `gh auth switch --hostname github.com --user brz-anderson`, como o `CLAUDE.md` promete ("O `gh` usa o perfil padrão,
+  com a conta `brz-anderson` ativa"). Quem achou foi a revisão da `agent-instructions-writer`, na iteração 2 da medição;
+  Anderson: "conserte".
+  - Risco: a sessão aberta sem a `projeto-externo_claude`, como a `projeto-externo-skills` no BrzA Studio, usa o perfil padrão e passa a
+    falar com o GitHub como `brz-anderson`; a `projeto-externo_claude` usa o próprio `GH_CONFIG_DIR` e não muda.
+  - Estado: ativo.
+  - Como desfazer: `gh auth switch --hostname github.com --user anderson-projeto-externo`.
+- **O bloco do BrzA no `~/.zshrc` está atrás do `README.md`**: a `brza_claude` de lá não passa o `--agents`, e a
+  sessão aberta pelo terminal no `brza-studio` sobe sem os subagentes por papel. A cópia foi barrada pelo classificador
+  de permissões da sessão e ficou com Anderson.
+  - Risco: até a cópia, o `Agent` com `reviewer`, `collector`, `implementer` ou `designer` não acha o papel no terminal
+    do `brza-studio`; o chat do app não sofre, porque o `claude-brza` passa o `--agents`.
+  - Estado: pendente.
+  - Como desfazer: depois da cópia, o `~/.zshrc.bak-2026-10-31-brza` que o comando grava.
+
 - **A sessão `projeto-externo-skills` no BrzA Studio**, em `~/Projects/projeto-externo`, que vai instalar a `skill-creator` no escopo local
   do checkout da projeto-externo.
   - Risco: a sessão grava notas e worktrees na projeto-externo, pela norma de lá.

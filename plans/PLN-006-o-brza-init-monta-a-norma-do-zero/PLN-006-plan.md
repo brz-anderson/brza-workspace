@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 27
-executed_h: 1.3
-remaining_h: 16
+executed_h: 1.6
+remaining_h: 14
 scope:
   - workspace
 opened: 2026-10-31
@@ -540,6 +540,24 @@ a regra escolhe opção de rodada, e não é a frase explícita que transforma t
 4. **A branch que o `--rebuild` lê.** Opções: a da `origin`, com a local de reserva (recomendada) — custo: 0 h; se paga:
    já · a local — custo: 0 h, e indexa nota não publicada; se paga: nunca. **Decidido pela regra — a da `origin`.**
 
+### Rodada 13 — os pontos do P7 (decidida pela regra, 2026-10-31)
+
+**Apresentado antes:** a devolução do `implementer` do P7, com cinco escolhas que o D10 não fixava.
+
+1. **Onde mora o bloco do shell.** Opções: `packages/client/shell/brza.zsh` (recomendada) — custo: ~0; se paga: já,
+   o P8 cola de lá · junto da regra em `packages/client/core/` — custo: invade o P3; se paga: nunca · só no README —
+   custo: sem teste do zsh; se paga: nunca. **Decidido pela regra — `packages/client/shell/brza.zsh`.**
+2. **O `brza install` rodado de um worktree.** Opções: avisar em stderr (recomendada) — custo: ~0; se paga: já · recusar
+   — custo: o desenvolvimento em worktree para; se paga: só no uso real · resolver para o checkout principal — custo:
+   ~1 h; se paga: nunca. **Decidido pela regra — avisar.**
+3. **O `adm-claude` e o `claude-adm`.** Opções: ficam no `~/.zshrc`, fora do bloco (recomendada) — custo: ~0; se paga:
+   já · no bloco — custo: o pessoal no pacote público; se paga: nunca. **Decidido pela regra — fora do bloco.**
+4. **O `doctor` sem `[author].email` nem `user.email`.** Opções: AVISO (recomendada) — custo: ~0; se paga: já · ERRO —
+   custo: trava o `doctor` sem `git config`; se paga: nunca. **Decidido pela regra — AVISO.**
+5. **O `app_age` do `doctor` com a `origin/master` do `brza-studio`.** Opções: deixar, porque mede o app instalado
+   (recomendada) — custo: ~0; se paga: já · ler `[code].branch` e `remote` — custo: ~20 min e um helper no
+   `brza_root`; se paga: no segundo workspace com app diferente. **Decidido pela regra — deixar.**
+
 ## Desenho
 
 O Desenho, D1–D12, está em [PLN-006 — Desenho](PLN-006-design.md), por passar de 400 linhas.
@@ -643,12 +661,19 @@ Estimado: 3 h · Executado: — h
 
 Executa D10 · executor: `implementer`
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0,3 h
 
-- [ ] **1. Testes que falham** do `--client`, do `--local` e do `--relink`, e do `doctor` com o registro
-- [ ] **2. Implementar**, com o `claude-brza`, o `brza-sessions` e o bloco do shell sem nome fixo
-- [ ] **3. Rodar e ver passar**
-- [ ] **4. Commit**
+- [x] **1. Testes que falham** do `--client`, do `--local` e do `--relink`, e do `doctor` com o registro
+- [x] **2. Implementar**, com o `claude-brza`, o `brza-sessions` e o bloco do shell sem nome fixo
+- [x] **3. Rodar e ver passar**
+- [x] **4. Commit**
+
+**Evidência:** `brza-workflow@d60b037` · `tests/cli` → 264 OK, sem skip (o do installer saiu, X4) · `tests/hooks` →
+193 OK, 1 skip (P3) · `tests/notes-checker/run.py` → saída 0 · o `brza-install --all --client --relink` rodado com o
+`HOME` trocado e o bloco do shell testado no zsh de verdade. O que o P8 precisa — o bloco do shell, a ordem dos
+comandos, o cabeçalho dos scripts locais — está no próprio `brza-install` e no `packages/client/shell/brza.zsh`.
+Desvios X14–X16; pontos R13. Só o vermelho do `doctor` foi visto antes do código; nos outros, os testes vieram antes,
+mas a rodada vermelha não foi capturada.
 
 ### P8 — O `brza-workspace` vira cliente do `brza-workflow`
 
@@ -710,6 +735,12 @@ Estimado: 1,5 h · Executado: — h
   antes o `git add` falhava, e o `changed` com o `path` novo da R8.1 não sairia.
 - **X13 — O `plan-open` não cria o arquivo do plano**: reserva o número, grava a linha e imprime o caminho; quem grava é
   a `plan-runner`. O `--no-push` não grava linha, e o `--rebuild` recolhe depois.
+- **X14 — O `--local <dir>` aceita a raiz do workspace ou a pasta dos scripts**, e o `--all` liga só o `bin/`; o
+  pacote do cliente vai pelo `--client`. O `claude-brza` segue só pelo `--chat-command`.
+- **X15 — O bloco do shell divide `<raiz> <papel>` pela última palavra** (`${w% *}`, `${w##* }`), e não pelo `${=w}`
+  do D10, que quebrava raiz com espaço no nome.
+- **X16 — O `claude-brza` e o `brza where` não têm legado**: sem manifesto e sem registro, a sessão sobe sem hooks. No
+  P8, o manifesto e o `brza register` vêm antes de qualquer relink.
 
 ## Decisões
 

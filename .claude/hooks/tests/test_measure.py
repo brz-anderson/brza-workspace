@@ -125,6 +125,21 @@ class ClaudeTranscriptTest(HookTest):
         (row,) = self.logged()
         self.assertEqual((row["event"], row["account"], row["max_context"]), ("turn", ".claude-adm", 250_310))
 
+    def test_turn_of_the_audit_session_carries_the_flag_and_the_others_do_not(self):
+        path = self.transcript()
+        payload = {"hook_event_name": "Stop", "session_id": "s", "transcript_path": path}
+        with mock.patch.dict(os.environ, {"BRZA_FACT_AUDIT": "1"}):
+            self.run_hook(payload, mode="turn")
+        (row,) = self.logged()
+        self.assertIs(row["fact_audit"], True)
+        os.remove(self.measure.LOG)
+        os.remove(self.measure.STATE)
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("BRZA_FACT_AUDIT", None)
+            self.run_hook(payload, mode="turn")
+        (row,) = self.logged()
+        self.assertNotIn("fact_audit", row)
+
     def test_lines_carry_the_claude_ai_link_that_clear_keeps(self):
         path = self.transcript()
         link = {"CLAUDE_CODE_BRIDGE_SESSION_ID": "session_01Y9ppkrW9R8FobmitY6B4Kr"}

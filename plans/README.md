@@ -15,7 +15,7 @@ worklog.
 | Regra | Como |
 | :---- | :--- |
 | Pasta | Uma por plano, mesmo com um arquivo só: `plans/PLN-001-assunto/`, no workstream da sessão que o abre, e nunca na `master`. O número é sequencial e não se reusa. A linha "Último PLN usado" acima sobe na `master`, num commit de norma, antes de o plano ser gravado |
-| Arquivos | `PLN-001-plan.md` sempre; `-interview.md` e `-design.md` quando o plano passa de ~400 linhas ou o desenho de ~800. O `-plan` é o arquivo lido para retomar |
+| Arquivos | `PLN-001-plan.md` sempre; `-interview.md` e `-design.md` quando o plano passa de ~400 linhas ou o desenho de ~800. O `-plan` é o arquivo lido para retomar. A imagem fica na pasta: a alternativa de interface escolhida no Desenho, `PLN-001-<assunto>.png`, pelo `brza shot`; o print de um caso manual, `PLN-001-C1.png`, pelo `brza print` |
 | IDs | `R3.2` rodada e pergunta, só cresce · `D3` item do Desenho, reescrito no lugar · `P3` passo · `X1` desvio · `A1` achado · `C1` caso manual. Citação de fora: `PLN-001/D3` |
 | Estado | Frontmatter **só no `-plan.md`**: `status`, `phase`, `origin`, `origin_ref`, `ready` e as três horas, na forma do molde; o `Retomar` é a primeira linha abaixo do H1 |
 | Origem | `origin` em `issue` · `decision` · `plan` · `request`; `origin_ref` com o nome da nota sem `.md`, `PLN-NNN` ou `PLN-NNN/A<n>`, ausente com `request`. Uma origem por plano: com mais de uma, vale a ordem `issue` > `plan` > `decision`, e as outras ficam na linha `- **Origem:**` do Pedido. Plano que veio de outro workspace é `request`, com a procedência na linha `- **Origem:**` |

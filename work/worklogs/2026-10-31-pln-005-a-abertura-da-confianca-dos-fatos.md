@@ -35,6 +35,12 @@ O `claude -p` em Haiku 5.5 auditou três fatos de fixture em 9,6 s, por US$ 0,00
 `--max-budget-usd` corta com saída 1. O D2 ficou como estava. A sonda achou ainda uma citação errada do próprio plano,
 `measure.py:22` no lugar da linha 23, que o Terreno corrigiu.
 
+## A marca nos papéis (P2)
+
+A régua ficou no `designer.md` e no `collector.md`, sem subir ao `AGENTS.md`, que carrega em toda sessão. A marca vai
+logo depois do que afirma, porque o custo e o "se paga" de uma opção dividem a mesma linha.
+
 ## Na master
 
 - `2e8ea67` — "Último PLN usado" passa a 005 no `plans/README.md`.
+- `68a925c` — a marca de confiança no `designer.md` e no `collector.md` (P2).

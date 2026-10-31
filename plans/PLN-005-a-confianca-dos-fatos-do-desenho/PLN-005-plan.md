@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 9
-executed_h: 0.2
-remaining_h: 8.5
+executed_h: 0.4
+remaining_h: 8
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,7 +16,7 @@ tags:
 
 # PLN-005: A confiança dos fatos do desenho se mede contra o que se sustentou
 
-- **Retomar:** P1 feito, a sonda confirmou o D2; o próximo é o P2, a marca nos papéis, a pedido de Anderson.
+- **Retomar:** P1 e P2 feitos; o próximo é o P3, a captura, pelo `implementer`, a pedido de Anderson.
 
 ## Pedido
 
@@ -365,7 +365,16 @@ Estimado: 0.5 h · Executado: 0.2 h
 
 Executa D1 · executor: a sessão que conduz, pela `agent-instructions-writer`, na `master`
 
-Estimado: 0.5 h · Executado: — h
+Estimado: 0.5 h · Executado: 0.2 h
+
+- [x] **1.** A régua fica nos dois papéis, e não sobe ao `AGENTS.md`: só pesa quando eles rodam, e o `AGENTS.md` paga
+  em toda sessão. Nenhuma outra linha da norma cita a marca (`git grep` por `inferência`, `a conferir` e `[F`).
+- [x] **2.** A marca vai "logo depois do que afirma", e não "no fim da linha" do D1, porque o custo e o "se paga" de uma
+  opção dividem a linha `Custo: … Se paga: …`; no `collector`, a regra substitui "Fato sem fonte é inferência".
+
+**Evidência:** `master@68a925c` — `.claude/agents/designer.md:19-30` e `.claude/agents/collector.md:15-24`; a expressão
+do D2 casa o exemplo `[F3 · lido · 90]` dos dois arquivos, e a maior linha tem 118 colunas; `brza note sync` →
+`studio`, `tools-kit` e `workspace` mesclados e enviados.
 
 ### P3 — A captura
 
@@ -432,5 +441,5 @@ Estimado: 1 h · Executado: — h
 
 ## Worklogs
 
-- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2. Parou antes do P2.
+- 2026-10-31 — aberto; R1–R3 respondidas; D1–D6 e P1–P9 escritos. Aceito na R4; P1 feito, a sonda confirmou o D2; P2 feito. Parou antes do P3.
   [PLN-005: a abertura da confiança dos fatos do desenho](../../work/worklogs/2026-10-31-pln-005-a-abertura-da-confianca-dos-fatos.md)

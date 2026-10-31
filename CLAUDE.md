@@ -103,8 +103,32 @@ O `.claude/hooks/measure.py`, ligado no `settings.json`, grava uma linha JSON po
 - **Python:** o da `BRZA_PYTHON`, ou `python3` sem ela.
 - **Precisão:** a saída de tokens fica subcontada, porque o transcript guarda a contagem do início de cada mensagem.
   Entrada e cache valem, e são eles que pesam no custo.
-- **Resumo:** `python3 scripts/summarize_measurements.py`, e `--by-workstream` para o aprendizado por workstream e dia.
+- **Resumo:** `python3 scripts/summarize_measurements.py`, `--by-workstream` para o aprendizado por workstream e dia, e
+  `--facts` para o acerto da confiança dos fatos.
 - **Testes:** em `.claude/hooks/tests/`.
+
+## A auditoria da confiança dos fatos
+
+O `designer` e o `collector` marcam cada fato com o tipo de evidência e a confiança, como `[F3 · lido · 90]`; a regra
+está nos dois papéis. O `.claude/hooks/fact_audit.py`, segundo hook do `SubagentStop`, lê as marcas da devolução — o
+`SubagentHandback` — e dos arquivos que o subagente gravou, e grava no mesmo log:
+
+| Evento         | Quando                                       | O que grava                                                         |
+| :------------- | :------------------------------------------- | :------------------------------------------------------------------ |
+| `fact`         | uma por marca                                | o id, o tipo de evidência, a confiança, o texto e a fonte           |
+| `fact_capture` | uma por trecho lido                          | as marcas, as malformadas e a devolução sem marca                   |
+| `fact_check`   | uma por fato `rodado`, `lido` ou `doc`       | o veredito do Haiku (`holds`, `fails`, `unknown`) e o `cite`        |
+| `fact_audit`   | uma por auditoria                            | os fatos enviados e conferidos, o custo, a duração e o erro         |
+| `fact_outcome` | pelo `scripts/fact_outcome.py`               | o desfecho que a sessão registra, com a `ref`                       |
+
+- **É o único hook que solta processo:** com fato auditável, o `stop` grava
+  `.measurements/fact-audit/<agente>-<offset>.json` e solta, sem esperar, um `claude -p --model haiku` só de leitura (`Read`, `Grep`, `Glob`, `WebFetch`; teto de
+  US$ 0,25 e 10 min) que refaz a evidência. O fato `rodado` se confere pela saída gravada, sem rodar de novo.
+- **Sem auditar a auditoria:** a sessão `-p` roda com `BRZA_FACT_AUDIT=1`; o `fact_audit.py` não a lê, e o `turn` dela
+  sai com `fact_audit: true`, fora dos agregados do resumo.
+- **O desfecho da sessão:** o fato `inferido`, abaixo de 80 ou de custo (`C…`) não vai ao Haiku. A sessão o registra
+  quando a sonda ou a rodada responde, com `python3 scripts/fact_outcome.py <agente>:<F3> holds|fails "<porquê>" --ref
+  <PLN-NNN/R…>`; o `close-task` lista os pendentes.
 
 ## A trava de fechamento antes do `/compact`
 

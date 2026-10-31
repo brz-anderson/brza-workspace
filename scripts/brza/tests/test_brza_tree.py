@@ -4,6 +4,8 @@
 """
 import contextlib
 import io
+import json
+import os
 import runpy
 import subprocess
 import sys
@@ -26,7 +28,7 @@ def git(*args, cwd: Path):
                           check=True, capture_output=True, text=True).stdout.strip()
 
 
-class TreeTest(unittest.TestCase):
+class TreeBase(unittest.TestCase):
     def setUp(self):
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
@@ -71,6 +73,8 @@ class TreeTest(unittest.TestCase):
     def commit_in(self, path: Path, message: str = 'trabalho'):
         git('commit', '-q', '--allow-empty', '-m', message, cwd=path)
 
+
+class TreeTest(TreeBase):
     # criar
 
     def test_creates_feat_branch_from_fetched_origin_master_and_installs(self):
@@ -220,6 +224,130 @@ class TreeTest(unittest.TestCase):
         self.assertRegex(lines['conferencia'], r'detached\s+0 à frente\s+limpo')
         self.assertIn('órfão', lines['orfao'])
         self.assertNotIn('studio', lines)
+
+
+class MemoryTest(TreeBase):
+    """A memória da sessão do worktree com pln-NNN: a do workstream do plano, num brza-workspace de mentira com um
+    bare como origin e o workstream studio, que tem o PLN-001, num worktree."""
+
+    def setUp(self):
+        super().setUp()
+        self.ws_origin, self.ws = self.base / 'ws-origin.git', self.base / 'ws'
+        subprocess.run(['git', 'init', '-q', '--bare', '-b', 'master', str(self.ws_origin)], check=True)
+        subprocess.run(['git', 'clone', '-q', str(self.ws_origin), str(self.ws)], check=True, capture_output=True)
+        git('commit', '-q', '--allow-empty', '-m', 'norma', cwd=self.ws)
+        git('push', '-q', 'origin', 'HEAD:master', cwd=self.ws)
+        self.stream = self.ws / '.worktrees' / 'studio'
+        git('worktree', 'add', '-q', '-b', 'workstream/studio', str(self.stream), cwd=self.ws)
+        plan = self.stream / 'plans' / 'PLN-001-x' / 'PLN-001-plan.md'
+        plan.parent.mkdir(parents=True)
+        plan.write_text('# plano\n')
+        git('add', '.', cwd=self.stream)
+        git('commit', '-q', '-m', 'docs: PLN-001', cwd=self.stream)
+        git('push', '-q', '-u', 'origin', 'workstream/studio', cwd=self.stream)
+        patcher = patch.object(runtime, 'WORKSPACE', self.ws)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def memory_of(self, name: str) -> str | None:
+        path = self.tree(name) / '.claude' / 'settings.local.json'
+        return json.loads(path.read_text())['autoMemoryDirectory'] if path.exists() else None
+
+    def test_the_plan_worktree_points_the_memory_at_the_workstream_of_the_plan(self):
+        code, out = self.run_tree('pln-001-p1')
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.memory_of('pln-001-p1'), str(self.stream / 'memory'))
+        self.assertIn(f'memória:  {self.stream / "memory"}', out)
+        self.assertEqual(self.installed, [self.tree('pln-001-p1')])
+
+    def test_the_memory_is_linked_even_when_the_install_fails(self):
+        self.install_error = 'o install offline falhou'
+        code, out = self.run_tree('pln-001-p2')
+        self.assertEqual(code, 1, out)
+        self.assertEqual(self.memory_of('pln-001-p2'), str(self.stream / 'memory'))
+
+    def test_the_type_does_not_matter_only_pln_in_the_branch(self):
+        code, out = self.run_tree('pln-001-docs', '--type', 'docs')
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.memory_of('pln-001-docs'), str(self.stream / 'memory'))
+
+    def test_a_plan_in_no_workstream_warns_and_goes_on_without_the_memory(self):
+        code, out = self.run_tree('pln-009-p1')
+        self.assertEqual(code, 0, out)
+        self.assertRegex(out, r'aviso: .*PLN-009 não está em nenhum workstream')
+        self.assertIsNone(self.memory_of('pln-009-p1'))
+        self.assertEqual(self.installed, [self.tree('pln-009-p1')])
+
+    def test_a_workstream_without_a_worktree_warns_with_the_command_that_creates_it(self):
+        git('worktree', 'remove', '--force', str(self.stream), cwd=self.ws)
+        code, out = self.run_tree('pln-001-p3')
+        self.assertEqual(code, 0, out)
+        self.assertIn('aviso:', out)
+        self.assertIn('brza note workstream studio', out)
+        self.assertIsNone(self.memory_of('pln-001-p3'))
+
+    def test_a_branch_without_pln_has_no_lookup_and_no_warning(self):
+        code, out = self.run_tree('x')
+        self.assertEqual(code, 0, out)
+        self.assertNotIn('aviso', out)
+        self.assertNotIn('memória', out)
+        self.assertIsNone(self.memory_of('x'))
+
+    def test_unreadable_local_settings_warn_and_do_not_stop_the_tree(self):
+        def broken(path, memory):
+            raise runtime.BrzaError('settings.local.json ilegível')
+
+        with patch.object(runtime, 'set_auto_memory', broken):
+            code, out = self.run_tree('pln-001-p4')
+        self.assertEqual(code, 0, out)
+        self.assertIn('aviso:', out)
+        self.assertIn('ilegível', out)
+
+    def test_the_agent_memory_is_a_symlink_to_the_workstream_created_when_missing(self):
+        target = self.stream / '.claude' / 'agent-memory'
+        self.assertFalse(target.exists())
+        code, out = self.run_tree('pln-001-p5')
+        self.assertEqual(code, 0, out)
+        link = self.tree('pln-001-p5') / '.claude' / 'agent-memory'
+        self.assertTrue(link.is_symlink())
+        self.assertEqual(Path(os.readlink(link)), target)
+        self.assertTrue(target.is_dir())
+        self.assertIn(f'agentes:  {link} -> {target}', out)
+        (target / 'reviewer').mkdir()
+        (link / 'reviewer' / 'achados.md').write_text('x\n')
+        self.assertTrue((target / 'reviewer' / 'achados.md').exists())
+
+    def test_the_agent_memory_keeps_what_the_workstream_already_has(self):
+        target = self.stream / '.claude' / 'agent-memory' / 'collector'
+        target.mkdir(parents=True)
+        (target / 'a.md').write_text('antes\n')
+        self.run_tree('pln-001-p6')
+        link = self.tree('pln-001-p6') / '.claude' / 'agent-memory'
+        self.assertEqual((link / 'collector' / 'a.md').read_text(), 'antes\n')
+
+    def test_a_real_directory_where_the_link_goes_is_not_replaced_and_warns(self):
+        link_memory = GLOBALS['link_memory']
+
+        def with_real_directory(path, branch):
+            (path / '.claude' / 'agent-memory').mkdir(parents=True)
+            (path / '.claude' / 'agent-memory' / 'meu.md').write_text('meu\n')
+            return link_memory(path, branch)
+
+        with patch.dict(GLOBALS, {'link_memory': with_real_directory}):
+            code, out = self.run_tree('pln-001-p7')
+        self.assertEqual(code, 0, out)
+        link = self.tree('pln-001-p7') / '.claude' / 'agent-memory'
+        self.assertFalse(link.is_symlink())
+        self.assertEqual((link / 'meu.md').read_text(), 'meu\n')
+        self.assertRegex(out, r'aviso: .*agent-memory já existe e não é um link')
+
+    def test_no_agent_link_without_the_workstream(self):
+        code, out = self.run_tree('pln-009-p2')
+        self.assertEqual(code, 0, out)
+        self.assertFalse((self.tree('pln-009-p2') / '.claude' / 'agent-memory').exists())
+        code, out = self.run_tree('y')
+        self.assertFalse((self.tree('y') / '.claude' / 'agent-memory').exists())
+        self.assertFalse((self.stream / '.claude' / 'agent-memory').exists())
 
 
 if __name__ == '__main__':

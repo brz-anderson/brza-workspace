@@ -20,8 +20,15 @@ install offline que falha não apaga o worktree: imprime o caminho e o pnpm inst
 com 1.
 
 Quando o nome é de plano, ele traz o pln-NNN-: `brza-tree pln-002-p3` cria .worktrees/pln-002-p3 em feat/pln-002-p3.
+
+A memória da sessão é do workstream do plano. Com pln-NNN na branch, o brza-tree acha o workstream que tem o PLN-NNN
+(a mesma busca do brza-note) e, existindo o worktree dele, grava no .claude/settings.local.json do worktree novo o
+autoMemoryDirectory absoluto para <worktree do workstream>/memory. Sem workstream, ou sem o worktree dele, imprime
+`aviso:` e segue sem a memória. A dos subagentes por papel (.claude/agent-memory/) é o symlink do worktree novo para o
+.claude/agent-memory do worktree do workstream, criado se faltar; o .gitignore do brza-studio leva `/.claude/agent-memory`.
 """
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -104,6 +111,8 @@ def create(name: str, kind: str, base: str | None, chat: str | None) -> int:
         print(f'falhou:   {e}')
         return 1
     print(f'worktree: {path}  ({branch}, de {base or "origin/master"})')
+    if workstream_tree := link_memory(path, branch):
+        link_agent_memory(path, workstream_tree)
     try:
         runtime.install_offline(path)
     except runtime.BrzaError as e:
@@ -117,6 +126,53 @@ def create(name: str, kind: str, base: str | None, chat: str | None) -> int:
             return 1
     print(path)
     return 0
+
+
+def link_memory(path: Path, branch: str) -> Path | None:
+    """A memória da sessão do worktree `path`, na branch `branch`: a do workstream do plano. Sem pln-NNN na branch, nada;
+    sem o workstream ou sem o worktree dele, aviso e segue. Devolve o worktree do workstream, ou None."""
+    m = runtime.STUDIO_BRANCH.match(branch)
+    if not m:
+        return None
+    try:
+        tree = runtime.workstream_root(runtime.workstream_of_plan(m.group(1)))
+    except runtime.Refused as e:
+        print(f'aviso:    sem a memória do workstream em {path}: {e}')
+        return None
+    try:
+        runtime.set_auto_memory(path, tree.resolve() / 'memory')
+    except runtime.BrzaError as e:
+        print(f'aviso:    sem a memória do workstream em {path}: {e}')
+        return None
+    print(f'memória:  {tree.resolve() / "memory"}  (autoMemoryDirectory em {path / ".claude" / "settings.local.json"})')
+    return tree
+
+
+def link_agent_memory(path: Path, workstream_tree: Path):
+    """A memória dos subagentes por papel (.claude/agent-memory/<papel>/, do `memory: project`) é do workstream: o
+    worktree `path` do brza-studio ganha o symlink .claude/agent-memory -> <workstream_tree>/.claude/agent-memory, e o
+    destino é criado se faltar. Diretório real no lugar do link não se substitui: aviso e segue. O link fica sem
+    commit, e o .gitignore do brza-studio precisa da linha `/.claude/agent-memory`. Roda depois do link_memory, só
+    quando o workstream do plano foi achado."""
+    target = workstream_tree.resolve() / '.claude' / 'agent-memory'
+    link = path / '.claude' / 'agent-memory'
+    if link.is_symlink():
+        if link.resolve() == target:
+            return
+        print(f'aviso:    {link} já é um link para {os.path.realpath(link)}, e não para {target}; não o troquei')
+        return
+    if link.exists():
+        print(f'aviso:    {link} já existe e não é um link; não o substituí, e a memória dos agentes fica aí, '
+              f'fora do workstream ({target})')
+        return
+    try:
+        target.mkdir(parents=True, exist_ok=True)
+        link.parent.mkdir(parents=True, exist_ok=True)
+        link.symlink_to(target)
+    except OSError as e:
+        print(f'aviso:    sem o link da memória dos agentes em {link}: {e}')
+        return
+    print(f'agentes:  {link} -> {target}')
 
 
 def remove(name: str, force: bool, empty: bool) -> int:

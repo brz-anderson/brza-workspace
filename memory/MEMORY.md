@@ -1,2 +1,1 @@
-- [A rodada do Desenho vai no chat](rodada-do-desenho-vai-no-chat.md) — rodada de Desenho em texto, sem AskUserQuestion, como a de decisão
 - [A edição renderizada, com o removido em callout](edicao-renderizada-com-o-removido-em-callout.md) — só o trecho renderizado, removido em CAUTION, sem a cerca diff; em medição

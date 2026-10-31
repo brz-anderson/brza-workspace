@@ -6,6 +6,7 @@ workstream studio num worktree dele, com o plano PLN-001, onde as notas vão.
 import contextlib
 import datetime
 import io
+import json
 import os
 import runpy
 import subprocess
@@ -42,7 +43,7 @@ class NoteTest(unittest.TestCase):
         (self.ws / 'work' / 'worklogs').mkdir(parents=True)
         (self.ws / 'work' / 'issues').mkdir(parents=True)
         (self.ws / 'README.md').write_text('um\n')
-        (self.ws / '.gitignore').write_text('.worktrees/\n')
+        (self.ws / '.gitignore').write_text('.worktrees/\n.claude/settings.local.json\n')
         self.checker_exit(0)
         git('add', '.', cwd=self.ws)
         git('commit', '-q', '-m', 'um', cwd=self.ws)
@@ -482,6 +483,136 @@ class NoteTest(unittest.TestCase):
     def test_workstream_name_out_of_kebab_case_is_wrong_usage(self):
         code, _ = self.run_note('workstream', 'Pln_003')
         self.assertEqual(code, 2)
+
+    # memória
+
+    def local_settings(self, tree: Path) -> dict:
+        return json.loads((tree / '.claude' / 'settings.local.json').read_text())
+
+    def test_workstream_links_the_session_memory_without_committing_it(self):
+        code, out = self.run_note('workstream', 'workspace')
+        self.assertEqual(code, 0, out)
+        path = self.ws / '.worktrees' / 'workspace'
+        self.assertEqual(self.local_settings(path), {'autoMemoryDirectory': str(path / 'memory')})
+        self.assertEqual(list((path / 'memory').iterdir()), [])
+        self.assertIn(f'memória:  {path / "memory"}', out)
+        self.assertEqual(git('status', '--porcelain', cwd=path), '')
+        self.assertEqual(git('rev-parse', 'workstream/workspace', cwd=self.origin),
+                         git('rev-parse', 'master', cwd=self.origin))
+
+    def test_the_workstream_reopened_from_the_origin_also_links_the_memory(self):
+        git('worktree', 'remove', '--force', str(self.tree), cwd=self.ws)
+        git('branch', '-q', '-D', 'workstream/studio', cwd=self.ws)
+        code, out = self.run_note('workstream', 'studio')
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.local_settings(self.tree), {'autoMemoryDirectory': str(self.tree / 'memory')})
+        self.assertTrue((self.tree / 'memory').is_dir())
+
+    def test_memory_setup_links_every_existing_workstream_and_is_idempotent(self):
+        two = self.make_workstream('tools-kit')
+        for tree in (self.tree, two):
+            (tree / '.claude' / 'settings.local.json').unlink()
+            (tree / 'memory').rmdir()
+        code, out = self.run_note('memory-setup')
+        self.assertEqual(code, 0, out)
+        lines = out.strip().splitlines()
+        self.assertEqual(len(lines), 2, out)
+        for name, tree in (('studio', self.tree), ('tools-kit', two)):
+            self.assertEqual(self.local_settings(tree), {'autoMemoryDirectory': str(tree / 'memory')})
+            self.assertTrue((tree / 'memory').is_dir())
+            self.assertIn(f'{name}: memória ligada em {tree / "memory"}', out)
+        before = (self.tree / '.claude' / 'settings.local.json').stat().st_mtime_ns
+        code, out = self.run_note('memory-setup', cwd=self.tree)
+        self.assertEqual(code, 0, out)
+        self.assertEqual(len(out.strip().splitlines()), 2, out)
+        self.assertEqual(out.count('memória em dia'), 2, out)
+        self.assertEqual((self.tree / '.claude' / 'settings.local.json').stat().st_mtime_ns, before)
+
+    def test_memory_setup_merges_the_key_and_keeps_the_others(self):
+        settings = self.tree / '.claude' / 'settings.local.json'
+        settings.write_text(json.dumps({'permissions': {'allow': ['Bash(ls)']}, 'autoMemoryDirectory': '/velho'}))
+        code, out = self.run_note('memory-setup')
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.local_settings(self.tree),
+                         {'permissions': {'allow': ['Bash(ls)']}, 'autoMemoryDirectory': str(self.tree / 'memory')})
+
+    def test_memory_setup_leaves_unreadable_settings_alone_and_reports_the_failure(self):
+        two = self.make_workstream('tools-kit')
+        settings = self.tree / '.claude' / 'settings.local.json'
+        settings.write_text('{quebrado')
+        (two / '.claude' / 'settings.local.json').unlink()
+        code, out = self.run_note('memory-setup')
+        self.assertEqual(code, 1, out)
+        self.assertIn('studio: memória falhou', out)
+        self.assertEqual(settings.read_text(), '{quebrado')
+        self.assertEqual(self.local_settings(two), {'autoMemoryDirectory': str(two / 'memory')})
+
+    def test_memory_setup_skips_the_master_and_the_workstream_without_a_worktree(self):
+        git('worktree', 'remove', '--force', str(self.tree), cwd=self.ws)
+        code, out = self.run_note('memory-setup')
+        self.assertEqual(code, 0, out)
+        self.assertEqual(out.strip(), '')
+        self.assertFalse((self.ws / 'memory').exists())
+
+    # o aviso da memória suja no commit
+
+    def dirty_memory(self):
+        self.write('memory/sessao.md', 'lembrança\n')
+        self.write('.claude/agent-memory/reviewer/achados.md', 'achado\n')
+
+    def test_commit_warns_about_dirty_memory_outside_the_given_paths_and_keeps_the_rest_of_the_output(self):
+        self.dirty_memory()
+        self.write('work/issues/a.md')
+        code, out = self.run_note('commit', 'work/issues/a.md', '-m', 'docs: a', '--no-push')
+        self.assertEqual(code, 0, out)
+        self.assertEqual(out.strip().splitlines()[-1],
+                         'aviso: memória suja fora do commit: .claude/agent-memory/reviewer/achados.md, '
+                         'memory/sessao.md')
+        self.assertEqual(self.committed_files(), ['work/issues/a.md'])
+        self.assertIn('docs: a', out.splitlines()[-2])
+        self.assertEqual(git('status', '--porcelain', '-uall', '--', 'memory', cwd=self.tree), '?? memory/sessao.md')
+
+    def test_commit_with_the_memory_paths_leaves_nothing_to_warn_about(self):
+        self.dirty_memory()
+        self.write('work/issues/a.md')
+        code, out = self.run_note('commit', 'work/issues/a.md', 'memory', '.claude/agent-memory', '-m', 'docs: a',
+                                  '--no-push')
+        self.assertEqual(code, 0, out)
+        self.assertNotIn('aviso', out)
+        self.assertEqual(sorted(self.committed_files()), ['.claude/agent-memory/reviewer/achados.md',
+                                                           'memory/sessao.md', 'work/issues/a.md'])
+
+    def test_commit_warns_only_about_the_memory_file_not_given(self):
+        self.dirty_memory()
+        code, out = self.run_note('commit', 'memory/sessao.md', '-m', 'docs: memória', '--no-push')
+        self.assertEqual(code, 0, out)
+        self.assertIn('aviso: memória suja fora do commit: .claude/agent-memory/reviewer/achados.md\n', out)
+        self.assertNotIn('memory/sessao.md\n', out.split('aviso')[1])
+
+    def test_commit_warns_about_a_tracked_memory_file_changed_after_the_last_commit(self):
+        self.write('memory/sessao.md', 'um\n')
+        self.assertEqual(self.run_note('commit', 'memory', '-m', 'docs: memória', '--no-push')[0], 0)
+        self.write('memory/sessao.md', 'dois\n')
+        self.write('work/issues/a.md')
+        code, out = self.run_note('commit', 'work/issues/a.md', '-m', 'docs: a', '--no-push')
+        self.assertEqual(code, 0, out)
+        self.assertIn('aviso: memória suja fora do commit: memory/sessao.md', out)
+
+    def test_commit_without_dirty_memory_prints_no_warning_and_still_pushes(self):
+        self.write('work/issues/a.md')
+        code, out = self.run_note('commit', 'work/issues/a.md', '-m', 'docs: a')
+        self.assertEqual(code, 0, out)
+        self.assertNotIn('aviso', out)
+        self.assertEqual(self.origin_log()[0], 'docs: a')
+
+    def test_commit_warns_before_the_push_and_the_push_still_happens(self):
+        self.dirty_memory()
+        self.write('work/issues/a.md')
+        code, out = self.run_note('commit', 'work/issues/a.md', '-m', 'docs: a')
+        self.assertEqual(code, 0, out)
+        self.assertIn('aviso: memória suja', out)
+        self.assertIn('enviado:', out)
+        self.assertEqual(self.origin_log()[0], 'docs: a')
 
     # sync
 

@@ -3,7 +3,7 @@
 O desenho do [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](PLN-001-plan.md). O
 que este desenho assume e o Terreno medido em 2026-10-24 estão no desenho do PLN-025 do workspace da Fixfy
 (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-design.md`); os itens D1 a D35 vieram de lá, pelo PLN-029 da Fixfy,
-com os IDs de antes (PLN-025/R28.2), e os D36 a D51 são daqui, de 2026-10-27 a 2026-10-29. Nos itens D1 a D35, o nome do
+com os IDs de antes (PLN-025/R28.2), e os D36 a D52 são daqui, de 2026-10-27 a 2026-10-31. Nos itens D1 a D35, o nome do
 repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do rebrand.
 
 ### O que este desenho assume
@@ -596,3 +596,27 @@ ferramenta não (P52, resposta de 2026-10-27).
 - **No streaming** (R54.2), o começo do texto aparece só na linha do raciocínio, que em andamento é a de um subagente
   que roda: "Raciocínio: <começo>". A linha ao vivo do turno principal (`NativeChatTurnActivityLine.tsx`) segue com o
   spinner, "Pensando" ou a atividade, e a seta.
+
+### D52 — Recolher a pergunta e a aprovação no chat estruturado — `brza-studio/src/renderer/src/components/native-chat/NativeChatStructuredSession.tsx` e `NativeChatApprovalCard.tsx` (P69)
+
+- **Origem:** pedido 34, R60.1, R60.2, R60.3, R61.1
+- **Contexto:** o chat do terminal recolhe os dois cartões a uma faixa acima do composer
+  (`NativeChatResolvedView.tsx:375-392`); o estruturado, o do Claude pelo Agent SDK, não passa o `onCollapse` e esconde
+  o composer enquanto há prompt (`NativeChatStructuredSession.tsx:185`, `:366-388`). A mensagem enviada com a pergunta
+  pendente vai à fila do host e não toca o prompt (R61, "Apresentado antes").
+
+#### Como fica
+
+- **O cartão.** O de pergunta e o de aprovação ganham a seta `NativeChatPromptCollapseToggle` ao lado do X que cancela;
+  o de aprovação deixa de escolher entre os dois (`NativeChatApprovalCard.tsx:88-103`).
+- **Recolhido.** O cartão fica montado, com `hidden` e `inert`, para a resposta pela metade sobreviver, como no terminal;
+  a `NativeChatPromptStrip` aparece no lugar, com o título, e a seta dela reabre.
+- **O composer** (R60.2) volta com o cartão recolhido e some de novo ao reabrir. O envio segue o caminho de hoje: com a
+  fila ligada, a mensagem espera no cartão da fila até o turno terminar.
+- **O "Steer"** do cartão da fila e o Cmd+Enter com o composer vazio ficam desabilitados enquanto há pergunta pendente
+  (R61.1), pelo `hasPendingPrompt` que já chega ao hook (`use-structured-agent-session.ts:206`).
+- **O estado** é da sessão estruturada, por `itemId` e `revision` do prompt: prompt novo abre aberto.
+- **Fora:** o celular (R60.3), que segue sem recolher no estruturado (`use-mobile-native-chat-prompt-cards.ts:48-49`).
+- **A conferir no passo:** o Esc da aprovação, que hoje cancela quando há X (`NativeChatApprovalCard.tsx:57`), e o da
+  pergunta (`NativeChatQuestionCard.tsx:205`); o foco ao recolher, que vai ao composer, e ao reabrir, que volta ao
+  cartão.

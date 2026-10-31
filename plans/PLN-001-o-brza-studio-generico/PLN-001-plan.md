@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P62 ao P64 do pedido 32, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 167.3
+ready: "sim — o P69 do pedido 34, autorizado por Anderson (R60.4); o P57, o P61, o P65 e os casos manuais com Anderson"
+estimate_h: 170.8
 executed_h: 29.8
-remaining_h: 3.9
+remaining_h: 7.4
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -25,7 +25,8 @@ tags:
   X48, e espera só o C21; o P67, que fecha o X20 com a R55 e a R56, fechou em `brza-studio@97a93f6ff57` e se
   confere junto do C6; sete arquivos de teste do transcript do mobile não carregam desde o P43 (X47). Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
   C17 depois do P60 o C18 ao C20 depois do P64 e o C21), o X10 e o P27.2 e o P27.3; o P37 fechou sem código
-  (R59.4), e o P68 fechou o X47 em `brza-studio@7be19418c8f`. Do PLN-002/P9 (R12.4, R13.4),
+  (R59.4), e o P68 fechou o X47 em `brza-studio@7be19418c8f`. O pedido 34 entrou em 2026-10-31, com a R60, a R61, o D52
+  e o P69, autorizado (R60.4), na sessão `pln-001-pedido-34`; a conferência é o C22. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
   sessão entra no correio com o nome automático `brza-workspace-<hex>`. O P64 não lê o mapa de sessões do PLN-002 e
   casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
@@ -95,6 +96,8 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   de..." como já é na interface do `Orca` na versão mais atual"
 - **Pedido 33 (2026-10-29, a mesma sessão):** "o texto do "Pensou" que aparece nos comandos executados deve aparecer
   no chat igual ao "Perguntou" com >"
+- **Pedido 34 (2026-10-31, sessão do workstream `studio` do `brza-workspace`):** "ferramenta de pergunta do chat deve
+  poder ser minimizada, para que eu possa ler a conversa no chat"
 
 ### Cobertura
 
@@ -136,6 +139,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 32` | As duas aparecem no cartão do Orca de 2026-10-29 (#34824), com o status do remetente (R50.1) | P63 | os testes do cartão trazidos do upstream (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 32` | O clique no nome do remetente abre a aba de chat da sessão dele, se aberta no app (R50.3) | P64 | teste da busca da aba (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 33` | A linha do raciocínio, fechada, mostra "Pensou por 3s:" e o começo do texto, cortado, no tom apagado, com a seta que abre o texto inteiro; o rótulo da pergunta passa a "Perguntou:" (R52.1 a R52.3) | P66 | teste da linha (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 34` | No chat estruturado do desktop, o cartão de pergunta e o de aprovação recolhem a uma faixa acima do composer, que fica usável; a seta da faixa reabre o cartão com a resposta pela metade; o "Steer" da fila espera a resposta (R60.1 a R60.3, R61.1) | P69 | teste da sessão estruturada e do cartão de aprovação (unidade); conferência no BrzA Studio (manual) |
 | `X20` | O `executeRead`, o `executeWrite` e o `executeDestructive` do MCP da Atlassian ganham o ícone do produto do `name` e o título com a ferramenta interna; o `discover` ganha o ícone do produto citado na busca, e o título com a busca entre aspas (R55.1, R55.2) | P67 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual, com o C6) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
@@ -1024,6 +1028,60 @@ custos são estimativa.
    caixa do chat, o que o botão direito mostrou?" — opções: "ortografia" no topo; só "Add to dictionary"; nem
    sublinhou. **Resposta — "\"ortografia\" no topo".** Fecha o P37.
 
+### Rodada 60 — recolher a pergunta no chat estruturado (enviada 2026-10-31)
+
+> **Apresentado antes:** o chat do terminal já recolhe o cartão de pergunta e o de aprovação a uma faixa acima do
+> composer, pela seta ou pelo Esc, e guarda a resposta pela metade (`NativeChatResolvedView.tsx:375-392`,
+> `NativeChatPromptCollapse.tsx`). O chat estruturado — o do Claude pelo Agent SDK — não passa o `onCollapse` a nenhum
+> dos dois nem mostra a faixa (`NativeChatStructuredSession.tsx:366-388`), e o celular o exclui de propósito
+> (`use-mobile-native-chat-prompt-cards.ts:48-49`). O cartão de aprovação mostra o X ou a seta, nunca os dois
+> (`NativeChatApprovalCard.tsx:88-103`). Com prompt pendente, o composer do estruturado fica escondido
+> (`NativeChatStructuredSession.tsx:185`), e o `/clear` e o `/compact` são recusados
+> (`structured-conversation-command-send.ts:56`).
+
+Respondida em 2026-10-31, por Anderson na sessão do workstream `studio` do `brza-workspace`, pelo AskUserQuestion. Os
+custos são estimativa.
+
+1. **R60.1 — O que passa a recolher no chat estruturado?** Seleção única. Opções: pergunta e aprovação, com o X e a seta
+   juntos na aprovação (recomendada) — custo: ~2 h; se paga: agora, na primeira aprovação longa; só a pergunta — custo:
+   ~1,5 h; se paga: agora, com a aprovação ainda tapando a conversa.
+   **Decidido — "Pergunta e aprovação (Recomendado)".** Vai ao D52 e ao P69.
+2. **R60.2 — Com o cartão recolhido, o que fica embaixo da conversa?** Seleção única. Opções: só a faixa, com o
+   composer escondido como hoje (recomendada) — custo: incluso no passo; se paga: agora, com a resposta livre no "Outro"
+   do cartão; a faixa e o composer usável, como no chat do terminal — custo: +1 a 2 h, e antes medir o que o envio faz
+   com a pergunta pendente no Agent SDK; se paga: quando se quer mandar mensagem sem responder a pergunta.
+   **Decidido — "Faixa e composer usável".** Vai ao D52 e ao P69, com a medição do envio antes do código.
+3. **R60.3 — O app do celular entra junto?** Seleção única. Opções: só o desktop (recomendada) — custo: nenhum; se paga:
+   agora; desktop e celular — custo: +1,5 a 2 h e um teste no aparelho; se paga: quando se responde pelo celular.
+   **Decidido — "Só o desktop (Recomendado)".** Vai ao D52.
+4. **R60.4 — Quando o passo roda?** Seleção única. Opções: agora, num worktree, numa sessão do `brza-studio`
+   (recomendada) — custo: uma sessão a mais; depois, no `Retomar` — custo: nenhum agora.
+   **Decidido — "Agora, num worktree (Recomendado)".** É a autorização do P69.
+
+### Rodada 61 — o envio com a pergunta pendente (enviada 2026-10-31)
+
+> **Apresentado antes:** a medição do `collector` (2026-10-31, `brza-studio@97a93f6ff57`, só leitura). A mensagem
+> comum enviada com a pergunta pendente não cancela nem responde o prompt: com o "enfileirar follow-ups" ligado, o
+> padrão (`NativeChatStructuredSession.tsx:83`), ela sai com `queue-if-active` e o host a põe na fila pelo hold
+> `'prompt'` (`structured-agent-session-queued-messages.ts:54-90`, `:163`); a fila só drena com o turno parado
+> (`:66-75`), e o cartão segue respondível (`structured-agent-session-message-projection.ts:216-231`). Com a fila
+> desligada, o frame vai ao stdin do Claude como steer (`claude-structured-dispatch.ts:113-169`), e o repo não diz se o
+> CLI cancela o `can_use_tool` pendente. O cartão da fila atrás da pergunta mostra o "Steer", e o Cmd+Enter com o
+> composer vazio o aciona (`use-native-chat-composer-keydown.ts:125-131`), mas o host recusa até a resposta
+> (`structured-agent-session-queued-mutations.ts:93-99`).
+
+Respondida em 2026-10-31, por Anderson na mesma sessão, pelo AskUserQuestion. Os custos são estimativa.
+
+1. **R61.1 — O "Steer" da fila durante a pergunta.** Seleção única. Opções: desabilitar o botão e o Cmd+Enter enquanto
+   houver pergunta pendente, pelo `hasPendingPrompt` que já chega ao hook (recomendada) — custo: ~0,5 h, com o ajuste
+   de `NativeChatQueuedMessageList.test.tsx:486`; se paga: na entrega; manter e mostrar a recusa do host — custo: ~0,25 h
+   para conferir como ela aparece; se paga: nunca.
+   **Decidido — "Desabilitar durante (Recomendado)".** Vai ao D52 e ao P69.
+2. **R61.2 — O ramo sem fila se confere?** Seleção única. Opções: não, só a fila, com o ramo sem fila como pendência
+   conhecida (recomendada) — custo: nenhum; sim, no C22, com um segundo envio com a fila desligada — custo: ~5 min no
+   build; se paga: se a fila for desligada algum dia.
+   **Decidido — "Sim, no C22".** Vai ao C22.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -1038,7 +1096,8 @@ vem depois do P36, de que reaproveita a troca, e o P41 não depende dele; o P43 
 base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum; o P54 ao P57 vêm depois do P44 ao P50 (R42.4), o P54
 antes do P55, o P56 independente e o P57 por último; o P58 vem antes do P59 e do P60, que não dependem um do outro, e
 o P61 por último; o pedido 32 roda em paralelo com o 31 (R51.2), o P62 antes do P63, o P64 depois do P63 e o P65 por
-último; o P66 do pedido 33 roda em paralelo com os dois (R52.4).
+último; o P66 do pedido 33 roda em paralelo com os dois (R52.4), e o P69 do pedido 34, agora, em paralelo com o que espera
+build (R60.4).
 
 **Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com "indicado". É
 leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a pedido, numa sessão
@@ -2505,6 +2564,30 @@ das categorias do BrzA (R59.1). Os outros ~40 mocks à mão do `mobile/` migram 
 fronteiras de import. O `rpc-recording/family-recordings.test.ts` falha em 2 casos ("Recording differs") também na
 `origin/master` `97a93f6ff57`, fora desta mudança. O worktree e a branch saíram depois do push.
 
+### P69 — Recolher a pergunta e a aprovação no chat estruturado (pedido 34)
+
+Executa D52 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-34`
+
+Estimado: 3,5 h · Executado: —
+
+Agora, em paralelo com o que espera build (R60.4).
+
+- [ ] **1.** Testes que falham: no `NativeChatStructuredSession.test.tsx`, com pergunta pendente, a seta recolhe o
+      cartão, que fica montado e escondido, a `NativeChatPromptStrip` aparece com o título e o `structured-composer`
+      volta; a seta da faixa reabre o cartão com a opção marcada antes; o mesmo com a aprovação; pergunta nova abre
+      aberta. No `NativeChatApprovalCard.test.tsx`, o X e a seta juntos quando há `onCancel` e `onCollapse`. No
+      `NativeChatQueuedMessageList.test.tsx:486`, o "Steer" desabilitado atrás de pergunta pendente; no
+      `use-structured-agent-session.queued-gating.test.tsx`, a fila ligada com `question` pendente; no host, o
+      `queue-if-active` atrás de pergunta pendente enfileira e deixa o prompt pendente, no rig de
+      `structured-agent-session-queued-gate.test.ts`
+- [ ] **2.** O recolher em `NativeChatStructuredSession.tsx`: o estado por `itemId` e `revision`, o `onCollapse` nos
+      dois cartões, a faixa e o `composerShown` com o cartão recolhido; o `onCollapse` passa pelo
+      `NativeChatStructuredQuestionCard`; o `NativeChatApprovalCard` mostra o X e a seta juntos. Os pontos "A conferir no
+      passo" do D52
+- [ ] **3.** O "Steer" e o Cmd+Enter desabilitados com pergunta pendente (R61.1)
+- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C22
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -2827,6 +2910,8 @@ da linha quando o teste entra.
   o P67 em `brza-studio@97a93f6ff57`, com a R55 e a R56, fecha o X20; a conferência vai junto do C6, com Anderson.
 - 2026-10-31 — [O P68 e o P37 do PLN-001, o mock compartilhado do lucide e a ortografia conferida](../../work/worklogs/2026-10-31-pln-001-p68-mock-do-lucide-e-p37-ortografia.md):
   o P68 em `brza-studio@7be19418c8f`, com a R57 e a R59, fecha o X47; o P37 fecha sem código, pela R58 e pela R59.4.
+- 2026-10-31 — [O pedido 34 do PLN-001, recolher a pergunta no chat estruturado](../../work/worklogs/2026-10-31-pln-001-pedido-34-recolher-a-pergunta.md):
+  o pedido 34, a R60, a R61, o D52 e o P69, sem código; o P69 vai à sessão `pln-001-pedido-34`.
 
 ## Decisões
 
@@ -2869,12 +2954,13 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C19 | `Pedido 32`: o cartão do Orca (P63.3) | As mesmas mensagens do C18 | O cartão, com o status do remetente | | |
 | C20 | `Pedido 32`: o clique no remetente (P64.3) | Clicar no nome de uma sessão aberta e no de uma fechada | A aba da sessão aberta em foco; a fechada sem ação | | |
 | C21 | `Pedido 33`: o "Pensou" com o texto na linha (P66.3) | Uma resposta com raciocínio, entre comandos e fora deles, no desktop e no app do celular (R54.1); abrir e fechar a linha | "Pensou por Xs:" e o começo do texto, apagado, cortado; aberta, o texto inteiro abaixo; a pergunta com "Perguntou:" | | |
+| C22 | `Pedido 34`: recolher a pergunta e a aprovação no chat estruturado (P69.4) | Num chat do Claude, uma pergunta do AskUserQuestion com uma opção marcada e uma aprovação; recolher, rolar a conversa, mandar uma mensagem pelo composer e reabrir | A faixa com o título no lugar do cartão e o composer usável; a mensagem vai à fila, sem "Steer", e sai depois do turno; reaberto, o cartão com a opção marcada; repetido com o "enfileirar follow-ups" desligado, a pergunta segue pendente e respondível, ou o caso falha (R61.2) | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,
 Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14. O C11
 entra no mesmo build, pelo pedido do P55 (2026-10-28), e o C12, pelo do P56 (2026-10-29). O C15 ao C17 são do
-pedido 31 e vão a um build depois do P60, com o P61; o C18 ao C20, do pedido 32, a um build depois do P64, com o P65; o C21, do pedido 33, ao mesmo build.
+pedido 31 e vão a um build depois do P60, com o P61; o C18 ao C20, do pedido 32, a um build depois do P64, com o P65; o C21, do pedido 33, ao mesmo build; o C22, do pedido 34, ao build depois do P69.
 
 ## Fechamento
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Converte em PNG o artboard de uma rodada de desenho, como o chat do BrzA Studio o mostra no tema padrão.
 
-  brza shot <arquivo.html> <destino.png> [--theme light|dark] [--width 1280] [--scale 2] [--wait 500] [--force]
+  brza shot <arquivo.html> <destino.png> [--theme light|dark] [--width 736] [--scale 2] [--wait 500] [--force]
 
 O `.html` é o do `::orca-visual`, gravado no ORCA_CHAT_SCRATCH_DIR. Fora do app ele sai sem cor, porque o chat o monta
 dentro de um shell que injeta o tema; o brza shot monta o mesmo shell, com o mesmo CSP, e captura a página inteira no
@@ -9,7 +9,8 @@ Chrome sem janela, pelo protocolo de depuração num pipe, sem dependência.
 
   --theme    light (padrão) ou dark: os tokens saem do :root e do .dark do main.css do brza-studio, com as cores do
              Tailwind do node_modules dele. Um tema personalizado do app não entra.
-  --width    a largura da janela em px (padrão 1280); a altura é a do conteúdo, medida depois das fontes.
+  --width    a largura da janela em px (padrão 736, a do chat: o --chat-content-max-width de 46rem do main.css); a
+             altura é a do conteúdo, medida depois das fontes.
   --scale    a densidade de pixel (padrão 2, a da tela Retina): o PNG sai com width × scale de largura.
   --wait     a espera em ms depois do carregamento e das fontes, para o script que desenha depois (padrão 500).
   --force    sobrescreve o destino; sem ele, o destino que já existe é recusado.
@@ -390,7 +391,8 @@ def main(argv=None):
     ap.add_argument('source', metavar='arquivo.html', help='o .html do ::orca-visual')
     ap.add_argument('dest', metavar='destino.png', help='o PNG, em geral plans/PLN-NNN-…/PLN-NNN-<assunto>.png')
     ap.add_argument('--theme', choices=('light', 'dark'), default='light', help='o tema do app (padrão: light)')
-    ap.add_argument('--width', type=int, default=1280, help='a largura da janela em px (padrão: 1280)')
+    ap.add_argument('--width', type=int, default=736,
+                    help='a largura da janela em px (padrão: 736, a largura do chat)')
     ap.add_argument('--scale', type=float, default=2, help='a densidade de pixel (padrão: 2)')
     ap.add_argument('--wait', type=int, default=500, metavar='MS',
                     help='a espera em ms depois do carregamento e das fontes (padrão: 500)')

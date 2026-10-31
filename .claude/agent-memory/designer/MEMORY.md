@@ -1,4 +1,5 @@
 - [Mecanismo nativo do runtime](feedback_mecanismo-nativo-do-runtime.md) — R2.2 e R3.2 do PLN-004: recusou o contorno por texto; quer procedência
 - [Medir antes de desenhar](feedback_medir-antes-de-desenhar.md) — sonda antes da rodada; a de custo zero primeiro
 - [Régua da Fixfy sem lastro aqui](project_porte-da-fixfy-regua-sem-lastro.md) — grep da regra na norma antes de portar; revisão Opus ~US$ 2,27
+- [PLN-006: rodadas e sondas](project_pln-006-rodadas-e-sondas.md) — 11/11 recomendadas; AGENTS.md por config de usuário; hook no 3.9
 - [Symlink de arquivo confiado](feedback_custo-de-symlink-com-confianca.md) — hooks.json do Codex por link não roda (R8.1); não renumerar D

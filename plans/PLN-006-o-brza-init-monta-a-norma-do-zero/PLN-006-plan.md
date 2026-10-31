@@ -13,8 +13,9 @@ tags:
 
 # PLN-006: O `brza init` monta a norma num workspace do zero
 
-- **Retomar:** R1–R3 fechadas, e a estrutura está decidida. Próximo: os itens `D` pelo `designer` — o
-  `brza-workflow`, o manifesto, a fronteira arquivo a arquivo, o init, o sync de duas camadas e a raiz pelo cwd.
+- **Retomar:** R1–R6 fechadas. O rascunho D1–D12 do `designer` está em `/private/tmp/pln006/desenho.md`, fora do git,
+  e precisa refletir a R4.1 (registro em `~/.config/brza`) e a R5 (o índice da `master`). Próximo: o `designer` revisa,
+  e o Desenho vai ao `PLN-006-design.md`, com os Passos e a rodada do corte.
 
 ## Pedido
 
@@ -43,6 +44,9 @@ Respondido que não, Anderson pediu: "plano".
 - **Generalizar o `brza tree` e o `brza test` para outro repositório de código.** Já decidido no
   [PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`](../PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md),
   R2.3, no workstream `tools-kit`; este plano não o refaz.
+- **O coordenador que lê o índice da `master`.** Pela R5.4, vai a
+  [O coordenador se baseia no índice de notas da master](../../work/issues/o-coordenador-le-o-indice-da-master.md); o
+  PLN-006 entrega só o índice.
 
 ## Entrevista
 
@@ -211,7 +215,145 @@ Respondida em 2026-10-31.
 
    **Decidido — "Flags, padrão do git config (Recomendado)".**
 
+### Rodada 4 — o código acha o workspace, os scripts, o contador e o `AGENTS.md` (enviada 2026-10-31)
+
+**Apresentado antes**, pelo rascunho do `designer` (`/private/tmp/pln006/desenho.md`, fora do git, D1–D12 e P1–P8,
+~21,5 h), conferido por amostra na sessão:
+- Os hooks não importam o CLI: só a stdlib e o `measure` vizinho (`compact_guard.py:28`).
+- O `AGENTS.md` carrega junto do `CLAUDE.md` só pela opção de usuário `instructionFiles: claude-md-and-agents-md`
+  (`~/.claude/settings.json:234-238`); a doc ignora a chave no settings de projeto, e o `CLAUDE.md:3-4` está impreciso.
+- Nenhum Markdown da norma usa `{{`.
+- Não conferido: que os hooks sobem no `/usr/bin/python3` 3.9.6, sem `tomllib`; o comando é `${BRZA_PYTHON:-python3}`.
+
+Respondida em 2026-10-31.
+
+1. **Como o repositório de código acha o workspace.** Opções:
+   - `git config --local brza.workspace <raiz>` no repositório de código, gravado pelo `brza init --code` e pela
+     migração (recomendada) — custo: ~0,5 h no P2 e ~9 ms por hook; se paga: já no P2;
+   - registro em `~/.config/brza/workspaces.toml` — custo: ~1 h, e um arquivo de usuário que vai ao worklog a cada
+     init; se paga: só com um repositório de código servindo a mais de um workspace;
+   - procurar nos diretórios irmãos do checkout de código — custo: ~0,5 h e um stat por irmão a cada hook; se paga: só
+     com workspace e código sempre no mesmo diretório pai.
+
+   **Decidido — "Registro em ~/.config/brza".**
+
+2. **Onde ficam os scripts fora do núcleo.** Opções:
+   - `app`, `dev`, `test`, `tree` e `shot` em `scripts/brza/` do `brza-workspace`, ligados por `brza install
+     --local`; `summarize_measurements` e `fact_outcome` ao workspace pelo sync, em `scripts/`; `brza-print` ao pacote
+     do cliente (recomendada) — custo: ~1 h no P6; se paga: no P7, sem caminho novo para quem chama;
+   - os cinco ao repositório `brza-studio` — custo: ~2–3 h e um pedido aos workstreams `studio` e `tools-kit`; se paga:
+     só com outro workspace no `brza-studio`;
+   - a medição como subcomando `brza measure` — custo: ~1,5 h, reescrevendo o `CLAUDE.md` e o `close-task`; se paga:
+     nunca no desenho de hoje.
+
+   **Decidido — "Camada local + sync (Recomendado)".**
+
+3. **O contador "Último PLN usado".** Opções:
+   - `plans/LAST_PLN`, local, numa linha (recomendada) — custo: ~0,5 h no P3; se paga: no primeiro PLN depois da
+     migração;
+   - `brza note next-plan`, pelo maior PLN entre as branches — custo: ~1 h; se paga: só se o contador escrito errar;
+   - o render preserva a linha — custo: ~1 h e uma exceção por arquivo; se paga: nunca.
+
+   **Resposta:** "jsonl na master do *-workspace com titulo, descrição, status, worktree/workstream e horário em que
+   foi criado/alterado, assim o coordenador tem um indice pra se basear". Leitura da sessão: contraproposta — um
+   índice dos planos em JSONL na `master` do workspace, que substitui o contador e serve de base a um coordenador. Abre
+   exceção à regra de que a `master` guarda só a norma (`AGENTS.md`, "Cada workstream mora numa branch"). Vai à R5.
+
+4. **Como o `AGENTS.md` carrega no Claude Code.** Opções:
+   - `@AGENTS.md` na primeira linha do `CLAUDE.md` do núcleo, com o texto local em `.claude/rules/workspace.md` e o do
+     pacote do cliente em `.claude/rules/brza-client.md` (recomendada) — custo: ~0,5 h no P3, e corrige o
+     `CLAUDE.md:3-4`; se paga: no primeiro init em outra máquina;
+   - `pluginConfigs` no settings de projeto — custo: ~0,2 h, e só vale com `--settings`; se paga: só com toda sessão pelo
+     lançador;
+   - a opção de usuário, documentada — custo: 0 h e um passo manual por máquina; se paga: nunca em máquina nova.
+
+   **Decidido — "@AGENTS.md no CLAUDE.md (Recomendado)".**
+
+### Rodada 5 — o índice da master (enviada 2026-10-31)
+
+**Apresentado antes:** a leitura da R4.3 como contraproposta; o índice na `master` abre exceção à regra de que ela
+guarda só a norma; dois acréscimos ao fim do mesmo arquivo conflitam no `git pull --rebase`, e o driver `merge=union`
+do git, ligado no `.gitattributes`, junta as linhas.
+
+Respondida em 2026-10-31.
+
+1. **O que o índice registra**, seleção múltipla. Opções:
+   - planos: id, título, descrição, status, phase, workstream e worktree, horário; substitui o contador (recomendada) —
+     custo: ~2 h no P3, com a gravação; se paga: no primeiro PLN depois da migração;
+   - issues — custo: ~1 h a mais e um push na `master` a cada issue que muda de estado; se paga: quando o coordenador
+     distribuir issue;
+   - decisões — custo: ~1 h a mais; se paga: quando o coordenador precisar ver decisão aberta entre workstreams.
+
+   **Decidido — as três.**
+
+2. **Como cresce.** Opções:
+   - só acrescenta, uma linha por evento (criado, alterado), com o estado vigente na última linha de cada id e
+     `merge=union` no `.gitattributes` (recomendada) — custo: ~0,5 h; se paga: no primeiro push simultâneo;
+   - uma linha por item, reescrita — custo: ~0,5 h, e conflito entre itens vizinhos; se paga: só com uma sessão por vez.
+
+   **Decidido — "Só acrescenta, merge=union (Recomendado)".**
+
+3. **Quem grava e numera.** Opções:
+   - o `brza note`: um `plan-open` reserva o número, maior id do índice + 1, com a linha "criado"; o `commit` acrescenta
+     "alterado" na `master` quando o frontmatter muda; a linha "Último PLN usado" sai (recomendada) — custo: ~2–3 h no
+     P3 e P5; se paga: no primeiro plano;
+   - à mão, pela `plan-runner` — custo: ~0,5 h, e a linha esquecida erra sem aviso; se paga: só com consulta ocasional.
+
+   **Decidido — "brza note, automático (Recomendado)".**
+
+4. **O coordenador no PLN-006.** Opções:
+   - não, vai a uma issue (recomendada) — custo: ~10 min; se paga: já;
+   - sim — custo: uma rodada a mais e horas a estimar depois; se paga: se o coordenador precisar sair junto.
+
+   **Decidido — "Não: vai a uma issue (Recomendado)".** A issue é
+   [O coordenador se baseia no índice de notas da master](../../work/issues/o-coordenador-le-o-indice-da-master.md).
+
+### Rodada 6 — o placeholder, a edição local, a versão e a migração (enviada 2026-10-31)
+
+**Apresentado antes:** os quatro pontos restantes do rascunho do `designer`; nenhum Markdown da norma usa `{{`; não
+conferido que os hooks rodam no Python 3.9 do sistema, sem `tomllib`.
+
+Respondida em 2026-10-31.
+
+1. **O placeholder e o motor.** Opções:
+   - `{{tabela.chave}}`, com as chaves do manifesto em inglês, por regex pura, sem condicional, só em `.md` e no molde
+     do settings; chave que falta é erro; o TOML por um parser próprio de um subconjunto, conferido contra o `tomllib`
+     nos testes (recomendada) — custo: ~1,5 h no P3; se paga: já;
+   - chaves planas em português, `{{nome}}`, `{{autor}}`, `{{repo-codigo}}` — custo: os mesmos ~1,5 h, sem as tabelas
+     da R3.3 e da R3.4; se paga: só com meia dúzia de chaves;
+   - `string.Template` — custo: ~1 h e escapar cada `$` dos blocos de shell; se paga: nunca;
+   - Jinja2 — custo: ~1 h e uma dependência fora da stdlib; se paga: só com seção condicional.
+
+   **Decidido — "{{tabela.chave}}, regex (Recomendado)".**
+
+2. **O arquivo da norma comum editado no workspace.** Opções:
+   - o `.brza/core.lock` guarda o sha256; o sync não escreve o divergente, mostra o diff e sai com 1; `--force
+     <caminho>` sobrescreve (recomendada) — custo: ~1 h no P5; se paga: no primeiro sync depois de uma edição por engano;
+   - merge de 3 vias, pelo `git merge-file` — custo: ~2 h e marcador de conflito na norma; se paga: só se editar a cópia
+     virar prática;
+   - sobrescreve sempre — custo: ~0,3 h; se paga: nunca.
+
+   **Decidido — "Recusa e mostra o diff (Recomendado)".**
+
+3. **A versão do `brza-workflow`.** Opções:
+   - segue a branch `core.ref` (padrão `master`), com o commit no lock e `brza-workflow@<sha7>` na mensagem; `--ref`
+     fixa uma vez; o comando é `brza sync`, e o `brza note sync` fica como a segunda camada (recomendada) — custo:
+     ~0,5 h; se paga: já;
+   - tags semver — custo: ~1,5 h e uma tag por mudança; se paga: com workspace de outro dono que trave versão;
+   - sha fixo no manifesto — custo: ~0,3 h e editar o manifesto a cada sync; se paga: nunca.
+
+   **Decidido — "A branch, com o sha no lock (Recomendado)".**
+
+4. **A ordem da migração do `brza-workspace`.** Opções:
+   - em estágios: do P1 ao P6 só o `brza-workflow` muda; no P7, o manifesto, as rules e o índice entram antes, o `brza
+     sync --dry-run` só pode mostrar uma lista fechada de diferenças, e depois vêm o relink e o sync real (recomendada)
+     — custo: ~1 h a mais; se paga: no P7, com as sessões abertas de pé;
+   - de uma vez — custo: ~0 h a mais, e quebra a sessão que chamar `brza note` no meio; se paga: só sem sessão aberta.
+
+   **Decidido — "Em estágios (Recomendado)".**
+
 ## Worklogs
 
-- 2026-10-31 — aberto; R1–R3 respondidas, a R2.1 em texto livre e confirmada na R3.1. Parou antes do Desenho.
+- 2026-10-31 — aberto; R1–R6 respondidas, a R2.1 em texto livre e confirmada na R3.1, a R4.3 em texto livre e
+  fechada na R5; rascunho D1–D12 e P1–P8 do `designer`. Parou antes de gravar o Desenho.
   [PLN-006: a abertura do brza init](../../work/worklogs/2026-10-31-pln-006-a-abertura-do-brza-init.md)

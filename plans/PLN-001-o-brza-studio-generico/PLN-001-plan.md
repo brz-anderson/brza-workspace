@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson; o P71 numa sessão do brza-studio"
+ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
 estimate_h: 177.8
-executed_h: 32.3
-remaining_h: 9.4
+executed_h: 33.8
+remaining_h: 3.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -28,8 +28,8 @@ tags:
   (R59.4), e o P68 fechou o X47 em `brza-studio@7be19418c8f`. O pedido 34 entrou em 2026-10-31, com a R60, a R61, o D52
   e o P69, que fechou em `brza-studio@a0eefa646e4`, com os X57 e X58, e espera só o C22, num build, com Anderson. O pedido 35
   entrou no mesmo dia, com o D53 e o P70, que fechou em `brza-studio@4eaac80df53`, com os X59 e X60, e espera só o C23, no
-  build do C22, com Anderson. O pedido 36 entrou no mesmo dia, com a R62, o D54 e o P71, que roda agora na sessão
-  `pln-001-pedido-36`, no worktree `.worktrees/pln-001-pedido-36` do `brza-studio`; depois, o C24, no build do C22. Do PLN-002/P9 (R12.4, R13.4),
+  build do C22, com Anderson. O pedido 36 entrou no mesmo dia, com a R62, o D54 e o P71, que fechou em
+  `brza-studio@abc5e78c243`, com os X61 ao X64, e espera só o C24, no build do C22, com Anderson. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
   sessão entra no correio com o nome automático `brza-workspace-<hex>`. O P64 não lê o mapa de sessões do PLN-002 e
   casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
@@ -2686,22 +2686,40 @@ início e o push. O worktree e a branch saíram depois do push. A conferência n
 
 Executa D54 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-36`
 
-Estimado: 5,5 h
+Estimado: 5,5 h · Executado: 1,5 h
 
 Agora, em paralelo com o que espera build (R62.4).
 
-- [ ] **1.** Testes que falham: no `BrzaExpandLayer.test.tsx`, o `brzaExpandTarget` devolve o bloco que não rola — a
+- [x] **1.** Testes que falham: no `BrzaExpandLayer.test.tsx`, o `brzaExpandTarget` devolve o bloco que não rola — a
       cerca curta, o `NativeChatDiffView` e o `NativeChatDiffCard`; a tela cheia de uma cerca `markdown` e de uma `md`
       abre na prévia, com o `EditorViewToggle` em `preview` e `source`, o frontmatter na caixa "Front Matter" e fora do
       corpo, e o `<>` mostra o cru; a de outra linguagem não mostra o seletor; o copiar copia o cru nos dois modos
-- [ ] **2.** O `brzaExpandTarget` sem a exigência de rolar (R62.2), com a posição do botão conferida no diff sem
+- [x] **2.** O `brzaExpandTarget` sem a exigência de rolar (R62.2), com a posição do botão conferida no diff sem
       cabeçalho
-- [ ] **3.** A prévia na `BrzaExpandOverlay`: o helper de linguagem Markdown (`markdown`, `md`) sobre o
+- [x] **3.** A prévia na `BrzaExpandOverlay`: o helper de linguagem Markdown (`markdown`, `md`) sobre o
       `data-code-language` do bloco, o `EditorViewToggle`, o `MarkdownPreviewBody` na casca com o
       `useMarkdownSurfaceTheme`, a caixa do frontmatter e os relativos sem ação (R62.1, R62.3). Os pontos "A conferir
       no passo" do D54
-- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C24
+
+**Evidência:** commit [`abc5e78c243`](https://github.com/brz-anderson/brza-studio/commit/abc5e78c243), na `master` do
+`brza-studio`, pela sessão do `brza-studio` no worktree `.worktrees/pln-001-pedido-36`, com o push direto. O
+`brzaExpandTarget` não chama mais o `brzaBlockScrolls`, que saiu; sem a linha de cabeçalho, o botão monta sobre a borda
+de cima do bloco (X61). O `brza-markdown-fence.ts` lê o `data-code-language` do bloco e reconhece `markdown` e `md`; a
+`BrzaExpandOverlay` monta o `EditorViewToggle` com `['preview', 'source']`, a quebra só no `<>`, e a prévia no
+`BrzaMarkdownExpandPreview.tsx`: o `MarkdownPreviewBody` na casca `markdown-preview-shell` com o estilo e o tamanho do
+`useMarkdownSurfaceTheme`, e a caixa "Front Matter" no `MarkdownFrontMatterBlock.tsx`, que saiu do
+`MarkdownPreviewSurface.tsx` para servir aos dois (X63). O texto da cerca Markdown é o `textContent` sem a quebra final,
+pelo `nativeChatCodeCopyText` (X62). Na prévia, o link `http(s)` abre pelo `openHttpLink`, com o modificador do olho; o
+`#âncora` rola dentro da tela cheia; o resto não navega, e a imagem que não é `http(s)` nem `data:` vira o texto
+alternativo (X64). Os pontos "A conferir no passo" do D54: o frontmatter some do corpo com o `remarkFrontmatter`, e a
+caixa recebe o tirado antes; o botão, a +4 px, cobria a primeira linha da cerca sem cabeçalho, na fixture, e passou à
+borda (X61); o clique em link relativo chama o `preventDefault`. Antes do código: o `BrzaExpandLayer.test.tsx` → 10
+failed. Depois: o mesmo, os vizinhos do bloco de código, do chat em Markdown e da prévia do editor → 37 arquivos, 245
+passed; `pnpm check:changed --base=origin/master --maxWorkers=2` → 21 de 21 verdes. A posição e a prévia foram vistas
+numa fixture local, fora do commit, nos dois temas. A `origin/master` não andou entre o início e o push. O worktree e a
+branch saíram depois do push. A conferência no app é o C24.
 
 ## Regressão
 
@@ -2925,6 +2943,21 @@ da linha quando o teste entra.
 - **X60 — A espera de 100 ms do teste do P69 virou `vi.waitFor`.** O `flaky-test-pattern-ratchet` do `check:changed`
   recusa o `setTimeout` do `settleFocus` no `NativeChatStructuredSession.prompt-collapse.test.tsx`, que o P70 tocou; o
   teste agora espera o foco no composer. Afeta P70.
+- **X61 — Sem a linha de cabeçalho, o botão monta sobre a borda de cima.** Numa fixture com o `NativeChatDiffView` e a
+  cerca sem linguagem, o botão a +4 px do topo cobria o fim da primeira linha da cerca, que agora ganha o botão mesmo
+  curta; a 12 px acima da borda, ele fica na margem e no padding, sem cobrir texto, no diff e na cerca. O bloco com
+  linguagem segue com o botão na linha do cabeçalho. Afeta P71; o D54 não muda, era um ponto a conferir.
+- **X62 — O texto da cerca Markdown é o `textContent`, sem a quebra final.** O `innerText` depende do layout, e o
+  `nativeChatCodeCopyText` é o mesmo do copiar do bloco: o copiar da tela cheia copia o mesmo que o do bloco, e o
+  `extractFrontMatter` vê o `---` seguido da quebra. Os outros blocos seguem com o `innerText`, que quebra as linhas do
+  diff. Afeta P71.
+- **X63 — A caixa "Front Matter" saiu do `MarkdownPreviewSurface.tsx` para o `MarkdownFrontMatterBlock.tsx`.** O olho
+  do editor e a tela cheia usam o mesmo componente; o arquivo do upstream mudou duas linhas. A caixa da tela cheia
+  aparece sempre que há frontmatter, sem o "mostrar o frontmatter" do editor, que é do arquivo aberto. Afeta P71.
+- **X64 — Na prévia, só o link `http(s)` abre.** O `file:` absoluto, que o olho abre numa aba do editor pelo worktree,
+  fica sem ação, como o relativo: abrir pede o roteamento pelo worktree que a R62.3 deixou de fora; a imagem `file:`
+  também. O `#âncora` rola dentro da tela cheia, e o Mermaid fica como código, porque o bloco dele é dos componentes do
+  olho, que pedem o arquivo. Afeta P71; se o `file:` precisar abrir, vai a Anderson como rodada.
 
 ## Worklogs
 
@@ -3050,6 +3083,8 @@ da linha quando o teste entra.
   o pedido 35, o D53 e o P70 em `brza-studio@4eaac80df53`, com os X59 e X60; o C23 espera o build do C22, com Anderson.
 - 2026-10-31 — [O pedido 36 do PLN-001, a prévia do Markdown e o expandir em todo bloco](../../work/worklogs/2026-10-31-pln-001-pedido-36-previa-do-markdown.md):
   o pedido 36, a R62, o D54 e o P71, sem código; o P71 vai à sessão `pln-001-pedido-36`.
+- 2026-10-31 — [O P71 do PLN-001, o expandir em todo bloco e a prévia do Markdown](../../work/worklogs/2026-10-31-pln-001-p71-expandir-e-previa-do-markdown.md):
+  o P71 em `brza-studio@abc5e78c243`, com os X61 ao X64; o C24 espera o build do C22, com Anderson.
 
 ## Decisões
 
@@ -3094,7 +3129,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C21 | `Pedido 33`: o "Pensou" com o texto na linha (P66.3) | Uma resposta com raciocínio, entre comandos e fora deles, no desktop e no app do celular (R54.1); abrir e fechar a linha | "Pensou por Xs:" e o começo do texto, apagado, cortado; aberta, o texto inteiro abaixo; a pergunta com "Perguntou:" | | |
 | C22 | `Pedido 34`: recolher a pergunta e a aprovação no chat estruturado (P69.4) | Num chat do Claude, uma pergunta do AskUserQuestion com uma opção marcada e uma aprovação; recolher, rolar a conversa, mandar uma mensagem pelo composer e reabrir | A faixa com o título no lugar do cartão e o composer usável; a mensagem vai à fila, sem "Steer", e sai depois do turno; reaberto, o cartão com a opção marcada; repetido com o "enfileirar follow-ups" desligado, a pergunta segue pendente e respondível, ou o caso falha (R61.2) | | |
 | C23 | `Pedido 35`: a faixa com ícone e ação (P70.3) | No build do C22, recolher uma pergunta e uma aprovação, no tema claro e no escuro | A barra e o ícone do tipo à esquerda e "Responder" ou "Revisar" com a seta à direita, que reabre o cartão; o título cortado no que sobra. A barra e o ícone saem pretos no claro e brancos no escuro, pelo `--primary` neutro; se a falta de cor incomodar, a escolha do token vai a Anderson como rodada | | |
-| C24 | `Pedido 36`: o expandir em todo bloco e a prévia do Markdown (P71.4) | No build do C22, passar o mouse sobre um bloco curto, uma cerca `diff`, o diff de um `Edit` e o da linha de ferramenta; expandir um SKILL.md numa cerca `markdown`, alternar para o `<>` e voltar, no tema claro e no escuro | O botão nos quatro; o SKILL.md renderizado como no olho do editor, com `name` e `description` na caixa "Front Matter"; o `<>` com o cru; o copiar com o cru | | |
+| C24 | `Pedido 36`: o expandir em todo bloco e a prévia do Markdown (P71.4) | No build do C22, passar o mouse sobre um bloco curto, uma cerca sem linguagem, uma cerca `diff`, o diff de um `Edit` e o da linha de ferramenta, com o botão sem cobrir texto (X61); expandir um SKILL.md numa cerca `markdown`, alternar para o `<>` e voltar, no tema claro e no escuro | O botão nos quatro; o SKILL.md renderizado como no olho do editor, com `name` e `description` na caixa "Front Matter"; o `<>` com o cru; o copiar com o cru | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,

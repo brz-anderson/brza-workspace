@@ -14,8 +14,9 @@ tags:
 
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** aberto, com a R1 trazida da sessão `brza-workspace-80`. O próximo é o levantamento do PLN-011 da Fixfy
-  por peça, pelo `collector`, com o agregado no scratch, e a rodada 2 com os pontos sem lastro.
+- **Retomar:** R1 e R2 fechadas; o levantamento do PLN-011 está no scratch da sessão `workspace`
+  (`pln-004-levantamento-pln-011.md`). O próximo é a rodada 3 — papéis, memória, medição e delegação — e a sonda da
+  identidade (R2.3).
 
 ## Pedido
 
@@ -111,7 +112,61 @@ Respondida em 2026-10-30, na sessão `brza-workspace-80`, e trazida a este plano
    **Decidido — "brz-anderson, igual ao Claude (Recomendado)".** As funções do shell exportam o mesmo
    `GIT_AUTHOR_*`/`GIT_COMMITTER_*` e o `GIT_SSH_COMMAND` do `env` do `.claude/settings.json`.
 
+### Rodada 2 — a base e a identidade (enviada 2026-10-30)
+
+**Apresentado antes:** o levantamento do PLN-011 da Fixfy, pelo `collector`, com o agregado no scratch da sessão
+(`pln-004-levantamento-pln-011.md`). As fontes abaixo são de lá; `FX` é `~/Projects/fixfy`.
+- **O Codex 0.164 lê o `AGENTS.md` do worktree e não o `CLAUDE.md` nem as `.claude/skills`** — `codex debug
+  prompt-input`, com `CODEX_HOME` vazio.
+- **Na Fixfy, o adaptador do Codex** é o `developer_instructions` do `FX/.codex/config.toml:9-19`, e o do `agy`, o
+  `FX/.agents/rules/runtime.md:1-18`, com `trigger: always_on`. As funções `codex` e `agy` do `~/.zshrc:79-98` só tratam
+  a Fixfy.
+- **As sessões Codex que o app abriu em worktree do brza-studio** (3 rollouts de 2026-10-28, `originator:
+  orca_desktop`) rodaram sem a norma do workspace, sem a identidade e sem a medição.
+- **Os hooks do Codex só rodam depois de confiados**, por hash e por caminho (`~/.codex/config.toml:161-210`): cada
+  worktree novo pede revisão (X3 da Fixfy, `PLN-011-plan.md:783`).
+- **A doc do Codex não diz qual `shell_environment_policy` vale por padrão**, nem se o `.git` do worktree é gravável em
+  `workspace-write`; a página `config-reference` deu 404.
+
+Respondida em 2026-10-30, na sessão `workspace`.
+
+1. **Por qual canal o adaptador chega ao brza-workspace e ao brza-studio.** Opções:
+   - função e wrapper (recomendada): as funções `codex()`/`agy()` e um wrapper no estilo do `claude-brza` passam o
+     adaptador (`-c developer_instructions`, `--add-dir`), mais `.codex/config.toml` e `.agents/rules/` no workspace —
+     custo: o código do wrapper, como pedido ao `tools-kit`, e a cópia do bloco ao `~/.zshrc`; se paga: na primeira
+     sessão Codex no brza-studio, onde hoje a norma não chega;
+   - só os arquivos no workspace, como a Fixfy — custo: poucos arquivos; se paga: nunca no brza-studio, que fica sem a
+     norma.
+
+   **Decidido — "Função e wrapper (Recomendado)".**
+
+2. **Como o "acionar uma skill" funciona no Codex e no `agy`.** Opções:
+   - uma linha no adaptador manda ler `.claude/skills/<nome>/SKILL.md`, como a Fixfy no Codex
+     (`FX/.codex/config.toml:16`) (recomendada) — custo: nenhum arquivo novo; se paga: agora, nas duas skills;
+   - espelhar em `.agents/skills/` — custo: a duplicação, que a Fixfy deixou em issue aberta (`PLN-011-plan.md:363-365`);
+     se paga: só com muitas skills.
+
+   **Decidido — "Espelhar em `.agents/skills/`".** Como o espelho evita divergir do `.claude/skills/` vai ao Desenho.
+
+3. **Medir antes se `GIT_AUTHOR_*` e `GIT_SSH_COMMAND` chegam ao `git commit` no Codex e no `agy`.** Opções:
+   - sondar antes (recomendada): um commit num repositório descartável do scratch, um turno por runtime — custo: dois
+     turnos curtos, ~US$ 0,20 cada no Codex (`PLN-011-plan.md:696`); se paga: antes de a R1.4 virar função do shell;
+   - confiar no `env` exportado — custo: nada agora; se paga: talvez nunca, e o commit com outra identidade só se
+     descobre depois.
+
+   **Decidido — "Sondar antes (Recomendado)".**
+
+4. **Onde moram os hooks de medição do Codex.** Opções:
+   - `.codex/hooks.json` versionado no workspace, aprovado uma vez por worktree (recomendada) — custo: uma aprovação em
+     `/hooks` por worktree novo; se paga: na primeira medição fechada de um workstream;
+   - `~/.codex/hooks.json` global, com uma aprovação só, e o `measure.py` filtrando pelo `cwd` — custo: dispara em toda
+     sessão da máquina, junto dos hooks do Orca; se paga: se a revisão por worktree incomodar;
+   - `--dangerously-bypass-hook-trust` na função — custo: nenhuma revisão de hook em sessão nenhuma; se paga: nunca,
+     salvo risco aceito.
+
+   **Decidido — "Versionado, revisão por worktree (Recomendado)".**
+
 ## Worklogs
 
-- 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`. Parou antes do levantamento do PLN-011.
+- 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2. Parou na R3.
   [O PLN-004: a abertura do Codex e do agy no fluxo](../../work/worklogs/2026-10-30-pln-004-a-abertura-do-codex-e-do-agy-no-fluxo.md)

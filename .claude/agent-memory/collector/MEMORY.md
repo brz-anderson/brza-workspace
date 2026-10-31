@@ -1,0 +1,1 @@
+- [Onde mora o PLN-011 da Fixfy e a contraparte do brza-workspace](reference_fixfy-pln-011-onde-mora.md) — mapa de peças, atalhos para Codex/agy e fontes que envelhecem

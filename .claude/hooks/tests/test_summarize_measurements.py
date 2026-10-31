@@ -127,6 +127,18 @@ class ByWorkstreamTest(unittest.TestCase):
         agg = self.summarize.aggregate(ROWS)
         self.assertEqual(sum(b["n"] for b in agg["turns"].values()), 4)
 
+    def test_compact_guard_is_apart_from_the_resume_guard(self):
+        agg = self.summarize.aggregate([
+            {"event": "guard", "kind": "resume", "decision": "blocked", "estimated_cost_usd": 1.0},
+            {"event": "guard", "kind": "compact", "workstream": "studio", "decision": "blocked"},
+            {"event": "guard", "kind": "compact", "workstream": "studio", "decision": "blocked"},
+            {"event": "guard", "kind": "compact", "workstream": "studio", "decision": "passed"},
+        ])
+        self.assertEqual(sum(b["n"] for b in agg["guard"].values()), 1)
+        self.assertEqual(agg["compact"], {("studio", "blocked"): 2, ("studio", "passed"): 1})
+        self.assertIn({"workstream": "studio", "decision": "blocked", "n": 2},
+                      self.summarize.to_json(agg)["compact_guard"])
+
 
 if __name__ == "__main__":
     unittest.main()

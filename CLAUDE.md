@@ -18,7 +18,7 @@ mecânica própria do Claude.
 | camada alta, média, rápida | Opus, Sonnet, Haiku — o `haiku` é o Haiku 5.5, pelo `env` do `settings.json`                     |
 | scratch                    | o scratchpad da sessão, anunciado no arranque, em `/private/tmp/claude-501/…`                    |
 | sessão nova                | `/exit` e `claude --name <nome>` no worktree do workstream, `.worktrees/<nome>`, sem `--resume`, `--continue` nem `--rc`; pelo `brza sessions`, com `--checkout .worktrees/<nome>` |
-| compactação                | `/compact`; o runtime também compacta sozinho perto do limite da janela                          |
+| compactação                | `/compact`, depois do `/close-task`; o runtime também compacta sozinho perto do limite da janela |
 
 **A própria sessão abre a sessão nova, pelo `brza sessions`**, e não passa o comando a Anderson:
 `brza sessions <nome> --title "<título>" --prompt "<prompt>" --checkout .worktrees/<workstream> --wait`. O título segue
@@ -93,6 +93,31 @@ O `.claude/hooks/measure.py`, ligado no `settings.json`, grava uma linha JSON po
   Entrada e cache valem, e são eles que pesam no custo.
 - **Resumo:** `python3 scripts/summarize_measurements.py`, e `--by-workstream` para o aprendizado por workstream e dia.
 - **Testes:** em `.claude/hooks/tests/`.
+
+## A trava de fechamento antes do `/compact`
+
+O resumo da compactação não grava nada em disco: a tarefa que não fechou num worklog antes dele fecha de memória, ou
+não fecha. Por isso o `/compact` vem depois do **`/close-task`**, a skill que grava o worklog de hoje e o `Retomar`,
+junta a memória e roda o `brza note commit`. A sessão também a aciona sozinha ao fechar uma tarefa. Quem digita o
+`/compact` é Anderson, porque o modelo não o roda.
+
+O `.claude/hooks/compact_guard.py` confere o worktree do workstream do cwd — no `brza-studio`, o do plano da branch:
+
+| Evento         | Matcher   | O que faz                                                                                                                                  |
+| :------------- | :-------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| `PreCompact`   | `manual`  | barra o `/compact` com arquivo sem commit em `work/`, `plans/`, `wiki/`, `memory/` ou `.claude/agent-memory/`, ou sem o worklog de hoje   |
+| `SessionStart` | `compact` | depois de qualquer compactação, com nota sem commit, põe no contexto a ordem de atualizar o worklog a partir do resumo e fechar a tarefa  |
+
+- **O worklog de hoje** é o arquivo de `work/worklogs/` com a data de hoje no prefixo do nome.
+- **A mensagem do bloqueio** aparece para quem digitou e aponta o `/close-task`. No `brza-studio`, que não carrega as
+  skills daqui, ela dá os passos.
+- **Sem nada a registrar:** `/compact sem-fechar` passa, e silencia o aviso do `SessionStart` da mesma sessão por 30 min.
+- **A compactação automática nunca é barrada**, porque ela pode vir para se recuperar de erro de limite, e barrá-la
+  faria o pedido falhar. Só recebe o aviso depois.
+- **Não confere** na `master`, fora de workstream, sem o worktree do workstream, quando o git falha nem em exceção.
+- **Medida:** cada conferência vira uma linha `guard` com `kind: compact` — `passed`, `blocked`, `released`,
+  `injected` —, que o resumo mostra por workstream.
+- **Testes:** `.claude/hooks/tests/test_compact_guard.py`.
 
 ## O cache da sessão principal dura 1 h
 

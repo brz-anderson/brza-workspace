@@ -265,7 +265,8 @@ Estimado: 3 h · Executado: — h
 ## Casos manuais
 
 > **Gatilho:** algum critério só se prova em aparelho. Escreva os `C` a partir do critério e peça a execução a quem tem
-> o aparelho. O Observado e o veredito vão na linha do caso.
+> o aparelho. O Observado e o veredito vão na linha do caso, e o Observado linka o print do aparelho, tirado pelo
+> `brza print plans/PLN-NNN-…/PLN-NNN-C1.png` — o simulador iOS, o Android do adb ou, com `--app`, a janela do app.
 
 | ID  | Critério                    | Passos                  | Esperado             | Observado       | Veredito      |
 | :-- | :-------------------------- | :---------------------- | :------------------- | :-------------- | :------------ |

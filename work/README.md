@@ -155,6 +155,10 @@ opened: 2026-10-27
 a norma de cada zona, nunca nota, e repete o nome por construção. Prefixo de data `AAAA-MM-DD-` só onde a data é parte
 do assunto — `worklogs/` e `notes/`. O plano leva número, não data: `PLN-001-…`.
 
+**A imagem de uma nota fica ao lado dela**, com o nome da nota e um sufixo quando há mais de uma — `<nome>.png`,
+`<nome>-escuro.png` — e o corpo a linka. É assim com o PNG da alternativa escolhida numa issue e com o print de um
+worklog.
+
 **Todo arquivo diz três coisas:** o que é, em que pé está e, quando trava, quem decide.
 
 **Nada migra de pasta; o conteúdo, sim, é promovido.** O registro fica num lugar e o produto vai para outro: o rascunho

@@ -11,7 +11,8 @@ mecânica própria do Claude.
 | pergunta com opções        | `AskUserQuestion`                                                                                |
 | correio                    | `SendMessage`, para o nome da sessão; `ListAgents` lista as abertas                              |
 | acionar uma skill          | `Skill`, ou `/nome` digitado                                                                     |
-| subagente                  | `Agent`, com o `model` pela camada                                                               |
+| subagente                  | `Agent`, com o `subagent_type` do papel e o `model` pela camada                                  |
+| subagente por papel        | `.claude/agents/<papel>.md`, com `memory: project`                                               |
 | retomar o subagente        | `SendMessage` com o nome ou o ID do agente, que volta com o contexto dele; não abre `Agent` novo |
 | estágio de workflow        | cada `agent()` de um workflow                                                                    |
 | camada alta, média, rápida | Opus, Sonnet, Haiku — o `haiku` é o Haiku 5.5, pelo `env` do `settings.json`                     |
@@ -19,8 +20,11 @@ mecânica própria do Claude.
 | sessão nova                | `/exit` e `claude --name <nome>` no worktree do workstream, `.worktrees/<nome>`, sem `--resume`, `--continue` nem `--rc`; pelo `brza sessions`, com `--checkout .worktrees/<nome>` |
 | compactação                | `/compact`; o runtime também compacta sozinho perto do limite da janela                          |
 
-O comando que a sessão passa a Anderson para abrir uma sessão nova com prompt é `claude --name <nome> "<prompt>"`.
-**Não use `--rc`**: com ele, o prompt entre aspas não funciona. Não use `/clear` no lugar da sessão nova, porque ele
+**A própria sessão abre a sessão nova, pelo `brza sessions`**, e não passa o comando a Anderson:
+`brza sessions <nome> --title "<título>" --prompt "<prompt>" --checkout .worktrees/<workstream> --wait`. O título segue
+o padrão "PLN-002 P7: renomear chat". O `--rename` vai quando a sessão manda ou recebe correio. O
+`claude --name <nome> "<prompt>"` fica para quando o `brza sessions` não serve. **Não use `--rc`**: com ele, o prompt
+entre aspas não funciona. Não use `/clear` no lugar da sessão nova, porque ele
 troca o `session_id` mas mantém a conversa anterior ligada à sessão.
 
 ## A configuração chega pela função do shell
@@ -35,6 +39,17 @@ o `~/.local/bin/claude-brza` (`scripts/brza/claude-brza`, instalado pelo `brza i
 que a função, no `brza-workspace`, no `brza-studio` e nos worktrees que o app cria em `~/orca/workspaces/…`, achados
 pelo `git --git-common-dir`. A sessão aberta sem nenhum dos dois — numa IDE, ou no app com o override vazio — sobe sem
 os hooks e sem a identidade abaixo.
+
+## A memória vai ao workstream
+
+O `brza note workstream` grava no `.claude/settings.local.json` do worktree, fora do git, o `autoMemoryDirectory`
+apontando para o `memory/` dele; o `brza note memory-setup` faz o mesmo nos worktrees que já existem. O `brza tree` faz
+o mesmo no worktree do `brza-studio`, apontando para o `memory/` do workstream do plano, e liga o `.claude/agent-memory`
+de lá, por symlink, ao do workstream. A sessão sem esse arquivo, como a da `master`, usa a memória compartilhada do
+runtime, que fica vazia.
+
+Os subagentes por papel vêm do `.claude/agents/` daqui. No `brza-studio`, que não lê esse diretório, o `claude-brza` e
+a função `claude` os passam pelo `--agents`, com o JSON que o `brza-agents` monta.
 
 ## A identidade é a do brz-anderson, pelo `env`
 
@@ -60,12 +75,15 @@ O `.claude/hooks/measure.py`, ligado no `settings.json`, grava uma linha JSON po
 | Evento     | Quando                                            | O que grava                                                                                                                                         |
 | :--------- | :------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `subagent` | `SubagentStop`, inclusive o `agent()` de workflow | duração, chamadas à API e de ferramenta, tokens por tipo, o maior contexto de uma chamada, custo estimado em US$, conta, modelo, modelo pedido, esforço, versão do plugin, workflow e fase |
-| `turn`     | `Stop`, o fim de cada turno da sessão principal   | o mesmo, e as skills e os agentes que rodaram no turno                                                                                             |
+| `turn`     | `Stop`, o fim de cada turno da sessão principal   | o mesmo, as skills e os agentes que rodaram no turno, e as rodadas: perguntas com opções, na recomendada, em outra opção e em texto livre          |
 | `skill`    | a ferramenta `Skill`                              | o nome, os argumentos e a versão do plugin                                                                                                         |
 | `command`  | `/nome` digitado, que não passa pela `Skill`      | o nome, os argumentos e a origem                                                                                                                   |
 | `failure`  | `StopFailure`                                     | o erro de API que encerrou o turno, como o limite de uso                                                                                           |
 | `mcp`      | toda chamada `mcp__*`                             | o servidor, a ferramenta, a duração e a falha                                                                                                      |
+| `memory`   | `Stop` e `SubagentStop`, pelo retrato da memória  | a memória criada, editada ou apagada no workstream: o dono (a sessão ou o papel), o arquivo, o nome e o tipo                                        |
 
+- **O workstream em toda linha:** sai da branch do cwd; no `brza-studio`, do plano da branch. O retrato da memória fica
+  em `.measurements/memory-snapshot.json`, e o primeiro retrato de um worktree não gera evento.
 - **Só o trecho novo do transcript:** retomada e turno medem só o que veio depois da última leitura.
 - **Onde grava:** sempre no `.measurements/` daqui, também nas sessões do `brza-studio`. O comando acha o script pela
   `BRZA_WORKSPACE` antes da `CLAUDE_PROJECT_DIR`, que no `brza-studio` apontaria para lá.
@@ -73,7 +91,7 @@ O `.claude/hooks/measure.py`, ligado no `settings.json`, grava uma linha JSON po
 - **Python:** o da `BRZA_PYTHON`, ou `python3` sem ela.
 - **Precisão:** a saída de tokens fica subcontada, porque o transcript guarda a contagem do início de cada mensagem.
   Entrada e cache valem, e são eles que pesam no custo.
-- **Resumo:** `python3 scripts/summarize_measurements.py`.
+- **Resumo:** `python3 scripts/summarize_measurements.py`, e `--by-workstream` para o aprendizado por workstream e dia.
 - **Testes:** em `.claude/hooks/tests/`.
 
 ## O cache da sessão principal dura 1 h

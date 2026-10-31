@@ -1,0 +1,3 @@
+- [Convivência BrzA × Orca](brza-orca-coexistence.md) — o que muda e o que fica Orca para os dois apps rodarem juntos
+- [Worktree node_modules sem symlink](worktree-node-modules-no-symlink.md) — symlink no worktree quebrou o node_modules da raiz; use pnpm install --offline
+- [Os .spec.ts de src/shared não rodam](shared-spec-files-do-not-run.md) — teste novo vai num .test.ts

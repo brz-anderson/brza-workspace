@@ -9,10 +9,13 @@ import importlib.util
 import io
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
 from unittest import mock
+
+import repo_fixture
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCRIPT = os.path.join(HERE, "..", "..", "..", "scripts", "summarize_measurements.py")
@@ -412,6 +415,47 @@ class FactsTest(unittest.TestCase):
             with mock.patch.object(sys, "argv", ["summarize", "--dir", tmp, "--facts"]), \
                     contextlib.redirect_stderr(io.StringIO()):
                 self.assertEqual(self.summarize.main(), 2)
+
+
+class RootTest(unittest.TestCase):
+    """Sem a BRZA_WORKSPACE e sem a MEASURE_DIR, a raiz sai do git, e não de `scripts/..`, que num worktree é ele mesmo."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        with open(SCRIPT, encoding="utf-8") as f:
+            source = f.read()
+        self.main, self.tree = repo_fixture.make(self.tmp.name, {"scripts/summarize_measurements.py": source,
+                                                                 ".gitignore": ".measurements/\n"})
+        self.summarize = load()
+
+    def test_the_root_of_a_worktree_is_the_master_checkout(self):
+        self.assertEqual(os.path.realpath(self.summarize.workspace_root(os.path.join(self.tree, "scripts"), {})),
+                         self.main)
+
+    def test_the_variables_win_over_the_git(self):
+        scripts = os.path.join(self.tree, "scripts")
+        self.assertEqual(self.summarize.workspace_root(scripts, {"BRZA_WORKSPACE": "/x/y"}), "/x/y")
+        self.assertEqual(os.path.normpath(self.summarize.workspace_root(scripts, {"MEASURE_DIR": "/z"})), self.tree)
+
+    def test_a_failing_git_falls_back_to_the_directory_above_scripts(self):
+        outside = os.path.join(self.tmp.name, "fora", "scripts")
+        os.makedirs(outside)
+        self.assertEqual(os.path.normpath(self.summarize.workspace_root(outside, {})), os.path.dirname(outside))
+        with mock.patch.object(self.summarize.subprocess, "run", side_effect=OSError("sem git")):
+            self.assertEqual(os.path.normpath(self.summarize.workspace_root(self.tree + "/scripts", {})), self.tree)
+
+    def test_the_script_run_from_the_worktree_reads_the_log_of_the_master(self):
+        for directory, rows in ((self.main, [fact("2026-10-28", "designer", "F1", "lido", 90)]),
+                                (self.tree, [turn("2026-10-28", "studio", 1.0)])):  # o do worktree é o velho
+            os.makedirs(os.path.join(directory, ".measurements"))
+            with open(os.path.join(directory, ".measurements", "measurements.jsonl"), "w", encoding="utf-8") as f:
+                f.writelines(json.dumps(row) + "\n" for row in rows)
+        done = subprocess.run([sys.executable, os.path.join(self.tree, "scripts", "summarize_measurements.py"),
+                               "--facts", "--json"], cwd=self.tree, env=repo_fixture.clean_env(),
+                              capture_output=True, text=True)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn('"designer"', done.stdout)
 
 
 if __name__ == "__main__":

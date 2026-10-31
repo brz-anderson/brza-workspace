@@ -1,5 +1,5 @@
-"""O CLI e o runtime do BrzA Studio, para os scripts de `scripts/brza/`: o envio ao chat, o git e o worktree do
-brza-studio.
+"""O CLI e o runtime do BrzA Studio, para os scripts de `scripts/brza/`: o envio ao chat, o git, o worktree do
+brza-studio, o workstream de um plano, a memória do workstream e o `--agents` do claude.
 
 O app ainda usa os nomes do Orca por dentro: o arquivo de runtime é `orca-runtime.json` e o terminal e o chat recebem
 `ORCA_CLI_COMMAND` e `ORCA_USER_DATA_PATH`. Dentro do app, esses valores vêm do ambiente; fora dele, valem os caminhos
@@ -9,6 +9,7 @@ do BrzA Studio instalado em /Applications.
 import hashlib
 import json
 import os
+import re
 import socket
 import subprocess
 import time
@@ -136,3 +137,159 @@ def install_offline(path: Path):
 def worktree_remove(path: Path):
     """`git worktree remove` sem --force; usado no worktree temporário, que nasce limpo."""
     git('worktree', 'remove', str(path))
+
+
+# O workstream e a memória dele
+
+WORKSTREAM_PREFIX = 'workstream/'
+STUDIO_BRANCH = re.compile(r'[a-z]+/pln-(\d+)(-|$)')
+
+
+class Refused(Exception):
+    """O pedido não se cumpre, e a mensagem diz por quê; o brza-note a imprime como `recusado:` e sai com 1."""
+
+
+def workstream_root(name: str) -> Path:
+    """O worktree do workstream `name` em <workspace>/.worktrees; sem ele, recusa e diz o comando que o cria."""
+    root = WORKSPACE / '.worktrees' / name
+    if not (root / '.git').exists():
+        raise Refused(f'o workstream {name} não tem worktree em {root}; crie com `brza note workstream {name}`')
+    return root
+
+
+def workstreams_with_plan(number: str, refs: str) -> list[str]:
+    """Os nomes dos workstreams, entre as branches de `refs` (refs/heads/workstream ou refs/remotes/origin/workstream),
+    que têm plans/PLN-<number>-* — um git ls-tree por ref."""
+    prefix = f'plans/PLN-{number}-'
+    base = f'{refs}/'
+    found = []
+    for ref in git('for-each-ref', '--format=%(refname)', base, cwd=WORKSPACE).split():
+        names = git('ls-tree', '--name-only', '-z', ref, 'plans/', cwd=WORKSPACE).split('\0')
+        if any(n.startswith(prefix) for n in names):
+            found.append(ref.removeprefix(base))
+    return sorted(found)
+
+
+def workstream_of_plan(number: str) -> str:
+    """O workstream que tem o plano PLN-<number>: as branches locais primeiro e, sem achar nenhuma, as de origin. Nenhum
+    ou mais de um recusa e pede o --workstream."""
+    for refs in ('refs/heads/workstream', 'refs/remotes/origin/workstream'):
+        found = workstreams_with_plan(number, refs)
+        if len(found) == 1:
+            return found[0]
+        if found:
+            raise Refused(f'o PLN-{number} está em mais de um workstream ({", ".join(found)}); '
+                          f'passe --workstream <nome>')
+    raise Refused(f'o PLN-{number} não está em nenhum workstream; passe --workstream <nome>')
+
+
+def set_auto_memory(root: Path, memory: Path) -> bool:
+    """Grava `autoMemoryDirectory` = `memory` (absoluto) em <root>/.claude/settings.local.json, com merge: as outras
+    chaves ficam. Devolve se o arquivo mudou. JSON ilegível ou que não é objeto vira BrzaError, sem sobrescrever."""
+    path = root / '.claude' / 'settings.local.json'
+    settings = {}
+    if path.exists():
+        try:
+            settings = json.loads(path.read_text() or '{}')
+        except ValueError as e:
+            raise BrzaError(f'{path} não é JSON legível ({e}); conserte à mão') from None
+        if not isinstance(settings, dict):
+            raise BrzaError(f'{path} não é um objeto JSON; conserte à mão')
+    if settings.get('autoMemoryDirectory') == str(memory):
+        return False
+    settings['autoMemoryDirectory'] = str(memory)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(settings, indent=2, ensure_ascii=False) + '\n')
+    return True
+
+
+def setup_memory(tree: Path) -> bool:
+    """A memória da sessão do worktree de workstream `tree`: cria <tree>/memory/, vazio e sem commit, e aponta o
+    `autoMemoryDirectory` do settings.local.json para ele. Devolve se algo mudou; idempotente."""
+    tree = tree.resolve()
+    memory = tree / 'memory'
+    created = not memory.is_dir()
+    memory.mkdir(exist_ok=True)
+    return set_auto_memory(tree, memory) or created
+
+
+# O --agents do claude
+
+# A ordem das chaves de cada agente no JSON; as outras vêm depois, em ordem alfabética.
+AGENT_KEYS = ('description', 'prompt', 'model', 'tools', 'memory', 'effort')
+# No frontmatter do Claude, estas chaves aceitam a lista separada por vírgula; no --agents, são array.
+AGENT_LIST_KEYS = ('tools', 'disallowedTools', 'skills')
+
+
+def _scalar(text: str):
+    """Um valor YAML simples: o entre aspas, o inteiro, o booleano; o resto, o texto."""
+    text = text.strip()
+    if len(text) >= 2 and text[0] == text[-1] and text[0] in '"\'':
+        return text[1:-1]
+    if text in ('true', 'false'):
+        return text == 'true'
+    if re.fullmatch(r'-?\d+', text):
+        return int(text)
+    return text
+
+
+def parse_frontmatter(text: str) -> tuple[dict, str] | None:
+    """O frontmatter YAML simples e o corpo de um .md, ou None sem `---` na primeira linha. Entende `chave: valor`,
+    lista inline `[a, b]`, lista em `- item` nas linhas de baixo e o texto em bloco `|` ou `>`."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != '---':
+        return None
+    try:
+        end = next(i for i in range(1, len(lines)) if lines[i].strip() == '---')
+    except StopIteration:
+        return None
+    meta: dict = {}
+    i = 1
+    while i < end:
+        m = re.fullmatch(r'([A-Za-z_][\w-]*):\s*(.*)', lines[i].rstrip())
+        i += 1
+        if not m:
+            continue
+        key, value = m.group(1), m.group(2).strip()
+        rest = []
+        while i < end and (not lines[i].strip() or lines[i][0] in ' \t' or lines[i].startswith('- ')):
+            rest.append(lines[i])
+            i += 1
+        items = [r.strip()[2:].strip() for r in rest if r.strip().startswith('- ')]
+        if value in ('|', '>', '|-', '>-'):
+            parts = [r.strip() for r in rest]
+            meta[key] = ('\n' if value[0] == '|' else ' ').join(parts).strip()
+        elif value.startswith('[') and value.endswith(']'):
+            meta[key] = [_scalar(v) for v in value[1:-1].split(',') if v.strip()]
+        elif not value and items:
+            meta[key] = [_scalar(v) for v in items]
+        elif key in AGENT_LIST_KEYS and ',' in value:
+            meta[key] = [v.strip() for v in value.split(',') if v.strip()]
+        else:
+            meta[key] = _scalar(value)
+    for key in AGENT_LIST_KEYS:
+        if isinstance(meta.get(key), str):
+            meta[key] = [meta[key]]
+    return meta, '\n'.join(lines[end + 1:]).strip()
+
+
+def agents_json(workspace: Path | None = None) -> str | None:
+    """O JSON do `claude --agents` com os subagentes de <workspace>/.claude/agents/*.md, na ordem dos nomes:
+    {nome: {description, prompt, model, tools?, memory?, effort?, …}}. O nome é o `name` do frontmatter ou o do arquivo;
+    o prompt é o corpo. Arquivo sem frontmatter fica de fora. Sem o diretório, ou sem agente, devolve None."""
+    folder = Path(workspace or WORKSPACE) / '.claude' / 'agents'
+    if not folder.is_dir():
+        return None
+    agents = {}
+    for path in sorted(folder.glob('*.md')):
+        parsed = parse_frontmatter(path.read_text())
+        if parsed is None:
+            continue
+        meta, body = parsed
+        name = str(meta.pop('name', path.stem))
+        agent = {'prompt': body, **meta}
+        ordered = [k for k in AGENT_KEYS if k in agent] + sorted(k for k in agent if k not in AGENT_KEYS)
+        agents[name] = {k: agent[k] for k in ordered}
+    if not agents:
+        return None
+    return json.dumps(dict(sorted(agents.items())), ensure_ascii=False, separators=(',', ':'))

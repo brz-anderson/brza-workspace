@@ -36,3 +36,19 @@ A R2 e a R3, todas na recomendada, menos a R2.1, respondida "repo brza-workflow"
   `brza-workflow`, e os scripts do `brza-studio` ficam locais;
 - a raiz sai do cwd, pelo manifesto; a branch e o remote também vêm do manifesto, com `master` e `origin` por padrão; a
   identidade vem por flags, com o padrão do `git config`.
+
+## O desenho e as rodadas 4 a 6
+
+O `designer` rascunhou D1–D12 e P1–P8 (~21,5 h), em `/private/tmp/pln006/desenho.md`. A sessão conferiu três fatos:
+os hooks não importam o CLI; o `AGENTS.md` só carrega junto do `CLAUDE.md` pela opção de usuário desta máquina, e o
+`CLAUDE.md:3-4` está impreciso nisso; nenhum Markdown da norma usa `{{`.
+
+Duas respostas saíram da recomendada:
+- **R4.1:** o repositório de código acha o workspace por um registro em `~/.config/brza`, e não pelo `git config`.
+- **R4.3:** o contador de PLN vira um índice JSONL na `master`. A R5 o fechou: planos, issues e decisões; só
+  acrescenta, com `merge=union`; gravado pelo `brza note`. O coordenador que o lê foi à issue
+  [O coordenador se baseia no índice de notas da master](../issues/o-coordenador-le-o-indice-da-master.md).
+
+O resto da R4 e a R6 inteira na recomendada: os scripts do `brza-studio` como camada local; `@AGENTS.md` no
+`CLAUDE.md`; `{{tabela.chave}}` por regex; o sync recusa o arquivo editado; segue a branch, com o sha no lock; a
+migração em estágios.

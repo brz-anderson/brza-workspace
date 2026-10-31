@@ -31,6 +31,13 @@ python3 -m unittest discover -s .claude/hooks/tests
 
 # Resumir a medição de .measurements/measurements.jsonl
 python3 scripts/summarize_measurements.py
+
+# O acerto da confiança dos fatos do designer e do collector
+python3 scripts/summarize_measurements.py --facts
+
+# Os fatos a conferir, e o desfecho de um deles
+python3 scripts/fact_outcome.py --pending
+python3 scripts/fact_outcome.py <agente>:<F3> holds|fails "<porquê>" --ref <PLN-NNN/R…>
 ```
 
 A norma de agente está no [`AGENTS.md`](AGENTS.md), e o adaptador do Claude Code no [`CLAUDE.md`](CLAUDE.md). O commit

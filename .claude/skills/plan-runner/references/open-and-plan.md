@@ -51,8 +51,13 @@ do pedido, e o plano segue para Planejar.
    com fonte (`arquivo:linha`) e os arquivos essenciais. Ele não grava nada.
 2. **Peça os itens `D` no molde, com o artefato escrito**, no mesmo laço. Bifurcação com três ou mais alternativas
    defensáveis ativa os consultores em paralelo, com foco; cada alternativa volta com custo e momento em que se paga.
-3. **Leve as alternativas a uma rodada**, lado a lado sobre os mesmos casos, com a tabela e a recomendação marcada.
-   Quem escolhe é Anderson. Opção que muda o que se vê vem com a comparação à vista — a captura, o protótipo.
+3. **Leve as alternativas a uma rodada na mensagem, em texto**, no formato sem a ferramenta, lado a lado sobre os
+   mesmos casos, com a tabela e a recomendação marcada: a caixa da pergunta com opções esconde o artefato que precisa
+   estar à vista para escolher. Quem escolhe é Anderson. Opção que muda o que se vê vem com a comparação à vista:
+   - **No chat do BrzA Studio, cada alternativa de interface é um artboard**: um `.html` no `ORCA_CHAT_SCRATCH_DIR`,
+     na forma da skill `orca-chat-visuals` do app, e uma linha `::orca-visual{file="<arquivo>.html" title="A — <rótulo>"}`
+     por alternativa, com a letra da opção no `title`. Até 8 por resposta.
+   - **Fora do chat**, sem o `ORCA_CHAT_SCRATCH_DIR`, o artboard vai ao _scratch_ e a rodada leva o caminho dele.
 4. **Grave o vigente**, com a origem de cada item. A alternativa que perdeu fica até o passo que a transcreve e então
    sai, com uma linha **Descartada** e o porquê. No `PLN`, a crítica posterior vai para a Entrevista, e o item é
    reescrito no lugar.

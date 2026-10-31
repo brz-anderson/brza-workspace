@@ -2,7 +2,10 @@
 status: open
 phase: design
 origin: request
-ready: não — faltam o Desenho e os Passos
+ready: não — aguarda a rodada do corte dos Passos
+estimate_h: 27
+executed_h: 0
+remaining_h: 27
 scope:
   - workspace
 opened: 2026-10-31
@@ -13,9 +16,9 @@ tags:
 
 # PLN-006: O `brza init` monta a norma num workspace do zero
 
-- **Retomar:** R1–R6 fechadas. O rascunho D1–D12 do `designer` está em `/private/tmp/pln006/desenho.md`, fora do git,
-  e precisa refletir a R4.1 (registro em `~/.config/brza`) e a R5 (o índice da `master`). Próximo: o `designer` revisa,
-  e o Desenho vai ao `PLN-006-design.md`, com os Passos e a rodada do corte.
+- **Retomar:** R1–R8 fechadas; o Desenho (D1–D12) e os Passos (P1–P9, 27 h) estão escritos. Próximo: a rodada do
+  corte — aceitar, juntar ou dividir —, que é o aceite do plano.
+- **Dividido:** [PLN-006 — Desenho](PLN-006-design.md)
 
 ## Pedido
 
@@ -28,14 +31,19 @@ Respondido que não, Anderson pediu: "plano".
 
 ### Cobertura
 
-> Rascunho da abertura: os critérios são propostas e se fecham no Planejar, com o passo e o teste.
-
-| Origem     | Critério de aceite                                                                                                                                                                                  | Passo | Teste (nível)                    |
-| :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---- | :------------------------------- |
-| `Pedido 1` | `brza init <dir>` cria, num diretório vazio, um workspace com `AGENTS.md`, `CLAUDE.md`, `README.md`, `plans/`, `wiki/`, `work/`, `.claude/skills/`, `.claude/agents/`, hooks e `settings.json`, e o `notes-checker` roda verde nele | —     | unidade, num diretório temporário |
-| `R1.2`     | O workspace inicializado aponta para o repositório de código dele, sem caminho fixo a `brza-workspace` ou `brza-studio` no que foi copiado                                                         | —     | unidade                          |
-| `R1.4`     | Uma mudança no núcleo genérico daqui chega ao workspace inicializado por um comando de sync, sem tocar a parte local dele                                                                           | —     | unidade                          |
-| `Pedido 1` | O `brza-workspace` segue funcionando depois da separação genérico/local: hooks, skills, `brza note` e os testes de hoje                                                                            | —     | os testes de hoje (unidade)      |
+| Origem         | Critério de aceite                                                                                                                                                                                  | Passo  | Teste (nível)                                         |
+| :------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----- | :---------------------------------------------------- |
+| `Pedido 1`     | `brza init <dir>` cria, num diretório vazio, um workspace com `AGENTS.md`, `CLAUDE.md`, `README.md`, `plans/`, `wiki/`, `work/`, `.claude/skills/`, `.claude/agents/`, hooks e `settings.json`, e o `notes-checker` roda verde nele | P5     | unidade, num diretório temporário                     |
+| `R1.2`         | O workspace inicializado aponta para o repositório de código dele, sem caminho fixo a `brza-workspace` ou `brza-studio` no que foi copiado                                                         | P3, P5 | unidade                                               |
+| `R1.4`         | Uma mudança no núcleo genérico chega ao workspace inicializado pelo `brza sync`, sem tocar a parte local dele                                                                                     | P6     | unidade                                               |
+| `Pedido 1`     | O `brza-workspace` segue funcionando depois da separação genérico/local: hooks, skills, `brza note` e os testes de hoje                                                                            | P1, P7, P8 | as três suítes (unidade); a Regressão (manual)    |
+| `R4.1`, `R7.1` | Do repositório de código, inclusive de um worktree fora do diretório dele, o `brza where`, os hooks e o `claude-brza` acham o workspace pelo `~/.config/brza/workspaces.toml`; sem entrada, nada; o `brza register` recusa ligar um código a dois workspaces | P2 | unidade, com `BRZA_REGISTRY` e um worktree temporário |
+| `R4.4`         | O `CLAUDE.md` do workspace inicializado começa com `@AGENTS.md`                                                                                                                                    | P3     | unidade                                               |
+| `R5.1`, `R5.3` | `brza note plan-open` numera pelo índice (maior + 1) e grava `created` na `origin/master`; dois `plan-open` em corrida saem com números diferentes                                                 | P4     | unidade, com remote bare local                        |
+| `R5.3`, `R7.4` | `brza note commit` de plano, issue ou decisão com frontmatter mudado acrescenta uma linha `changed` na `origin/master` sem tocar o checkout principal; sem mudança, nenhuma linha                  | P4     | unidade                                               |
+| `R5.2`         | Duas linhas acrescentadas em paralelo se juntam pelo `merge=union`, e o estado vigente de cada id é o de maior `ts`                                                                                | P4     | unidade                                               |
+| `R5.1`         | Depois da migração, o índice traz PLN-001 a PLN-006, as issues e as decisões de todos os workstreams                                                                                              | P8     | `brza note index --rebuild` e a contagem (manual)     |
+| `R6.2`         | Com um arquivo do núcleo editado no workspace, o `brza sync` não o escreve, mostra o diff e sai com 1; `--force <caminho>` o escreve e atualiza o lock                                             | P6     | unidade                                               |
 
 ### Fora de escopo
 
@@ -352,8 +360,214 @@ Respondida em 2026-10-31.
 
    **Decidido — "Em estágios (Recomendado)".**
 
+### Rodada 7 — o registro e o índice, no detalhe (enviada 2026-10-31)
+
+**Apresentado antes**, pela revisão do `designer` com a R4–R6: o hook passa no `/usr/bin/python3` 3.9.6, mas as
+sessões vivas resolvem `python3` para o 3.14; o parser TOML próprio fica, por um caso mais estreito (máquina só com o
+3.9 no PATH, onde o `|| true` calaria a quebra). O `merge=union` deixa as linhas fora de ordem (`man gitattributes`),
+então o estado vigente de cada id passa a ser a linha de maior `ts`. O total foi de ~21,5 h para ~27 h, +5 h do índice.
+
+Respondida em 2026-10-31.
+
+1. **O registro.** Opções:
+   - o par raiz + código, escrito pelo `brza init` e por `brza register <raiz> [--code <caminho>]`, que recusa código
+     já ligado a outro workspace (recomendada) — custo: ~1 h no P2 e uma linha de worklog por máquina; se paga: na
+     segunda máquina;
+   - só a raiz, com o código do `[code].path` do manifesto — custo: ~0,8 h, e cada busca lê todos os manifestos; se
+     paga: só com o código no mesmo caminho em toda máquina;
+   - o par, escrito por `brza install --register` — custo: os mesmos ~1 h, e o install liga binários e workspaces; se
+     paga: nunca melhor que a primeira.
+
+   **Decidido — "Par raiz+código, brza register (Recomendado)".**
+
+2. **O caminho do índice.** Opções:
+   - `.brza/index.jsonl` (recomendada) — custo: 0 h; se paga: já;
+   - `work/index.jsonl` — custo: ~0,2 h; se paga: só se quem coordena procurar no `work/`;
+   - `INDEX.jsonl` na raiz — custo: 0 h; se paga: só com o índice na página do repositório.
+
+   **Decidido — ".brza/index.jsonl (Recomendado)".**
+
+3. **A descrição de cada linha.** Opções:
+   - um campo `description` no frontmatter de plano, issue e decisão, obrigatório na nota nova, com o H1 nas antigas
+     (recomendada) — custo: ~1 h no P4; se paga: no primeiro uso do índice pelo coordenador;
+   - a primeira frase do corpo — custo: ~0,5 h, e sai `- **Retomar:**` ou `## O pedido`; se paga: só com parágrafo de
+     resumo nas notas;
+   - só na criação, por flag — custo: ~0,3 h, e a nota criada sem o `brza note` fica sem; se paga: só com tudo criado
+     pelo `brza note`.
+
+   **Decidido — "Campo description (Recomendado)".**
+
+4. **Como a linha chega à `master`.** Opções:
+   - commit sem checkout na `origin/master`, com 3 tentativas, e o aviso de `brza note index --rebuild` quando falha
+     (recomendada) — custo: ~1,5 h no P4 e ~1–2 s por commit, não medido contra o GitHub; se paga: no primeiro commit com
+     o checkout principal sujo;
+   - no checkout principal — custo: ~0,8 h, e recusa com ele sujo; se paga: só com ele sempre limpo.
+
+   **Decidido — "Commit sem checkout (Recomendado)".**
+
+### Rodada 8 — o id, a Fixfy, a medição datada e a decisão (enviada 2026-10-31)
+
+**Apresentado antes:** o quinto ponto da revisão do `designer` e três escolhas que o rascunho marcou "sem lastro" sem
+levar à rodada (`PLN-006-design.md`, D3 e D11).
+
+Respondida em 2026-10-31.
+
+1. **O id de issue e decisão no índice.** Opções:
+   - `issue:<slug>` ou `decision:<slug>`, com o slug da criação; o rename só muda o `path` (recomendada) — custo: 0 h;
+     se paga: no primeiro `move_note.py` de uma issue;
+   - o caminho atual — custo: 0 h, e o rename vira item novo; se paga: nunca.
+
+   **Decidido — "kind:slug da criação (Recomendado)".**
+
+2. **As 7 menções à Fixfy.** Opções:
+   - saem do núcleo (recomendada) — custo: ~0,2 h no P3; se paga: já, com o núcleo público;
+   - vão à parte local — custo: ~0,3 h; se paga: se a procedência servir a quem lê este workspace;
+   - ficam no núcleo — custo: 0 h; se paga: só se a referência for desejada em todo workspace.
+
+   **Decidido — "Saem do núcleo (Recomendado)".**
+
+3. **A medição datada que justifica regras** (`AGENTS.md:92-93`, o cache de 1 h no `CLAUDE.md`). Opções:
+   - no núcleo, como o porquê da regra (recomendada) — custo: 0 h; se paga: já;
+   - na parte local, com a regra sem o número — custo: ~0,3 h; se paga: quando outro workspace medir o próprio;
+   - num guia em `wiki/` — custo: ~0,5 h; se paga: se a medição crescer.
+
+   **Decidido — "No núcleo, como porquê (Recomendado)".**
+
+4. **A exceção à decisão de 2026-10-30.** Opções:
+   - nota nova em `work/decisions/`, citando a R5, sem `superseded_by`, nascida como proposta (recomendada) — custo:
+     ~0,3 h no P4; se paga: na primeira leitura da de 2026-10-30;
+   - reabrir a de 2026-10-30 — custo: ~0,2 h, e a decisão fechada muda; se paga: só com exceção pequena;
+   - só no plano e no `AGENTS.md` — custo: 0 h, e a decisão fica contradita; se paga: nunca.
+
+   **Decidido — "Nota nova, sem superseded_by (Recomendado)".**
+
+## Desenho
+
+O Desenho, D1–D12, está em [PLN-006 — Desenho](PLN-006-design.md), por passar de 400 linhas.
+
+## Passos
+
+> Do P1 ao P7 só o `brza-workflow` muda, e o `brza-workspace` segue como hoje; o P8 é o único que o toca, em estágios
+> (R6.4). Cada passo só executa a pedido explícito de Anderson.
+
+### P1 — O `brza-workflow` nasce com o núcleo, o CLI e os testes verdes
+
+Executa D1, D3 · executor: `implementer`; o `gh repo create brz-anderson/brza-workflow --public` pela sessão
+
+Estimado: 1,5 h · Executado: — h
+
+- [ ] **1. Criar o repositório** e o layout do D1
+- [ ] **2. Copiar** o núcleo, o CLI e os testes pela fronteira do D3, sem os scripts locais nem o `resume_guard`
+- [ ] **3. Rodar** as três suítes lá — `scripts/brza/tests`, `.claude/hooks/tests`, `notes-checker` — e ver passar
+- [ ] **4. Commit e push** no `brza-workflow`
+
+### P2 — A raiz sai do cwd e do registro, no CLI e nos hooks
+
+Executa D6, D7 · executor: `implementer`
+
+Estimado: 4,5 h · Executado: — h
+
+- [ ] **1. Testes que falham**: o `brza where` de um worktree fora do diretório, sem entrada no registro, e o `brza
+  register` recusando um código já ligado
+- [ ] **2. Implementar** o `brza_root`, o registro, o `brza where` e o `brza register`; os hooks e o `brza_runtime`
+  passam a usá-lo, sem `tomllib`
+- [ ] **3. Rodar e ver passar**, também no `/usr/bin/python3` 3.9
+- [ ] **4. Commit**
+
+### P3 — O manifesto, o lock, o motor e a norma em molde
+
+Executa D2, D4, D5 · executor: `implementer`
+
+Estimado: 3,5 h · Executado: — h
+
+- [ ] **1. Teste de ouro que falha**: o render do núcleo com o manifesto do `brza-workspace` sai igual à `master`
+  daqui, menos a lista fechada do D12
+- [ ] **2. Implementar** o parser TOML, o render `{{tabela.chave}}`, o lock; pôr os placeholders nos `.md`, tirar a
+  Fixfy (R8.2), o `@AGENTS.md` e as `.claude/rules/`
+- [ ] **3. Rodar e ver passar**
+- [ ] **4. Commit**
+
+### P4 — O índice da `master`
+
+Executa D11 · executor: `implementer`; o texto da norma e a nota de decisão pela sessão
+
+Estimado: 5 h · Executado: — h
+
+- [ ] **1. Testes que falham**: o `plan-open` em corrida, a linha `changed` do `commit` sem tocar o checkout principal,
+  o `merge=union` e o estado vigente pelo maior `ts`
+- [ ] **2. Implementar** o `brza note plan-open`, a linha do `commit`, o `brza note index --rebuild`, o
+  `.gitattributes` e o campo `description` no checador e no molde
+- [ ] **3. Rodar e ver passar**
+- [ ] **4. A norma**: o texto do `AGENTS.md` e da `plan-runner` do D11, e a nota de decisão da R8.4, como proposta
+- [ ] **5. Commit**
+
+### P5 — O `brza init`
+
+Executa D8 · executor: `implementer`
+
+Estimado: 3 h · Executado: — h
+
+- [ ] **1. Teste de aceite que falha**: o init num diretório temporário, com o checador verde e sem caminho fixo
+- [ ] **2. Implementar**
+- [ ] **3. Rodar e ver passar**
+- [ ] **4. Commit**
+
+### P6 — O `brza sync`, camada 1
+
+Executa D9 · executor: `implementer`
+
+Estimado: 3 h · Executado: — h
+
+- [ ] **1. Testes que falham**: a mudança do núcleo chega sem tocar a parte local; o arquivo editado é recusado com o
+  diff, e o `--force` o escreve
+- [ ] **2. Implementar**
+- [ ] **3. Rodar e ver passar**
+- [ ] **4. Commit**
+
+### P7 — O `install`, o lançador, o `doctor` e os scripts locais
+
+Executa D10 · executor: `implementer`
+
+Estimado: 2 h · Executado: — h
+
+- [ ] **1. Testes que falham** do `--client`, do `--local` e do `--relink`, e do `doctor` com o registro
+- [ ] **2. Implementar**, com o `claude-brza`, o `brza-sessions` e o bloco do shell sem nome fixo
+- [ ] **3. Rodar e ver passar**
+- [ ] **4. Commit**
+
+### P8 — O `brza-workspace` vira cliente do `brza-workflow`
+
+Executa D12, D10 · executor: a sessão do `workspace`
+
+Estimado: 3 h · Executado: — h
+
+- [ ] **1. Estágio 1**: o manifesto, as rules e o índice, povoado pelo `index --rebuild`, entram; os scripts de hoje os
+  ignoram
+- [ ] **2. Estágio 2**: o `brza sync --dry-run` mostra só a lista fechada do D12
+- [ ] **3. Estágio 3**: o `brza register`, o relink do `~/.local/bin` e o bloco do `~/.zshrc`, ao worklog em "Fora do
+  workspace"; o sync real
+- [ ] **4. Conferir** a Regressão inteira
+
+### P9 — A revisão adversária e o README do `brza-workflow`
+
+Executa todos · executor: `reviewer`; o README pela sessão
+
+Estimado: 1,5 h · Executado: — h
+
+- [ ] **1. A revisão**, com o parecer em `work/reviews/pln-006-o-brza-init.md`
+- [ ] **2. Cada achado com destino**
+
+## Regressão
+
+- **O `brza-workspace` segue funcionando a cada estágio do P8.** Como se confere: as três suítes de hoje, o `brza note
+  commit` e o `brza note sync` num workstream, e uma linha `turn` com o `workstream` preenchido na medição.
+- **O `compact_guard` segue barrando.** Como se confere: `.claude/hooks/tests/test_compact_guard.py` e um `/compact`
+  manual com nota sem commit.
+- **As sessões do `brza-studio` acham o workspace.** Como se confere: o `brza where` e o `measure.py` de um checkout do
+  `brza-studio`, pelo registro.
+
 ## Worklogs
 
-- 2026-10-31 — aberto; R1–R6 respondidas, a R2.1 em texto livre e confirmada na R3.1, a R4.3 em texto livre e
-  fechada na R5; rascunho D1–D12 e P1–P8 do `designer`. Parou antes de gravar o Desenho.
+- 2026-10-31 — aberto; R1–R8 respondidas, a R2.1 em texto livre e confirmada na R3.1, a R4.3 em texto livre e
+  fechada na R5; D1–D12 gravados no `-design`, P1–P9 escritos (27 h). Parou na rodada do corte.
   [PLN-006: a abertura do brza init](../../work/worklogs/2026-10-31-pln-006-a-abertura-do-brza-init.md)

@@ -90,6 +90,30 @@
           }
         ]
       }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${BRZA_PYTHON:-python3} \"${BRZA_WORKSPACE:-$CLAUDE_PROJECT_DIR}/.claude/hooks/compact_guard.py\" pre || true",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${BRZA_PYTHON:-python3} \"${BRZA_WORKSPACE:-$CLAUDE_PROJECT_DIR}/.claude/hooks/compact_guard.py\" post || true",
+            "timeout": 15
+          }
+        ]
+      }
     ]
   },
   "disableClaudeAiConnectors": true

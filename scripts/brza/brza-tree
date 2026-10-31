@@ -3,8 +3,9 @@
 
   brza-tree <nome> [--type feat|fix|docs|chore] [--base <ref>] [--chat <sessão>]
       cria ~/Projects/brza-studio/.worktrees/<nome> na branch <tipo>/<nome> (tipo padrão feat), a partir da
-      origin/master depois de git fetch origin, ou de --base; instala com pnpm install --offline --frozen-lockfile e
-      imprime o caminho. --chat abre a sessão no worktree pelo brza-sessions --checkout.
+      origin/master depois de git fetch origin, ou de --base; instala com pnpm install --offline --frozen-lockfile na
+      raiz e no mobile/, que tem lockfile próprio, e imprime o caminho. --chat abre a sessão no worktree pelo
+      brza-sessions --checkout.
   brza-tree --rm <nome> [--empty] [--force]
       remove o worktree e a branch quando o HEAD é ancestral da origin/master e o worktree está limpo. A branch sem
       commit próprio pede --empty, porque "na origin/master" vale também para ela. O sujo, o não mergeado e o órfão
@@ -41,6 +42,9 @@ import brza_runtime as runtime  # noqa: E402
 
 SESSIONS = HERE / 'brza-sessions'
 TYPES = ('feat', 'fix', 'docs', 'chore')
+# Os pacotes com lockfile próprio, fora do pnpm-workspace.yaml da raiz, que o install da raiz não alcança. O cloud/
+# fica de fora: o store não tem os pacotes dele, e o install offline falha.
+OWN_LOCKFILE = ('mobile',)
 NAME = re.compile(r'[a-z0-9][a-z0-9._-]*')
 
 
@@ -113,13 +117,15 @@ def create(name: str, kind: str, base: str | None, chat: str | None) -> int:
     print(f'worktree: {path}  ({branch}, de {base or "origin/master"})')
     if workstream_tree := link_memory(path, branch):
         link_agent_memory(path, workstream_tree)
-    try:
-        runtime.install_offline(path)
-    except runtime.BrzaError as e:
-        print(f'CHECK:    {e}')
-        print(f'          o worktree fica em {path}; rode lá `pnpm install --frozen-lockfile`')
-        return 1
-    print('install:  ok (offline)')
+    packages = ['.', *(p for p in OWN_LOCKFILE if (path / p / 'pnpm-lock.yaml').exists())]
+    for package in packages:
+        try:
+            runtime.install_offline(path / package)
+        except runtime.BrzaError as e:
+            print(f'CHECK:    {e}')
+            print(f'          o worktree fica em {path}; rode em {path / package} `pnpm install --frozen-lockfile`')
+            return 1
+    print(f'install:  ok (offline: {", ".join("raiz" if p == "." else p for p in packages)})')
     if chat:
         r = subprocess.run([str(SESSIONS), chat, '--checkout', str(path)])
         if r.returncode != 0:

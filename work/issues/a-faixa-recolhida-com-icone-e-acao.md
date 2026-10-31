@@ -16,6 +16,8 @@ implementar". A rodada está em
 [Os artboards na rodada de desenho de interface](../worklogs/2026-10-31-artboards-na-rodada-de-desenho.md),
 na seção "O teste no chat".
 
+![A alternativa C, com uma pergunta de título longo e uma aprovação, a 736 px no tema claro](a-faixa-recolhida-com-icone-e-acao.png)
+
 ## O que existe
 
 A faixa é o `NativeChatPromptStrip` (`src/renderer/src/components/native-chat/NativeChatPromptCollapse.tsx:50-70`,

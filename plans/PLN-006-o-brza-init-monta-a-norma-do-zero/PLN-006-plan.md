@@ -1,8 +1,8 @@
 ---
-status: open
-phase: design
+status: in_progress
+phase: execution
 origin: request
-ready: não — aguarda a rodada do corte dos Passos
+ready: sim
 estimate_h: 27
 executed_h: 0
 remaining_h: 27
@@ -16,8 +16,7 @@ tags:
 
 # PLN-006: O `brza init` monta a norma num workspace do zero
 
-- **Retomar:** R1–R8 fechadas; o Desenho (D1–D12) e os Passos (P1–P9, 27 h) estão escritos. Próximo: a rodada do
-  corte — aceitar, juntar ou dividir —, que é o aceite do plano.
+- **Retomar:** aceito na R9, com a execução em paralelo pedida. Em curso: o P1; depois, P2, P3 e P4 juntos.
 - **Dividido:** [PLN-006 — Desenho](PLN-006-design.md)
 
 ## Pedido
@@ -440,6 +439,23 @@ Respondida em 2026-10-31.
    - só no plano e no `AGENTS.md` — custo: 0 h, e a decisão fica contradita; se paga: nunca.
 
    **Decidido — "Nota nova, sem superseded_by (Recomendado)".**
+
+### Rodada 9 — o corte dos Passos (enviada 2026-10-31, na mensagem)
+
+**Apresentado antes:** o índice dos D, a Cobertura, os Passos P1–P9 (27 h) e a Regressão, na mensagem, por ser a
+rodada que aprova o texto do plano.
+
+Respondida em 2026-10-31.
+
+1. **O corte.** Opções:
+   - aceitar P1–P9 como estão (recomendada) — custo: 27 h, 5 h delas do índice; se paga: no segundo workspace;
+   - dividir, com o índice (P4) num plano próprio — custo: ~15 min e a `plan-runner` mexida duas vezes; se paga: se o
+     `brza init` for mais urgente que o índice;
+   - juntar P5 e P6 — custo: o mesmo total, num commit maior; se paga: só se init e sync dividirem quase todo o código.
+
+   **Resposta:** "aceito e pode iniciar os passos em paralelo". **Decidido — aceitar P1–P9**, que é o aceite do plano
+   em 2026-10-31, e a execução pedida, em paralelo onde a dependência deixa: o P1 antes de todos; P2, P3 e P4 juntos;
+   P5, P6 e P7 depois deles; o P8 e o P9 no fim.
 
 ## Desenho
 

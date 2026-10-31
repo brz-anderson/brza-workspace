@@ -68,3 +68,9 @@ estruturado (`NativeChatPromptStrip`, do `a0eefa646e4` no `brza-studio`).
     `studio` (`1c079c2`).
 - **O `--checkout` relativo falha fora da raiz:** `brza sessions … --checkout .worktrees/tools-kit`, rodado no worktree
   do `workspace`, resolveu o caminho a partir do cwd e devolveu `selector_not_found`. Com o caminho absoluto, abriu.
+- **A norma**, aprovada por Anderson ("1. sim"), na `master` (`a29f79b`), levada aos workstreams pelo `brza note sync`:
+  no Desenhar, passo 3, a sessão confere cada artboard pelo `brza shot --width 736` antes da rodada; no passo 4, a
+  escolhida que vai a uma issue deixa o PNG ao lado dela; no `work/README.md`, a imagem de uma nota fica ao lado dela.
+- **O `brza shot` a 736 px** saiu do `tools-kit` no `0dcc82d`.
+- **O `--checkout` relativo** (resposta "2. 1"): o `brza sessions` passa a resolvê-lo a partir da raiz do
+  `brza-workspace`, pedido por correio à sessão `tools-kit-shot-736`. A norma não muda.

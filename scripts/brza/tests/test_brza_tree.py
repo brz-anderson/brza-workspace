@@ -101,6 +101,40 @@ class TreeTest(TreeBase):
         self.assertIn(str(self.tree('x')), out)
         self.assertIn('pnpm install --frozen-lockfile', out)
 
+    def push_mobile_lockfile(self):
+        (self.seed / 'mobile').mkdir()
+        (self.seed / 'mobile' / 'pnpm-lock.yaml').write_text('lockfileVersion: 9.0\n')
+        git('add', 'mobile', cwd=self.seed)
+        git('commit', '-q', '-m', 'mobile', cwd=self.seed)
+        git('push', '-q', 'origin', 'HEAD:master', cwd=self.seed)
+
+    def test_mobile_with_its_own_lockfile_is_installed_after_the_root(self):
+        self.push_mobile_lockfile()
+        code, out = self.run_tree('x')
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.installed, [self.tree('x'), self.tree('x') / 'mobile'])
+        self.assertIn('install:  ok (offline: raiz, mobile)', out)
+
+    def test_without_the_mobile_lockfile_only_the_root_is_installed(self):
+        code, out = self.run_tree('x')
+        self.assertEqual(code, 0, out)
+        self.assertIn('install:  ok (offline: raiz)', out)
+
+    def test_failed_mobile_install_names_the_mobile_directory(self):
+        self.push_mobile_lockfile()
+        root_install = self.fake_install
+
+        def fails_in_mobile(path: Path):
+            root_install(path)
+            if path.name == 'mobile':
+                raise runtime.BrzaError(f'o install offline falhou em {path}')
+
+        with patch.object(runtime, 'install_offline', fails_in_mobile):
+            code, out = self.run_tree('x')
+        self.assertEqual(code, 1, out)
+        self.assertIn(f'rode em {self.tree("x") / "mobile"} `pnpm install --frozen-lockfile`', out)
+        self.assertNotIn('install:  ok', out)
+
     def test_existing_directory_is_refused(self):
         self.tree('x').mkdir(parents=True)
         code, out = self.run_tree('x')

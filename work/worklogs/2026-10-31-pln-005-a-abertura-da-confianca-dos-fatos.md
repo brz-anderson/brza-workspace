@@ -28,6 +28,13 @@ Três rodadas, gravadas na Entrevista do plano:
 
 O Desenho (D1–D6) e os Passos (P1–P9, 9 h) foram escritos e aceitos na R4 ("1"). A execução começa pelo P1, a pedido.
 
+## A sonda do P1
+
+O `claude -p` em Haiku 5.5 auditou três fatos de fixture em 9,6 s, por US$ 0,0056, e acertou os três vereditos: dois
+`holds` e o `fails` plantado. Os hooks do projeto rodam na sessão `-p` e enxergam o `BRZA_FACT_AUDIT`, e o
+`--max-budget-usd` corta com saída 1. O D2 ficou como estava. A sonda achou ainda uma citação errada do próprio plano,
+`measure.py:22` no lugar da linha 23, que o Terreno corrigiu.
+
 ## Na master
 
 - `2e8ea67` — "Último PLN usado" passa a 005 no `plans/README.md`.

@@ -36,7 +36,7 @@ rodada.
 - **Como medir:** "3 tarefas, com e sem" — a mesma tarefa com a skill adaptada e sem ela, pela `skill-creator`; e as
   três tarefas propostas, "Servem".
 - **As skills de documento:** "essas vão ao `tools-kit` para um possível plugin", registrado como "Issue no tools-kit"
-  em As skills de documento da Fixfy num possível plugin do BrzA.
+  em [As skills de documento da Fixfy num possível plugin do BrzA](../issues/skills-de-documento-da-fixfy-num-plugin.md).
 - **Os furos do `end-day-runner`:** "Issue", em
   [O close-task não varre o work/notes/ do dia nem relata os worktrees sujos](../issues/close-task-sem-varredura-de-notes-nem-worktrees-sujos.md).
 

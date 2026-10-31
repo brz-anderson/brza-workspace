@@ -14,9 +14,8 @@ tags:
 
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** R1 e R2 fechadas; o levantamento do PLN-011 está no scratch da sessão `workspace`
-  (`pln-004-levantamento-pln-011.md`). O próximo é a rodada 3 — papéis, memória, medição e delegação — e a sonda da
-  identidade (R2.3).
+- **Retomar:** R1 a R4 fechadas; o levantamento do PLN-011 está no scratch da sessão `workspace`
+  (`pln-004-levantamento-pln-011.md`). O próximo são as três sondas (R4.2) e, com elas, o Terreno e os itens `D`.
 
 ## Pedido
 
@@ -166,7 +165,90 @@ Respondida em 2026-10-30, na sessão `workspace`.
 
    **Decidido — "Versionado, revisão por worktree (Recomendado)".**
 
+### Rodada 3 — os papéis, a memória, a medição e a delegação (enviada 2026-10-30)
+
+**Apresentado antes:** do mesmo levantamento.
+- **Os geradores da Fixfy** — `generate_codex_agents.py` e `generate_agy_agents.py`, sobre `agent_frontmatter.py` —
+  têm `--check`, que acusa divergência (`FX/fixfy-plugin/scripts/generate_codex_agents.py:93-108`). O Codex não traduz
+  `tools` nem `memory` (`:13-15`).
+- **Nem o Codex nem o `agy` têm campo de memória por agente**; aqui, os papéis usam `memory: project`
+  (`.claude/agents/collector.md:6`).
+- **O `agy` trocou os nomes das ferramentas** em 2026-10-20 (`view_file` → `read_file`, `write_to_file` →
+  `write_file`, `replace_file_content` → `edit_file`); a tabela da Fixfy (`generate_agy_agents.py:34-43`) e os matchers
+  do `FX/.agents/hooks.json:14-40` têm os nomes antigos.
+- **O `measure.py` daqui** não tem `runtime` nem os modos `codex` e `agy`; o da Fixfy tem os dois
+  (`FX/.claude/hooks/measure.py:468-701`). O Codex 0.164 grava também rollouts `guardian_review`.
+- **A delegação da Fixfy** é o `FX/scripts/delegate.py`, do PLN-022, com o destino pelo `quota.py` e a conta `adm`; a
+  medição dela fecha hoje, sem veredito gravado.
+
+Respondida em 2026-10-30, na sessão `workspace`.
+
+1. **Como o papel grava na memória do workstream no Codex e no `agy`.** Opções:
+   - o gerador injeta no papel "leia e grave em `.claude/agent-memory/<papel>/`", com o caminho do worktree
+     (recomendada) — custo: o gerador conhece o worktree, e os geradores e os testes crescem; se paga: no primeiro papel
+     rodado fora do Claude;
+   - a memória dos papéis vai a uma pasta neutra — custo: muda o `memory_dirs()` (`measure.py:627-638`), o
+     `memory: project` e o `AGENTS.md`; se paga: só se o `.claude/` atrapalhar o Codex.
+
+   **Resposta:** "opção 1 + a memória registra se foi gravada por um runtime diferente de claude". Leitura: vale o
+   bloco no prompt, e a memória gravada fora do Claude carrega o runtime que a gravou. Onde o runtime fica — no arquivo
+   da memória, no evento `memory` da medição, ou nos dois — vai à rodada 4.
+
+2. **Como `reviewer`, `collector` e `designer` ficam só em leitura fora do Claude.** Opções:
+   - pela chamada (`codex exec -s read-only`, `agy --mode plan`) e pelo texto, sem `tools` no `agy` (recomendada) —
+     custo: a restrição só vale quando o papel vem pela delegação; se paga: agora, sem portar a tabela de nomes ainda
+     não provados;
+   - traduzir `tools` no `agy`, depois de uma sonda de um turno (`agy -p`) que lê os nomes atuais — custo: um turno
+     medido (~US$ 0,35 em seis turnos no P11 da Fixfy, `PLN-011-plan.md:696`), a tabela e os testes; se paga: se um
+     papel do `agy` rodar como sessão interativa.
+
+   **Decidido — "Traduzir tools no agy"**, com a sonda dos nomes antes.
+
+3. **Como a medição do Codex e do `agy` entra no `measure.py` daqui.** Opções:
+   - portar o `codex()`/`agy()` da Fixfy, com `runtime`, `workstream` e `memory()` em todo modo, o `API_PRICES`
+     conferido com os modelos de hoje e a tabela "Por runtime" no resumo, depois de uma sonda que vê se o
+     `guardian_review` dispara `SubagentStop` (recomendada) — custo: ~260 linhas e testes com três fixtures; se paga: no
+     primeiro resumo com linha real de cada runtime, o que o P9 da Fixfy reabriu;
+   - só tokens e cota, sem US$ — custo: menor, sem comparar com o Claude; se paga: nunca, se o custo por turno for
+     métrica.
+
+   **Decidido — "Portar com US$ (Recomendado)".**
+
+4. **Se a delegação porta o `delegate.py` da Fixfy.** Opções:
+   - versão reduzida: `--type review|reading`, `--to codex|agy` explícito, sem `quota.py` nem a conta `adm`, só leitura,
+     com a linha `delegation` na medição (recomendada) — custo: ~150 linhas a menos que o original e um pedido ao
+     `tools-kit`; se paga: na primeira revisão feita pelo Codex ou pelo `agy`;
+   - esperar o veredito da Fixfy — custo: o PLN-004 para na frente 4; se paga: se o veredito for encerrar a delegação.
+
+   **Decidido — "Versão reduzida (Recomendado)".**
+
+### Rodada 4 — o runtime na memória e as sondas (enviada 2026-10-30)
+
+**Apresentado antes:** a leitura da resposta da R3.1, e as três sondas que as rodadas pediram — a identidade no commit
+(R2.3), os nomes das ferramentas do `agy` (R3.2) e o `guardian_review` com o `SubagentStop` (R3.3). O `memory()` do
+`measure.py` já lê o bloco `metadata:` do frontmatter (`.claude/hooks/measure.py:606-623`).
+
+Respondida em 2026-10-30, na sessão `workspace`.
+
+1. **Onde fica o runtime da memória gravada fora do Claude** (R3.1). Opções:
+   - no arquivo e no evento (recomendada): o bloco do papel manda gravar `metadata.runtime: codex|agy` no frontmatter —
+     sem o campo, foi o Claude —, e o evento `memory` lê o campo — custo: uma linha no bloco gerado e a leitura no
+     `memory()`, com teste; se paga: na primeira memória gravada fora do Claude, à vista no git e no `--by-workstream`;
+   - só no arquivo — custo: só a linha no bloco; se paga: agora no git, sem o resumo separar por runtime;
+   - só no evento, pelo runtime da sessão — custo: a leitura no `memory()`, com o `session_id` aproximado do retrato;
+     se paga: só se o runtime da sessão for confiável no retrato, e hoje não é.
+
+   **Decidido — "No arquivo e no evento (Recomendado)".**
+
+2. **Quando rodam as três sondas.** Opções:
+   - agora, antes do Desenho, por um subagente, num repositório descartável do scratch (recomendada) — custo: ~2 turnos
+     de Codex (~US$ 0,40), ~2 de `agy` (~US$ 0,12) e o subagente; se paga: no Desenho, com fato no lugar de hipótese;
+   - como P0 do plano — custo: o mesmo, mais reescrever o `D` que a sonda desmentir; se paga: só se as três
+     confirmarem o que o Desenho supôs.
+
+   **Decidido — "Agora, antes do Desenho (Recomendado)".**
+
 ## Worklogs
 
-- 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2. Parou na R3.
+- 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4. Parou nas sondas.
   [O PLN-004: a abertura do Codex e do agy no fluxo](../../work/worklogs/2026-10-30-pln-004-a-abertura-do-codex-e-do-agy-no-fluxo.md)

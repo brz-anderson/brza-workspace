@@ -16,7 +16,7 @@ mecânica própria do Claude.
 | retomar o subagente        | `SendMessage` com o nome ou o ID do agente, que volta com o contexto dele; não abre `Agent` novo |
 | estágio de workflow        | cada `agent()` de um workflow                                                                    |
 | camada alta, média, rápida | Opus, Sonnet, Haiku — o `haiku` é o Haiku 5.5, pelo `env` do `settings.json`                     |
-| scratch                    | o scratchpad da sessão, anunciado no arranque, em `/private/tmp/claude-501/…`                    |
+| scratch                    | o scratchpad da sessão, anunciado no arranque, em `/private/tmp/claude-501/…`; no chat do BrzA Studio, o `chat-scratch/<hash>` do `~/Library/Application Support/brza-studio/`, que entra como diretório de trabalho adicional |
 | sessão nova                | `/exit` e `claude --name <nome>` no worktree do workstream, `.worktrees/<nome>`, sem `--resume`, `--continue` nem `--rc`; pelo `brza sessions`, com `--checkout .worktrees/<nome>` |
 | compactação                | `/compact`, depois do `/close-task`; o runtime também compacta sozinho perto do limite da janela |
 
@@ -26,6 +26,10 @@ o padrão "PLN-002 P7: renomear chat". O `--rename` vai quando a sessão manda o
 `claude --name <nome> "<prompt>"` fica para quando o `brza sessions` não serve. **Não use `--rc`**: com ele, o prompt
 entre aspas não funciona. Não use `/clear` no lugar da sessão nova, porque ele
 troca o `session_id` mas mantém a conversa anterior ligada à sessão.
+
+**O caminho do scratch vai ao subagente por um link curto.** O do chat do BrzA Studio tem espaço e um hash de 32
+caracteres, que o subagente copia errado sem dar erro: grava numa pasta nova com o nome trocado, ou para achando que o
+arquivo não existe. Antes de delegar, `ln -sfn "<scratch>/<pasta>" /private/tmp/<nome>`, e o pedido leva só o link.
 
 ## A configuração chega pela função do shell
 

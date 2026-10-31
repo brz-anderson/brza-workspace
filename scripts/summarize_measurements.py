@@ -14,6 +14,9 @@ decisões das travas de retomada e do /compact. As negações de hook saem com o
   python3 scripts/summarize_measurements.py --json               a mesma agregação em JSON
   python3 scripts/summarize_measurements.py --by-workstream      por workstream e por dia: turnos, custo, subagentes por
                                                                  agent_type, memórias e rodadas (com --json, em JSON)
+  python3 scripts/summarize_measurements.py --facts              o acerto dos fatos do desenho (PLN-005), por papel, classe,
+                                                                 faixa de confiança e tipo (com --json, em JSON); --since
+                                                                 filtra pela data do fato
 
 Log que não existe é pulado; linha que não é JSON é contada e ignorada. Só biblioteca padrão, Python 3.9.
 """
@@ -348,6 +351,146 @@ def to_json_by_workstream(days):
              "live_memories": days[(w, d)]["live"], "rounds": days[(w, d)]["rounds"]} for (w, d) in sorted(days)]
 
 
+FACT_BANDS = ("90+", "80–89", "<80")
+FACT_KINDS = ("rodado", "lido", "doc", "inferido")
+FACT_CLASSES = ("fato", "custo")
+PENDING_HINT = "python3 scripts/fact_outcome.py --pending --workstream all"  # a contagem é de todos os workstreams (PLN-005/R10.3)
+
+
+def fact_band(confidence):
+    if isinstance(confidence, (int, float)) and confidence >= 90:
+        return FACT_BANDS[0]
+    if isinstance(confidence, (int, float)) and confidence >= 80:
+        return FACT_BANDS[1]
+    return FACT_BANDS[2]  # a confiança que não é número também fica a conferir
+
+
+def in_range(row, since):
+    return not since or str(row.get("timestamp", ""))[:10] >= since
+
+
+def last_by_fact(measurements, event):
+    """{(agent_id, fact_id): o último evento do tipo}, pela ordem do log."""
+    last = {}
+    for row in measurements:
+        if row.get("event") == event:
+            last[(row.get("agent_id"), row.get("fact_id"))] = row
+    return last
+
+
+def fact_sort_key(key):
+    agent, klass, band, kind = key
+    return (agent, FACT_CLASSES.index(klass), FACT_BANDS.index(band),
+            FACT_KINDS.index(kind) if kind in FACT_KINDS else len(FACT_KINDS), kind)
+
+
+def aggregate_facts(measurements, since=""):
+    """O acerto dos fatos do desenho: {rows, captures, audits, pending}. O fato é o par (agent_id, fact_id), e vale o
+    primeiro `fact` de cada par; o `--since` filtra pela data dele. O veredito final é o último `fact_outcome` da sessão
+    (holds ou fails) e, sem ele, o último `fact_check` do Haiku; o desfecho e o check que chegam depois da data valem.
+    O `unknown` não entra no acerto. O `cite` vem do último `fact_check`. As leituras (`fact_capture`) e as auditorias
+    (`fact_audit`) filtram pela data delas."""
+    first = {}
+    for row in measurements:
+        if row.get("event") == "fact":
+            first.setdefault((row.get("agent_id"), row.get("fact_id")), row)
+    checks, outcomes = last_by_fact(measurements, "fact_check"), last_by_fact(measurements, "fact_outcome")
+    buckets, pending = {}, 0
+    for key, row in first.items():
+        if not in_range(row, since):
+            continue
+        fact_id = str(row.get("fact_id") or "")
+        confidence, kind = row.get("confidence"), label(row.get("kind"))
+        klass = "custo" if fact_id.startswith("C") else "fato"
+        session, haiku = outcomes.get(key), checks.get(key)
+        verdict = session.get("verdict") if session and session.get("verdict") in ("holds", "fails") else None
+        if verdict is None and haiku:
+            verdict = haiku.get("verdict") if haiku.get("verdict") in ("holds", "fails", "unknown") else None
+        bucket = buckets.setdefault((short_name(row.get("agent_type")), klass, fact_band(confidence), kind), {
+            "facts": 0, "with_outcome": 0, "holds": 0, "fails": 0, "unknown": 0, "confidence_n": 0,
+            "confidence_sum": 0.0, "checked": 0, "cite_off": 0})
+        bucket["facts"] += 1
+        if verdict == "unknown":
+            bucket["unknown"] += 1
+        elif verdict:
+            bucket["with_outcome"] += 1
+            bucket[verdict] += 1
+            if isinstance(confidence, (int, float)):
+                bucket["confidence_n"] += 1
+                bucket["confidence_sum"] += confidence
+        if haiku:
+            bucket["checked"] += 1
+            bucket["cite_off"] += 1 if haiku.get("cite") == "off" else 0
+        if key not in outcomes and (kind == "inferido" or klass == "custo" or fact_band(confidence) == FACT_BANDS[2]):
+            pending += 1
+
+    rows = {}
+    for key in sorted(buckets, key=fact_sort_key):
+        b = buckets[key]
+        holds_pct = 100 * b["holds"] / b["with_outcome"] if b["with_outcome"] else None
+        mean_confidence = b["confidence_sum"] / b["confidence_n"] if b["confidence_n"] else None
+        rows[key] = {
+            "facts": b["facts"], "with_outcome": b["with_outcome"], "holds": b["holds"], "fails": b["fails"],
+            "holds_pct": holds_pct, "mean_confidence": mean_confidence,
+            "distance": mean_confidence - holds_pct if holds_pct is not None and mean_confidence is not None else None,
+            "unknown": b["unknown"], "checked": b["checked"], "cite_off": b["cite_off"],
+            "cite_off_pct": 100 * b["cite_off"] / b["checked"] if b["checked"] else None}
+
+    captures = {}
+    audits = {"n": 0, "cost": 0.0, "failed": 0, "ignored": 0}
+    for row in measurements:
+        if not in_range(row, since):
+            continue
+        if row.get("event") == "fact_capture":
+            c = captures.setdefault(short_name(row.get("agent_type")), {"read": 0, "unmarked": 0, "malformed": 0})
+            c["read"] += 1
+            c["unmarked"] += 1 if row.get("unmarked") else 0
+            c["malformed"] += int(row.get("malformed") or 0)
+        elif row.get("event") == "fact_audit":
+            audits["n"] += 1
+            audits["cost"] += float(row.get("cost_usd") or 0)
+            audits["failed"] += 1 if row.get("error") else 0
+            audits["ignored"] += int(row.get("ignored") or 0)
+    audits["cost"] = round(audits["cost"], 6)
+    return {"rows": rows, "captures": dict(sorted(captures.items())), "audits": audits, "pending": pending}
+
+
+def signed(value):
+    value = round(value, 1) + 0.0  # tira o -0.0
+    return f"{value:+.1f}"
+
+
+def percent(value):
+    return UNKNOWN if value is None else f"{value:.1f}%"
+
+
+def print_facts(facts):
+    print_table("Fatos do desenho, por papel, classe, faixa de confiança e tipo — distância = confiança média menos "
+                "holds %, positiva é excesso de confiança",
+                ("papel", "classe", "faixa", "tipo", "fatos", "com desfecho", "holds %", "confiança média", "distância",
+                 "unknown", "cite off %"),
+                ("<", "<", "<", "<", ">", ">", ">", ">", ">", ">", ">"),
+                [(agent, klass, band, kind, r["facts"], r["with_outcome"], percent(r["holds_pct"]),
+                  UNKNOWN if r["mean_confidence"] is None else f"{r['mean_confidence']:.1f}",
+                  UNKNOWN if r["distance"] is None else signed(r["distance"]), r["unknown"], percent(r["cite_off_pct"]))
+                 for (agent, klass, band, kind), r in facts["rows"].items()])
+    if facts["captures"]:
+        print("Por papel: " + "; ".join(f"{a}: lidas {c['read']}, sem marca {c['unmarked']}, malformadas {c['malformed']}"
+                                        for a, c in facts["captures"].items()))
+    audits = facts["audits"]
+    if audits["n"]:
+        print(f"Auditorias: rodaram {audits['n']}, custo US$ {audits['cost']:.4f}, falharam {audits['failed']}, "
+              f"ignorados {audits['ignored']}")
+    if facts["rows"]:
+        print(f"Pendentes: {facts['pending']} sem desfecho (inferido, abaixo de 80 ou custo) — {PENDING_HINT}")
+
+
+def to_json_facts(facts):
+    return {"rows": [{"agent": a, "class": k, "band": b, "kind": t, **r} for (a, k, b, t), r in facts["rows"].items()],
+            "captures": [{"agent": a, **c} for a, c in facts["captures"].items()],
+            "audits": facts["audits"], "pending": facts["pending"]}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--dir", default=DEFAULT_DIR, help="diretório com o log")
@@ -356,12 +499,30 @@ def main():
     parser.add_argument("--json", action="store_true", help="imprime a agregação em JSON")
     parser.add_argument("--by-workstream", action="store_true",
                         help="só o resumo por workstream e por dia: turnos, custo, subagentes, memórias e rodadas")
+    parser.add_argument("--facts", action="store_true",
+                        help="só o acerto dos fatos do desenho, por papel, classe, faixa de confiança e tipo")
     args = parser.parse_args()
+    if args.facts and (args.by_workstream or args.denials):
+        parser.error("--facts não se combina com --by-workstream nem com --denials")
 
-    rows, bad, exists = read_log(os.path.join(args.dir, LOG), args.since)
+    # No --facts a data filtra o `fact`, e não o log: o desfecho que chega depois dela vale para o fato de dentro.
+    rows, bad, exists = read_log(os.path.join(args.dir, LOG), "" if args.facts else args.since)
     if not exists:
         print(f"nenhum log em {args.dir}: {LOG}", file=sys.stderr)
         return 2
+
+    if args.facts:
+        facts = aggregate_facts(rows, args.since)
+        if args.json:
+            print(json.dumps(to_json_facts(facts), ensure_ascii=False, indent=2))
+            return 0
+        print(f"{args.dir}: {LOG} {sum(1 for r in rows if in_range(r, args.since))}"
+              + (f" (+{bad} ilegível)" if bad else "") + (f", desde {args.since}" if args.since else ""))
+        print()
+        if not facts["rows"]:
+            print("nenhum fato marcado ainda")
+        print_facts(facts)
+        return 0
 
     if args.by_workstream:
         days = aggregate_by_workstream(rows)

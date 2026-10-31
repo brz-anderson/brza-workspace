@@ -41,6 +41,9 @@ ls work/worklogs/ | grep "^$(date +%F)-"
 - **Com plano:** o `Retomar`, a primeira linha abaixo do H1 do `PLN-NNN-plan.md`, diz de onde a próxima sessão parte. O
   `## Worklogs` ganha a linha com a data, os IDs e o link do worklog. A forma está no `plans/README.md`.
 - **Sem plano:** o pendente vira issue em `work/issues/`, ou linha no `Retomar` do plano dono.
+- **Os fatos a conferir:** `python3 scripts/fact_outcome.py --pending` lista os fatos `inferido`, abaixo de 80 e os
+  custos do workstream sem desfecho. O que a sonda, a rodada ou a execução da tarefa respondeu vai ao
+  `fact_outcome.py` com a `--ref`; o resto fica.
 
 ## 4. A memória
 

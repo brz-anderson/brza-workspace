@@ -175,7 +175,7 @@ class CompactGuardTest(unittest.TestCase):
         self.assertIsNone(self.post())
         self.assertEqual(self.logged(), [])
 
-    def test_main_prints_the_block_and_exits_zero(self):
+    def test_main_passes_outside_the_workspace(self):
         self.write("memory/m.md")
         script = os.path.join(os.path.dirname(HERE), "compact_guard.py")
         # Sem o mock, o processo novo resolve o workstream pelo git: o repositório temporário não é do workspace, e passa.

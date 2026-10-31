@@ -57,11 +57,17 @@ do pedido, e o plano segue para Planejar.
    - **No chat do BrzA Studio, cada alternativa de interface é um artboard**: um `.html` no `ORCA_CHAT_SCRATCH_DIR`,
      na forma da skill `orca-chat-visuals` do app, e uma linha `::orca-visual{file="<arquivo>.html" title="A — <rótulo>"}`
      por alternativa, com a letra da opção no `title`. Até 8 por resposta.
+   - **Antes da rodada, a sessão confere cada artboard pelo PNG**, porque ela não vê o chat:
+     `brza shot <artboard>.html <scratch>/<letra>.png --width 736`, a largura do chat, e a leitura da imagem. Coluna
+     estourada, corte ou texto sobreposto se corrige no `.html` antes da rodada. Numa grade com texto que não quebra, a
+     coluna é `minmax(0,1fr)` e o item tem `min-width:0`.
    - **Fora do chat**, sem o `ORCA_CHAT_SCRATCH_DIR`, o artboard vai ao _scratch_ e a rodada leva o caminho dele.
 4. **Grave o vigente**, com a origem de cada item. A alternativa que perdeu fica até o passo que a transcreve e então
    sai, com uma linha **Descartada** e o porquê. No `PLN`, a crítica posterior vai para a Entrevista, e o item é
    reescrito no lugar. A alternativa de interface escolhida vira PNG na pasta do plano, para sobreviver ao scratch:
-   `brza shot <artboard>.html plans/PLN-NNN-…/PLN-NNN-<assunto>.png`, e o item `D` linka a imagem.
+   `brza shot <artboard>.html plans/PLN-NNN-…/PLN-NNN-<assunto>.png`, e o item `D` linka a imagem. **A escolhida que vai a
+   uma issue**, e não a um plano, deixa o PNG ao lado dela, `work/issues/<nome-da-issue>.png`, e o corpo da issue linka
+   a imagem.
 5. **Aplique o reverso**: item que vira regra durável do `brza-studio` sai para a norma dele, e o plano cita. Sem isso o
    Desenho vira uma segunda norma.
 

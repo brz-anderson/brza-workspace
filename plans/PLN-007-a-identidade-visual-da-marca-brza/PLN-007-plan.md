@@ -1,8 +1,8 @@
 ---
 status: open
-phase: interview
+phase: design
 origin: request
-ready: não — faltam a entrevista, o Desenho e os Passos
+ready: não — faltam o Desenho e os Passos
 scope:
   - brza-studio
   - workspace
@@ -14,8 +14,8 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** R1 e R2 fechadas: A1 com o `}` refeito, B1, vetor à mão, referência o próprio ícone, E2 e M1, M2, M3
-  e M5 no chat. Próximo: a R3, com o logotipo e a tipografia, a paleta, onde a marca aparece e o corte pequeno do A1.
+- **Retomar:** entrevista fechada (R1–R3). Próximo: o Desenho — os itens `D` do SVG do símbolo A1, do corte S1, dos
+  lockups L2, dos tokens P1, da marca no chat (E2, M1, M2, M3, M5) e das aplicações do desktop, do CLI e dos READMEs.
 
 ## Pedido
 
@@ -38,17 +38,22 @@ Na sessão do `brand`, no mesmo dia, durante a R2:
 | :--------- | :----------------------------------------------------------------------------------------------------- | :---- | :------------------------------------ |
 | `R2.1`     | O símbolo BrzA é a ilustração do ícone atual, com o `}` solto refeito inteiro                           | —     | conferência a 1024 e a 256 px (manual) |
 | `R2.3`     | O símbolo existe em SVG desenhado pela sessão, com paths, conferido a 16, 32 e 128 px                  | —     | `brza shot` e abrir o SVG (manual)    |
-| `Pedido 1` | O logotipo BrzA existe em vetor, com o símbolo e a palavra, nos arranjos decididos                      | —     | conferência dos artboards (manual)    |
+| `R3.1`     | O logotipo BrzA existe em SVG, no arranjo L2, para as 4 filhas, na horizontal e na vertical, nos 2 temas | —     | conferência dos artboards (manual)    |
+| `R3.3`     | O corte pequeno é o traço mono de hoje, com o `}` corrigido, e serve ao glifo do chat, ao M2 e ao M5    | —     | conferência a 13, 16 e 18 px (manual) |
 | `R2.2`     | BrzA Studio, o CLI `brza` e o workspace usam o símbolo único, com o nome da filha ao lado da palavra   | —     | conferência dos artboards (manual)    |
 | `R2.5`     | O composer do chat ganha a borda da logo só no foco, nos dois temas                                    | —     | conferência no app (manual)           |
 | `R2.6`     | O chat mostra a marca no estado vazio, no agente trabalhando, no anel de contexto e no cabeçalho      | —     | conferência no app (manual)           |
-| `R1.2`     | A paleta e a tipografia estão fixadas com os valores, e os pontos em que a marca aparece as usam        | —     | conferência no app (manual)           |
-| `Pedido 1` | O ícone do app sai da mesma fonte vetorial que o símbolo, pelo `generate.sh`                            | —     | `resources/icon-source/generate.sh` (manual) |
+| `R3.2`     | A paleta P1 vira tokens nos dois temas, e o `--agent-question` passa a azul                             | —     | conferência no app (manual)           |
+| `R3.4`     | O ícone do app sai do SVG do símbolo pelo `generate.sh`, e o tray, a barra de título, a Landing e o Onboarding usam a marca | — | `resources/icon-source/generate.sh` e conferência no app (manual) |
+| `R3.4`     | O `brza --help` não imprime "orca", e os READMEs do `brza-studio` e do `brza-workspace` levam o logotipo | —     | `brza --help` (manual)                |
 
 ### Fora de escopo
 
 - **Aplicar a marca no código do `brza-studio`.** Cada aplicação é passo de código, executado numa sessão do
   `brza-studio`, na branch `<tipo>/pln-007-<slug>`; aqui fica o pedido.
+- **O app mobile e os restos da Orca à vista** (R3.4). Foram à
+  [issue dos restos da Orca](../../work/issues/os-restos-da-orca-a-vista-no-brza-studio.md).
+- **O cursor e a seleção em laranja no chat** (M4, R2.6). Recusado na rodada; sem destino.
 
 ## Entrevista
 
@@ -176,8 +181,60 @@ Respondida em 2026-10-31, na sessão do `brand`.
 a marca aparece, com os restos da Orca neste plano ou numa issue; e o corte pequeno do A1 — o glifo do chat, o M2 a
 18 px e o M5 a 13 px, onde a ilustração inteira não lê: o traço mono de hoje, ou outra silhueta.
 
+### Rodada 3 — logotipo, paleta, corte pequeno e onde a marca aparece (enviada 2026-10-31)
+
+**Apresentado antes:** seis artboards, com o símbolo A1 de `}` corrigido nos lockups e a Geist do app
+(`src/renderer/src/assets/fonts/Geist-Variable.woff2`) embutida. O contraste medido: o `#F26228` dá 3,2:1 sobre branco e
+não serve a texto pequeno no claro, e por isso a paleta ganhou o `#C2410C` (5,2:1); o `#FFAA44` dá 10,5:1 sobre
+`#0a0a0a`. O corte "só a silhueta" saiu antes da rodada: o contorno do traço mono já carrega o grafo vazado. Os L não
+carregaram no chat na primeira ida — ~630 KB cada, com a imagem repetida —; foram de novo com ~130 KB.
+
+Respondida em 2026-10-31, na sessão do `brand`.
+
+1. **O logotipo e a tipografia.** Opções:
+   - L2, o arranjo do selo "BrzA STUDIO ADE" do `.icns`, na Geist, com a filha em caixa alta espaçada e o "ADE" só no
+     ícone (recomendada) — custo: ~2–3 h para os lockups em SVG, texto em paths, 4 filhas, 2 arranjos e 2 temas; se
+     paga: já, o logotipo bate com o ícone;
+   - L1, a Geist com a filha em peso regular — custo: o mesmo; se paga: já, se o selo não for a referência;
+   - L3, a monoespaçada — custo: o mesmo, e puxa a marca para o CLI, contra a R2.4; se paga: só no README e no CLI.
+
+   **Resposta:** "L2 e S1". **Decidido — L2**: [o logotipo L2](PLN-007-logotipo-l2.png).
+
+2. **A paleta**, âmbar `#FFAA44`, laranja `#F26228`, brasa `#E04A2B`, laranja texto `#C2410C` e grafite `#2C2D32`, com o
+   degradê como assinatura. Opções:
+   - P1, e o `--agent-question` passa ao azul que o app já usa (`#1447e6`) (recomendada) — custo: ~1 h numa sessão do
+     `brza-studio`, os tokens `--brand-*` e o aviso nos dois temas; se paga: já, e resolve o choque do M3 que a R2.6
+     mandou ao Desenho;
+   - P2, e o `--agent-question` fica laranja — custo: ~0,5 h; se paga: nunca resolve o choque.
+
+   **Resposta:** "P1". **Decidido — P1**: [a paleta P1](PLN-007-paleta-p1.png).
+
+3. **O corte pequeno do símbolo**, para o glifo do chat, o M2 e o M5. Opções:
+   - S1, o traço mono de hoje, com o `}` solto corrigido também nele (os subpaths 4 e 6 do `brza-flame-mono.svg`)
+     (recomendada) — custo: quase nenhum agora, e o traço é refeito junto com o SVG da R2.3; se paga: já;
+   - S2, a chama e o grafo sem o `>_` e o `{}` — custo: ~0,5 h; se afasta do A1; se paga: só acima de 24 px.
+
+   **Resposta:** "L2 e S1". **Decidido — S1**: [o corte pequeno](PLN-007-corte-pequeno-s1.png), o S1 à esquerda.
+
+4. **Onde a marca aparece** (múltipla), pela ferramenta de pergunta. Opções:
+   - o app desktop: o ícone, com o `icon.json` e o `generate.sh` no SVG novo, o tray, a barra de título, a Landing e o
+     Onboarding (recomendada) — custo: ~3–5 h numa sessão do `brza-studio`, depois do SVG; se paga: já;
+   - o CLI e os READMEs: o `brza --help` sem "orca" (`src/cli/root-help-text-primary.ts:2-4`) e o logotipo no README
+     do `brza-studio` e no do `brza-workspace` (recomendada) — custo: ~1–2 h; se paga: já;
+   - o app mobile — custo: ~4–8 h, estimado pelo inventário; se paga: quando o mobile entrar no uso;
+   - os restos da Orca à vista neste plano; sem esta opção, viram issue — custo: ~3–6 h, com risco nos merges do
+     upstream; se paga: com outro usuário além de Anderson.
+
+   **Resposta:** "App desktop (Recomendado), CLI e READMEs (Recomendado)". **Decidido — o app desktop e o CLI e os
+   READMEs.** O mobile e os restos da Orca foram à
+   [issue dos restos da Orca](../../work/issues/os-restos-da-orca-a-vista-no-brza-studio.md), gravada no `brand`, com
+   `scope: brza-studio`.
+
+**A entrevista fecha aqui.** Nada de estrutura ficou aberto; os riscos do M3 e do M5 vão ao Desenho, e o do M3 já perde
+metade com a P1.
+
 ## Worklogs
 
 - 2026-10-31 — aberto; R1 gravada como chegou da sessão do `workspace`; Terreno pelo `collector`; R2 fechada, com os
-  pedidos 2 e 3 da borda e da marca no chat. Parou antes da R3.
+  pedidos 2 e 3 da borda e da marca no chat; R3 fechada, com a issue dos restos da Orca. Parou antes do Desenho.
   [PLN-007: a abertura da marca BrzA](../../work/worklogs/2026-10-31-pln-007-a-abertura-da-marca-brza.md)

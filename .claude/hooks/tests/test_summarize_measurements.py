@@ -161,9 +161,14 @@ def fact(day, agent, fact_id, kind, confidence, agent_id="a1", **extra):
             "workstream": "studio", "fact_id": fact_id, "kind": kind, "confidence": confidence, "text": "t", **extra}
 
 
-def check(agent_id, fact_id, verdict, cite="ok", day="2026-10-28"):
+def check(agent_id, fact_id, verdict, cite="ok", day="2026-10-28", **extra):
     return {"event": "fact_check", "timestamp": f"{day}T10:30:00-03:00", "agent_id": agent_id, "fact_id": fact_id,
-            "verdict": verdict, "cite": cite}
+            "verdict": verdict, "cite": cite, **extra}
+
+
+def downgraded(agent_id, fact_id, claimed="holds", day="2026-10-28"):
+    """O `fact_check` que o `fact_audit.py` rebaixou: o auditor disse `claimed`, o `read` não casou, o veredito é unknown."""
+    return check(agent_id, fact_id, "unknown", day=day, read="x.py", read_ok=False, claimed=claimed)
 
 
 def outcome(agent_id, fact_id, verdict, day="2026-10-28"):
@@ -179,9 +184,9 @@ def capture(agent, facts=1, malformed=0, unmarked=False, day="2026-10-28"):
     return row
 
 
-def audit(cost, error=None, ignored=0, day="2026-10-28"):
+def audit(cost, error=None, ignored=0, day="2026-10-28", **extra):
     return {"event": "fact_audit", "timestamp": f"{day}T10:40:00-03:00", "agent_id": "a1", "facts": 1, "checked": 1,
-            "ignored": ignored, "cost_usd": cost, "error": error}
+            "ignored": ignored, "cost_usd": cost, "error": error, **extra}
 
 
 class FactsTest(unittest.TestCase):
@@ -287,7 +292,32 @@ class FactsTest(unittest.TestCase):
 
     def test_audits_sum_the_cost_and_count_errors_and_ignored(self):
         rows = [audit(0.0123, ignored=1), audit(0.0200, error="timeout", ignored=2), audit(None, error="binary_not_found")]
-        self.assertEqual(self.agg(rows)["audits"], {"n": 3, "cost": 0.0323, "failed": 2, "ignored": 3})
+        self.assertEqual(self.agg(rows)["audits"], {"n": 3, "cost": 0.0323, "failed": 2, "ignored": 3, "downgraded": 0})
+
+    def test_audits_sum_the_downgraded_and_the_old_ones_without_the_field_count_zero(self):
+        rows = [audit(0.01, downgraded=2), audit(0.01, downgraded=3, day="2026-10-20"), audit(0.01)]
+        self.assertEqual(self.agg(rows)["audits"]["downgraded"], 5)
+        self.assertEqual(self.agg(rows, since="2026-10-25")["audits"]["downgraded"], 2)
+
+    def test_downgraded_counts_the_facts_whose_last_check_was_read_not_ok_with_a_claimed_other_than_unknown(self):
+        rows = [fact("2026-10-28", "designer", "F1", "lido", 95), downgraded("a1", "F1", "holds"),
+                fact("2026-10-28", "designer", "F2", "lido", 95), downgraded("a1", "F2", "fails"),
+                fact("2026-10-28", "designer", "F3", "lido", 95), downgraded("a1", "F3", "unknown"),  # não é rebaixado
+                fact("2026-10-28", "designer", "F4", "lido", 95),
+                check("a1", "F4", "holds", read="x.py", read_ok=True),                              # leitura casou
+                fact("2026-10-28", "designer", "F5", "lido", 95), check("a1", "F5", "unknown"),    # check antigo
+                fact("2026-10-28", "designer", "F6", "lido", 95), downgraded("a1", "F6", "holds"),
+                check("a1", "F6", "holds", read="x.py", read_ok=True),                              # vale o último
+                fact("2026-10-28", "designer", "F7", "lido", 95)]                                    # sem check
+        row = self.line(self.agg(rows), "designer", "fato", "90+", "lido")
+        self.assertEqual((row["facts"], row["downgraded"]), (7, 2))
+
+    def test_downgraded_is_counted_by_row_and_a_session_outcome_does_not_hide_it(self):
+        rows = [fact("2026-10-28", "designer", "F1", "lido", 95), downgraded("a1", "F1"), outcome("a1", "F1", "holds"),
+                fact("2026-10-28", "designer", "F2", "inferido", 60), downgraded("a1", "F2", "fails")]
+        agg = self.agg(rows)
+        self.assertEqual(self.line(agg, "designer", "fato", "90+", "lido")["downgraded"], 1)
+        self.assertEqual(self.line(agg, "designer", "fato", "<80", "inferido")["downgraded"], 1)
 
     def test_pending_are_inferred_low_or_cost_facts_without_a_session_outcome(self):
         rows = [fact("2026-10-28", "designer", "F1", "inferido", 95),   # pendente: inferido
@@ -329,7 +359,7 @@ class FactsTest(unittest.TestCase):
         print("\n" + text)
         header = next(l for l in text.splitlines() if l.startswith("papel"))
         for column in ("classe", "faixa", "tipo", "fatos", "com desfecho", "holds %", "confiança média", "distância",
-                       "unknown", "cite off %"):
+                       "unknown", "rebaixados", "cite off %"):
             self.assertIn(column, header)
         lido = next(l for l in text.splitlines() if "lido" in l and "90+" in l)
         for expected in ("50.0%", "95.0", "+45.0", "50.0%"):
@@ -338,8 +368,25 @@ class FactsTest(unittest.TestCase):
         self.assertEqual(custo.count("—"), 4)  # holds %, confiança, distância e cite off %: nenhum com desfecho ou check
         self.assertIn("Por papel: collector: lidas 1, sem marca 1, malformadas 0; designer: lidas 1, sem marca 0, malformadas 1",
                       text)
-        self.assertIn("Auditorias: rodaram 1, custo US$ 0.0123, falharam 1, ignorados 2", text)
+        self.assertIn("Auditorias: rodaram 1, custo US$ 0.0123, falharam 1, ignorados 2, rebaixados 0", text)
         self.assertIn("Pendentes: 1 sem desfecho (inferido, abaixo de 80 ou custo) — python3 scripts/fact_outcome.py --pending --workstream all", text)
+
+    def test_table_shows_the_downgraded_per_row_and_in_the_audits_line(self):
+        rows = [fact("2026-10-28", "designer", "F1", "lido", 95), downgraded("a1", "F1"),
+                fact("2026-10-28", "designer", "F2", "lido", 95), downgraded("a1", "F2", "fails"),
+                fact("2026-10-28", "designer", "C1", "inferido", 60), audit(0.01, downgraded=2)]
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.summarize.print_facts(self.agg(rows))
+        lines = out.getvalue().splitlines()
+        header = next(l for l in lines if l.startswith("papel")).split()
+        lido = next(l for l in lines if "lido" in l and "90+" in l).split()
+        custo = next(l for l in lines if "custo" in l and "inferido" in l).split()
+        # as colunas de uma palavra só, contadas do fim: ... unknown rebaixados "cite off %"
+        self.assertEqual((lido[-3], lido[-2]), ("2", "2"))  # o rebaixado também é `unknown`
+        self.assertEqual((custo[-3], custo[-2]), ("0", "0"))
+        self.assertIn("rebaixados", header)
+        self.assertIn("ignorados 0, rebaixados 2", out.getvalue())
 
     def run_main(self, rows, *flags, raw=""):
         with tempfile.TemporaryDirectory() as tmp:
@@ -373,8 +420,15 @@ class FactsTest(unittest.TestCase):
                          ("designer", "fato", "90+", "lido", 1, 1, 100.0, 90.0, -10.0, 0, 100.0))
         self.assertEqual(data["rows"][1]["holds_pct"], None)
         self.assertEqual(data["captures"], [{"agent": "designer", "read": 1, "unmarked": 1, "malformed": 2}])
-        self.assertEqual(data["audits"], {"n": 1, "cost": 0.5, "failed": 1, "ignored": 1})
+        self.assertEqual(data["audits"], {"n": 1, "cost": 0.5, "failed": 1, "ignored": 1, "downgraded": 0})
+        self.assertEqual(first["downgraded"], 0)
         self.assertEqual(data["pending"], 1)
+
+    def test_json_carries_the_downgraded_of_the_rows_and_of_the_audits(self):
+        rows = [fact("2026-10-28", "designer", "F1", "lido", 95), downgraded("a1", "F1"), audit(0.1, downgraded=1)]
+        code, text = self.run_main(rows, "--facts", "--json")
+        data = json.loads(text)
+        self.assertEqual((code, data["rows"][0]["downgraded"], data["audits"]["downgraded"]), (0, 1, 1))
 
     def test_log_without_fact_events_says_so_and_exits_zero(self):
         code, text = self.run_main(ROWS, "--facts")

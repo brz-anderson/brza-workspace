@@ -16,7 +16,7 @@ metadata:
 - `sed` do macOS não tem `\(a\|b\)`: edite com `python3` e `assert t.count(a) == 1`.
 - Os scripts do `packages/client/bin` importam `brza_runtime` do `bin/` por `parents[3] / 'bin'` (ou `parents[2]` no
   `brza-doctor`, que usa `HERE`); o `brza-note` roda o `brza-sessions` do cliente por `HERE.parent / 'packages/client/bin'`.
-- Skip marcado com o passo que o resolve: `SettingsTest` do `test_fact_audit` (P3, lê o `settings.json`). O do installer saiu no P7.
+- Sem skip por passo pendente: o `SettingsTest` do `test_fact_audit` saiu no P3 (lê `core/.claude/settings.hooks.json`) e o do installer no P7.
 - **Testes do `brza-note` que precisam do workspace de mentira herdam de `NoteFixture`** (`tests/cli/test_brza_note.py`, sem
   `test_*`), e não de `NoteTest`: o unittest reexecutaria os testes herdados. O `test_brza_note_index.py` (P4) é o exemplo.
 - **Índice da master (P4):** commit sem checkout por `plumb(...)` do próprio `brza-note` (o `runtime.git` não aceita `env` nem
@@ -47,3 +47,13 @@ metadata:
 - Teste de função de shell: `zsh -f -c 'source bloco; ...'` com `ZDOTDIR`/`HOME` temporários e PATH com um `python3` que é
   `sys.executable` (o `/usr/bin/python3` 3.9 não roda o `brza-agents`, e ele falha calado). Use raiz com espaço no nome.
 - `brza_root.find` pede que o cwd exista (o git roda nele): teste de "subpasta do código" precisa criar a pasta.
+- **Norma em molde (P3):** `core/**/*.md` leva `{{tabela.chave}}`; o `brza_root.render` (+ `render_settings`, `merge_hooks`,
+  `validate_manifest`, `dump_manifest`, `dump_lock`) vive no mesmo `brza_root.py`. **Teste de ouro** em
+  `tests/hooks/test_golden_render.py`: cópia da master em `tests/hooks/fixtures/golden/master/` e a lista fechada de trocas de
+  texto em `tests/hooks/golden_differences.py` (`DIFFERENCES`, `WHY`; o P8 reusa). Mudou um `.md` do núcleo: o ouro reprova até a
+  lista acompanhar. Edição em massa dos `.md`: script Python com `count == 1` por troca literal e depois as trocas de valor por
+  placeholder (a mais longa primeiro: nome+email, `brz-anderson/brza-studio`, `brz-anderson`, `brza-workspace`…), com o
+  `\bmaster\b` à parte (a do código vira `{{code.branch}}`). As entradas da lista são trocas de substring; a inserção ancora
+  numa linha vizinha.
+- Varredura de `{{workspace.x}}` em `.py` exclui o `brza_root.py`, que documenta a sintaxe. `tests/hooks` no 3.9 dá 5 skips
+  (tomllib: 3 do P2 e 2 do P3).

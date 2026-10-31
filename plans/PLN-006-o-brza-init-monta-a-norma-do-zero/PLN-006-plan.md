@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 27
-executed_h: 1.6
-remaining_h: 14
+executed_h: 2
+remaining_h: 10.5
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,9 +16,9 @@ tags:
 
 # PLN-006: O `brza init` monta a norma num workspace do zero
 
-- **Retomar:** P1, P2 e P4 feitos (`brza-workflow@ca22efe`). Em curso: P3 e P7, em `.worktrees/p3` e `.worktrees/p7`
-  do `brza-workflow`; depois P5 e P6, e então P8 e P9 (X7). Pontos novos vão na recomendada, pela regra de Anderson
-  após a R10.
+- **Retomar:** P1, P2, P3, P4 e P7 feitos (`brza-workflow@acf8bef`). Em curso: o P6, em `.worktrees/p6`; depois o P5,
+  que chama a camada 1 do sync (X17) e reconcilia o bloco do shell (X18); então P8 e P9. Pontos novos vão na
+  recomendada, pela regra de Anderson após a R10.
 - **Dividido:** [PLN-006 — Desenho](PLN-006-design.md)
 
 ## Pedido
@@ -558,6 +558,30 @@ a regra escolhe opção de rodada, e não é a frase explícita que transforma t
    (recomendada) — custo: ~0; se paga: já · ler `[code].branch` e `remote` — custo: ~20 min e um helper no
    `brza_root`; se paga: no segundo workspace com app diferente. **Decidido pela regra — deixar.**
 
+### Rodada 14 — os pontos do P3 (decidida pela regra, 2026-10-31)
+
+**Apresentado antes:** a devolução do `implementer` do P3, com seis escolhas que o D2–D5 não fixavam.
+
+1. **O `author.login` no manifesto.** Opções: obrigatório, com o P5 pedindo `--author-login` ou o derivando do noreply
+   (recomendada) — custo: ~15 min no P5; se paga: no primeiro init · opcional — custo: o render falha sem aviso; se
+   paga: nunca. **Decidido pela regra — obrigatório.**
+2. **O molde do `settings.json`.** Opções: fiel à `master`, com o Haiku, os TTLs de cache e o
+   `disableClaudeAiConnectors`, menos o `GIT_SSH_COMMAND` (recomendada) — custo: uma preferência pessoal vira padrão;
+   se paga: já · sem o `disableClaudeAiConnectors` — custo: ~5 min; se paga: se o núcleo público não quiser esse
+   padrão. **Decidido pela regra — fiel à `master`.**
+3. **A linha do scratch e "o chat do BrzA Studio" no `CLAUDE.md`.** Opções: placeholders `{{workspace.title}}` e
+   `{{code.name}}` (recomendada) — custo: 0; se paga: já · mover ao `brza-client.md` — custo: ~20 min e a tabela
+   quebrada; se paga: com um segundo app. **Decidido pela regra — placeholders.**
+4. **O exemplo do glossário.** Opções: `app` e `ferramental` no lugar de `studio` e `tools-kit` (recomendada) — custo:
+   0; se paga: já · deixar — custo: o núcleo cita workstreams alheios; se paga: nunca. **Decidido pela regra —
+   generalizar.**
+5. **As linhas "Testes:" do `CLAUDE.md` e o gate local do `reviewer.md`.** Opções: apontar ao `brza-workflow` e tirar
+   o gate local (recomendada) — custo: 0; se paga: no P8 · deixar — custo: a frase mente em todo cliente; se paga:
+   nunca. **Decidido pela regra — apontar ao `brza-workflow`.**
+6. **Onde o `check_notes.py` lê as datas do manifesto.** Opções: só no `main()` (recomendada) — custo: 0; se paga: já ·
+   também no `check()` — custo: ~1 h; se paga: se alguém importar o `check()` esperando o manifesto. **Decidido pela
+   regra — só no `main()`.**
+
 ## Desenho
 
 O Desenho, D1–D12, está em [PLN-006 — Desenho](PLN-006-design.md), por passar de 400 linhas.
@@ -604,14 +628,20 @@ inválidos e 8 fora do subconjunto. Desvios X8–X10; pontos R11.
 
 Executa D2, D4, D5 · executor: `implementer`
 
-Estimado: 3,5 h · Executado: — h
+Estimado: 3,5 h · Executado: 0,4 h
 
-- [ ] **1. Teste de ouro que falha**: o render do núcleo com o manifesto do `brza-workspace` sai igual à `master`
+- [x] **1. Teste de ouro que falha**: o render do núcleo com o manifesto do `brza-workspace` sai igual à `master`
   daqui, menos a lista fechada do D12
-- [ ] **2. Implementar** o parser TOML, o render `{{tabela.chave}}`, o lock; pôr os placeholders nos `.md`, tirar a
+- [x] **2. Implementar** o parser TOML, o render `{{tabela.chave}}`, o lock; pôr os placeholders nos `.md`, tirar a
   Fixfy (R8.2), o `@AGENTS.md` e as `.claude/rules/`
-- [ ] **3. Rodar e ver passar**
-- [ ] **4. Commit**
+- [x] **3. Rodar e ver passar**
+- [x] **4. Commit**
+
+**Evidência:** `brza-workflow@acf8bef`, o merge do P3 sobre o P7 · na `master`: `tests/hooks` → 244 OK, e no
+`/usr/bin/python3` 3.9.6 → 244 OK, 5 skips (sem `tomllib`) · `tests/cli` → 264 OK · `tests/notes-checker/run.py` →
+saída 0. O teste de ouro reproduz os 16 `.md` da `master` do `brza-workspace@d85c783`, salvo a lista fechada de 37
+trocas em `tests/hooks/golden_differences.py`, que o P8 reusa; um `X` plantado em `core/work/README.md` o fez reprovar.
+Um teste confere que, com outro manifesto, não sobra nada do `brza-workspace` no núcleo. Desvios X18–X20; pontos R14.
 
 ### P4 — O índice da `master`
 
@@ -741,6 +771,15 @@ Estimado: 1,5 h · Executado: — h
   do D10, que quebrava raiz com espaço no nome.
 - **X16 — O `claude-brza` e o `brza where` não têm legado**: sem manifesto e sem registro, a sessão sobe sem hooks. No
   P8, o manifesto e o `brza register` vêm antes de qualquer relink.
+- **X17 — O P6 vem antes do P5**, e não junto: o passo 6 do D8 roda a camada 1 do sync no diretório novo. Escolha da
+  sessão, pela regra da recomendada.
+- **X18 — O bloco do shell tem duas cópias e uma chamada à Fixfy**: o `packages/client/shell/brza.zsh` do P7 cai na
+  `fixfy_claude`, contra a R8.2, e o `templates/README.md` do P3 traz outra cópia do bloco. O P5, dono do molde do
+  README, os reconcilia.
+- **X19 — O `render` ganhou o parâmetro `escape`**, e o `render_settings` escapa o valor para JSON; o
+  `templates/.brza/workspace.toml` é a saída exata do `dump_manifest`, para o P5 ter uma fonte só.
+- **X20 — Ficaram no núcleo**, só com placeholders, o exemplo `fixfy:architect` do docstring do `measure.py:135` e o
+  parágrafo do `CLAUDE.md` sobre o `--agents` do `claude-brza`, que é do cliente. O primeiro sai no P5, com o X18.
 
 ## Decisões
 

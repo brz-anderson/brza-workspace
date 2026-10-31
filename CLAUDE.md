@@ -64,8 +64,16 @@ O `gh` usa o perfil padrão, com a conta `brz-anderson` ativa (`gh auth switch`)
 
 ## Os plugins são habilitados só aqui
 
-O `.claude/settings.json` habilita só o `context7`. Não há `.mcp.json`. Nenhum plugin daqui vai para a configuração de
-usuário.
+O `.claude/settings.json` habilita o `context7`, para todos os workstreams. Não há `.mcp.json`. Nenhum plugin daqui vai
+para a configuração de usuário.
+
+O plugin de um workstream só vai no `.claude/settings.local.json` do worktree dele, pelo
+`claude plugin install <plugin> --scope local` rodado no worktree. Hoje é o `skill-creator`, no `workspace`.
+- **O CLI grava no checkout da `master`:** o `enabledPlugins` vai ao `.claude/settings.local.json` da raiz do
+  repositório, embora o `~/.claude/plugins/installed_plugins.json` registre o worktree como `projectPath`. Mova a
+  entrada para o arquivo do worktree e apague a da `master`.
+- **Conferir:** `claude plugin list`, rodado no worktree, mostra o plugin com `Scope: local` e `enabled`.
+- **O `brza note memory-setup` preserva a chave**, porque grava o `autoMemoryDirectory` com merge.
 
 ## O hook de medição
 

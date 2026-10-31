@@ -29,3 +29,14 @@ fora. O M3 e o M5 entraram contra a recomendação, e os riscos deles vão ao De
   1024 e no de 256 px. Nada foi gravado no `brza-studio`.
 - O `brza print --app` não tirou o print do app: falta a permissão de Gravação de Tela. O "hoje" dos artboards do chat
   saiu do código.
+
+## A R3
+
+Na R3, a entrevista fechou. O logotipo é o arranjo do selo do `.icns` (L2). A paleta é a do ícone, e o aviso de
+pergunta do agente passa a azul (P1). O corte pequeno é o traço mono de hoje, com o `}` corrigido (S1). A marca entra no
+app desktop, no CLI e nos READMEs. O mobile e os restos da Orca foram a
+[Os restos da Orca à vista no BrzA Studio](../issues/os-restos-da-orca-a-vista-no-brza-studio.md), gravada aqui no
+`brand`, e não no `studio`: pedido de outro workstream não entra nesta sessão.
+
+Os três artboards L não carregaram no chat na primeira ida: tinham ~630 KB cada, com a imagem do símbolo repetida em
+base64. Com a imagem uma vez só, em classe CSS, caíram a ~130 KB e carregaram. O plano foi a `phase: design`.

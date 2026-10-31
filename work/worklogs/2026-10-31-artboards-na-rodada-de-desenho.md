@@ -38,3 +38,27 @@ interface, como numa sessão do Cowork. A sessão não conseguiu abrir o link do
 - **O `brza shot`** foi pedido à sessão `tools-kit-brza-shot`, aberta pelo `brza sessions` no worktree do `tools-kit`,
   com a especificação e o terreno. Ela também propaga à norma o trecho do PNG — o passo 4 do Desenhar e a linha
   **Arquivos** do `plans/README.md` —, que ficou fora daqui para a norma não apontar para um comando que ainda não roda.
+
+## O teste no chat
+
+Rodada de desenho descartável, pedida pela sessão do terminal do `workspace`, para testar o fluxo de ponta a ponta no
+chat do BrzA Studio, sem plano e sem commit do PNG. A tela foi a faixa recolhida da pergunta e da aprovação do chat
+estruturado (`NativeChatPromptStrip`, do `a0eefa646e4` no `brza-studio`).
+
+- **A rodada:** três artboards no `ORCA_CHAT_SCRATCH_DIR` — A, a faixa mínima de hoje; B, tipo e progresso; C, ícone e
+  ação —, cada um com uma pergunta de título longo e uma aprovação, uma tabela, a recomendação C e
+  `Custo: … Se paga: …` em cada opção. Anderson respondeu: "C e já coloque na fila pra implementar".
+- **A fila:** a issue
+  [A faixa recolhida da pergunta e da aprovação com ícone e ação](../issues/a-faixa-recolhida-com-icone-e-acao.md), no
+  `studio`.
+- **O `brza shot`** aceitou o caminho do scratch, que tem espaço, nos dois temas: `teste-c.png` e `teste-c-dark.png`,
+  2560×442, na largura padrão de 1280 px. Os tokens do tema chegaram ao artboard, no claro e no escuro.
+- **O PNG padrão escondeu um defeito do artboard.** A grade `1fr 1fr` com título `nowrap` estoura a coluna. A 1280 px
+  não aparece; a 736 px, a largura do chat (`--chat-content-max-width: 46rem`), a segunda coluna sai cortada, e o
+  shell do visual esconde a barra de rolagem. Com `minmax(0,1fr)`, o `faixa-c2-icone-acao.html` trunca certo a 736 px.
+  O que o chat mostrou, então, era provavelmente o corte, e não o PNG de 1280 px.
+- **O `--primary` do tema padrão é neutro** (`#171717` e `#e5e5e5`), e por isso o destaque da alternativa C saiu preto
+  ou branco. O artboard não tem `--chat-canvas`: o shell repassa só a lista do painel de plugin, os `--chart-*` e as
+  fontes (`native-chat-visual-shell.ts:59-68`).
+- **Não conferido pela sessão:** se o `::orca-visual` mostrou o `title` e a altura certa, e se os três empilhados ficaram
+  legíveis. A sessão não vê o chat renderizado; só Anderson.

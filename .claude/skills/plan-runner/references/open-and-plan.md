@@ -60,7 +60,8 @@ do pedido, e o plano segue para Planejar.
    - **Fora do chat**, sem o `ORCA_CHAT_SCRATCH_DIR`, o artboard vai ao _scratch_ e a rodada leva o caminho dele.
 4. **Grave o vigente**, com a origem de cada item. A alternativa que perdeu fica até o passo que a transcreve e então
    sai, com uma linha **Descartada** e o porquê. No `PLN`, a crítica posterior vai para a Entrevista, e o item é
-   reescrito no lugar.
+   reescrito no lugar. A alternativa de interface escolhida vira PNG na pasta do plano, para sobreviver ao scratch:
+   `brza shot <artboard>.html plans/PLN-NNN-…/PLN-NNN-<assunto>.png`, e o item `D` linka a imagem.
 5. **Aplique o reverso**: item que vira regra durável do `brza-studio` sai para a norma dele, e o plano cita. Sem isso o
    Desenho vira uma segunda norma.
 

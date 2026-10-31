@@ -14,8 +14,9 @@ tags:
 
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** a Entrevista fechou nas rodadas 1 a 5, com o levantamento do PLN-011 e as sondas no scratch da sessão
-  `workspace` (`pln-004-levantamento-pln-011.md`, `pln-004-sondas.md`). O próximo é o Desenho: o Terreno e os itens `D`.
+- **Retomar:** o Desenho está em rascunho no scratch da sessão `workspace` (`pln-004-design-rascunho.md`, D1 a D14), com
+  a R6 fechada. O próximo são as sondas da R6.1, pelo `collector`, com um `/hooks` de Anderson, e depois a rodada 7 —
+  o `--approve-for-me` do app, a memória por caminho relativo, a função da Fixfy no shell e a issue do `studio`.
 
 ## Pedido
 
@@ -303,8 +304,56 @@ Respondida em 2026-10-30, na sessão `workspace`.
 
    **Decidido — "Wrapper libera o .git; push com aprovação (Recomendado)".**
 
+### Rodada 6 — a estrutura do Desenho (enviada 2026-10-30, no chat)
+
+**Apresentado antes:** o rascunho do Desenho, pelo `designer`, no scratch da sessão `workspace`
+(`pln-004-design-rascunho.md`, 730 linhas): D1 a D14, a ordem de execução, 8 pontos para rodada e 12 fatos "a
+conferir". A rodada foi no chat, sem a ferramenta, a pedido de Anderson: "faça a rodada no chat, igual a de decisão, sem
+a ferramenta de pergunta".
+
+Respondida em 2026-10-30, na sessão `workspace`: "6.1.1 / 6.2.1 / 6.3.1 / 6.4.1".
+
+1. **Quando rodam as sondas que sobraram** — o `agy` segue symlink; o `trustedWorkspaces` e o `--sandbox` pelo
+   `--settings` do `agy`; o hook do `agy` num worktree não confiado, e o cwd dele; o `hooks.json` do Codex por symlink;
+   o app com `agentCmdOverrides.codex` e `.antigravity`; os nomes novos de busca e web no `agy`. Opções:
+   - agora, antes de fechar o Desenho, pelo `collector`, com um `/hooks` de Anderson (recomendada) — custo: ~US$ 0,15
+     e ~5 min de Anderson; se paga: no Desenho, porque três respostas decidem a R6.2 e a R6.3;
+   - como P0 do plano — custo: o mesmo, mais reescrever o `D` desmentido; se paga: só se todas confirmarem.
+
+   **Decidido — agora, antes de fechar o Desenho.**
+
+2. **Como o espelho em `.agents/skills/` não diverge** (D4). Opções:
+   - um symlink por skill, e o `brza agents --check` acusa o link que falta ou está quebrado (recomendada) — custo: 2
+     links e uma sonda de ~US$ 0,01 no `agy`; o Codex já segue o link; se paga: agora;
+   - cópia gerada, com `--check` — custo: ~60 linhas, 136 KB duplicados e a troca de `${CLAUDE_SKILL_DIR}`; se paga: só
+     se o texto mudar por runtime;
+   - esqueleto gerado, com a linha "leia `.claude/skills/<nome>/SKILL.md`" — custo: ~30 linhas e uma leitura a mais por
+     acionamento; se paga: se o `agy` não seguir o link.
+
+   **Decidido — um symlink por skill**, a confirmar no `agy` pela sonda da R6.1.
+
+3. **Como os hooks, a regra do `agy` e os papéis chegam ao brza-studio** (D8). Opções:
+   - o `brza tree` liga por symlink, como já liga o `.claude/agent-memory` (recomendada) — custo: código no
+     `tools-kit`, `/.codex/` e `/.agents/` no `.gitignore` do brza-studio e um `/hooks` por worktree; os worktrees que o
+     app cria em `~/orca/workspaces/…` ficam de fora; se paga: na primeira sessão Codex ou `agy` num worktree do
+     brza-studio;
+   - pelo wrapper, `-c hooks.…` no Codex e hooks globais do `agy` — custo: uma sonda interativa, e no `agy` o hook em
+     toda sessão da máquina, o que reabre a R2.4; se paga: se a primeira deixar muitos worktrees de fora;
+   - sem hooks no brza-studio por ora — custo: nenhum agora; se paga: nunca, se a medição vale lá.
+
+   **Decidido — o `brza tree` liga por symlink.**
+
+4. **Onde mora o gerador dos papéis** (D7). Opções:
+   - no `brza agents --write|--check`, sobre o `parse_frontmatter` que já existe (recomendada) — custo: ~150 linhas e
+     ~10 testes pelo `tools-kit`, e a frente 2 na fila dele; se paga: agora, com um parser só;
+   - um script novo na `master`, pela sessão que conduz — custo: as mesmas linhas, mais um `import` cruzado ou um
+     parser repetido, e pode reabrir a R1.1; se paga: se o `tools-kit` não tiver sessão livre antes do D9;
+   - portar os geradores da Fixfy — custo: 282 linhas e um parser que já divergiu (G13); se paga: nunca.
+
+   **Decidido — no `brza agents --write|--check`.**
+
 ## Worklogs
 
-- 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4; as sondas; R5. Parou antes do
-  Desenho.
+- 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4; as sondas; R5; o rascunho
+  do Desenho, pelo `designer`; R6. Parou nas sondas da R6.1.
   [O PLN-004: a abertura do Codex e do agy no fluxo](../../work/worklogs/2026-10-30-pln-004-a-abertura-do-codex-e-do-agy-no-fluxo.md)

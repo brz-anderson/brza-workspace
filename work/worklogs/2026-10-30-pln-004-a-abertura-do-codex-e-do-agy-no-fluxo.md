@@ -32,12 +32,16 @@ reservado na `master` (`233ea9a`). O plano é o
   `.git` do worktree, e o push pede aprovação.
 - **Um defeito do `~/.zshrc`**, achado nas sondas: o `fixfy_where` responde `root` em qualquer cwd quando a
   `FIXFY_WORKSPACE` está vazia (`~/.zshrc:17`). Entra no desenho das funções novas.
+- **O rascunho do Desenho**, pelo `designer`, no scratch: D1 a D14 e a ordem de execução, com 8 pontos para rodada.
+- **A rodada 6**, no chat, a pedido de Anderson: as sondas que sobraram agora; as skills por symlink; o `brza tree`
+  liga `.codex/` e `.agents/` no brza-studio; o gerador dos papéis no `brza agents --write|--check`.
 
 ## O que ficou
 
 - **O custo e o "se paga" das opções da R1** ficaram na sessão `brza-workspace-80`; o plano grava as opções e as
   respostas.
-- **O próximo:** o Desenho — o Terreno e os itens `D`.
+- **O próximo:** as sondas da R6.1, com um `/hooks` de Anderson, e a rodada 7; depois, o Desenho gravado em
+  `PLN-004-design.md`.
 
 ## Fora do workspace
 

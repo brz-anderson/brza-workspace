@@ -1,0 +1,1 @@
+- [Ativos de marca no brza-studio](reference_brza-studio-brand-assets.md) — onde moram ícone, logo, chama, cores e restos da Orca; fontes que enganam

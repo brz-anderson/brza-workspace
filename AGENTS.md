@@ -22,7 +22,7 @@ nascida da `master`, com um worktree em `.worktrees/<nome>`:
 - **Na `master`:** só a norma — este arquivo, o `CLAUDE.md`, o `README.md`, o `plans/README.md`, o `work/README.md`, o
   `.claude/`, o `scripts/` e o `.gitignore`.
 - **No workstream:** a norma, que chega pelo `git merge` da `master`, e as notas da frente, com os planos dela, abertos
-  e fechados. A branch nunca volta à `master`.
+  e fechados, e a memória dela, em `memory/` e `.claude/agent-memory/`. A branch nunca volta à `master`.
 - **Os de agora:** o `studio`, o app; o `tools-kit`, o `brza`, os scripts e os plugins; o `workspace`, a própria norma.
   **Workstream novo só nasce por pedido de Anderson**, pelo `brza note workstream <nome>`.
 - **Workstream encerrado** perde o worktree e fica com a branch.
@@ -97,6 +97,32 @@ depois vai ao `Retomar` do plano ou a uma issue.
 **Devolução e aviso vão a arquivo**: o worklog, o `Retomar` ou a issue. "Recebido" não se manda, e o _correio_ de volta
 só vai quando o pedido diz "me avise".
 
+## Cada workstream aprende na memória dele
+
+**A memória é do workstream, e mora na branch dele**, para que o aprendizado de cada frente se acompanhe no git e na
+medição:
+- **A sessão** grava em `memory/`, na raiz do worktree. A sessão de código num worktree do `brza-studio` grava na
+  memória do workstream do plano da branch.
+- **Os _subagentes por papel_** gravam em `.claude/agent-memory/<papel>/`, no worktree do workstream.
+- **A memória que muda vai ao commit do worklog que fecha a tarefa**, pelo `brza note commit`, que avisa quando sobra
+  memória suja fora dos caminhos dados.
+- **O que vale para todos os workstreams não é memória: sobe à norma**, por rodada, e sai das memórias.
+
+**Os subagentes por papel** são a forma padrão de delegar; o `general-purpose` só vai quando nenhum papel cobre a
+tarefa. Cada um consulta a memória antes de começar e grava o que aprendeu ao terminar:
+
+| Papel         | Tarefa                                                               | Camada |
+| :------------ | :------------------------------------------------------------------- | :----- |
+| `collector`   | Levantamento, leitura, busca e extração, com o agregado no _scratch_ | Média  |
+| `implementer` | Implementação de especificação fechada, com testes e sem commit      | Média  |
+| `reviewer`    | Revisão adversária, com cada achado e a evidência dele               | Alta   |
+| `designer`    | Desenho e alternativas para a rodada, como consultor                 | Alta   |
+
+**O aprendizado se mede.** Toda linha da medição leva o `workstream`. A memória criada, editada ou apagada vira um
+evento `memory`, com o tipo e o nome. O turno conta as perguntas com opções: quantas saíram na recomendada, em outra
+opção e em texto livre. O `python3 scripts/summarize_measurements.py --by-workstream` mostra, por workstream e por
+dia, o custo por turno, as correções (memórias `feedback`), as memórias vivas e as rodadas.
+
 ## O modelo segue a tarefa
 
 O modelo de cada _subagente_ ou _estágio de workflow_ é escolhido pela tarefa, e não herdado da sessão.
@@ -106,6 +132,8 @@ O modelo de cada _subagente_ ou _estágio de workflow_ é escolhido pela tarefa,
 | Desenho, decisão, julgamento entre alternativas        | Alta                                      |
 | Revisão                                                | Alta, até a medição dizer que média basta |
 | Leitura, coleta, busca, extração, verificação mecânica | Média ou rápida                           |
+
+O papel já traz a camada; a tabela vale para o `general-purpose`.
 
 - **Workflow tem teto de agentes**, que o pedido declara, e a camada alta entra só no estágio que julga ou sintetiza.
 - **Na sessão principal, o modelo é o de quem a abriu.**
@@ -187,5 +215,7 @@ O vocabulário deste arquivo. A tradução para cada runtime está no adaptador 
 - _camada_ alta, média ou rápida — o nível de modelo, da que julga à que coleta.
 - _scratch_ — o diretório temporário da sessão, fora do repositório, para o que não vai ao git.
 - _compactação_ — o resumo que o runtime faz da conversa, no lugar dela, para a sessão seguir com menos contexto.
+- _subagente por papel_ — subagente definido em `.claude/agents/` (`collector`, `implementer`, `reviewer`, `designer`),
+  com modelo e memória próprios.
 - _workstream_ — a frente de trabalho, como o `studio` ou o `tools-kit`, com os planos e as notas dela. Mora numa branch
   `workstream/<nome>` e num worktree em `.worktrees/<nome>`.

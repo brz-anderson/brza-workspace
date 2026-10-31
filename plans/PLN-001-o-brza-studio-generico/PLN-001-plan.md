@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 172.3
+ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson; o P71 numa sessão do brza-studio"
+estimate_h: 177.8
 executed_h: 32.3
-remaining_h: 3.9
+remaining_h: 9.4
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -28,7 +28,8 @@ tags:
   (R59.4), e o P68 fechou o X47 em `brza-studio@7be19418c8f`. O pedido 34 entrou em 2026-10-31, com a R60, a R61, o D52
   e o P69, que fechou em `brza-studio@a0eefa646e4`, com os X57 e X58, e espera só o C22, num build, com Anderson. O pedido 35
   entrou no mesmo dia, com o D53 e o P70, que fechou em `brza-studio@4eaac80df53`, com os X59 e X60, e espera só o C23, no
-  build do C22, com Anderson. Do PLN-002/P9 (R12.4, R13.4),
+  build do C22, com Anderson. O pedido 36 entrou no mesmo dia, com a R62, o D54 e o P71, que roda agora na sessão
+  `pln-001-pedido-36`, no worktree `.worktrees/pln-001-pedido-36` do `brza-studio`; depois, o C24, no build do C22. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
   sessão entra no correio com o nome automático `brza-workspace-<hex>`. O P64 não lê o mapa de sessões do PLN-002 e
   casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
@@ -105,6 +106,12 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   fila pra implementar"; depois, "siga". Chegou a esta sessão pelo pedido da sessão do `workspace`, com a resposta
   literal e a data, e a issue
   [A faixa recolhida da pergunta e da aprovação com ícone e ação](../../work/issues/a-faixa-recolhida-com-icone-e-acao.md)
+- **Pedido 36 (2026-10-31, sessão `compact-guard` do workstream `workspace`, no chat do BrzA Studio):** sobre a tela
+  cheia que o expandir de um bloco ` ```markdown ` abre, com o Markdown cru: "na imagem 1, deveria estar renderizado no
+  modo pré-visualização igual ao do editor"; "a imagem 2 é o botão que abre aquela tela, é o primeiro botão,
+  destacado". No mesmo dia e na mesma sessão: "os de diff de código não está aparecendo o botão de expandir". Chegaram a
+  esta sessão pelo pedido da sessão `compact-guard`, com as palavras e a data, e as imagens em
+  `/private/tmp/brza-pedido-preview-md/`, fora do git
 
 ### Cobertura
 
@@ -148,6 +155,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 33` | A linha do raciocínio, fechada, mostra "Pensou por 3s:" e o começo do texto, cortado, no tom apagado, com a seta que abre o texto inteiro; o rótulo da pergunta passa a "Perguntou:" (R52.1 a R52.3) | P66 | teste da linha (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 34` | No chat estruturado do desktop, o cartão de pergunta e o de aprovação recolhem a uma faixa acima do composer, que fica usável; a seta da faixa reabre o cartão com a resposta pela metade; o "Steer" da fila espera a resposta (R60.1 a R60.3, R61.1) | P69 | teste da sessão estruturada e do cartão de aprovação (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 35` | A faixa recolhida tem a barra de 3 px e o ícone do tipo em `--primary` à esquerda e, à direita, o botão "Responder" ou "Revisar" com a seta, que reabre o cartão; a seta do cartão aberto não muda | P70 | teste da sessão estruturada e do chat do terminal (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 36` | O expandir aparece em todo bloco de código e diff, role ou não; a tela cheia da cerca `markdown` ou `md` abre na prévia do olho do editor, com o `<>` para o cru e o frontmatter na caixa "Front Matter" (R62.1 a R62.3) | P71 | teste da camada do expandir (unidade); conferência no BrzA Studio (manual) |
 | `X20` | O `executeRead`, o `executeWrite` e o `executeDestructive` do MCP da Atlassian ganham o ícone do produto do `name` e o título com a ferramenta interna; o `discover` ganha o ícone do produto citado na busca, e o título com a busca entre aspas (R55.1, R55.2) | P67 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual, com o C6) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
@@ -1090,6 +1098,36 @@ Respondida em 2026-10-31, por Anderson na mesma sessão, pelo AskUserQuestion. O
    build; se paga: se a fila for desligada algum dia.
    **Decidido — "Sim, no C22".** Vai ao C22.
 
+### Rodada 62 — a prévia do Markdown e o expandir em todo bloco (enviada 2026-10-31)
+
+> **Apresentado antes:** o levantamento do `collector` (2026-10-31, `brza-studio@046474ba49c`, só leitura) e a
+> leitura desta sessão. O expandir é uma camada delegada pelo DOM e só aparece quando o bloco rola
+> (`BrzaExpandLayer.tsx:11-26`); o diff da linha de ferramenta tem `overflow-hidden` e nunca rola
+> (`NativeChatDiffView.tsx:9`), o do cartão de edição rola só acima de `max-h-72` (`NativeChatDiffCard.tsx:105`), e a
+> cerca curta não rola. Inferências apresentadas como a confirmar, sem pergunta própria: a prévia é o
+> `MarkdownPreviewBody` do olho do editor com o tema do `useMarkdownSurfaceTheme`, e não o renderizador das mensagens;
+> a prévia vale para `markdown` e `md`, sem o `mdx`; o seletor é o `EditorViewToggle`; o lápis e o celular ficam de
+> fora.
+
+Respondida em 2026-10-31, por Anderson na sessão do workstream `studio` do `brza-workspace`, pelo AskUserQuestion. Os
+custos são estimativa.
+
+1. **R62.1 — O que a tela cheia do bloco `markdown`/`md` mostra?** Seleção única. Opções: o olho e o `<>`, com a
+   prévia por padrão (recomendada) — custo: ~4 h; se paga: no primeiro SKILL.md expandido; só a prévia — custo: ~2,5 h;
+   se paga: nunca para quem quer ler o fonte; os três, com o lápis — custo: ~12 h ou mais; se paga: nunca.
+   **Decidido — "Olho e <> (Recomendado)".** Vai ao D54 e ao P71.
+2. **R62.2 — Quando o expandir aparece?** Seleção única. Opções: em todo bloco, role ou não (recomendada) — custo:
+   ~0,5 h, e o botão aparece no hover de bloco de uma linha; sempre em diff e `markdown`, os outros com a regra de rolar
+   — custo: ~1,5 h; só o diff da ferramenta, trocando o `overflow-hidden` — custo: ~0,5 h; se paga: só no diff longo.
+   **Decidido — "Em todo bloco (Recomendado)".** Vai ao D54 e ao P71.
+3. **R62.3 — O frontmatter e os links e imagens relativos na prévia.** Seleção única. Opções: a caixa "Front Matter" e
+   os relativos sem ação (recomendada) — custo: ~1 h; resolver pelo worktree do chat — custo: ~4 h ou mais; ignorar o
+   frontmatter — custo: 0 h; se paga: nunca.
+   **Decidido — "Caixa e relativos inertes (Recomendado)".** Vai ao D54.
+4. **R62.4 — Quando o passo roda?** Seleção única. Opções: agora, num worktree, numa sessão do `brza-studio`
+   (recomendada) — custo: uma sessão a mais; depois, no `Retomar` — custo: nenhum agora.
+   **Decidido — "Agora, num worktree (Recomendado)".** É a autorização do P71.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -1105,7 +1143,7 @@ base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum; o P54 ao P57 v
 antes do P55, o P56 independente e o P57 por último; o P58 vem antes do P59 e do P60, que não dependem um do outro, e
 o P61 por último; o pedido 32 roda em paralelo com o 31 (R51.2), o P62 antes do P63, o P64 depois do P63 e o P65 por
 último; o P66 do pedido 33 roda em paralelo com os dois (R52.4), e o P69 do pedido 34, agora, em paralelo com o que espera
-build (R60.4), e o P70 do pedido 35 depois do P69, que criou a faixa.
+build (R60.4), e o P70 do pedido 35 depois do P69, que criou a faixa; o P71 do pedido 36, agora, sem depender de nenhum (R62.4).
 
 **Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com "indicado". É
 leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a pedido, numa sessão
@@ -2644,6 +2682,27 @@ estruturada, do chat do terminal, dos cartões e do i18n → 33 arquivos, 269 pa
 `open-uncommitted-entry.test.ts`, depois do ajuste do botão e do teste (X59, X60). A `origin/master` não andou entre o
 início e o push. O worktree e a branch saíram depois do push. A conferência no app é o C23.
 
+### P71 — O expandir em todo bloco e a prévia do Markdown na tela cheia (pedido 36)
+
+Executa D54 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-36`
+
+Estimado: 5,5 h
+
+Agora, em paralelo com o que espera build (R62.4).
+
+- [ ] **1.** Testes que falham: no `BrzaExpandLayer.test.tsx`, o `brzaExpandTarget` devolve o bloco que não rola — a
+      cerca curta, o `NativeChatDiffView` e o `NativeChatDiffCard`; a tela cheia de uma cerca `markdown` e de uma `md`
+      abre na prévia, com o `EditorViewToggle` em `preview` e `source`, o frontmatter na caixa "Front Matter" e fora do
+      corpo, e o `<>` mostra o cru; a de outra linguagem não mostra o seletor; o copiar copia o cru nos dois modos
+- [ ] **2.** O `brzaExpandTarget` sem a exigência de rolar (R62.2), com a posição do botão conferida no diff sem
+      cabeçalho
+- [ ] **3.** A prévia na `BrzaExpandOverlay`: o helper de linguagem Markdown (`markdown`, `md`) sobre o
+      `data-code-language` do bloco, o `EditorViewToggle`, o `MarkdownPreviewBody` na casca com o
+      `useMarkdownSurfaceTheme`, a caixa do frontmatter e os relativos sem ação (R62.1, R62.3). Os pontos "A conferir
+      no passo" do D54
+- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C24
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -2989,6 +3048,8 @@ da linha quando o teste entra.
   o P69 em `brza-studio@a0eefa646e4`, com os X57 e X58; o C22 espera o build, com Anderson.
 - 2026-10-31 — [O P70 do PLN-001, a faixa recolhida com ícone e ação](../../work/worklogs/2026-10-31-pln-001-p70-faixa-com-icone-e-acao.md):
   o pedido 35, o D53 e o P70 em `brza-studio@4eaac80df53`, com os X59 e X60; o C23 espera o build do C22, com Anderson.
+- 2026-10-31 — [O pedido 36 do PLN-001, a prévia do Markdown e o expandir em todo bloco](../../work/worklogs/2026-10-31-pln-001-pedido-36-previa-do-markdown.md):
+  o pedido 36, a R62, o D54 e o P71, sem código; o P71 vai à sessão `pln-001-pedido-36`.
 
 ## Decisões
 
@@ -3033,12 +3094,13 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C21 | `Pedido 33`: o "Pensou" com o texto na linha (P66.3) | Uma resposta com raciocínio, entre comandos e fora deles, no desktop e no app do celular (R54.1); abrir e fechar a linha | "Pensou por Xs:" e o começo do texto, apagado, cortado; aberta, o texto inteiro abaixo; a pergunta com "Perguntou:" | | |
 | C22 | `Pedido 34`: recolher a pergunta e a aprovação no chat estruturado (P69.4) | Num chat do Claude, uma pergunta do AskUserQuestion com uma opção marcada e uma aprovação; recolher, rolar a conversa, mandar uma mensagem pelo composer e reabrir | A faixa com o título no lugar do cartão e o composer usável; a mensagem vai à fila, sem "Steer", e sai depois do turno; reaberto, o cartão com a opção marcada; repetido com o "enfileirar follow-ups" desligado, a pergunta segue pendente e respondível, ou o caso falha (R61.2) | | |
 | C23 | `Pedido 35`: a faixa com ícone e ação (P70.3) | No build do C22, recolher uma pergunta e uma aprovação, no tema claro e no escuro | A barra e o ícone do tipo à esquerda e "Responder" ou "Revisar" com a seta à direita, que reabre o cartão; o título cortado no que sobra. A barra e o ícone saem pretos no claro e brancos no escuro, pelo `--primary` neutro; se a falta de cor incomodar, a escolha do token vai a Anderson como rodada | | |
+| C24 | `Pedido 36`: o expandir em todo bloco e a prévia do Markdown (P71.4) | No build do C22, passar o mouse sobre um bloco curto, uma cerca `diff`, o diff de um `Edit` e o da linha de ferramenta; expandir um SKILL.md numa cerca `markdown`, alternar para o `<>` e voltar, no tema claro e no escuro | O botão nos quatro; o SKILL.md renderizado como no olho do editor, com `name` e `description` na caixa "Front Matter"; o `<>` com o cru; o copiar com o cru | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,
 Anderson escolheu "Depois da Run, num build só (Recomendado)": uma instalação para o C1 ao C7, o C10 e o C14. O C11
 entra no mesmo build, pelo pedido do P55 (2026-10-28), e o C12, pelo do P56 (2026-10-29). O C15 ao C17 são do
-pedido 31 e vão a um build depois do P60, com o P61; o C18 ao C20, do pedido 32, a um build depois do P64, com o P65; o C21, do pedido 33, ao mesmo build; o C22, do pedido 34, ao build depois do P69, e o C23, do pedido 35, ao mesmo build.
+pedido 31 e vão a um build depois do P60, com o P61; o C18 ao C20, do pedido 32, a um build depois do P64, com o P65; o C21, do pedido 33, ao mesmo build; o C22, do pedido 34, ao build depois do P69, e o C23, do pedido 35, ao mesmo build, como o C24, do pedido 36.
 
 ## Fechamento
 

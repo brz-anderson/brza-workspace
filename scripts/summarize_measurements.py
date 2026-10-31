@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Resume o log de medição do workspace brza, `.measurements/measurements.jsonl`, escrito pelo hook `measure.py` (um
-evento por linha) e pela trava `resume_guard.py` (a linha `guard`).
+evento por linha), pela trava `resume_guard.py`, já desligada, e pela trava `compact_guard.py` (a linha `guard`, com
+`kind: compact`).
 
 Agrega o subagente por agente, modelo e esforço, e por versão do plugin; o turno da sessão principal por modelo e
 esforço, e pelas skills que entraram nele; os comandos digitados; as falhas por tipo de erro; o MCP por servidor; e as
-decisões da trava de retomada. As negações de hook saem com o motivo.
+decisões das travas de retomada e do /compact. As negações de hook saem com o motivo.
 
   python3 scripts/summarize_measurements.py                      lê o .measurements/ da $BRZA_WORKSPACE, ou de ..
   python3 scripts/summarize_measurements.py --dir <diretório>    outro diretório com o log
@@ -99,6 +100,7 @@ def aggregate(measurements):
     failures = collections.Counter()
     mcp = collections.defaultdict(lambda: {"n": 0, "failed": 0, "duration_ms": 0})
     guard = collections.defaultdict(lambda: {"n": 0, "cost": 0.0, "no_cost": 0, "context": 0, "idle_min": 0})
+    compact = collections.Counter()  # (workstream, decisão) da trava do /compact
     reasons = collections.Counter()
     denials = []
     hook_errors = 0
@@ -135,6 +137,8 @@ def aggregate(measurements):
             server["n"] += 1
             server["failed"] += 1 if row.get("failed") else 0
             server["duration_ms"] += int(row.get("duration_ms") or 0)
+        elif event == "guard" and row.get("kind") == "compact":
+            compact[(label(row.get("workstream")), label(row.get("decision")))] += 1
         elif event == "guard":
             bucket = guard[label(row.get("decision"))]
             bucket["n"] += 1
@@ -149,7 +153,8 @@ def aggregate(measurements):
 
     return {
         "agents": agents, "models": models, "versions": versions, "turns": turns, "turns_by_skill": turns_by_skill,
-        "skills": skills, "commands": commands, "failures": failures, "mcp": mcp, "guard": guard, "reasons": reasons,
+        "skills": skills, "commands": commands, "failures": failures, "mcp": mcp, "guard": guard, "compact": compact,
+        "reasons": reasons,
         "denials": denials, "hook_errors": hook_errors,
     }
 
@@ -224,6 +229,8 @@ def print_report(agg, show_denials):
                 ("decisão", "n", "parada média (min)", "contexto médio", "US$ total"), ("<", ">", ">", ">", ">"),
                 [(d, b["n"], round(b["idle_min"] / b["n"]), kilo(round(b["context"] / b["n"])), money(b))
                  for d, b in sorted(agg["guard"].items())])
+    print_table("Trava do /compact, por workstream e decisão", ("workstream", "decisão", "n"), ("<", "<", ">"),
+                [(w, d, n) for (w, d), n in sorted(agg["compact"].items())])
     print_table("Negações de hook, por motivo", ("n", "motivo (sem o alvo)"), (">", "<"),
                 [(n, r) for r, n in agg["reasons"].most_common()])
     if show_denials and agg["denials"]:
@@ -250,6 +257,7 @@ def to_json(agg):
         "failures": [{"error": e, "where": w, "n": n} for (e, w), n in agg["failures"].items()],
         "mcp": bucket_rows(agg["mcp"], ("server",)),
         "guard": bucket_rows(agg["guard"], ("decision",)),
+        "compact_guard": [{"workstream": w, "decision": d, "n": n} for (w, d), n in agg["compact"].items()],
         "denial_reasons": dict(agg["reasons"]),
         "hook_errors": agg["hook_errors"],
     }

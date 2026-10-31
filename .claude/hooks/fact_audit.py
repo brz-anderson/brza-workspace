@@ -5,8 +5,9 @@
 Um modo por entrada de hook, no primeiro argumento:
 
 - `stop` (SubagentStop, o mesmo payload do `measure.py subagent`): lê o trecho novo do transcript do subagente e tira as
-  marcas `[F3 · lido · 90]` — tipo `F` (fato) ou `C` (custo), número, a evidência (`rodado`, `lido`, `doc`, `inferido`)
-  e a confiança de 0 a 100 — da devolução (`source: reply`: o `input.message` do `SubagentHandback`, ou, sem ele, a
+  marcas `[F3 · lido · 90]` — tipo `F` (fato) ou `C` (custo), número, a evidência (`rodado`, `lido`, `doc`, `inferido`;
+  com parêntese opcional depois do tipo) e a confiança de 0 a 100, com texto opcional depois dela, de `;` ou `,` até o `]`
+  — da devolução (`source: reply`: o `input.message` do `SubagentHandback`, ou, sem ele, a
   última mensagem de texto do assistente) e do `content` de cada `Write`
   do trecho (`source`: o caminho gravado). Grava um evento `fact` por marca nova e um `fact_capture` por trecho, com o
   total, as marcas malformadas e `unmarked` quando a devolução veio sem nenhuma. Com algum fato novo `rodado`, `lido` ou
@@ -47,15 +48,21 @@ def load_measure():
 measure = load_measure()
 
 AUDITED = ("designer", "collector")
-MARK = re.compile(r"\[([FC])(\d+) · (rodado|lido|doc|inferido) · (\d{1,3})\]")
-MARK_START = re.compile(r"\[[FC]\d")  # todo `[F3` ou `[C2` é tentativa de marca: a que MARK não casa é malformada
+# A marca é `[F3 · lido · 90]`, com dois acréscimos que os subagentes escrevem: um parêntese depois do tipo
+# (`[F6 · rodado (grep) · 85]`) e um texto depois do número, de `;` ou `,` até o `]` (`[F3 · lido · 80; premissa …]`).
+MARK = re.compile(r"\[([FC])(\d+) · (rodado|lido|doc|inferido)(?: \([^)\]\n]*\))? · (\d{1,3})(?:[;,][^\]\n]*)?\]")
+# A referência agrupada (`[F3, F25 · lido · 80-90]`, `[F7-F9 · …]`: um id, `,` `-` ou `–` e outro id) cita fatos já
+# marcados em outro lugar: não é fato nem erro.
+REFERENCE = re.compile(r"\[[FC]\d+\s*[,\-\u2013]\s*[FC]\d+")
+MARK_START = re.compile(r"\[[FC]\d")  # todo `[F3` ou `[C2` é tentativa: a que nem MARK nem REFERENCE casa é malformada
 TEXT_LIMIT = 300
 STATE_FILE = "fact-audit-state.json"
 AUDIT_DIR = "fact-audit"
 AUDITED_KINDS = ("rodado", "lido", "doc")  # o `inferido` não tem evidência a refazer
 RUN_OUTPUT_LIMIT = 4000
 RUN_TIMEOUT = 600
-BUDGET_USD = "0.25"
+BUDGET_PER_FACT = 0.012  # US$ por fato enviado: ~0,0065 medido em 2026-10-31, com folga para o fato difícil
+BUDGET_MIN = 0.25
 VERDICTS = ("holds", "fails", "unknown")
 CITES = ("ok", "off")
 PROMPT = """Você é o auditor dos fatos de um desenho. Leia o arquivo {arquivo}: é um JSON com `cwd`, `facts` (cada fato \
@@ -141,6 +148,8 @@ def marks_of(sources):
         for start in MARK_START.finditer(text):
             m = MARK.match(text, start.start())
             if not m or int(m.group(4)) > 100:
+                if not m and REFERENCE.match(text, start.start()):
+                    continue
                 malformed += 1
                 continue
             found += 1
@@ -232,14 +241,19 @@ def claude_binary():
     return os.environ.get("BRZA_FACT_AUDIT_CLAUDE") or shutil.which("claude")
 
 
-def call_claude(path, cwd):
+def budget_usd(facts):
+    """O `--max-budget-usd` da rodada: BUDGET_PER_FACT por fato enviado, com o piso BUDGET_MIN, em duas casas."""
+    return f"{max(BUDGET_MIN, BUDGET_PER_FACT * facts):.2f}"
+
+
+def call_claude(path, cwd, facts):
     """(saída, JSON de saída): roda a sessão da auditoria e lê o JSON também com a saída diferente de 0, que o
-    `--max-budget-usd` usa para cortar. Levanta FileNotFoundError, TimeoutExpired ou InvalidOutput."""
+    `--max-budget-usd` usa para cortar; `facts` é o número de fatos do arquivo, que dimensiona o teto. Levanta FileNotFoundError, TimeoutExpired ou InvalidOutput."""
     binary = claude_binary()
     if not binary:
         raise FileNotFoundError("claude")
     command = [binary, "-p", "--model", "haiku", "--tools", "Read,Grep,Glob,WebFetch", "--add-dir",
-               os.path.dirname(path), "--output-format", "json", "--max-budget-usd", BUDGET_USD,
+               os.path.dirname(path), "--output-format", "json", "--max-budget-usd", budget_usd(facts),
                PROMPT.replace("{arquivo}", path)]
     process = subprocess.Popen(command, cwd=cwd, env={**os.environ, "BRZA_FACT_AUDIT": "1"}, text=True,
                                encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
@@ -293,7 +307,7 @@ def run(path):
     try:
         with open(path, encoding="utf-8") as f:
             data = json.load(f)
-        result = call_claude(path, data.get("cwd") or None)
+        result = call_claude(path, data.get("cwd") or None, len(data.get("facts") or []))
         if result.get("is_error") or str(result.get("subtype") or "success") != "success":
             error = result.get("subtype") or "is_error"
         ids = {f.get("id") for f in data.get("facts") or []}

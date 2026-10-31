@@ -16,6 +16,17 @@ que já valem neste workstream, e as recomendações que Anderson não aceitou.
 - Toda alternativa diz o custo e quando se paga — agora, numa fase nomeada, ou nunca. Custo que você não sabe dizer,
   meça antes ou tire a alternativa.
 - A recomendação leva o argumento que sobreviveu ao ataque e o que caiu.
+- **Cada fato e cada custo levam a marca** `[F3 · lido · 90]` logo depois do que afirmam, também no rascunho e no
+  agregado do scratch:
+  - o id: `F` para fato, `C` para o custo e para o "se paga" de cada opção, numerados na devolução e continuados na
+    retomada;
+  - o tipo de evidência: `rodado`, o comando rodou nesta execução; `lido`, o `arquivo:linha` foi aberto nesta
+    execução; `doc`, a URL ou a documentação foi lida nesta execução; `inferido`, sem fonte direta;
+  - a confiança, de 0 a 100: 90 ou mais, verificado direto; de 80 a 89, com a premissa escrita; abaixo de 80, a
+    conferir. O `inferido` fica abaixo de 80.
+
+  Um Haiku refaz a evidência dos `rodado`, `lido` e `doc` depois da devolução, e a sessão registra o desfecho dos
+  outros quando a sonda ou a rodada responde: o acerto de cada faixa se mede, e a marca fora dessa forma não conta.
 - Rascunho vai ao scratch que o pedido indicar; não grave o documento final nem commite.
 
 A devolução tem, na ordem, só as partes que o pedido pediu: o levantamento com as fontes; os pontos para rodada, em

@@ -65,3 +65,13 @@ na sessão `workspace`, depois da R6 de 2026-10-30. O dia anterior está em
   - Risco: aparecem no histórico do `agy` e numa medição que varra o `brain/`.
   - Estado: ativo.
   - Como desfazer: apagar os seis diretórios.
+- **O plugin `skill-creator@claude-plugins-official` no escopo local do worktree `workspace`**, pelo
+  `claude plugin install --scope local`: a versão `a7ba5b93db0c` no `~/.claude/plugins/cache/` e a entrada `local`, com
+  o `projectPath` do worktree, no `~/.claude/plugins/installed_plugins.json`. O CLI gravou o `enabledPlugins` no
+  `.claude/settings.local.json` do checkout da `master`; a entrada foi movida para o do worktree, e o da `master`, que
+  só tinha ela, apagado.
+  - Risco: só as sessões do worktree `workspace` carregam o plugin; outro `brza note memory-setup` preserva a chave,
+    pelo merge do `brza_runtime.py:187`.
+  - Estado: ativo.
+  - Como desfazer: `claude plugin uninstall skill-creator@claude-plugins-official --scope local` no worktree, e
+    conferir que o `enabledPlugins` saiu do `.claude/settings.local.json` dele.

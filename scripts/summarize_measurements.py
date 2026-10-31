@@ -107,6 +107,8 @@ def aggregate(measurements):
 
     for row in measurements:
         event = row.get("event")
+        if event == "turn" and row.get("fact_audit"):
+            continue  # o turno da sessão `claude -p` da auditoria: o custo dela vai no --facts, e não no da sessão principal
         if event == "subagent":
             agent = short_name(row.get("agent_type"))
             add_cost(agents[(agent, label(row.get("model")), label(row.get("effort")))], row)
@@ -279,8 +281,8 @@ def aggregate_by_workstream(measurements):
     days = collections.defaultdict(new_workstream_day)
     for row in measurements:
         event = row.get("event")
-        if event not in ("turn", "subagent", "memory"):
-            continue
+        if event not in ("turn", "subagent", "memory") or (event == "turn" and row.get("fact_audit")):
+            continue  # o turno de auditoria fica de fora: o custo dela vai no --facts
         workstream = row.get("workstream") or NO_WORKSTREAM
         day = days[(workstream, str(row.get("timestamp", ""))[:10] or UNKNOWN)]
         if event == "turn":

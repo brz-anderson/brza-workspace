@@ -4,9 +4,11 @@
 """
 import contextlib
 import io
+import json
 import os
 import runpy
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -17,6 +19,11 @@ SCRIPTS = HERE.parent
 WRAPPER = runpy.run_path(str(SCRIPTS / 'claude-brza'))
 RUN = runpy.run_path(str(SCRIPTS / 'brza-run'))
 INSTALL = runpy.run_path(str(SCRIPTS / 'brza-install'))
+AGENTS = runpy.run_path(str(SCRIPTS / 'brza-agents'))
+sys.path.insert(0, str(SCRIPTS))
+import brza_runtime as runtime  # noqa: E402
+
+runtime_agents = runtime.agents_json
 
 
 def git(*args):
@@ -58,6 +65,58 @@ class WrapperTest(unittest.TestCase):
         self.assertEqual(out['BRZA_WORKSPACE'], str(self.workspace))
         self.assertNotIn('GH_CONFIG_DIR', out)
 
+    def add_agents(self):
+        folder = self.workspace / '.claude' / 'agents'
+        folder.mkdir(parents=True)
+        (folder / 'reviewer.md').write_text('---\ndescription: Revisa\nmodel: opus\nmemory: project\n---\nRevise.\n')
+        return json.loads(runtime_agents(self.workspace))
+
+    def settings_args(self):
+        return ['--settings', str(self.workspace / '.claude' / 'settings.json')]
+
+    def test_studio_gets_the_agents_after_settings_and_the_workspace_does_not(self):
+        agents = self.add_agents()
+        args, _ = WRAPPER['command']('/x/claude', ['-p', 'oi'], self.studio, self.env)
+        self.assertEqual(args[:4], ['/x/claude', *self.settings_args(), '--agents'])
+        self.assertEqual(json.loads(args[4]), agents)
+        self.assertEqual(args[5:], ['-p', 'oi'])
+        args, _ = WRAPPER['command']('/x/claude', ['-p', 'oi'], self.workspace, self.env)
+        self.assertEqual(args, ['/x/claude', *self.settings_args(), '-p', 'oi'])
+
+    def test_a_studio_worktree_outside_the_studio_folder_gets_the_agents_too(self):
+        self.add_agents()
+        outside = self.base / 'orca' / 'workspaces' / 'brza-studio' / 'feat'
+        outside.parent.mkdir(parents=True)
+        git('-C', str(self.studio), 'worktree', 'add', '-q', str(outside))
+        args, _ = WRAPPER['command']('/x/claude', [], outside, self.env)
+        self.assertIn('--agents', args)
+        self.assertEqual(WRAPPER['repo_of'](outside, self.env), 'studio')
+        ws_outside = self.base / 'orca' / 'workspaces' / 'brza-workspace' / 'feat'
+        ws_outside.parent.mkdir(parents=True)
+        git('-C', str(self.workspace), 'worktree', 'add', '-q', str(ws_outside))
+        args, _ = WRAPPER['command']('/x/claude', [], ws_outside, self.env)
+        self.assertNotIn('--agents', args)
+        self.assertEqual(WRAPPER['repo_of'](ws_outside, self.env), 'workspace')
+
+    def test_the_agents_the_user_passed_win_in_both_forms(self):
+        self.add_agents()
+        for given in (['--agents', '{}', '-p', 'oi'], ['--agents={}', '-p', 'oi']):
+            with self.subTest(given=given):
+                args, _ = WRAPPER['command']('/x/claude', given, self.studio, self.env)
+                self.assertEqual(args, ['/x/claude', *self.settings_args(), *given])
+
+    def test_without_agents_the_studio_command_is_the_old_one(self):
+        args, _ = WRAPPER['command']('/x/claude', ['-p', 'oi'], self.studio, self.env)
+        self.assertEqual(args, ['/x/claude', *self.settings_args(), '-p', 'oi'])
+        args, _ = WRAPPER['command']('/x/claude', ['-p', 'oi'], Path('/'), self.env)
+        self.assertEqual(args, ['/x/claude', '-p', 'oi'])
+
+    def test_a_failing_agents_json_does_not_cost_the_settings(self):
+        self.add_agents()
+        (self.workspace / '.claude' / 'agents' / 'ruim.md').write_bytes(b'\xff\xfe---\n')
+        args, _ = WRAPPER['command']('/x/claude', ['-p', 'oi'], self.studio, self.env)
+        self.assertEqual(args, ['/x/claude', *self.settings_args(), '-p', 'oi'])
+
     def test_wrapper_skips_itself_in_path(self):
         mine, real = self.base / 'mine', self.base / 'real'
         mine.mkdir()
@@ -67,6 +126,45 @@ class WrapperTest(unittest.TestCase):
         (real / 'claude').chmod(0o755)
         with patch.dict(os.environ, {'PATH': f'{mine}:{real}'}):
             self.assertEqual(WRAPPER['real_claude'](), str(real / 'claude'))
+
+
+class AgentsCliTest(unittest.TestCase):
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.ws = Path(temp.name)
+
+    def run_cli(self, *argv):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
+            code = AGENTS['main'](list(argv))
+        return code, out.getvalue()
+
+    def test_prints_the_json_in_one_line(self):
+        folder = self.ws / '.claude' / 'agents'
+        folder.mkdir(parents=True)
+        (folder / 'collector.md').write_text('---\ndescription: Coleta\nmodel: haiku\n---\nColete.\n')
+        code, out = self.run_cli('--workspace', str(self.ws))
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(out), {'collector': {'description': 'Coleta', 'prompt': 'Colete.',
+                                                         'model': 'haiku'}})
+        self.assertEqual(len(out.splitlines()), 1)
+
+    def test_without_agents_prints_nothing_and_exits_0(self):
+        self.assertEqual(self.run_cli('--workspace', str(self.ws)), (0, ''))
+
+    def test_it_uses_the_workspace_of_the_environment_by_default(self):
+        folder = self.ws / '.claude' / 'agents'
+        folder.mkdir(parents=True)
+        (folder / 'a.md').write_text('---\ndescription: x\n---\ny\n')
+        with patch.object(runtime, 'WORKSPACE', self.ws):
+            code, out = self.run_cli()
+        self.assertEqual((code, list(json.loads(out))), (0, ['a']))
+
+    def test_the_installer_picks_it_up_as_a_command(self):
+        self.assertTrue((SCRIPTS / 'brza-agents').stat().st_mode & 0o111)
+        with patch.object(runtime, 'WORKSPACE', SCRIPTS.parent.parent):
+            self.assertIn('brza-agents', INSTALL['commands']())
 
 
 @contextlib.contextmanager

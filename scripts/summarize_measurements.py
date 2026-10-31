@@ -11,6 +11,8 @@ decisões da trava de retomada. As negações de hook saem com o motivo.
   python3 scripts/summarize_measurements.py --since 2026-10-10   só os eventos a partir da data (AAAA-MM-DD)
   python3 scripts/summarize_measurements.py --denials            lista cada negação, com o agente, a data e o motivo
   python3 scripts/summarize_measurements.py --json               a mesma agregação em JSON
+  python3 scripts/summarize_measurements.py --by-workstream      por workstream e por dia: turnos, custo, subagentes por
+                                                                 agent_type, memórias e rodadas (com --json, em JSON)
 
 Log que não existe é pulado; linha que não é JSON é contada e ignorada. Só biblioteca padrão, Python 3.9.
 """
@@ -29,6 +31,7 @@ WORKSPACE = os.environ.get("BRZA_WORKSPACE") or os.path.join(HERE, "..")
 DEFAULT_DIR = os.path.normpath(os.path.join(WORKSPACE, ".measurements"))
 LOG = "measurements.jsonl"
 UNKNOWN = "—"
+NO_WORKSTREAM = "(sem workstream)"  # a linha de antes do campo `workstream`, ou de um cwd fora dos workstreams
 
 
 def read_log(path, since):
@@ -252,18 +255,114 @@ def to_json(agg):
     }
 
 
+def new_workstream_day():
+    return {"turns": new_cost_bucket(), "subagents": collections.defaultdict(new_cost_bucket),
+            # (dono, é feedback?) → {created, updated, deleted}
+            "memory": collections.defaultdict(lambda: {"created": 0, "updated": 0, "deleted": 0}),
+            "live": 0,
+            "rounds": {"questions": 0, "recommended": 0, "other_option": 0, "free_text": 0}}
+
+
+def aggregate_by_workstream(measurements):
+    """{(workstream, dia): contas}: turnos, custo de subagente por agent_type, memórias por dono (as `feedback` à parte),
+    as vivas no fim do dia e as rodadas. O dia é o do `timestamp` da linha. O índice (MEMORY.md, type "index") não é
+    memória e fica de fora das contas. As vivas saem dos eventos, acumuladas dos dias anteriores: created e updated
+    põem o arquivo vivo; deleted tira."""
+    days = collections.defaultdict(new_workstream_day)
+    for row in measurements:
+        event = row.get("event")
+        if event not in ("turn", "subagent", "memory"):
+            continue
+        workstream = row.get("workstream") or NO_WORKSTREAM
+        day = days[(workstream, str(row.get("timestamp", ""))[:10] or UNKNOWN)]
+        if event == "turn":
+            add_cost(day["turns"], row)
+            for field in day["rounds"]:
+                day["rounds"][field] += int((row.get("rounds") or {}).get(field) or 0)
+        elif event == "subagent":
+            add_cost(day["subagents"][short_name(row.get("agent_type"))], row)
+        elif row.get("type") != "index" and row.get("action") in ("created", "updated", "deleted"):
+            owner = row.get("owner") or UNKNOWN
+            day["memory"][(owner, row.get("type") == "feedback")][row["action"]] += 1
+    # As vivas de cada dia: o acumulado do workstream até o fim dele, recontado na ordem dos dias.
+    running = collections.defaultdict(set)
+    events = sorted(((str(r.get("timestamp", "")), r) for r in measurements
+                     if r.get("event") == "memory" and r.get("type") != "index"), key=lambda t: t[0])
+    live_at = {}  # (workstream, dia) → vivas no fim do dia
+    for stamp, row in events:
+        workstream = row.get("workstream") or NO_WORKSTREAM
+        key = (row.get("owner") or UNKNOWN, row.get("file"))
+        (running[workstream].discard if row.get("action") == "deleted" else running[workstream].add)(key)
+        live_at[(workstream, stamp[:10])] = len(running[workstream])
+    last = {}
+    for (workstream, day) in sorted(days):
+        if (workstream, day) in live_at:
+            last[workstream] = live_at[(workstream, day)]
+        days[(workstream, day)]["live"] = last.get(workstream, 0)
+    return dict(days)
+
+
+def pct(part, whole):
+    return f"{100 * part / whole:.0f}%" if whole else ""
+
+
+def print_by_workstream(days):
+    keys = sorted(days)
+    print_table("Por workstream e dia — turnos, custo e rodadas",
+                ("workstream", "dia", "turnos", "US$ total", "US$ por turno", "perguntas", "recomendada", "outra opção",
+                 "texto livre"), ("<", "<", ">", ">", ">", ">", ">", ">", ">"),
+                [(w, d, v["turns"]["n"], money(v["turns"]), mean(v["turns"]) if v["turns"]["n"] else "",
+                  v["rounds"]["questions"] or "", pct(v["rounds"]["recommended"], v["rounds"]["questions"]),
+                  pct(v["rounds"]["other_option"], v["rounds"]["questions"]),
+                  pct(v["rounds"]["free_text"], v["rounds"]["questions"])) for (w, d), v in ((k, days[k]) for k in keys)])
+    print_table("Subagentes por workstream, dia e agent_type", ("workstream", "dia", "agent_type", "n", "US$ total"),
+                ("<", "<", "<", ">", ">"),
+                [(w, d, a, b["n"], money(b)) for (w, d) in keys
+                 for a, b in sorted(days[(w, d)]["subagents"].items(), key=lambda kv: -kv[1]["cost"])])
+    memory_rows = []
+    for (w, d) in keys:
+        v = days[(w, d)]
+        for (owner, feedback), c in sorted(v["memory"].items(), key=lambda kv: (kv[0][0], kv[0][1])):
+            memory_rows.append((w, d, owner, "feedback" if feedback else "outras", c["created"], c["updated"],
+                                c["deleted"], v["live"]))
+    print_table("Memórias por workstream, dia e dono — vivas é o total do workstream no fim do dia",
+                ("workstream", "dia", "dono", "tipo", "criadas", "editadas", "apagadas", "vivas"),
+                ("<", "<", "<", "<", ">", ">", ">", ">"), memory_rows)
+
+
+def to_json_by_workstream(days):
+    return [{"workstream": w, "day": d,
+             "turns": days[(w, d)]["turns"],
+             "subagents": {a: b for a, b in days[(w, d)]["subagents"].items()},
+             "memory": [{"owner": o, "feedback": f, **c} for (o, f), c in days[(w, d)]["memory"].items()],
+             "live_memories": days[(w, d)]["live"], "rounds": days[(w, d)]["rounds"]} for (w, d) in sorted(days)]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--dir", default=DEFAULT_DIR, help="diretório com o log")
     parser.add_argument("--since", default="", help="data mínima, AAAA-MM-DD")
     parser.add_argument("--denials", action="store_true", help="lista cada negação com o motivo inteiro")
     parser.add_argument("--json", action="store_true", help="imprime a agregação em JSON")
+    parser.add_argument("--by-workstream", action="store_true",
+                        help="só o resumo por workstream e por dia: turnos, custo, subagentes, memórias e rodadas")
     args = parser.parse_args()
 
     rows, bad, exists = read_log(os.path.join(args.dir, LOG), args.since)
     if not exists:
         print(f"nenhum log em {args.dir}: {LOG}", file=sys.stderr)
         return 2
+
+    if args.by_workstream:
+        days = aggregate_by_workstream(rows)
+        if args.json:
+            print(json.dumps(to_json_by_workstream(days), ensure_ascii=False, indent=2))
+            return 0
+        print(f"{args.dir}: {LOG} {len(rows)}" + (f" (+{bad} ilegível)" if bad else "")
+              + (f", desde {args.since}" if args.since else ""))
+        print()
+        print_by_workstream(days)
+        return 0
 
     agg = aggregate(rows)
     if args.json:

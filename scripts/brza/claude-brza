@@ -8,7 +8,9 @@ do `claude` o executável de `agentCmdOverrides.claude`, que o `brza install --c
 ~/.local/bin/claude-brza, um link para este arquivo.
 
 Quando o cwd é do brza-workspace ou do brza-studio, o wrapper faz o mesmo que a `brza_claude`: põe a BRZA_WORKSPACE e o
---settings do brza-workspace. O repositório sai do `git rev-parse --git-common-dir`, e não do prefixo do caminho,
+--settings do brza-workspace. No brza-studio, e só nele, acrescenta também o `--agents` com os subagentes do
+.claude/agents do brza-workspace (o brza_runtime.agents_json), se houver algum e a chamada não trouxer o `--agents`; no
+brza-workspace o claude já lê o .claude/agents do projeto. O repositório sai do `git rev-parse --git-common-dir`, e não do prefixo do caminho,
 porque o worktree que o app cria fica em ~/orca/workspaces/…, fora dos dois. Fora deles — o `--version`, o one-shot que
 o app roda com cwd=/ e os checkouts da Fixfy —, o claude puro, com os argumentos intactos. Qualquer falha também cai no
 claude puro, porque o override vale para todo chat do Claude no app.
@@ -22,6 +24,7 @@ import sys
 from pathlib import Path
 
 SELF = Path(__file__).resolve()
+sys.path.insert(0, str(SELF.parent))
 
 
 def real_claude():
@@ -55,20 +58,45 @@ def main_checkout(cwd: Path):
     return common.parent if common.name == '.git' else common
 
 
-def is_brza(cwd: Path, environ) -> bool:
-    if any(inside(cwd, root) for root in roots(environ)):
-        return True
+def repo_of(cwd: Path, environ) -> str | None:
+    """'workspace' ou 'studio', o repositório brza do cwd — pelo caminho e, sem ele, pelo checkout principal —, ou None."""
+    for label, root in zip(('workspace', 'studio'), roots(environ)):
+        if inside(cwd, root):
+            return label
     checkout = main_checkout(cwd)
-    return checkout is not None and any(inside(checkout, root) for root in roots(environ))
+    if checkout is not None:
+        for label, root in zip(('workspace', 'studio'), roots(environ)):
+            if inside(checkout, root):
+                return label
+    return None
+
+
+def is_brza(cwd: Path, environ) -> bool:
+    return repo_of(cwd, environ) is not None
+
+
+def studio_agents(workspace: Path):
+    """Os argumentos `--agents <json>` dos subagentes do brza-workspace, ou [] sem agente ou com qualquer falha, que
+    não pode custar o --settings."""
+    try:
+        import brza_runtime
+        agents = brza_runtime.agents_json(workspace)
+    except Exception:
+        return []
+    return ['--agents', agents] if agents else []
 
 
 def command(claude, argv, cwd: Path, environ):
     """(argumentos, ambiente) da chamada."""
-    if not is_brza(cwd.resolve(), environ):
+    repo = repo_of(cwd.resolve(), environ)
+    if repo is None:
         return [claude, *argv], environ
     workspace = roots(environ)[0]
     env = {**environ, 'BRZA_WORKSPACE': str(workspace)}
-    return [claude, '--settings', str(workspace / '.claude' / 'settings.json'), *argv], env
+    agents = []
+    if repo == 'studio' and not any(a == '--agents' or a.startswith('--agents=') for a in argv):
+        agents = studio_agents(workspace)
+    return [claude, '--settings', str(workspace / '.claude' / 'settings.json'), *agents, *argv], env
 
 
 def main():

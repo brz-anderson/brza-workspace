@@ -48,21 +48,29 @@ O `.claude/settings.json` daqui não é herdado pelo `brza-studio`, que fica ao 
 BRZA_WORKSPACE="$HOME/Projects/brza-workspace"
 BRZA_STUDIO="$HOME/Projects/brza-studio"
 
-# "yes" quando o cwd está no brza-workspace ou no brza-studio (worktrees inclusive), nada fora. Caminho físico e sem
-# maiúsculas, como o fixfy_where.
+# "workspace" ou "studio" quando o cwd está no brza-workspace ou no brza-studio (worktrees inclusive), nada fora.
+# Caminho físico e sem maiúsculas, como o fixfy_where.
 brza_where() {
-  local here root
+  local here root label
   here=$(pwd -P | tr '[:upper:]' '[:lower:]')
-  for root in "$BRZA_WORKSPACE" "$BRZA_STUDIO"; do
+  for label in workspace studio; do
+    case $label in workspace) root="$BRZA_WORKSPACE" ;; studio) root="$BRZA_STUDIO" ;; esac
     root=$(cd "$root" 2>/dev/null && pwd -P | tr '[:upper:]' '[:lower:]') || continue
-    case "$here/" in "$root"/*) echo yes; return ;; esac
+    case "$here/" in "$root"/*) echo $label; return ;; esac
   done
 }
 
 # Claude Code no BrzA: o --settings do brza-workspace (hooks de medição e a identidade do brz-anderson) e a raiz
-# para os hooks; o gh fica no perfil padrão.
+# para os hooks; no brza-studio, também o --agents com os subagentes por papel do brza-workspace (brza-agents), se
+# houver e se a chamada não trouxer o seu; o gh fica no perfil padrão.
 brza_claude() {
-  BRZA_WORKSPACE="$BRZA_WORKSPACE" command claude --settings "$BRZA_WORKSPACE/.claude/settings.json" "$@"
+  local -a agents=()
+  local json
+  if [ "$(brza_where)" = studio ] && [[ " $* " != *" --agents"* ]]; then
+    json=$(brza-agents 2>/dev/null)
+    [ -n "$json" ] && agents=(--agents "$json")
+  fi
+  BRZA_WORKSPACE="$BRZA_WORKSPACE" command claude --settings "$BRZA_WORKSPACE/.claude/settings.json" "${agents[@]}" "$@"
 }
 
 claude()     { if [ -n "$(brza_where)" ]; then brza_claude "$@"; else fixfy_claude "$@"; fi; }

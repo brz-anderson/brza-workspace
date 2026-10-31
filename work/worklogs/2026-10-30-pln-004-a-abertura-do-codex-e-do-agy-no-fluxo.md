@@ -20,12 +20,17 @@ reservado na `master` (`233ea9a`). O plano é o
   pontos sem lastro.
 - **A rodada 2**, da base e da identidade: função e wrapper; as skills espelhadas em `.agents/skills/`; a sonda da
   identidade antes do desenho; o `.codex/hooks.json` versionado, com revisão por worktree.
+- **A rodada 3**, dos papéis, da memória, da medição e da delegação: o bloco de memória no prompt do papel, com o
+  runtime registrado (contraproposta de Anderson); o `tools` traduzido no `agy`; a medição portada com US$; a delegação
+  reduzida.
+- **A rodada 4**: o runtime em `metadata.runtime` no arquivo e no evento `memory`; as três sondas antes do Desenho.
 
 ## O que ficou
 
 - **O custo e o "se paga" das opções da R1** ficaram na sessão `brza-workspace-80`; o plano grava as opções e as
   respostas.
-- **O próximo:** a rodada 3, com os papéis, a memória, a medição e a delegação; depois, a sonda da identidade (R2.3).
+- **O próximo:** as três sondas da R4.2 — a identidade no commit, os nomes das ferramentas do `agy` e o
+  `guardian_review` —, e então o Desenho.
 
 ## Fora do workspace
 

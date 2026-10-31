@@ -1,0 +1,1 @@
+- [A rodada do Desenho vai no chat](rodada-do-desenho-vai-no-chat.md) — rodada de Desenho em texto, sem AskUserQuestion, como a de decisão

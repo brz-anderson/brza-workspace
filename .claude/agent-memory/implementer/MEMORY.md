@@ -1,2 +1,2 @@
 - [Hooks do Claude: como testar e estender](hooks-do-claude-testes.md) — gate, carga por importlib, MEASURE_DIR, State com path
-- [brza-workflow: layout e testes](brza-workflow-layout-e-testes.md) — comandos das 3 suítes, Python >= 3.10 no CLI, skips P3/P7
+- [brza-workflow: layout e testes](brza-workflow-layout-e-testes.md) — comandos das 3 suítes, Python >= 3.10, skips P3/P7, NoteFixture, índice P4

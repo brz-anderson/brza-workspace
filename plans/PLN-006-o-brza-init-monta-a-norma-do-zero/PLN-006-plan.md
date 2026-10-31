@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 27
-executed_h: 0.3
-remaining_h: 25.5
+executed_h: 1.3
+remaining_h: 16
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,8 +16,9 @@ tags:
 
 # PLN-006: O `brza init` monta a norma num workspace do zero
 
-- **Retomar:** P1 feito (`brza-workflow@83fce24`). Em curso: P2, P3 e P4 juntos, cada um num worktree do
-  `brza-workflow`; depois, P5, P6 e P7. Pontos novos vão na recomendada, pela regra de Anderson após a R10.
+- **Retomar:** P1, P2 e P4 feitos (`brza-workflow@ca22efe`). Em curso: P3 e P7, em `.worktrees/p3` e `.worktrees/p7`
+  do `brza-workflow`; depois P5 e P6, e então P8 e P9 (X7). Pontos novos vão na recomendada, pela regra de Anderson
+  após a R10.
 - **Dividido:** [PLN-006 — Desenho](PLN-006-design.md)
 
 ## Pedido
@@ -500,6 +501,45 @@ resultado". Daqui ao fechamento, cada ponto sem lastro vira rodada gravada aqui,
 **decidida pela regra** na recomendada, sem ir à pergunta. A nota de `work/decisions/` segue nascendo como proposta:
 a regra escolhe opção de rodada, e não é a frase explícita que transforma texto em decisão.
 
+### Rodada 11 — os pontos do P2 (decidida pela regra, 2026-10-31)
+
+**Apresentado antes:** a devolução do `implementer` do P2, com cinco escolhas que o D6 e o D7 não fixavam.
+
+1. **O runtime sem workspace achado.** Opções: cair no legado, `BRZA_WORKSPACE` sem manifesto ou
+   `~/Projects/brza-workspace` (recomendada) — custo: o nome fixo fica no runtime até o P7/P8; se paga: no P7/P8 ·
+   `WORKSPACE = None` e erro no uso — custo: ~1 h a mais, fora do escopo, e quebra o `brza-workspace` antes do P8; se
+   paga: depois do P8. **Decidido pela regra — o legado.**
+2. **A saída do `brza where` sem workspace.** Opções: nada impresso, saída 0 (recomendada) — custo: nenhum para o
+   `-n "$(…)"` do shell; se paga: já · saída 1 — custo: a função com `err_return` falha; se paga: só para `if brza
+   where`. **Decidido pela regra — nada, saída 0.**
+3. **O papel sob a `BRZA_WORKSPACE`.** Opções: o override escolhe a raiz e o papel vem do cwd, `notes`, `code` ou
+   nenhum (recomendada) — custo: o cwd fora dos dois sai sem papel; se paga: já, sem lançar hooks em repositório alheio
+   · papel `notes` fixo — custo: hooks em qualquer diretório; se paga: nunca. **Decidido pela regra — do cwd.**
+4. **O `brza register` com o mesmo workspace e outro código.** Opções: recusar, com o mesmo par como no-op
+   (recomendada) — custo: trocar o código exige editar o arquivo à mão; se paga: já · substituir a entrada — custo: o
+   comando reescreve o arquivo do usuário; se paga: só se trocar o código for frequente. **Decidido pela regra —
+   recusar.**
+5. **A `BRZA_STUDIO` contra o registro.** Opções: a variável vence, até o P7 (recomendada) — custo: duas fontes até lá;
+   se paga: no P7 · tirar já — custo: quebra o `claude-brza` e os testes; se paga: só depois do P7. **Decidido pela
+   regra — a variável vence até o P7.**
+
+### Rodada 12 — os pontos do P4 (decidida pela regra, 2026-10-31)
+
+**Apresentado antes:** a devolução do `implementer` do P4, com quatro escolhas que o D11 não fixava.
+
+1. **A data de corte do `description` no checador.** Opções: `2026-11-01`, o dia seguinte ao P4 (recomendada) —
+   custo: ~0 h, e a nota aberta hoje fica isenta; se paga: já · o dia da migração — custo: ~0,2 h, e nada é cobrado até
+   lá; se paga: só se o P8 demorar semanas · só aviso — custo: 0 h; se paga: nunca, contra a R7.3. **Decidido pela
+   regra — 2026-11-01.**
+2. **A precisão do `ts`.** Opções: segundos, como o exemplo do D11 (recomendada) — custo: 0 h, e empate raro resolvido
+   pela ordem do arquivo; se paga: já · milissegundos — custo: ~0,1 h; se paga: se o coordenador mostrar empate.
+   **Decidido pela regra — segundos.**
+3. **A raiz do índice antes do P2.** Opções: uma função só, `index_repo()` (recomendada) — custo: 0 h; se paga: já ·
+   esperar o P2 — custo: o P4 bloqueado; se paga: nunca. **Decidido pela regra — a função**; depois do merge ela lê o
+   `runtime.WORKSPACE` que o `discover()` do P2 acha.
+4. **A branch que o `--rebuild` lê.** Opções: a da `origin`, com a local de reserva (recomendada) — custo: 0 h; se paga:
+   já · a local — custo: 0 h, e indexa nota não publicada; se paga: nunca. **Decidido pela regra — a da `origin`.**
+
 ## Desenho
 
 O Desenho, D1–D12, está em [PLN-006 — Desenho](PLN-006-design.md), por passar de 400 linhas.
@@ -528,14 +568,19 @@ hooks e checador passam também no `/usr/bin/python3` 3.9.6. Desvios X1–X6.
 
 Executa D6, D7 · executor: `implementer`
 
-Estimado: 4,5 h · Executado: — h
+Estimado: 4,5 h · Executado: 0,4 h
 
-- [ ] **1. Testes que falham**: o `brza where` de um worktree fora do diretório, sem entrada no registro, e o `brza
+- [x] **1. Testes que falham**: o `brza where` de um worktree fora do diretório, sem entrada no registro, e o `brza
   register` recusando um código já ligado
-- [ ] **2. Implementar** o `brza_root`, o registro, o `brza where` e o `brza register`; os hooks e o `brza_runtime`
+- [x] **2. Implementar** o `brza_root`, o registro, o `brza where` e o `brza register`; os hooks e o `brza_runtime`
   passam a usá-lo, sem `tomllib`
-- [ ] **3. Rodar e ver passar**, também no `/usr/bin/python3` 3.9
-- [ ] **4. Commit**
+- [x] **3. Rodar e ver passar**, também no `/usr/bin/python3` 3.9
+- [x] **4. Commit**
+
+**Evidência:** `brza-workflow@273c47d`, no merge `ca22efe` · na `master` depois do merge: `tests/cli` → 216 OK, 1 skip
+(P7) · `tests/hooks` → 193 OK, 1 skip (P3), e no `/usr/bin/python3` 3.9.6 → 193 OK, 4 skips (3 sem `tomllib`, 1 do
+P3) · `tests/notes-checker/run.py` → saída 0. O parser confere contra o `tomllib` em 14 documentos válidos, 17
+inválidos e 8 fora do subconjunto. Desvios X8–X10; pontos R11.
 
 ### P3 — O manifesto, o lock, o motor e a norma em molde
 
@@ -554,15 +599,22 @@ Estimado: 3,5 h · Executado: — h
 
 Executa D11 · executor: `implementer`; o texto da norma e a nota de decisão pela sessão
 
-Estimado: 5 h · Executado: — h
+Estimado: 5 h · Executado: 0,6 h
 
-- [ ] **1. Testes que falham**: o `plan-open` em corrida, a linha `changed` do `commit` sem tocar o checkout principal,
+- [x] **1. Testes que falham**: o `plan-open` em corrida, a linha `changed` do `commit` sem tocar o checkout principal,
   o `merge=union` e o estado vigente pelo maior `ts`
-- [ ] **2. Implementar** o `brza note plan-open`, a linha do `commit`, o `brza note index --rebuild`, o
+- [x] **2. Implementar** o `brza note plan-open`, a linha do `commit`, o `brza note index --rebuild`, o
   `.gitattributes` e o campo `description` no checador e no molde
-- [ ] **3. Rodar e ver passar**
-- [ ] **4. A norma**: o texto do `AGENTS.md` e da `plan-runner` do D11, e a nota de decisão da R8.4, como proposta
-- [ ] **5. Commit**
+- [x] **3. Rodar e ver passar**
+- [x] **4. A norma**: o texto do `AGENTS.md` e da `plan-runner` do D11, e a nota de decisão da R8.4, como proposta
+- [x] **5. Commit**
+
+**Evidência:** `brza-workflow@8b2a355`, no merge `ca22efe` · no worktree: `tests/cli` → 196 OK, 1 skip; os dois
+`plan-open` em processos reais, 6 de 6 sem flake · na `master` depois do merge, as suítes do P2 · a norma em
+`core/AGENTS.md`, `core/plans/README.md`, `core/work/README.md` e na `plan-runner` (`SKILL.md`, `open-and-plan.md`,
+`close.md`, `plan-template.md`) · a proposta
+[O índice de notas mora na `master`, a única exceção à regra da norma](../../work/decisions/o-indice-de-notas-mora-na-master.md),
+`open`. Desvios X11–X13; pontos R12.
 
 ### P5 — O `brza init`
 
@@ -642,6 +694,22 @@ Estimado: 1,5 h · Executado: — h
 - **X5 — Um `.gitignore` na raiz do `brza-workflow`**, que o D1 não lista (R10.4).
 - **X6 — O CLI segue exigindo Python 3.10 ou mais** (`str | None`), como na origem; só os hooks e o `brza_root`
   rodam no 3.9. Vai ao README no P9.
+- **X7 — As levas mudam: P2 e P4; depois P3 e P7; depois P5 e P6.** A R9 previa P2, P3 e P4 juntos, mas o parser
+  TOML mora no `brza_root.py` (D2) e serve ao registro do P2 e ao manifesto do P3; o P3 espera o P2. Escolha da sessão,
+  pela regra da recomendada.
+- **X8 — O P2 não tocou o `bin/brza-note`.** Ele já compara o common dir com `runtime.WORKSPACE` e `runtime.STUDIO`,
+  que agora vêm do `brza_root`; os `origin/master` literais dele ficam para o P6 (D9). Afeta P6.
+- **X9 — O `brza_root` difere do D6 em três detalhes:** `registry_path()` é função, e não constante, para ler o
+  ambiente na hora; o `find` ganhou `branch=False`, porque só o `measure` paga a chamada ao git; o parser aceita
+  inteiro e booleano, porque o `schema = 1` do manifesto pede inteiro.
+- **X10 — O `brza_runtime.discover()` cai no legado** (`BRZA_WORKSPACE` sem manifesto, ou `~/Projects/brza-workspace`)
+  quando não acha workspace, para os scripts de hoje não quebrarem antes do P8; o nome fixo sai no P7 ou no P8.
+- **X11 — O `commit` compara com a linha vigente do índice, e não com o commit anterior** como o D11 dizia: o
+  `plan-open` já grava `created`, e o índice se conserta no commit seguinte quando um push falha.
+- **X12 — O `brza note commit` aceita o caminho antigo de um rename**, com `git rm --cached` para o que sumiu do disco;
+  antes o `git add` falhava, e o `changed` com o `path` novo da R8.1 não sairia.
+- **X13 — O `plan-open` não cria o arquivo do plano**: reserva o número, grava a linha e imprime o caminho; quem grava é
+  a `plan-runner`. O `--no-push` não grava linha, e o `--rebuild` recolhe depois.
 
 ## Worklogs
 

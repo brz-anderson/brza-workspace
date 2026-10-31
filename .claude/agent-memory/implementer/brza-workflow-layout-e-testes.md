@@ -18,3 +18,25 @@ metadata:
   `brza-doctor`, que usa `HERE`); o `brza-note` roda o `brza-sessions` do cliente por `HERE.parent / 'packages/client/bin'`.
 - Skips marcados com o passo que os resolve: `SettingsTest` do `test_fact_audit` (P3, lê o `settings.json`) e
   `test_the_installer_picks_it_up_as_a_command` (P7, o `brza-install` lista `WORKSPACE/scripts/brza`).
+- **Testes do `brza-note` que precisam do workspace de mentira herdam de `NoteFixture`** (`tests/cli/test_brza_note.py`, sem
+  `test_*`), e não de `NoteTest`: o unittest reexecutaria os testes herdados. O `test_brza_note_index.py` (P4) é o exemplo.
+- **Índice da master (P4):** commit sem checkout por `plumb(...)` do próprio `brza-note` (o `runtime.git` não aceita `env` nem
+  stdin; o `GIT_INDEX_FILE` temporário precisa de caminho absoluto). A corrida se testa trocando `GLOBALS['index_push']` por
+  um fio que empurra um rival na primeira chamada; o teste de dois processos reais (`Popen` do `bin/brza-note` com
+  `BRZA_WORKSPACE`) passou 6 de 6. O rename só chega ao índice se o caminho antigo for dado ao `commit`, e o `git add`
+  recusava o pathspec sumido: o `commit` agora usa `git rm --cached --ignore-unmatch` para o que não existe no disco.
+- O fixture tem `PLN-001-x` sem frontmatter no `studio`: todo teste de `--rebuild` o enxerga, conte com ele nos ids.
+- **Worktree de trabalho do P2 em diante:** `/Users/andepb/Projects/brza-workflow/.worktrees/pN`, branch `feat/pln-006-pN`; o
+  pedido manda trabalhar só nele. `PYTHONDONTWRITEBYTECODE=1` também em `python3 -c`/depuração solta: sem ele sobra
+  `bin/__pycache__` e `core/.claude/hooks/__pycache__` (o `.gitignore` os ignora, mas apague pelo caminho exato).
+- **`brza_root` (P2):** `core/.claude/hooks/brza_root.py`, só stdlib e 3.9; `bin/brza-where` e `bin/brza-register` o importam por
+  `parent.parent/'core'/'.claude'/'hooks'` e também sobem no 3.9. O `brza_runtime` o importa do mesmo jeito e expõe
+  `WORKSPACE`, `STUDIO` e `STUDIO_BRANCH` por `discover()` **no import**, pelo cwd, com o legado (`BRZA_WORKSPACE` sem manifesto,
+  `~/Projects/brza-workspace`) como último recurso até o P8 pôr o manifesto lá. Teste do CLI que importa o runtime põe
+  `os.environ['BRZA_REGISTRY'] = '/nonexistent/...'` antes do import; os de processo montam o env à mão.
+- **O `brza_root` é um módulo só por processo:** teste que troca `brza_root.git` num teste de hook vaza para os seguintes
+  (o `measure` o importa por `sys.modules`); use `mock.patch.object` com `addCleanup`. O `measure.resolve_workstream` engole
+  exceção e devolve `(None, None)`: ao depurar, chame `_resolve_workstream` direto. O cache `_WORKSTREAMS` é por cwd: limpe-o
+  entre duas leituras do mesmo cwd depois de mudar a branch.
+- Testes do `brza_root` batem o parser contra o `tomllib` (pula no 3.9: 4 skips no 3.9 = 3 do `tomllib` + P3). Os testes
+  de `tests/cli` não coletam no 3.9 (`str | None`); só os scripts `brza-where`/`brza-register` são rodados lá, por subprocesso.

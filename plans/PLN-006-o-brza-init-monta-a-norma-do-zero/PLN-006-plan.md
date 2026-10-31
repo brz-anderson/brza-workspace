@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 27
-executed_h: 2
-remaining_h: 10.5
+executed_h: 2.4
+remaining_h: 7.5
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,9 +16,9 @@ tags:
 
 # PLN-006: O `brza init` monta a norma num workspace do zero
 
-- **Retomar:** P1, P2, P3, P4 e P7 feitos (`brza-workflow@acf8bef`). Em curso: o P6, em `.worktrees/p6`; depois o P5,
-  que chama a camada 1 do sync (X17) e reconcilia o bloco do shell (X18); então P8 e P9. Pontos novos vão na
-  recomendada, pela regra de Anderson após a R10.
+- **Retomar:** P1–P4, P6 e P7 feitos (`brza-workflow@9356995`). Em curso: o P5, em `.worktrees/p5`, que chama a
+  camada 1 do sync e reconcilia o bloco do shell (X18); então P8 e P9. Pontos novos vão na recomendada, pela regra de
+  Anderson após a R10.
 - **Dividido:** [PLN-006 — Desenho](PLN-006-design.md)
 
 ## Pedido
@@ -582,6 +582,28 @@ a regra escolhe opção de rodada, e não é a frase explícita que transforma t
    também no `check()` — custo: ~1 h; se paga: se alguém importar o `check()` esperando o manifesto. **Decidido pela
    regra — só no `main()`.**
 
+### Rodada 15 — os pontos do P6 (decidida pela regra, 2026-10-31)
+
+**Apresentado antes:** a devolução do `implementer` do P6, com cinco escolhas que o D9 não fixava.
+
+1. **O arquivo presente, sem entrada no lock e diferente do núcleo.** Opções: sobrescrever no primeiro sync, como o D9
+   diz (recomendada) — custo: uma edição anterior ao lock se perde, mas fica no git, e o `--dry-run` a mostra antes; se
+   paga: já, no primeiro sync do P8 · recusar — custo: `--force` por arquivo no P8; se paga: só com arquivo local
+   homônimo de um novo do núcleo. **Decidido pela regra — sobrescrever.**
+2. **O editado que persiste.** Opções: sai 1 a cada sync até reverter ou `--force` (recomendada) — custo: o aviso se
+   repete; se paga: já, pela R6.2 · calar quando o núcleo não mudou o arquivo — custo: ~0,5 h, e esconde a edição; se
+   paga: só se editar a cópia virar prática. **Decidido pela regra — sai 1.**
+3. **Os testes antigos do `brza-workspace`.** Opções: o P8 os apaga por `git rm` (recomendada) — custo: uma linha no
+   P8; se paga: no P8 · a lista `RETIRED` com a pasta inteira — custo: ~0,5 h, e apagar por prefixo sem lock; se paga:
+   só para o dry-run mostrar tudo junto. **Decidido pela regra — `git rm` no P8.**
+4. **O índice e o push do `commit` com `origin` e `master` fixos no `brza-note`.** Opções: deixar até haver workspace
+   com outro remote (recomendada) — custo: 0 agora; se paga: no primeiro workspace com remote ou branch diferente ·
+   trocar agora — custo: ~1 h, mexendo no P4; se paga: já, se o P5 ou o P8 criarem um assim. **Decidido pela regra —
+   deixar.** Vai às Pendências no fechamento.
+5. **O que o `--core-only` exclui.** Opções: a camada 2 (recomendada) — custo: 0; se paga: já · a camada 2 sempre
+   separada, sem a flag — custo: ~0,3 h; se paga: só se ela ficar sempre à parte. **Decidido pela regra — a camada
+   2.**
+
 ## Desenho
 
 O Desenho, D1–D12, está em [PLN-006 — Desenho](PLN-006-design.md), por passar de 400 linhas.
@@ -679,13 +701,20 @@ Estimado: 3 h · Executado: — h
 
 Executa D9 · executor: `implementer`
 
-Estimado: 3 h · Executado: — h
+Estimado: 3 h · Executado: 0,4 h
 
-- [ ] **1. Testes que falham**: a mudança do núcleo chega sem tocar a parte local; o arquivo editado é recusado com o
+- [x] **1. Testes que falham**: a mudança do núcleo chega sem tocar a parte local; o arquivo editado é recusado com o
   diff, e o `--force` o escreve
-- [ ] **2. Implementar**
-- [ ] **3. Rodar e ver passar**
-- [ ] **4. Commit**
+- [x] **2. Implementar**
+- [x] **3. Rodar e ver passar**
+- [x] **4. Commit**
+
+**Evidência:** `brza-workflow@9356995` · `tests/cli` → 318 OK (49 do `test_brza_sync.py`, 5 novos no
+`test_brza_note.py`) · `tests/hooks` → 244 OK, e no 3.9.6 → 244 OK, 5 skips · checador → saída 0 · cinco mutações
+plantadas (escrever o editado, lock quebrado como ausente, o dry-run aplicar, apagar o editado, pular o pull)
+derrubaram cada uma ao menos um teste · fumaça com o `core/` real num diretório temporário: 28 arquivos escritos e o
+lock com 28 sha256. Os testes vieram na mesma passada do código, sem o vermelho antes; a mutação o supre. Desvios
+X21–X23; pontos R15.
 
 ### P7 — O `install`, o lançador, o `doctor` e os scripts locais
 
@@ -780,6 +809,12 @@ Estimado: 1,5 h · Executado: — h
   `templates/.brza/workspace.toml` é a saída exata do `dump_manifest`, para o P5 ter uma fonte só.
 - **X20 — Ficaram no núcleo**, só com placeholders, o exemplo `fixfy:architect` do docstring do `measure.py:135` e o
   parágrafo do `CLAUDE.md` sobre o `--agents` do `claude-brza`, que é do cliente. O primeiro sai no P5, com o X18.
+- **X21 — O `brza sync` sem `--core-only` roda também a camada 2**, o `brza-note sync`, por subprocesso; o
+  `--dry-run` e o `--core-only` não a rodam. O D9 não dizia o que o `--core-only` excluía.
+- **X22 — O commit do `brza-workflow` é o da `origin/<ref>`**, depois do `fetch`, com o `<ref>` local só sem `origin`:
+  o commit local não empurrado não entra no workspace. O `--ref` não grava no manifesto.
+- **X23 — O `resume_guard.py` e o teste dele saem no primeiro sync**, mesmo fora do lock, por uma lista `RETIRED`; os
+  `.claude/hooks/tests/*` e o `notes-checker/tests/run.py` do `brza-workspace` saem por `git rm` no P8 (R15.3).
 
 ## Decisões
 

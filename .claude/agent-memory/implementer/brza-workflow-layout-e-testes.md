@@ -57,3 +57,13 @@ metadata:
   numa linha vizinha.
 - Varredura de `{{workspace.x}}` em `.py` exclui o `brza_root.py`, que documenta a sintaxe. `tests/hooks` no 3.9 dá 5 skips
   (tomllib: 3 do P2 e 2 do P3).
+- **P6 (`bin/brza-sync`, camada 1):** tests/cli 318 (49 em `test_brza_sync.py`), hooks 244 (5 skips no 3.9), em 2026-10-31. Script sem
+  `.py`: carregue com `runpy.run_path(BIN / 'brza-sync')` e chame `sync_core(root, flow=..., out=lista.append, today='...')`; o
+  teste monta um brza-workflow de mentira (clone de uma origin bare, `core/` + `packages/client/core/`) e um workspace de
+  mentira (clone de outra origin, manifesto por `dump_manifest`, parte local); identidade por `patch.dict(os.environ)` com
+  `GIT_AUTHOR_*`/`GIT_COMMITTER_*`. O teste de processo (`SyncCommandTest`) usa `BRZA_WORKFLOW` e cwd no workspace. A camada 2
+  roda o `bin/brza-note sync` por subprocesso com `BRZA_WORKSPACE`. Testes do `brza-note` com manifesto: escreva
+  `.brza/workspace.toml` no `self.ws` (o `runtime.WORKSPACE` está patchado) e adicione um remote `up` para a mesma origin.
+- Validei os testes do sync por mutação em cópia (`cp -R bin core tests packages` num `mktemp -d`): sobrescrever o editado,
+  tratar lock quebrado como ausente, o dry-run aplicar, apagar o editado e pular o pull — cada um derruba pelo menos 1 teste.
+  A suíte de `tests/cli` leva ~130 s: rode em background ou com timeout alto (o limite do Bash é 120 s por padrão).

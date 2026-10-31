@@ -17,8 +17,10 @@ workstream, as buscas que já deram certo e as que enganaram.
   - o id: `F` e o número, na ordem da devolução e continuado na retomada;
   - o tipo de evidência: `rodado`, o comando rodou nesta execução; `lido`, o `arquivo:linha` foi aberto nesta
     execução; `doc`, a URL ou a documentação foi lida nesta execução; `inferido`, sem fonte direta;
-  - a confiança, de 0 a 100: 90 ou mais, verificado direto; de 80 a 89, com a premissa escrita; abaixo de 80, a
-    conferir. O `inferido` fica abaixo de 80.
+  - a confiança, de 0 a 100: 90 ou mais, verificado direto; de 80 a 89, com a premissa escrita na frase do fato,
+    fora da marca; abaixo de 80, a conferir. O `inferido` fica abaixo de 80.
+
+  Uma marca por fato, só com o id, o tipo e o número: o resumo que retoma fatos já marcados cita o id sem a marca.
 
   Um Haiku refaz a evidência dos `rodado`, `lido` e `doc` depois da devolução, e a sessão registra o desfecho dos
   outros quando a sonda ou a rodada responde: o acerto de cada faixa se mede, e a marca fora dessa forma não conta.

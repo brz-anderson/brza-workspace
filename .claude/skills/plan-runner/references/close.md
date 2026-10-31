@@ -20,7 +20,7 @@ um que falte trava o fechamento**, e a resposta é dizer o que falta e onde:
    - regra que o código do `brza-studio` precisa cumprir depois → a norma dele (`AGENTS.md`), por uma sessão aberta lá;
    - o que Anderson precisa lembrar de como usar uma ferramenta → um guia em `wiki/guides/`;
    - pendência que ficou para depois → uma issue em `work/issues/`;
-   - achado falso → descartado no parecer, com o porquê.
+   - achado falso → `→ falso` no parecer, com o `**Por que é falso:**` e a evidência; o parecer é a casa dele.
 4. **As decisões que o plano respondeu estão `done`**, citando a rodada.
 5. **O resumo está redigido** — o pedido, o que foi entregue, os desvios, os achados por destino, o que ficou fora —, um
    em cada commit ou pull request do `brza-studio` que a entrega abriu, com o link do plano. Trabalho só em notas de

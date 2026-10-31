@@ -4,7 +4,6 @@ scope:
 date: 2026-10-31
 tags:
   - chat
-  - mobile
 ---
 
 # O P68 e o P37 do PLN-001, o mock compartilhado do lucide e a ortografia conferida

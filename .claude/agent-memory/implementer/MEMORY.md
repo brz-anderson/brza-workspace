@@ -1,0 +1,1 @@
+- [Ferramentas do chat nativo (brza-studio)](brza-studio-native-chat-tools.md) — oxfmt, comando do vitest, chamadores do resolvedor, armadilhas de identidade MCP

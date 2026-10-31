@@ -3,8 +3,8 @@ status: in_progress
 phase: execution
 origin: request
 ready: "sim — o P62 ao P64 do pedido 32, autorizados por Anderson; o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 164.6
-executed_h: 28.0
+estimate_h: 166.6
+executed_h: 28.5
 remaining_h: 3.9
 scope:
   - brza-studio
@@ -22,8 +22,9 @@ tags:
   R53 e os X38 ao X40, e o P59 em `brza-studio@697ee59c0bf`, com os X41 ao X44: o pedido 31 espera só o P61 e o C15
   ao C17, num build, com Anderson. O pedido 32 fechou o P62, o P63 e o P64, na
   sessão `pln-001-pedido-32`, em `brza-studio@21f9cfe90bb`, `9564eff9368` e `ba4102b5c95`, e espera só o P65, com o C18 ao C20, num build, com Anderson. O P66 do pedido 33 fechou em `brza-studio@9118f60672b`, com a R54 e os X45 ao
-  X48, e espera só o C21; sete arquivos de teste do transcript do mobile não carregam desde o P43 (X47). Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
-  C17 depois do P60 o C18 ao C20 depois do P64 e o C21), o X10, o X20 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
+  X48, e espera só o C21; o P67, que fecha o X20 com a R55 e a R56, fechou em `brza-studio@97a93f6ff57` e se
+  confere junto do C6; sete arquivos de teste do transcript do mobile não carregam desde o P43 (X47). Esperam Anderson o P57, o P61, o P65 e os casos manuais (C1 ao C7, C10 ao C12 e C14, num build só, o C15 ao
+  C17 depois do P60 o C18 ao C20 depois do P64 e o C21), o X10 e o P27.2 e o P27.3; aberto desde a Fixfy, o P37. Do PLN-002/P9 (R12.4, R13.4),
   para o P64: o `brza sessions` abre sem o `/rename` por padrão e dá à aba o título do `--title`; sem `--rename`, a
   sessão entra no correio com o nome automático `brza-workspace-<hex>`. O P64 não lê o mapa de sessões do PLN-002 e
   casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
@@ -134,6 +135,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 32` | As duas aparecem no cartão do Orca de 2026-10-29 (#34824), com o status do remetente (R50.1) | P63 | os testes do cartão trazidos do upstream (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 32` | O clique no nome do remetente abre a aba de chat da sessão dele, se aberta no app (R50.3) | P64 | teste da busca da aba (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 33` | A linha do raciocínio, fechada, mostra "Pensou por 3s:" e o começo do texto, cortado, no tom apagado, com a seta que abre o texto inteiro; o rótulo da pergunta passa a "Perguntou:" (R52.1 a R52.3) | P66 | teste da linha (unidade); conferência no BrzA Studio (manual) |
+| `X20` | O `executeRead`, o `executeWrite` e o `executeDestructive` do MCP da Atlassian ganham o ícone do produto do `name` e o título com a ferramenta interna; o `discover` ganha o ícone do produto citado na busca, e o título com a busca entre aspas (R55.1, R55.2) | P67 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual, com o C6) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
 
@@ -914,6 +916,48 @@ custos são estimativa.
    — custo: +0,3 a 0,5 h; se paga: lê o raciocínio sem abrir, mas a linha muda a cada pedaço que chega.
    **Decidido — "Só na linha do raciocínio (Recomendado)".** Vai ao D51 e ao P66.
 
+### Rodada 55 — as meta-ferramentas do MCP da Atlassian (enviada 2026-10-31)
+
+> **Apresentado antes:** o `atlassianProduct` (`brza-atlassian-tool.ts:25-34`) escolhe o produto só pelo nome da
+> ferramenta, e o `match` (`brza-tool-categories.ts:133-141`) recebe o input mas não o passa ao `matchesMcpTool`. Nos
+> transcripts da Fixfy, o `executeRead` (53 chamadas), o `executeWrite` (7) e o `executeDestructive` (9), este fora do
+> X20, levam `{ cloudId, name, inputs }`, com o `name` da ferramenta interna (`getJiraBoardSprintData`,
+> `manageJiraSprint`, `createConfluenceAttachment`); o `discover` (49) leva só `{ query }`, em texto livre. O `inputs`
+> não traz o `issueIdOrKey` em que o título do P48 se apoia.
+
+Respondida em 2026-10-31, por Anderson na sessão do workstream `studio` do `brza-workspace`, pelo AskUserQuestion. Os
+custos são estimativa.
+
+1. **R55.1 — Até onde vão as linhas do `executeRead`, do `executeWrite` e do `executeDestructive`?** Seleção única.
+   Opções: ícone e título curtos — o produto pelo `input.name` e o título com a ferramenta interna, como
+   "manageJiraSprint · start" (recomendada) — custo: ~1,5 h; se paga: na primeira sessão de sprint; só o ícone —
+   custo: ~1 h; se paga: já, mas a linha não diz o que fez; ícone, título e chip com a chave do card ou da página —
+   custo: ~3 h; se paga: só com clique nesses chips, e a maioria das chamadas é de board e sprint.
+   **Decidido — "Ícone e título curtos (Recomendado)".** Vai ao P67.
+2. **R55.2 — O que fazer com o `discover`?** Seleção única. Opções: o produto pela busca — jira ou confluence na
+   query dão o ícone, e o título mostra a busca entre aspas; sem produto, fica como hoje (recomendada) — custo: ~0,5 h;
+   se paga: agora; deixar sem categoria — custo: nenhum; se paga: nunca; um ícone genérico da Atlassian para o resto
+   do servidor — custo: ~1,5 h, com o SVG novo no desktop e no mobile; se paga: quando essas linhas forem frequentes.
+   **Decidido — "Produto pela busca (Recomendado)".** Vai ao P67.
+
+### Rodada 56 — os nomes das meta-ferramentas e a busca longa do `discover` (enviada 2026-10-31)
+
+> **Apresentado antes:** o `implementer` do P67 deixou duas escolhas sem lastro na R55: casou só os três nomes
+> (`/^execute(?:read|write|destructive)$/i`) e pôs a busca do `discover` inteira no título, sem cortar.
+
+Respondida em 2026-10-31, por Anderson na sessão do workstream `studio` do `brza-workspace`, pelo AskUserQuestion. Os
+custos são estimativa.
+
+1. **R56.1 — Quais nomes de meta-ferramenta entram no casamento?** Seleção única. Opções: os três nomes explícitos
+   (recomendada) — custo: nenhum agora; um `executeX` novo fica sem ícone até alguém acrescentar o nome; se paga:
+   agora, sem pegar por engano ferramenta futura de outro formato; qualquer `execute*` — custo: ~5 min; ferramenta
+   futura cujo `name` não seja a interna ganha título errado; se paga: se a Atlassian criar novos `execute*` iguais.
+   **Decidido — "Os três nomes explícitos (Recomendado)".** Fica no P67.
+2. **R56.2 — A busca do `discover` vai inteira no título?** Seleção única. Opções: inteira, sem cortar, com o corte do
+   CSS (recomendada) — custo: nenhum; se paga: agora; cortar em ~120 caracteres — custo: ~15 min, com um teste, e a
+   dica perde o texto; se paga: só com busca enorme na prática.
+   **Decidido — "Inteira, sem cortar (Recomendado)".** Fica no P67.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -1303,7 +1347,7 @@ Sem `.app` aberto; a troca `claude` → `adm` no Orca se confere com o PLN-028/P
 
 Executa D31 · executor: sessão do `brza-studio`
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0,5 h h
 
 - [ ] **1.** Conferir, no `orca-dev` aberto, o botão direito numa palavra errada da caixa do chat, em pt-BR; se as
       sugestões aparecem, o passo fecha sem código
@@ -2334,6 +2378,35 @@ P59, `pnpm check:changed --base=origin/master --maxWorkers=2` → 24 de 26, em 5
 desta mudança: o `external-subcommand.ts` nas fronteiras de import e os 2 casos de `open-uncommitted-entry.test.ts`
 (19561 passed). O worktree e a branch saíram depois do push. Desvios X45 ao X48.
 
+### P67 — As meta-ferramentas do MCP da Atlassian com ícone e título (X20)
+
+Executa X20 · executor: `implementer` da sessão do workstream `studio`, no worktree `.worktrees/pln-001-p67` do
+`brza-studio`
+
+Estimado: 2 h · Executado: —
+
+- [x] **1.** Teste que falha, junto do `brza-atlassian-tool.test.ts` e do `brza-tool-categories.test.ts`: o
+      `executeRead`, o `executeWrite` e o `executeDestructive` com `name` de Jira ganham o logo do Jira, e com `name` de
+      Confluence o `file-text`; o título é o `name`, e ` · <inputs.action>` quando a ação é texto
+      ("manageJiraSprint · start"); o `discover` com jira ou confluence na `query` ganha o ícone do produto e o título
+      com a busca entre aspas; sem produto no `name` ou na `query`, a linha fica como hoje (R55.1, R55.2)
+- [x] **2.** O `matchesMcpTool` recebe o input como segundo argumento, que o `match` já tem; o produto das
+      meta-ferramentas sai do input no `brza-atlassian-tool.ts`; o chip delas fica de fora (R55.1)
+- [x] **3.** Os testes do que foi tocado, o `typecheck` do `mobile/` e o `pnpm check:changed --base=origin/master`;
+      rebase na `origin/master` e push. A conferência no app vai junto do C6
+
+**Evidência:** commit [`97a93f6ff57`](https://github.com/brz-anderson/brza-studio/commit/97a93f6ff57), na `master` do
+`brza-studio`, pelo `implementer` (Sonnet) da sessão do workstream `studio`, no worktree `.worktrees/pln-001-p67`, com
+o commit e o push pela sessão. O produto das meta-ferramentas sai do `metaToolSubject`, em `brza-atlassian-tool.ts`: o
+`input.name` dos três `execute*` e a `query` do `discover`, pelo `productInText`, que fica com o produto citado
+primeiro; o `metaToolReference` dá o título e `chip: null`. O `matchesMcpTool` recebe o input, e os chamadores do desktop
+e do mobile já o passavam. A identidade chega crua nos dois caminhos — pelo nome `mcp__atlassian__executeRead` e pelo
+`{ server, tool }` do Codex (`codex-structured-item-translation.ts:162`) —, e a regex dos três nomes casa (R56.1). Antes
+do código: `brza-atlassian-tool.test.ts` e `brza-tool-categories.test.ts` → 11 failed, 26 passed. Depois: os dois → 37
+passed; `src/shared/native-chat` → 81 arquivos, 1.182 passed; `pnpm tc` e o `typecheck` do `mobile/` → exit 0;
+`pnpm check:changed --base=origin/master --maxWorkers=2` → só o vermelho de antes, o `external-subcommand.ts` nas
+fronteiras de import. O worktree e a branch saíram depois do push. A conferência no app vai junto do C6.
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -2427,7 +2500,8 @@ da linha quando o teste entra.
 - **X19 — O site do Jira do app é o `activeSiteId`, senão o primeiro.** Com vários sites e o `cloudId` em UUID, o chip
   pode abrir no site errado, e o `cloudId` em prefixo não vira domínio; afeta P48.
 - **X20 — As meta-ferramentas `executeRead`, `executeWrite` e `discover` do MCP da Atlassian ficam sem categoria.**
-  Cobri-las pede o input no `matchesMcpTool`; a decidir com Anderson; afeta P48.
+  Cobri-las pede o input no `matchesMcpTool`; decidido na R55 e na R56, com o `executeDestructive` junto, e fechado no P67
+  (`brza-studio@97a93f6ff57`); afeta P48.
 - **X21 — O P53.4 e o P40 foram à `master` com o import boundaries vermelho.** O vermelho é preexistente, do
   `9a81e65c852`, e Anderson mandou seguir, com o conserto no PLN-002 (R46.6); afeta P53 e P40.
 - **X22 — O tom `faint` do link sobre código ficou sem medição útil.** O `native-chat-markdown.css:55` já põe `a, code`
@@ -2650,6 +2724,8 @@ da linha quando o teste entra.
   o P59 em `brza-studio@697ee59c0bf`, com os X41 ao X44; o C16 e o P61 esperam o build do pedido 31, com Anderson.
 - 2026-10-29 — [O P66 do PLN-001, o "Pensou" com o texto na linha](../../work/worklogs/2026-10-29-pln-001-p66-o-pensou-com-o-texto-na-linha.md):
   o P66 em `brza-studio@9118f60672b`, com a R54 e os X45 ao X48; o C21 espera o build, com Anderson.
+- 2026-10-31 — [O P67 do PLN-001, as meta-ferramentas da Atlassian com ícone e título](../../work/worklogs/2026-10-31-pln-001-p67-meta-ferramentas-da-atlassian.md):
+  o P67 em `brza-studio@97a93f6ff57`, com a R55 e a R56, fecha o X20; a conferência vai junto do C6, com Anderson.
 
 ## Decisões
 

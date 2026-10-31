@@ -1,0 +1,2 @@
+- [Mecanismo nativo do runtime](feedback_mecanismo-nativo-do-runtime.md) — R2.2 e R3.2 do PLN-004: recusou o contorno por texto; quer procedência
+- [Medir antes de desenhar](feedback_medir-antes-de-desenhar.md) — sonda antes da rodada; a de custo zero primeiro

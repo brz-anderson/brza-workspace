@@ -89,9 +89,10 @@ conferidos; a sem a skill afirmou que o `~/.zshrc` batia com o `README.md`. As o
 Anderson: "tudo aprovado, segue". A skill entrou na `master` em `3f55576`, em `.claude/skills/agent-instructions-writer/`.
 A otimização da `description` pela `skill-creator` não rodou.
 
-**Candidato à norma:** o link curto para o scratch, na memória
-[O caminho do scratch vai por link curto](../../memory/caminho-do-scratch-vai-por-link-curto.md); o erro do hash vale
-para toda delegação, de todo workstream.
+**O link curto para o scratch subiu à norma**, a pedido de Anderson ("suba o candidato a norma"), pela
+`agent-instructions-writer`: no `CLAUDE.md`, um parágrafo depois da tabela de vocabulário, e a linha do scratch passou
+a dizer onde ele fica no chat do BrzA Studio, que o `/private/tmp/claude-501/…` não cobria (`81a3d1b`). A memória que o
+guardava saiu.
 
 ## A sessão paralela na Fixfy
 

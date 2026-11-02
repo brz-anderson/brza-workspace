@@ -868,6 +868,12 @@ Estimado: 1,5 h · Executado: — h
 - **X26 — Sobrou um nome pessoal no CLI do núcleo**: o molde de issue do `bin/brza-note:117` diz "O pedido de Anderson".
   O `bin/` não é renderizado; vai à revisão do P9.
 
+## Revisões
+
+- [REV: o `brza-workflow` dos passos P1–P7 do PLN-006, em `b9210a6`](../../work/reviews/pln-006-o-brza-init.md) —
+  2026-11-02, 11 achados e 5 falsos; A1 corrigido no porte (`ebeb779`), A2, A3 e A10 no P8, os outros num conserto
+  antes dele, todos pela regra da recomendada.
+
 ## Decisões
 
 - [O índice de notas mora na `master`, a única exceção à regra da norma](../../work/decisions/o-indice-de-notas-mora-na-master.md)

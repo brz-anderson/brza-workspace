@@ -132,3 +132,7 @@ reporte no final". O P2 rodou no scratch e a fonte foi à pasta do plano, renome
   embaixo e 90 em cima. O `brza-app-icon.svg` foi regenerado, o artboard e o rascunho do PNG também, e o `implementer`
   do P4 foi avisado para regenerar o ícone e rodar de novo o `pnpm build:icons`. O rótulo "BrzA Studio ADE" do seletor
   de ícone do app não foi tocado: é texto do `shared/app-icon.ts`, e trocá-lo é decisão de Anderson.
+- **A R11: Anderson aprovou os lockups e o selo** ("aprovado, com as mudanças solicitadas"), com o selo "BrzA STUDIO" e o
+  `.icns` sem faíscas. O PNG foi à pasta do plano como `PLN-007-lockups-l2.png`, e o P2 fechou, com `Executado` de 0,4 h
+  contra as 2,5 h estimadas. As perguntas 2, 3 e 4 da rodada (merges, README do workspace, branch do P6) seguem sem resposta.
+  O artboard só renderizou no chat depois de copiado para a raiz do scratch; a lição foi à memória do workstream.

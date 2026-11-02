@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 20.75
-executed_h: 0.85
-remaining_h: 13.0
+executed_h: 0.95
+remaining_h: 10.5
 scope:
   - brza-studio
   - workspace
@@ -17,10 +17,9 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** P1 aprovado (R10); P3 na `master` do `brza-studio` em `a3a89e3aaf5`. O P2 tem os passos 1 a 3 feitos e
-  espera a aprovação dos lockups (passo 4, decisão de Anderson). A pedido, o P4, o P5 e o P6 correm em branches
-  empilhadas no `brza-studio`, sem merge, porque levam os lockups e o selo ainda sem aprovação; a fonte está em
-  `PLN-007-fonte-da-marca/`.
+- **Retomar:** P1 (R10) e P2 (R11) aprovados; P3 na `master` do `brza-studio` em `a3a89e3aaf5`. A pedido, o P4, o P5 e o
+  P6 correm em branches empilhadas no `brza-studio`, sem merge, até a R11 responder os merges (2), o README do workspace
+  (3) e a branch do P6 (4). A fonte está em `PLN-007-fonte-da-marca/`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
 ## Pedido
@@ -100,7 +99,7 @@ clara e sem as faíscas do D1, por decisão da R10.
 
 Executa D3 (o script de texto e os 16 SVG) · executor: sessão do `brand`, no scratch
 
-Estimado: 2,5 h · Executado: 0,3 h
+Estimado: 2,5 h · Executado: 0,4 h
 
 - [x] **1. O texto em path** — o `brza-brand-text.swift` devolve o JSON de "BrzA" (750), "STUDIO", "CLI", "WORKSPACE"
       (500, `.14em`); a prova é o avanço de "BrzA" a 100 pt dar ~246,9 em 750.
@@ -108,15 +107,15 @@ Estimado: 2,5 h · Executado: 0,3 h
       `brza-app-icon.svg`, pela tabela de geometria do D3.
 - [x] **3. A conferência** — artboard com as 4 filhas, horizontal e vertical, nos 2 temas, ao lado do PNG do L2, pelo
       `brza shot`.
-- [ ] **4. A rodada dos lockups** — aprovação; o PNG vai à pasta do plano como `PLN-007-lockups-l2.png`. **Pendente da
-      decisão de Anderson**: o rascunho está em `PLN-007-lockups-l2-rascunho.png`.
-- [ ] **5. Commit** — o PNG e a linha do plano, pelo `brza note commit`. Espera o passo 4; a fonte dos lockups já está
-      commitada em `PLN-007-fonte-da-marca/`.
+- [x] **4. A rodada dos lockups** — aprovação; o PNG vai à pasta do plano como `PLN-007-lockups-l2.png`. Aprovado na
+      [R11](PLN-007-interview.md), com o selo sem o "ADE".
+- [x] **5. Commit** — o PNG e a linha do plano, pelo `brza note commit`; a fonte dos lockups está em
+      `PLN-007-fonte-da-marca/`.
 
-**Evidência (passos 1 a 3):** `swift brza-brand-text.swift <woff2> 750 0 BrzA` dá `advance` 246,91 (a prova do Desenho)
+**Evidência:** `swift brza-brand-text.swift <woff2> 750 0 BrzA` dá `advance` 246,91 (a prova do Desenho)
 e `capHeight` 71; em `wght` 400, 226,4. O `brza-brand-build.mjs` gera os 16 `*-lockup-*.svg` e o `brza-app-icon.svg` com o
 `<g id="seal">`. O artboard foi conferido pelo `brza shot` a 736 px, nos dois temas
-([`PLN-007-lockups-l2-rascunho.png`](PLN-007-lockups-l2-rascunho.png)), ao lado do L2 da R3; a primeira passada estourou a
+([`PLN-007-lockups-l2.png`](PLN-007-lockups-l2.png)), ao lado do L2 da R3; a primeira passada estourou a
 fila dos verticais, e foi corrigida. O `rsvg-convert` renderiza o ícone com selo e um lockup sem erro, e é com ele que o
 P4 gera o `.icns`. **O selo do ícone saiu sem o "ADE"**, a pedido de Anderson em 2026-11-02, e o grupo chama e texto
 desceu 36 px para ficar centrado no tile (margem de ~125 px em cima e embaixo); o `brza-app-icon.svg` foi regenerado.

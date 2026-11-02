@@ -14,9 +14,11 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** a Entrevista fechou nas rodadas 1 a 7. O próximo é escrever os itens `D` a partir da matriz do
-  Desenho, com os riscos da fase 0 como hipóteses (R7.3), e depois os Passos, com o P0 numa sessão `pln-003-p0`. O P7
-  do PLN-002 corre na sessão `pln-002-p7`.
+- **Retomar:** a Entrevista fechou nas rodadas 1 a 7. **Primeiro, o spike do C5** (2026-11-02): um plugin mínimo
+  `trusted-worker`, com um painel `html` e um `components`, nos dois apps, pelo `plugin dev watch --check --shot`, com as
+  sete perguntas do C5 no [Desenho](PLN-003-design.md). Depois, escrever os itens `D` a partir da matriz, com os riscos
+  da fase 0 como hipóteses (R7.3), e os Passos, com o P0 numa sessão `pln-003-p0`. O P7 do PLN-002 corre na sessão
+  `pln-002-p7`.
 - **Mudou a norma (2026-10-29):** a trava de retomada saiu, e a sessão passou a ser por frente, não por tarefa
   ([Uma sessão por frente de trabalho, sem trava de retomada e com o cache de 1 h](../../work/decisions/uma-sessao-por-frente-e-sem-trava-de-retomada.md)). O Desenho ainda conta com a
   trava no roteador (M2) e na tabela de conflitos (`PLN-003-design.md:181-182`): ajustar antes dos itens `D`.
@@ -26,10 +28,8 @@ tags:
   O Desenho que conta com as notas na `master` ou com o `brza note` de antes se ajusta antes dos itens `D`.
 - **Mudou o Terreno do plugin do Orca (2026-11-02):** o sistema da `v1.4.246` tem canal worker↔painel, frame isolado
   ligado e manifesto v2, e `terminal.sendText` é só do worker, então a R1.2 ("HTML regenerado") e o C5 ficaram em
-  revisão (o Terreno e a matriz do Desenho). **Retomar pelo spike do C5, antes dos itens `D` do painel:** plugin mínimo
-  `trusted-worker` com um painel `html` e um `components`, nos dois apps, pelo `plugin dev watch --check --shot`; as sete
-  perguntas estão no C5 do [Desenho](PLN-003-design.md). Rodada respondida em 2026-11-02: o spike mede os dois caminhos. O plugin do Orca não contribui skills (reservado e
-  vazio): o veículo delas é o plugin do Claude ([As skills de documento da Fixfy num possível plugin do BrzA](../../work/issues/skills-de-documento-da-fixfy-num-plugin.md)).
+  revisão (o Terreno e a matriz do Desenho). Rodada respondida em 2026-11-02: o spike mede os dois caminhos,
+  HTML+worker e TSX+worker. O plugin do Orca não contribui skills (reservado e vazio): o veículo delas é o plugin do Claude.
 - **Dividido:** [PLN-003 — Entrevista](PLN-003-interview.md) · [PLN-003 — Desenho](PLN-003-design.md)
 
 ## Pedido
@@ -66,6 +66,11 @@ Anderson, em 2026-10-29, na mesma sessão.
 | `Pedido 4` | `brza app install` baixa o DMG da release e troca o app; `--from-source` compila da `origin/master`            | —     | —             |
 | `Pedido 4` | `brza mcp start`, `stop` e `status` controlam o servidor residente                                           | —     | —             |
 | `Pedido 3` | `brza <sub>` acha o app que está rodando — BrzA Studio ou Orca — sem caminho fixo                        | —     | —             |
+
+## Pendências conhecidas
+
+- [As skills de documento da Fixfy num possível plugin do BrzA](../../work/issues/skills-de-documento-da-fixfy-num-plugin.md)
+  — o veículo é o plugin do Claude, não o do Orca; o gatilho é de Anderson.
 
 ## Worklogs
 

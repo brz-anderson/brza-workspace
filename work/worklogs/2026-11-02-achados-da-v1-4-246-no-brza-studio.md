@@ -85,14 +85,19 @@ a sessão que o executa, num worktree do `brza-studio`:
   aparecem no chat de destino como o cartão "Tarefa do coordenador", e não como balão de usuário. Sessão
   `pln-001-pedido-37`.
 - **Pedido 38 (R64, D56, P73):** o tipo do agente na lista "AGENTES" do chat (`descrição · reviewer · Bash`), só na faixa
-  do chat. Sessão `pln-001-pedido-38`.
+  do chat. Sessão `pln-001-pedido-38`, que já fechou o P73 (`brza-studio@563705a7aaf`); o C26 espera o build.
+- **Pedido 39 (R65, D57 a D60, P74 a P77):** a correção dos achados, decidida por Anderson na R65, todas as respostas na
+  recomendada: o fork na conta fixada da origem (P74), as credenciais numa pasta própria `~/.brza` (P75), o atualizador
+  desligado no build ad hoc (P76) e os quatro pequenos consertos num commit só, antes da alpha.2 (P77). Quatro sessões,
+  `pln-001-pedido-39-fork`, `-credenciais`, `-atualizador` e `-consertos`, cada uma num worktree do `brza-studio`. O
+  worker de plugin sem sandbox ficou fora, com a decisão dos plugins.
 
 ## O que ficou
 
-- **A rodada dos achados com Anderson:** o fork do chat fixado, as credenciais em `~/.orca` e o atualizador. Cada issue
-  traz as opções com o custo.
-- **Os pontos que só o build prova:** o `brza foo` pelo app empacotado (item 1 dos pequenos consertos), e o C25 e o C26
-  dos pedidos acima.
+- **O worker de plugin sem sandbox** fica na issue, com a decisão dos plugins, de Anderson.
+- **Os casos que só o build prova**, com Anderson, num build só a partir da `master` depois dos pushes: o C25 e o C26, e
+  o C27 ao C30 do pedido 39 (o `brza foo` pelo app empacotado é o C30).
+- **O `ast-grep-gates` vermelho** (dois testes do `filesystem-watcher`) segue como no upstream; não é do fork.
 
 ## Fora do workspace
 
@@ -101,10 +106,10 @@ a sessão que o executa, num worktree do `brza-studio`:
   desfazer:** `rm /private/tmp/studio-246`.
 - **`/private/tmp/reviewer-fork-tests/`**, a cópia do teste temporário do F1. **Risco:** nenhum. **Estado:** ativo.
   **Como desfazer:** `rm -r /private/tmp/reviewer-fork-tests`.
-- **Dois chats abertos no BrzA Studio pelo `brza sessions`**, `pln-001-pedido-37` e `pln-001-pedido-38`, nos worktrees
-  `.worktrees/pln-001-pedido-37` e `-38` do `brza-studio`, criados pelo `brza tree`. **Risco:** nenhum para os outros
-  checkouts. **Estado:** ativo. **Como desfazer:** fechar as abas e `brza tree --rm pln-001-pedido-37` e `-38`, depois
-  dos pushes.
+- **Seis chats abertos no BrzA Studio pelo `brza sessions`**, `pln-001-pedido-37`, `-38` e `pln-001-pedido-39-fork`,
+  `-credenciais`, `-atualizador` e `-consertos`, nos worktrees de mesmo nome em `.worktrees/` do `brza-studio`, criados
+  pelo `brza tree`. **Risco:** nenhum para os outros
+  checkouts. **Estado:** ativo. **Como desfazer:** fechar as abas e `brza tree --rm <nome>` de cada um, depois dos pushes.
 - **Leituras no Keychain e no perfil real**, só de metadado: `security find-generic-password` sem `-w`, e `sqlite3
   -readonly` em cópias no scratch, apagadas. **Risco:** nenhum; nenhum segredo foi lido, e um comando que imprimiria o
   `ORCA_PAIRING_CODE` foi barrado e não repetido.

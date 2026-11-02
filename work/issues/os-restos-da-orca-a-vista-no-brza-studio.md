@@ -37,3 +37,24 @@ O levantamento é o do `collector` para a R2 do plano, com as fontes no `brza-st
 
 Os restos fora do mobile foram estimados em ~3–6 h na R3.4, e muitos são identificadores de build, com risco de conflito
 nos merges do `stablyai/orca`. Se paga quando houver outro usuário além de Anderson.
+
+## O que o sistema de plugins da 1.4.246 acrescenta
+
+O levantamento de 2026-11-02 (ver
+[Os plugins da Orca 1.4.246 e o que mudam nos planos](../worklogs/2026-11-02-os-plugins-da-orca-1-4-246-e-os-planos.md))
+achou mais restos, e mediu as chamadas externas no app instalado (`1.4.246-alpha.1`):
+
+- **As mensagens do CLI** (`nextSteps` do `plugin create` e afins) ainda dizem `orca plugin …`; o guia de plugin embarcado
+  (`src/main/…/bundled-skill-guides.ts`) e a URL do `$schema` apontam para a Orca. O formato (`orca-plugin.json`,
+  `orca-catalog.json`, módulos `orca`, `engines.orca`) **não se troca**: quebraria o ecossistema.
+- **Os catálogos oficial e da comunidade** são repositórios Git da `stablyai`, visíveis por padrão em Configurações.
+- **O `kill-list.json` e o `stats.json` de `onorca.dev`:** o app empacotado busca o primeiro a cada 6 h (15 min no retry) e
+  o segundo só empacotado (`main-process-plugins.ts:67`). São GET com `credentials: 'omit'`, sem corpo. O `kill-list` é a
+  revogação de plugin malicioso, e vale manter; o `stats` só alimenta a contagem de instalações.
+- **A telemetria `plugin_installed` está desligada no nosso build:** o `client.ts` só transmite com a identidade de build
+  (`stable`|`rc`) e a chave PostHog, que só o CI oficial injeta; o `app.asar` instalado não tem nenhuma chave `phc_`. Fica
+  desligada enquanto o CI do fork não definir o `ORCA_POSTHOG_WRITE_KEY` (o `release-mac-build.yml:189` já o lê de
+  `secrets`; não confirmei se o segredo existe no repositório).
+
+**Não medi:** o tráfego de rede ao vivo (nenhuma conexão aberta no momento da conferência; o `kill-list` só roda a cada 6 h)
+nem o comportamento do catálogo offline.

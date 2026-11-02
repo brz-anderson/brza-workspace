@@ -1,0 +1,65 @@
+---
+scope:
+  - brza-studio
+  - workspace
+---
+
+# Os plugins da Orca 1.4.246 e o que mudam nos planos
+
+Anderson pediu, na sessão `brand`: "verifique como funcionam os plugins adicionados nessa ultima versão do Orca
+(upstream), pode mudar os planos futuros que temos". Antes, no mesmo dia, pediu para tirar os agentes "Não instalado" do
+menu "+" do app.
+
+## O menu "+" sem os agentes não instalados
+
+O seletor (`AgentLaunchPickerMenu.tsx`) e o menu antigo de linhas (`QuickLaunchButton.tsx`) passaram a omitir o agente sem
+nenhuma superfície e com linha `chat-unavailable` de motivo `not-installed`; os outros motivos (SSH, WSL, falha de
+verificação) seguem à vista. Teste novo `AgentLaunchPickerMenu.not-installed.test.tsx`, que falhou antes e passa depois; o
+`pnpm check:changed --base=master --force` passou nos 24 checks. **Está no worktree
+`~/Projects/brza-studio/.worktrees/hide-uninstalled-agents` (branch `feat/hide-uninstalled-agents`), sem commit.** Não vai ao
+app instalado sem merge e novo build. A tela de instalar skill (`SkillInstallAgentPicker`) também diz "Not installed" e ficou
+como está.
+
+## O levantamento dos plugins
+
+Um `collector` leu, só leitura, os docs, a skill de autoria e o código de plugins do `brza-studio`, separando o que está na
+`v1.4.246` do que só existe no `upstream/main` (279 commits à frente, API do host 1.3, `engines.orca >=1.4.248`). O agregado,
+com 116 fatos marcados, estava em `/private/tmp/plugins-orca/levantamento.md` (scratch; copiado para
+`/private/tmp/pln-003-plugins-levantamento.md`). A sessão conferiu por conta própria quatro fatos: a versão instalada é a
+`1.4.246-alpha.1`, `pluginSystemEnabled` é o padrão desde esta versão, `hooks` e `statusBarItems` são `1.4.248`, e
+`skills`/`mcpServers`/`agentHarnesses` seguem reservados.
+
+**O que muda nos planos:**
+
+- **PLN-003 (`tools-kit`):** o Terreno do plugin do Orca envelheceu ("sem canal worker→painel", três métodos do host, "fork
+  só manifest 1"); o painel TSX com worker pede o C5 reaberto, com um spike no app instalado. A orquestração segue no MCP e
+  no `brza` até a base chegar a 1.4.248. O plugin do Claude com MCP (R4.3, R4.4) não muda.
+- **A issue das skills de documento da Fixfy:** o plugin do Orca não contribui skills, então o veículo é o plugin do Claude.
+- **PLN-007:** nada; tema de plugin não toca o chat nem a marca.
+- **Próximo sync:** só quando houver tag; os hooks e a API nova de plugins vêm junto, e plugin com `engines.orca >=1.4.248`
+  não carrega no fork antes disso.
+
+## O que se decidiu
+
+Rodada respondida por Anderson em 2026-11-02:
+
+- **"Onde registro o que o levantamento mudou nos planos?"**: "Sessão no tools-kit (Recomendado)". Aberta como
+  `pln-003-plugins` ("PLN-003: o Terreno do plugin do Orca"), com o pedido em `/private/tmp/pln-003-prompt-plugins.md`.
+- **"O app chama `onorca.dev` … O que fazemos?"**: "Medir antes (Recomendado)". Medido, e o resultado está na issue
+  [Os restos da Orca à vista no BrzA Studio](../issues/os-restos-da-orca-a-vista-no-brza-studio.md): telemetria desligada no
+  nosso build, `kill-list` e `stats` por GET sem identidade, catálogos da `stablyai` à vista. **A decisão (deixar, ou
+  desligar o sistema por padrão) volta a Anderson com esses fatos; nada foi mudado.**
+
+## Pendente
+
+- Commit e merge de `feat/hide-uninstalled-agents` e um build novo, se Anderson quiser o menu sem os não instalados.
+- Anderson decide o que fazer com as chamadas a `onorca.dev` e com os catálogos da `stablyai`.
+- A sessão `pln-003-plugins` atualiza o Terreno e o C5 do PLN-003.
+
+## Fora do workspace
+
+- **A sessão `pln-003-plugins`** aberta pelo `brza sessions` no worktree `tools-kit`; **estado:** ativa; **como desfazer:**
+  `brza sessions close pln-003-plugins`.
+- **O worktree `~/Projects/brza-studio/.worktrees/hide-uninstalled-agents`** e a branch `feat/hide-uninstalled-agents`, com a
+  mudança sem commit; **como desfazer:** `git worktree remove --force` e `git branch -D`.
+- **`git fetch upstream --tags --prune`** no `brza-studio`: atualizou `upstream/main` (leitura, só refs remotas).

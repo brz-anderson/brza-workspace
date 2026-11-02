@@ -1,1 +1,2 @@
 - [Ativos de marca no brza-studio](reference_brza-studio-brand-assets.md) — onde moram ícone, logo, chama, cores e restos da Orca; fontes que enganam
+- [Mapa do sistema de plugins do Orca](reference_orca-plugin-system-map.md) — docs geradas, skill stub vs guia real, código, serviços externos, armadilhas de zsh

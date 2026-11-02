@@ -49,3 +49,12 @@ Duas saídas, ambas com um teste do caminho:
   `accountSwitch` no registro adotado, com o divisor "Conta trocada". Custo: o pino na criação e no registro adotado.
 - **Na conta global, com a cópia do transcript para o home dela**, como a troca do P36 já faz. Custo: uma cópia entre
   contas.
+
+## Estado
+
+Corrigido na `master` pelo P74 do PLN-001, em
+[`bdb2b55be14`](https://github.com/brz-anderson/brza-studio/commit/bdb2b55be14): o resultado do fork nomeia a conta da
+origem, o chat novo nasce pinado nela, com o divisor "Conta trocada", e o lançamento retoma o transcript. Os testes de
+unidade passam; **o app não foi rodado.** O `status` fica `open` até o C27, de Anderson, no build novo. O mesmo defeito
+no import de chat do CLI está em
+[Um chat adotado sem pino abre em branco na conta selecionada](chat-adotado-sem-pino-abre-em-branco-na-conta-selecionada.md).

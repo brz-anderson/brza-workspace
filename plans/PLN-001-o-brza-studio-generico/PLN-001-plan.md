@@ -2933,18 +2933,46 @@ Anderson, num build novo.
 
 Executa D57 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-39-fork`
 
-Estimado: 3 h · Executado: 0 h
+Estimado: 3 h · Executado: 1,5 h
 
 Agora (R65.1).
 
-- [ ] **1.** Os "A conferir no passo" do D57, lidos no código antes de escrever
-- [ ] **2.** Teste que falha: o fork de um chat com `accountSwitch` abre o chat novo com o mesmo `accountSwitch`, o lançamento
+- [x] **1.** Os "A conferir no passo" do D57, lidos no código antes de escrever
+- [x] **2.** Teste que falha: o fork de um chat com `accountSwitch` abre o chat novo com o mesmo `accountSwitch`, o lançamento
       usa o home da conta fixada, `claudeLaunchResumesTranscript` devolve `true`, e o divisor "Conta trocada" aparece
-- [ ] **3.** O pino da origem passa na criação do chat bifurcado e o main o grava no registro adotado
-- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **3.** O pino da origem passa na criação do chat bifurcado e o main o grava no registro adotado
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C27
 
-**Evidência:** (a preencher)
+**Evidência:** commit [`bdb2b55be14`](https://github.com/brz-anderson/brza-studio/commit/bdb2b55be14), na `master` do
+`brza-studio`, pela sessão do `brza-studio` no worktree `.worktrees/pln-001-pedido-39-fork`, com o push direto
+(`f7490afab9e..bdb2b55be14`, depois do rebase sobre o `f7490afab9e`: credenciais, P77 e Markdown). Os "A conferir no
+passo" do D57, lidos no código antes de escrever: **(a)** o que lê o `accountSwitch` na criação: nada — o registro nasce
+no `reserveOwner`/founding (`agentSessionRecordIdentityFields`), e quem o lê é o lançamento
+(`claude-structured-launch-resolution.ts:254-260`) e o `structured-session-account-home.ts:59-63`, que já seguiam o pino;
+o `create-support` só monta o `AttachParams` (X74); **(b)** o `leafUuid` ausente **é** um caminho silencioso para outro
+fluxo de adoção: a adoção por import de chat do CLI deixa o handle sem cursor do mesmo jeito, e com o transcript fora da
+conta selecionada o `claudeLaunchResumesTranscript` devolve `false` antes da checagem de `historyInOtherAccount` (só roda
+com `leafUuid`); o rewind não, porque a conclusão dele grava o `resumeCursor`. O P74 não mexe nisso (é decisão nova, fora
+da R65.1): issue nova
+[Um chat adotado sem pino abre em branco na conta selecionada](../../work/issues/chat-adotado-sem-pino-abre-em-branco-na-conta-selecionada.md),
+com o import não rodado ponta a ponta. **O que mudou:** o resultado do `agentSession.forkThroughMessage` ganha
+`accountSwitch: { accountId }` quando a origem está pinada; o renderer o passa em `resumeFrom.accountSwitch`
+(`native-chat-fork-from-message.ts`); o host o prepara (`claudeReadyAccountPin`, extraído do `claudePrepareAccountSwitch`
+sem a cópia de transcript), grava `accountSwitch` no registro adotado e fecha o histórico importado com o divisor "Conta
+trocada", na mesma transação da importação; conta removida ou sem preparo recusa o create, em vez de abrir em branco
+(X74, X75). **Testes:** falharam antes do código os 4 do pino — o renderer (2 casos), o fork no host (2), o `attach`
+adotado (1) —, e o `resolveStructuredAdoptionAccountPin` e o lançamento do fork pinado (`resumesTranscript === true`, home
+da conta fixada) entram verdes, porque o lançamento já seguia o pino; depois: 21 arquivos, 116 passed no conjunto dos
+tocados, e 97 arquivos, 761 passed (1 pulado) nos vizinhos (`agent-session-wire` de attach/adopt/create/fork/switch,
+`claude/` e `launch`, `session-tabs`, `agent-session/ownership` e `records`, `rpc-contract`, o `create` do `shared` e o
+`launch` do renderer), com `--maxWorkers=2`; depois do rebase, `pnpm tc`, oxlint e oxfmt verdes e o conjunto tocado outra
+vez (116 passed). `pnpm check:changed --base=origin/master --maxWorkers=2`: 29 de 30 verdes (format, oxlint, typecheck,
+ratchets, import boundaries, localização, o contrato do `rpc params catalog`); o passo de testes de unidade abriu em
+leque pelos tipos compartilhados e estourou os 30 min, com um vermelho de `tests/e2e/helpers/persisted-profile-state.unit.test.ts`
+sob o `bun`, que não toquei (X76). Suíte inteira: roda no merge, pela coordenação. **Não rodei o app:** a conferência é o
+C27, de Anderson, no build novo. **Limites:** o pino viaja só pelo resultado do fork, então um host antigo (sem o campo)
+segue como antes, e o fork pelo celular não existe, então não há paridade a fazer.
 
 ### P75 — As credenciais de integração do BrzA numa pasta própria (pedido 39)
 
@@ -3380,6 +3408,21 @@ da linha quando o teste entra.
   `brand-identity.ts` é importado por quase todo o `src/main`, e o passo ficou 29 min com a máquina cheia e foi
   interrompido. Pela regra de Anderson (a suíte inteira roda no merge, pela coordenação), rodei os diretórios dos stores
   por caminho, o `pnpm tc` e o `pnpm check:code-quality:changed`. Afeta P75.
+- **X74 — O registro adotado nasce no `reserveOwner`, e o divisor entra na importação; o D57 apontava o `create-support`.**
+  O `structured-session-create-support.ts` só monta o `AttachParams` (ganhou o campo `accountSwitch`, host-only, resolvido
+  por `resolveStructuredAdoptionAccountPin`); quem grava o `accountSwitch` é o `agentSessionRecordIdentityFields`, usado
+  pela reserva e pela fundação, com `operationId`, `callerKey` e `switchedAt` do create. O divisor não passa pelo recibo
+  do `switchAccount`: é um item a mais da importação (`prepareAdoptedTranscript`), na mesma transação do histórico. O
+  `ResumeSource` do schema saiu para `structured-agent-session-resume-source-params.ts`, porque o arquivo passou do
+  limite de 300 linhas. Afeta P74.
+- **X75 — O pino vem do host, no resultado do fork, e viaja só como `accountId`.** O D57 dizia "o renderer passa o pino da
+  origem", sem dizer de onde ele o lê. O renderer não tem o registro da origem, e um campo novo no `resumeFrom` é
+  rejeitado pelo schema estrito de um host antigo; então o `forkThroughMessage` devolve o pino da origem (aditivo) e o
+  renderer só o repassa. Host antigo não devolve, e o fork segue como antes, sem capability nova. O host resolve a conta e
+  o login (o cliente não escolhe pasta nem rótulo). Afeta P74.
+- **X76 — O `check:changed` estourou os 30 min no passo de testes de unidade; rodei os arquivos por caminho.** Os tipos
+  compartilhados (`ResumeSource`, o resultado do fork) abrem a seleção em leque. Pela regra de Anderson, rodei os tocados e
+  os vizinhos por caminho, o `pnpm tc` e o lint dos arquivos. Afeta P74.
 
 ## Worklogs
 
@@ -3513,6 +3556,8 @@ da linha quando o teste entra.
   o pedido 40, com a R66, o D61 e o P78 em `brza-studio@2738100d3f5`; o C31 espera o build, com Anderson.
 - 2026-11-02 — [O P75 do PLN-001, as credenciais de integração do BrzA numa pasta própria](../../work/worklogs/2026-11-02-pln-001-p75-credenciais-numa-pasta-propria.md):
   o P75 em `brza-studio@f7490afab9e`, com os X71 ao X73; o C28 espera o build do C22, com Anderson.
+- 2026-11-02 — [O P74 do PLN-001, o fork de um chat fixado nasce na conta fixada](../../work/worklogs/2026-11-02-pln-001-p74-fork-de-chat-fixado.md):
+  o P74 em `brza-studio@bdb2b55be14`, com os X74 ao X76; o C27 espera o build do C22, com Anderson.
 - 2026-11-02 — [O PLN-001 e o merge da v1.4.246 do upstream](../../work/worklogs/2026-11-02-pln-001-coordenacao-com-o-sync-v1-4-246.md):
   o acordo com a sessão `studio-75`, sem código; o PLN-001 espera o merge.
 
@@ -3527,6 +3572,9 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 
 ## Pendências conhecidas
 
+- [Um chat adotado sem pino abre em branco na conta selecionada](../../work/issues/chat-adotado-sem-pino-abre-em-branco-na-conta-selecionada.md)
+  — achada pelo P74 em 2026-11-02; o import de chat do CLI cai no mesmo caminho silencioso do fork, e a saída é decisão de
+  Anderson; `open`.
 - [Os Passos e os Desvios do PLN-001 no molde, depois da Run do P44 ao P50](../../work/issues/pln-001-passos-e-desvios-no-molde-depois-da-run.md)
   — da rodada de 2026-10-28 na sessão `pln-001-norma-fixfy`; resolvida em 2026-10-28, `done`.
 - [O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md)

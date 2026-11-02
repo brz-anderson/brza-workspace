@@ -14,10 +14,11 @@ tags:
 
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** a R1 a R9 fecharam, mas o PLN-006 (2026-11-02) levou o CLI, os hooks, os papéis e a norma comum ao
-  `brza-workflow`, e o rascunho do Desenho (`pln-004-design-rascunho.md`, D1 a D14, no scratch) ainda conta com tudo
-  isso no `brza-workspace`; o próximo é a rodada 10, que decide onde cada item mora agora, e então reescrever o rascunho
-  e mandá-lo à aprovação, na mensagem, antes de gravá-lo em `PLN-004-design.md`.
+- **Retomar:** a R1 a R10 fecharam — o código passa ao `brza-workflow`, executado pela sessão `workspace`, com o pacote
+  `packages/runtimes` —, mas o rascunho do Desenho (`pln-004-design-rascunho.md`, D1 a D14, no scratch) ainda conta com
+  tudo no `brza-workspace`; o próximo é a rodada 11 (o `.agents/skills/` sem symlink no sync, os papéis gerados, o shell e
+  a auditoria de fatos), depois reescrever o rascunho e mandá-lo à aprovação, na mensagem, antes de gravá-lo em
+  `PLN-004-design.md`.
 
 ## Pedido
 
@@ -96,7 +97,7 @@ Respondida em 2026-10-30, na sessão `brza-workspace-80`, e trazida a este plano
    - emenda ao PLN-003.
 
    **Decidido — "PLN-004 no workspace (Recomendado)".** O que é código do `brza` (`sessions`, `claude-brza`) vai como
-   pedido ao `tools-kit`.
+   pedido ao `tools-kit`. **→ reaberta em R10.2**: o código passou ao `brza-workflow`.
 
 2. **Escopo**, seleção múltipla. Opções:
    - Base: adaptador e shell;
@@ -147,7 +148,8 @@ Respondida em 2026-10-30, na sessão `workspace`.
    - só os arquivos no workspace, como a Fixfy — custo: poucos arquivos; se paga: nunca no brza-studio, que fica sem a
      norma.
 
-   **Decidido — "Função e wrapper (Recomendado)".**
+   **Decidido — "Função e wrapper (Recomendado)".** **→ reaberta em R10.1**: o `.codex/config.toml` e o
+   `.agents/rules/` deixam de ser arquivos locais e vão ao pacote `runtimes` do `brza-workflow`.
 
 2. **Como o "acionar uma skill" funciona no Codex e no `agy`.** Opções:
    - uma linha no adaptador manda ler `.claude/skills/<nome>/SKILL.md`, como a Fixfy no Codex
@@ -443,7 +445,8 @@ Respondida em 2026-10-31, na sessão `workspace`: "todos recomendados".
    - `..` no `agy` e `.` no Codex, como na Fixfy — custo: sem o wrapper, a medição vai ao worktree e, no brza-studio,
      se perde; se paga: nunca.
 
-   **Decidido — `${BRZA_WORKSPACE:-$HOME/Projects/brza-workspace}`.**
+   **Decidido — `${BRZA_WORKSPACE:-$HOME/Projects/brza-workspace}`.** **→ reaberta em R10.3**: o `measure.py` e o
+   `claude-brza` já não caem nesse caminho.
 
 2. **O `agy-brza` passa `--settings '{"trustedWorkspaces":["<raiz do worktree>"]}'`** (D5). Opções:
    - sim, quando a chamada não traz o próprio `--settings` (recomendada) — custo: ~5 linhas e um teste no `tools-kit`;
@@ -462,6 +465,74 @@ Respondida em 2026-10-31, na sessão `workspace`: "todos recomendados".
 A aprovação do Desenho vai em três mensagens — o que assume, o Terreno e D1–D4; D5–D8; D9–D14 e a ordem —, como
 proposto na mesma mensagem e aceito na mesma resposta.
 
+### Rodada 10 — onde cada item mora depois do PLN-006 (enviada 2026-11-02, no chat)
+
+**Apresentado antes:** o levantamento do `collector` contra as mudanças dos três repositórios (agregado no scratch,
+`pln-004-revisao-mudancas.md`), com 38 citações conferidas, das quais 19 mudaram de lugar. O PLN-006 levou ao
+`brza-workflow` o CLI, os hooks, os papéis e a norma comum (`AGENTS.md`, `CLAUDE.md`, `plans/README.md`,
+`work/README.md`); o `brza sync` só escreve `core/` e `packages/<nome>/core/`, e deixa intocado o que não conhece, como
+o `.codex/` e o `.agents/`; o `brza-workflow` não tem `plans/` nem `work/` e não cita Codex nem `agy`; o `tools-kit` não
+tem item do PLN-004, e o PLN-006 foi executado pela sessão `workspace` nos dois repositórios. Medi o `brza-where`:
+mediana de 42 ms em 20 chamadas, e do brza-studio e de subdiretório do worktree ele acha a raiz.
+
+Respondida em 2026-11-02, na sessão `workspace`: "10.1.2 `packages/runtimes` / 10.4.2 `measure_runtimes.py` / restante
+`Recomendado`". A rodada saiu com `packages/codex` e `measure_codex.py` como alternativas, sem o `agy`; Anderson
+perguntou por quê, a sessão reconheceu a omissão, e as duas opções foram reapresentadas para os dois runtimes.
+
+1. **Onde moram o `.codex/`, o `.agents/` e os papéis gerados** (D1 a D4, D7, D8). Opções:
+   - locais do workspace, com as linhas genéricas no `core/AGENTS.md` (recomendada) — custo: uma edição genérica no
+     núcleo e um segundo workspace refaz os arquivos locais; se paga: agora;
+   - um pacote para os dois runtimes, `packages/runtimes`, ligado no manifesto — custo: sessão e testes no
+     `brza-workflow`, o `.toml` entra sem molde, o que o pacote escreve editado local trava o sync, e um workspace que
+     usa um runtime só recebe os dois; seria o primeiro pacote além do `client`; se paga: quando um segundo workspace
+     usar Codex ou `agy`;
+   - um pacote por runtime — custo: o mesmo, mais a disputa pelo `.agents/skills/`, que os dois leem; se paga: nunca,
+     enquanto os dois compartilharem esse caminho;
+   - tudo local, sem tocar o `AGENTS.md` do núcleo — custo: a norma não cita Codex nem `agy`, e o
+     `agent-instructions-writer`, neutro de runtime, fica sem onde registrar; se paga: nunca.
+
+   **Decidido — "10.1.2 `packages/runtimes`"**, não a recomendada. Anderson não deu o porquê; a leitura da sessão é que
+   o pacote leva o adaptador, a regra, os hooks e os papéis ao workspace pelo sync, sem editar a norma comum.
+
+2. **Quem executa o código no `brza-workflow`** (`codex-brza`, `agy-brza`, `brza agents --write|--check`,
+   `brza sessions --agent`, `brza delegate`, o `measure.py`). Opções:
+   - a sessão `workspace`, com `implementer`, como no PLN-006 (recomendada) — custo: sessão grande, e a R1.1 é reaberta;
+     se paga: já na fase 1, porque a sessão que conduz o plano tem o contexto e o pedido de 7 itens do D13 deixa de
+     existir;
+   - o `tools-kit`, por pedido — custo: a fila dele (PLN-003 aberto e 7 issues) e o núcleo editado por outra frente; se
+     paga: se a sessão `workspace` não aguentar o tamanho;
+   - divisão: núcleo e `measure` pela `workspace`; wrappers, `sessions`, `delegate` e `brza-tree` pelo `tools-kit` —
+     custo: dois executores e uma ordem de entrega; se paga: se houver paralelismo.
+
+   **Decidido — a sessão `workspace`, com `implementer`.**
+
+3. **Para onde o comando dos hooks aponta sem a `BRZA_WORKSPACE`** (reabre a R9.1). Opções:
+   - a `BRZA_WORKSPACE` que o wrapper põe; sem ela, o `brza-where` (recomendada) — custo: 42 ms só quando a variável
+     falta, nos eventos `Stop` e `SubagentStop`, e a dependência do `~/.local/bin` no PATH do hook; se paga: agora, sem
+     nome fixo, pelo registro do PLN-006;
+   - `${BRZA_WORKSPACE:-$HOME/Projects/brza-workspace}`, como a R9.1 — custo: nome fixo num arquivo local, que o núcleo
+     proíbe nos scripts (`test_brza_scripts.py:161`); se paga: nunca;
+   - sem fallback — custo: a sessão aberta sem o wrapper nem a função não é medida; se paga: agora, se Anderson aceitar
+     o limite.
+
+   **Decidido — a `BRZA_WORKSPACE` do wrapper e, sem ela, o `brza-where`.**
+
+4. **Onde entram os modos `codex` e `agy` do `measure.py`** (D9). Opções:
+   - no `core/.claude/hooks/measure.py` do `brza-workflow`, com os testes em `tests/hooks/` (recomendada) — custo: ~260
+     linhas de runtime que todo workspace recebe pelo sync sem usar; se paga: agora, com um `measure.py` só;
+   - um arquivo para os dois runtimes, `measure_runtimes.py`, num pacote — custo: importar o `memory()` e o
+     `workstream_of` do `measure.py` do núcleo, e depende de a 10.1 escolher o pacote; se paga: com o segundo
+     workspace;
+   - um arquivo por runtime, `measure_codex.py` e `measure_agy.py` — custo: o mesmo, com dois arquivos; se paga: se os
+     dois divergirem a ponto de não dividir o import.
+
+   **Decidido — `measure_runtimes.py`**, não a recomendada, coerente com o pacote da 10.1.
+
+**O que a R10 deixa aberto**, e vai à R11: como o `.agents/skills/` chega ao workspace, porque o `brza-sync` só conhece
+os modos `100644` e `100755` e gravaria um symlink do pacote como arquivo de texto (`bin/brza-sync:115`, `:323-331`);
+onde moram os papéis gerados; onde entram o `codex()` e o `agy()` no shell; e o que fazer com a auditoria de fatos, que
+só roda para o Claude.
+
 ## Worklogs
 
 - 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4; as sondas; R5; o rascunho
@@ -473,5 +544,5 @@ proposto na mesma mensagem e aceito na mesma resposta.
 - 2026-10-31 — fora do plano, a triagem do porte da Fixfy mandou à frente 4 os três focos de revisão.
   [O porte das skills da Fixfy para o workspace](../../work/worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md)
 - 2026-11-02 — a revisão do plano contra a migração ao `brza-workflow` (PLN-006), o `Retomar` e a frente 4 com os três
-  focos. Parou na R10.
+  focos; R10. Parou na R11.
   [O PLN-004: a revisão do plano contra a migração ao brza-workflow](../../work/worklogs/2026-11-02-pln-004-a-revisao-contra-o-pln-006.md)

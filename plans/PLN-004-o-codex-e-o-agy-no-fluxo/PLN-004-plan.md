@@ -14,11 +14,11 @@ tags:
 
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** a R1 a R10 fecharam — o código passa ao `brza-workflow`, executado pela sessão `workspace`, com o pacote
-  `packages/runtimes` —, mas o rascunho do Desenho (`pln-004-design-rascunho.md`, D1 a D14, no scratch) ainda conta com
-  tudo no `brza-workspace`; o próximo é a rodada 11 (o `.agents/skills/` sem symlink no sync, os papéis gerados, o shell e
-  a auditoria de fatos), depois reescrever o rascunho e mandá-lo à aprovação, na mensagem, antes de gravá-lo em
-  `PLN-004-design.md`.
+- **Retomar:** a R1 a R10 fecharam e a R11 só espera a 11.3, a auditoria de fatos, medida e reapresentada; o código
+  passa ao `brza-workflow`, executado pela sessão `workspace`, com o pacote `packages/runtimes`. O rascunho do Desenho
+  (`pln-004-design-rascunho.md`, D1 a D14, no scratch) ainda conta com tudo no `brza-workspace`; o próximo é a R12, o
+  foco da revisão, depois dividir o plano em `-plan` e `-interview`, reescrever o rascunho e mandá-lo à aprovação, na
+  mensagem, antes de gravá-lo em `PLN-004-design.md`.
 
 ## Pedido
 
@@ -532,6 +532,51 @@ perguntou por quê, a sessão reconheceu a omissão, e as duas opções foram re
 os modos `100644` e `100755` e gravaria um symlink do pacote como arquivo de texto (`bin/brza-sync:115`, `:323-331`);
 onde moram os papéis gerados; onde entram o `codex()` e o `agy()` no shell; e o que fazer com a auditoria de fatos, que
 só roda para o Claude.
+
+### Rodada 11 — o que o pacote `runtimes` abriu (enviada 2026-11-02, no chat)
+
+**Apresentado antes:** o `brza-sync` só conhece os modos `100644` e `100755` e gravaria um symlink do pacote como arquivo
+de texto (`brza-workflow/bin/brza-sync:115`, `:323-331`, lido, não rodado); o `~/.zshrc` faz `source` do `brza.zsh`, tem
+a `brza_claude_fallback`, e o `codex()` e o `agy()` dele são da Fixfy; o `fact_audit.py` lê o transcript no formato do
+Claude (`blocks_of`, `sources_of`, `runs_of`), só para `designer` e `collector`, e solta o `claude -p --model haiku`, cuja
+metade `run` não depende do runtime.
+
+Respondida em 2026-11-02, na sessão `workspace`: "11.3 meça a opção 2, restante `Recomendado`".
+
+1. **Como os papéis gerados e os links de `.agents/skills/` chegam ao workspace** (D4, D7). Opções:
+   - tudo pelo sync: o pacote entrega os papéis gerados, e o `brza-sync` aprende o modo `120000` (recomendada) — custo:
+     mexer no `brza-sync` e no lock, com testes em `tests/cli/`, e regerar o pacote no commit que muda um papel do
+     núcleo; se paga: agora, porque o PLN-006 prometeu que a mudança do núcleo chega pelo sync;
+   - tudo local, pelo `brza agents --write` depois de cada sync — custo: um passo manual por sync e por skill nova, e a
+     defasagem só aparece no `--check`; se paga: agora, sem mexer no sync;
+   - papéis pelo sync e links locais — custo: dois mecanismos; se paga: se mexer no sync não valer.
+
+   **Decidido — "Tudo pelo sync (Recomendado)".**
+
+2. **Onde entram o `codex()` e o `agy()` no shell** (D6). Opções:
+   - um arquivo do pacote `runtimes` (`shell/runtimes.zsh`), com o `~/.zshrc` renomeando os da Fixfy para
+     `brza_codex_fallback` e `brza_agy_fallback` (recomendada) — custo: Anderson edita o `~/.zshrc` (~6 linhas), e vai ao
+     worklog em "Fora do workspace"; se paga: agora;
+   - dentro do `packages/client/shell/brza.zsh` — custo: o `client` passa a conhecer o `codex-brza`, de outro pacote;
+     se paga: nunca;
+   - direto no `~/.zshrc` — custo: uma segunda fonte fora do repositório; se paga: nunca.
+
+   **Decidido — "Um arquivo do pacote `runtimes` (Recomendado)".**
+
+3. **O que fazer com a auditoria de fatos nos papéis do Codex e do `agy`.** **Resposta:** "meça a opção 2". Medido em
+   2026-11-02, e reapresentada com as medições; **segue aberta**. O que a medição achou:
+   - **O custo da auditoria:** US$ 1,03 em 8 auditorias para 238 fatos, ou **US$ 0,0043 por fato**, com mediana de 134 s
+     em segundo plano (`.measurements/measurements.jsonl`, eventos `fact_audit`); com ~24 fatos auditáveis por devolução
+     (240 em 10 capturas), **~US$ 0,10 por devolução**. O auditor é o Haiku do `claude -p`: não muda com o runtime.
+   - **O Codex dá o que o `stop` precisa:** o `SubagentStop` traz `agent_type` e `agent_transcript_path`; na Fixfy há 11
+     linhas `subagent` de `reviewer` do Codex (`~/Projects/fixfy/.measurements/measurements.jsonl`;
+     `FX/.claude/hooks/measure.py:326-329,558`). Aqui o hook só roda depois do `/hooks`, por worktree.
+   - **O `agy` não dá:** o `Stop` traz `conversationId`, `transcriptPath` e `lastUserInput`, sem nome de agente, e não há
+     `SubagentStop` (`pln-004-sondas-r6.md`, eventos do espião); só dá para filtrar pela marca na última resposta.
+   - **O `rodado` pesa menos do que parece:** dos 240 fatos auditáveis, 82 são `rodado` (34%), e mesmo no Claude 49 de 80
+     saíram `unknown` (61%); o `lido` segurou 105 de 150 (70%).
+   - **Estimativa, não medida:** ~140 linhas e ~8 testes para os dois adaptadores de captura (o `stop` tem 40 linhas; o
+     `codex()` e o `agy()` do `measure.py` da Fixfy, 48 e 33).
 
 ## Worklogs
 

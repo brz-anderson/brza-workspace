@@ -48,11 +48,23 @@ o dia anterior está em
   grava o blob como arquivo (`:323-331`), então um symlink do pacote chegaria como arquivo de texto. O `brza install`
   tem `packages/client/bin` fixo (`bin/brza-install:61`) e só liga `brza-*` e o `claude-brza`.
 
+- **A rodada 11**, no chat: os papéis gerados e os links de skill vão tudo pelo sync (o `brza-sync` aprende o modo
+  `120000`); o `codex()` e o `agy()` vão num `shell/runtimes.zsh` do pacote `runtimes`, e o `~/.zshrc` renomeia os da
+  Fixfy. Na auditoria de fatos, Anderson pediu a medição da opção 2 antes de decidir.
+- **As medições da R11.3 e da R12**, só leitura, a pedido de Anderson, em `.measurements/` daqui e da Fixfy:
+  - **A auditoria custa US$ 0,0043 por fato** (US$ 1,03 por 238 fatos), ~US$ 0,10 por devolução; o `SubagentStop` do
+    Codex traz `agent_type` e o caminho do transcript; o `Stop` do `agy` não traz nome de agente; o `rodado` é 34% dos
+    fatos auditáveis e 61% dele sai `unknown` mesmo no Claude.
+  - **Uma revisão custa** US$ 1,98 de mediana no Codex (`gpt-6-astra` em `xhigh`, 122 s, 11 revisões da Fixfy) e US$ 4,22
+    no Claude (`opus-5-5`, 1.079 s, 4 revisões daqui); a do `agy` não tem linha de `reviewer` e fica estimada em US$ 0,1
+    a 0,4 pelos tokens das sondas, no preço da tabela da Fixfy. As tarefas diferem, então é a forma do custo, e não a
+    qualidade.
+  - **A Fixfy não gravou o veredito da delegação**, que fechava em 2026-10-30: a decisão segue com o título "em medição
+    até 2026-10-30" e sem nota do resultado.
+
 ## O que ficou
 
-- **A rodada 11**, no chat: como o `.agents/skills/` chega ao workspace sem symlink no sync; onde moram os papéis
-  gerados; onde entram o `codex()` e o `agy()` no shell; a auditoria de fatos, que só roda para o Claude. O foco da
-  revisão fica para a R12, porque depende dos papéis gerados.
+- **A 11.3**, a auditoria de fatos, e a **R12**, o foco da revisão e qual foco vai a qual runtime, no chat.
 - **O plano passa de 400 linhas** (548 hoje), e o `plans/README.md` manda a Entrevista ao `-interview.md`; a divisão vai
   depois da R11, junto com a gravação do Desenho, para fazer uma vez.
 - **O rascunho do Desenho** (556 linhas, no scratch) é reescrito depois da R10, e só então vai à aprovação.

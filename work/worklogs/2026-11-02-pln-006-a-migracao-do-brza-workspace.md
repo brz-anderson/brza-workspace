@@ -24,9 +24,14 @@ a sessão não o tomou por resposta.
 
 ## Fora do workspace
 
-- **O quê e onde:** `brew upgrade python@3.14` (3.14.7 → 3.14.10), em `/opt/homebrew`; fica porque o `azure-cli`
-  depende dele, e as bibliotecas Python do `openvino` e do `numpy` do Homebrew estão nele. **Risco:** baixo.
-  **Estado:** ativo. **Como desfazer:** não volta por `brew`; o 3.14.7 saiu no cleanup.
+- **O quê e onde:** `brew upgrade python@3.14` (3.14.7 → 3.14.10), em `/opt/homebrew`. **Risco:** baixo.
+  **Estado:** desfeito, com o `azure-cli`, no item seguinte. **Como desfazer:** não volta por `brew`; o 3.14.7 saiu no cleanup.
+- **O quê e onde:** `brew uninstall azure-cli`, que levou junto, por autoremove, o `python@3.14` e as dependências
+  órfãs — entre elas `libsodium` e `mpdecimal`; a saída foi cortada, e a lista inteira não ficou. Sem sinal de uso: sem
+  `~/.azure`, sem `az` no histórico do zsh, sem chamada em `~/Projects`. Anderson escolheu "Remover os dois
+  (Recomendado)". **Risco:** as bibliotecas Python do `openvino` e do `numpy` do Homebrew, que seguem instalados,
+  deixam de ser importáveis; sobram as pastas `/opt/homebrew/lib/python3.11` a `3.15`, com o que elas instalaram.
+  **Estado:** ativo. **Como desfazer:** `brew install azure-cli`, que traz de volta o `python@3.14`.
 - **O quê e onde:** `brew install python@3.15` (3.15.2), removido em seguida por `brew uninstall python@3.15`, porque
   repetia o 3.15.2 do python.org e nada dependia dele; Anderson escolheu "Remover (Recomendado)". Com isso, sai o
   `/opt/homebrew/bin/python3`. **Risco:** nenhum. **Estado:** desfeito.

@@ -196,3 +196,30 @@ Os testes que falham vieram primeiro, e depois o E2, o K2 e os quatro momentos d
 - **O push à `master` do `brza-studio`:** `1bfb496aebf..786f4b56ff9`.
 - **O build local em `~/Projects/brza-studio/dist/`:** o `pnpm build:mac` regrava `dist/mac-arm64` e os helpers nativos;
   **risco:** nenhum, `dist/` está no `.gitignore`; **estado:** ativo; **como desfazer:** apagar `dist/`.
+
+## O build local, o P6 e o fechamento do que dá para fechar
+
+- **O primeiro `pnpm build:mac` falhou** com `ENOENT … .worktrees/pln-007-brand-cli/…/cli-display-name.test.ts`: o
+  `electron-builder` varre a pasta do projeto, o worktree do `implementer` do P6 mora dentro dela, e um arquivo dele sumiu no
+  meio do empacotamento. A sessão tinha dito que o build ia terminar; o aviso de "concluído" da ferramenta enganou, porque o
+  comando terminava num `echo`, e o código de saída real, 1, só estava no log. O build refeito num worktree à parte,
+  `.worktrees/pln-007-build`, em 3 minutos, deu o `.app` (`1.4.246-local.…786f4b56ff9e`, ad hoc), com o `icon.icns` igual ao
+  do repositório.
+- **O P6** correu num `implementer`: o `check:changed` forçado deu 19 de 19, e o merge na `master` do `brza-studio` foi
+  `5c286937e0c`. 11 asserções de help impresso em 6 arquivos de teste existentes passaram de `orca` a `brza`; fica, pela
+  recomendada. Um commit a mais, `cec12c519c4`, corrigiu a frase de `brza-brand-logos.md`, que o próprio D2 tinha pedido e
+  que ficou desencontrada.
+- **O plano não fecha**: os casos manuais no app e o `grep -c` do P6 no binário instalado são de Anderson, e o `.ico` com
+  6 quadros virou [issue](../issues/o-ico-do-app-sai-com-6-quadros-sem-o-24px.md). Os seis passos têm `[x]` ou `[-]` com
+  evidência, e o `Executado` soma 3,6 h contra as 20,75 h estimadas.
+- **A memória do `implementer` caiu no scratch** nos P5 e P6, porque o cwd dele é o do chat; foi movida para o workstream, e a
+  lição foi à memória da sessão.
+
+## Fora do workspace
+
+- **O worktree `.worktrees/pln-007-brand-cli` e a branch `feat/pln-007-brand-cli` do `brza-studio`**, removidos depois do merge;
+  **risco:** nenhum; **estado:** removidos; **como desfazer:** `git worktree add` a partir do `5c286937e0c`.
+- **O worktree `.worktrees/pln-007-build` do `brza-studio`**, com o `.app` em `dist/mac-arm64/` (685 MB), para a conferência de
+  Anderson; **risco:** nenhum, `dist/` está no `.gitignore`; **estado:** ativo; **como desfazer:** `git worktree remove
+  --force .worktrees/pln-007-build` no `brza-studio`, depois da conferência.
+- **Dois pushes à `master` do `brza-studio`:** `786f4b56ff9..5c286937e0c` e `5c286937e0c..cec12c519c4`.

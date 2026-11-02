@@ -51,3 +51,36 @@ assets depois do chat. O Desenho foi a
 
 A R9: Anderson respondeu "aceito" ao corte em seis passos, ~20,75 h. Os Passos, a Regressão e os Casos manuais foram
 ao plano, que passou a `phase: execution`, sem passo executado. O próximo é o P1, nesta sessão, a pedido.
+
+## O conserto do brza shot, em sessão própria
+
+Anderson pediu o conserto da
+[issue do brza shot](../issues/brza-shot-quebra-com-os-tokens-do-painel-movidos.md) "em sessão própria, na conta
+`admin@fixfy.com.br`". A primeira tentativa, pelo `brza sessions brza-shot-fix --checkout .worktrees/tools-kit`, subiu
+na conta padrão, `anderson@fixfy.com.br` (`~/.claude/sessions/77277.json`): o `brza sessions` abre com a conta ativa do
+app, e não com a desta sessão, que roda no perfil `8eee0e1b…` do app. A sessão foi fechada com `--force` antes de
+commitar e deixou um teste começado em `scripts/brza/tests/test_brza_shot.py`, na `master`, sem commit.
+
+Numa rodada, Anderson escolheu reabrir pelo terminal, com o `adm-claude` (`CLAUDE_CONFIG_DIR=~/.claude-adm`), e deixar o
+teste para a sessão nova. A `brza-shot-fix` roda numa aba de terminal do worktree do `tools-kit`, na conta
+`admin@fixfy.com.br` (`~/.claude-adm/sessions/99742.json`), com o pedido em `/private/tmp/pln-007/prompt-brza-shot.md`,
+e avisa a `brand-24` pelo correio ao terminar. A issue fecha aqui, no `brand`.
+
+## Fora do workspace
+
+- **A pasta do `tools-kit` confiada na conta admin:** o `adm-claude` pediu a confirmação de confiança da pasta
+  `/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit`, e a sessão respondeu "Yes, I trust this folder", que
+  grava em `~/.claude-adm/.claude.json`.
+  - **Risco:** nenhum além do que a conta padrão já tem; a pasta é deste workspace.
+  - **Estado:** ativo.
+  - **Como desfazer:** apagar a entrada da pasta em `projects` no `~/.claude-adm/.claude.json`.
+- **Uma sessão do Claude na conta padrão, fechada:** o chat `claude_18da3d5b…` da `brza-shot-fix`, aberto pelo
+  `brza sessions` e fechado pelo `brza sessions close --force`.
+  - **Risco:** o teste que ela deixou na `master`, sem commit.
+  - **Estado:** encerrada.
+  - **Como desfazer:** nada a desfazer; o teste fica para a sessão nova.
+- **Uma aba de terminal no worktree do `tools-kit`**, "brza-shot-fix (admin)", aberta pelo `orca terminal create`, com
+  o `adm-claude` rodando.
+  - **Risco:** nenhum.
+  - **Estado:** ativa.
+  - **Como desfazer:** fechar a aba quando a sessão terminar.

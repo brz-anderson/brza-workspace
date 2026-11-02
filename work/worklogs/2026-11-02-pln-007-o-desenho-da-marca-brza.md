@@ -42,3 +42,9 @@ degradê com foco (H1). Com a N1 e a H1, os riscos do M3 e do M5 da R2.6 fechara
 A R7, na recomendada: o `--agent-question` vai ao blue-700 no claro e ao blue-400 no escuro, porque o `#1447e6` dá
 2,9:1 sobre o fundo escuro; o `brza --help` troca o nome na impressão, num arquivo do fork. Os 14 pontos do rascunho
 têm resposta, e o `designer` foi retomado para reescrever o Desenho com elas.
+
+O `designer` reescreveu o Desenho com as respostas e trouxe dois pontos novos, que a R8 fechou na recomendada: o
+estado vazio mantém o título com o nome do agente e o subtítulo, e o passo do CLI e dos READMEs volta à branch de
+assets depois do chat. O Desenho foi a
+[PLN-007 — Desenho](../../plans/PLN-007-a-identidade-visual-da-marca-brza/PLN-007-design.md), e o corte em seis passos,
+~20,75 h, foi à R9.

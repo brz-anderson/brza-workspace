@@ -2,7 +2,7 @@
 status: open
 phase: design
 origin: request
-ready: não — faltam o Desenho e os Passos
+ready: não — aguarda o aceite do corte, na R9
 scope:
   - brza-studio
   - workspace
@@ -14,8 +14,9 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** R4 a R7 fechadas; os 14 pontos do Desenho têm resposta. Próximo: o `designer` reescreve o rascunho com
-  as respostas, e o Desenho e os Passos vão a `PLN-007-design.md` e a este arquivo.
+- **Retomar:** Desenho gravado em `PLN-007-design.md`, com as R4 a R8. Próximo: a R9, o aceite do corte em seis passos,
+  e então os Passos, a Regressão e os Casos manuais neste arquivo.
+- **Dividido:** [PLN-007 — Desenho](PLN-007-design.md)
 
 ## Pedido
 
@@ -396,12 +397,40 @@ Respondida em 2026-11-02, na sessão do `brand`, pela ferramenta de pergunta.
 
    **Resposta:** "Troca na impressão (Recomendado)". **Decidido.**
 
-**O Desenho fecha aqui**: os 14 pontos do rascunho do `designer` têm resposta, da R4 à R7.
+**Os 14 pontos do rascunho do `designer`** têm resposta, da R4 à R7.
+
+### Rodada 8 — o texto do estado vazio e a branch do CLI (enviada 2026-11-02)
+
+**Apresentado antes:** a reescrita do Desenho pelo `designer`, com dois pontos que nenhuma rodada cobriu. A sessão
+conferiu no `brza-studio@a70f63b6a92` que o estado vazio tem título e subtítulo (`NativeChatEmptyState.tsx:38-41`), que
+o teste do indicador afirma o `animate-spin` (`NativeChatMessageList.turn-indicator.test.tsx:115`) e que o help sai por
+três `console.log` (`src/cli/help.ts:14,19,29`).
+
+Respondida em 2026-11-02, na sessão do `brand`, pela ferramenta de pergunta.
+
+1. **O texto abaixo do logotipo no estado vazio (M1).** Opções:
+   - o título com o nome do agente e o subtítulo de hoje (recomendada) — custo: nenhum; se paga: já, o chat segue dizendo
+     com qual agente se fala, e as traduções não mudam;
+   - uma linha só, como nos artboards do M1 e da V2 — custo: ~0,25 h e uma chave de tradução a menos; se paga: com o
+     nome do agente à vista em outro lugar do painel.
+
+   **Resposta:** "Título e subtítulo de hoje (Recomendado)". **Decidido.**
+
+2. **A branch do passo do CLI e dos READMEs.** Opções:
+   - abrir de novo a `feat/pln-007-brand-assets` a partir da `master`, depois do chat (recomendada) — custo: nenhum a
+     mais; se paga: já, mantém as três branches e a ordem da R4.4;
+   - junto do passo dos assets, antes do chat — custo: ~0 h, contra o "por último"; se paga: se um merge a menos valer
+     mais que a ordem;
+   - uma quarta branch, `feat/pln-007-brand-cli` — custo: um merge a mais; se paga: nunca, além da primeira.
+
+   **Resposta:** "De novo a de assets (Recomendado)". **Decidido.**
+
+**O Desenho fecha aqui**, em [PLN-007 — Desenho](PLN-007-design.md).
 
 ## Worklogs
 
 - 2026-10-31 — aberto; R1 gravada como chegou da sessão do `workspace`; Terreno pelo `collector`; R2 fechada, com os
   pedidos 2 e 3 da borda e da marca no chat; R3 fechada, com a issue dos restos da Orca. Parou antes do Desenho.
   [PLN-007: a abertura da marca BrzA](../../work/worklogs/2026-10-31-pln-007-a-abertura-da-marca-brza.md)
-- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 a R7 fechadas. Parou antes de gravar o Desenho.
+- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 a R8 fechadas; Desenho gravado. Parou no aceite do corte.
   [PLN-007: o Desenho da marca BrzA](../../work/worklogs/2026-11-02-pln-007-o-desenho-da-marca-brza.md)

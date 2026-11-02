@@ -33,12 +33,19 @@ teste. Com isso, os 21 checks passaram.
 
 O merge na `master` foi fast-forward, e o push foi direto, como a norma manda no `brza-studio`.
 
+Depois do registro, Anderson pediu seguir com o que ficou aberto. O app dev subiu fora da tela, com perfil temporário e
+CDP, e os tokens foram lidos no app vivo: nos dois temas o `--agent-question` e o `--agent-question-text` resolvem para o
+azul do D4, e a classe `text-agent-question` pinta essas cores. O app e o perfil foram encerrados e removidos. O worktree
+`.worktrees/pln-007-brand-tokens` e a branch `feat/pln-007-brand-tokens` foram removidos, a branch já contida na
+`master`.
+
 ## O que ficou
 
-- A conferência com uma pergunta real de agente no app, que a Regressão do plano pede para o aviso azul: não foi feita.
+- A conferência com uma pergunta de agente de verdade no app, que a Regressão do plano pede para o aviso azul: não foi
+  feita. O perfil novo não tem projeto nem terminal e a store não está exposta; dá-la pede um workspace e um agente
+  rodando, que gasta a conta de Anderson, ou um evento de hook sintético num painel existente.
 - O texto do passo 3 do P3 manda o `NativeChatQuestionCard`, que não exercita o token; o P5 e a Regressão que citam "o
   `fixtures:shot` do P3" devem usar o `AgentStateDot:allStates`.
-- A branch `feat/pln-007-brand-tokens` e o worktree dela seguem no `brza-studio`, sem remover.
 
 ## Fora do workspace
 

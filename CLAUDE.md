@@ -1,8 +1,11 @@
+@AGENTS.md
+
 # Adaptador do Claude Code
 
-A norma do workspace está no `AGENTS.md`. O Claude Code lê esse arquivo junto com este quando a opção
-`claude-md-and-agents-md` está ativa. Este arquivo traz só o adaptador: traduz o vocabulário da norma e acrescenta a
-mecânica própria do Claude.
+A norma do workspace está no `AGENTS.md`, importado na primeira linha deste arquivo: o Claude Code o carrega em
+qualquer valor de **Project instructions**, e sem duplicar quando o valor é `claude-md-and-agents-md`. Este arquivo
+traz só o adaptador: traduz o vocabulário da norma e acrescenta a mecânica própria do Claude. O que é só deste
+workspace está em `.claude/rules/`, que o Claude Code também carrega no arranque.
 
 ## O vocabulário do `AGENTS.md` no Claude Code
 
@@ -16,7 +19,7 @@ mecânica própria do Claude.
 | retomar o subagente        | `SendMessage` com o nome ou o ID do agente, que volta com o contexto dele; não abre `Agent` novo |
 | estágio de workflow        | cada `agent()` de um workflow                                                                    |
 | camada alta, média, rápida | Opus, Sonnet, Haiku — o `haiku` é o Haiku 5.5, pelo `env` do `settings.json`                     |
-| scratch                    | o scratchpad da sessão, anunciado no arranque, em `/private/tmp/claude-501/…`; no chat do BrzA Studio, o `chat-scratch/<hash>` do `~/Library/Application Support/brza-studio/`, que entra como diretório de trabalho adicional |
+| scratch                    | o scratchpad da sessão, anunciado no arranque; com o pacote `client`, o do chat do app está em `.claude/rules/brza-client.md` |
 | sessão nova                | `/exit` e `claude --name <nome>` no worktree do workstream, `.worktrees/<nome>`, sem `--resume`, `--continue` nem `--rc`; pelo `brza sessions`, com `--checkout .worktrees/<nome>` |
 | compactação                | `/compact`, depois do `/close-task`; o runtime também compacta sozinho perto do limite da janela |
 
@@ -31,19 +34,6 @@ troca o `session_id` mas mantém a conversa anterior ligada à sessão.
 caracteres, que o subagente copia errado sem dar erro: grava numa pasta nova com o nome trocado, ou para achando que o
 arquivo não existe. Antes de delegar, `ln -sfn "<scratch>/<pasta>" /private/tmp/<nome>`, e o pedido leva só o link.
 
-## A configuração chega pela função do shell
-
-O `.claude/settings.json` daqui **não é herdado** pelo `brza-studio`, que fica ao lado e não dentro deste repositório. Por
-isso a função `claude` do `~/.zshrc` passa `--settings ~/Projects/brza-workspace/.claude/settings.json` e
-`BRZA_WORKSPACE` sempre que o cwd está no `brza-workspace` ou no `brza-studio`, inclusive nos worktrees. Fora deles, ela
-segue para a função da Fixfy. O bloco está no `README.md`, em "Funções do shell".
-
-O chat do BrzA Studio não passa pelo zsh de login: o app roda no lugar do `claude` o `agentCmdOverrides.claude`, que é
-o `~/.local/bin/claude-brza` (`scripts/brza/claude-brza`, instalado pelo `brza install --chat-command`). Ele faz o mesmo
-que a função, no `brza-workspace`, no `brza-studio` e nos worktrees que o app cria em `~/orca/workspaces/…`, achados
-pelo `git --git-common-dir`. A sessão aberta sem nenhum dos dois — numa IDE, ou no app com o override vazio — sobe sem
-os hooks e sem a identidade abaixo.
-
 ## A memória vai ao workstream
 
 O `brza note workstream` grava no `.claude/settings.local.json` do worktree, fora do git, o `autoMemoryDirectory`
@@ -57,22 +47,20 @@ a função `claude` os passam pelo `--agents`, com o JSON que o `brza-agents` mo
 
 ## A identidade é a do brz-anderson, pelo `env`
 
-O `env` do `.claude/settings.json` define:
-- `GIT_AUTHOR_*` e `GIT_COMMITTER_*`: `Anderson Pereira Brzezinski <240569289+brz-anderson@users.noreply.github.com>`;
-- `GIT_SSH_COMMAND`: o `~/.ssh/config` padrão, onde mora o alias `personal`.
+O `env` do `.claude/settings.json` define `GIT_AUTHOR_*` e `GIT_COMMITTER_*`:
+`Anderson Pereira Brzezinski <240569289+brz-anderson@users.noreply.github.com>`. A chave de acesso e o perfil do `gh`
+estão no `README.md`.
 
-Isso vale para os commits deste repositório e do `brza-studio`, e vence o ambiente da `fixfy-claude` que uma sessão
-herde. O `git var GIT_AUTHOR_IDENT` confere: deve sair o noreply do `brz-anderson`.
-
-O `gh` usa o perfil padrão, com a conta `brz-anderson` ativa (`gh auth switch`).
+Isso vale para os commits deste repositório e do `brza-studio`, e vence o ambiente que uma sessão herde. O `git var
+GIT_AUTHOR_IDENT` confere: deve sair o noreply do `brz-anderson`.
 
 ## Os plugins são habilitados só aqui
 
-O `.claude/settings.json` habilita o `context7`, para todos os workstreams. Não há `.mcp.json`. Nenhum plugin daqui vai
-para a configuração de usuário.
+O `.claude/settings.json` habilita os plugins de todos os workstreams; a lista, e os servidores MCP, estão em
+`.claude/rules/workspace.md`. Nenhum plugin daqui vai para a configuração de usuário.
 
 O plugin de um workstream só vai no `.claude/settings.local.json` do worktree dele, pelo
-`claude plugin install <plugin> --scope local` rodado no worktree. Hoje é o `skill-creator`, no `workspace`.
+`claude plugin install <plugin> --scope local` rodado no worktree.
 - **O CLI grava no checkout da `master`:** o `enabledPlugins` vai ao `.claude/settings.local.json` da raiz do
   repositório, embora o `~/.claude/plugins/installed_plugins.json` registre o worktree como `projectPath`. Mova a
   entrada para o arquivo do worktree e apague a da `master`.
@@ -105,7 +93,7 @@ O `.claude/hooks/measure.py`, ligado no `settings.json`, grava uma linha JSON po
   Entrada e cache valem, e são eles que pesam no custo.
 - **Resumo:** `python3 scripts/summarize_measurements.py`, `--by-workstream` para o aprendizado por workstream e dia, e
   `--facts` para o acerto da confiança dos fatos.
-- **Testes:** em `.claude/hooks/tests/`.
+- **Testes:** no `brza-workflow`, em `tests/hooks/`.
 
 ## A auditoria da confiança dos fatos
 
@@ -156,7 +144,7 @@ O `.claude/hooks/compact_guard.py` confere o worktree do workstream do cwd — n
 - **Não confere** na `master`, fora de workstream, sem o worktree do workstream, quando o git falha nem em exceção.
 - **Medida:** cada conferência vira uma linha `guard` com `kind: compact` — `passed`, `blocked`, `released`,
   `injected` —, que o resumo mostra por workstream.
-- **Testes:** `.claude/hooks/tests/test_compact_guard.py`.
+- **Testes:** `tests/hooks/test_compact_guard.py`, no `brza-workflow`.
 
 ## O cache da sessão principal dura 1 h
 

@@ -3,9 +3,9 @@ status: in_progress
 phase: execution
 origin: request
 ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 183.8
+estimate_h: 184.8
 executed_h: 33.8
-remaining_h: 9.9
+remaining_h: 10.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -43,6 +43,7 @@ tags:
   com o `origin.name` na linha do JSONL; o nome está no `from-name=`, e não no `from=` do `<agent-message>` do D48; o P62 lê os dois (X34).
   **O pedido 37 entrou em 2026-11-02**, com a R63, o D55 e o P72, que a sessão `pln-001-pedido-37` executa, num worktree
   do `brza-studio` a partir da `master` (a `master` anda com as correções do `v1.4.246-alpha.2`: parta do commit atual).
+  O pedido 38 entrou no mesmo dia, com a R64, o D56 e o P73, que a sessão `pln-001-pedido-38` executa.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
@@ -125,6 +126,11 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   mensagens enviadas ao criar sessões com `brza sessions` apareçam dessa forma e não como mensagem do usuário como é
   hoje". A imagem está em `/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace--worktrees-studio/1cc6cebf-df5c-4f57-a8ad-cdddea824cf4/images/2.png`,
   fora do git
+- **Pedido 38 (2026-11-02, a mesma sessão), com a imagem da lista "3 agentes" do chat:** "ajuste também o `Revisar
+  features do fork pós-sync · Bash` para aparecer o nome do agente chamado ao lado de `· Bash`, ex: `Revisar features do
+  fork pós-sync · reviewer · Bash`". A imagem está em
+  `/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace--worktrees-studio/1cc6cebf-df5c-4f57-a8ad-cdddea824cf4/images/3.png`,
+  fora do git
 
 ### Cobertura
 
@@ -170,6 +176,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 35` | A faixa recolhida tem a barra de 3 px e o ícone do tipo em `--primary` à esquerda e, à direita, o botão "Responder" ou "Revisar" com a seta, que reabre o cartão; a seta do cartão aberto não muda | P70 | teste da sessão estruturada e do chat do terminal (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 36` | O expandir aparece em todo bloco de código e diff, role ou não; a tela cheia da cerca `markdown` ou `md` abre na prévia do olho do editor, com o `<>` para o cru e o frontmatter na caixa "Front Matter" (R62.1 a R62.3) | P71 | teste da camada do expandir (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 37` | O prompt que o `brza sessions` manda ao abrir uma sessão (`--prompt`, `--rename --prompt`) e o do `brza sessions send` aparecem no chat de destino como o cartão "Tarefa do coordenador", com o chat de origem como remetente, e não como balão de usuário; o `/rename` e o envio feito por uma pessoa seguem como estão (R63.1, R63.2) | P72 | teste do launch e do `agentSession.send` com e sem chamador de chat (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 38` | A linha de cada agente na lista "AGENTES" da faixa do chat mostra a descrição, o tipo do agente e a ferramenta, nessa ordem (`descrição · reviewer · Bash`); a barra lateral e o celular não mudam (R64.1) | P73 | teste do texto da linha (unidade); conferência no BrzA Studio (manual) |
 | `X20` | O `executeRead`, o `executeWrite` e o `executeDestructive` do MCP da Atlassian ganham o ícone do produto do `name` e o título com a ferramenta interna; o `discover` ganha o ícone do produto citado na busca, e o título com a busca entre aspas (R55.1, R55.2) | P67 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual, com o C6) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
@@ -1173,6 +1180,27 @@ custos são estimativa.
 
 Sem rodada própria, por ser a ordem do pedido: o passo roda agora, numa sessão do `brza-studio` num worktree.
 
+### Rodada 64 — o tipo do agente na linha da lista de agentes (enviada 2026-11-02)
+
+> **Apresentado antes:** a leitura desta sessão, em `brza-studio@384d4b08fd6`, sem rodar. A lista "AGENTES" é a
+> `NativeChatBackgroundTasksStatus.tsx`, e o texto `descrição · ferramenta` sai do `agentChildRowLeadTrail`
+> (`agent-child-row-lead-trail.ts:26-36`), que a faixa do chat, a linha compacta da barra lateral e o celular
+> compartilham. O tipo do agente já está no modelo da linha (`AgentChildRowModel.agentType`,
+> `agent-child-row-model.ts:41`), e hoje só aparece quando a linha não tem nada mais específico (`detail.kind ===
+> 'role'`). Inferência apresentada como a confirmar: o `agentType` vem preenchido para o subagente do Claude com o
+> `subagent_type` (`claude-child-work-decoder.ts:320`).
+
+Respondida em 2026-11-02, por Anderson na sessão `studio-achados-246` do workstream `studio`, pelo AskUserQuestion. Os
+custos são estimativa.
+
+1. **R64.1 — Onde a linha passa a mostrar o tipo?** Seleção única. Opções: só a faixa do chat (recomendada) — custo:
+   ~1 h, só desktop; se paga: já no passo; a faixa e a barra lateral — custo: ~2 h, e a linha estreita pode cortar a
+   ferramenta; se paga: se os agentes se leem também pela barra lateral; tudo, no código compartilhado — custo: ~2,5 h,
+   com o celular sem teste de tela nesta máquina; se paga: só se o tipo é querido em todo lugar.
+   **Decidido — "Só a faixa do chat (Recomendado)".** Vai ao D56 e ao P73.
+
+Sem rodada própria, por ser a ordem do pedido: o passo roda agora, numa sessão do `brza-studio` num worktree.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -1188,7 +1216,7 @@ base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum; o P54 ao P57 v
 antes do P55, o P56 independente e o P57 por último; o P58 vem antes do P59 e do P60, que não dependem um do outro, e
 o P61 por último; o pedido 32 roda em paralelo com o 31 (R51.2), o P62 antes do P63, o P64 depois do P63 e o P65 por
 último; o P66 do pedido 33 roda em paralelo com os dois (R52.4), e o P69 do pedido 34, agora, em paralelo com o que espera
-build (R60.4), e o P70 do pedido 35 depois do P69, que criou a faixa; o P71 do pedido 36, agora, sem depender de nenhum (R62.4); o P72 do pedido 37, agora, sem depender de nenhum.
+build (R60.4), e o P70 do pedido 35 depois do P69, que criou a faixa; o P71 do pedido 36, agora, sem depender de nenhum (R62.4); o P72 do pedido 37 e o P73 do pedido 38, agora, sem depender de nenhum.
 
 **Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com "indicado". É
 leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a pedido, numa sessão
@@ -2787,6 +2815,24 @@ Agora (pedido 37). O passo nomeia o `brza-workflow` só para o ponto "A conferir
 
 **Evidência:** (a preencher)
 
+### P73 — O tipo do agente na linha da lista de agentes do chat (pedido 38)
+
+Executa D56 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-38`
+
+Estimado: 1 h · Executado: 0 h
+
+Agora (pedido 38).
+
+- [ ] **1.** Os "A conferir no passo" do D56, lidos no código antes de escrever
+- [ ] **2.** Testes que falham: a linha da faixa do chat com `agentType` e ferramenta mostra `descrição · reviewer ·
+      Bash`; sem `agentType`, ou com só um dos dois, sem separador sobrando; a linha da barra lateral e a do celular
+      seguem iguais
+- [ ] **3.** O tipo na linha da `NativeChatBackgroundTasksStatus`, sem mexer no `agentChildRowLeadTrail` compartilhado
+- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C26
+
+**Evidência:** (a preencher)
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -3199,6 +3245,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C23 | `Pedido 35`: a faixa com ícone e ação (P70.3) | No build do C22, recolher uma pergunta e uma aprovação, no tema claro e no escuro | A barra e o ícone do tipo à esquerda e "Responder" ou "Revisar" com a seta à direita, que reabre o cartão; o título cortado no que sobra. A barra e o ícone saem pretos no claro e brancos no escuro, pelo `--primary` neutro; se a falta de cor incomodar, a escolha do token vai a Anderson como rodada | | |
 | C24 | `Pedido 36`: o expandir em todo bloco e a prévia do Markdown (P71.4) | No build do C22, passar o mouse sobre um bloco curto, uma cerca sem linguagem, uma cerca `diff`, o diff de um `Edit` e o da linha de ferramenta, com o botão sem cobrir texto (X61); expandir um SKILL.md numa cerca `markdown`, alternar para o `<>` e voltar, no tema claro e no escuro | O botão nos quatro; o SKILL.md renderizado como no olho do editor, com `name` e `description` na caixa "Front Matter"; o `<>` com o cru; o copiar com o cru | | |
 | C25 | `Pedido 37`: o prompt do `brza sessions` como cartão (P72.4) | No build do C22, de um chat qualquer, rodar `brza sessions <nome> --prompt "<tarefa longa>"` e, com `--rename`, o mesmo; depois `brza sessions send <nome> "outra coisa"`; num terminal fora de chat, rodar o mesmo `brza sessions … --prompt` | O chat novo abre com o cartão "Tarefa do coordenador", com o chat de origem como remetente e o texto dobrado em 3 linhas com "Show more"; o `/rename` não aparece; o `send` chega como cartão; no terminal fora de chat, a mensagem segue como balão de usuário | | |
+| C26 | `Pedido 38`: o tipo do agente na lista "AGENTES" (P73.4) | No build do C22, num chat, disparar um subagente com `subagent_type` (um `reviewer`) e olhar a lista "AGENTES" enquanto ele roda | A linha mostra `descrição · reviewer · <ferramenta>`; a barra lateral segue como antes | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,

@@ -726,3 +726,34 @@ ferramenta não (P52, resposta de 2026-10-27).
 - Se o `Show more` e o texto longo do prompt (um `--prompt-file` de página inteira) funcionam no cartão, que dobra em 3
   linhas.
 - Um `send` de um chat a si mesmo, ou de dois chats em turnos opostos, não faz laço nem cartão duplo.
+
+### D56 — O tipo do agente na linha da lista de agentes do chat — `brza-studio/src/renderer/src/components/native-chat/NativeChatBackgroundTasksStatus.tsx` (P73)
+
+- **Origem:** pedido 38, R64.1
+- **Contexto** (`brza-studio@384d4b08fd6`, lido sem rodar): cada linha é a `BackgroundTaskRow`
+  (`NativeChatBackgroundTasksStatus.tsx:68-125`), que monta o texto no `AgentChildRowContent` com o separador `" · "`
+  (`:90`). O texto sai do `agentChildRowLeadTrail(row, name, detail)`: a descrição é o `lead`, e a ferramenta
+  (`detail.kind === 'operation'`, `agentChildRowDetailText`) é o `trail`; a linha em `monitoring` inverte os dois
+  (`agent-child-row-lead-trail.ts:26-36`). O tipo está em `AgentChildRowModel.agentType` (`agent-child-row-model.ts:41`),
+  e só vira texto quando o `detail` é `role` (`:68-69`). O `AgentChildRowContent` e o `agentChildRowLeadTrail` também
+  servem a linha compacta da barra lateral (`worktree-card-compact-agent-row.tsx`) e ao celular
+  (`mobile-agent-child-row-text.ts`).
+
+#### Como fica
+
+- **A linha da faixa do chat** mostra `descrição · tipo · ferramenta` (R64.1), por exemplo
+  `Revisar features do fork pós-sync · reviewer · Bash`. O tipo sai de `row.agentType`, pelo
+  `formatAgentTypeLabel` que o `role` já usa, ou do valor cru se o rótulo for o do upstream para CLI de agente.
+- **Sem o tipo**, ou com o `detail` que não é a ferramenta (`monitoring`, `message`, `ended`, `no-update`, `reason`), a
+  linha fica como hoje, sem separador sobrando. Quando o `detail` já é o `role`, o tipo não repete.
+- **O `agentChildRowLeadTrail` compartilhado não muda** (R64.1): a barra lateral e o celular seguem iguais. A faixa
+  monta o tipo ao lado do `AgentChildRowContent`, ou o `AgentChildRowContent` recebe um parâmetro opcional que só ela
+  passa.
+
+#### A conferir no passo
+
+- O `agentType` vem preenchido para o subagente do Claude, com o `subagent_type` (`claude-child-work-decoder.ts:320`), ou
+  chega vazio, e aí a faixa mostra o que já mostra.
+- O `formatAgentTypeLabel` de um tipo de usuário (`reviewer`, `collector`) devolve o nome cru ou o capitaliza; o pedido
+  quer `reviewer`, como o nome do papel.
+- A linha tem `truncate`: o tipo não empurra a ferramenta para fora; o `aria-label` do "Parar" não muda.

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Seis sobras do PLN-006 que as rodadas deixaram para depois, do nome fixo do código ao plano longo demais.
+description: Cinco sobras do PLN-006 que as rodadas deixaram para depois, do nome fixo do código ao ref do lock.
 scope:
   - workspace
 opened: 2026-11-02
@@ -30,8 +30,8 @@ sempre o recomendado":
   revisão, pontos 4 e 7.
 - **O `ref` do lock** pode ficar velho até o próximo arquivo mudado, porque o sync só regrava o lock com arquivo mudado
   (A4 da segunda revisão).
-- **O `PLN-006-plan.md` passou de 900 linhas**, e a norma manda levar a Entrevista ao `PLN-006-interview.md` acima de
-  ~400. A mudança só move texto e ficou para depois do fechamento.
+- ~~**O `PLN-006-plan.md` passou de 900 linhas.**~~ Feito em 2026-11-02, a pedido de Anderson ("separe"): a Entrevista
+  foi ao `PLN-006-interview.md`, e o `-plan` ficou com 382 linhas.
 
 ## O que falta decidir
 

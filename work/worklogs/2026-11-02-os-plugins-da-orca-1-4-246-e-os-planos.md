@@ -68,3 +68,6 @@ Rodada respondida por Anderson em 2026-11-02:
 - **`git fetch upstream --tags --prune`** no `brza-studio`: atualizou `upstream/main` (leitura, só refs remotas).
 - **A tag `v1.4.246-alpha.1` no origin do `brza-studio`** (`git push origin v1.4.246-alpha.1`, a pedido de Anderson), apontando para
   `6d47623`; **risco:** tag publicada não se move sem `--force`; **como desfazer:** `git push origin :refs/tags/v1.4.246-alpha.1`.
+- **A sessão `studio-achados-246`** ("Studio: achados da 1.4.246") aberta pelo `brza sessions` no worktree `studio`, a pedido de
+  Anderson, para procurar achados novos da v1.4.246; o pedido está em `/private/tmp/studio-prompt-achados-246.md`. Só acha e
+  registra; **estado:** ativa; **como desfazer:** `brza sessions close studio-achados-246`.

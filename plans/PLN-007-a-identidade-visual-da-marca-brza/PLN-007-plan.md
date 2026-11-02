@@ -14,8 +14,8 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** R4 a R6 fechadas, sobre o rascunho do Desenho do `designer` (no scratch). Próximo: a R7 (o azul no
-  escuro e o CLI) e então o Desenho gravado em `PLN-007-design.md`.
+- **Retomar:** R4 a R7 fechadas; os 14 pontos do Desenho têm resposta. Próximo: o `designer` reescreve o rascunho com
+  as respostas, e o Desenho e os Passos vão a `PLN-007-design.md` e a este arquivo.
 
 ## Pedido
 
@@ -373,10 +373,35 @@ Respondida em 2026-11-02, na sessão do `brand`.
    **Resposta:** "6.4.1". **Decidido — H1**: [a chama no cabeçalho](PLN-007-cabecalho-h1.png). Fecha o risco do M5 da
    R2.6.
 
+### Rodada 7 — o azul no escuro e o `brza --help` (enviada 2026-11-02)
+
+**Apresentado antes:** o `#1447e6` da P1 dá 2,9:1 sobre `#0a0a0a`; o `--terminal-pane-locate` já usa o
+`--color-blue-400` no escuro. O `brza --help` imprime "orca" em 95 linhas, e o upstream editou o texto do help 3 vezes
+em 5 dias.
+
+Respondida em 2026-11-02, na sessão do `brand`, pela ferramenta de pergunta.
+
+1. **O azul do `--agent-question` no escuro.** Opções:
+   - `#1447e6` (blue-700) no claro e `--color-blue-400` no escuro (recomendada) — custo: ~0 h a mais nos tokens; se
+     paga: já, o glifo passa de 3:1 no escuro;
+   - `#1447e6` nos dois temas — custo: nenhum, e o glifo fica abaixo de 3:1 no escuro; se paga: nunca, no escuro.
+
+   **Resposta:** "blue-700 no claro, blue-400 no escuro (Recomendado)". **Decidido.** Ajusta a P1 da R3.2 no escuro.
+
+2. **O `brza --help` sem "orca".** Opções:
+   - a troca na impressão, num arquivo do fork (`src/cli/brza/cli-display-name.ts`), com o cabeçalho "BrzA CLI", e
+     `orca://pair` e `ORCA_*` como estão (recomendada) — custo: ~1 h, com o teste; se paga: já, e a cada merge;
+   - editar as 95 linhas — custo: ~1–1,5 h e conflito a cada merge que tocar o texto; se paga: nunca, além da primeira;
+   - só as linhas 2 a 4 — custo: ~0,1 h, e os exemplos seguem `orca open`; se paga: já, só para o cabeçalho.
+
+   **Resposta:** "Troca na impressão (Recomendado)". **Decidido.**
+
+**O Desenho fecha aqui**: os 14 pontos do rascunho do `designer` têm resposta, da R4 à R7.
+
 ## Worklogs
 
 - 2026-10-31 — aberto; R1 gravada como chegou da sessão do `workspace`; Terreno pelo `collector`; R2 fechada, com os
   pedidos 2 e 3 da borda e da marca no chat; R3 fechada, com a issue dos restos da Orca. Parou antes do Desenho.
   [PLN-007: a abertura da marca BrzA](../../work/worklogs/2026-10-31-pln-007-a-abertura-da-marca-brza.md)
-- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 a R6 fechadas. Parou antes da R7.
+- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 a R7 fechadas. Parou antes de gravar o Desenho.
   [PLN-007: o Desenho da marca BrzA](../../work/worklogs/2026-11-02-pln-007-o-desenho-da-marca-brza.md)

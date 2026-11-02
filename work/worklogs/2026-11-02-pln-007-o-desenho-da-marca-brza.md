@@ -38,3 +38,7 @@ A R6: o fio de 1 px com halo no foco (W1); o botão de enviar no degradê da mar
 degradê com foco (H1). Com a N1 e a H1, os riscos do M3 e do M5 da R2.6 fecharam. Anderson pediu o artboard do botão
 "redondo": o botão do app já é `size-8 rounded-full`, e os artboards o tinham desenhado quadrado — refeito, e a lição foi
 à memória do workstream.
+
+A R7, na recomendada: o `--agent-question` vai ao blue-700 no claro e ao blue-400 no escuro, porque o `#1447e6` dá
+2,9:1 sobre o fundo escuro; o `brza --help` troca o nome na impressão, num arquivo do fork. Os 14 pontos do rascunho
+têm resposta, e o `designer` foi retomado para reescrever o Desenho com elas.

@@ -45,6 +45,23 @@ Na `master` do `brza-workspace`, a migração deixou cinco commits:
 Sobraram dois `hook_error` na medição, das 12:59. São das sondas da trava do `/compact` que rodei sem o modo `pre`, e
 não da trava em uso.
 
+## A segunda revisão e o fechamento
+
+A revisão da migração está em
+[REV: a migração do `brza-workspace` para cliente do `brza-workflow`, o P8 do PLN-006](../reviews/pln-006-a-migracao.md).
+
+- **O incidente:** o ensaio do revisor, rodado de um clone, escreveu o `fa4152f` na `master` real, porque a
+  `BRZA_WORKSPACE` herdada venceu o cwd (A1).
+- **O reset:** a trava do runtime barrou o `reset` do revisor, e a sessão não o repassou. Anderson escolheu "Eu rodo o
+  reset (Recomendado)", e o `git reset --keep bca0a4f` trouxe a `master` de volta à `origin`.
+- **Os consertos, pela regra da recomendada:**
+  - A2 e A6 em `brza-workspace@f12fdd4`;
+  - A7 no worklog;
+  - A1, A3, A4, A5 e A8 em `brza-workflow@a313ec5`, levados ao `brza-workspace` pelo `brza sync` (`afc3859`).
+
+O plano fechou. As sobras foram para
+[As sobras do PLN-006 no brza-workflow e no plano](../issues/as-sobras-do-pln-006.md).
+
 ## Fora do workspace
 
 - **O quê e onde:** `brew upgrade python@3.14` (3.14.7 → 3.14.10), em `/opt/homebrew`. **Risco:** baixo.

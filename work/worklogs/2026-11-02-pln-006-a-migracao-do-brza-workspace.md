@@ -78,8 +78,9 @@ não da trava em uso.
     `com.microsoft.autoupdate.fba.plist`, `com.microsoft.autoupdate2.plist` e o cache `com.microsoft.autoupdate.fba`.
   - Anderson removeu pelo Finder `~/Library/Group Containers/UBF8T346G9.com.microsoft.teams`, que o macOS protege do
     terminal.
-  - **Ficaram:** `~/Library/Containers/com.microsoft.teams2*` (318 MB: cache do Teams, de 2025-08-26, e a sessão da
-    conta de trabalho), que o `mv` de Anderson no terminal também não moveu; saem pelo Finder.
+  - Anderson removeu pelo Finder também `~/Library/Containers/com.microsoft.teams2`, `.notificationcenter` e
+    `.respawn` (318 MB: cache do Teams, de 2025-08-26, e a sessão da conta de trabalho), que o `mv` dele no terminal
+    não moveu. Conferido: nada com `teams` em `~/Library/Containers`, `Preferences`, `Caches` nem no HAL.
 
   **Risco:** um app do Office instalado no futuro reinstala o AutoUpdate sozinho; o Teams, o driver. **Estado:** ativo.
   **Como desfazer:** tudo está em `~/.Trash/microsoft-limpeza-2026-11-02/` (o de `/Library` em `root/`), até a Lixeira

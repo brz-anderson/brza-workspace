@@ -794,6 +794,11 @@ ferramenta não (P52, resposta de 2026-10-27).
 - **A conferir no passo:** como o app sabe que o bundle é ad hoc em runtime (a versão, uma constante de build, ou a
   assinatura do bundle); que o build assinado, quando existir, liga o atualizador; o que mais o `updater-setup.ts:141-166`
   faz antes da guarda.
+- **Conferido no P76:** o app sabe pelo arquivo `ad-hoc-signed` em `Resources`, que o `afterPack` do darwin estampa quando
+  a identidade é `-` (`mac-ad-hoc-marker.cjs`, lido em `updater/ad-hoc-signed-build.ts`); a versão não distingue, e a
+  constante do `electron-vite` nasce antes da decisão de assinatura. O build assinado (identidade nomeada ou release) não
+  tem o marcador e liga. Antes da guarda, o `updater-setup.ts` só reporta a falha do handoff do serve. O nudge e o
+  `fetchChangelog` já ficavam atrás do `isUpdaterEnabled()`. X67.
 
 ### D60 — Os quatro pequenos consertos — `brza-studio/config/electron-builder.config.cjs` e outros (P77)
 
@@ -805,3 +810,33 @@ ferramenta não (P52, resposta de 2026-10-27).
   código do Markdown compara com o modo do Monaco (`markdown-surface-theme.ts:64-65,87`).
 - **A conferir no passo:** se o build real gera o resolvedor autocontido (o item do CLI empacotado só se prova no
   build); os params válidos de cada um dos 5 métodos; no coreano, que só o `ORCA` de produto muda, e não o `ORCA_*`.
+
+### D61 — O fundo do texto no bloco de código e o botão de copiar do visualizador de Markdown — `brza-studio/src/renderer/src/assets/markdown-preview.css` (P78)
+
+- **Origem:** pedido 40, R66.1 a R66.3
+- **Contexto** (`brza-studio@384d4b08fd6`, lido sem rodar): o `code` dentro do `pre` herda o fundo do código inline.
+  `.markdown-dark .markdown-body code` (`markdown-preview.css:634`, `rgba(255,255,255,0.1)`) e
+  `.markdown-light .markdown-body code` (`:638`, `rgba(0,0,0,0.07)`) têm especificidade (0,2,1) e vencem o
+  `.markdown-body pre code { background: none }` (`:660`, (0,1,2)); o `padding: 0` do `pre code` vence só porque o
+  `.markdown-body code` não tem a classe do tema. Daí o texto "grifado". No editor rico, o `.rich-markdown-editor pre
+  code` (`rich-markdown-editor.css:999`, (0,1,2)) vence o `.rich-markdown-editor code` (`:930`, (0,1,1)): o defeito não
+  existe lá. O botão: o `.markdown-annotation-block` é `display: grid` (`:324`), e o `.code-block-wrapper` (`:668`,
+  `position: relative`) vira item do grid e contém a margem `1em 0` do `pre` (`:642`); o `.code-block-copy-btn`
+  (`:671`, `top: 8px`) fica 8 px abaixo do topo do wrapper, que está 1em acima do `pre`, e cai sobre a borda superior do
+  bloco.
+
+#### Como fica
+
+- **O texto do bloco** não tem fundo, nos dois temas: `.markdown-dark .markdown-body pre code` e `.markdown-light
+  .markdown-body pre code` com `background: none`. O `pre` fica igual, com o fundo e a borda (R66.2).
+- **O botão de copiar** fica a 8 px do topo do `pre`: a margem passa do `pre` ao `.code-block-wrapper`
+  (`.code-block-wrapper > pre { margin: 0 }` e `.code-block-wrapper { margin: 1em 0 }`), sem mudar o espaçamento entre
+  blocos. O `.code-block-wrapper-diagram` (`top: 0; right: 28px`) segue como está.
+- **O editor rico** não muda, porque o defeito não existe lá (R66.3, a confirmar no C31). O chat fica de fora.
+
+#### A conferir no passo
+
+- Se algum outro seletor do arquivo (`.hljs`, os temas de sintaxe) põe fundo no código dentro do `pre`.
+- Se a margem passada ao wrapper muda o espaçamento do bloco dentro de lista, citação e callout.
+- O P77 mexe no `markdown-surface-theme.ts` (o fundo do código no modo cru): o P78 não toca esse arquivo, e os dois não
+  se pisam.

@@ -41,3 +41,15 @@ Decisão de Anderson, porque mexe numa guarda do upstream:
   conta de desenvolvedor para notarizar. Se paga: quando houver outro usuário além de Anderson.
 - **Deixar.** Custo: nenhum agora, e o app tenta checar um feed que dá 404. Se paga: nunca, se nenhum release com
   manifesto sair.
+
+## Resolução
+
+Anderson decidiu **desligar o atualizador no build ad hoc** (R65.3 do PLN-001), e o P76 o fez em
+`brza-studio@cdce032d264`: o `afterPack` do darwin estampa o arquivo `ad-hoc-signed` em `Resources` quando a identidade
+de assinatura é `-`, e o `isUpdaterEnabled()` fica falso quando o app o lê. Um build com identidade nomeada (`CSC_NAME`) ou
+de release não tem o marcador, e o atualizador dele liga. O nudge a `onorca.dev` e o `fetchChangelog` já ficavam atrás da
+mesma guarda. Testado em unidade; **o marcador só se prova no bundle empacotado**, e o app instalado
+(`1.4.246-alpha.1`) não o tem, então o atualizador dele segue ligado até o build novo. O `status` fica `open` até o C29,
+de Anderson, no build novo: sem o breadcrumb `updater_macos_installer_scheduling_configured` no log e sem GET a
+`onorca.dev`.
+

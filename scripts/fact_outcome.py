@@ -14,9 +14,9 @@ fato, e não o do cwd, porque chega de outra sessão.
 
 Saída 0, ou 2 no erro de uso, no fato ou prefixo que não se resolve e na falha de leitura ou gravação do log. O log é o
 do `measure.py` (`MEASURE_DIR` para teste), de `<raiz do workspace>/.claude/hooks/`: a raiz é a `BRZA_WORKSPACE` ou, sem
-ela e sem a `MEASURE_DIR`, o pai do `git rev-parse --git-common-dir` — o checkout da `master`, também de um worktree —,
+ela e sem a `MEASURE_DIR`, o pai do `git rev-parse --git-common-dir` — o checkout principal, também de um worktree —,
 ou o diretório acima de scripts/ se o git falhar. O `--pending` diz no stderr o log lido e o workstream filtrado, e
-avisa quando ele é `master` ou vazio. Só biblioteca padrão, Python 3.9.
+avisa quando ele é a branch da norma (`[workspace].branch` do manifesto) ou vazio. Só biblioteca padrão, Python 3.9.
 """
 
 import argparse
@@ -32,7 +32,7 @@ HOOK = os.path.join(".claude", "hooks", "measure.py")
 
 
 def git_root(here):
-    """O pai do `git rev-parse --git-common-dir` de `here`, que é o checkout da `master` mesmo num worktree, ou None se o
+    """O pai do `git rev-parse --git-common-dir` de `here`, que é o checkout principal mesmo num worktree, ou None se o
     git falha ou o diretório comum não é um `.git`. A mesma função do summarize_measurements.py."""
     try:
         done = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"], cwd=here, text=True,
@@ -47,7 +47,7 @@ def git_root(here):
 
 def workspace_root(here=HERE, env=None):
     """A raiz do workspace: com a `BRZA_WORKSPACE` ou a `MEASURE_DIR`, a de sempre (a variável, ou o diretório acima de
-    scripts/); sem as duas, o checkout da `master` pelo git, para o terminal de um worktree ler o log vivo, e não o
+    scripts/); sem as duas, o checkout principal pelo git, para o terminal de um worktree ler o log vivo, e não o
     `.measurements/` velho do próprio worktree. O `measure.py` carregado dali escreve e lê no mesmo diretório."""
     env = os.environ if env is None else env
     if env.get("BRZA_WORKSPACE"):
@@ -61,6 +61,13 @@ def workspace_root(here=HERE, env=None):
 
 WORKSPACE = workspace_root()
 MEASURE = os.path.normpath(os.path.join(WORKSPACE, HOOK))
+
+
+def norm_branch():
+    """A branch da norma do workspace do cwd (`[workspace].branch` do manifesto, pelo `brza_root` do `measure.py`), ou
+    None fora de um workspace: o `workstream_of` devolve esse nome no checkout da norma, que não guarda fatos."""
+    ws = measure.brza_root.find(os.getcwd())
+    return measure.brza_root.workspace_branch(ws.manifest) if ws else None
 
 
 def load_measure():
@@ -267,8 +274,8 @@ def main(argv=None):
         else:
             workstream = a.workstream or measure.workstream_of(os.getcwd())
             print(f"fact_outcome.py: lendo {measure.LOG}; workstream {workstream or DASH}", file=sys.stderr)
-            if workstream == "master":
-                print("fact_outcome.py: o workstream filtrado é master, que não guarda fatos; "
+            if workstream and workstream == norm_branch():
+                print(f"fact_outcome.py: o workstream filtrado é {workstream}, a branch da norma, que não guarda fatos; "
                       "use --workstream <nome>|all", file=sys.stderr)
             elif not workstream:
                 print("fact_outcome.py: o cwd não está num workstream; use --workstream <nome>|all",

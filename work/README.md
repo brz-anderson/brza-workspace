@@ -1,8 +1,7 @@
 # work/ e wiki/
 
 **A norma de escrita das notas do brza-workspace** — o que está em andamento, o que trava, o que foi decidido e como
-Anderson usa as ferramentas —, para quem escreve em `work/` ou em `wiki/`, pessoa ou agente. Adaptada da norma do
-workspace da Fixfy, sem o que é só de lá.
+Anderson usa as ferramentas —, para quem escreve em `work/` ou em `wiki/`, pessoa ou agente.
 
 > [!IMPORTANT]
 >
@@ -174,7 +173,7 @@ que apontam para ela —, pelo `move_note.py`.
 **Link entre notas é Markdown relativo, com o H1 da nota de destino como rótulo:**
 `[Título da nota](../issues/assunto.md)`. `[[wikilink]]` não existe. Todo caminho é relativo **ao arquivo que contém o
 link**, e só quando o arquivo existe em disco; nome de arquivo solto em prosa fica em crase — é citação, não link. O
-que mora em outro repositório — o código do `brza-studio`, ou uma nota do workspace da Fixfy — se cita em crase, com o
+que mora em outro repositório — o código do `brza-studio` — se cita em crase, com o
 caminho, e não vira link. `README.md` de repositório nunca vira link de rótulo genérico: diga de qual repositório.
 
 **Callout** — os cinco tipos do GitHub (`NOTE`, `TIP`, `IMPORTANT`, `WARNING`, `CAUTION`), com a marca sozinha
@@ -186,9 +185,11 @@ por um formatador que junta linhas.
 `work/`, `plans/` e `wiki/` são deste repositório, mas **não moram na `master`**: cada nota mora na branch do
 workstream dela, `workstream/<nome>`, no worktree `.worktrees/<nome>`, como diz o `AGENTS.md`. **A nota nasce no
 workstream da sessão que a escreve.** **O commit é pelo `brza note commit`**, que roda o checador, commita só os
-caminhos dados e dá o push na branch do workstream, sem PR, e recusa a `master`. O commit é com a identidade do
-`brz-anderson`, que vem do `env` da sessão, e o push vai pela chave `personal` do `origin`
-(`git@personal:brz-anderson/brza-workspace.git`).
+caminhos dados e dá o push na branch do workstream, sem PR, e recusa a `master`; quando o frontmatter, o H1 ou o
+caminho de um plano, issue ou decisão muda, ele acrescenta a linha do índice `.brza/index.jsonl` na `master`, sem
+checkout. O commit é com a identidade do
+`brz-anderson`, que vem do `env` da sessão, e o push vai pelo `origin`, com a chave de acesso que o
+`README.md` documenta.
 
 O `brza-studio` é outro repositório, com branch `master` e a norma dele: o plano daqui só aponta para ele.
 
@@ -205,6 +206,7 @@ O `brza-studio` é outro repositório, com branch `master` e a norma dele: o pla
 | `type` | **Ausente**, quer dizer o gênero da pasta. Escrito só quando refina o caminho: `unknown`, para investigação em `issues/` |
 | `status` | `open` existe e ninguém pegou · `in_progress` alguém está fazendo · `in_review` feito, esperando parecer · `done` encerrado **com** desfecho · `dropped` encerrado **sem** desfecho, por escolha. **Omitido** nos gêneros sem ciclo de vida: `guide`, `worklog` e `note` |
 | `scope` | A que a nota se refere. Sempre **lista**: `brza-studio`, `workspace`, ou o que mais vier |
+| `description` | Uma frase: o que a nota entrega ou pede. Obrigatória em plano (`-plan.md`), issue e decisão criados a partir de 2026-11-01, e vai ao índice da `master`; nas anteriores, o índice usa o H1. O checador cobra `description-missing` |
 | `priority` | Só em `issues/`: `high` · `medium` · `low`. Opcional e sem default |
 | `opened` | Quando o assunto foi aberto |
 | `decided` / `decided_by` | Data da decisão e quem decidiu — par indivisível |
@@ -289,7 +291,7 @@ transcrição.
 - **Plano que atravessa mais de uma sessão** é copiado para `plans/`, com os mesmos IDs, e o worklog ganha
   "promovido a PLN-NNN".
 - **O que muda estado fora do workspace tem seção própria**, `## Fora do workspace`, no worklog do dia: arquivo criado
-  ou alterado fora de `~/Projects/brza-workspace` e do `brza-studio`, cujo commit já é o registro, e comando que muda
+  ou alterado fora deste repositório e do `brza-studio`, cujo commit já é o registro, e comando que muda
   estado fora deles; leitura pura não entra. Um item por coisa, com quatro campos — **o quê e onde**; **o risco**, o
   que pode dar errado e para quem; **estado**, se segue ativo; **como desfazer**.
 
@@ -371,4 +373,3 @@ carrega a ferramenta.
 | O código, o build e os testes | No `brza-studio` |
 | Procedimento que se repete | Skill |
 | Material de terceiros copiado | Em lugar nenhum daqui: a nota cita a fonte e guarda só o achado |
-| Nota, plano ou decisão do workspace da Fixfy | No workspace da Fixfy; daqui se cita em crase, com o caminho, e não se linka |

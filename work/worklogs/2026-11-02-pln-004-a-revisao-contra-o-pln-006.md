@@ -39,13 +39,22 @@ o dia anterior está em
   upstream (#36848) grava um `agent-handoff` quando o chat nativo roda `agent launch`, o que toca o "caminho 1" dela.
 - **No plano:** o `Retomar` reescrito (dizia "R6 a R8", e a R9 já estava gravada), e a frente 4 com os três focos de
   revisão, que só estavam no `Retomar`, com a linha da Cobertura.
+- **A rodada 10**, no chat, que reabriu a R1.1, a R2.1 e a R9.1: os arquivos do Codex e do `agy` vão num pacote
+  `packages/runtimes` do `brza-workflow` (resposta de Anderson, não a recomendada); o código é executado pela sessão
+  `workspace`, com `implementer`, e não pelo `tools-kit`; os hooks usam a `BRZA_WORKSPACE` do wrapper e, sem ela, o
+  `brza-where` (42 ms de mediana, medidos); a medição dos dois runtimes vai num `measure_runtimes.py`. A rodada saiu com
+  as alternativas só do Codex; Anderson perguntou por quê, e as opções foram reapresentadas para os dois runtimes.
+- **Um fato do `brza-sync`**, lido e não rodado: ele só conhece os modos `100644` e `100755` (`bin/brza-sync:115`) e
+  grava o blob como arquivo (`:323-331`), então um symlink do pacote chegaria como arquivo de texto. O `brza install`
+  tem `packages/client/bin` fixo (`bin/brza-install:61`) e só liga `brza-*` e o `claude-brza`.
 
 ## O que ficou
 
-- **A rodada 10**, no chat: onde moram `.codex/` e `.agents/`; quem executa o código no `brza-workflow`; o fallback dos
-  hooks; o `measure.py` e a auditoria de fatos; onde entram o `codex()` e o `agy()`; onde entra o foco da revisão.
-- **O plano passa de 400 linhas** (480 hoje), e o `plans/README.md` manda a Entrevista ao `-interview.md`; a divisão vai
-  depois da R10, que ainda acrescenta à Entrevista.
+- **A rodada 11**, no chat: como o `.agents/skills/` chega ao workspace sem symlink no sync; onde moram os papéis
+  gerados; onde entram o `codex()` e o `agy()` no shell; a auditoria de fatos, que só roda para o Claude. O foco da
+  revisão fica para a R12, porque depende dos papéis gerados.
+- **O plano passa de 400 linhas** (580 hoje), e o `plans/README.md` manda a Entrevista ao `-interview.md`; a divisão vai
+  depois da R11, junto com a gravação do Desenho, para fazer uma vez.
 - **O rascunho do Desenho** (556 linhas, no scratch) é reescrito depois da R10, e só então vai à aprovação.
 - **As 19 citações que não batem** estão na tabela do agregado; três nunca sustentaram o fato (a linha do app para o
   `app-server` e a `permissionPolicy`, a do `agentCmdOverrides` no terminal e a do X3 do PLN-011).

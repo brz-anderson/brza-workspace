@@ -23,3 +23,12 @@ leem —, e a grade da Apple para o tile. A sessão conferiu por amostra quatro 
 A R4, toda na recomendada: a fonte da marca mora em `brza-studio/resources/brand/`; esta sessão do `brand` desenha o
 símbolo e os lockups, e o `brza-studio` só copia o aprovado; o `.icns` sai do SVG pelo `rsvg-convert` e o `iconutil`,
 sem o `actool`, o que tira o `icon.json` do caminho do ícone; a execução vai em seis passos e três branches.
+
+A R5: o tile na grade da Apple (T1); o `logo.svg` com o A1 colorido (G2) e o estado vazio com o S1 no degradê (V2), os
+dois contra a recomendação; o logotipo dentro do app como texto vivo na Geist.
+
+O `brza shot` quebrou no meio da R5: o merge do upstream v1.4.246 no `brza-studio` moveu o
+`PANEL_DESIGN_TOKEN_ALLOWLIST` para `src/shared/plugins/frames/plugin-panel-design-tokens.ts`. Os PNGs da R5 já tinham
+saído e foram copiados do scratch; o pedido do conserto foi a
+[O brza shot quebra com os tokens do painel movidos no brza-studio](../issues/brza-shot-quebra-com-os-tokens-do-painel-movidos.md),
+e o Desenho segue com uma cópia corrigida no scratch, conferida igual pixel a pixel.

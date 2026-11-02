@@ -53,7 +53,7 @@ o dia anterior está em
 - **A rodada 11**, no chat: como o `.agents/skills/` chega ao workspace sem symlink no sync; onde moram os papéis
   gerados; onde entram o `codex()` e o `agy()` no shell; a auditoria de fatos, que só roda para o Claude. O foco da
   revisão fica para a R12, porque depende dos papéis gerados.
-- **O plano passa de 400 linhas** (580 hoje), e o `plans/README.md` manda a Entrevista ao `-interview.md`; a divisão vai
+- **O plano passa de 400 linhas** (548 hoje), e o `plans/README.md` manda a Entrevista ao `-interview.md`; a divisão vai
   depois da R11, junto com a gravação do Desenho, para fazer uma vez.
 - **O rascunho do Desenho** (556 linhas, no scratch) é reescrito depois da R10, e só então vai à aprovação.
 - **As 19 citações que não batem** estão na tabela do agregado; três nunca sustentaram o fato (a linha do app para o

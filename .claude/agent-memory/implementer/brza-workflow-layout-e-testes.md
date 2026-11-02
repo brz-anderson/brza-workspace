@@ -93,3 +93,15 @@ metadata:
   `package_files(...)` (por `SYNC['ls_tree']`) à conferência. A fumaça do init copia `core/ packages/ templates/` para um flow de
   mentira **commitado**, porque o sync lê commits e não a árvore de trabalho. Em 2026-11-02: cli 395 (150 a 440 s conforme a carga, rode em
   background e espere um arquivo-marca), hooks 283 (5 skips no 3.9).
+
+- **P9-fix2 (A1/A4/A5, `.worktrees/p9-fix2`):** a sessão herda `BRZA_WORKSPACE` real: **todo** teste e fumaça com `env -u BRZA_WORKSPACE -u
+  BRZA_STUDIO`, só em temporários (um revisor já deixou commit na master real). `runtime.WORKSPACE` agora é `None` sem workspace
+  (sem legado X10); leia pelo `runtime.require_workspace()` (levanta `NoWorkspace`, que é `Refused` e `BrzaError`; lê o global na hora,
+  então `patch.object(runtime, 'WORKSPACE', ...)` vale). A recusa do A1 é `brza_root.foreign_cwd(found)` (role None **e** top
+  não None; fora de git a variável vale), chamada no `main` do `brza-sync` e do `brza-note`. Teste de processo com a
+  `BRZA_WORKSPACE` precisa de manifesto no workspace (a variável sem manifesto é ignorada): no `NoteFixture` use `OWNER = 'x'` ou
+  `write_manifest()`. Teste do `brza-sessions` troca `GLOBALS['WORKSPACE']` por `fake_workspace(self)`. O `brza-sync` só regrava
+  o lock com arquivo mudado (`lock_changed` sem o `commit`/`ref`). **Vermelho antes:** `git archive HEAD | tar -x -C $T`, `rm -rf
+  $T/tests && cp -R tests $T/tests`, rode os testes novos lá (apague `$T`). Suíte cli ~500 s sob carga: background + Monitor com
+  until-loop (o `sleep` solto é barrado). Golden: diferença nova usa `old` = texto da master **depois** das diferenças anteriores do
+  mesmo arquivo.

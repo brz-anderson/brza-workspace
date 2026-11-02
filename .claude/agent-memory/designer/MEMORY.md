@@ -1,0 +1,3 @@
+- [Escolhas de marca de Anderson](feedback_escolhas_de_marca.md) — preserva o ícone e quer mais marca; recusou A2, M4 e o workstream `studio`
+- [Artboard sobre o componente real](licao-artboard-sobre-o-componente.md) — o M5 desenhou título que não existe; o que o artboard muda vira opção
+- [Ferramental de vetor e fonte](ferramental-vetor-e-fonte.md) — woff2 em path só pelo CoreText/swift; o que está e não está instalado

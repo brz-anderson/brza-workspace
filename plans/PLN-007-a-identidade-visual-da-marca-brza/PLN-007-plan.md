@@ -14,8 +14,8 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** entrevista fechada (R1–R3). Próximo: o Desenho — os itens `D` do SVG do símbolo A1, do corte S1, dos
-  lockups L2, dos tokens P1, da marca no chat (E2, M1, M2, M3, M5) e das aplicações do desktop, do CLI e dos READMEs.
+- **Retomar:** R4 fechada, sobre o rascunho do Desenho do `designer` (no scratch). Próximo: a R5 e a R6, com artboards
+  (o tile, o `logo.svg`, o logotipo e o símbolo no app, a borda, o botão, o anel e o M5), e a R7 (o azul no escuro e o CLI).
 
 ## Pedido
 
@@ -233,8 +233,63 @@ Respondida em 2026-10-31, na sessão do `brand`.
 **A entrevista fecha aqui.** Nada de estrutura ficou aberto; os riscos do M3 e do M5 vão ao Desenho, e o do M3 já perde
 metade com a P1.
 
+### Rodada 4 — a fonte da marca, quem desenha, o pipeline do ícone e o corte (enviada 2026-11-02)
+
+**Apresentado antes:** o rascunho do Desenho pelo `designer`, com 8 itens `D` e 14 pontos para rodada, conferido por
+amostra pela sessão: o app instalado só leva o `Resources/icon.icns`, sem `Assets.car` nem `CFBundleIconName` no
+`Info.plist`; o Icon Composer gera uma arte só para todos os tamanhos, e o `.icns` de hoje tem duas — sem o selo
+abaixo de 128 px, com o selo de 128 para cima; o `#1447e6` dá 2,9:1 sobre `#0a0a0a`; o cabeçalho do painel do chat não
+tem título e marca o painel com foco por `data-active-pane` (`NativeChatPaneHeader.tsx:43`); o "agente trabalhando" é
+o `LoadingSpinner` do `NativeChatTurnActivityLine.tsx:61`. Os pontos vão em três rodadas: esta, de estrutura, pela
+ferramenta; as de tela, com artboards.
+
+Respondida em 2026-11-02, na sessão do `brand`, pela ferramenta de pergunta.
+
+1. **Onde moram os SVG mestres e os scripts.** Opções:
+   - `brza-studio/resources/brand/`, com os scripts em `config/scripts/` (recomendada) — custo: ~0,25 h, sem conflito,
+     porque o upstream não tem a pasta; se paga: já, o `generate.sh`, a Landing e o README leem do próprio repositório;
+   - a pasta do PLN-007 no `brand` — custo: uma cópia de ~0,25 h a cada ida ao `brza-studio`, com duas fontes que
+     divergem; se paga: nunca, para o app;
+   - `resources/icon-source/`, ao lado do `icon.icon` — custo: o da primeira e conflito numa pasta que o upstream mexeu 3
+     vezes em 4 dias; se paga: nunca, além da primeira.
+
+   **Resposta:** "brza-studio/resources/brand/ (Recomendado)". **Decidido.**
+
+2. **Quem desenha o SVG do A1 e os lockups L2.** Opções:
+   - esta sessão do `brand`, no scratch, com a aprovação por artboard aqui, e a sessão do `brza-studio` só copia
+     (recomendada) — custo: ~7,5–10,5 h aqui; se paga: já, o contexto e os artboards estão nesta sessão;
+   - uma sessão do `brza-studio`, na branch `feat/pln-007-brand-assets` — custo: as mesmas horas e o arranque de uma
+     sessão nova; se paga: só se o desenho tiver de nascer no commit da aplicação.
+
+   **Resposta:** "Esta sessão do brand (Recomendado)". **Decidido.** O desenho é da sessão do `brand`; a aplicação
+   segue no `brza-studio`, como o Fora de escopo diz.
+
+3. **O pipeline do ícone.** Opções:
+   - o `generate.sh` renderiza cada slot do SVG com o `rsvg-convert` e monta o `.icns` com o `iconutil`, sem o `actool`;
+     o mesmo script gera o tray, o `icon-dev.png` e os PNG do seletor; o `icon.icon` fica parado e vai à issue dos
+     restos da Orca (recomendada) — custo: ~1,5 h; se paga: já, e mantém as duas artes;
+   - o `icon.json` no SVG, com o `actool` — custo: ~1 h, o selo ilegível a 16 e 32 px, e o tray, o dev e o Light Flame
+     fora do script; se paga: só com o `Assets.car` empacotado;
+   - o `actool` nos slots grandes e o `rsvg-convert` nos 4 pequenos — custo: ~2 h e dois caminhos; se paga: nunca, sem
+     `Assets.car`.
+
+   **Resposta:** "rsvg-convert + iconutil (Recomendado)". **Decidido.** Reabre o "com o `icon.json`" da R3.4: o
+   `icon.json` deixa de ser o caminho do ícone, e a cauda da Orca para que ele aponta vai à issue.
+
+4. **O corte da execução**, ~17–24 h. Opções:
+   - seis passos e três branches no `brza-studio` — tokens, assets, chat —, com os tokens junto do desenho do símbolo e
+     o CLI e os READMEs por último (recomendada) — custo: ~17–24 h, em três merges; se paga: nos tokens, o azul do aviso
+     tira o choque do M3 antes do chat;
+   - uma branch só, depois do símbolo aprovado — custo: o mesmo, com os tokens esperando; se paga: se um merge só valer
+     mais;
+   - o chat primeiro, com o S1 de hoje — custo: ~0,5 h a mais para refazer o M1; se paga: para ver a marca no chat antes.
+
+   **Resposta:** "Seis passos, três branches (Recomendado)". **Decidido.**
+
 ## Worklogs
 
 - 2026-10-31 — aberto; R1 gravada como chegou da sessão do `workspace`; Terreno pelo `collector`; R2 fechada, com os
   pedidos 2 e 3 da borda e da marca no chat; R3 fechada, com a issue dos restos da Orca. Parou antes do Desenho.
   [PLN-007: a abertura da marca BrzA](../../work/worklogs/2026-10-31-pln-007-a-abertura-da-marca-brza.md)
+- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 fechada. Parou antes da R5.
+  [PLN-007: o Desenho da marca BrzA](../../work/worklogs/2026-11-02-pln-007-o-desenho-da-marca-brza.md)

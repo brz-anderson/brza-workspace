@@ -14,8 +14,8 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** R4 fechada, sobre o rascunho do Desenho do `designer` (no scratch). Próximo: a R5 e a R6, com artboards
-  (o tile, o `logo.svg`, o logotipo e o símbolo no app, a borda, o botão, o anel e o M5), e a R7 (o azul no escuro e o CLI).
+- **Retomar:** R4 e R5 fechadas, sobre o rascunho do Desenho do `designer` (no scratch). Próximo: a R6, com artboards
+  (a borda, o botão, o anel e o M5), e a R7 (o azul no escuro e o CLI).
 
 ## Pedido
 
@@ -54,6 +54,9 @@ Na sessão do `brand`, no mesmo dia, durante a R2:
 - **O app mobile e os restos da Orca à vista** (R3.4). Foram à
   [issue dos restos da Orca](../../work/issues/os-restos-da-orca-a-vista-no-brza-studio.md).
 - **O cursor e a seleção em laranja no chat** (M4, R2.6). Recusado na rodada; sem destino.
+- **O `brza shot` quebrado pelo merge do upstream v1.4.246 no `brza-studio`.** Foi à
+  [issue do brza shot](../../work/issues/brza-shot-quebra-com-os-tokens-do-painel-movidos.md); o Desenho segue com uma
+  cópia corrigida no scratch.
 
 ## Entrevista
 
@@ -286,10 +289,50 @@ Respondida em 2026-11-02, na sessão do `brand`, pela ferramenta de pergunta.
 
    **Resposta:** "Seis passos, três branches (Recomendado)". **Decidido.**
 
+### Rodada 5 — o tile, o `logo.svg`, o símbolo do estado vazio e o logotipo no app (enviada 2026-11-02)
+
+**Apresentado antes:** três artboards, conferidos pelo PNG — o ícone num Dock de mentira, entre ícones na grade da
+Apple, a 64 e 96 px; a barra de título com o `logo.svg` a 16 px nos dois temas; o estado vazio com o símbolo a 48 px e
+o L2 na Geist. O tile de hoje ocupa 914 px no canvas de 1024 (`magick … -format %@` → `914x952+55+36`). A caixa cinza
+do macOS 26 para o ícone fora da grade veio de resultados de busca, sem as páginas abertas, e foi dita assim.
+
+Respondida em 2026-11-02, na sessão do `brand`.
+
+1. **A grade do tile.** Opções:
+   - T1, a grade da Apple, 824 px, o ícone ~10% menor que hoje (recomendada) — custo: nenhum a mais, no D1; se paga:
+     já;
+   - T2, a caixa de hoje, 914 px — custo: nenhum; se paga: sem caixa cinza no Dock e com o ícone maior preferido.
+
+   **Resposta:** "5.1.1". **Decidido — T1**: [a grade da Apple](PLN-007-tile-t1.png).
+
+2. **O `logo.svg`**, na barra de título, no menu de ajuda e em Configurações. Opções:
+   - G1, o S1 chapado, branco no escuro e preto no claro, sem mudar código, porque os 5 usos já invertem
+     (recomendada) — custo: ~0,25 h; se paga: já, segue o chrome monocromático da norma do app;
+   - G2, o A1 colorido, com o tile — custo: ~1 h, os 5 usos perdem o `invert` e o `opacity`, e a 16 px a ilustração
+     vira mancha; se paga: nunca, a 16 px.
+
+   **Resposta:** "5.2.2". **Decidido — G2**, contra a recomendação: [o A1 na barra de título](PLN-007-logo-svg-g2.png).
+   A 16 px entra a arte sem selo dos slots pequenos do `.icns`.
+
+3. **O símbolo do estado vazio (M1).** Opções:
+   - V1, o A1 com o tile, o mesmo do ícone e do L2 (recomendada) — custo: nenhum a mais; se paga: já;
+   - V2, o S1 no degradê, sem o tile, como o artboard do M1 da R2.6 — custo: nenhum a mais, reaproveita a chama do M2;
+     se paga: se o tile pesar no tema claro.
+
+   **Resposta:** "5.3.2". **Decidido — V2**: [o S1 no degradê](PLN-007-estado-vazio-v2.png), como o M1 foi escolhido.
+
+4. **O logotipo dentro do app** — Landing, Onboarding, M1 —, pela ferramenta. Opções:
+   - texto vivo na Geist, um componente `BrzaWordmark` com as medidas do L2 (recomendada) — custo: ~0,5 h; se paga: já,
+     segue o tema e o tamanho do texto;
+   - o SVG do lockup como imagem — custo: ~0,25 h, um arquivo por tema, sem acompanhar o texto; se paga: só fora do
+     app, no README.
+
+   **Resposta:** "Texto vivo na Geist (Recomendado)". **Decidido.**
+
 ## Worklogs
 
 - 2026-10-31 — aberto; R1 gravada como chegou da sessão do `workspace`; Terreno pelo `collector`; R2 fechada, com os
   pedidos 2 e 3 da borda e da marca no chat; R3 fechada, com a issue dos restos da Orca. Parou antes do Desenho.
   [PLN-007: a abertura da marca BrzA](../../work/worklogs/2026-10-31-pln-007-a-abertura-da-marca-brza.md)
-- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 fechada. Parou antes da R5.
+- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 e R5 fechadas. Parou antes da R6.
   [PLN-007: o Desenho da marca BrzA](../../work/worklogs/2026-11-02-pln-007-o-desenho-da-marca-brza.md)

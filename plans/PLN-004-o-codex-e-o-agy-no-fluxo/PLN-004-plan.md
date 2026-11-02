@@ -621,8 +621,13 @@ Respondida em 2026-11-02, na sessão `workspace`: "11.3.2 / 12.1.1 / 12.2.2".
    - sem mapa fixo, com o `--focus` obrigatório e quem pede escolhe — custo: nenhum agora, e o hábito pode virar sempre
      o mesmo foco; se paga: agora, até a medição mostrar qual runtime acerta qual foco.
 
-   **Decidido — medir antes**, não a recomendada. Anderson não deu o porquê. A medição ainda não rodou; o diff de
-   referência e o critério de acerto saem da sessão, e voltam a Anderson antes de gastar.
+   **Decidido — medir antes**, não a recomendada. Anderson não deu o porquê. O diff de referência e o critério de acerto
+   saíram da sessão e voltaram a Anderson antes de gastar: o diff é a entrega do PLN-005 na `master`
+   (`2e8ea67..13a291a`, 2.519 linhas em 22 arquivos), com o parecer do `reviewer` como resposta conhecida, 10 achados
+   reais e 5 hipóteses falsas, e o recall contado sobre os 7 achados que o diff permite (A5, A9 e A10 dependem do plano
+   e do log). Anderson o confirmou em 2026-11-02, "confirmo o experimento", e as 9 revisões rodaram. **As 3 do Codex
+   usaram exatamente os 100% do limite de 5 h**, na palavra de Anderson; os rollouts mostram a janela de 0% a 99% no
+   último evento, de 28 a 35 pontos por revisão. O resultado vem na rodada seguinte.
 
 ## Worklogs
 

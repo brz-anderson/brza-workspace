@@ -69,12 +69,22 @@ o dia anterior está em
 - **O desenho do experimento da 12.2**, a partir do que as revisões daqui deixaram: o diff é a entrega do PLN-005 na
   `master` (`2e8ea67..13a291a`, 2.519 linhas em 22 arquivos), e a resposta conhecida é o parecer
   `work/reviews/pln-005-a-confianca-dos-fatos.md`, com 10 achados reais e 5 hipóteses conferidas e falsas. Anderson
-  ainda não o confirmou, e nada foi gasto.
+  o confirmou ("confirmo o experimento"), e as 9 revisões rodaram em 2026-11-02, de 18:13 em diante: os três
+  braços do Claude no Opus como `general-purpose`, sem a memória do `reviewer`; os três do Codex em `gpt-6-astra` com
+  `xhigh`; e os três do `agy` em `gemini-4-argon-high`, em modo `plan`, todos sobre uma cópia do diff sem o histórico
+  posterior, em `/private/tmp/pln004/ref-pln005`.
+- **As 3 revisões do Codex usaram exatamente os 100% do limite de 5 h**, na palavra de Anderson, que viu o contador
+  do app. Os rollouts mostram a janela de 5 h em 0% quando a primeira começou (21:13:48 UTC) e em 99% no último
+  evento da terceira (21:34:19); o 100% que Anderson viu é posterior a esse evento. Por revisão: o defeito foi de 0%
+  a 31%, a convenção de 34% a 62% e a simplicidade de 64% a 99%; a janela semanal foi de 1% a 16%. Cada revisão
+  consumiu, portanto, de 28 a 35 pontos da janela de 5 h, e o experimento inteiro a esgotou: é um custo que o US$
+  equivalente não mostra, e a tabela da R12 o traz.
 
 ## O que ficou
 
-- **A confirmação do experimento**, no chat, antes de gastar ~US$ 19 a 22; depois, dividir o plano, reescrever o
-  rascunho do Desenho e mandá-lo à aprovação.
+- **A pontuação do experimento**: as 3 revisões do Codex e as 3 do Claude estão prontas, e as do `agy` terminam; a
+  tabela de acerto, falso positivo e custo por runtime e foco vai a Anderson, e só então a R12.2 se decide. Depois,
+  dividir o plano, reescrever o rascunho do Desenho e mandá-lo à aprovação.
 - **Os nomes de modelo do `agy` no rascunho**, a corrigir no Desenho: o `agy models` (1.4.12) lista
   `gemini-4-argon-{low,medium,high}`, `gemini-3.8-flash-{low,medium,high}`, `claude-opus-5-5-*`, `claude-sonnet-5-5-*` e
   `gpt-oss-120b-medium`, e nenhum `pro` nem `flash`; o mapa `opus`/`sonnet` para `pro` e `haiku` para `flash`, que veio

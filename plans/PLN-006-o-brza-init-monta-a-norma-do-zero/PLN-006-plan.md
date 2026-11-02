@@ -1,15 +1,16 @@
 ---
-status: in_progress
-phase: execution
+status: done
+phase: closed
 origin: request
 description: O brza init monta a norma num workspace do zero, e o brza-workspace a segue do brza-workflow pelo brza sync.
 ready: sim
 estimate_h: 27
-executed_h: 4
-remaining_h: 1.5
+executed_h: 5.4
+remaining_h: 0
 scope:
   - workspace
 opened: 2026-10-31
+completed: 2026-11-02
 owner: Anderson
 tags:
   - tooling
@@ -17,9 +18,8 @@ tags:
 
 # PLN-006: O `brza init` monta a norma num workspace do zero
 
-- **Retomar:** P1–P8 feitos; o `brza-workspace` é cliente do `brza-workflow@2286f31`. Falta o P9: o README do
-  `brza-workflow` e a revisão da migração; depois, o fechamento. Pontos novos vão na recomendada, pela regra de Anderson
-  após a R10.
+- **Retomar:** fechado em 2026-11-02. O `brza-workspace` segue o `brza-workflow@a313ec5` pelo `brza sync`; as sobras
+  estão em [As sobras do PLN-006 no brza-workflow e no plano](../../work/issues/as-sobras-do-pln-006.md).
 - **Dividido:** [PLN-006 — Desenho](PLN-006-design.md)
 
 ## Pedido
@@ -44,7 +44,7 @@ Respondido que não, Anderson pediu: "plano".
 | `R5.1`, `R5.3` | `brza note plan-open` numera pelo índice (maior + 1) e grava `created` na `origin/master`; dois `plan-open` em corrida saem com números diferentes                                                 | P4     | unidade, com remote bare local                        |
 | `R5.3`, `R7.4` | `brza note commit` de plano, issue ou decisão com frontmatter mudado acrescenta uma linha `changed` na `origin/master` sem tocar o checkout principal; sem mudança, nenhuma linha                  | P4     | unidade                                               |
 | `R5.2`         | Duas linhas acrescentadas em paralelo se juntam pelo `merge=union`, e o estado vigente de cada id é o de maior `ts`                                                                                | P4     | unidade                                               |
-| `R5.1`         | Depois da migração, o índice traz PLN-001 a PLN-006, as issues e as decisões de todos os workstreams                                                                                              | P8     | `brza note index --rebuild` e a contagem (manual)     |
+| `R5.1`         | Depois da migração, o índice traz todos os planos (PLN-001 a PLN-007, A10), issues e decisões de todos os workstreams                                                                                             | P8     | `brza note index --rebuild` e a contagem (manual)     |
 | `R6.2`         | Com um arquivo do núcleo editado no workspace, o `brza sync` não o escreve, mostra o diff e sai com 1; `--force <caminho>` o escreve e atualiza o lock                                             | P6     | unidade                                               |
 
 ### Fora de escopo
@@ -817,10 +817,17 @@ Estimado: 3 h · Executado: 1,2 h
 
 Executa todos · executor: `reviewer`; o README pela sessão
 
-Estimado: 1,5 h · Executado: — h
+Estimado: 1,5 h · Executado: 1,4 h
 
-- [ ] **1. A revisão**, com o parecer em `work/reviews/pln-006-o-brza-init.md`
-- [ ] **2. Cada achado com destino**
+- [x] **1. A revisão**, com o parecer em `work/reviews/pln-006-o-brza-init.md`
+- [x] **2. Cada achado com destino**
+
+**Evidência:** duas revisões em vez de uma — a do `brza-workflow` antes da migração e a da migração depois dela (X29),
+nos pareceres de `## Revisões`, com os 19 achados corrigidos e os 9 falsos derrubados · os consertos em
+`brza-workflow@2286f31` e `@a313ec5` e em `brza-workspace@f12fdd4` · na `master` do `brza-workflow` em `a313ec5`:
+`tests/cli` → 413 OK, `tests/hooks` → 287 OK, e no `/usr/bin/python3` 3.9.6 → 287 OK, 5 skips, o checador → saída 0 ·
+o sync da norma nova no `brza-workspace` → `afc3859`, com o merge nos quatro workstreams; de um repositório alheio,
+com a `BRZA_WORKSPACE`, o `brza sync` recusa e diz os dois caminhos · o README do `brza-workflow` em `@6d6ad2f`.
 
 ## Regressão
 
@@ -892,6 +899,9 @@ Estimado: 1,5 h · Executado: — h
   sync tira do `AGENTS.md` e do `CLAUDE.md`** (a lista dos workstreams, com o `brand`; a chave `personal` e o `gh`; o
   `skill-creator` do `workspace`), para nada sumir; o D12 só citava o manifesto, as rules, o `.gitattributes` e o
   índice.
+- **X29 — O P9 teve duas revisões, e não uma**: a do `brza-workflow` antes da migração, que achou o A1 do PLN-005 que
+  o sync desfaria, e a da migração depois dela. Escolha da sessão, pela regra da recomendada; a primeira poupou o P8 de
+  desfazer trabalho alheio.
 - **X26 — Sobrou um nome pessoal no CLI do núcleo**: o molde de issue do `bin/brza-note:117` diz "O pedido de Anderson".
   O `bin/` não é renderizado; vai à revisão do P9.
 
@@ -918,3 +928,35 @@ Estimado: 1,5 h · Executado: — h
 - 2026-11-02 — R17 respondida; a proposta do índice decidida; o P8 começa pelo porte do PLN-005, com a revisão do
   `brza-workflow` (P9) em paralelo.
   [PLN-006: a migração do brza-workspace](../../work/worklogs/2026-11-02-pln-006-a-migracao-do-brza-workspace.md)
+- 2026-11-02 — P8 e P9 feitos: a migração em nove estágios, as duas revisões e os consertos; o incidente do `fa4152f`,
+  desfeito por Anderson. Fechado.
+  [PLN-006: a migração do brza-workspace](../../work/worklogs/2026-11-02-pln-006-a-migracao-do-brza-workspace.md)
+
+## Pendências conhecidas
+
+- [As sobras do PLN-006 no brza-workflow e no plano](../../work/issues/as-sobras-do-pln-006.md) — seis pendências
+  deixadas para depois pelas rodadas, nenhuma travando o uso de hoje.
+- [O coordenador se baseia no índice de notas da master](../../work/issues/o-coordenador-le-o-indice-da-master.md) —
+  de R5.4; o índice que ele lê já existe.
+
+## Documentação
+
+- `brz-anderson/brza-workflow`: o repositório novo, com o núcleo, o CLI, os moldes, o pacote do cliente, os testes e o
+  README (`@6d6ad2f`), criado em P1.
+- A norma do `brza-workspace`, na `master`: o `AGENTS.md`, o `CLAUDE.md`, o `work/README.md`, o `plans/README.md` e a
+  `plan-runner`, que agora chegam pelo `brza sync` (`a45018c`, `afc3859`); o README local e a
+  `.claude/rules/workspace.md` (`2e6ea1d`, `f12fdd4`), em P8 e P9.
+
+## Fechamento
+
+- [x] Todo passo `[x]` com evidência, ou `[-]` com motivo.
+- [x] Todo achado com destino que existe: os 19 corrigidos, e os 9 falsos com o porquê, nos dois pareceres.
+- [x] Trabalho só em notas, no `brza-workspace` e no `brza-workflow`, sem pull request do `brza-studio`: não há
+      resumo de PR.
+- [x] O durável saiu para a casa dona e está em `## Decisões` e `## Documentação`: a decisão do índice em
+      `work/decisions/`, a norma comum no `brza-workflow`, a local no `brza-workspace`.
+- [x] As decisões que o plano respondeu estão `done`, citando a rodada.
+- [x] `status: done`, `phase: closed` e `completed` no frontmatter.
+
+A Janela não houve. O plano estimou 27 h e executou 5,4 h, numa execução quase toda delegada a subagentes, com 31
+escolhas e mais 4 do fechamento decididas pela regra da recomendada.

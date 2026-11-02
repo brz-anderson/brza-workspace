@@ -16,7 +16,13 @@ tags:
 
 # PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat
 
-- **Retomar:** o pedido 31 entrou em 2026-10-29, com a R48 e a R49, o D45 ao D47 e o P58 ao P61, e o pedido 32 no
+- **Retomar:** em 2026-11-02, o PLN-001 espera o merge da `v1.4.246` do upstream, que a sessão `studio-75` faz no
+  worktree `.worktrees/sync-v1.4.246` do `brza-studio`, a partir de `abc5e78c243`. Até o merge chegar à `master`, nenhum
+  passo de código do PLN-001 roda no `brza-studio`. Só esta sessão grava no PLN-001: a do merge manda o commit, a rodada
+  dela com as respostas literais, os desvios e os testes, e fica com o worklog do sync. A rodada de lá, respondida por
+  Anderson em 2026-11-02, tira o P40 ("Fica o do upstream (Recomendado)", o `NativeChatUsageLimitActions` do #31241) e
+  mantém o P36 ("Mantém o P36 (Recomendado)"); o P40 e o C14 viram `[-]` quando o merge chegar. Os casos manuais e o P57,
+  o P61 e o P65 vão ao build do merge. Antes: o pedido 31 entrou em 2026-10-29, com a R48 e a R49, o D45 ao D47 e o P58 ao P61, e o pedido 32 no
   mesmo dia, com a R50 e a R51, o D48 ao D50 e o P62 ao P65. O P58 fechou em `brza-studio@9c7fcdebbb0`, com o
   resolvedor `resolveNativeChatTheme` em `src/shared/native-chat-theme.ts`, o P60 em `brza-studio@a44e84add32`, com a
   R53 e os X38 ao X40, e o P59 em `brza-studio@697ee59c0bf`, com os X41 ao X44: o pedido 31 espera só o P61 e o C15
@@ -3086,6 +3092,8 @@ da linha quando o teste entra.
 - 2026-10-31 — [O P71 do PLN-001, o expandir em todo bloco e a prévia do Markdown](../../work/worklogs/2026-10-31-pln-001-p71-expandir-e-previa-do-markdown.md):
   o P71 em `brza-studio@abc5e78c243`, com os X61 ao X64; o C24 espera o build do C22, com Anderson.
 
+- 2026-11-02 — [O PLN-001 e o merge da v1.4.246 do upstream](../../work/worklogs/2026-11-02-pln-001-coordenacao-com-o-sync-v1-4-246.md):
+  o acordo com a sessão `studio-75`, sem código; o PLN-001 espera o merge.
 ## Decisões
 
 Notas de decisão do workspace da Fixfy, ao lado deste clone:

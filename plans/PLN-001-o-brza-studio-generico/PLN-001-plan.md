@@ -2950,20 +2950,48 @@ Agora (R65.1).
 
 Executa D58 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-39-credenciais`
 
-Estimado: 6 h · Executado: 0 h
+Estimado: 6 h · Executado: 2,5 h
 
 Agora (R65.2).
 
-- [ ] **1.** Os "A conferir no passo" do D58, lidos no código antes de escrever: a lista completa dos stores que usam
+- [x] **1.** Os "A conferir no passo" do D58, lidos no código antes de escrever: a lista completa dos stores que usam
       `getOrcaDir()` para credencial, e o que é hook ou estado e fica em `~/.orca`
-- [ ] **2.** Testes que falham: cada store de credencial grava e lê na pasta nova, e não lê nem apaga o arquivo da
+- [x] **2.** Testes que falham: cada store de credencial grava e lê na pasta nova, e não lê nem apaga o arquivo da
       `~/.orca`; o hook de agente segue em `~/.orca`
-- [ ] **3.** A constante em `brand-identity.ts` e os stores, sem migração que leia o arquivo cifrado do Orca (a chave é
+- [x] **3.** A constante em `brand-identity.ts` e os stores, sem migração que leia o arquivo cifrado do Orca (a chave é
       outra); o usuário reconecta
-- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C28
 
-**Evidência:** (a preencher)
+**Evidência:** commit [`f7490afab9e`](https://github.com/brz-anderson/brza-studio/commit/f7490afab9e), na `master` do
+`brza-studio`, pela sessão do `brza-studio` no worktree `.worktrees/pln-001-pedido-39-credenciais`, com o push direto
+(`ecc4a13d456..f7490afab9e`, depois do rebase na `origin/master`). Os "A conferir no passo" do D58, lidos no código
+antes de escrever, sustentaram o desenho: 7 stores em 8 arquivos montavam `join(homedir(), '.orca')` para credencial
+(Jira `site-credential-store.ts`, Linear `linear-credential-paths.ts`, Bitbucket `credential-store.ts`, OpenAI speech
+`openai-api-key-store.ts`, MiniMax `minimax-cookie-store.ts`, zcode `zcode-plan-api-key-store.ts`, e a fábrica
+`encrypted-api-key-file-store.ts`, que serve a chave do MiniMax e a do OpenCode Go); a migração do orcad
+(`orcad-plaintext-credential-migration.ts`) só deriva os caminhos desses stores, então acompanha. O `jira-sites.json`,
+o `linear-workspaces.json`, o `linear-viewer.json` e o `bitbucket-credential.json` são metadado do mesmo store e foram
+com ele: se ficassem em `~/.orca`, o BrzA listaria os sites do Orca sem token, e o "desconectar" mexeria nos dois. Os
+hooks (`agent-hooks`, `keybindings.json`, `claude-agent-teams-bin`, `host-settings`) e a raiz da chave do orcad
+(`orcadCredentialRoot`) seguem em `~/.orca`. O `~/.brza` não existia na máquina e não colide com o `brza` do PATH (que
+é o CLI do app). A pasta vem do `homedir()`, como a de antes, sem relação com `userData` nem com o
+`ORCA_USER_DATA_PATH`, que o CLI e o shell usam para achar os dados e que as credenciais nunca leram. A constante `BRAND_CREDENTIALS_DIR_NAME` ficou em `brand-identity.ts`, e
+o `getIntegrationCredentialsDir()` num arquivo novo, `credentials/integration-credentials-dir.ts`, que os 7 stores usam
+no lugar dos 8 `getOrcaDir()` locais (os `ensureOrcaDir` viraram `ensureCredentialsDir`). Sem migração: o arquivo do
+Orca tem outra chave, e o usuário reconecta. Antes do código: os 12 testes de store que já existiam, com o caminho
+esperado trocado para `.brza`, e o novo `integration-credentials-location.test.ts` (semeia um `~/.orca` com um arquivo
+de cada store) → falhavam: o Jira lia o site do Orca e o `~/.brza` não era criado. Depois: o novo teste prova que
+nenhum store lê o `~/.orca`, que os 9 arquivos nascem em `~/.brza` e que, depois de limpar todos, o `~/.orca` está
+byte a byte como estava; os testes de `credentials`, `jira`, `linear`, `bitbucket`, `speech`, `minimax`,
+`opencode-go-api-key-store`, `zcode-plan*` e a migração do orcad → 79 arquivos, 641 passed, 3 skipped; os hooks de
+agente não mudaram, e os testes deles seguem esperando `~/.orca`. `pnpm tc` → exit 0 antes do rebase, e o `pnpm tc:node`
+depois; `pnpm check:code-quality:changed origin/master` → passou (25 arquivos); o `pnpm check:changed
+--base=origin/master --maxWorkers=2` passou nos 28 passos que terminaram, e o passo de testes de unidade, que `brand-identity.ts`
+espalha por quase tudo, não terminou em 29 min e foi interrompido (X73). No único `orcad-forked-child-paths.test.ts`,
+4 testes falham por `/tmp` contra `/private/tmp` no sandbox, e não importam nenhum arquivo tocado. Suíte inteira: roda no
+merge, pela coordenação. Não rodei o app, não li nenhum `.enc` nem toquei em `~/.orca`, no Keychain nem no perfil real:
+os testes usam diretório temporário. A conferência é o C28, de Anderson, num build novo.
 
 ### P76 — O atualizador desligado no build ad hoc (pedido 39)
 
@@ -3340,6 +3368,18 @@ da linha quando o teste entra.
 - **X70 — O modo do Monaco saiu do `useMonacoTheme` para um hook `useMonacoDark`, e o `markdownSurfaceTheme` ganhou o
   terceiro parâmetro `monacoDark`.** O D60 dizia "compara com o modo do Monaco"; reusar o cálculo do `use-monaco-theme.ts`
   (a base do tema de editor, senão o modo pintado) evita uma cópia. Afeta P77.
+- **X71 — A raiz da chave do orcad fica em `~/.orca`, e o orcad remoto também grava as credenciais em `~/.brza`.** O D58
+  lista só os stores de credencial; o `orcadCredentialRoot()` guarda a chave do servidor, e não uma credencial de
+  integração, e a chave compartilhada com o Orca não impede nada. Como os stores são o mesmo código, o orcad do BrzA numa
+  máquina remota também passa a gravar Jira, Linear e as chaves em `~/.brza` de lá, e a migração do orcad sela os
+  arquivos do caminho novo. Afeta P75.
+- **X72 — A frase do diálogo da chave do OpenAI trocou `~/.orca` por `~/.brza` nas 11 línguas.** O D58 não falava do
+  texto; mantê-lo diria uma pasta errada ao usuário. A chave do i18n (`d246b2bdb3`) não depende do texto, então o
+  `OpenAiTranscriptionKeyDialog.tsx` e as 11 linhas dos catálogos mudaram só no caminho. Afeta P75.
+- **X73 — O `check:changed` não terminou o passo de testes de unidade; rodei os arquivos por caminho.** O
+  `brand-identity.ts` é importado por quase todo o `src/main`, e o passo ficou 29 min com a máquina cheia e foi
+  interrompido. Pela regra de Anderson (a suíte inteira roda no merge, pela coordenação), rodei os diretórios dos stores
+  por caminho, o `pnpm tc` e o `pnpm check:code-quality:changed`. Afeta P75.
 
 ## Worklogs
 
@@ -3471,6 +3511,8 @@ da linha quando o teste entra.
   o P73 em `brza-studio@563705a7aaf`, com os X65 e X66; o C26 espera o build do C22, com Anderson.
 - 2026-11-02 — [O P78 do PLN-001, o fundo do texto no bloco de código e o botão de copiar do visualizador de Markdown](../../work/worklogs/2026-11-02-pln-001-pedido-40-fundo-do-codigo-e-botao-copiar.md):
   o pedido 40, com a R66, o D61 e o P78 em `brza-studio@2738100d3f5`; o C31 espera o build, com Anderson.
+- 2026-11-02 — [O P75 do PLN-001, as credenciais de integração do BrzA numa pasta própria](../../work/worklogs/2026-11-02-pln-001-p75-credenciais-numa-pasta-propria.md):
+  o P75 em `brza-studio@f7490afab9e`, com os X71 ao X73; o C28 espera o build do C22, com Anderson.
 - 2026-11-02 — [O PLN-001 e o merge da v1.4.246 do upstream](../../work/worklogs/2026-11-02-pln-001-coordenacao-com-o-sync-v1-4-246.md):
   o acordo com a sessão `studio-75`, sem código; o PLN-001 espera o merge.
 

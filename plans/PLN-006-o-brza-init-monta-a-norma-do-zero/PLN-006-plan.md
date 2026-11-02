@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 27
-executed_h: 2.8
-remaining_h: 4.5
+executed_h: 4
+remaining_h: 1.5
 scope:
   - workspace
 opened: 2026-10-31
@@ -16,9 +16,9 @@ tags:
 
 # PLN-006: O `brza init` monta a norma num workspace do zero
 
-- **Retomar:** P1–P7 feitos (`brza-workflow@b9210a6`). Em curso, pela R17: o P8, começando pelo porte do PLN-005 em
-  `.worktrees/p8-porte` do `brza-workflow`, e a revisão do `reviewer` sobre o `brza-workflow` (parte do P9). Pontos
-  novos vão na recomendada, pela regra de Anderson após a R10.
+- **Retomar:** P1–P8 feitos; o `brza-workspace` é cliente do `brza-workflow@2286f31`. Falta o P9: o README do
+  `brza-workflow` e a revisão da migração; depois, o fechamento. Pontos novos vão na recomendada, pela regra de Anderson
+  após a R10.
 - **Dividido:** [PLN-006 — Desenho](PLN-006-design.md)
 
 ## Pedido
@@ -783,14 +783,34 @@ mas a rodada vermelha não foi capturada.
 
 Executa D12, D10 · executor: a sessão do `workspace`
 
-Estimado: 3 h · Executado: — h
+Estimado: 3 h · Executado: 1,2 h
 
-- [ ] **1. Estágio 1**: o manifesto, as rules e o índice, povoado pelo `index --rebuild`, entram; os scripts de hoje os
+- [x] **1. Estágio 1**: o manifesto, as rules e o índice, povoado pelo `index --rebuild`, entram; os scripts de hoje os
   ignoram
-- [ ] **2. Estágio 2**: o `brza sync --dry-run` mostra só a lista fechada do D12
-- [ ] **3. Estágio 3**: o `brza register`, o relink do `~/.local/bin` e o bloco do `~/.zshrc`, ao worklog em "Fora do
+- [x] **2. Estágio 2**: o `brza sync --dry-run` mostra só a lista fechada do D12
+- [x] **3. Estágio 3**: o `brza register`, o relink do `~/.local/bin` e o bloco do `~/.zshrc`, ao worklog em "Fora do
   workspace"; o sync real
-- [ ] **4. Conferir** a Regressão inteira
+- [x] **4. Conferir** a Regressão inteira
+
+**Evidência**, na ordem do D12:
+- **1:** `brza-workspace@2e6ea1d` (manifesto, com o `[checker]` do A2, a `.claude/rules/workspace.md`, o
+  `.gitattributes` e o README com o `brand` e a chave de acesso); o índice `@1fd3be0`, 29 linhas — PLN-001 a PLN-007,
+  17 issues e 5 decisões de `brand`, `studio`, `tools-kit` e `workspace` (A10).
+- **2:** `brza-register` → `~/.config/brza/workspaces.toml`; o `brza-where` dá `notes` no worktree e `code` no
+  `brza-studio`.
+- **3:** `brza-sync --dry-run --core-only` → saída 0, 18 escritos e 2 apagados (o `resume_guard`), sem o `fact_audit.py`
+  (A1) nem o `settings.json`; os `.py` conferidos à mão.
+- **4:** o `index --rebuild` de novo → "em dia".
+- **5:** `brza-install --all --client --relink` e `--chat-command --relink`; o `brza doctor` → `ok` em identidade,
+  medição, links (16), registro e chat. O `--local` foi para depois do 6 (X27).
+- **6:** `brza sync --core-only` → `brza-workspace@a45018c` (`brza-workflow@2286f31`); `@bbe723b` tira de
+  `scripts/brza/` o que foi ao núcleo e os testes antigos, e troca o cabeçalho dos cinco scripts locais (A3) →
+  `python3 -m unittest discover -s scripts/brza/tests` → 94 OK, e os cinco `--help` sobem; o `--local` → nada a trocar.
+- **7:** `brza note sync` → `brand`, `studio`, `tools-kit` e `workspace` mesclados e enviados.
+- **8:** o `~/.zshrc` passa a `source` do `packages/client/shell/brza.zsh` e a `brza_claude_fallback` à Fixfy;
+  `zsh -n` ok, e a `claude` roteia: `--agents` no `brza-studio`, `--settings` no worktree, a Fixfy fora.
+- **9:** a trava do `/compact` com a memória suja → `decision: block` e a linha `guard` com `workstream: workspace`;
+  os turnos novos gravam o `workstream`; a linha `changed` do índice sai deste commit do plano.
 
 ### P9 — A revisão adversária e o README do `brza-workflow`
 
@@ -865,6 +885,12 @@ Estimado: 1,5 h · Executado: — h
   `brza-workspace`, `brza-studio`, `Anderson`, `brz-anderson`, `Fixfy` —, salvo o que o manifesto traz.
 - **X25 — O `brza init` ganhou `--code-github`**, e grava o checkout principal quando o `--code` é um worktree; com o
   `brza-workflow` em detached, o `core.ref` cai no `master`.
+- **X27 — O `--local` vem depois do estágio 6, e não no 5**: antes de o 6 tirar de `scripts/brza/` o que foi ao
+  núcleo, ele religaria o `brza-note` e o `brza-install` de lá, desfazendo o `--all`. Pela regra da recomendada.
+- **X28 — Entraram na `master` do `brza-workspace`, no estágio 1, o README e a `.claude/rules/workspace.md` com o que o
+  sync tira do `AGENTS.md` e do `CLAUDE.md`** (a lista dos workstreams, com o `brand`; a chave `personal` e o `gh`; o
+  `skill-creator` do `workspace`), para nada sumir; o D12 só citava o manifesto, as rules, o `.gitattributes` e o
+  índice.
 - **X26 — Sobrou um nome pessoal no CLI do núcleo**: o molde de issue do `bin/brza-note:117` diz "O pedido de Anderson".
   O `bin/` não é renderizado; vai à revisão do P9.
 

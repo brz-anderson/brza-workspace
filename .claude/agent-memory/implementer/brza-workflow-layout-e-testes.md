@@ -84,3 +84,12 @@ metadata:
   (o `measure.py` do núcleo o importa do mesmo diretório). `"master"` literal em código portado vira
   `brza_root.workspace_branch(find(cwd).manifest)` (via `measure.brza_root`); prove por manifesto com `branch = "norma"`.
   Em 2026-11-02: hooks 282 (5 skips no 3.9), cli 372 (~150 s), notes-checker ok.
+
+- **P9-fix (achados da revisão, `.worktrees/p9-fix`):** `NoteFixture` ganhou `BRANCH`/`REMOTE`/`OWNER` (subclasse com `main`/`up`
+  grava o manifesto por `dump_manifest(with_defaults(...))` e usa `clone -o` + `checkout -B`); `test_brza_note_index.py` agora tem
+  `IndexFixture` (setUp + ajudantes) e `IndexTest`/`IndexRepairTest` por cima: **subclasse de `IndexTest` reroda os testes dele**
+  (cada um leva ~2 s). O `brza-note` não tem mais `INDEX_BRANCH`: `remote_and_branch()` vale para o índice e o `push -u`.
+  Texto do app (`orca`, `ORCA`) é termo de fora no núcleo e nos moldes, mas o pacote `client` pode nomeá-lo: o `brza-init` passa
+  `package_files(...)` (por `SYNC['ls_tree']`) à conferência. A fumaça do init copia `core/ packages/ templates/` para um flow de
+  mentira **commitado**, porque o sync lê commits e não a árvore de trabalho. Em 2026-11-02: cli 395 (150 a 440 s conforme a carga, rode em
+  background e espere um arquivo-marca), hooks 283 (5 skips no 3.9).

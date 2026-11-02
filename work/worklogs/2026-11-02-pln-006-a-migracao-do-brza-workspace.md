@@ -22,6 +22,29 @@ a sessão não o tomou por resposta.
 - O porte, ao núcleo, dos dois commits que a `master` do `brza-workspace` ganhou depois da cópia do P1: `2c9a546` e
   `cfa058e`, do PLN-005, em oito arquivos.
 
+## A revisão e os consertos
+
+O `reviewer` achou 11 defeitos e derrubou 5 hipóteses de dano, em
+[REV: o `brza-workflow` dos passos P1–P7 do PLN-006, em `b9210a6`](../reviews/pln-006-o-brza-init.md). Pela regra
+da recomendada, o porte fechou o A1 (`brza-workflow@ebeb779`), um `implementer` consertou A4–A9 e A11
+(`@2286f31`), e a migração fechou A2, A3 e A10.
+
+## A migração
+
+Os nove estágios do D12 rodaram nesta sessão, com a evidência no P8 do plano. Duas mudanças de ordem:
+- **X27:** o `--local` foi para depois de os scripts movidos saírem de `scripts/brza/`, que ele religaria.
+- **X28:** o README e a `.claude/rules/workspace.md` receberam antes o que o sync tira do `AGENTS.md` e do `CLAUDE.md`.
+
+Na `master` do `brza-workspace`, a migração deixou cinco commits:
+- `2e6ea1d`: o manifesto e as regras;
+- `1fd3be0`: o índice, com 29 linhas;
+- `a45018c`: o sync;
+- `bbe723b`: os scripts e os testes;
+- o merge nos quatro workstreams.
+
+Sobraram dois `hook_error` na medição, das 12:59. São das sondas da trava do `/compact` que rodei sem o modo `pre`, e
+não da trava em uso.
+
 ## Fora do workspace
 
 - **O quê e onde:** `brew upgrade python@3.14` (3.14.7 → 3.14.10), em `/opt/homebrew`. **Risco:** baixo.
@@ -44,3 +67,21 @@ a sessão não o tomou por resposta.
   `/usr/local/bin` ao 3.14.
 - **Sem mudança:** o `/usr/bin/python3` do sistema é o 3.9.6 do Xcode (`xcode-select -p`), protegido pelo SIP; só muda
   com o Xcode ou as Command Line Tools.
+- **O quê e onde:** o `~/.config/brza/workspaces.toml`, criado pelo `brza-register`, com o par
+  `~/Projects/brza-workspace` → `~/Projects/brza-studio` (PLN-006/P8, estágio 2). **Risco:** sem ele, o `claude-brza`
+  e a função `claude` no `brza-studio` sobem sem hooks nem identidade (X16). **Estado:** ativo. **Como desfazer:** apagar
+  o arquivo, depois de desfazer os dois itens seguintes.
+- **O quê e onde:** os links de `~/.local/bin` (estágio 5): `brza-note`, `brza-install`, `brza-agents` e os novos
+  `brza-init`, `brza-sync`, `brza-register` e `brza-where` passam ao `~/Projects/brza-workflow/bin/`;
+  `brza-sessions`, `brza-run`, `brza-doctor`, `brza-print` e `claude-brza`, ao `packages/client/bin/` de lá; `brza-app`,
+  `brza-dev`, `brza-shot`, `brza-test` e `brza-tree` seguem no `scripts/brza/` do `brza-workspace`. O
+  `agentCmdOverrides.claude` do app segue no `~/.local/bin/claude-brza`. **Risco:** toda sessão nova, do terminal ou
+  do chat, roda o CLI do `brza-workflow`; um defeito dele chega a todas. **Estado:** ativo; o `brza doctor` dá `ok`.
+  **Como desfazer:** a lista de antes está em `/private/tmp/pln006/links-antes.txt`; refazer cada um com `ln -sfn`
+  ao `scripts/brza/` do `brza-workspace` num checkout em `a45018c`, o último commit antes de os scripts saírem de lá.
+- **O quê e onde:** o `~/.zshrc`, onde as linhas 51–80 (as `BRZA_WORKSPACE` e `BRZA_STUDIO`, a `brza_where`, a
+  `brza_claude` e a `claude`) dão lugar ao `source "$HOME/Projects/brza-workflow/packages/client/shell/brza.zsh"` e a
+  uma `brza_claude_fallback` que chama a `fixfy_claude` (estágio 8). As `adm-claude` e `claude-adm` ficam. **Risco:**
+  sem o checkout do `brza-workflow`, o `source` falha e a `claude` cai na de verdade, sem a Fixfy. **Estado:** ativo;
+  `zsh -n` ok, e a `claude` roteia nos três casos. **Como desfazer:** a cópia de antes está em
+  `/private/tmp/pln006/zshrc-antes`, e o bloco antigo também no README do `brza-workspace` em `d85c783`.

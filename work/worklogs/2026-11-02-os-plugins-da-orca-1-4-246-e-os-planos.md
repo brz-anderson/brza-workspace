@@ -15,9 +15,10 @@ menu "+" do app.
 O seletor (`AgentLaunchPickerMenu.tsx`) e o menu antigo de linhas (`QuickLaunchButton.tsx`) passaram a omitir o agente sem
 nenhuma superfície e com linha `chat-unavailable` de motivo `not-installed`; os outros motivos (SSH, WSL, falha de
 verificação) seguem à vista. Teste novo `AgentLaunchPickerMenu.not-installed.test.tsx`, que falhou antes e passa depois; o
-`pnpm check:changed --base=master --force` passou nos 24 checks. **Está no worktree
-`~/Projects/brza-studio/.worktrees/hide-uninstalled-agents` (branch `feat/hide-uninstalled-agents`), sem commit.** Não vai ao
-app instalado sem merge e novo build. A tela de instalar skill (`SkillInstallAgentPicker`) também diz "Not installed" e ficou
+`pnpm check:changed --base=master --force` passou nos 24 checks. **Commitada e mergeada por fast-forward na `master` do `brza-studio` como `7cb41bbd5c4`**, por pedido de Anderson, depois de
+um rebase sobre o `d3d636f` (outra sessão avançou a `master` no meio). Os 107 arquivos de teste de `agent/` e `tab-bar/`
+passaram de novo depois do rebase. **Sem push:** a `master` local está 1 commit à frente do origin. Não está no app
+instalado: falta um build novo. O worktree e a branch foram removidos. A tela de instalar skill (`SkillInstallAgentPicker`) também diz "Not installed" e ficou
 como está.
 
 ## O levantamento dos plugins
@@ -52,7 +53,8 @@ Rodada respondida por Anderson em 2026-11-02:
 
 ## Pendente
 
-- Commit e merge de `feat/hide-uninstalled-agents` e um build novo, se Anderson quiser o menu sem os não instalados.
+- O push do `7cb41bb` e um build novo, se Anderson quiser o menu sem os não instalados no app. A tag `v1.4.246-alpha.1` segue em
+  `6d47623`, sem esta mudança.
 - Anderson decide o que fazer com as chamadas a `onorca.dev` e com os catálogos da `stablyai`.
 - A sessão `pln-003-plugins` atualiza o Terreno e o C5 do PLN-003.
 
@@ -60,6 +62,6 @@ Rodada respondida por Anderson em 2026-11-02:
 
 - **A sessão `pln-003-plugins`** aberta pelo `brza sessions` no worktree `tools-kit`; **estado:** ativa; **como desfazer:**
   `brza sessions close pln-003-plugins`.
-- **O worktree `~/Projects/brza-studio/.worktrees/hide-uninstalled-agents`** e a branch `feat/hide-uninstalled-agents`, com a
-  mudança sem commit; **como desfazer:** `git worktree remove --force` e `git branch -D`.
+- **O commit `7cb41bb` na `master` do `brza-studio`**, só local; **como desfazer:** `git reset --hard d3d636f`, antes do push. O
+  worktree e a branch da mudança foram removidos.
 - **`git fetch upstream --tags --prune`** no `brza-studio`: atualizou `upstream/main` (leitura, só refs remotas).

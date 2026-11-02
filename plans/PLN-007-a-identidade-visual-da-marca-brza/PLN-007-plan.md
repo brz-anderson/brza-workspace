@@ -365,7 +365,8 @@ Estimado: 1,5 h · Executado: 0,75 h
   cauda do `icon.json` e os nomes `orca-*`.
 - [O brza sessions abre na conta ativa do app](../../work/issues/o-brza-sessions-abre-na-conta-ativa-do-app.md).
 - **Os casos manuais C1 a C8, no app**, com Anderson, no DMG final.
-- **O push do commit `6d47623` e da tag `v1.4.246-alpha.1`** ao origin do `brza-studio`, que espera a conferência de Anderson.
+- **O push da tag `v1.4.246-alpha.1`** ao origin do `brza-studio`, que espera a conferência de Anderson. O commit `6d47623` já está
+  no origin: outra sessão deu o push da `master` em 2026-11-02, junto do `d3d636f`; a tag segue só local.
 
 ## Casos manuais
 

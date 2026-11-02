@@ -14,11 +14,12 @@ tags:
 
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** a R1 a R10 fecharam e a R11 só espera a 11.3, a auditoria de fatos, medida e reapresentada; o código
+- **Retomar:** a R1 a R12 fecharam, menos a medição que a 12.2 mandou fazer antes de escolher qual foco vai a qual
+  runtime: o desenho do experimento (9 revisões do PLN-005, ~US$ 19 a 20) espera a confirmação de Anderson; o código
   passa ao `brza-workflow`, executado pela sessão `workspace`, com o pacote `packages/runtimes`. O rascunho do Desenho
-  (`pln-004-design-rascunho.md`, D1 a D14, no scratch) ainda conta com tudo no `brza-workspace`; o próximo é a R12, o
-  foco da revisão, depois dividir o plano em `-plan` e `-interview`, reescrever o rascunho e mandá-lo à aprovação, na
-  mensagem, antes de gravá-lo em `PLN-004-design.md`.
+  (`pln-004-design-rascunho.md`, D1 a D14, no scratch) ainda conta com tudo no `brza-workspace`; depois da medição,
+  dividir o plano em `-plan` e `-interview`, reescrever o rascunho e mandá-lo à aprovação, na mensagem, antes de
+  gravá-lo em `PLN-004-design.md`.
 
 ## Pedido
 
@@ -563,8 +564,19 @@ Respondida em 2026-11-02, na sessão `workspace`: "11.3 meça a opção 2, resta
 
    **Decidido — "Um arquivo do pacote `runtimes` (Recomendado)".**
 
-3. **O que fazer com a auditoria de fatos nos papéis do Codex e do `agy`.** **Resposta:** "meça a opção 2". Medido em
-   2026-11-02, e reapresentada com as medições; **segue aberta**. O que a medição achou:
+3. **O que fazer com a auditoria de fatos nos papéis do Codex e do `agy`.** Opções, na ordem em que voltaram com as
+   medições:
+   - auditar o que o `brza delegate` devolve, com uma entrada nova do `fact_audit.py` e o mesmo `run` do Haiku, sem hook
+     (recomendada) — custo: ~40 linhas e testes, ~US$ 0,10 por devolução; se paga: na primeira delegação de
+     levantamento; cobre o caminho da R3.4, não a sessão interativa;
+   - hooks nos dois runtimes — `SubagentStop` no Codex e `Stop` no `agy`, filtrando pela marca, só `lido` e `doc` —:
+     custo: ~140 linhas, ~8 testes, 1 a 2 hooks a mais por runtime para confiar em `/hooks` em cada worktree, e US$
+     0,0043 por fato; se paga: quando sessões interativas de Codex ou `agy` fizerem desenho e levantamento em volume;
+   - aceitar o limite, com uma linha no bloco do papel gerado — custo: nenhum código; se paga: agora.
+
+   **Resposta:** primeiro "meça a opção 2"; depois da medição, "11.3.2". **Decidido — hooks nos dois runtimes**, não a
+   recomendada: `SubagentStop` no Codex e `Stop` no `agy`, só `lido` e `doc`. Anderson não deu o porquê. A opção de
+   auditar o `brza delegate` nasceu da medição e ficou de fora. O que a medição achou:
    - **O custo da auditoria:** US$ 1,03 em 8 auditorias para 238 fatos, ou **US$ 0,0043 por fato**, com mediana de 134 s
      em segundo plano (`.measurements/measurements.jsonl`, eventos `fact_audit`); com ~24 fatos auditáveis por devolução
      (240 em 10 capturas), **~US$ 0,10 por devolução**. O auditor é o Haiku do `claude -p`: não muda com o runtime.
@@ -578,6 +590,40 @@ Respondida em 2026-11-02, na sessão `workspace`: "11.3 meça a opção 2, resta
    - **Estimativa, não medida:** ~140 linhas e ~8 testes para os dois adaptadores de captura (o `stop` tem 40 linhas; o
      `codex()` e o `agy()` do `measure.py` da Fixfy, 48 e 33).
 
+### Rodada 12 — o foco da revisão (enviada 2026-11-02, no chat)
+
+**Apresentado antes:** a Fixfy parte o diff de uma entrega em três revisores isolados, com o mesmo escopo e a mesma
+régua, cada um só relatando o que cai no foco dele — simplicidade, defeito ou convenção
+(`~/Projects/fixfy/fixfy-plugin/skills/review-writer/references/review-orders.md:13-30`) —, e Anderson mandou os três para
+a frente 4, "um por runtime". O custo de uma revisão, medido: **Codex** US$ 1,98 de mediana (`gpt-6-astra` em `xhigh`,
+122 s, 11 revisões da Fixfy); **Claude** US$ 4,22 (`opus-5-5`, 1.079 s, 4 revisões daqui); **`agy`** estimado em US$ 0,1
+a 0,4 pelos tokens das sondas, no preço da tabela da Fixfy. As tarefas diferem: é a forma do custo, não a qualidade. A
+Fixfy não gravou o veredito da delegação, que fechava em 2026-10-30.
+
+Respondida em 2026-11-02, na sessão `workspace`: "11.3.2 / 12.1.1 / 12.2.2".
+
+1. **Onde entra o foco da revisão** (D11). Opções:
+   - no pedido de cada `brza delegate --type review`, com `--focus simplicidade|defeito|convenção`, e o corpo do
+     `reviewer` igual nos três (recomendada) — custo: ~20 linhas no `brza delegate` e o texto dos três focos num
+     arquivo do núcleo; se paga: agora, e o mapa da 12.2 muda sem regerar papel;
+   - um bloco por runtime que o gerador injeta no `reviewer` gerado — custo: o gerador deixa de só copiar o corpo, e
+     mudar o mapa regera o pacote; se paga: se o foco virar fixo por runtime;
+   - no `reviewer.md` do núcleo — custo: vira regra de todo workspace, inclusive o Claude; se paga: nunca, enquanto só
+     este workspace delegar.
+
+   **Decidido — `--focus` no pedido de cada `brza delegate --type review`.**
+
+2. **Qual foco vai a qual runtime.** Opções:
+   - Claude = defeito, Codex = simplicidade, `agy` = convenção (recomendada) — inferência, sem medição de qualidade —:
+     custo: ~US$ 6,3 a 6,6 por revisão completa dos três; se paga: agora, revista pela medição;
+   - medir antes, com o mesmo diff de referência nos três focos e nos três runtimes, 9 revisões — custo: ~US$ 19 a 20 e
+     ~1 h da sessão; se paga: se o mapa valer por meses, ou se os achados dos três divergirem;
+   - sem mapa fixo, com o `--focus` obrigatório e quem pede escolhe — custo: nenhum agora, e o hábito pode virar sempre
+     o mesmo foco; se paga: agora, até a medição mostrar qual runtime acerta qual foco.
+
+   **Decidido — medir antes**, não a recomendada. Anderson não deu o porquê. A medição ainda não rodou; o diff de
+   referência e o critério de acerto saem da sessão, e voltam a Anderson antes de gastar.
+
 ## Worklogs
 
 - 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4; as sondas; R5; o rascunho
@@ -589,5 +635,6 @@ Respondida em 2026-11-02, na sessão `workspace`: "11.3 meça a opção 2, resta
 - 2026-10-31 — fora do plano, a triagem do porte da Fixfy mandou à frente 4 os três focos de revisão.
   [O porte das skills da Fixfy para o workspace](../../work/worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md)
 - 2026-11-02 — a revisão do plano contra a migração ao `brza-workflow` (PLN-006), o `Retomar` e a frente 4 com os três
-  focos; R10. Parou na R11.
+  focos; R10 a R12, e as medições da auditoria de fatos e da revisão por runtime. Parou no desenho do experimento da
+  12.2.
   [O PLN-004: a revisão do plano contra a migração ao brza-workflow](../../work/worklogs/2026-11-02-pln-004-a-revisao-contra-o-pln-006.md)

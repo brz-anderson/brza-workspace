@@ -62,9 +62,19 @@ o dia anterior está em
   - **A Fixfy não gravou o veredito da delegação**, que fechava em 2026-10-30: a decisão segue com o título "em medição
     até 2026-10-30" e sem nota do resultado.
 
+- **A 11.3 e a R12**, respondidas "11.3.2 / 12.1.1 / 12.2.2": a auditoria de fatos ganha hooks nos dois runtimes
+  (`SubagentStop` no Codex e `Stop` no `agy`, só `lido` e `doc`), não a recomendada, que era auditar o que o
+  `brza delegate` devolve; o foco entra pelo `--focus` no pedido de cada `brza delegate --type review`; e o mapa de
+  qual foco vai a qual runtime fica para depois de uma medição, não a recomendada.
+- **O desenho do experimento da 12.2**, a partir do que as revisões daqui deixaram: o diff é a entrega do PLN-005 na
+  `master` (`2e8ea67..13a291a`, 2.519 linhas em 22 arquivos), e a resposta conhecida é o parecer
+  `work/reviews/pln-005-a-confianca-dos-fatos.md`, com 10 achados reais e 5 hipóteses conferidas e falsas. Anderson
+  ainda não o confirmou, e nada foi gasto.
+
 ## O que ficou
 
-- **A 11.3**, a auditoria de fatos, e a **R12**, o foco da revisão e qual foco vai a qual runtime, no chat.
+- **A confirmação do experimento**, no chat, antes de gastar ~US$ 19 a 20; depois, dividir o plano, reescrever o
+  rascunho do Desenho e mandá-lo à aprovação.
 - **O plano passa de 400 linhas** (548 hoje), e o `plans/README.md` manda a Entrevista ao `-interview.md`; a divisão vai
   depois da R11, junto com a gravação do Desenho, para fazer uma vez.
 - **O rascunho do Desenho** (556 linhas, no scratch) é reescrito depois da R10, e só então vai à aprovação.

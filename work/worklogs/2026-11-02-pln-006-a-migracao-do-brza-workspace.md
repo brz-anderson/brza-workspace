@@ -86,6 +86,23 @@ não da trava em uso.
   **Como desfazer:** tudo está em `~/.Trash/microsoft-limpeza-2026-11-02/` (o de `/Library` em `root/`), até a Lixeira
   ser esvaziada; voltar cada item ao lugar com `sudo mv` e `launchctl bootstrap`. O PowerShell 7.4.1 volta com
   `brew install powershell/tap/powershell`.
+- **O quê e onde:** os apps e programas sem uso há mais de 6 meses que Anderson escolheu remover. O critério foi a
+  data mais recente nas pastas de dados de cada app e o último acesso aos executáveis, preservados do Mac antigo
+  pela migração de hoje (`.AppleSetupDone` às 10:21). O levantamento está em `/private/tmp/uso-apps.tsv` e
+  `/private/tmp/uso-brew.tsv`.
+  - `brew uninstall protobuf@21 git-filter-repo` (últimos usos em 2022-12-14 e 2024-12-03; nada dependia deles).
+  - Para `~/.Trash/apps-sem-uso-2026-11-02/`: `uTorrent Web.app`, com `~/Library/Application Support/uTorrent Web`,
+    `BitTorrentHelper` e `com.bitTorrent.utweb.plist`; o atalho quebrado `/Applications/Cliente Riot.app` e
+    `/Users/Shared/Riot Games`; e, com a senha de Anderson, `The Unarchiver.app` e `AppIcons.app`, da App Store.
+  - **Ficaram:** `~/Library/Containers/cx.c3.theunarchiver` e `com.macd.developer.AppIcons`, que o macOS protege do
+    terminal; saem pelo Finder.
+  - O `gnirehtet` já estava na última versão, a 2.5.1, e não mudou.
+  - O PS Remote Play 7.0.1 → 9.5.0: o `RemotePlayInstaller.pkg` oficial, assinado pela Sony (8UT4NVUACP) e
+    notarizado, baixado em `/private/tmp/remoteplay-dl/` e aberto no Installer para Anderson concluir.
+
+  **Risco:** baixo; os apps da App Store voltam pela loja, e os do Homebrew pelo `brew install`. **Estado:** ativo; o
+  `RemotePlay.app` dá 9.5.0. **Como desfazer:** voltar os itens da Lixeira ao lugar, até ela ser
+  esvaziada.
 - **O quê e onde:** o `~/.config/brza/workspaces.toml`, criado pelo `brza-register`, com o par
   `~/Projects/brza-workspace` → `~/Projects/brza-studio` (PLN-006/P8, estágio 2). **Risco:** sem ele, o `claude-brza`
   e a função `claude` no `brza-studio` sobem sem hooks nem identidade (X16). **Estado:** ativo. **Como desfazer:** apagar

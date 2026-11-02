@@ -2,3 +2,4 @@
 - [Worktree node_modules sem symlink](worktree-node-modules-no-symlink.md) — symlink no worktree quebrou o node_modules da raiz; use pnpm install --offline
 - [Os .spec.ts de src/shared não rodam](shared-spec-files-do-not-run.md) — teste novo vai num .test.ts
 - [Procedimento do sync do upstream](upstream-sync-procedure.md) — rebrand por script, linha de base na tag pura, --no-verify no merge, uma suíte por vez
+- [Worklog sem pedir autorização](worklog-sem-pedir-autorizacao.md) — fechou a tarefa, grave o worklog e commite sem perguntar

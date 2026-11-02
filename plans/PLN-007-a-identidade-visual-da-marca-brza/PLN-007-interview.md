@@ -430,9 +430,28 @@ Respondida em 2026-11-02, na sessão do `brand`, na mensagem.
    **Resposta:** "aprovado, com as mudanças solicitadas". **Decidido — os lockups e o selo "BrzA STUDIO" valem como
    estão no artboard**, com as duas mudanças acima.
 
-2. **Os merges do P4, P5 e P6**, quando os checks passarem: em ordem, um por vez (recomendada); só depois dos casos
-   manuais C1 a C8; um merge único da branch do P6. **Sem resposta.**
-3. **O README do `brza-workspace`**: depois do merge do P4 (recomendada); com os SVG copiados para a `master`; não fazer.
-   **Sem resposta.**
-4. **A branch do P6**: branch nova empilhada `feat/pln-007-brand-cli` (recomendada); esperar os merges e reabrir a de
-   assets, como a R8.2. **Sem resposta.**
+2. **Os merges do P4, P5 e P6**, quando os checks passarem. Opções:
+   - em ordem, um por vez, depois da pergunta 1 (recomendada) — custo: ~0,25 h por merge, com os checks de cada um; se
+     paga: já, a marca entra no app;
+   - só depois dos casos manuais C1 a C8 — custo: a marca fica nas branches até testar, e as branches empilhadas
+     envelhecem com os merges do upstream; se paga: se se quer ver o ícone e o chat antes de a `master` mudar;
+   - um merge único da branch do P6 — custo: perde o isolamento por passo; se paga: se um merge a menos vale mais que a
+     reversão por passo.
+
+   **Resposta:** "o restante segue com as recomendadas". **Decidido — em ordem, um por vez, com os checks de cada um.**
+3. **O README do `brza-workspace`**, que é público. Opções:
+   - depois do merge do P4 (recomendada) — custo: ~0,25 h, e as duas URLs do raw têm que dar `200` e `image/svg+xml`
+     antes do push; se paga: já, o workspace passa a mostrar a marca;
+   - com os SVG copiados para a `master` do workspace — custo: arquivos novos na `master`, que a norma reserva à norma;
+     se paga: nunca, além de não depender do `brza-studio`;
+   - não fazer — custo: o README segue sem logotipo; se paga: se se prefere sem marca por enquanto.
+
+   **Resposta:** "o restante segue com as recomendadas". **Decidido — depois do merge do P4.**
+4. **A branch do P6.** Opções:
+   - branch nova empilhada, `feat/pln-007-brand-cli` (recomendada) — custo: uma branch a mais e um desvio da R8.2; se
+     paga: já, o P6 não espera o merge;
+   - esperar os merges e reabrir a de assets, como a R8.2 — custo: o P6 só começa depois dos merges; se paga: se se
+     quer só três branches.
+
+   **Resposta:** "o restante segue com as recomendadas". **Decidido — a branch nova empilhada.** Com os merges em ordem,
+   a empilhada só dura até o merge do P5; o desvio da R8.2 fica registrado.

@@ -17,9 +17,9 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** P1 (R10) e P2 (R11) aprovados; P3 na `master` do `brza-studio` em `a3a89e3aaf5`. A pedido, o P4, o P5 e o
-  P6 correm em branches empilhadas no `brza-studio`, sem merge, até a R11 responder os merges (2), o README do workspace
-  (3) e a branch do P6 (4). A fonte está em `PLN-007-fonte-da-marca/`.
+- **Retomar:** P1 (R10) e P2 (R11) aprovados; P3 na `master` do `brza-studio` em `a3a89e3aaf5`. A R11 decidiu: os
+  merges do P4, P5 e P6 em ordem, um por vez, com os checks de cada um; o README do workspace depois do merge do P4; o P6
+  numa branch nova empilhada. O P4 está em execução num `implementer`; a fonte está em `PLN-007-fonte-da-marca/`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
 ## Pedido

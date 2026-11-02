@@ -27,6 +27,12 @@ O levantamento é o do `collector` para a R2 do plano, com as fontes no `brza-st
   `orca-ide` e `orca.cmd` empacotados ao lado do `brza`.
 - **Os links ao site da Orca:** `onorca.dev` e `app.orca.dev`, em `SidebarSettingsHelpMenu.tsx:48-49` e outros 5
   arquivos.
+- **A cauda da Orca no `icon.json`:** o `resources/icon-source/icon.icon`, o projeto do Icon Composer, segue apontando
+  para a arte da Orca. O P4 do PLN-007 deixou de lê-lo e o `generate.sh` renderiza dos SVG de `resources/brand/`, então
+  o arquivo fica intocado e sem uso.
+- **Os nomes `orca-*` dos arquivos de ícone:** `resources/app-icons/orca-watercolor.png` e `orca-blue.png`
+  (`src/main/app-icon.ts:8-25`) e `resources/tray/orca-menu-barTemplate.png` e `@2x` (`src/main/tray/system-tray.ts:2-3`).
+  Ficam com o nome, porque renomear toca os imports do upstream; o conteúdo já é BrzA.
 - **O que parece resto e fica:** o pareamento `orca://pair` é mantido de propósito (`src/shared/brand-identity.ts:14`).
 
 Os restos fora do mobile foram estimados em ~3–6 h na R3.4, e muitos são identificadores de build, com risco de conflito

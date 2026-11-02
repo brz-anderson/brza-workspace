@@ -38,7 +38,7 @@ pasta** → **sob demanda** (skill, `README.md`). Cada coisa fica no nível mais
   não aponte.
 - **O que o arquivo diz hoje**, e as seções vizinhas: a regra nova costuma reescrever uma que já existe, e não ganhar
   seção própria. Procure os termos dela em todos os arquivos da tabela antes de escrever.
-- **A norma mora na `master`.** Leia e edite no checkout da raiz (`~/Projects/brza-workspace`), não no worktree do
+- **A norma mora na `master`.** Leia e edite no checkout da raiz, não no worktree do
   workstream, que só recebe a norma pelo merge.
 
 ## Escrever

@@ -33,8 +33,7 @@ a categoria limpa não dispensa a seguinte; o que tem resposta mecânica roda an
 - **Código** — o do `brza-studio`, os scripts do `brza`, os hooks: corretude → contrato e compatibilidade → testes →
   convenção → desempenho. Na corretude, a falha silenciosa: a saída que diz `ok` sem conferir, o `except` largo, o
   fallback que esconde o erro. Nos testes, se cada um falharia com o defeito que diz barrar. A régua é o `AGENTS.md`
-  do repositório e o gate que ele manda rodar antes da entrega; aqui, os `unittest` de `scripts/brza/tests/` e de
-  `.claude/hooks/tests/`.
+  do repositório e o gate que ele manda rodar antes da entrega.
 - **Norma, skill ou agente** — o `AGENTS.md`, o `CLAUDE.md`, os `README.md` de pasta, `SKILL.md` e referências,
   `.claude/agents/`: contradição com outro documento → caminho, `arquivo:linha` ou nome que não aponta ao lugar
   certo → regra repetida em vez de apontada. A régua é o `AGENTS.md` e o adaptador do runtime.

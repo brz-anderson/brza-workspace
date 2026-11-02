@@ -18,6 +18,16 @@ Padrões que se repetiram na revisão do merge da v1.4.246 (2026-11-02):
   recuperação e o seletor do limite (`NativeChatUsageLimitActions`). Procure `activeClaudeManagedAccountId` e
   `router.accountSelectionHomes` em caminho de chat que pode estar fixado.
 
+- **Feature nova do upstream que cria chat a partir de outro** (o fork por mensagem da v1.4.246): o chat
+  novo nasce sem `accountSwitch`, segue a seleção global e perde o pino do P36. Confira todo
+  `resumeFrom`/adoção: o registro adotado não leva `resumeCursor`, e o lançamento em outra conta cai em
+  sessão nova vazia, sem erro. Um teste temporário com o fixture do
+  `claude-structured-launch-account-routing.test.ts` prova em 1 s.
+- **Estado compartilhado em `~/.orca` × Keychain renomeado.** Os `.enc` de integração (Jira, Linear,
+  Bitbucket, chaves de API) são selados pelo `safeStorage`; com `BrzA Studio Safe Storage`, o BrzA não lê
+  o que o Orca selou, e reconectar sobrescreve o do Orca. Confira `ls ~/.orca` e as datas `cdat` dos itens
+  (`security find-generic-password -s ...` sem `-w`).
+
 **Método que rendeu:** listar as linhas que o fork somou (`git diff -U0 <base do último sync> <master do
 fork> -- src`) e que não existem em lugar nenhum da árvore atual. Quase tudo é refatoração ou texto
 reescrito; o resto aponta o que caiu. Depois, `git diff v1.4.246 -- <arquivo>` nas junções.

@@ -16,4 +16,13 @@ metadata:
 - **Mudança de nome/identidade vista no código e conferida por comando** (`gh api`, grep da cópia no NSIS):
   90 ou mais.
 
+- **Defeito de caminho de lançamento provado por teste temporário**: 85, não 90, quando a premissa sobre o
+  registro (sem `accountSwitch`, sem `resumeCursor`) foi só lida. Teste temporário vai no worktree do sync,
+  com nome `zz-reviewer-*`, e é apagado no mesmo comando; confira o `git status` depois.
+- **Hipóteses que costumam cair no P36:** retomada agendada na conta global, `acquiredAccount` vazando na
+  troca, seletor global na linha de limite de chat fixado. O código do fork já cobre as três; não gaste
+  tempo nelas sem um caminho novo do upstream.
+- **Colisão de coexistência por recurso em `/tmp` ou `~/.orca`** costuma cair (hash do runtimeDir, shim
+  idêntico, ledger de PTY compartilhado de propósito). O que fica é o que é **cifrado por app**.
+
 Related: [[sync-review-patterns]]

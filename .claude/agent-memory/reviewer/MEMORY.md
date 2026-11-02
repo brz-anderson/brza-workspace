@@ -1,2 +1,2 @@
-- [Padrões da revisão de sync do upstream](sync-review-patterns.md) — cópias paralelas de identidade, slug de repo, pino P36 vs seleção global, método das linhas perdidas
-- [Calibração da confiança](reviewer-confidence-calibration.md) — achado em arquivo sob edição cai; reler o índice antes do handback
+- [Padrões da revisão de sync do upstream](sync-review-patterns.md) — identidade copiada, slug, pino P36 vs global e fork, ~/.orca × Keychain
+- [Calibração da confiança](reviewer-confidence-calibration.md) — arquivo sob edição cai; teste temporário; hipóteses P36 e /tmp que caem

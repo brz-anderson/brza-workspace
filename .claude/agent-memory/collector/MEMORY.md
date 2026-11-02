@@ -1,2 +1,4 @@
 - [Caminho de envio do chat estruturado](reference_studio_structured_chat_send_path.md) — arquivos do composer ao host Claude, atalhos de grep e lacunas de teste
+- [Auditoria de qualidade do fork](reference_studio_fork_quality_audit_tricks.md) — árvore pura temporária, run-vitest, catálogos, armadilhas de comparar por arquivo
 - [Expandir do chat e prévia de Markdown](reference_studio_chat_expand_and_markdown_preview.md) — BrzaExpandLayer (DOM), MarkdownPreviewBody, EditorViewToggle, o que reaproveita
+- [Coexistência Orca e auditoria do perfil](reference_studio_orca_coexistence_and_profile_audit.md) — onde moram identidade, updater, perfil real e as armadilhas de zsh/permissão

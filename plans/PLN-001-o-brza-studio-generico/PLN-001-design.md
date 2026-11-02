@@ -757,3 +757,51 @@ ferramenta não (P52, resposta de 2026-10-27).
 - O `formatAgentTypeLabel` de um tipo de usuário (`reviewer`, `collector`) devolve o nome cru ou o capitaliza; o pedido
   quer `reviewer`, como o nome do papel.
 - A linha tem `truncate`: o tipo não empurra a ferramenta para fora; o `aria-label` do "Parar" não muda.
+
+### D57 — O fork de um chat fixado nasce na conta fixada — `brza-studio/src/renderer/src/components/native-chat/native-chat-fork-from-message.ts` e `src/main/runtime/session-tabs/structured-session-create-support.ts` (P74)
+
+- **Origem:** pedido 39, R65.1. O defeito, o fluxo e a prova estão na issue
+  [O fork de um chat fixado abre na conta global e sem o contexto](../../work/issues/o-fork-de-um-chat-fixado-abre-na-conta-global-e-sem-contexto.md)
+  (`brza-studio@384d4b08fd6`).
+- **Como fica:** o renderer passa o pino da origem (`accountSwitch`) na criação do chat bifurcado
+  (`native-chat-fork-from-message.ts:56-64`), e o main o grava no registro adotado
+  (`structured-session-create-support.ts:197-229`), para que o home siga o pino
+  (`structured-session-account-home.ts:58-66`) e o `claudeLaunchResumesTranscript` ache o transcript
+  (`claude-structured-launch-home.ts:46-48`). O chat novo mostra o divisor "Conta trocada".
+- **A conferir no passo:** o que mais lê o `accountSwitch` na criação; se o `resumeCursor`/`leafUuid` ausente continua a
+  ser um caminho sem aviso para outro fluxo de adoção (importar chat, rewind); o teste do `reviewer` em
+  `/private/tmp/reviewer-fork-tests/` serve de ponto de partida.
+
+### D58 — As credenciais de integração do BrzA numa pasta própria — `brza-studio/src/shared/brand-identity.ts` e os stores de credencial (P75)
+
+- **Origem:** pedido 39, R65.2. O mecanismo e o que está na máquina estão na issue
+  [As credenciais de integração em `~/.orca` são cifradas por app](../../work/issues/as-credenciais-de-integracao-em-orca-sao-cifradas-por-app.md).
+- **Como fica:** uma constante de pasta de credenciais do BrzA (`~/.brza`) em `brand-identity.ts`, e os stores de
+  Jira, Linear, Bitbucket, OpenAI speech, MiniMax, OpenCode Go e zcode passam a ela. Os hooks de agente e o que o Orca e o
+  BrzA compartilham de propósito ficam em `~/.orca`. **Sem migração** do arquivo cifrado do Orca, porque a chave é outra: o
+  usuário reconecta uma vez no BrzA.
+- **A conferir no passo:** a lista completa dos usos de `getOrcaDir()` (~8 arquivos) e qual é credencial e qual é estado
+  compartilhado; o `jira-sites.json`, que hoje é compartilhado, e o que o "desconectar" apaga; o nome da pasta contra o
+  `userData` e o `ORCA_USER_DATA_PATH`.
+
+### D59 — O atualizador desligado no build ad hoc — `brza-studio/src/main/updater/updater-enabled.ts` (P76)
+
+- **Origem:** pedido 39, R65.3. A prova está na issue
+  [O atualizador está ligado no build ad hoc, sem manifesto para ler](../../work/issues/o-atualizador-esta-ligado-no-build-ad-hoc.md).
+- **Como fica:** a guarda do `isUpdaterEnabled()` (`updater-enabled.ts:4-9`) também desliga para o bundle ad hoc, e o
+  nudge a `onorca.dev` (`updater/updater-nudge.ts:9-44`, `updater-changelog.ts:13,32`) não roda com o atualizador
+  desligado.
+- **A conferir no passo:** como o app sabe que o bundle é ad hoc em runtime (a versão, uma constante de build, ou a
+  assinatura do bundle); que o build assinado, quando existir, liga o atualizador; o que mais o `updater-setup.ts:141-166`
+  faz antes da guarda.
+
+### D60 — Os quatro pequenos consertos — `brza-studio/config/electron-builder.config.cjs` e outros (P77)
+
+- **Origem:** pedido 39, R65.4. Os quatro itens, com arquivo e linha, estão na issue
+  [Pequenos consertos do fork depois do sync da v1.4.246](../../work/issues/pequenos-consertos-do-fork-depois-do-sync-da-v1-4-246.md).
+- **Como fica:** o `command-path-directory.js` e o do worker client entram no `asarUnpack`
+  (`electron-builder.config.cjs:342`); o `STRUCTURED_CALLS` ganha as 5 chamadas do fork com params válidos
+  (`structured-agent-session-surface-calls.ts:20`); `ORCA` vira `BrzA Studio` nas 9 linhas do `ko.json`; e o fundo do
+  código do Markdown compara com o modo do Monaco (`markdown-surface-theme.ts:64-65,87`).
+- **A conferir no passo:** se o build real gera o resolvedor autocontido (o item do CLI empacotado só se prova no
+  build); os params válidos de cada um dos 5 métodos; no coreano, que só o `ORCA` de produto muda, e não o `ORCA_*`.

@@ -3,9 +3,9 @@ status: in_progress
 phase: execution
 origin: request
 ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 184.8
+estimate_h: 197.8
 executed_h: 33.8
-remaining_h: 10.9
+remaining_h: 23.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -44,7 +44,8 @@ tags:
   **O pedido 37 entrou em 2026-11-02**, com a R63, o D55 e o P72, que a sessão `pln-001-pedido-37` executa, num worktree
   do `brza-studio` a partir da `master` (a `master` anda com as correções do `v1.4.246-alpha.2`: parta do commit atual).
   O pedido 38 entrou no mesmo dia, com a R64, o D56 e o P73, que fechou em `brza-studio@563705a7aaf`, com os X65 e X66, e
-  espera só o C26, no build do C22, com Anderson.
+  espera só o C26, no build do C22, com Anderson. O pedido 39 entrou
+  no mesmo dia, da caçada de achados da v1.4.246, com a R65, o D57 ao D60 e o P74 ao P77, cada um numa sessão `pln-001-pedido-39-*`.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
@@ -132,6 +133,11 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   fork pós-sync · reviewer · Bash`". A imagem está em
   `/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace--worktrees-studio/1cc6cebf-df5c-4f57-a8ad-cdddea824cf4/images/3.png`,
   fora do git
+- **Pedido 39 (2026-11-02, a mesma sessão):** a caçada de achados da v1.4.246, pedida pela sessão `brand` ("abra uma sessão
+  em `workstream/studio` para verificarmos mais possíveis achados que essa versão trouxe"), achou cinco issues em
+  `work/issues/`; Anderson decidiu a correção de quatro delas na R65, e a quinta, o worker de plugin, fica com a
+  decisão dos plugins. O worklog é
+  [Mais achados que a v1.4.246 trouxe ao BrzA Studio](../../work/worklogs/2026-11-02-achados-da-v1-4-246-no-brza-studio.md)
 
 ### Cobertura
 
@@ -178,6 +184,10 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 36` | O expandir aparece em todo bloco de código e diff, role ou não; a tela cheia da cerca `markdown` ou `md` abre na prévia do olho do editor, com o `<>` para o cru e o frontmatter na caixa "Front Matter" (R62.1 a R62.3) | P71 | teste da camada do expandir (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 37` | O prompt que o `brza sessions` manda ao abrir uma sessão (`--prompt`, `--rename --prompt`) e o do `brza sessions send` aparecem no chat de destino como o cartão "Tarefa do coordenador", com o chat de origem como remetente, e não como balão de usuário; o `/rename` e o envio feito por uma pessoa seguem como estão (R63.1, R63.2) | P72 | teste do launch e do `agentSession.send` com e sem chamador de chat (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 38` | A linha de cada agente na lista "AGENTES" da faixa do chat mostra a descrição, o tipo do agente e a ferramenta, nessa ordem (`descrição · reviewer · Bash`); a barra lateral e o celular não mudam (R64.1) | P73 | teste do texto da linha (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 39` | O chat bifurcado de um chat fixado nasce na conta fixada da origem, com o divisor "Conta trocada", e o Claude retoma o transcript (R65.1) | P74 | teste do caminho do lançamento do fork (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 39` | As credenciais de integração do BrzA (Jira, Linear, Bitbucket, chaves de API) ficam numa pasta própria, sem ler nem apagar as do Orca em `~/.orca`; os hooks seguem em `~/.orca` (R65.2) | P75 | teste dos stores com a pasta nova (unidade); reconectar o Jira no BrzA e conferir o Orca (manual) |
+| `Pedido 39` | O atualizador fica desligado no build ad hoc, e o nudge a `onorca.dev` não roda com ele desligado (R65.3) | P76 | teste da guarda (unidade); conferência no log do app instalado (manual) |
+| `Pedido 39` | O CLI empacotado acha o resolvedor, o contrato cruzado lista os 5 métodos do fork, o coreano sem `ORCA` de produto e o fundo do código do Markdown segue o modo do Monaco (R65.4) | P77 | os 4 testes vermelhos ou novos (unidade); `brza foo` pelo app empacotado (manual) |
 | `X20` | O `executeRead`, o `executeWrite` e o `executeDestructive` do MCP da Atlassian ganham o ícone do produto do `name` e o título com a ferramenta interna; o `discover` ganha o ícone do produto citado na busca, e o título com a busca entre aspas (R55.1, R55.2) | P67 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual, com o C6) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
@@ -1202,6 +1212,31 @@ custos são estimativa.
 
 Sem rodada própria, por ser a ordem do pedido: o passo roda agora, numa sessão do `brza-studio` num worktree.
 
+### Rodada 65 — a correção dos achados da v1.4.246 (enviada 2026-11-02)
+
+> **Apresentado antes:** os relatórios do `reviewer` e dos dois `collector` da caçada de achados, em
+> `brza-studio@384d4b08fd6`, conferidos por esta sessão em quatro pontos (o `asarUnpack` do CLI, a guarda do
+> atualizador, as nove linhas do coreano e a `origin/master` sem commit novo) e dados nas cinco issues. Os custos em
+> horas são estimativa desta sessão, não medida.
+
+Respondida em 2026-11-02, por Anderson na sessão `studio-achados-246` do workstream `studio`, pelo AskUserQuestion.
+
+1. **R65.1 — Em que conta nasce o chat bifurcado de um chat fixado?** Seleção única. Opções: na conta fixada da origem
+   (recomendada) — ~3 h; na conta global, copiando o transcript — ~3 h; só a issue — 0 h.
+   **Decidido — "Na conta fixada da origem (Recomendado)".** Vai ao D57 e ao P74.
+2. **R65.2 — Como o BrzA convive com as credenciais que o Orca cifrou em `~/.orca`?** Seleção única. Opções: pasta
+   própria do BrzA (recomendada) — ~6 h; compartilhado, cada integração num app só — 0 h; voltar à chave do Keychain do
+   Orca — ~4 h, desfaz a decisão de 2026-10-27.
+   **Decidido — "Pasta própria do BrzA (Recomendado)".** Vai ao D58 e ao P75.
+3. **R65.3 — O atualizador ligado no build ad hoc.** Seleção única. Opções: desligar no build ad hoc (recomendada) —
+   ~1 h; publicar o manifesto e assinar com identidade local — ~6 h ou mais; deixar — 0 h.
+   **Decidido — "Desligar no build ad hoc (Recomendado)".** Vai ao D59 e ao P76.
+4. **R65.4 — Quando os quatro pequenos consertos?** Seleção única. Opções: agora, num commit só, antes da alpha.2
+   (recomendada) — ~3 h; só o CLI empacotado e o coreano — ~1 h; depois, no próximo sync — 0 h.
+   **Decidido — "Agora, num commit só, antes da alpha.2 (Recomendado)".** Vai ao D60 e ao P77.
+
+O worker de plugin sem sandbox não foi à rodada: fica com a decisão dos plugins, de Anderson.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -1217,7 +1252,7 @@ base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum; o P54 ao P57 v
 antes do P55, o P56 independente e o P57 por último; o P58 vem antes do P59 e do P60, que não dependem um do outro, e
 o P61 por último; o pedido 32 roda em paralelo com o 31 (R51.2), o P62 antes do P63, o P64 depois do P63 e o P65 por
 último; o P66 do pedido 33 roda em paralelo com os dois (R52.4), e o P69 do pedido 34, agora, em paralelo com o que espera
-build (R60.4), e o P70 do pedido 35 depois do P69, que criou a faixa; o P71 do pedido 36, agora, sem depender de nenhum (R62.4); o P72 do pedido 37 e o P73 do pedido 38, agora, sem depender de nenhum.
+build (R60.4), e o P70 do pedido 35 depois do P69, que criou a faixa; o P71 do pedido 36, agora, sem depender de nenhum (R62.4); o P72 do pedido 37, o P73 do pedido 38 e o P74 ao P77 do pedido 39, agora, sem depender de nenhum um do outro.
 
 **Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com "indicado". É
 leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a pedido, numa sessão
@@ -2854,6 +2889,77 @@ afirmar a diferença da faixa nas 4 linhas com ferramenta, com a barra lateral i
 typecheck e a lint. A `origin/master` não andou entre o commit e o push. Não rodei o app: a conferência é o C26, de
 Anderson, num build novo.
 
+### P74 — O fork de um chat fixado nasce na conta fixada (pedido 39)
+
+Executa D57 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-39-fork`
+
+Estimado: 3 h · Executado: 0 h
+
+Agora (R65.1).
+
+- [ ] **1.** Os "A conferir no passo" do D57, lidos no código antes de escrever
+- [ ] **2.** Teste que falha: o fork de um chat com `accountSwitch` abre o chat novo com o mesmo `accountSwitch`, o lançamento
+      usa o home da conta fixada, `claudeLaunchResumesTranscript` devolve `true`, e o divisor "Conta trocada" aparece
+- [ ] **3.** O pino da origem passa na criação do chat bifurcado e o main o grava no registro adotado
+- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C27
+
+**Evidência:** (a preencher)
+
+### P75 — As credenciais de integração do BrzA numa pasta própria (pedido 39)
+
+Executa D58 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-39-credenciais`
+
+Estimado: 6 h · Executado: 0 h
+
+Agora (R65.2).
+
+- [ ] **1.** Os "A conferir no passo" do D58, lidos no código antes de escrever: a lista completa dos stores que usam
+      `getOrcaDir()` para credencial, e o que é hook ou estado e fica em `~/.orca`
+- [ ] **2.** Testes que falham: cada store de credencial grava e lê na pasta nova, e não lê nem apaga o arquivo da
+      `~/.orca`; o hook de agente segue em `~/.orca`
+- [ ] **3.** A constante em `brand-identity.ts` e os stores, sem migração que leia o arquivo cifrado do Orca (a chave é
+      outra); o usuário reconecta
+- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C28
+
+**Evidência:** (a preencher)
+
+### P76 — O atualizador desligado no build ad hoc (pedido 39)
+
+Executa D59 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-39-atualizador`
+
+Estimado: 1 h · Executado: 0 h
+
+Agora (R65.3).
+
+- [ ] **1.** Os "A conferir no passo" do D59, lidos no código antes de escrever
+- [ ] **2.** Teste que falha: `isUpdaterEnabled()` devolve `false` para o build ad hoc (a versão `1.4.246-alpha.1`
+      empacotada sem identidade de assinatura), e `true` para o build assinado
+- [ ] **3.** A guarda e o nudge a `onorca.dev` sem rodar com o atualizador desligado
+- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C29
+
+**Evidência:** (a preencher)
+
+### P77 — Os quatro pequenos consertos (pedido 39)
+
+Executa D60 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-39-consertos`
+
+Estimado: 3 h · Executado: 0 h
+
+Agora, num commit só, antes da alpha.2 (R65.4).
+
+- [ ] **1.** Os quatro itens da issue, relidos no código antes de escrever
+- [ ] **2.** Os testes que já falham: `packaged-cli-assets.test.ts:54` e o `cross-version-agent-session-wire`, e um
+      teste novo do fundo do código do Markdown
+- [ ] **3.** O `asarUnpack` do CLI, as 5 chamadas no `STRUCTURED_CALLS` com params válidos, as 9 linhas do coreano e o
+      modo do Monaco no fundo do Markdown
+- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C30
+
+**Evidência:** (a preencher)
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -3277,6 +3383,10 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C24 | `Pedido 36`: o expandir em todo bloco e a prévia do Markdown (P71.4) | No build do C22, passar o mouse sobre um bloco curto, uma cerca sem linguagem, uma cerca `diff`, o diff de um `Edit` e o da linha de ferramenta, com o botão sem cobrir texto (X61); expandir um SKILL.md numa cerca `markdown`, alternar para o `<>` e voltar, no tema claro e no escuro | O botão nos quatro; o SKILL.md renderizado como no olho do editor, com `name` e `description` na caixa "Front Matter"; o `<>` com o cru; o copiar com o cru | | |
 | C25 | `Pedido 37`: o prompt do `brza sessions` como cartão (P72.4) | No build do C22, de um chat qualquer, rodar `brza sessions <nome> --prompt "<tarefa longa>"` e, com `--rename`, o mesmo; depois `brza sessions send <nome> "outra coisa"`; num terminal fora de chat, rodar o mesmo `brza sessions … --prompt` | O chat novo abre com o cartão "Tarefa do coordenador", com o chat de origem como remetente e o texto dobrado em 3 linhas com "Show more"; o `/rename` não aparece; o `send` chega como cartão; no terminal fora de chat, a mensagem segue como balão de usuário | | |
 | C26 | `Pedido 38`: o tipo do agente na lista "AGENTES" (P73.4) | No build do C22, num chat, disparar um subagente com `subagent_type` (um `reviewer`) e olhar a lista "AGENTES" enquanto ele roda | A linha mostra `descrição · reviewer · <ferramenta>`; a barra lateral segue como antes | | |
+| C27 | `Pedido 39`: o fork de um chat fixado (P74.4) | No build do C22, trocar um chat de conta pelo seletor (o pino do P36), bifurcar uma mensagem dele e perguntar ao chat novo sobre algo da conversa de antes | O chat novo abre na conta fixada, com o divisor "Conta trocada", e responde com o contexto | | |
+| C28 | `Pedido 39`: as credenciais numa pasta própria (P75.4) | No build do C22, conectar o Jira no BrzA Studio e depois abrir a integração no Orca | O Jira conecta no BrzA; o Orca segue com o dele; desconectar num não apaga o do outro | | |
+| C29 | `Pedido 39`: o atualizador desligado (P76.4) | No app instalado do build do C22, abrir e esperar 1 min, e procurar o breadcrumb `updater_macos_installer_scheduling_configured` no log | Sem o breadcrumb, e sem GET a `onorca.dev` pelo nudge | | |
+| C30 | `Pedido 39`: o CLI empacotado e os consertos (P77.4) | No build do C22, rodar `brza foo` pelo app empacotado; abrir o Markdown no modo código com o "Match Terminal" invertido; ver o idioma coreano | O CLI acha o resolvedor; o texto legível; sem `ORCA` de produto no coreano | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,

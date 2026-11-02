@@ -91,7 +91,7 @@ Estimado: 6,5 h · Executado: 0,25 h
 [`PLN-007-simbolo-a1.png`](PLN-007-simbolo-a1.png); `magick compare -metric AE` do traço mono original contra a chama do
 mestre, a 1024 px, dá 347 px de 1 milhão, todos no `}` solto e no `{`, que são a correção do D2 e o espelho; o S1 gerado
 tem 12 subpaths e o solto em 9,06–10,08 × 16,68–19,56, igual à sonda do Desenho. O 1024 px saiu pelo `rsvg-convert`, e
-não pelo artboard, que tem 736 px. A aprovação é a [R10](PLN-007-interview.md). A fonte e o gerador estão em
+não pelo artboard, que tem 736 px. A aprovação é a [R10](PLN-007-interview.md), e o commit é `f1f7fe6` em `workstream/brand`. A fonte e o gerador estão em
 `PLN-007-fonte-do-simbolo/`; o `brza-brand-build.mjs` regenera os SVG idênticos, pixel a pixel. O mestre sai sem a língua
 clara e sem as faíscas do D1, por decisão da R10.
 

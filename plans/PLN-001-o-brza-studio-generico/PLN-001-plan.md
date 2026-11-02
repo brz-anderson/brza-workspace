@@ -43,7 +43,8 @@ tags:
   com o `origin.name` na linha do JSONL; o nome está no `from-name=`, e não no `from=` do `<agent-message>` do D48; o P62 lê os dois (X34).
   **O pedido 37 entrou em 2026-11-02**, com a R63, o D55 e o P72, que a sessão `pln-001-pedido-37` executa, num worktree
   do `brza-studio` a partir da `master` (a `master` anda com as correções do `v1.4.246-alpha.2`: parta do commit atual).
-  O pedido 38 entrou no mesmo dia, com a R64, o D56 e o P73, que a sessão `pln-001-pedido-38` executa.
+  O pedido 38 entrou no mesmo dia, com a R64, o D56 e o P73, que fechou em `brza-studio@563705a7aaf`, com os X65 e X66, e
+  espera só o C26, no build do C22, com Anderson.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
@@ -2819,19 +2820,39 @@ Agora (pedido 37). O passo nomeia o `brza-workflow` só para o ponto "A conferir
 
 Executa D56 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-38`
 
-Estimado: 1 h · Executado: 0 h
+Estimado: 1 h · Executado: 0,6 h
 
 Agora (pedido 38).
 
-- [ ] **1.** Os "A conferir no passo" do D56, lidos no código antes de escrever
-- [ ] **2.** Testes que falham: a linha da faixa do chat com `agentType` e ferramenta mostra `descrição · reviewer ·
+- [x] **1.** Os "A conferir no passo" do D56, lidos no código antes de escrever
+- [x] **2.** Testes que falham: a linha da faixa do chat com `agentType` e ferramenta mostra `descrição · reviewer ·
       Bash`; sem `agentType`, ou com só um dos dois, sem separador sobrando; a linha da barra lateral e a do celular
       seguem iguais
-- [ ] **3.** O tipo na linha da `NativeChatBackgroundTasksStatus`, sem mexer no `agentChildRowLeadTrail` compartilhado
-- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **3.** O tipo na linha da `NativeChatBackgroundTasksStatus`, sem mexer no `agentChildRowLeadTrail` compartilhado
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C26
 
-**Evidência:** (a preencher)
+**Evidência:** commit [`563705a7aaf`](https://github.com/brz-anderson/brza-studio/commit/563705a7aaf), na `master` do
+`brza-studio`, pela sessão do `brza-studio` no worktree `.worktrees/pln-001-pedido-38`, com o push direto
+(`384d4b08fd6..563705a7aaf`). Os "A conferir no passo" do D56, lidos no código antes de escrever: o `agentType` chega
+preenchido para o subagente do Claude, porque o `claude-child-work-decoder.ts:75` grava o nome da tarefa
+(`subagent_type`) em `name` e em `agentType`, o que o teste do decoder (`:47`) já fixa, e o `rowFromView`
+(`agent-child-row-model.ts`) o repassa ao `AgentChildRowModel.agentType`; o `formatAgentTypeLabel` passa o tipo de
+usuário (`reviewer`, `collector`) cru, mas capitaliza os nomes de CLI (`claude` vira `Claude`), e por isso a faixa usa o
+valor cru (X65); a linha já tinha `truncate`, e o tipo entra no mesmo `span` da ferramenta, sem mexer no `aria-label` do
+"Parar". O `AgentChildRowContent` ganhou o parâmetro opcional `agentTypeBeforeTool`, que só a
+`NativeChatBackgroundTasksStatus` passa, e o `agent-child-row-text.ts` ganhou o `agentChildRowTypeBeforeTool`; o
+`agentChildRowLeadTrail` compartilhado, a barra lateral e o celular não mudaram. A linha da faixa lê
+`descrição · reviewer · Bash` (e `… · Bash: pnpm test` com a entrada); sem `agentType`, com `default`, `unknown`, em
+branco ou igual ao nome da linha, ou com o detalhe que não é a ferramenta, fica como estava. Antes do código: o bloco
+novo do `NativeChatBackgroundTasksStatus.test.tsx` → 3 failed, 24 passed: a ordem e a entrada da ferramenta, como
+devia, e um caso de mensagem que escrevi errado (o `lastMessage` não chega ao detalhe numa linha `working` nem
+`blocked`), que tirei, porque o caso do `role` já cobre o detalhe que não é a ferramenta; os casos de "não mostra"
+passavam. Depois: esse arquivo e o `agent-child-row-parity.test.tsx` → 59 passed; o paridade passou a
+afirmar a diferença da faixa nas 4 linhas com ferramenta, com a barra lateral igual à de antes (X66);
+`pnpm check:changed --base=origin/master --maxWorkers=2` → 24 de 24 verdes, entre elas os testes de unidade, o
+typecheck e a lint. A `origin/master` não andou entre o commit e o push. Não rodei o app: a conferência é o C26, de
+Anderson, num build novo.
 
 ## Regressão
 
@@ -3070,6 +3091,14 @@ da linha quando o teste entra.
   fica sem ação, como o relativo: abrir pede o roteamento pelo worktree que a R62.3 deixou de fora; a imagem `file:`
   também. O `#âncora` rola dentro da tela cheia, e o Mermaid fica como código, porque o bloco dele é dos componentes do
   olho, que pedem o arquivo. Afeta P71; se o `file:` precisar abrir, vai a Anderson como rodada.
+- **X65 — A faixa mostra o `agentType` cru, não o `formatAgentTypeLabel`.** O D56 deixava os dois: o rótulo capitaliza
+  os nomes de CLI (`claude` vira `Claude`, `codex` vira `Codex`), e o pedido quer o nome do papel como o `subagent_type`
+  o traz (`reviewer`). O tipo também não aparece quando é `default`, `unknown`, em branco ou igual ao nome da linha, as
+  mesmas regras do detalhe `role`. Afeta P73.
+- **X66 — O teste de paridade `agent-child-row-parity.test.tsx` deixou de afirmar faixa igual à barra lateral nas linhas
+  com ferramenta.** Ele cobria exatamente o que o R64.1 muda; as 4 linhas com ferramenta (`Read`, `Bash`, `Edit` e o
+  `Bash` do filho com shell) passam a esperar `general-purpose · <ferramenta>` na faixa, e a barra lateral segue com o
+  esperado de antes. Afeta P73.
 
 ## Worklogs
 
@@ -3197,6 +3226,8 @@ da linha quando o teste entra.
   o pedido 36, a R62, o D54 e o P71, sem código; o P71 vai à sessão `pln-001-pedido-36`.
 - 2026-10-31 — [O P71 do PLN-001, o expandir em todo bloco e a prévia do Markdown](../../work/worklogs/2026-10-31-pln-001-p71-expandir-e-previa-do-markdown.md):
   o P71 em `brza-studio@abc5e78c243`, com os X61 ao X64; o C24 espera o build do C22, com Anderson.
+- 2026-11-02 — [O P73 do PLN-001, o tipo do agente na lista de agentes do chat](../../work/worklogs/2026-11-02-pln-001-p73-tipo-do-agente-na-lista.md):
+  o P73 em `brza-studio@563705a7aaf`, com os X65 e X66; o C26 espera o build do C22, com Anderson.
 - 2026-11-02 — [O PLN-001 e o merge da v1.4.246 do upstream](../../work/worklogs/2026-11-02-pln-001-coordenacao-com-o-sync-v1-4-246.md):
   o acordo com a sessão `studio-75`, sem código; o PLN-001 espera o merge.
 

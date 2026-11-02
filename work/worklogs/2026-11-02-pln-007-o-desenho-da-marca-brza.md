@@ -134,5 +134,6 @@ reporte no final". O P2 rodou no scratch e a fonte foi à pasta do plano, renome
   de ícone do app não foi tocado: é texto do `shared/app-icon.ts`, e trocá-lo é decisão de Anderson.
 - **A R11: Anderson aprovou os lockups e o selo** ("aprovado, com as mudanças solicitadas"), com o selo "BrzA STUDIO" e o
   `.icns` sem faíscas. O PNG foi à pasta do plano como `PLN-007-lockups-l2.png`, e o P2 fechou, com `Executado` de 0,4 h
-  contra as 2,5 h estimadas. As perguntas 2, 3 e 4 da rodada (merges, README do workspace, branch do P6) seguem sem resposta.
+  contra as 2,5 h estimadas. As perguntas 2, 3 e 4 (merges, README do workspace, branch do P6) vieram depois: "o restante segue com as
+  recomendadas" — merges em ordem, um por vez, com os checks; README depois do merge do P4; branch nova empilhada no P6.
   O artboard só renderizou no chat depois de copiado para a raiz do scratch; a lição foi à memória do workstream.

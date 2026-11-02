@@ -1,2 +1,3 @@
 - [Armadilhas de checagem no brza-studio](brza-studio-armadilhas-de-checagem.md) — i18n, path-literal, ico de 6 quadros, AE do magick
 - [Validação do native-chat no brza-studio](brza-studio-native-chat-validacao.md) — fixtures que faltam, lints de base quebrada, jest-dom, token por esquema do chat
+- [Help do CLI do brza-studio e testes](brza-studio-cli-help-testes.md) — trocar texto do help quebra 5 arquivos de teste; como rodar o CLI local

@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 20.75
-executed_h: 3.1
-remaining_h: 1.25
+executed_h: 3.6
+remaining_h: 0
 scope:
   - brza-studio
   - workspace
@@ -17,10 +17,12 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** P1 a P5 prontos e na `master` do `brza-studio` (o P5 em `786f4b56ff9`); o README do workspace, do P6, na `master`
-  daqui em `b30b6bc`. Falta o P6 do `brza-studio` (o CLI e o README do repositório), em execução num `implementer`, e fechar
-  o plano. **Aberto para Anderson:** o `.ico` com 6 quadros, em vez de 7; os casos manuais no app (C1 a C8); e a conferência
-  do build local, `dist/mac-arm64/BrzA Studio.app`, gerado pelo `pnpm build:mac`.
+- **Retomar:** os seis passos executados; P1 a P6 estão na `master` do `brza-studio` (o P6 em `5c286937e0c`) e o README
+  do workspace na `master` daqui (`b30b6bc`). O plano **não fecha** (`status` segue `in_progress`) porque falta a
+  conferência de Anderson no app, que o `pnpm build:mac` gerou em
+  `~/Projects/brza-studio/.worktrees/pln-007-build/dist/mac-arm64/BrzA Studio.app`: os casos C1 a C8 e o `grep -c` do
+  passo 3 do P6 no binário instalado. Depois disso, decidir o `.ico` de 6 ou 7 quadros e fechar, com `status: done`,
+  `phase: closed` e `completed`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
 ## Pedido
@@ -266,20 +268,21 @@ Estimado: 4,5 h · Executado: 0,9 h
 
 ### P6 — O CLI e os READMEs
 
-Executa D8 · executor: sessão do `brza-studio`, de novo na branch `feat/pln-007-brand-assets`, aberta da `master`
-depois do P5, para o `brza-studio`; a sessão do `brand`, para o README do workspace na `master`
+Executa D8 · executor: o `implementer`, na branch `feat/pln-007-brand-cli` (a R11 trocou a `feat/pln-007-brand-assets` da
+R8.2, porque a de assets já tinha ido à `master`), para o `brza-studio`; a sessão do `brand`, para o README do workspace
+na `master`
 
-Estimado: 1,5 h · Executado: 0,25 h
+Estimado: 1,5 h · Executado: 0,75 h
 
-- [ ] **1. Teste que falha** — `src/cli/brza/cli-display-name.test.ts`: o `printHelp(specs)` raiz, com o
+- [x] **1. Teste que falha** — `src/cli/brza/cli-display-name.test.ts`: o `printHelp(specs)` raiz, com o
       `console.log` espiado, não imprime linha que case `(^|\s)orca\s` e segue imprimindo `orca://pair` e
       `ORCA_PAIRING_CODE`; falha hoje no cabeçalho `orca`.
-- [ ] **2. Implementar** — o `cli-display-name.ts` e os três `console.log` do `help.ts:14,19,29`; o
+- [x] **2. Implementar** — o `cli-display-name.ts` e os três `console.log` do `help.ts:14,19,29`; o
       `root-help-text-primary.ts:2` como `'BrzA CLI'`; o `<picture>` e os badges `F26228` no `README.md`.
-- [ ] **3. Rodar e ver passar** — `pnpm test src/cli/brza/cli-display-name.test.ts src/cli/skills.test.ts src/cli/handlers/core.test.ts`;
+- [x] **3. Rodar e ver passar** — `pnpm test src/cli/brza/cli-display-name.test.ts src/cli/skills.test.ts src/cli/handlers/core.test.ts`;
       `pnpm tc:cli`; depois do build instalado,
       `"/Applications/BrzA Studio.app/Contents/Resources/bin/brza" --help | grep -c -E '(^|\s)orca\s'` → 0.
-- [ ] **4. Commit no `brza-studio`** — `feat(cli): brza --help says brza; the README carries the BrzA lockup (PLN-007 P6)`,
+- [x] **4. Commit no `brza-studio`** — `feat(cli): brza --help says brza; the README carries the BrzA lockup (PLN-007 P6)`,
       e o merge na `master`.
 - [x] **5. O README do workspace** — o `<picture>` do D8 na `master` do workspace, com `git add README.md`, commit e
       push; a prova é `curl -sI` das duas URLs do raw devolver `200` e `image/svg+xml`.
@@ -288,7 +291,25 @@ Estimado: 1,5 h · Executado: 0,25 h
 
 - **5:** `curl -sI` das duas URLs do raw (`…/brza-studio/master/resources/brand/brza-workspace-lockup-horizontal-{dark,light}.svg`)
   deu `HTTP/2 200` e `content-type: image/svg+xml`, depois do merge do P4; o `<picture>` do D8 está no título do `README.md`
-  da `master` do workspace, em `b30b6bc`, com push. Os passos 1 a 4, do `brza-studio`, esperam o P5.
+  da `master` do workspace, em `b30b6bc`, com push. 
+- **1:** com um stub que devolvia o texto sem trocar, `cli-display-name.test.ts` deu 3 falhas e 1 passe; o root help trazia o
+  cabeçalho `orca`, `Usage: orca <command> [options]` e `$ orca open`, 90 linhas casando. A regex do plano,
+  `(^|\s)orca\s`, não pega o cabeçalho `orca` sozinho na linha, e o teste usa `(^|\s)orca(\s|$)`.
+- **2:** `src/cli/brza/cli-display-name.ts` (com o `withBrzaCommandName` do D8), os três `console.log` do `help.ts`, o
+  `root-help-text-primary.ts` como `'BrzA CLI'`, o `<picture>` e os badges `F26228` no `README.md`.
+- **3:** `pnpm test src/cli/brza/cli-display-name.test.ts src/cli/skills.test.ts src/cli/handlers/core.test.ts`, 27 testes;
+  `pnpm tc:cli`, saída 0; `pnpm test src/cli` inteiro, 213 arquivos e 2 439 testes; `pnpm check:changed --force
+  --base=master`, rodado pela sessão `brand`, 19 de 19 em 29,6 s. O CLI local (`pnpm build:cli`, depois `orca-dev --help |
+  grep -c -E '(^|\s)orca\s'`) deu **0**. O `grep` no binário **instalado** espera o build novo instalado.
+- **4:** `5c286937e0c`, fast-forward na `master` do `brza-studio`, push `786f4b56ff9..5c286937e0c`; o worktree e a branch foram
+  removidos. Mais um commit, `cec12c519c4`, conserta a frase de `brza-brand-logos.md` que o D2 mandava e que ficou
+  desencontrada: só o `brza-logo` é o corte pequeno da marca.
+- **Desvio:** 11 asserções de help impresso, em 6 arquivos de teste existentes, passaram de `orca` a `brza`
+  (`skills.test.ts`, `computer.test.ts`, `file.test.ts`, `terminal-set-pane-title.test.ts`,
+  `index-automation-run-output.test.ts` e `index.test.ts`), porque eles leem o help por `main(['--help'])` ou `printHelp`,
+  que agora imprime `brza`. O plano dizia "sem mudança" para o `skills.test.ts` e o `core.test.ts`; o `core.test.ts`
+  ficou intacto. Mantido, pela opção recomendada, porque sem isso o `check:changed` fica vermelho.
+
 
 ## Regressão
 
@@ -301,8 +322,8 @@ Estimado: 1,5 h · Executado: 0,25 h
   instalado.
 - **O tray** segue como template monocromático, com o carimbo de dev e o ícone de atenção. Como se confere: C8.
 - **O `brza --help` segue mostrando `orca://pair`, `ORCA_PAIRING_CODE` e `ORCA_ENVIRONMENT`**, e as mensagens de erro
-  dos handlers seguem "Usage: orca …". Como se confere: o teste do P6 e `src/cli/skills.test.ts`,
-  `src/cli/handlers/core.test.ts` sem mudança.
+  dos handlers seguem "Usage: orca …". Como se confere: o teste do P6 e `src/cli/handlers/core.test.ts`, que ficou sem
+  mudança; as asserções de help impresso dos outros seis arquivos de teste passaram de `orca` a `brza`.
 - **O anel crítico**: de 90% para cima, o `text-destructive`, o rótulo `aria` e o popover como hoje. Como se confere:
   o caso de 95% do P5.
 - **O composer não pula no foco**: a borda tem 1 px em repouso e em foco; o botão "parar" segue `secondary`, e o
@@ -322,11 +343,27 @@ Estimado: 1,5 h · Executado: 0,25 h
 - 2026-10-31 — aberto; R1 gravada como chegou da sessão do `workspace`; Terreno pelo `collector`; R2 fechada, com os
   pedidos 2 e 3 da borda e da marca no chat; R3 fechada, com a issue dos restos da Orca. Parou antes do Desenho.
   [PLN-007: a abertura da marca BrzA](../../work/worklogs/2026-10-31-pln-007-a-abertura-da-marca-brza.md)
-- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 a R8 fechadas; Desenho gravado; R9, o aceite; P1 executado e aprovado na R10; P3 aberto no `brza-studio`. Parou antes do P2.
+- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 a R8 fechadas; Desenho gravado; R9, o aceite; P1 e P2 aprovados (R10, R11); P3 a P6 executados e na `master` do `brza-studio`; o build local para a conferência de Anderson.
   [PLN-007: o Desenho da marca BrzA](../../work/worklogs/2026-11-02-pln-007-o-desenho-da-marca-brza.md)
 - 2026-11-02 — P3 executado no `brza-studio`: os tokens da marca, o `--agent-question` azul, o conserto do
   `path-literal-ratchet`, o merge e o push na `master`. Falta a conferência com uma pergunta real de agente.
   [PLN-007: os tokens da marca e o aviso de pergunta azul](../../work/worklogs/2026-11-02-pln-007-os-tokens-da-marca.md)
+
+## Documentação
+
+- [`resources/brand/README.md`](https://github.com/brz-anderson/brza-studio/blob/master/resources/brand/README.md), no
+  `brza-studio`: a construção do símbolo, as cores, o que se gera de quê e o comando.
+- O papel `brand` da norma de cor do `brza-studio`, em `docs/styleguide/color.md`, e a exceção em `docs/STYLEGUIDE.md:5`.
+- O README do `brza-studio` e o do `brza-workspace` levam o lockup BrzA.
+
+## Pendências conhecidas
+
+- [O .ico do app sai com 6 quadros, sem o de 24 px](../../work/issues/o-ico-do-app-sai-com-6-quadros-sem-o-24px.md).
+- [Os testes e2e de SQLite falham na master do brza-studio](../../work/issues/os-testes-e2e-de-sqlite-falham-na-master-do-brza-studio.md).
+- [Os restos da Orca à vista no BrzA Studio](../../work/issues/os-restos-da-orca-a-vista-no-brza-studio.md), agora com a
+  cauda do `icon.json` e os nomes `orca-*`.
+- [O brza sessions abre na conta ativa do app](../../work/issues/o-brza-sessions-abre-na-conta-ativa-do-app.md).
+- **Os casos manuais C1 a C8, no app**, e o `grep -c` do passo 3 do P6 no binário instalado, com Anderson.
 
 ## Casos manuais
 
@@ -343,9 +380,10 @@ Estimado: 1,5 h · Executado: 0,25 h
 
 ## Fechamento
 
-- [ ] Todo passo `[x]` com evidência, ou `[-]` com motivo.
-- [ ] Todo achado com destino que existe.
-- [ ] Um resumo por commit do `brza-studio` da entrega, com o link do plano: os achados e o destino de cada um.
-- [ ] O durável saiu para a casa dona e está em `## Documentação`: o `resources/brand/README.md` e o papel `brand` da
+- [x] Todo passo `[x]` com evidência, ou `[-]` com motivo.
+- [x] Todo achado com destino que existe.
+- [x] Um resumo por commit do `brza-studio` da entrega, com o link do plano: os achados e o destino de cada um. O P4, o
+      P5 e o P6 levam o corpo; o P3 (`41bfe6d1d4e`), feito noutra sessão, não leva o link do plano, e a `master` não se reescreve.
+- [x] O durável saiu para a casa dona e está em `## Documentação`: o `resources/brand/README.md` e o papel `brand` da
       norma de cor do `brza-studio`.
 - [ ] `status: done`, `phase: closed` e `completed` no frontmatter.

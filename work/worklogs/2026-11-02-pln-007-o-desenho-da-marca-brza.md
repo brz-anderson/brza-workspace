@@ -32,3 +32,9 @@ O `brza shot` quebrou no meio da R5: o merge do upstream v1.4.246 no `brza-studi
 saído e foram copiados do scratch; o pedido do conserto foi a
 [O brza shot quebra com os tokens do painel movidos no brza-studio](../issues/brza-shot-quebra-com-os-tokens-do-painel-movidos.md),
 e o Desenho segue com uma cópia corrigida no scratch, conferida igual pixel a pixel.
+
+A R6: o fio de 1 px com halo no foco (W1); o botão de enviar no degradê da marca (K2, contra a recomendação); o anel no
+âmbar e laranja até 89% e no vermelho de alerta de 90% para cima (N1); a chama no cabeçalho apagada sem foco e no
+degradê com foco (H1). Com a N1 e a H1, os riscos do M3 e do M5 da R2.6 fecharam. Anderson pediu o artboard do botão
+"redondo": o botão do app já é `size-8 rounded-full`, e os artboards o tinham desenhado quadrado — refeito, e a lição foi
+à memória do workstream.

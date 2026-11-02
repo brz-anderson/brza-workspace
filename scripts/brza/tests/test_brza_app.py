@@ -16,7 +16,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 SCRIPTS = Path(__file__).parent.parent
-sys.path.insert(0, str(SCRIPTS))
+import shutil  # noqa: E402
+
+_FLOW = os.environ.get('BRZA_WORKFLOW')
+sys.path.insert(0, str(Path(_FLOW) / 'bin' if _FLOW else Path(os.path.realpath(shutil.which('brza-note') or '')).parent))
 import brza_runtime as runtime  # noqa: E402
 
 APP_SCRIPT = runpy.run_path(str(SCRIPTS / 'brza-app'))

@@ -37,7 +37,9 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
+# O brza_runtime mora no checkout do brza-workflow (PLN-006): a BRZA_WORKFLOW, ou o bin/ do brza-note ligado no PATH.
+_FLOW = os.environ.get('BRZA_WORKFLOW')
+sys.path.insert(0, str(Path(_FLOW) / 'bin' if _FLOW else Path(os.path.realpath(shutil.which('brza-note') or '')).parent))
 import brza_runtime as runtime  # noqa: E402
 
 SESSIONS = HERE / 'brza-sessions'

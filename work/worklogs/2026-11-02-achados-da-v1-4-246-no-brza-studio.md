@@ -113,3 +113,11 @@ a sessão que o executa, num worktree do `brza-studio`:
 - **Leituras no Keychain e no perfil real**, só de metadado: `security find-generic-password` sem `-w`, e `sqlite3
   -readonly` em cópias no scratch, apagadas. **Risco:** nenhum; nenhum segredo foi lido, e um comando que imprimiria o
   `ORCA_PAIRING_CODE` foi barrado e não repetido.
+- **Vigia do limite de 5h, `/private/tmp/studio-246/limite-conta.py`, em segundo plano na sessão `studio-achados-246`**
+  (pedido de Anderson às 20h27: uso da `anderson@fixfy.com.br` em 95%, reset às 21h30). Lê o uso pelo RPC
+  `accounts.list` a cada 60 s e, ao bater 100%, troca a conta ativa global do Claude para a `admin@fixfy.com.br`
+  (`accounts.selectClaude`); às 21h31 (reset + 1 min) volta à conta de antes, o padrão do sistema, que é a
+  `anderson@fixfy.com.br`. Não move sessão em andamento nem mexe em chat fixado (P36). Para sem trocar se o reset chegar
+  antes do limite, ou se Anderson trocar a conta pela interface. **Risco:** durante a janela, o seletor global do app
+  fica na `admin`. **Estado:** ativo até ~21h40. **Como desfazer:** `kill` do processo e, se preciso, escolher a conta
+  no seletor do app; o log está em `/private/tmp/studio-246/limite-conta.log`.

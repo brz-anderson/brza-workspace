@@ -44,7 +44,7 @@ CHROME = Path('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
 MAIN_CSS = 'src/renderer/src/assets/main.css'
 TAILWIND_THEME = 'node_modules/tailwindcss/theme.css'
 VISUAL_SHELL = 'src/shared/native-chat/native-chat-visual-shell.ts'
-PANEL_SHELL = 'src/shared/plugins/plugin-panel-shell.ts'
+PANEL_LIST = 'PANEL_DESIGN_TOKEN_ALLOWLIST'
 # O chat lê alguns tokens no escopo de aparência dele (SCOPED_SOURCES, em use-native-chat-visual-theme.ts).
 SCOPED_SOURCES = {
     '--background': ('--chat-canvas', '--background'),
@@ -166,16 +166,60 @@ def string_concat(source: str, name: str, path: str) -> str:
     return ''.join(re.findall(r"'([^']*)'", m.group(1)))
 
 
+def module_candidates(base: Path, spec: str) -> list[Path]:
+    """Os arquivos que o import relativo `spec`, feito de um arquivo em `base`, pode nomear."""
+    target = base / spec
+    return [Path(f'{target}{ext}') for ext in ('.ts', '.tsx', '.d.ts')] + [target / 'index.ts', target]
+
+
+def import_specifier(source: str, name: str) -> str | None:
+    """O módulo de onde `source` importa ou reexporta `name`, em `import {…} from '…'` ou `export {…} from '…'`."""
+    for m in re.finditer(r'\b(?:import|export)\s*(?:type\s*)?\{([^}]*)\}\s*from\s*[\'"]([^\'"]+)[\'"]', source):
+        if re.search(rf'(?<![\w$]){name}(?![\w$])', m.group(1)):
+            return m.group(2)
+    return None
+
+
+def find_token_list(studio: Path, visual: Path, visual_src: str) -> list[str]:
+    """A PANEL_DESIGN_TOKEN_ALLOWLIST, achada pelo import do shell dos visuais, e não por caminho fixo: o upstream já a
+    moveu, e o shell dos visuais a acompanha. Segue reexport até a definição."""
+    defined = rf'{PANEL_LIST}\s*(?::[^=]+)?=\s*\['
+    path, src, trail = visual, visual_src, []
+    for _ in range(6):
+        if re.search(defined, src):
+            return array_literal(src, PANEL_LIST, str(path.relative_to(studio)))
+        spec = import_specifier(src, PANEL_LIST)
+        where = path.relative_to(studio)
+        if spec is None:
+            raise ShotError(f'não achei {PANEL_LIST}, nem definida nem importada, em {where}; '
+                            'o brza-studio mudou, e o brza-shot precisa acompanhar')
+        if not spec.startswith('.'):
+            raise ShotError(f'{where} importa {PANEL_LIST} de {spec!r}, que não é caminho relativo; '
+                            'o brza-shot só segue import relativo')
+        candidates = module_candidates(path.parent, spec)
+        found = next((c for c in candidates if c.is_file()), None)
+        if found is None:
+            tried = ', '.join(str(c.relative_to(studio)) if c.is_relative_to(studio) else str(c) for c in candidates)
+            raise ShotError(f'{where} importa {PANEL_LIST} de {spec!r}, e não achei o arquivo; procurei {tried}')
+        path = found
+        try:
+            src = path.read_text()
+        except OSError as e:
+            raise ShotError(f'não li {path} ({e})') from None
+        trail.append(str(path.relative_to(studio)))
+    raise ShotError(f'o import de {PANEL_LIST} passou de 6 reexports ({" -> ".join(trail)}); o brza-shot desistiu')
+
+
 def shell_parts(studio: Path) -> dict:
     """A lista de tokens, as CDNs do CSP e o CSS de base, lidos do código do brza-studio."""
-    visual, panel = studio / VISUAL_SHELL, studio / PANEL_SHELL
+    visual = studio / VISUAL_SHELL
     try:
-        visual_src, panel_src = visual.read_text(), panel.read_text()
+        visual_src = visual.read_text()
     except OSError as e:
         raise ShotError(f'não li o shell dos visuais no brza-studio ({e})') from None
     extras = array_literal(visual_src, 'NATIVE_CHAT_VISUAL_THEME_TOKENS', VISUAL_SHELL)
     return {
-        'tokens': array_literal(panel_src, 'PANEL_DESIGN_TOKEN_ALLOWLIST', PANEL_SHELL) + extras,
+        'tokens': find_token_list(studio, visual, visual_src) + extras,
         'cdns': array_literal(visual_src, 'NATIVE_CHAT_VISUAL_CDN_ORIGINS', VISUAL_SHELL),
         'base_css': string_concat(visual_src, 'BASE_CSS', VISUAL_SHELL),
     }

@@ -1,0 +1,30 @@
+# .brza/workspace.toml — o manifesto do workspace. O init o escreve; depois é local: o sync nunca o toca.
+schema = 1
+
+[workspace]
+name = "brza-workspace"
+title = "BrzA Studio"
+owner = "Anderson"
+branch = "master"
+remote = "origin"
+born = "2026-10-26"
+
+[author]
+name = "Anderson Pereira Brzezinski"
+email = "240569289+brz-anderson@users.noreply.github.com"
+login = "brz-anderson"
+
+[code]
+name = "brza-studio"
+path = "~/Projects/brza-studio"
+github = "brz-anderson/brza-studio"
+branch = "master"
+remote = "origin"
+plan_branch = "[a-z]+/pln-(\\d+)(-|$)"
+
+[core]
+ref = "master"
+packages = ["client"]
+
+[checker]
+worklogs_link_from = "2026-10-28"

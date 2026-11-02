@@ -89,6 +89,29 @@ Emulators` e `iOS Simulators` quando disponível". O pedido veio depois de dois 
   para ligar o aparelho com ele antes do `brza print`. Isso não foi pedido e fica para uma rodada.
 - **Os testes no chat:** a issue acima.
 
+## O emulador do Pixel, ajustado
+
+Pedido de Anderson: "tente otimizar o emulador do Android, equilibrando as configs de uso da maquina da imagem,
+extraindo o máximo de recurso para que o emulador rode \"liso\"".
+
+- **A máquina:** Apple M5 Pro, com 15 núcleos (5 de desempenho e 10 de eficiência), 24 GB de RAM e GPU de 16 núcleos
+  com Metal 4. O emulador é a versão 36.6.11.0, com o Hypervisor.Framework.
+- **A causa:** o log da subida de 13:49 dizia "Software GL rendering will be used due to system memory pressure
+  (Available Memory: 4421 MB, Required: 5120 MB)". Com o `hw.gpu.mode=auto`, o emulador caiu no `lavapipe` e no
+  `swangle`, que renderizam na CPU, e o launcher travou ("Pixel Launcher isn't responding").
+- **O ajuste**, no `~/.android/avd/Pixel_9_Pro_XL.avd/config.ini`:
+  - `hw.gpu.mode`: de `auto` para `host`;
+  - `hw.ramSize`: de `2048` para `4096`, o que o emulador já tinha escolhido sozinho;
+  - `hw.cpu.ncore`: de `4` para `6`.
+- **A medida**, com boot a frio pelo `-no-snapshot-load`:
+  - o boot saiu em 18 s, contra 2 min 25 s antes;
+  - o log passou a dizer `vulkan_mode_selected:host gles_mode_selected:host`, com o dispositivo Vulkan Apple M5 Pro;
+  - o Android vê 6 núcleos (`nproc`) e 4 GB (`MemTotal: 4010096 kB`);
+  - em 12 gestos de abrir e fechar a gaveta de apps, o `dumpsys gfxinfo` do launcher deu 264 quadros, 19,32% lentos,
+    mediana de 17 ms, 90º percentil de 31 ms, 99º de 150 ms, e mediana de GPU de 14 ms.
+- **Os quadros de antes não foram medidos**: a comparação é o boot e a impressão de Anderson, "já está bem melhor".
+- **O que ainda pesa** é a GPU, numa tela de 1344×2992 a 480 dpi.
+
 ## Fora do workspace
 
 - **O link `~/.local/bin/brza-devices`**, pelo `brza install --client`.
@@ -104,3 +127,8 @@ Emulators` e `iOS Simulators` quando disponível". O pedido veio depois de dois 
   - **Risco:** nenhum.
   - **Estado:** apagados.
   - **Como desfazer:** nada a desfazer.
+- **O `config.ini` do AVD `Pixel_9_Pro_XL`**, com `hw.gpu.mode=host`, `hw.ramSize=4096` e `hw.cpu.ncore=6`.
+  - **Risco:** o emulador usa até 4 GB de RAM e 6 núcleos enquanto está ligado.
+  - **Estado:** ativo; o emulador segue ligado em `emulator-5554`, subido a frio pelo `-no-snapshot-load`.
+  - **Como desfazer:** `cp ~/.android/avd/Pixel_9_Pro_XL.avd/config.ini.brza-backup-2026-11-02
+    ~/.android/avd/Pixel_9_Pro_XL.avd/config.ini`, com o emulador desligado.

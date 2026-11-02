@@ -408,3 +408,31 @@ Respondida em 2026-11-02, na sessão do `brand`, na mensagem.
 
    **Resposta:** "aprovo a opção 1". **Decidido — a chama no degradê, sem língua clara e sem faíscas.** O mestre, as
    variantes e o S1 do P1 valem como estão.
+
+### Rodada 11 — os lockups L2, o selo e as pendências da execução (enviada 2026-11-02)
+
+**Apresentado antes:** o artboard do P2 (`PLN-007-lockups-l2.png`), com os 16 lockups, o ícone com selo e o L2 da R3 como
+referência, conferido pelo `brza shot`. O artboard não renderizou no chat na primeira vez, porque estava numa subpasta do
+scratch; copiado para a raiz, carregou.
+
+Respondida em 2026-11-02, na sessão do `brand`, na mensagem.
+
+1. **Os lockups L2 e o selo do ícone (passo 4 do P2).** Opções:
+   - aprovar como estão (recomendada) — custo: nenhum; se paga: já, o P4 ao P6 usam os arquivos;
+   - aprovar com um ajuste (tamanho do selo, vão, cor da filha) — custo: ~0,5 h por ajuste pequeno; se paga: já, se algo
+     incomoda;
+   - refazer o arranjo — custo: ~2,5 h, e o P4 ao P6 são refeitos; se paga: se o L2 da R3 não é o que se quer.
+
+   **Pedidos em texto livre, antes da aprovação:** "O ícone do app com o selo 'BrzA STUDIO ADE', mude o selo para 'BrzA
+   STUDIO' sem o `ADE`" e "no selo `.icns` utilize o mesmo ícone, sem as faíscas". A sessão tirou o "ADE", rebalanceou o
+   grupo chama e texto no tile (36 px para baixo) e confirmou que nenhum SVG da marca tem faíscas.
+
+   **Resposta:** "aprovado, com as mudanças solicitadas". **Decidido — os lockups e o selo "BrzA STUDIO" valem como
+   estão no artboard**, com as duas mudanças acima.
+
+2. **Os merges do P4, P5 e P6**, quando os checks passarem: em ordem, um por vez (recomendada); só depois dos casos
+   manuais C1 a C8; um merge único da branch do P6. **Sem resposta.**
+3. **O README do `brza-workspace`**: depois do merge do P4 (recomendada); com os SVG copiados para a `master`; não fazer.
+   **Sem resposta.**
+4. **A branch do P6**: branch nova empilhada `feat/pln-007-brand-cli` (recomendada); esperar os merges e reabrir a de
+   assets, como a R8.2. **Sem resposta.**

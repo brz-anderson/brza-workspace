@@ -1,4 +1,9 @@
-# brza-workspace
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brz-anderson/brza-studio/master/resources/brand/brza-workspace-lockup-horizontal-dark.svg" />
+    <img src="https://raw.githubusercontent.com/brz-anderson/brza-studio/master/resources/brand/brza-workspace-lockup-horizontal-light.svg" alt="BrzA Workspace" height="48" />
+  </picture>
+</h1>
 
 O workspace pessoal de Anderson para o **BrzA Studio** (`~/Projects/brza-studio`, o fork do Orca que antes se chamava
 `orca-dev`): os planos, o registro do que foi feito e as decisões ficam aqui, e o código fica no `brza-studio`.

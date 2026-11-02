@@ -108,6 +108,22 @@ O P1 rodou no scratch (`/private/tmp/pln-007/brand/`), a pedido de Anderson, e f
   `sparks.mjs` rastreia 15 faíscas do `build/icon.png`, registrado sobre o traço mono; a luz de borda é uma aproximação
   da língua clara, e não rastreada. O `p1-opcoes.png` põe as duas no mesmo tile, nos dois fundos, de 240 a 16 px.
 - **A R10: Anderson aprovou a opção 1** ("aprovo a opção 1"), a chama no degradê, sem língua clara e sem faíscas. O PNG
-  foi à pasta do plano como `PLN-007-simbolo-a1.png`, e a fonte e o gerador, a `PLN-007-fonte-do-simbolo/`, porque o P4
+  foi à pasta do plano como `PLN-007-simbolo-a1.png`, e a fonte e o gerador, a `PLN-007-fonte-da-marca/`, porque o P4
   copia dali e o scratch não dura. O `Executado` do P1 ficou em 0,25 h, o tempo de relógio do log (16h29 a 16h40), contra
   as 6,5 h estimadas. O P2 espera o pedido de Anderson.
+
+## A execução do P2
+
+Anderson pediu "siga" e, em seguida, "execute o plano até o final, pule os passos que precisarem de decisão minha,
+reporte no final". O P2 rodou no scratch e a fonte foi à pasta do plano, renomeada de `PLN-007-fonte-do-simbolo` para
+`PLN-007-fonte-da-marca`, porque agora leva também os lockups.
+
+- O `brza-brand-text.swift` devolve o JSON de cada texto pelo CoreText; a prova do Desenho, 246,91 de avanço para "BrzA"
+  a 100 px em 750, bateu. O `brza-brand-build.mjs` monta os 16 lockups e o ícone com selo.
+- O artboard do P2 estourou na primeira passada: a fila dos quatro lockups verticais passava da largura do painel e
+  cortava o "WORKSPACE". Foi corrigida e conferida de novo pelo `brza shot`.
+- **O passo 4, a rodada dos lockups, fica para Anderson**, é decisão dele. O P4, o P5 e o P6 correm em branches
+  empilhadas no `brza-studio`, sem merge: levam os lockups e o selo.
+- O P3 foi feito por outra sessão, conduzida por Anderson: `41bfe6d1d4e` e o conserto do `path-literal-ratchet`
+  (`a3a89e3aaf5`), na `master`; o worklog dela está em
+  [PLN-007: os tokens da marca e o aviso de pergunta azul](2026-11-02-pln-007-os-tokens-da-marca.md).

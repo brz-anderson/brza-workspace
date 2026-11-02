@@ -26,8 +26,14 @@ python3 .claude/skills/notes-checker/scripts/check_notes.py
 # Levar a norma da master a cada worktree de workstream
 brza note sync
 
-# Testar os hooks de medição
-python3 -m unittest discover -s .claude/hooks/tests
+# Testar os hooks, o CLI brza e o checador: no checkout do brza-workflow (ao lado deste)
+python3 -m unittest discover -s ~/Projects/brza-workflow/tests/hooks
+
+# Testar os scripts locais do brza-studio (app, dev, shot, test, tree)
+python3 -m unittest discover -s scripts/brza/tests
+
+# Trazer a norma do brza-workflow e levá-la aos workstreams
+brza sync
 
 # Resumir a medição de .measurements/measurements.jsonl
 python3 scripts/summarize_measurements.py

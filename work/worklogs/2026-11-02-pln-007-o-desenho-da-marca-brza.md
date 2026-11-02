@@ -223,3 +223,37 @@ Os testes que falham vieram primeiro, e depois o E2, o K2 e os quatro momentos d
   Anderson; **risco:** nenhum, `dist/` está no `.gitignore`; **estado:** ativo; **como desfazer:** `git worktree remove
   --force .worktrees/pln-007-build` no `brza-studio`, depois da conferência.
 - **Dois pushes à `master` do `brza-studio`:** `786f4b56ff9..5c286937e0c` e `5c286937e0c..cec12c519c4`.
+- **(Ver a seção seguinte: o build local em `.worktrees/pln-007-build` foi removido, e o DMG final está em `dist/`.)**
+
+## A versão `1.4.246-alpha.1`: a tag e o DMG final
+
+Anderson pediu "a tag `v<upstream-version>-alpha.1` e o DMG final da versão", com o worktree removido, para conferir na versão
+final. A versão do upstream no `package.json` é `1.4.246`.
+
+- **O commit e a tag.** Seguindo o precedente da `v1.4.242.alpha.1` (um commit `release:` que só muda o `package.json` para
+  a forma SemVer, e uma tag anotada), `6d47623` troca `1.4.246` por `1.4.246-alpha.1`, e a tag anotada
+  `v1.4.246-alpha.1`, com o hífen que Anderson pediu (a anterior usava ponto), aponta para ele. **Não foram ao origin:** tag é
+  publicação, e Anderson ainda vai conferir. Os workflows do repositório só têm `workflow_dispatch` e tags `mobile-*`, então o
+  push não dispara build. O push é `git -C ~/Projects/brza-studio push origin master v1.4.246-alpha.1`.
+- **Um erro no caminho:** a primeira tentativa quebrou num `git rev-parse --short` com dois argumentos, as linhas seguintes
+  rodaram soltas, e a tag foi criada em `cec12c519c4`, sem a mudança de versão. Foi apagada na hora, só existiu localmente, e
+  refeita com `set -e`, conferindo que a tag e o `HEAD` apontam para o mesmo commit.
+- **O DMG.** A `build:mac:release` exige as credenciais de assinatura e notarização da Apple; o alpha anterior foi um build local
+  ad hoc, com o sufixo `-local`. O DMG final usou a mesma cadeia do `build:mac --dmg`, **sem** o `ORCA_LOCAL_BUILD_VERSION`,
+  num worktree na tag: `latest-mac.yml` com `version: 1.4.246-alpha.1`, ad hoc, sem notarização, 250 MB. Montado somente
+  leitura: versão `1.4.246-alpha.1`, `icon.icns` igual ao do repositório, `codesign --verify --deep --strict` passa, e o `brza`
+  empacotado dá 0 linhas de `orca` como comando. O `spctl` rejeita, como esperado para um build sem notarização; um DMG
+  baixado, e não copiado, pede "Abrir" com o botão direito ou `xattr -dr com.apple.quarantine`.
+
+## Fora do workspace
+
+- **O commit `6d47623` e a tag `v1.4.246-alpha.1` no `brza-studio`**, só locais; **risco:** a `master` local fica 1 commit à
+  frente do origin; **estado:** ativos; **como desfazer:** `git tag -d v1.4.246-alpha.1` e `git reset --hard HEAD~1`, antes do
+  push.
+- **O DMG `~/Projects/brza-studio/dist/brza-studio-1.4.246-alpha.1-macos-arm64.dmg`**; **risco:** nenhum, `dist/` está no
+  `.gitignore`; **estado:** ativo; **como desfazer:** apagar o arquivo.
+- **O worktree `.worktrees/pln-007-build` do `brza-studio`**, removido com o `.app` de 685 MB; **estado:** removido. O build que
+  falhou antes também tinha apagado o `.app` local anterior de `dist/mac-arm64`, e deixado um `Electron.app` cru, que foi
+  removido: **risco:** nenhum, são artefatos regeneráveis, e o DMG do alpha anterior ficou em `dist/`.
+- **O `pnpm install` que o gancho do repositório rodou** no checkout principal ao mudar o `package.json`: compilou os módulos
+  nativos do Windows; **risco:** nenhum.

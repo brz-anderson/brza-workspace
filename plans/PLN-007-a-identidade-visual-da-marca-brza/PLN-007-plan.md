@@ -18,11 +18,11 @@ tags:
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
 - **Retomar:** os seis passos executados; P1 a P6 estão na `master` do `brza-studio` (o P6 em `5c286937e0c`) e o README
-  do workspace na `master` daqui (`b30b6bc`). O plano **não fecha** (`status` segue `in_progress`) porque falta a
-  conferência de Anderson no app, que o `pnpm build:mac` gerou em
-  `~/Projects/brza-studio/.worktrees/pln-007-build/dist/mac-arm64/BrzA Studio.app`: os casos C1 a C8 e o `grep -c` do
-  passo 3 do P6 no binário instalado. Depois disso, decidir o `.ico` de 6 ou 7 quadros e fechar, com `status: done`,
-  `phase: closed` e `completed`.
+  do workspace na `master` daqui (`b30b6bc`). Há o commit `release: v1.4.246-alpha.1` (`6d47623`) e a tag anotada
+  `v1.4.246-alpha.1`, **só locais**, e o DMG final em
+  `~/Projects/brza-studio/dist/brza-studio-1.4.246-alpha.1-macos-arm64.dmg`. O plano **não fecha** (`status` segue
+  `in_progress`) até Anderson conferir o DMG (os casos C1 a C8 no app), dar o push do commit e da tag e decidir o `.ico` de
+  6 ou 7 quadros; depois, `status: done`, `phase: closed` e `completed`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
 ## Pedido
@@ -300,7 +300,8 @@ Estimado: 1,5 h · Executado: 0,75 h
 - **3:** `pnpm test src/cli/brza/cli-display-name.test.ts src/cli/skills.test.ts src/cli/handlers/core.test.ts`, 27 testes;
   `pnpm tc:cli`, saída 0; `pnpm test src/cli` inteiro, 213 arquivos e 2 439 testes; `pnpm check:changed --force
   --base=master`, rodado pela sessão `brand`, 19 de 19 em 29,6 s. O CLI local (`pnpm build:cli`, depois `orca-dev --help |
-  grep -c -E '(^|\s)orca\s'`) deu **0**. O `grep` no binário **instalado** espera o build novo instalado.
+  grep -c -E '(^|\s)orca\s'`) deu **0**. O mesmo `grep` no `brza` empacotado no DMG final (`1.4.246-alpha.1`, montado somente leitura) deu **0**, e o
+  `--help` começa com `BrzA CLI`; o `/Applications/BrzA Studio.app` instalado só ganha isso quando Anderson instalar o DMG.
 - **4:** `5c286937e0c`, fast-forward na `master` do `brza-studio`, push `786f4b56ff9..5c286937e0c`; o worktree e a branch foram
   removidos. Mais um commit, `cec12c519c4`, conserta a frase de `brza-brand-logos.md` que o D2 mandava e que ficou
   desencontrada: só o `brza-logo` é o corte pequeno da marca.
@@ -363,7 +364,8 @@ Estimado: 1,5 h · Executado: 0,75 h
 - [Os restos da Orca à vista no BrzA Studio](../../work/issues/os-restos-da-orca-a-vista-no-brza-studio.md), agora com a
   cauda do `icon.json` e os nomes `orca-*`.
 - [O brza sessions abre na conta ativa do app](../../work/issues/o-brza-sessions-abre-na-conta-ativa-do-app.md).
-- **Os casos manuais C1 a C8, no app**, e o `grep -c` do passo 3 do P6 no binário instalado, com Anderson.
+- **Os casos manuais C1 a C8, no app**, com Anderson, no DMG final.
+- **O push do commit `6d47623` e da tag `v1.4.246-alpha.1`** ao origin do `brza-studio`, que espera a conferência de Anderson.
 
 ## Casos manuais
 

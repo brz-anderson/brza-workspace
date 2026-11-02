@@ -103,7 +103,7 @@ Executa D3 (o script de texto e os 16 SVG) · executor: sessão do `brand`, no s
 Estimado: 2,5 h · Executado: 0,3 h
 
 - [x] **1. O texto em path** — o `brza-brand-text.swift` devolve o JSON de "BrzA" (750), "STUDIO", "CLI", "WORKSPACE"
-      e "ADE" (500, `.14em`); a prova é o avanço de "BrzA" a 100 pt dar ~246,9 em 750.
+      (500, `.14em`); a prova é o avanço de "BrzA" a 100 pt dar ~246,9 em 750.
 - [x] **2. Os lockups** — o `brza-brand-build.mjs` monta os 16 `*-lockup-*.svg` e o `<g id="seal">` do
       `brza-app-icon.svg`, pela tabela de geometria do D3.
 - [x] **3. A conferência** — artboard com as 4 filhas, horizontal e vertical, nos 2 temas, ao lado do PNG do L2, pelo
@@ -118,7 +118,9 @@ e `capHeight` 71; em `wght` 400, 226,4. O `brza-brand-build.mjs` gera os 16 `*-l
 `<g id="seal">`. O artboard foi conferido pelo `brza shot` a 736 px, nos dois temas
 ([`PLN-007-lockups-l2-rascunho.png`](PLN-007-lockups-l2-rascunho.png)), ao lado do L2 da R3; a primeira passada estourou a
 fila dos verticais, e foi corrigida. O `rsvg-convert` renderiza o ícone com selo e um lockup sem erro, e é com ele que o
-P4 gera o `.icns`. **Desvio:** o `kCTKernAttributeName` zero desliga o kerning, então o `advance` do "BrzA" a
+P4 gera o `.icns`. **O selo do ícone saiu sem o "ADE"**, a pedido de Anderson em 2026-11-02, e o grupo chama e texto
+desceu 36 px para ficar centrado no tile (margem de ~125 px em cima e embaixo); o `brza-app-icon.svg` foi regenerado.
+**Desvio:** o `kCTKernAttributeName` zero desliga o kerning, então o `advance` do "BrzA" a
 `tracking 0` é a soma dos avanços; com o `-0,01 em` dos lockups o kerning vale, como no texto vivo do `BrzaWordmark`.
 
 ### P3 — Os tokens P1 e o aviso de pergunta azul

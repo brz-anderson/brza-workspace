@@ -40,8 +40,9 @@ const S1_D = [FLAME, ...S1_EXTRA].join(' ');
 
 const FIRE = `<stop offset="0" stop-color="#FFAA44"/><stop offset=".30" stop-color="#F4902A"/><stop offset=".65" stop-color="#F26228"/><stop offset="1" stop-color="#E04A2B"/>`;
 const FLAME_T = 'translate(512 512) scale(22) translate(-12.01 -11.985)';
-// No ícone com selo a chama sobe e encolhe (20,6 em vez de 22, centro em y 417) para dar lugar ao texto.
-const SEAL_FLAME_T = 'translate(512 417) scale(20.6) translate(-12.01 -11.985)';
+// No ícone com selo a chama encolhe (20,6 em vez de 22) e sobe para dar lugar ao texto; o grupo chama e texto fica
+// centrado no tile, com ~125 px de margem em cima e embaixo.
+const SEAL_FLAME_T = 'translate(512 453) scale(20.6) translate(-12.01 -11.985)';
 const TILE = `<rect x="100" y="100" width="824" height="824" rx="185"`;
 
 function master({ light = false, dev = false, seal = false } = {}) {
@@ -97,7 +98,6 @@ const text = (t, wght, tracking) => JSON.parse(execFileSync('swift', [SWIFT, FON
 const T = {
   BrzA: text('BrzA', 750, -0.01),
   STUDIO: text('STUDIO', 500, 0.14), CLI: text('CLI', 500, 0.14), WORKSPACE: text('WORKSPACE', 500, 0.14),
-  ADE: text('ADE', 500, 0.14),
 };
 const NAME = { STUDIO: 'Studio', CLI: 'CLI', WORKSPACE: 'Workspace' };
 const n3 = (v) => (Math.round(v * 1000) / 1000).toString();
@@ -108,15 +108,13 @@ const brza = (x, y, s, ink) =>
   `<path fill="${ink}" transform="${at(x, y, s)}" d="${T.BrzA.glyphs.slice(0, 3).join('')}"/>` +
   `<path fill="url(#brza-fire-tile)" transform="${at(x, y, s)}" d="${T.BrzA.glyphs[3]}"/>`;
 
-// O selo do ícone do app: "BrzA STUDIO" e "ADE" sob a chama, no arranjo do build/icon.png de hoje (tile de 824 em 100,100).
+// O selo do ícone do app: "BrzA STUDIO" sob a chama, em uma linha (tile de 824 em 100,100).
 function sealSvg() {
-  const [sA, sS, sD] = [0.8, 0.608, 0.36];
+  const [sA, sS] = [0.8, 0.608];
   const wA = T.BrzA.advance * sA, wS = T.STUDIO.advance * sS, gap = 0.5 * 80;
   const x0 = 512 - (wA + gap + wS) / 2;
-  const y1 = 734 + (T.BrzA.capHeight * sA) / 2;
-  const yD = 816 + (T.ADE.capHeight * sD) / 2;
-  return `<g id="seal">${brza(x0, y1, sA, '#FAFAFA')}${plain(T.STUDIO, x0 + wA + gap, y1, sS, '#BCBCBC')}` +
-    `${plain(T.ADE, 512 - (T.ADE.advance * sD) / 2, yD, sD, '#9A9A9A')}</g>`;
+  const y1 = 770 + (T.BrzA.capHeight * sA) / 2;
+  return `<g id="seal">${brza(x0, y1, sA, '#FAFAFA')}${plain(T.STUDIO, x0 + wA + gap, y1, sS, '#BCBCBC')}</g>`;
 }
 
 const master_svg = master();

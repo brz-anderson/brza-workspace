@@ -12,7 +12,7 @@ Do plano [PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da c
   o próprio ícone.
 - **R2.5:** E2, a borda da logo só no foco do composer.
 - **R2.6:** M1, M2, M3 e M5 no chat; o M4 fica fora.
-- **R3.1:** L2, o arranjo do selo do `.icns` na Geist; o "ADE" só no ícone.
+- **R3.1:** L2, o arranjo do selo do `.icns` na Geist; o selo do ícone é só "BrzA STUDIO", sem o "ADE" (pedido de Anderson, 2026-11-02).
 - **R3.2:** P1, a paleta do ícone, com o `--agent-question` em azul.
 - **R3.3:** S1, o traço mono de hoje com o `}` corrigido, para o glifo do chat, o M2 e o M5.
 - **R3.4:** a marca entra no app desktop, no CLI e nos READMEs; o mobile e os restos da Orca vão à issue.
@@ -149,7 +149,7 @@ resources/brand/
   brza-symbol.svg              # mestre: tile grafite + chama, sem selo
   brza-symbol-light.svg        # Light Flame: o mestre com o tile claro
   brza-symbol-dev.svg          # o mestre com o selo azul "D"
-  brza-app-icon.svg            # o mestre com o selo "BrzA STUDIO ADE" em paths
+  brza-app-icon.svg            # o mestre com o selo "BrzA STUDIO" em paths
   brza-symbol-mono.svg         # S1 (D2), em currentColor
   brza-tray-template.svg       # S1 em preto, no canvas 22×14 do tray
   brza-*-lockup-*.svg          # D3
@@ -231,7 +231,7 @@ O mestre, `brza-symbol.svg`, com o tile na grade da Apple (R5.1):
   | :------ | :--------- |
   | `brza-symbol-light.svg` | `url(#brza-tile-dark)` → `url(#brza-tile-light)` |
   | `brza-symbol-dev.svg` | mais um `<g id="dev-badge">`: círculo `#1447e6` de r=150 em (800, 800) com o "D" da Geist 700 em path branco |
-  | `brza-app-icon.svg` | `#flame` subido e reduzido, e o `<g id="seal">` do D3 com "BrzA STUDIO" e "ADE" em paths, no arranjo do `build/icon.png` de hoje |
+  | `brza-app-icon.svg` | `#flame` subido e reduzido, e o `<g id="seal">` do D3 com "BrzA STUDIO" em paths, no arranjo do `build/icon.png` de hoje |
   | `brza-tray-template.svg` | o S1 (D2) em `fill="#000"`, `viewBox` 22×14, a chama de 14 de altura centrada |
   | `resources/logo.svg` | cópia do `brza-symbol.svg` (R5.2): o A1 colorido com o tile, a arte sem selo dos slots pequenos |
 
@@ -278,7 +278,7 @@ swift config/scripts/brza-brand-text.swift <woff2> <wght> <tracking-em> <texto> 
 - Monta um `CTLine` com `kCTFontVariationAttribute` (`wght`) e `kCTKernAttributeName` (o tracking), para o kerning do
   GPOS valer; percorre os `CTRun` e grava o `CTFontCreatePathForGlyph` de cada glifo na posição do run, com y invertido
   e 2 casas decimais.
-- O `brza-brand-build.mjs` chama o script uma vez por texto — "BrzA" peso 750; "STUDIO", "CLI", "WORKSPACE" e "ADE"
+- O `brza-brand-build.mjs` chama o script uma vez por texto — "BrzA" peso 750; "STUDIO", "CLI" e "WORKSPACE"
   peso 500 com `.14em` — e monta os lockups. Os SVG gerados vão ao git; o script só roda de novo quando o texto ou a
   fonte mudam.
 
@@ -300,7 +300,7 @@ swift config/scripts/brza-brand-text.swift <woff2> <wght> <tracking-em> <texto> 
 | claro  | `brza-symbol-light.svg`  | `#0A0A0A` | `#474747`                                |
 
 **Os arquivos:** `brza-lockup-{horizontal,vertical}-{dark,light}.svg`, só "BrzA", e
-`brza-{studio,cli,workspace}-lockup-{horizontal,vertical}-{dark,light}.svg` — 16 ao todo. O "ADE" só entra no
+`brza-{studio,cli,workspace}-lockup-{horizontal,vertical}-{dark,light}.svg` — 16 ao todo. O selo "BrzA STUDIO", sem "ADE", só entra no
 `brza-app-icon.svg` (D1).
 
 **Dentro do app, o logotipo é texto vivo** (R5.4), em `src/renderer/src/components/brza/BrzaWordmark.tsx`:

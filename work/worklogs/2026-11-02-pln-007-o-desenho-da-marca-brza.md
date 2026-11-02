@@ -127,3 +127,8 @@ reporte no final". O P2 rodou no scratch e a fonte foi à pasta do plano, renome
 - O P3 foi feito por outra sessão, conduzida por Anderson: `41bfe6d1d4e` e o conserto do `path-literal-ratchet`
   (`a3a89e3aaf5`), na `master`; o worklog dela está em
   [PLN-007: os tokens da marca e o aviso de pergunta azul](2026-11-02-pln-007-os-tokens-da-marca.md).
+- **O selo sem o "ADE":** Anderson pediu o selo do ícone só com "BrzA STUDIO". O `brza-brand-build.mjs` perdeu o texto
+  "ADE", e o grupo chama e texto desceu 36 px para ficar centrado no tile; com só o "ADE" removido, sobravam 161 px
+  embaixo e 90 em cima. O `brza-app-icon.svg` foi regenerado, o artboard e o rascunho do PNG também, e o `implementer`
+  do P4 foi avisado para regenerar o ícone e rodar de novo o `pnpm build:icons`. O rótulo "BrzA Studio ADE" do seletor
+  de ícone do app não foi tocado: é texto do `shared/app-icon.ts`, e trocá-lo é decisão de Anderson.

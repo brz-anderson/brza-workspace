@@ -481,6 +481,9 @@ O S1 vira máscara sobre o degradê, sem `id` de gradiente por instância, em `m
 
 - O S1 no degradê, sem o tile, a 48 px (V2), e o `BrzaWordmark` em texto vivo (R5.4). O `loading`, o `error` e o
   `not-agent` ficam como estão.
+- **O texto abaixo do logotipo no estado vazio** fica o de hoje: o título com o nome do agente e o subtítulo, embaixo
+  do símbolo e do `BrzaWordmark` (R8.1; F69). Os artboards do M1 e da V2 mostravam uma linha só, e a linha deles não
+  vale.
 
 #### M2 — o agente trabalhando (`NativeChatTurnActivityLine.tsx:61-64`)
 
@@ -552,10 +555,6 @@ O S1 vira máscara sobre o degradê, sem `id` de gradiente por instância, em `m
 
 - No painel sem foco, a chama é mono, na cor apagada do chrome; só o painel com foco a pinta no degradê (H1), e ela diz
   qual chat recebe o teclado. `size-3.25` dá os 13 px da R3.3.
-
-- **O texto abaixo do logotipo no estado vazio** fica o de hoje: o título com o nome do agente e o subtítulo, embaixo
-  do símbolo e do `BrzaWordmark` (R8.1; F69). Os artboards do M1 e da V2 mostravam uma linha só, e a linha deles não
-  vale.
 
 ### D7 — A marca no app desktop
 

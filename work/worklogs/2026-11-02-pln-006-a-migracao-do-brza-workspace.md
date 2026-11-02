@@ -103,6 +103,27 @@ não da trava em uso.
   **Risco:** baixo; os apps da App Store voltam pela loja, e os do Homebrew pelo `brew install`. **Estado:** ativo; o
   `RemotePlay.app` dá 9.5.0. **Como desfazer:** voltar os itens da Lixeira ao lugar, até ela ser
   esvaziada.
+- **O quê e onde:** o Orca reinstalado do zero, sem o fork, por pedido de Anderson ("desinstale todas as versões do
+  Orca incluindo as do fork orca-fixfy e instale a última versão estável; não mexa no BrzA Studio"). As rodadas:
+  dados do Orca "Manter (Recomendado)"; fork "Só os builds (Recomendado)"; remendos "Remover a pasta inteira".
+  - Para `~/.Trash/orca-limpeza-2026-11-02/`: o `/Applications/Orca.app` 1.4.245 (oficial, Team ID `6CX3WHS9HZ`); o
+    `dist/` do `~/Projects/fixfy/orca-fixfy` (o Orca 1.4.242-local do fork, 988 MB), em `fork-dist/`; os dados de
+    desenvolvimento do fork, `~/Library/Application Support/orca-dev-wt` (180 MB); e o `~/.config/orca-patches`
+    inteiro, com o `orca_bundle.py`, o `fixfy-panel`, o `ps-locale` e o backup do Orca 1.4.237 (687 MB).
+  - Instalado o Orca 1.4.246, a `Latest` do `stablyai/orca`, pelo `orca-macos-arm64.dmg` (notarizado, Team ID
+    `6CX3WHS9HZ`), com `ditto` para `/Applications/Orca.app`.
+  - **Ficaram**, por serem do BrzA Studio ou divididos com ele: o `BrzA Studio.app`, o `orca` do terminal (que vem
+    dele), `~/Library/Application Support/brza-studio`, `brza-dev` e `brza-dev-wt`, `~/.orca` (os hooks de agente que
+    o BrzA Studio grava, em `src/main/agent-hooks/installer-utils.ts:113`, e os tokens do Jira),
+    `~/orca/workspaces/brza-studio` e a skill `orca-cli`. Ficaram também os dados do Orca,
+    `~/Library/Application Support/orca` (1,0 GB), e o código-fonte do fork, que é submódulo de `~/Projects/fixfy` e
+    tem 3 arquivos sem commit.
+  - **Sem dono conferido, e intocados:** `~/.orca-relay`, `~/.config/orca-plugins` (7,4 MB), `~/.config/orca-themes`
+    (141 MB) e `~/.local/share/orca-scripts-backup-2026-10-24`.
+
+  **Risco:** o painel da Fixfy e o idioma remendado não voltam ao Orca sem os scripts de `orca-patches`. **Estado:**
+  ativo; `/Applications/Orca.app` dá 1.4.246, e a assinatura confere. **Como desfazer:** voltar os itens da Lixeira
+  ao lugar, até ela ser esvaziada.
 - **O quê e onde:** o `~/.config/brza/workspaces.toml`, criado pelo `brza-register`, com o par
   `~/Projects/brza-workspace` → `~/Projects/brza-studio` (PLN-006/P8, estágio 2). **Risco:** sem ele, o `claude-brza`
   e a função `claude` no `brza-studio` sobem sem hooks nem identidade (X16). **Estado:** ativo. **Como desfazer:** apagar

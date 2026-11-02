@@ -2,6 +2,7 @@
 status: in_progress
 phase: execution
 origin: request
+description: O brza init monta a norma num workspace do zero, e o brza-workspace a segue do brza-workflow pelo brza sync.
 ready: sim
 estimate_h: 27
 executed_h: 4

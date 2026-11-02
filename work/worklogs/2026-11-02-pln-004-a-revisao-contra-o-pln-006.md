@@ -96,6 +96,8 @@ o dia anterior está em
     cita `killpg`, `TEXT_LIMIT`, `--pending` nem as 120 colunas). **O desenho limita o resultado:** o trecho de testes
     de `fact_audit` não viu o `fact_audit.py`, então A1, A2 e A8 não eram achados possíveis, e a convenção não viu a
     régua do `AGENTS.md`.
+  - **Decisão de Anderson ("Parar aqui"):** o modelo local fica fora das revisões e não se mede mais agora; o uso de
+    LLMs locais em outros fluxos se avalia no futuro. A R12.2 decide só entre Claude, Codex e `agy`.
 
 ## O que ficou
 

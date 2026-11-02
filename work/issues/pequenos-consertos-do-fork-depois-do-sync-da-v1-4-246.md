@@ -63,3 +63,10 @@ commit só na `master`, quando Anderson mandar a sessão de correção.
   idêntico ao `brza`, então só confunde.
 - **"Orca Computer Use.app" mantido:** a identidade de TCC é compartilhada, e renomear pede build nativo e permissões
   reconcedidas.
+
+## Corrigido em 2026-11-02
+
+Os quatro itens saíram no commit [`ecc4a13d456`](https://github.com/brz-anderson/brza-studio/commit/ecc4a13d456), na
+`master` (P77 do PLN-001; worklog `work/worklogs/2026-11-02-pln-001-p77-quatro-pequenos-consertos.md`). O `status` fica
+`open` até o C30, de Anderson, no build novo: o item 1 só se prova com `brza foo` pelo app empacotado, e o teste unitário
+usa `tsc` solto.

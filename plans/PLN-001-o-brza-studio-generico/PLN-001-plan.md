@@ -3010,19 +3010,42 @@ segue ligado até o build novo; o C29 vale só para o build seguinte.
 
 Executa D60 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-39-consertos`
 
-Estimado: 3 h · Executado: 0 h
+Estimado: 3 h · Executado: 1,5 h
 
 Agora, num commit só, antes da alpha.2 (R65.4).
 
-- [ ] **1.** Os quatro itens da issue, relidos no código antes de escrever
-- [ ] **2.** Os testes que já falham: `packaged-cli-assets.test.ts:54` e o `cross-version-agent-session-wire`, e um
+- [x] **1.** Os quatro itens da issue, relidos no código antes de escrever
+- [x] **2.** Os testes que já falham: `packaged-cli-assets.test.ts:54` e o `cross-version-agent-session-wire`, e um
       teste novo do fundo do código do Markdown
-- [ ] **3.** O `asarUnpack` do CLI, as 5 chamadas no `STRUCTURED_CALLS` com params válidos, as 9 linhas do coreano e o
+- [x] **3.** O `asarUnpack` do CLI, as 5 chamadas no `STRUCTURED_CALLS` com params válidos, as 9 linhas do coreano e o
       modo do Monaco no fundo do Markdown
-- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C30
 
-**Evidência:** (a preencher)
+**Evidência:** commit [`ecc4a13d456`](https://github.com/brz-anderson/brza-studio/commit/ecc4a13d456), na `master` do
+`brza-studio`, pela sessão do `brza-studio` no worktree `.worktrees/pln-001-pedido-39-consertos`, com o push direto
+(`2738100d3f5..ecc4a13d456`, depois do rebase sobre o commit do pedido 40). **Os "A conferir no passo" do D60, lidos no
+código antes de escrever:** a leitura se sustentou e nada voltou como pergunta, com um desvio de tamanho (X68). **(a)** O
+build real: o `out/main/chunks/**` já está no `asarUnpack` e o `electron.vite.config.ts` emite os módulos
+compartilhados ali, então o resolvedor do build real tende a sair autocontido; isso é inferido, e só o `brza foo` pelo
+app empacotado prova. O `tsc` solto do teste emite um arquivo por módulo, e foi o que quebrou. **(b)** Os params dos 5
+métodos, de `ItemParams`, `SwitchAccountParams` e `UsageLimitAutoResume*Params` (X69). **(c)** No coreano, 10
+ocorrências de `ORCA` fora de `ORCA_*`, em 9 linhas (20744, 20770, 21091 ×2, 21094, 21100, 21106, 21112, 21117, 21130); os
+`ORCA_*` ficaram. **Os testes:** `packaged-cli-assets.test.ts` falhava com `JSON Parse error: Unexpected EOF` (o stderr
+dava `Cannot find module './command-path-directory'`, depois `'../lazy-worker-thread-host'`) e passa com os 4 módulos no
+`asarUnpack`; o `cross-version-agent-session-wire.unit.test.ts` passou 40 de 40 (a contagem 51 = 51); o teste novo do
+fundo do Markdown em `markdown-surface-theme.test.ts` falhou com a lógica antiga e passa com a nova, e o
+`use-monaco-theme.test.tsx` segue verde. **O que rodou no fim** (a regra da suíte completa uma vez, no merge):
+`pnpm check:changed --base=origin/master --maxWorkers=2` → 24 de 25 checks verdes, com o `typecheck` (node e web) e o
+`localization catalogs` entre eles; os testes unitários selecionados, 2042 arquivos passaram e 1 falhou, e `pnpm tc:web`
+e `pnpm tc:node` depois do rebase sem erro. **As duas falhas que não são deste commit:** (1)
+`cross-version-structured-attention-frames.unit.test.ts` não carrega: a harness importa
+`src/shared/structured-agent-session-projection.ts` do checkout da v1.4.246, e a tag o tem em
+`src/shared/agent-session/view/`; é a classe das suítes `cross-version-wire` que a issue já deixa de fora, herdada do
+upstream, e não toquei nada dela; (2) `packaged-cli-assets.test.ts > sanitizes node env … macOS launcher` falha aqui
+porque o `TMPDIR` é um caminho com symlink (`/tmp` contra `/private/tmp`); com `TMPDIR` real o arquivo passa 6 de 6.
+Suíte inteira: roda no merge, pela coordenação. **Não provado, de Anderson, no build novo (C30):** `brza foo` pelo app
+empacotado, o Markdown no modo código com o "Match Terminal" invertido e o idioma coreano.
 
 ### P78 — O fundo do texto no bloco de código e o botão de copiar do visualizador de Markdown (pedido 40)
 
@@ -3304,6 +3327,19 @@ da linha quando o teste entra.
   da identidade, então o `afterPack` darwin estampa o arquivo `ad-hoc-signed` quando a identidade é `-`. Um teste de
   unidade não assina bundle: a guarda é testada com o leitor mockado, o leitor com um `resourcesPath` de verdade, e o
   escritor à parte, com um teste de que os dois lados usam o mesmo nome de arquivo. Afeta P76.
+
+- **X68 — O `asarUnpack` do CLI ganhou 4 módulos, e não os 2 do D60.** O D60 falava do `command-path-directory.js` e do
+  worker client. O fecho de imports do worker client puxa o `lazy-worker-thread-host.js` e o
+  `worker-thread-entry-path.js`, e o teste só passou com os quatro. No build real, que emite chunks, esses nomes podem
+  não casar com nada (inofensivo). Afeta P77.
+- **X69 — As 5 chamadas do contrato cruzado: três com `hostMethod: null` e o `switchAccount` com um stub novo.** O
+  `forkThroughMessage` sem registro no stub responde `{ ok: false, reason: 'unsupported' }`, como o `readVisual`; os três
+  `usageLimitAutoResume*` respondem o vazio de um host sem agenda (`resume: null`, `cancelled: true`, `resumes: []`), e
+  provam o handler e o esquema, não a agenda. O `switchAccount` ganhou um spy em `structuredHostStub` e o membro
+  `conversationCommands` no `installableHost`. Afeta P77.
+- **X70 — O modo do Monaco saiu do `useMonacoTheme` para um hook `useMonacoDark`, e o `markdownSurfaceTheme` ganhou o
+  terceiro parâmetro `monacoDark`.** O D60 dizia "compara com o modo do Monaco"; reusar o cálculo do `use-monaco-theme.ts`
+  (a base do tema de editor, senão o modo pintado) evita uma cópia. Afeta P77.
 
 ## Worklogs
 

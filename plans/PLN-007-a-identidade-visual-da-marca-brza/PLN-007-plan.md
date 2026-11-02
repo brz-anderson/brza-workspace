@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 20.75
-executed_h: 2.2
-remaining_h: 5.75
+executed_h: 3.1
+remaining_h: 1.25
 scope:
   - brza-studio
   - workspace
@@ -17,10 +17,10 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** P1, P2, P3 e P4 prontos; o P4 está na `master` do `brza-studio` em `1bfb496aebf`, e o README do workspace,
-  do P6, na `master` daqui em `b30b6bc`. O P5, a marca no chat, está em execução num `implementer`, partindo da `master`.
-  Falta o P6 do `brza-studio` (o CLI e o README) e fechar o plano. **Aberto para Anderson:** o `.ico` com 6 quadros, em vez
-  de 7; e os casos manuais C1 a C8 no app.
+- **Retomar:** P1 a P5 prontos e na `master` do `brza-studio` (o P5 em `786f4b56ff9`); o README do workspace, do P6, na `master`
+  daqui em `b30b6bc`. Falta o P6 do `brza-studio` (o CLI e o README do repositório), em execução num `implementer`, e fechar
+  o plano. **Aberto para Anderson:** o `.ico` com 6 quadros, em vez de 7; os casos manuais no app (C1 a C8); e a conferência
+  do build local, `dist/mac-arm64/BrzA Studio.app`, gerado pelo `pnpm build:mac`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
 ## Pedido
@@ -224,22 +224,45 @@ Estimado: 4,5 h · Executado: 1 h
 
 ### P5 — A marca no chat
 
-Executa D5 e D6 · executor: sessão do `brza-studio`, branch `feat/pln-007-brand-chat`, depois do P3 e do P4
+Executa D5 e D6 · executor: sessão do `brza-studio`, branch `feat/pln-007-brand-chat`, depois do P3 e do P4 (nas duas, os merges já tinham saído)
 
-Estimado: 4,5 h · Executado: — h
+Estimado: 4,5 h · Executado: 0,9 h
 
-- [ ] **1. Testes que falham**
+- [x] **1. Testes que falham**
   - `NativeChatMessageList.turn-indicator.test.tsx:115,160` passa a afirmar o `[data-brza-working-flame]` com
     `size-4.5` e o rótulo com `brza-working-label`, no lugar do `animate-spin`; falha com o spinner de hoje.
   - `NativeChatContextUsageRing.test.tsx` ganha o caso de 60%, com o traço em `url(#…)`, e o de 95%, com
     `currentColor` e `text-destructive`; o de 60% falha hoje.
-- [ ] **2. Implementar** — E2 e K2 (D5); M1, M2, M3 e M5, com o `.brza-flame-glyph` (D6).
-- [ ] **3. Rodar e ver passar** — `pnpm test src/renderer/src/components/native-chat/NativeChatMessageList.turn-indicator.test.tsx src/renderer/src/components/native-chat/NativeChatContextUsageRing.test.tsx`;
+- [x] **2. Implementar** — E2 e K2 (D5); M1, M2, M3 e M5, com o `.brza-flame-glyph` (D6).
+- [x] **3. Rodar e ver passar** — `pnpm test src/renderer/src/components/native-chat/NativeChatMessageList.turn-indicator.test.tsx src/renderer/src/components/native-chat/NativeChatContextUsageRing.test.tsx`;
       `pnpm check:changed --maxWorkers=2`; `pnpm fixtures:shot 'native-chat/*' --theme both`.
-- [ ] **4. Casos manuais** — C1 a C4 e C6.
-- [ ] **5. Commit** — `feat(native-chat): the BrzA mark in the chat (PLN-007 P5)`, e o merge na `master`.
+- [-] **4. Casos manuais** — C1 a C4 e C6. Vistos nos componentes reais pelo `pnpm fixtures:shot`, que prova o visual e
+      não o app; o foco de teclado, o flicker, o "Reduzir movimento" e os vários painéis seguem com Anderson. Motivo: um PNG
+      estático não mostra movimento nem troca de foco.
+- [x] **5. Commit** — `feat(native-chat): the BrzA mark in the chat (PLN-007 P5)`, e o merge na `master`.
 
-**Evidência:** —
+**Evidência:**
+
+- **1:** antes de implementar, `pnpm test <turn-indicator> <ContextUsageRing>` deu 3 falhas e 28 passes: o caso de 60% do
+  anel (o `linearGradient` não existia) e dois do indicador, que ainda achavam o rótulo `min-w-0 truncate
+  text-chat-foreground`, sem `brza-working-label`. O caso de 95% passa nos dois estados, é guarda de regressão. As
+  afirmações do spinner eram quatro (linhas ~115, ~160, ~271 e ~383), e não duas.
+- **2:** E2 e K2 (D5), o glifo comum, M1, M2, M3 e M5 (D6), em `786f4b56ff9`. Um teste a mais, não pedido, em
+  `NativeChatComposerActions.test.tsx`: o `data-brza-send` existe no enviar e não no "parar".
+- **3:** os dois arquivos, 31 testes passando; o pacote `native-chat` inteiro, 389 arquivos e 3 902 testes;
+  `pnpm check:changed --force --base=master --maxWorkers=2`, rodado pela sessão `brand`, sem o cache: 24 de 24 em 61,8 s.
+  O `fixtures:shot 'native-chat/*' --theme both` gerou os PNG; o `AgentStateDot:allStates --scale 2` mostra o aviso de
+  pergunta azul nos dois temas.
+- **5:** `786f4b56ff9`, fast-forward na `master` do `brza-studio`, push `1bfb496aebf..786f4b56ff9`; o worktree e a branch
+  foram removidos.
+- **Desvios:** (a) o `NativeChatBrandMark.fixture.tsx`, um fixture só de dev, ficou: o `native-chat/*` não tinha
+  fixture para o estado vazio, o composer, a atividade e o cabeçalho; (b) os tokens do foco do composer saíram do `:root`
+  e do `.dark` do D4 e foram para os blocos de esquema do chat (`:root, .native-chat-appearance[…='light']` e
+  `.dark, .native-chat-appearance[…='dark']`), porque um `var()` declarado em `:root` se resolve ali e um chat de esquema
+  oposto ao do app saía com o fundo errado, nos dois sentidos — reproduzido num caso novo do fixture e conferido depois
+  do conserto; (c) o `lint:design-system` aponta o `rounded-full` do botão de enviar, que já existia e vem do upstream.
+
+
 
 ### P6 — O CLI e os READMEs
 
@@ -309,12 +332,12 @@ Estimado: 1,5 h · Executado: 0,25 h
 
 | ID  | Critério | Passos | Esperado | Observado | Veredito |
 | :-- | :------- | :----- | :------- | :-------- | :------- |
-| C1  | R6.1: o fio e o halo no foco, sem corte do `[contain:paint]` | Focar o composer no tema escuro e no claro; anexar uma imagem com o foco | Fio de 1 px no degradê, halo de 3 px visível fora da borda e sem corte; nada se desloca ao focar | — | — |
-| C2  | R6.2: o botão de enviar no degradê só no foco | Com foco e texto; sem foco; com o agente rodando ("parar"); com o composer vazio | Degradê só com foco e o enviar habilitado; "parar" `secondary`; desabilitado como hoje | — | — |
-| C3  | R2.6/H1: a chama do M5 não cobre a transcrição | Rolar a transcrição até o topo e parar no meio de uma mensagem | A chama de 13 px no canto não cobre texto legível | — | — |
-| C4  | R6.4: a chama colorida só no painel com foco | Três chats lado a lado; trocar o foco do do meio para o da direita | Só o painel com foco tem a chama no degradê; a cor acompanha a troca | — | — |
+| C1  | R6.1: o fio e o halo no foco, sem corte do `[contain:paint]` | Focar o composer no tema escuro e no claro; anexar uma imagem com o foco | Fio de 1 px no degradê, halo de 3 px visível fora da borda e sem corte; nada se desloca ao focar | Pelo `fixtures:shot` ([PNG](PLN-007-casos-c1-c4-c6.png)): o composer real em repouso (1 px cinza) e em foco (fio em degradê âmbar a laranja, halo de 3 px, fundo branco no claro e grafite no escuro); num chat de esquema oposto ao do app, o fundo acompanha o chat. O composer não mudou de tamanho entre os dois estados. | visto no componente real; o foco de teclado e o corte do `[contain:paint]` com anexo seguem pendentes no app |
+| C2  | R6.2: o botão de enviar no degradê só no foco | Com foco e texto; sem foco; com o agente rodando ("parar"); com o composer vazio | Degradê só com foco e o enviar habilitado; "parar" `secondary`; desabilitado como hoje | Pelo `fixtures:shot` ([PNG](PLN-007-casos-c1-c4-c6.png)): o enviar é preto/branco em repouso e laranja com a seta branca no foco; o teste novo afirma que o `data-brza-send` não existe no "parar". | visto no componente real; "parar" e desabilitado no app seguem pendentes |
+| C3  | R2.6/H1: a chama do M5 não cobre a transcrição | Rolar a transcrição até o topo e parar no meio de uma mensagem | A chama de 13 px no canto não cobre texto legível | Não verificável por PNG: a chama de 13 px sobre a transcrição rolando pede o app. | pendente no app |
+| C4  | R6.4: a chama colorida só no painel com foco | Três chats lado a lado; trocar o foco do do meio para o da direita | Só o painel com foco tem a chama no degradê; a cor acompanha a troca | Pelo `fixtures:shot` ([PNG](PLN-007-casos-c1-c4-c6.png)): o cabeçalho do painel com foco tem a chama em degradê, e sem foco, cinza apagada; sem título. | visto no componente real; a troca de foco entre três painéis segue pendente no app |
 | C5  | R5.1: o ícone no Dock e no Finder, na grade da Apple | Instalar o build do P4; ver o Dock, o Cmd-Tab e o Finder | Sem caixa cinza; do tamanho dos ícones vizinhos | Pelo `brza shot` ([PNG](PLN-007-casos-c5-c7-c8.png)): a fatia de 1024 do `.icns` gerado, com o selo, ao lado de vizinhos de mentira na grade da Apple, sem caixa cinza e com o tile do mesmo tamanho; a de 64, sem selo. Sem faíscas. | visto no artboard; o Dock, o Cmd-Tab e o Finder seguem pendentes no app |
-| C6  | R2.6: o M2 parado com movimento reduzido | Ativar "Reduzir movimento" no macOS; mandar um prompt | A chama parada no degradê e o rótulo sem brilho, na cor de hoje | — | — |
+| C6  | R2.6: o M2 parado com movimento reduzido | Ativar "Reduzir movimento" no macOS; mandar um prompt | A chama parada no degradê e o rótulo sem brilho, na cor de hoje | Não verificável por PNG: o `prefers-reduced-motion` e o flicker são movimento. | pendente no app |
 | C7  | R5.2: o `logo.svg` colorido a 16 px na barra de título | No Windows ou no Linux, com barra de título própria, nos dois temas | O A1 com o tile lê como a marca, sem `invert` | Pelo `brza shot` ([PNG](PLN-007-casos-c5-c7-c8.png)): o `logo.svg` colorido a 14, 16, 28 e 80 px, nos dois temas, sem `invert`; a 16 px lê como o tile com a chama. | visto no artboard; a barra de título do Windows ou do Linux segue pendente |
 | C8  | R3.4: o tray do S1 | Barra de menus clara e escura; o app de dev; um aviso de atenção | Template monocromático que segue o tema; o carimbo de dev e o de atenção aparecem | Pelo `brza shot` ([PNG](PLN-007-casos-c5-c7-c8.png)): o `orca-menu-barTemplate` e o `@2x` em menu claro e escuro (o tinge do macOS simulado por `invert`); a chama S1 em preto lê nos dois. | visto no artboard; o tray de verdade, o carimbo de dev e o aviso de atenção seguem pendentes no app |
 

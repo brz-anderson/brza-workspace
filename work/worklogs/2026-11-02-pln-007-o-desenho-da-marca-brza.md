@@ -167,3 +167,32 @@ O P4 correu num `implementer`, com o pedido em `/private/tmp/pln-007/prompt-p4.m
   depois do merge; **risco:** nenhum, a branch estava contida na `master`; **estado:** removidos; **como desfazer:**
   `git worktree add` a partir do `1bfb496aebf`.
 - **Dois pushes à `master`:** `a3a89e3aaf5..1bfb496aebf` no `brza-studio` e `3c40096..b30b6bc` no `brza-workspace`.
+
+## A execução do P5
+
+O P5 correu num `implementer`, com o pedido em `/private/tmp/pln-007/prompt-p5.md`, partindo da `master` com o P3 e o P4.
+Os testes que falham vieram primeiro, e depois o E2, o K2 e os quatro momentos do chat.
+
+- **O conserto que a sessão pediu ao `implementer`:** os tokens do foco do composer, no `:root` e no `.dark` do D4,
+  resolvem ali o `var()`; num chat de esquema oposto ao do app, o fundo saía com a cor errada nos dois sentidos.
+  Reproduzido num caso novo do fixture, e corrigido movendo os tokens para os blocos de esquema do chat. O Desenho
+  mostrava os tokens no `:root`, e esse trecho do D4 não vale.
+- O `fixtures:shot` que o plano manda (`native-chat/*`) só tinha 4 fixtures; o `implementer` criou o
+  `NativeChatBrandMark.fixture.tsx` para ver o estado vazio, o composer, a atividade, o anel e o cabeçalho, e ele ficou.
+- O `check:changed` da sessão, forçado (sem o cache), deu 24 de 24. O merge na `master` do `brza-studio` foi `786f4b56ff9`,
+  fast-forward e push.
+- **Os casos do chat (C1 a C4 e C6)** foram vistos nos componentes reais pelo `fixtures:shot`, a pedido de Anderson de
+  rodar os manuais com ferramenta, e não pelo `brza shot`: ele converte um artboard, e o fixture é o componente de
+  verdade. O PNG está em `PLN-007-casos-c1-c4-c6.png`. O C3 e o C6 não dá para ver em imagem parada e ficam pendentes.
+- **O build local:** Anderson pediu o "build dev" para conferir, e a sessão gerou o `.app` pelo `pnpm build:mac`
+  (`dist/mac-arm64/BrzA Studio.app`), na `master`, depois do merge do P5.
+- A memória do `implementer` do P5 tinha ido ao scratch e foi movida para `.claude/agent-memory/implementer/` do workstream.
+
+## Fora do workspace
+
+- **O worktree `.worktrees/pln-007-brand-chat` e a branch `feat/pln-007-brand-chat` do `brza-studio`**, removidos depois do
+  merge; **risco:** nenhum, a branch estava contida na `master`; **estado:** removidos; **como desfazer:** `git worktree add`
+  a partir do `786f4b56ff9`.
+- **O push à `master` do `brza-studio`:** `1bfb496aebf..786f4b56ff9`.
+- **O build local em `~/Projects/brza-studio/dist/`:** o `pnpm build:mac` regrava `dist/mac-arm64` e os helpers nativos;
+  **risco:** nenhum, `dist/` está no `.gitignore`; **estado:** ativo; **como desfazer:** apagar `dist/`.

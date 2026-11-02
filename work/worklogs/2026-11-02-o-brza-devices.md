@@ -112,6 +112,39 @@ extraindo o máximo de recurso para que o emulador rode \"liso\"".
 - **Os quadros de antes não foram medidos**: a comparação é o boot e a impressão de Anderson, "já está bem melhor".
 - **O que ainda pesa** é a GPU, numa tela de 1344×2992 a 480 dpi.
 
+### A resolução, medida nas duas opções
+
+A rodada sobre baixar a resolução teve duas perguntas:
+- **AVD novo:** "Sim, nasce ajustado (Recomendado)";
+- **Resolução:** em texto livre, "meça agora a diferença de desempenho das duas opções e tire um print cada opção pra
+  mim comparar".
+
+As duas opções foram medidas nas mesmas condições: boot a frio pelo `-no-snapshot-load`, 60 s de espera e rodadas de
+12 gestos de abrir e fechar a gaveta de apps, com o `dumpsys gfxinfo` do launcher. A primeira rodada depois do boot sai
+ruidosa nas duas, e não conta.
+
+| Opção | Tela | Quadros lentos, depois de assentar | Mediana | 99º percentil | GPU, mediana |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| A | 1344×2992 a 480 dpi, com a moldura do Pixel | 6,81% e 5,52% | 16 ms | 32 ms | 12–13 ms |
+| B | 1080×2400 a 420 dpi, sem a moldura | de 30,94% a 46,34% | 23–28 ms | 81–101 ms | 12–13 ms |
+
+- **A B ficou pior**, com o mesmo tempo de GPU: os pixels não eram o gargalo. A causa da diferença não foi isolada.
+- **A primeira tentativa da B não valeu:** só o `hw.lcd.*` foi trocado, e a moldura `pixel_9_pro_xl` manteve a tela em
+  1344×2992, mudando só a densidade. A B medida foi com o `skin.name=1080x2400` e o `showDeviceFrame=no`.
+- **O AVD voltou à A**, com o ajuste da GPU, da RAM e dos núcleos, e segue ligado em `emulator-5554`.
+- **Os prints das duas opções** foram mostrados lado a lado no chat.
+
+### O AVD novo nasce ajustado
+
+- **`adf9229` no `brza-workflow`:** `feat(client): o AVD que o brza devices cria nasce na GPU do Mac`.
+  - Depois do `avdmanager create`, o `config.ini` ganha `hw.gpu.mode=host`, metade da RAM da máquina até 4 GB e os
+    núcleos de desempenho mais um, lidos do `sysctl`.
+  - Sem o `sysctl`, valem 2 GB e metade dos núcleos.
+  - O `test_brza_devices.py` foi a 23 casos, e a `tests/cli` limpa deu `OK`.
+- **A conferência:** o `brza devices open "Pixel 10 Pro" --android --wait` criou o AVD com `hw.gpu.mode=host`,
+  `hw.ramSize=4096` e `hw.cpu.ncore=6`. Ele subiu em `vulkan_mode_selected:host gles_mode_selected:host`, com o Pixel
+  9 Pro XL ligado ao lado, e foi apagado depois.
+
 ## Fora do workspace
 
 - **O link `~/.local/bin/brza-devices`**, pelo `brza install --client`.
@@ -129,6 +162,7 @@ extraindo o máximo de recurso para que o emulador rode \"liso\"".
   - **Como desfazer:** nada a desfazer.
 - **O `config.ini` do AVD `Pixel_9_Pro_XL`**, com `hw.gpu.mode=host`, `hw.ramSize=4096` e `hw.cpu.ncore=6`.
   - **Risco:** o emulador usa até 4 GB de RAM e 6 núcleos enquanto está ligado.
-  - **Estado:** ativo; o emulador segue ligado em `emulator-5554`, subido a frio pelo `-no-snapshot-load`.
+  - **Estado:** ativo; o emulador segue ligado em `emulator-5554`. Na medida, o `config.ini` passou pela opção B
+    (1080×2400, sem a moldura) e voltou à A, com o `diff` contra o backup mostrando só as três chaves do ajuste.
   - **Como desfazer:** `cp ~/.android/avd/Pixel_9_Pro_XL.avd/config.ini.brza-backup-2026-11-02
     ~/.android/avd/Pixel_9_Pro_XL.avd/config.ini`, com o emulador desligado.

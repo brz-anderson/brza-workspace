@@ -19,7 +19,7 @@ tags:
 
 - **Retomar:** P1 executado e aprovado na R10 (a chama no degradê, sem língua nem faíscas); a fonte está em
   `PLN-007-fonte-do-simbolo/`. O P3 executou em 2026-11-02, na sessão `pln-007-brand-tokens` do `brza-studio`, e está na
-  `master` do `brza-studio` em `a3a89e3aaf5`, com push; falta a conferência com uma pergunta real de agente no app.
+  `master` do `brza-studio` em `a3a89e3aaf5`, com push; o azul foi conferido no app vivo nos dois temas, e falta só uma pergunta de agente de verdade.
   Próximo, a pedido de Anderson: o P2, os lockups L2, nesta sessão do `brand`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
@@ -144,7 +144,17 @@ Estimado: 1,25 h · Executado: 0,3 h
   `fixtures:shot` do P3".
 - **4:** `41bfe6d1d4e` e `a3a89e3aaf5`, fast-forward na `master` do `brza-studio`, `git push origin master`
   (`a70f63b6a92..a3a89e3aaf5`).
-- **Falta:** a conferência com uma pergunta real de agente no app, da Regressão do aviso de pergunta.
+- **No app vivo:** `ORCA_BACKGROUND_LAUNCH=1 pnpm dev:fresh -- --remote-debugging-port=9477`, perfil temporário, janela
+  fora da tela, lido por CDP. Claro: `--agent-question` `oklch(48.8% 0.243 264.376)` (blue-700) e
+  `--agent-question-text` `oklch(42.4% 0.199 265.638)` (blue-800). Escuro, com a classe `.dark` alternada e
+  restaurada: `oklch(70.7% 0.165 254.624)` (blue-400) e `oklch(80.9% 0.105 251.813)` (blue-300). Um elemento com
+  `text-agent-question` pinta exatamente essas cores, e o `--brand-text` alterna `#c2410c` e `#ffaa44`. O app abriu na
+  tela de boas-vindas, sem laranja. O app e o perfil temporário foram encerrados e removidos.
+- **Falta:** uma pergunta de agente de verdade no app, da Regressão do aviso de pergunta. O perfil novo não tem projeto
+  nem terminal, e o app não expõe a store; dá-la pede um workspace e um agente rodando, que gasta a conta de Anderson,
+  ou um evento de hook sintético num painel existente.
+- **Limpeza:** o worktree `.worktrees/pln-007-brand-tokens` e a branch `feat/pln-007-brand-tokens` foram removidos, a
+  branch sem cópia no `origin` e já contida na `master` (`a3a89e3aaf5`).
 
 ### P4 — Os assets no app desktop
 

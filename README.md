@@ -56,41 +56,18 @@ ativa (`gh auth switch`).
 
 ## Funções do shell
 
-O `.claude/settings.json` daqui não é herdado pelo `brza-studio`, que fica ao lado deste repositório. Este bloco do
-`~/.zshrc` passa a configuração às sessões abertas nos dois. Se ele mudar, mude aqui e copie para lá. A `fixfy_claude`
-é a função do workspace da Fixfy, que atende o resto.
+O `.claude/settings.json` daqui não é herdado pelo `brza-studio`, que fica ao lado deste repositório. Quem acha o
+workspace do cwd — pelo `.brza/workspace.toml`, ou, no `brza-studio`, pelo `~/.config/brza/workspaces.toml` — e passa a
+configuração às sessões abertas nos dois é o bloco do shell do `brza-workflow`, que **não é copiado para cá**: a fonte
+única é o `packages/client/shell/brza.zsh` do checkout do `brza-workflow`.
+
+No `~/.zshrc` desta máquina, ele entra assim, com a função da Fixfy para o que fica fora dos dois:
 
 ```zsh
-# Workspace BrzA: o bloco de "Funções do shell", no README.md do brza-workspace. Mude lá e copie para cá.
-BRZA_WORKSPACE="$HOME/Projects/brza-workspace"
-BRZA_STUDIO="$HOME/Projects/brza-studio"
-
-# "workspace" ou "studio" quando o cwd está no brza-workspace ou no brza-studio (worktrees inclusive), nada fora.
-# Caminho físico e sem maiúsculas, como o fixfy_where.
-brza_where() {
-  local here root label
-  here=$(pwd -P | tr '[:upper:]' '[:lower:]')
-  for label in workspace studio; do
-    case $label in workspace) root="$BRZA_WORKSPACE" ;; studio) root="$BRZA_STUDIO" ;; esac
-    root=$(cd "$root" 2>/dev/null && pwd -P | tr '[:upper:]' '[:lower:]') || continue
-    case "$here/" in "$root"/*) echo $label; return ;; esac
-  done
-}
-
-# Claude Code no BrzA: o --settings do brza-workspace (hooks de medição e a identidade do brz-anderson) e a raiz
-# para os hooks; no brza-studio, também o --agents com os subagentes por papel do brza-workspace (brza-agents), se
-# houver e se a chamada não trouxer o seu; o gh fica no perfil padrão.
-brza_claude() {
-  local -a agents=()
-  local json
-  if [ "$(brza_where)" = studio ] && [[ " $* " != *" --agents"* ]]; then
-    json=$(brza-agents 2>/dev/null)
-    [ -n "$json" ] && agents=(--agents "$json")
-  fi
-  BRZA_WORKSPACE="$BRZA_WORKSPACE" command claude --settings "$BRZA_WORKSPACE/.claude/settings.json" "${agents[@]}" "$@"
-}
-
-claude()     { if [ -n "$(brza_where)" ]; then brza_claude "$@"; else fixfy_claude "$@"; fi; }
+source "$HOME/Projects/brza-workflow/packages/client/shell/brza.zsh"
+brza_claude_fallback() { fixfy_claude "$@"; }
 adm-claude() { CLAUDE_CONFIG_DIR="$HOME/.claude-adm" claude "$@"; }
 claude-adm() { adm-claude "$@"; }
 ```
+
+O bloco pede o `brza-where` e o `brza-agents` no PATH, que o `brza install --all` do `brza-workflow` liga.

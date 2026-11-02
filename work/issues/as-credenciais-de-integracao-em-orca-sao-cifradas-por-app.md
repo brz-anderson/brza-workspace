@@ -1,9 +1,10 @@
 ---
-status: open
+status: done
 description: Jira, Linear, Bitbucket e chaves de API gravados em ~/.orca são cifrados com o Keychain de cada app, então o BrzA Studio não lê os do Orca e reconectar num app quebra o outro.
 scope:
   - brza-studio
 opened: 2026-11-02
+completed: 2026-11-02
 tags:
   - auth
   - infra
@@ -49,3 +50,9 @@ Storage` do Keychain, e o BrzA se renomeia antes do `ready` (`main-process-prefl
   num dos dois.
 - **Voltar a chave do BrzA ao item do Keychain do Orca.** Custo: desfaz a decisão de 2026-10-27, e o que o BrzA gravou
   deixa de ser lido.
+
+## Resolução
+
+Corrigida em 2026-11-02 pelo P75 do PLN-001 (R65.2), em `brza-studio@f7490afab9e`: os stores gravam em `~/.brza`, sem
+ler nem apagar o `~/.orca`, e os hooks seguem em `~/.orca`. Falta a conferência no app (o C28, de Anderson): reconectar o
+Jira no BrzA e conferir que o Orca segue com o dele.

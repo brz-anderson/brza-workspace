@@ -1,0 +1,1 @@
+- [Armadilhas de checagem no brza-studio](brza-studio-armadilhas-de-checagem.md) — i18n, path-literal, ico de 6 quadros, AE do magick

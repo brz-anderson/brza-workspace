@@ -1,20 +1,22 @@
 ---
-status: open
+status: done
 scope:
   - workspace
 opened: 2026-10-31
-owner: Anderson
-trigger: Anderson confirma ou recusa o texto, por frase explícita, antes do P8 do PLN-006 levar o índice à master.
+decided: 2026-11-02
+decided_by: Anderson
 tags:
   - tooling
 ---
 
 # O índice de notas mora na `master`, a única exceção à regra da norma
 
-**Proposta.** A `master` do workspace guarda a norma e, como única exceção, o índice `.brza/index.jsonl`: uma linha por
+A `master` do workspace guarda a norma e, como única exceção, o índice `.brza/index.jsonl`: uma linha por
 plano, issue ou decisão criada ou alterada, em qualquer workstream, para que quem coordena veja todas as frentes num
 arquivo só. Só o `brza note` acrescenta — o `plan-open`, que reserva o número do plano, e o `commit`, quando o
 frontmatter, o H1 ou o caminho da nota muda —, por commit sem checkout, e ninguém edita.
+
+Decidido por Anderson em 2026-11-02, na R17.1 do PLN-006: "decidido, agora".
 
 ## De onde vem
 
@@ -36,7 +38,7 @@ não há `superseded_by`.
 O texto do `AGENTS.md`, do `work/README.md`, do `plans/README.md` e da `plan-runner` está no núcleo, em
 `brz-anderson/brza-workflow@8b2a355`, e chega ao `brza-workspace` no P8.
 
-## O que falta
+## A alternativa recusada
 
-A confirmação de Anderson. A regra do PLN-006 ("escolha sempre o recomendado") escolhe a opção de rodada, mas não é a
-frase explícita que transforma esta proposta em decisão.
+Recusar o índice e voltar ao contador "Último PLN usado" na `master`: custava ~2 h para desfazer o P4 e a norma, e
+deixava quem coordena sem uma visão das frentes num arquivo só.

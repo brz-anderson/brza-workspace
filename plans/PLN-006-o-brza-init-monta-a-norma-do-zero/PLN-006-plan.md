@@ -16,9 +16,9 @@ tags:
 
 # PLN-006: O `brza init` monta a norma num workspace do zero
 
-- **Retomar:** P1–P7 feitos (`brza-workflow@b9210a6`). Falta o P8, a migração do `brza-workspace`, que espera a
-  confirmação de Anderson da proposta do índice (R8.4) e mexe no `~/.zshrc`, no `~/.local/bin` e no `~/.config/brza`;
-  e o P9. Pontos novos vão na recomendada, pela regra de Anderson após a R10.
+- **Retomar:** P1–P7 feitos (`brza-workflow@b9210a6`). Em curso, pela R17: o P8, começando pelo porte do PLN-005 em
+  `.worktrees/p8-porte` do `brza-workflow`, e a revisão do `reviewer` sobre o `brza-workflow` (parte do P9). Pontos
+  novos vão na recomendada, pela regra de Anderson após a R10.
 - **Dividido:** [PLN-006 — Desenho](PLN-006-design.md)
 
 ## Pedido
@@ -624,6 +624,24 @@ a regra escolhe opção de rodada, e não é a frase explícita que transforma t
    (recomendada) — custo: esvaziar o clone antes; se paga: já · aceitar um `.git` sem commits — custo: um caminho a
    mais de teste; se paga: se "criar no GitHub, clonar, init" virar o comum. **Decidido pela regra — recusar.**
 
+### Rodada 17 — a decisão do índice e a hora do P8 (enviada 2026-10-31, na mensagem)
+
+**Apresentado antes:** P1–P7 feitos; o texto inteiro da proposta do índice, por ser a rodada que aprova uma decisão; o
+P8 mexendo no `~/.local/bin`, no `~/.zshrc`, no `~/.config/brza` e na norma da `master`, com a sessão do PLN-005 aberta;
+a `master` do `brza-workspace` dois commits à frente da cópia do P1 (`2c9a546`, `cfa058e`).
+
+Respondida em 2026-11-02, depois de um "Continue where you left off." que não respondia a rodada.
+
+1. **A proposta do índice.** Opções: "decidido" (recomendada) — custo: nenhum agora; se paga: no P8 · recusar — custo:
+   ~2 h para desfazer o P4; se paga: só sem nada além da norma na `master`.
+2. **Quando rodar o P8.** Opções: agora, em estágios, com o que muda fora do workspace no worklog (recomendada) — custo:
+   ~3 h, e uma sessão aberta pode ver a norma mudar; se paga: já · depois que as outras sessões pararem — custo: o
+   plano parado; se paga: com uma edição de norma em curso · só os estágios sem efeito fora do repositório — custo:
+   ~1 h e o tempo de Anderson; se paga: se ele preferir mexer na configuração dele.
+
+   **Resposta:** "decidido, agora". **Decidido — a proposta do índice**, que vai a `done`, **e o P8 agora, em
+   estágios.**
+
 ## Desenho
 
 O Desenho, D1–D12, está em [PLN-006 — Desenho](PLN-006-design.md), por passar de 400 linhas.
@@ -853,10 +871,14 @@ Estimado: 1,5 h · Executado: — h
 ## Decisões
 
 - [O índice de notas mora na `master`, a única exceção à regra da norma](../../work/decisions/o-indice-de-notas-mora-na-master.md)
-  — R8.4, `open`, como proposta, à espera da confirmação de Anderson.
+  — R8.4, `done` na R17.1.
 
 ## Worklogs
 
 - 2026-10-31 — aberto; R1–R8 respondidas, a R2.1 em texto livre e confirmada na R3.1, a R4.3 em texto livre e
-  fechada na R5; D1–D12 gravados no `-design`, P1–P9 escritos (27 h). Parou na rodada do corte.
+  fechada na R5; D1–D12 gravados no `-design`, P1–P9 escritos (27 h); aceito na R9; P1–P7 feitos, com a R10 e, pela
+  regra da recomendada, as R11–R16. Parou na R17, antes do P8.
   [PLN-006: a abertura do brza init](../../work/worklogs/2026-10-31-pln-006-a-abertura-do-brza-init.md)
+- 2026-11-02 — R17 respondida; a proposta do índice decidida; o P8 começa pelo porte do PLN-005, com a revisão do
+  `brza-workflow` (P9) em paralelo.
+  [PLN-006: a migração do brza-workspace](../../work/worklogs/2026-11-02-pln-006-a-migracao-do-brza-workspace.md)

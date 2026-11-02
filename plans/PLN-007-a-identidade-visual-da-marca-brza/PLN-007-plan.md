@@ -19,7 +19,7 @@ tags:
 
 - **Retomar:** P1 executado e aprovado na R10 (a chama no degradê, sem língua nem faíscas); a fonte está em
   `PLN-007-fonte-do-simbolo/`. O P3 executou em 2026-11-02, na sessão `pln-007-brand-tokens` do `brza-studio`, e está na
-  `master` do `brza-studio` em `a3a89e3aaf5`, com push; o azul foi conferido no app vivo nos dois temas, e falta só uma pergunta de agente de verdade.
+  `master` do `brza-studio` em `a3a89e3aaf5`, com push; o azul foi conferido no app vivo nos dois temas, com um Claude de verdade parado numa pergunta.
   Próximo, a pedido de Anderson: o P2, os lockups L2, nesta sessão do `brand`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
@@ -150,9 +150,14 @@ Estimado: 1,25 h · Executado: 0,3 h
   restaurada: `oklch(70.7% 0.165 254.624)` (blue-400) e `oklch(80.9% 0.105 251.813)` (blue-300). Um elemento com
   `text-agent-question` pinta exatamente essas cores, e o `--brand-text` alterna `#c2410c` e `#ffaa44`. O app abriu na
   tela de boas-vindas, sem laranja. O app e o perfil temporário foram encerrados e removidos.
-- **Falta:** uma pergunta de agente de verdade no app, da Regressão do aviso de pergunta. O perfil novo não tem projeto
-  nem terminal, e o app não expõe a store; dá-la pede um workspace e um agente rodando, que gasta a conta de Anderson,
-  ou um evento de hook sintético num painel existente.
+- **Com um agente de verdade:** a pedido de Anderson, um workspace descartável (`repo add` pelo `out/bin/orca-dev`) e
+  `agent launch --agent claude --surface terminal --model claude-haiku-5-5`, com um prompt que usa a ferramenta
+  `AskUserQuestion`. O Claude (Haiku 5.5) parou na pergunta "Where should this run?", e o sidebar mostrou o ícone de
+  pergunta no cabeçalho "Projetos" e na linha do agente, os dois `text-agent-question`, lidos no DOM:
+  `oklch(0.488 0.243 264.376)` no claro e `oklch(0.707 0.165 254.624)` no escuro; recortes nos dois temas. O sino
+  laranja ao lado do `main` é `text-amber-500`, outro token, e não muda no P3. Não se exercitaram o cartão do kanban,
+  a atividade nem o cartão de pergunta do chat: só o sidebar, com um agente de terminal. A pergunta ficou sem resposta,
+  o terminal e o app foram encerrados, e o workspace descartável, removido.
 - **Limpeza:** o worktree `.worktrees/pln-007-brand-tokens` e a branch `feat/pln-007-brand-tokens` foram removidos, a
   branch sem cópia no `origin` e já contida na `master` (`a3a89e3aaf5`).
 

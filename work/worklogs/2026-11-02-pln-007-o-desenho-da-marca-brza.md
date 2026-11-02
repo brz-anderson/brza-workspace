@@ -84,3 +84,7 @@ e avisa a `brand-24` pelo correio ao terminar. A issue fecha aqui, no `brand`.
   - **Risco:** nenhum.
   - **Estado:** ativa.
   - **Como desfazer:** fechar a aba quando a sessão terminar.
+
+O conserto voltou: `8d554e7` na `master`, com o arquivo da lista achado pelo import do shell dos visuais; Anderson
+relatou os 98 `unittest` passando e o teste novo falhando antes. A sessão conferiu o commit na `origin/master` e rodou o
+`brza shot` oficial: o PNG saiu igual ao da cópia do scratch, e a issue fechou.

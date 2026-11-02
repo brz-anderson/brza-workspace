@@ -1,9 +1,10 @@
 ---
-status: open
+status: done
 description: O brza shot procura os tokens do painel no caminho antigo, que o merge do upstream v1.4.246 moveu, e não gera mais o PNG.
 scope:
   - workspace
 opened: 2026-11-02
+completed: 2026-11-02
 tags:
   - tooling
 ---
@@ -27,3 +28,10 @@ pixel a pixel, ao de antes da quebra (`magick compare -metric AE` → `0`).
 **O conserto** é trocar o caminho do `PANEL_SHELL` e, para a próxima mudança do upstream, achar o arquivo pelo import
 do `native-chat-visual-shell.ts` em vez do caminho fixo. Mora no `scripts/brza/` da `master` ou no `brza-workflow`,
 conforme o PLN-006 deixou o `brza shot`; não é do `brand`.
+
+**Resolvida em 2026-11-02**, pela sessão `brza-shot-fix`, aberta a pedido de Anderson no worktree do `tools-kit`, na
+conta `admin@fixfy.com.br`: `8d554e7` na `master` ("brza shot: acha a lista de tokens pelo import do shell dos
+visuais"), que acha o arquivo da lista pelo import do `native-chat-visual-shell.ts`, com o teste novo que falhava antes
+e os 98 `unittest` de `scripts/brza/tests/` passando, segundo o relato de Anderson. A sessão do `brand` conferiu o
+commit na `origin/master` e rodou o `brza shot` oficial num artboard da R6 do PLN-007: o PNG saiu igual, pixel a pixel,
+ao da cópia corrigida (`magick compare -metric AE` → `0`).

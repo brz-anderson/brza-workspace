@@ -1,1 +1,2 @@
 - [Artboard lê o componente antes](artboard-le-o-componente-antes.md) — forma e tamanho do artboard saem das classes do componente real
+- [Artboard fica na raiz do scratch](artboard-fica-na-raiz-do-scratch.md) — o `::orca-visual` não renderiza `.html` em subpasta do scratch

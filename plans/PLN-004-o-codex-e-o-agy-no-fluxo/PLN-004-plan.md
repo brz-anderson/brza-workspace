@@ -14,11 +14,10 @@ tags:
 
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** o Desenho está em rascunho no scratch da sessão `workspace` (`pln-004-design-rascunho.md`, D1 a D14), com
-  as rodadas 6 a 8 fechadas e as sondas da R6.1 feitas (`pln-004-sondas-r6.md`). O próximo é o `designer` aplicar a R6
-  a R8 ao rascunho e a aprovação do texto, na mensagem, antes de gravá-lo em `PLN-004-design.md`. A frente 4 leva
-  também os três focos de revisão — simplicidade, defeito, convenção —, um por runtime, como Anderson escolheu na
-  triagem do porte da Fixfy, em 2026-10-31: "Com a frente 4".
+- **Retomar:** a R1 a R9 fecharam, mas o PLN-006 (2026-11-02) levou o CLI, os hooks, os papéis e a norma comum ao
+  `brza-workflow`, e o rascunho do Desenho (`pln-004-design-rascunho.md`, D1 a D14, no scratch) ainda conta com tudo
+  isso no `brza-workspace`; o próximo é a rodada 10, que decide onde cada item mora agora, e então reescrever o rascunho
+  e mandá-lo à aprovação, na mensagem, antes de gravá-lo em `PLN-004-design.md`.
 
 ## Pedido
 
@@ -40,7 +39,9 @@ As frentes do pedido, pela R1.2, numeradas para a Cobertura:
    `.agents/agents/*.md`, gravando na memória do workstream, gerados para não divergir do `.claude/agents/`;
 3. **Medição:** o `measure.py` lendo o rollout do Codex e o transcript do `agy`, com o runtime em cada linha;
 4. **Delegação e sessões:** a sessão Claude manda revisão e levantamento ao Codex e ao `agy`, só leitura, e o
-   `brza sessions` abre sessão Codex ou `agy` no worktree.
+   `brza sessions` abre sessão Codex ou `agy` no worktree. Esta frente leva também os três focos de revisão —
+   simplicidade, defeito e convenção —, um por runtime, que Anderson mandou para cá na triagem do porte das skills da
+   Fixfy, em 2026-10-31 ("Com a frente 4", no [O porte das skills da Fixfy para o workspace](../../work/worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md)).
 
 ### Cobertura
 
@@ -57,6 +58,7 @@ As frentes do pedido, pela R1.2, numeradas para a Cobertura:
 | `R1.2` 3 | a sessão Codex e a `agy` geram linhas em `.measurements/measurements.jsonl`, com o `runtime` e o `workstream`                        | —     | —             |
 | `R1.2` 4 | a sessão Claude pede revisão e levantamento ao Codex e ao `agy` sem que eles gravem no repositório                                   | —     | —             |
 | `R1.2` 4 | o `brza sessions` abre uma sessão Codex ou `agy` no worktree do workstream                                                           | —     | —             |
+| `R1.2` 4 | a revisão delegada roda com um foco por runtime: simplicidade, defeito ou convenção                                                  | —     | —             |
 
 ### Fora de escopo
 
@@ -470,3 +472,6 @@ proposto na mesma mensagem e aceito na mesma resposta.
   [O PLN-004: as sondas da R6 e o Desenho do Codex e do agy](../../work/worklogs/2026-10-31-pln-004-as-sondas-e-o-desenho.md)
 - 2026-10-31 — fora do plano, a triagem do porte da Fixfy mandou à frente 4 os três focos de revisão.
   [O porte das skills da Fixfy para o workspace](../../work/worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md)
+- 2026-11-02 — a revisão do plano contra a migração ao `brza-workflow` (PLN-006), o `Retomar` e a frente 4 com os três
+  focos. Parou na R10.
+  [O PLN-004: a revisão do plano contra a migração ao brza-workflow](../../work/worklogs/2026-11-02-pln-004-a-revisao-contra-o-pln-006.md)

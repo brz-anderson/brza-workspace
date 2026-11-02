@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 20.75
-executed_h: 0.95
-remaining_h: 10.5
+executed_h: 2.2
+remaining_h: 5.75
 scope:
   - brza-studio
   - workspace
@@ -17,9 +17,10 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** P1 (R10) e P2 (R11) aprovados; P3 na `master` do `brza-studio` em `a3a89e3aaf5`. A R11 decidiu: os
-  merges do P4, P5 e P6 em ordem, um por vez, com os checks de cada um; o README do workspace depois do merge do P4; o P6
-  numa branch nova empilhada. O P4 está em execução num `implementer`; a fonte está em `PLN-007-fonte-da-marca/`.
+- **Retomar:** P1, P2, P3 e P4 prontos; o P4 está na `master` do `brza-studio` em `1bfb496aebf`, e o README do workspace,
+  do P6, na `master` daqui em `b30b6bc`. O P5, a marca no chat, está em execução num `implementer`, partindo da `master`.
+  Falta o P6 do `brza-studio` (o CLI e o README) e fechar o plano. **Aberto para Anderson:** o `.ico` com 6 quadros, em vez
+  de 7; e os casos manuais C1 a C8 no app.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
 ## Pedido
@@ -59,6 +60,8 @@ Na sessão do `brand`, no mesmo dia, durante a R2:
 - **O app mobile e os restos da Orca à vista** (R3.4). Foram à
   [issue dos restos da Orca](../../work/issues/os-restos-da-orca-a-vista-no-brza-studio.md).
 - **O cursor e a seleção em laranja no chat** (M4, R2.6). Recusado na rodada; sem destino.
+- **Os testes e2e de SQLite que falham na `master` do `brza-studio`**, achados na conferência do P4. Foram à
+  [issue dos testes e2e de SQLite](../../work/issues/os-testes-e2e-de-sqlite-falham-na-master-do-brza-studio.md).
 - **O `brza shot` quebrado pelo merge do upstream v1.4.246 no `brza-studio`.** Foi à
   [issue do brza shot](../../work/issues/brza-shot-quebra-com-os-tokens-do-painel-movidos.md); o Desenho segue com uma
   cópia corrigida no scratch.
@@ -175,23 +178,49 @@ Estimado: 1,25 h · Executado: 0,3 h
 Executa D1 e D2 (a cópia ao repositório), D3 (os SVG e o `BrzaWordmark`) e D7 · executor: sessão do `brza-studio`,
 branch `feat/pln-007-brand-assets`, depois do P1 e do P2
 
-Estimado: 4,5 h · Executado: — h
+Estimado: 4,5 h · Executado: 1 h
 
-- [ ] **1. A conferência que falha antes** — `magick resources/build/icon.png -alpha extract -threshold 50% -format '%@' info:`
+- [x] **1. A conferência que falha antes** — `magick resources/build/icon.png -alpha extract -threshold 50% -format '%@' info:`
       dá `914x952+55+36` hoje e deve dar `824x824+100+100`; `git grep -n 'invert' -- src/renderer/src/components/Landing.tsx src/renderer/src/components/onboarding/OnboardingFlow.tsx src/renderer/src/components/sidebar/SidebarSettingsHelpMenu.tsx src/renderer/src/components/settings/orca-logo-settings-icon.tsx`
       acha os usos que invertem o `logo.svg` e deve achar nenhum.
-- [ ] **2. Copiar a fonte** — `resources/brand/` e os dois scripts de `config/scripts/`, aprovados no P1 e no P2; o `d`
+- [x] **2. Copiar a fonte** — `resources/brand/` e os dois scripts de `config/scripts/`, aprovados no P1 e no P2; o `d`
       do D2 no `resources/brza-flame-mono.svg` e no `BrzaFlameLogo.tsx`; a frase da `brza-brand-logos.md:6`.
-- [ ] **3. O pipeline** — o `generate.sh` do D7; `pnpm build:icons` gera o `.icns`, o `build/icon.png`, o
+- [x] **3. O pipeline** — o `generate.sh` do D7; `pnpm build:icons` gera o `.icns`, o `build/icon.png`, o
       `icon.png`, o `icon-dev.png`, os dois `app-icons/orca-*.png`, os dois PNG do tray e o `.ico`.
-- [ ] **4. O `logo.svg` e o logotipo** — o `logo.svg` colorido e os 5 usos sem `invert` e `opacity`; o `BrzaWordmark`
+- [x] **4. O `logo.svg` e o logotipo** — o `logo.svg` colorido e os 5 usos sem `invert` e `opacity`; o `BrzaWordmark`
       em `components/brza/` e o CSS dele; a Landing e o Onboarding do D7.
-- [ ] **5. Rodar e ver passar** — a conferência do 1; `iconutil -c iconset resources/build/icon.icns -o "$TMPDIR/brza.iconset" && ls "$TMPDIR/brza.iconset" | wc -l`
+- [x] **5. Rodar e ver passar** — a conferência do 1; `iconutil -c iconset resources/build/icon.icns -o "$TMPDIR/brza.iconset" && ls "$TMPDIR/brza.iconset" | wc -l`
       → 10; `magick identify resources/build/icon.ico | wc -l` → 7; `pnpm check:changed --maxWorkers=2`.
-- [ ] **6. Casos manuais** — C5, C7 e C8.
-- [ ] **7. Commit** — `feat(brand): the BrzA symbol, icon pipeline and wordmark (PLN-007 P4)`, e o merge na `master`.
+- [-] **6. Casos manuais** — C5, C7 e C8. Feitos pelo `brza shot`, que prova o visual e não o app; o Dock, a barra de título
+      do Windows e o tray de verdade seguem com Anderson. Motivo: o `brza shot` converte um artboard, não abre o app.
+- [x] **7. Commit** — `feat(brand): the BrzA symbol, icon pipeline and wordmark (PLN-007 P4)`, e o merge na `master`.
 
-**Evidência:** —
+**Evidência:**
+
+- **1:** antes, `914x952+55+36` e 3 usos de `invert` (a Landing usava o tile `#12181e`, e não o `invert`); depois,
+  `824x824+100+100` e nenhum `invert`.
+- **2:** o gerador, adaptado ao S1 de 12 subpaths, dá `magick compare -metric AE` **0** nos 23 SVG (22 de `resources/brand/`
+  e o `logo.svg`) contra a fonte aprovada; o mono e o tray saem idênticos byte a byte. O `d` do D2 está em
+  `resources/brza-flame-mono.svg` e no `BrzaFlameLogo.tsx`.
+- **3:** `pnpm build:icons`, saída 0, gerou o `.icns` (10 fatias, de 16 a 1024), `build/icon.png`, `icon.png`,
+  `icon-dev.png`, os dois `app-icons`, os dois PNG do tray e o `.ico`. Os PNG foram lidos: sem faíscas, e o selo é só
+  "BrzA STUDIO" nas fatias de 128 para cima.
+- **4:** os 5 usos do `logo.svg` sem `invert` nem `opacity`; o `BrzaWordmark` e o teste dele, de 2 casos; o h1 da Landing
+  e o do Onboarding usam o wordmark.
+- **5:** `iconutil -c iconset` → 10; `magick identify icon.ico` → **6, não 7** (desvio abaixo). O `pnpm check:changed
+  --base=master` deu 26 de 27: o `unit tests` falhou em 3 testes de 4 arquivos e2e, com "unable to open database file", e
+  os mesmos 4 arquivos falham na `master` `a3a89e3aaf5`, isolados; foi à issue. O `implementer` rodou 24 de 24 antes da troca
+  do rótulo do seletor, que ampliou o conjunto de testes.
+- **7:** `1bfb496aebf`, fast-forward na `master` do `brza-studio`, `git push origin master`
+  (`a3a89e3aaf5..1bfb496aebf`); o worktree e a branch foram removidos.
+- **Desvios:** (a) o `.ico` tem 6 quadros: o `trim-windows-icon-source.mjs` emite `[256,128,64,48,32,16]`, e o 7º (24 px)
+  do arquivo antigo vinha de um pipeline anterior — **aberto para Anderson**: acrescentar o 24 ao `ICO_FRAME_SIZES`, que é
+  script e teste do upstream; (b) o `BrzaWordmark` entrou na allowlist de localização, e as duas chaves de i18n que a
+  Landing e o Onboarding deixaram de usar foram apagadas das 11 línguas; (c) a Landing mantém o `<h1>` e o `alt` que já
+  tinha; (d) a frase de `brza-brand-logos.md` ficou truncada, e o P5 a reescreve; (e) o rótulo "BrzA Studio ADE" do seletor
+  virou "BrzA Studio", a pedido de Anderson.
+
+
 
 ### P5 — A marca no chat
 
@@ -217,7 +246,7 @@ Estimado: 4,5 h · Executado: — h
 Executa D8 · executor: sessão do `brza-studio`, de novo na branch `feat/pln-007-brand-assets`, aberta da `master`
 depois do P5, para o `brza-studio`; a sessão do `brand`, para o README do workspace na `master`
 
-Estimado: 1,5 h · Executado: — h
+Estimado: 1,5 h · Executado: 0,25 h
 
 - [ ] **1. Teste que falha** — `src/cli/brza/cli-display-name.test.ts`: o `printHelp(specs)` raiz, com o
       `console.log` espiado, não imprime linha que case `(^|\s)orca\s` e segue imprimindo `orca://pair` e
@@ -229,17 +258,22 @@ Estimado: 1,5 h · Executado: — h
       `"/Applications/BrzA Studio.app/Contents/Resources/bin/brza" --help | grep -c -E '(^|\s)orca\s'` → 0.
 - [ ] **4. Commit no `brza-studio`** — `feat(cli): brza --help says brza; the README carries the BrzA lockup (PLN-007 P6)`,
       e o merge na `master`.
-- [ ] **5. O README do workspace** — o `<picture>` do D8 na `master` do workspace, com `git add README.md`, commit e
+- [x] **5. O README do workspace** — o `<picture>` do D8 na `master` do workspace, com `git add README.md`, commit e
       push; a prova é `curl -sI` das duas URLs do raw devolver `200` e `image/svg+xml`.
 
-**Evidência:** —
+**Evidência:**
+
+- **5:** `curl -sI` das duas URLs do raw (`…/brza-studio/master/resources/brand/brza-workspace-lockup-horizontal-{dark,light}.svg`)
+  deu `HTTP/2 200` e `content-type: image/svg+xml`, depois do merge do P4; o `<picture>` do D8 está no título do `README.md`
+  da `master` do workspace, em `b30b6bc`, com push. Os passos 1 a 4, do `brza-studio`, esperam o P5.
 
 ## Regressão
 
 - **O `.icns` segue com duas artes:** sem selo de 16 a 64 px e com selo de 128 para cima. Como se confere: o
   `iconutil -c iconset` do P4 e os 10 PNG abertos.
-- **O `.ico` segue com 7 quadros**, de 16 a 256. Como se confere: `magick identify resources/build/icon.ico`.
-- **O seletor de ícone** segue com Flame, BrzA Studio ADE e Light Flame, e cada um troca o ícone do Dock; o
+- **O `.ico` tem 6 quadros**, de 16 a 256 (o 24 px não sai do `trim-windows-icon-source.mjs`). Como se confere:
+  `magick identify resources/build/icon.ico`. Aberto: acrescentar o 24, decisão de Anderson.
+- **O seletor de ícone** segue com Flame, BrzA Studio e Light Flame, e cada um troca o ícone do Dock; o
   `icon-dev.png` segue fora do pacote. Como se confere: Configurações, o seletor, as três opções, no app de dev e no
   instalado.
 - **O tray** segue como template monocromático, com o carimbo de dev e o ícone de atenção. Como se confere: C8.
@@ -251,7 +285,8 @@ Estimado: 1,5 h · Executado: — h
 - **O composer não pula no foco**: a borda tem 1 px em repouso e em foco; o botão "parar" segue `secondary`, e o
   desabilitado segue como hoje. Como se confere: C1 e C2.
 - **O aviso de pergunta só muda de cor**, em todo lugar que usa o `--agent-question` (barra lateral, kanban, atividade,
-  cartão de pergunta). Como se confere: o `fixtures:shot` do P3 e uma pergunta real de agente no app.
+  cartão de pergunta). Como se confere: o `AgentStateDot:allStates` do P3 (o `fixtures:shot` do `NativeChatQuestionCard` não exercita o
+  token) e uma pergunta real de agente no app.
 - **O `LoadingSpinner` fora da linha de atividade e o `NativeChatLoadingCue` seguem como estão.** Como se confere:
   `NativeChatQueuedMessageList.test.tsx` e `NativeChatToolRun.test.tsx` sem mudança.
 - **Os glifos `brza-logo` nas linhas de ferramenta seguem monocromáticos em `currentColor`.** Como se confere:
@@ -278,10 +313,10 @@ Estimado: 1,5 h · Executado: — h
 | C2  | R6.2: o botão de enviar no degradê só no foco | Com foco e texto; sem foco; com o agente rodando ("parar"); com o composer vazio | Degradê só com foco e o enviar habilitado; "parar" `secondary`; desabilitado como hoje | — | — |
 | C3  | R2.6/H1: a chama do M5 não cobre a transcrição | Rolar a transcrição até o topo e parar no meio de uma mensagem | A chama de 13 px no canto não cobre texto legível | — | — |
 | C4  | R6.4: a chama colorida só no painel com foco | Três chats lado a lado; trocar o foco do do meio para o da direita | Só o painel com foco tem a chama no degradê; a cor acompanha a troca | — | — |
-| C5  | R5.1: o ícone no Dock e no Finder, na grade da Apple | Instalar o build do P4; ver o Dock, o Cmd-Tab e o Finder | Sem caixa cinza; do tamanho dos ícones vizinhos | — | — |
+| C5  | R5.1: o ícone no Dock e no Finder, na grade da Apple | Instalar o build do P4; ver o Dock, o Cmd-Tab e o Finder | Sem caixa cinza; do tamanho dos ícones vizinhos | Pelo `brza shot` ([PNG](PLN-007-casos-c5-c7-c8.png)): a fatia de 1024 do `.icns` gerado, com o selo, ao lado de vizinhos de mentira na grade da Apple, sem caixa cinza e com o tile do mesmo tamanho; a de 64, sem selo. Sem faíscas. | visto no artboard; o Dock, o Cmd-Tab e o Finder seguem pendentes no app |
 | C6  | R2.6: o M2 parado com movimento reduzido | Ativar "Reduzir movimento" no macOS; mandar um prompt | A chama parada no degradê e o rótulo sem brilho, na cor de hoje | — | — |
-| C7  | R5.2: o `logo.svg` colorido a 16 px na barra de título | No Windows ou no Linux, com barra de título própria, nos dois temas | O A1 com o tile lê como a marca, sem `invert` | — | — |
-| C8  | R3.4: o tray do S1 | Barra de menus clara e escura; o app de dev; um aviso de atenção | Template monocromático que segue o tema; o carimbo de dev e o de atenção aparecem | — | — |
+| C7  | R5.2: o `logo.svg` colorido a 16 px na barra de título | No Windows ou no Linux, com barra de título própria, nos dois temas | O A1 com o tile lê como a marca, sem `invert` | Pelo `brza shot` ([PNG](PLN-007-casos-c5-c7-c8.png)): o `logo.svg` colorido a 14, 16, 28 e 80 px, nos dois temas, sem `invert`; a 16 px lê como o tile com a chama. | visto no artboard; a barra de título do Windows ou do Linux segue pendente |
+| C8  | R3.4: o tray do S1 | Barra de menus clara e escura; o app de dev; um aviso de atenção | Template monocromático que segue o tema; o carimbo de dev e o de atenção aparecem | Pelo `brza shot` ([PNG](PLN-007-casos-c5-c7-c8.png)): o `orca-menu-barTemplate` e o `@2x` em menu claro e escuro (o tinge do macOS simulado por `invert`); a chama S1 em preto lê nos dois. | visto no artboard; o tray de verdade, o carimbo de dev e o aviso de atenção seguem pendentes no app |
 
 ## Fechamento
 

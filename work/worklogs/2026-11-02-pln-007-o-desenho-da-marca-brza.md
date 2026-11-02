@@ -137,3 +137,33 @@ reporte no final". O P2 rodou no scratch e a fonte foi à pasta do plano, renome
   contra as 2,5 h estimadas. As perguntas 2, 3 e 4 (merges, README do workspace, branch do P6) vieram depois: "o restante segue com as
   recomendadas" — merges em ordem, um por vez, com os checks; README depois do merge do P4; branch nova empilhada no P6.
   O artboard só renderizou no chat depois de copiado para a raiz do scratch; a lição foi à memória do workstream.
+
+## A execução do P4 e o README do workspace
+
+O P4 correu num `implementer`, com o pedido em `/private/tmp/pln-007/prompt-p4.md`; a sessão conferiu o diff, rodou o
+`check:changed` por conta própria e commitou. Anderson pediu antes o rótulo "BrzA Studio" no seletor de ícones, e o
+`implementer` recebeu as duas mudanças que chegaram no meio (o selo sem "ADE" e o `.icns` sem faíscas).
+
+- O gerador adaptado ao S1 deu AE 0 nos 23 SVG contra a fonte aprovada; o `.icns` tem 10 fatias, sem faíscas, e o `.ico`,
+  6 quadros, não 7. O 7 do plano vinha do arquivo antigo; o script do upstream só emite 6. Ficou aberto para Anderson.
+- O `check:changed` da sessão deu 26 de 27: 3 testes e2e de SQLite falham, e os mesmos quatro arquivos falham na `master`
+  `a3a89e3aaf5`, isolados. Foram a uma [issue](../issues/os-testes-e2e-de-sqlite-falham-na-master-do-brza-studio.md).
+  O `implementer` tinha visto 24 de 24 porque o conjunto de testes dele era menor; a troca do rótulo, em `shared/app-icon.ts`,
+  puxou 5 372 arquivos.
+- Merge do P4 na `master` do `brza-studio`, `1bfb496aebf`, fast-forward e push, como a R11 mandou (em ordem, com os checks).
+  Depois, o README do workspace: as duas URLs do raw deram `200` e `image/svg+xml`, e o `<picture>` foi à `master` daqui,
+  `b30b6bc`.
+- **C5, C7 e C8** foram feitos pelo `brza shot`, a pedido de Anderson ("rode os casos manuais utilizando o `brza shot`"):
+  o PNG está em `PLN-007-casos-c5-c7-c8.png`, e o veredito diz "visto no artboard", porque o `brza shot` converte um
+  artboard e não abre o app. Na primeira passada o dock pequeno usou a arte de 1024 reduzida, com o selo, e o `.icns` não
+  leva selo até 64 px; foi corrigido para a fatia real de 64.
+- Duas issues: [o `brza sessions` abre na conta ativa do app](../issues/o-brza-sessions-abre-na-conta-ativa-do-app.md),
+  e dois itens a mais na dos restos da Orca (a cauda do `icon.json` e os nomes `orca-*`).
+- O P5 partiu da `master`, num `implementer`, e o P6 do `brza-studio` espera o merge dele.
+
+## Fora do workspace
+
+- **O worktree `.worktrees/pln-007-brand-assets` e a branch `feat/pln-007-brand-assets` do `brza-studio`**, removidos
+  depois do merge; **risco:** nenhum, a branch estava contida na `master`; **estado:** removidos; **como desfazer:**
+  `git worktree add` a partir do `1bfb496aebf`.
+- **Dois pushes à `master`:** `a3a89e3aaf5..1bfb496aebf` no `brza-studio` e `3c40096..b30b6bc` no `brza-workspace`.

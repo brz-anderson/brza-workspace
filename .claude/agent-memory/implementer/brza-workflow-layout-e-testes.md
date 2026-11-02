@@ -76,3 +76,11 @@ metadata:
   cópia (`cp -R bin core tests packages templates`): 8 mutantes mortos; a suíte de init leva ~35 s, e o loop passa de 120 s:
   rode em background. Rodar a suíte inteira em background com `( ... ) &` solta a notificação cedo: espere um arquivo-marca.
 
+- **P8 estágio 1 (portar commits da master do workspace ao núcleo):** hooks/scripts/testes que o P1 só reposicionou voltam por
+  `git show origin/master:<caminho>` + as 2-3 trocas de caminho do P1 (`HOOKS`, `core/scripts`, `settings.hooks.json`), com
+  `count == 1`; `core/CLAUDE.md` por `patch -p1` do diff da master (apague o `.orig`). A região da mudança sem nome de
+  workspace não ganha placeholder, e o ouro só pede trocar `fixtures/golden/master/<arquivo>` (a lista de diferenças não mexe).
+  Teste que copia `measure.py` para um repo temporário (`RootTest` do fact_outcome) tem de copiar também o `brza_root.py`
+  (o `measure.py` do núcleo o importa do mesmo diretório). `"master"` literal em código portado vira
+  `brza_root.workspace_branch(find(cwd).manifest)` (via `measure.brza_root`); prove por manifesto com `branch = "norma"`.
+  Em 2026-11-02: hooks 282 (5 skips no 3.9), cli 372 (~150 s), notes-checker ok.

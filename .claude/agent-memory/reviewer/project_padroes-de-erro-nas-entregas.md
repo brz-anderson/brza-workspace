@@ -1,6 +1,6 @@
 ---
 name: padroes-de-erro-nas-entregas
-description: Onde os defeitos das entregas de plano do workspace costumam se esconder (hooks de medição, auditoria por LLM, evidência de passo [x], desvios), e as hipóteses que costumam cair
+description: Onde os defeitos das entregas de plano do workspace costumam se esconder (hooks de medição, auditoria por LLM, evidência de passo [x], desvios, cópia congelada contra a origem, sync e índice do brza-workflow), e as hipóteses que costumam cair
 metadata:
   type: project
 ---
@@ -25,12 +25,39 @@ Padrões vistos na revisão do PLN-005 (2026-10-31), a primeira deste papel no w
   worktree a raiz vira o worktree, que pode ter um `.measurements/` velho; o log ausente vira "vazio" sem aviso. Testar
   com `env -u BRZA_WORKSPACE` no worktree e rodar da raiz da `master` (onde o workstream é `master`, não vazio).
 - **Teste de timeout que não distingue `killpg` de `kill`**: mutação numa cópia em `/private/tmp` mostra.
+- **Cópia que congelou num sha enquanto a origem andou** (PLN-006: o `brza-workflow` nasceu de `d85c783`, e a `master`
+  ganhou o P11 do PLN-005 depois). O sync "sem entrada no lock → sobrescreve" desfaz a mudança alheia com saída 0.
+  Conferir com `git log <sha da cópia>..origin/master` e com o `shasum` de cada arquivo nos três lados. Depois, ensaiar
+  o `--dry-run` num clone em `/private/tmp`, com o `BRZA_WORKFLOW` apontando para um clone, porque o `fetch` do sync
+  escreve no `.git` do repositório real. Confiança dada: 97.
+- **Valor padrão que difere do valor real do workspace**: o dict de teste "que o P8 grava" omite uma chave, e o
+  `with_defaults` preenche outra data. Rodar o checador do núcleo nas notas reais dos worktrees
+  (`git worktree add <tmp> origin/workstream/<x>`) com os dois valores. Confiança dada: 90, com premissa.
+- **Promessa de reparo que só cobre metade**: o aviso manda rodar um `--rebuild` que só acrescenta o que falta e não
+  corrige o que ficou velho. O teste fixa o lado que falha ("sem push, sem linha") e não o reparo. Reproduzir a
+  sequência inteira (mudar, perder, reparar). Confiança dada: 95.
+- **Flag nova que contradiz um "deixar até…" de outra rodada**: a R15.4 deixou o `origin`/`master` fixos "até haver um
+  workspace assim", e o P5 ganhou `--branch`, que cria um. Cruzar as condições "se paga: se o P_x criar…" com as flags
+  dos passos seguintes.
+- **Esqueleto do CLI que o checador do mesmo núcleo reprova**: a regra nova do checador (o `description`) não chegou
+  ao molde do `brza note new`. O aceite roda o checador num workspace vazio, e por isso passa. Testar criando a nota
+  pelo comando.
 
 **Hipóteses que costumam cair** (deixar como `→ falso` no parecer):
 - a trava compartilhada do `measure.State` segurando o hook — conferir pelos timestamps `subagent` → `fact_capture`;
 - a sessão no worktree do `brza-studio` sem o modelo ou a permissão — o `env` do `settings.json` chega aos filhos, e o
   `defaultMode: auto` é de usuário;
 - vazamento para o log — `.measurements/` está no `.gitignore`.
+- caminho `../` no lock apagando fora da raiz — o `git status -- <caminhos>` do guard recusa o caminho fora do
+  repositório antes de escrever;
+- `--relink` apagando arquivo que não é link — a recusa vem antes de qualquer `unlink`;
+- "o repositório público ganhou e-mail ou caminho pessoal" — conferir com `git grep` na `origin/master` do
+  `brza-workspace`, que é público e já os tinha;
+- o `claude-brza` quebrando no 3.9 — o `import` falho cai num `except` e só perde o `--agents`, como antes (X6).
+
+**Ambiente de experimento:** o `rm -rf` com glob relativo é barrado pela trava do runtime. Crie um diretório novo por
+experimento (`/private/tmp/<plano>/expN`), com `HOME`, `GIT_CONFIG_GLOBAL`, `BRZA_REGISTRY` e `XDG_CONFIG_HOME`
+temporários, num `env.sh` que cada comando carrega.
 
 **Cuidado de leitura:** dois `sed -n` concatenados num só comando colam trechos de testes diferentes e fazem parecer
 código morto; ler o teste pelos limites do `def`.

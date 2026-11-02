@@ -4,7 +4,7 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 20.75
-executed_h: 0.55
+executed_h: 0.85
 remaining_h: 13.0
 scope:
   - brza-studio
@@ -17,10 +17,10 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** P1 executado e aprovado na R10 (a chama no degradê, sem língua nem faíscas); a fonte está em
-  `PLN-007-fonte-do-simbolo/`. O P3 executou em 2026-11-02, na sessão `pln-007-brand-tokens` do `brza-studio`, e está na
-  `master` do `brza-studio` em `a3a89e3aaf5`, com push; o azul foi conferido no app vivo nos dois temas, com um Claude de verdade parado numa pergunta.
-  Próximo, a pedido de Anderson: o P2, os lockups L2, nesta sessão do `brand`.
+- **Retomar:** P1 aprovado (R10); P3 na `master` do `brza-studio` em `a3a89e3aaf5`. O P2 tem os passos 1 a 3 feitos e
+  espera a aprovação dos lockups (passo 4, decisão de Anderson). A pedido, o P4, o P5 e o P6 correm em branches
+  empilhadas no `brza-studio`, sem merge, porque levam os lockups e o selo ainda sem aprovação; a fonte está em
+  `PLN-007-fonte-da-marca/`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
 ## Pedido
@@ -93,25 +93,33 @@ Estimado: 6,5 h · Executado: 0,25 h
 mestre, a 1024 px, dá 347 px de 1 milhão, todos no `}` solto e no `{`, que são a correção do D2 e o espelho; o S1 gerado
 tem 12 subpaths e o solto em 9,06–10,08 × 16,68–19,56, igual à sonda do Desenho. O 1024 px saiu pelo `rsvg-convert`, e
 não pelo artboard, que tem 736 px. A aprovação é a [R10](PLN-007-interview.md), e o commit é `f1f7fe6` em `workstream/brand`. A fonte e o gerador estão em
-`PLN-007-fonte-do-simbolo/`; o `brza-brand-build.mjs` regenera os SVG idênticos, pixel a pixel. O mestre sai sem a língua
+`PLN-007-fonte-da-marca/`; o `brza-brand-build.mjs` regenera os SVG idênticos, pixel a pixel. O mestre sai sem a língua
 clara e sem as faíscas do D1, por decisão da R10.
 
 ### P2 — Os lockups L2 e o texto em paths
 
 Executa D3 (o script de texto e os 16 SVG) · executor: sessão do `brand`, no scratch
 
-Estimado: 2,5 h · Executado: — h
+Estimado: 2,5 h · Executado: 0,3 h
 
-- [ ] **1. O texto em path** — o `brza-brand-text.swift` devolve o JSON de "BrzA" (750), "STUDIO", "CLI", "WORKSPACE"
+- [x] **1. O texto em path** — o `brza-brand-text.swift` devolve o JSON de "BrzA" (750), "STUDIO", "CLI", "WORKSPACE"
       e "ADE" (500, `.14em`); a prova é o avanço de "BrzA" a 100 pt dar ~246,9 em 750.
-- [ ] **2. Os lockups** — o `brza-brand-build.mjs` monta os 16 `*-lockup-*.svg` e o `<g id="seal">` do
+- [x] **2. Os lockups** — o `brza-brand-build.mjs` monta os 16 `*-lockup-*.svg` e o `<g id="seal">` do
       `brza-app-icon.svg`, pela tabela de geometria do D3.
-- [ ] **3. A conferência** — artboard com as 4 filhas, horizontal e vertical, nos 2 temas, ao lado do PNG do L2, pelo
+- [x] **3. A conferência** — artboard com as 4 filhas, horizontal e vertical, nos 2 temas, ao lado do PNG do L2, pelo
       `brza shot`.
-- [ ] **4. A rodada dos lockups** — aprovação; o PNG vai à pasta do plano como `PLN-007-lockups-l2.png`.
-- [ ] **5. Commit** — o PNG e a linha do plano, pelo `brza note commit`.
+- [ ] **4. A rodada dos lockups** — aprovação; o PNG vai à pasta do plano como `PLN-007-lockups-l2.png`. **Pendente da
+      decisão de Anderson**: o rascunho está em `PLN-007-lockups-l2-rascunho.png`.
+- [ ] **5. Commit** — o PNG e a linha do plano, pelo `brza note commit`. Espera o passo 4; a fonte dos lockups já está
+      commitada em `PLN-007-fonte-da-marca/`.
 
-**Evidência:** —
+**Evidência (passos 1 a 3):** `swift brza-brand-text.swift <woff2> 750 0 BrzA` dá `advance` 246,91 (a prova do Desenho)
+e `capHeight` 71; em `wght` 400, 226,4. O `brza-brand-build.mjs` gera os 16 `*-lockup-*.svg` e o `brza-app-icon.svg` com o
+`<g id="seal">`. O artboard foi conferido pelo `brza shot` a 736 px, nos dois temas
+([`PLN-007-lockups-l2-rascunho.png`](PLN-007-lockups-l2-rascunho.png)), ao lado do L2 da R3; a primeira passada estourou a
+fila dos verticais, e foi corrigida. O `rsvg-convert` renderiza o ícone com selo e um lockup sem erro, e é com ele que o
+P4 gera o `.icns`. **Desvio:** o `kCTKernAttributeName` zero desliga o kerning, então o `advance` do "BrzA" a
+`tracking 0` é a soma dos avanços; com o `-0,01 em` dos lockups o kerning vale, como no texto vivo do `BrzaWordmark`.
 
 ### P3 — Os tokens P1 e o aviso de pergunta azul
 

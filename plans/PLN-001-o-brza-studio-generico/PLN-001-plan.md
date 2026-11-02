@@ -3,8 +3,8 @@ status: in_progress
 phase: execution
 origin: request
 ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 197.8
-executed_h: 33.8
+estimate_h: 198.3
+executed_h: 34.3
 remaining_h: 23.9
 scope:
   - brza-studio
@@ -45,7 +45,11 @@ tags:
   do `brza-studio` a partir da `master` (a `master` anda com as correções do `v1.4.246-alpha.2`: parta do commit atual).
   O pedido 38 entrou no mesmo dia, com a R64, o D56 e o P73, que fechou em `brza-studio@563705a7aaf`, com os X65 e X66, e
   espera só o C26, no build do C22, com Anderson. O pedido 39 entrou
-  no mesmo dia, da caçada de achados da v1.4.246, com a R65, o D57 ao D60 e o P74 ao P77, cada um numa sessão `pln-001-pedido-39-*`.
+  no mesmo dia, da caçada de achados da v1.4.246, com a R65, o D57 ao D60 e o P74 ao P77, cada um numa sessão `pln-001-pedido-39-*`. **O pedido 40 entrou no mesmo dia**,
+  com a R66, o D61 e o P78: o fundo cinza do texto dentro do bloco de código do visualizador de Markdown e o botão de
+  copiar fora do lugar. O P78 fechou em `brza-studio@2738100d3f5`, na `master`, e espera só o C31, num build, com
+  Anderson. Dois pontos da R66 são leitura da sessão, a confirmar no C31: o que "aparece fora do hover" quer dizer
+  (R66.1) e o escopo (R66.3).
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
@@ -138,6 +142,12 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   `work/issues/`; Anderson decidiu a correção de quatro delas na R65, e a quinta, o worker de plugin, fica com a
   decisão dos plugins. O worklog é
   [Mais achados que a v1.4.246 trouxe ao BrzA Studio](../../work/worklogs/2026-11-02-achados-da-v1-4-246-no-brza-studio.md)
+- **Pedido 40 (2026-11-02, sessão `studio` do workstream `studio`, no chat do BrzA Studio), com a imagem do README no modo
+  olho e um recorte do botão de copiar do bloco de código:** "corrija o [recorte do botão] e deixe os blocos de código sem
+  o fundo cinza atrás". Na rodada, a explicação de Anderson: "eu quiz dizer o fundo da escrita, como se estivesse
+  grifado, o bloco se mantém igual". As imagens estão em
+  `/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace--worktrees-studio/3c979448-152e-4d39-8083-1ed021e930bd/images/3.png`
+  e `…/4.png`, fora do git
 
 ### Cobertura
 
@@ -188,6 +198,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 39` | As credenciais de integração do BrzA (Jira, Linear, Bitbucket, chaves de API) ficam numa pasta própria, sem ler nem apagar as do Orca em `~/.orca`; os hooks seguem em `~/.orca` (R65.2) | P75 | teste dos stores com a pasta nova (unidade); reconectar o Jira no BrzA e conferir o Orca (manual) |
 | `Pedido 39` | O atualizador fica desligado no build ad hoc, e o nudge a `onorca.dev` não roda com ele desligado (R65.3) | P76 | teste da guarda (unidade); conferência no log do app instalado (manual) |
 | `Pedido 39` | O CLI empacotado acha o resolvedor, o contrato cruzado lista os 5 métodos do fork, o coreano sem `ORCA` de produto e o fundo do código do Markdown segue o modo do Monaco (R65.4) | P77 | os 4 testes vermelhos ou novos (unidade); `brza foo` pelo app empacotado (manual) |
+| `Pedido 40` | No visualizador de Markdown, o texto dentro do bloco de código não tem fundo próprio, como se estivesse grifado: o bloco, com o fundo e a borda, fica como está; o botão de copiar fica dentro do bloco, a 8 px do topo, sem cobrir a borda (R66.1, R66.2) | P78 | teste do CSS do fundo e da posição (unidade); conferência no BrzA Studio (manual) |
 | `X20` | O `executeRead`, o `executeWrite` e o `executeDestructive` do MCP da Atlassian ganham o ícone do produto do `name` e o título com a ferramenta interna; o `discover` ganha o ícone do produto citado na busca, e o título com a busca entre aspas (R55.1, R55.2) | P67 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual, com o C6) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
@@ -1237,6 +1248,35 @@ Respondida em 2026-11-02, por Anderson na sessão `studio-achados-246` do workst
 
 O worker de plugin sem sandbox não foi à rodada: fica com a decisão dos plugins, de Anderson.
 
+### Rodada 66 — o fundo do código e o botão de copiar do visualizador de Markdown (enviada 2026-11-02)
+
+> **Apresentado antes:** a leitura desta sessão, em `brza-studio@384d4b08fd6`, sem rodar. O cinza que Anderson apontou
+> vem do `.markdown-body pre` (`markdown-preview.css:642-658`: `rgba(255,255,255,0.06)` e borda a 6% no escuro,
+> `#f6f8fa` e borda a 8% no claro). O botão de copiar é o `.code-block-copy-btn` (`markdown-preview.css:671-698`, a 8 px
+> do canto, invisível até o hover, com a caixa `--accent` no hover). O recorte da imagem era pequeno demais para eu ter
+> certeza do defeito; a inferência apresentada foi que a caixa do botão sobrepunha o canto da borda do bloco.
+
+Respondida em 2026-11-02, por Anderson na sessão `studio` do workstream `studio`, pelo AskUserQuestion. Os custos são
+estimativa.
+
+1. **R66.1 — O que está errado no botão de copiar da imagem 2?** Seleção única. Opções: sem caixa, só o ícone, que muda de
+   cor (recomendada) — ~0,2 h; manter a caixa e afastar do canto — ~0,2 h; o ícone aparece fora do hover — ~0,3 h, mais
+   uma conferência no app. **Respondida — "O ícone aparece fora do hover".** Leitura da sessão, a confirmar no C31: o
+   CSS só mostra o botão no hover do `.code-block-wrapper` (`markdown-preview.css:692`); o que está fora do lugar é o
+   botão, que o grid do bloco anotado põe sobre a borda superior do bloco (D61). Se o que Anderson quis dizer é que o
+   botão aparece sem o mouse em cima, a causa é outra e volta à rodada. Vai ao D61 e ao P78.
+2. **R66.2 — Sem o fundo cinza, o que fica no bloco de código?** Seleção única. Opções: sem fundo e com a borda fina
+   (recomendada) — ~0,2 h; sem fundo e sem borda — ~0,2 h. **Respondida em texto livre —** "eu quiz dizer o fundo da
+   escrita, como se estivesse grifado, o bloco se mantém igual". O pedido é outro: o `pre` não muda, e o fundo a tirar é o
+   do texto dentro dele. Vai ao D61 e ao P78.
+3. **R66.3 — Onde o bloco de código perde o fundo?** Seleção múltipla. Opções: o olho, o visualizador renderizado
+   (recomendada) — ~0,2 h; o lápis, o editor rico (recomendada) — ~0,2 h a mais; os blocos do chat — ~0,5 h.
+   **Respondida —** "resposta anterior", isto é, o que a R66.2 diz, sem escopo nomeado. Leitura da sessão, a confirmar no
+   C31: o olho, que é o da imagem; o lápis só se o defeito existir lá, e a leitura do CSS diz que não (D61); o chat fica
+   de fora, porque ninguém o pediu. Vai ao D61 e ao P78.
+
+Sem rodada própria, por ser a ordem do pedido: o passo roda agora, num worktree do `brza-studio`.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -1252,7 +1292,7 @@ base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum; o P54 ao P57 v
 antes do P55, o P56 independente e o P57 por último; o P58 vem antes do P59 e do P60, que não dependem um do outro, e
 o P61 por último; o pedido 32 roda em paralelo com o 31 (R51.2), o P62 antes do P63, o P64 depois do P63 e o P65 por
 último; o P66 do pedido 33 roda em paralelo com os dois (R52.4), e o P69 do pedido 34, agora, em paralelo com o que espera
-build (R60.4), e o P70 do pedido 35 depois do P69, que criou a faixa; o P71 do pedido 36, agora, sem depender de nenhum (R62.4); o P72 do pedido 37, o P73 do pedido 38 e o P74 ao P77 do pedido 39, agora, sem depender de nenhum um do outro.
+build (R60.4), e o P70 do pedido 35 depois do P69, que criou a faixa; o P71 do pedido 36, agora, sem depender de nenhum (R62.4); o P72 do pedido 37, o P73 do pedido 38 e o P74 ao P77 do pedido 39, agora, sem depender de nenhum um do outro, e o P78 do pedido 40, agora, sem depender de nenhum (o P77 mexe no `markdown-surface-theme.ts`, que o P78 não toca).
 
 **Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com "indicado". É
 leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a pedido, numa sessão
@@ -2929,18 +2969,42 @@ Agora (R65.2).
 
 Executa D59 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-39-atualizador`
 
-Estimado: 1 h · Executado: 0 h
+Estimado: 1 h · Executado: 0,7 h
 
 Agora (R65.3).
 
-- [ ] **1.** Os "A conferir no passo" do D59, lidos no código antes de escrever
-- [ ] **2.** Teste que falha: `isUpdaterEnabled()` devolve `false` para o build ad hoc (a versão `1.4.246-alpha.1`
+- [x] **1.** Os "A conferir no passo" do D59, lidos no código antes de escrever
+- [x] **2.** Teste que falha: `isUpdaterEnabled()` devolve `false` para o build ad hoc (a versão `1.4.246-alpha.1`
       empacotada sem identidade de assinatura), e `true` para o build assinado
-- [ ] **3.** A guarda e o nudge a `onorca.dev` sem rodar com o atualizador desligado
-- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **3.** A guarda e o nudge a `onorca.dev` sem rodar com o atualizador desligado
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C29
 
-**Evidência:** (a preencher)
+**Evidência:** commit [`cdce032d264`](https://github.com/brz-anderson/brza-studio/commit/cdce032d264), na `master` do
+`brza-studio`, pela sessão do `brza-studio` no worktree `.worktrees/pln-001-pedido-39-atualizador`, com o push direto
+(`e9a3b9745bf..cdce032d264`, depois do rebase sobre o `e9a3b9745bf`, que só mexia no chat nativo). Os "A conferir no
+passo" do D59, lidos no código antes de escrever: **(a)** como o app sabe que o bundle é ad hoc: a versão não serve
+(`1.4.246-alpha.1` não tem o sufixo `-local`) e uma constante do `electron-vite` é calculada antes da decisão de
+assinatura, que mora no `electron-builder.config.cjs:86` (`macLocalSigningIdentity = isMacRelease ? null : CSC_NAME ||
+'-'`); o `afterPack` do darwin já escreve arquivos em `Resources` (o `orca-local-build.json`; o `package-type` no Linux),
+então ele estampa o marcador `ad-hoc-signed` quando a identidade é `-` (`config/scripts/mac-ad-hoc-marker.cjs`) e o app o
+lê em `src/main/updater/ad-hoc-signed-build.ts`, só no macOS (X67); **(b)** o build assinado liga: `CSC_NAME` com
+identidade nomeada e o release (`ORCA_MAC_RELEASE`, o canal `ORCA_MAC_ADHOC` do upstream) dão identidade diferente de `-`,
+então não têm marcador e o `isUpdaterEnabled()` segue `true`; **(c)** o que o `updater-setup.ts:141-166` faz antes da
+guarda: só a mensagem de falha do handoff do serve (`:131-139`); `configureMacShipItScheduling`, o `setFeedURL`, os
+handlers (de onde sai o `fetchChangelog`), o nudge e os timers vêm depois, e `updater-remote-status`, `-menu-checks`,
+`-build-selection` e `-scheduling` têm a mesma guarda. O nudge a `onorca.dev` (`updater-nudge.ts:9`) já ficava atrás do
+`isUpdaterEnabled()`, então o passo 3 é a guarda ampliada, mais um teste que o prende. Antes do código: os 3 arquivos
+novos ou tocados → 2 por módulo ausente e 1 pela asserção (`isUpdaterEnabled()` devolvendo `true` com o ad hoc); depois:
+`ad-hoc-signed-build.test.ts` (marcador presente, ausente, `resourcesPath` desconhecido, fora do macOS),
+`updater-enabled.test.ts` (ad hoc desliga qualquer versão; com identidade liga), `mac-ad-hoc-marker.test.mjs` (estampa só
+`-`, e o nome do arquivo é o mesmo nos dois lados) e, no `updater.nudge-campaign.test.ts`, o caso "ad hoc: sem
+`fetchNudge` e sem `checkForUpdates`", que falha sem a guarda ampliada → 25 passed no conjunto, e o
+`build-win-local.test.mjs`, que usa a guarda, segue verde. `pnpm check:changed --base=origin/master --maxWorkers=2` → 22
+de 22 verdes (format, oxlint, typecheck, ratchets, import boundaries, localização e testes de unidade). **Não rodei o app
+nem montei o build:** o marcador só se prova no bundle empacotado, que é o C29, de Anderson, no build novo. **O app já
+instalado (`1.4.246-alpha.1`) não ganha o desligamento:** ele foi empacotado sem o marcador, então o atualizador dele
+segue ligado até o build novo; o C29 vale só para o build seguinte.
 
 ### P77 — Os quatro pequenos consertos (pedido 39)
 
@@ -2959,6 +3023,35 @@ Agora, num commit só, antes da alpha.2 (R65.4).
       push. A conferência no app é o C30
 
 **Evidência:** (a preencher)
+
+### P78 — O fundo do texto no bloco de código e o botão de copiar do visualizador de Markdown (pedido 40)
+
+Executa D61 · executor: um `implementer`, disparado pela sessão `studio`, no worktree `.worktrees/pln-001-pedido-40`; o
+commit e o push, pela sessão `studio`, com a confirmação de Anderson ("faça isso", 2026-11-02)
+
+Estimado: 0,5 h · Executado: 0,5 h
+
+Agora (pedido 40). Fechou em 2026-11-02.
+
+- [x] **1.** As duas causas do D61, confirmadas no código antes de escrever, e o mesmo defeito conferido no editor rico
+- [x] **2.** Testes que falham: o `code` dentro do `pre` sem fundo nos temas escuro e claro, e o botão de copiar a 8 px do
+      topo do `pre`, sem a margem do `pre` dentro do wrapper
+- [x] **3.** O `background: none` do `pre code` com a especificidade dos temas, e a margem do `pre` passada ao
+      `.code-block-wrapper`, sem mudar o espaçamento entre blocos nem o diagrama (`.code-block-wrapper-diagram`)
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C31
+
+**Evidência:** `brza-studio@2738100d3f5`, na `master` (`cdce032d264..2738100d3f5`), em
+`src/renderer/src/assets/markdown-preview.css` (+15 linhas) e no teste novo
+`src/renderer/src/assets/markdown-preview-code-block.test.ts` (10 testes, happy-dom com o CSS real).
+- Sem a correção, 4 dos 10 testes falharam: o fundo `rgba(255,255,255,0.1)` e `rgba(0,0,0,0.07)` no `code` do `pre`, e a
+  margem de 16 px no `pre`.
+- `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts` nos três arquivos do `implementer` (o teste
+  novo, `MarkdownPreview.mermaid-wrapper.test.tsx` e `MarkdownPreviewBody.test.tsx`) → 18 passed; sobre a base
+  rebaseada, o teste novo e o do wrapper mermaid → 12 passed.
+- `pnpm check:changed --base=origin/master` → 24 de 24, depois de trocar 6 `as` do teste por um helper `find()`.
+- O editor rico não tem o defeito (`rich-markdown-editor.css:999` vence o `:930`): não foi tocado.
+- Não conferido em tela: o happy-dom não tem layout, e a posição do botão se prova no C31.
 
 ## Regressão
 
@@ -3205,6 +3298,12 @@ da linha quando o teste entra.
   com ferramenta.** Ele cobria exatamente o que o R64.1 muda; as 4 linhas com ferramenta (`Read`, `Bash`, `Edit` e o
   `Bash` do filho com shell) passam a esperar `general-purpose · <ferramenta>` na faixa, e a barra lateral segue com o
   esperado de antes. Afeta P73.
+- **X67 — O app reconhece o bundle ad hoc por um marcador em `Resources`, e o teste da guarda mocka o marcador.** O P76.2
+  pedia `isUpdaterEnabled()` falso para "a versão `1.4.246-alpha.1` empacotada sem identidade de assinatura", e o D59
+  deixava o mecanismo aberto (versão, constante de build ou assinatura). A versão não distingue e a constante nasce antes
+  da identidade, então o `afterPack` darwin estampa o arquivo `ad-hoc-signed` quando a identidade é `-`. Um teste de
+  unidade não assina bundle: a guarda é testada com o leitor mockado, o leitor com um `resourcesPath` de verdade, e o
+  escritor à parte, com um teste de que os dois lados usam o mesmo nome de arquivo. Afeta P76.
 
 ## Worklogs
 
@@ -3385,8 +3484,9 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C26 | `Pedido 38`: o tipo do agente na lista "AGENTES" (P73.4) | No build do C22, num chat, disparar um subagente com `subagent_type` (um `reviewer`) e olhar a lista "AGENTES" enquanto ele roda | A linha mostra `descrição · reviewer · <ferramenta>`; a barra lateral segue como antes | | |
 | C27 | `Pedido 39`: o fork de um chat fixado (P74.4) | No build do C22, trocar um chat de conta pelo seletor (o pino do P36), bifurcar uma mensagem dele e perguntar ao chat novo sobre algo da conversa de antes | O chat novo abre na conta fixada, com o divisor "Conta trocada", e responde com o contexto | | |
 | C28 | `Pedido 39`: as credenciais numa pasta própria (P75.4) | No build do C22, conectar o Jira no BrzA Studio e depois abrir a integração no Orca | O Jira conecta no BrzA; o Orca segue com o dele; desconectar num não apaga o do outro | | |
-| C29 | `Pedido 39`: o atualizador desligado (P76.4) | No app instalado do build do C22, abrir e esperar 1 min, e procurar o breadcrumb `updater_macos_installer_scheduling_configured` no log | Sem o breadcrumb, e sem GET a `onorca.dev` pelo nudge | | |
+| C29 | `Pedido 39`: o atualizador desligado (P76.4) | No app instalado do build do C22 (o `1.4.246-alpha.1` já instalado não tem o marcador, então não serve), abrir e esperar 1 min, e procurar o breadcrumb `updater_macos_installer_scheduling_configured` no log | Sem o breadcrumb, e sem GET a `onorca.dev` pelo nudge | | |
 | C30 | `Pedido 39`: o CLI empacotado e os consertos (P77.4) | No build do C22, rodar `brza foo` pelo app empacotado; abrir o Markdown no modo código com o "Match Terminal" invertido; ver o idioma coreano | O CLI acha o resolvedor; o texto legível; sem `ORCA` de produto no coreano | | |
+| C31 | `Pedido 40`: o fundo do texto e o botão de copiar no bloco de código (P78.4) | No build que levar o P78, abrir um `.md` com blocos de código no olho, no tema escuro e no claro, com e sem a linguagem na cerca; passar o mouse sobre o bloco e fora dele; clicar no copiar; abrir o mesmo arquivo no lápis | O texto do bloco sem fundo atrás, e o bloco com o fundo e a borda de antes; o botão invisível fora do bloco, dentro dele a 8 px do topo, sem cobrir a borda, e o "Copiado" aparece no clique; o lápis igual ao de antes. Se o botão aparecer sem o mouse em cima (R66.1), anotar onde | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,

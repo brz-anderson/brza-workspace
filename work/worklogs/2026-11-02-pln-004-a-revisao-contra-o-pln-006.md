@@ -79,6 +79,23 @@ o dia anterior está em
   a 31%, a convenção de 34% a 62% e a simplicidade de 64% a 99%; a janela semanal foi de 1% a 16%. Cada revisão
   consumiu, portanto, de 28 a 35 pontos da janela de 5 h, e o experimento inteiro a esgotou: é um custo que o US$
   equivalente não mostra, e a tabela da R12 o traz.
+- **O mesmo diff no `qwen2.5:14b` local (Ollama 0.40.13)**, a pedido de Anderson, para saber se um modelo local entra no
+  fluxo e economiza token. O modelo não tem ferramenta: o diff foi inline, em 4 trechos de arquivos inteiros (de 8,4 a
+  15,8 mil tokens), 3 focos × 4 trechos = 12 chamadas, `num_ctx` 20.480, temperatura 0,2. O script está em
+  `/private/tmp/pln004/bench/scripts/run-qwen.py`; as saídas, as chamadas e as 1.022 amostras da máquina, em `out/qwen-*`.
+  - **Tempo:** 1.366 s de parede (defeito 414, convenção 500, simplicidade 452); prefill de 411 tok/s e geração de 19,6
+    tok/s; 4 chamadas bateram no teto de 3.072 tokens de saída. Custo em token pago: zero.
+  - **A máquina** (M5 Pro, 24 GB, na tomada): GPU a 99% o tempo todo, com 12,6 GB em uso (pico 13,5); o `runner`
+    (`llama-server`) usou 27% de um núcleo em média; memória *wired* de 2,9 para 14,9 GB, livre de 1,2 GB para 0,16 GB,
+    swap de 0,8 para 6,0 GB (pico 11,6), compressor de 1,2 para 5,0 GB; sem aviso térmico; tudo voltou depois do
+    descarregamento. **Não medi watts**: o `powermetrics` pede `sudo`. O `ps` só pegou o `serve`, e a CPU do `runner`
+    vem do `top`. A linha de base não era ociosa (37% de CPU em uso por outras sessões).
+  - **Acerto:** 0 de 7 itens do recall, 0 falsos positivos do gabarito, e 1 achado verdadeiro entre 80 únicos (o `736`
+    do `brza-shot` sem teste, achado menor): 152 achados brutos, 72 repetições, confiança sempre 80 a 100 (75 com 100, 0
+    verdadeiros). A pontuação do `collector` está em `out/qwen-pontuacao.md`; conferi por grep o que pesa (nenhuma saída
+    cita `killpg`, `TEXT_LIMIT`, `--pending` nem as 120 colunas). **O desenho limita o resultado:** o trecho de testes
+    de `fact_audit` não viu o `fact_audit.py`, então A1, A2 e A8 não eram achados possíveis, e a convenção não viu a
+    régua do `AGENTS.md`.
 
 ## O que ficou
 
@@ -112,3 +129,24 @@ o dia anterior está em
 - **O rascunho do Desenho** (556 linhas, no scratch) é reescrito depois da R10, e só então vai à aprovação.
 - **As 19 citações que não batem** estão na tabela do agregado; três nunca sustentaram o fato (a linha do app para o
   `app-server` e a `permissionPolicy`, a do `agentCmdOverrides` no terminal e a do X3 do PLN-011).
+
+## Fora do workspace
+
+- **O `qwen2.5:14b` carregado no Ollama, pela API local** (`/api/chat`, `keep_alive` 10 min, e `keep_alive` 0 no fim).
+  - **Risco:** 12,6 GB de GPU e 14,9 GB *wired* na máquina de 24 GB, com swap até 11,6 GB e memória livre de ~100 MB,
+    que degrada as outras sessões e o app enquanto dura.
+  - **Estado:** descarregado; `ollama ps` vazio, e o `ollama serve` do app segue.
+  - **Desfazer:** `ollama stop qwen2.5:14b`; os modelos `qwen2.5:14b` e `qwen2.5:7b` ficam em disco (9,0 e 4,7 GB).
+- **Os rollouts do Codex e os transcripts do `agy`** das sondas e das 9 revisões do experimento, em
+  `~/.codex/sessions/2026/11/02/` e `~/.gemini/antigravity-cli/brain/`.
+  - **Risco:** guardam o diff e as respostas inteiras, fora do git.
+  - **Estado:** ativos, parados.
+  - **Desfazer:** apagar os arquivos de 2026-11-02 dos dois diretórios, depois de pontuado o experimento.
+- **A confiança de projetos no `~/.codex/config.toml`**, que o Codex gravou nos worktrees das sondas.
+  - **Risco:** o Codex passa a confiar nesses caminhos.
+  - **Estado:** ativo.
+  - **Desfazer:** tirar as entradas `[projects."…"]` dos worktrees do PLN-004.
+- **O auto-update do `agy` de 1.4.8 para 1.4.12**, feito pelo próprio `agy` durante as sondas.
+  - **Risco:** o comportamento do `agy` mudou entre as sondas e o experimento.
+  - **Estado:** ativo.
+  - **Desfazer:** não há reversão simples; a versão fica registrada aqui.

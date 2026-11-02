@@ -1,1 +1,5 @@
 - [Ferramentas do chat nativo (brza-studio)](brza-studio-native-chat-tools.md) — oxfmt, comando do vitest, chamadores do resolvedor, armadilhas de identidade MCP
+- [Varredura do rebrand Orca -> BrzA Studio](brza-studio-rebrand-sweep.md) — varrer após merge, fontes de guias gerados ficam Orca, armadilhas de teste e locale
+- [Travas do lint após sync do upstream](brza-studio-lint-gates-after-sync.md) — max-lines, anti-slop, focus-read, tsc com sintaxe quebrada
+- [Teste que falha só no merge do upstream](brza-studio-sync-test-failures.md) — linha de base, URL do Orca, overrides do terminal que segue o chat
+- [Conflitos do merge do upstream](brza-studio-upstream-merge-conflicts.md) — git add por caminho, imports movidos, max-lines, catálogo RPC, linha do fork perdida

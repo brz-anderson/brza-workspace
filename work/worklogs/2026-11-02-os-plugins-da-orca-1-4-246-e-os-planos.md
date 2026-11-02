@@ -17,7 +17,7 @@ nenhuma superfície e com linha `chat-unavailable` de motivo `not-installed`; os
 verificação) seguem à vista. Teste novo `AgentLaunchPickerMenu.not-installed.test.tsx`, que falhou antes e passa depois; o
 `pnpm check:changed --base=master --force` passou nos 24 checks. **Commitada e mergeada por fast-forward na `master` do `brza-studio` como `7cb41bbd5c4`**, por pedido de Anderson, depois de
 um rebase sobre o `d3d636f` (outra sessão avançou a `master` no meio). Os 107 arquivos de teste de `agent/` e `tab-bar/`
-passaram de novo depois do rebase. **Sem push:** a `master` local está 1 commit à frente do origin. Não está no app
+passaram de novo depois do rebase. **Push dado depois, a pedido de Anderson** (`d3d636f..7cb41bb`). Não está no app
 instalado: falta um build novo. O worktree e a branch foram removidos. A tela de instalar skill (`SkillInstallAgentPicker`) também diz "Not installed" e ficou
 como está.
 
@@ -53,8 +53,9 @@ Rodada respondida por Anderson em 2026-11-02:
 
 ## Pendente
 
-- O push do `7cb41bb` e um build novo, se Anderson quiser o menu sem os não instalados no app. A tag `v1.4.246-alpha.1` segue em
-  `6d47623`, sem esta mudança.
+- Um build novo, para o menu sem os não instalados chegar ao app: Anderson fixou a próxima tag em `v1.4.246-alpha.2` (o
+  `v1.4.246-alpha.1` do pedido anterior era typo), depois das correções dos achados que outra sessão faz na `master`. A
+  `v1.4.246-alpha.1` segue em `6d47623`, sem esta mudança.
 - Anderson decide o que fazer com as chamadas a `onorca.dev` e com os catálogos da `stablyai`.
 - A sessão `pln-003-plugins` atualiza o Terreno e o C5 do PLN-003.
 
@@ -62,8 +63,8 @@ Rodada respondida por Anderson em 2026-11-02:
 
 - **A sessão `pln-003-plugins`** aberta pelo `brza sessions` no worktree `tools-kit`; **estado:** ativa; **como desfazer:**
   `brza sessions close pln-003-plugins`.
-- **O commit `7cb41bb` na `master` do `brza-studio`**, só local; **como desfazer:** `git reset --hard d3d636f`, antes do push. O
-  worktree e a branch da mudança foram removidos.
+- **O commit `7cb41bb` no origin do `brza-studio`** (`git push origin master`, a pedido de Anderson); **como desfazer:** só com
+  `--force`, que não se faz sem pedido. O worktree e a branch da mudança foram removidos.
 - **`git fetch upstream --tags --prune`** no `brza-studio`: atualizou `upstream/main` (leitura, só refs remotas).
 - **A tag `v1.4.246-alpha.1` no origin do `brza-studio`** (`git push origin v1.4.246-alpha.1`, a pedido de Anderson), apontando para
   `6d47623`; **risco:** tag publicada não se move sem `--force`; **como desfazer:** `git push origin :refs/tags/v1.4.246-alpha.1`.

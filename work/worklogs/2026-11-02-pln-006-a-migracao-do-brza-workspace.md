@@ -67,6 +67,22 @@ não da trava em uso.
   `/usr/local/bin` ao 3.14.
 - **Sem mudança:** o `/usr/bin/python3` do sistema é o 3.9.6 do Xcode (`xcode-select -p`), protegido pelo SIP; só muda
   com o Xcode ou as Command Line Tools.
+- **O quê e onde:** a limpeza da Microsoft, por pedido de Anderson ("desinstale os candidatos óbvios"):
+  - `brew uninstall --formula powershell` (7.4.1, sem link) e `brew untap powershell/tap`; o `pwsh` segue no cask
+    7.3.7, em `/usr/local/bin/pwsh`.
+  - Com a senha de Anderson: `launchctl bootout` do `com.microsoft.autoupdate.helper` (system) e do
+    `com.microsoft.update.agent` (gui); os dois plists, o helper de `/Library/PrivilegedHelperTools`,
+    `/Library/Application Support/Microsoft` (o AutoUpdate 4.85) e o `MSTeamsAudioDevice.driver` de
+    `/Library/Audio/Plug-Ins/HAL` foram para a Lixeira; `killall coreaudiod` descarregou o driver.
+  - Para a Lixeira também: `~/Library/Preferences/com.microsoft.teams2.helper.plist`,
+    `com.microsoft.autoupdate.fba.plist`, `com.microsoft.autoupdate2.plist` e o cache `com.microsoft.autoupdate.fba`.
+  - **Ficaram:** `~/Library/Containers/com.microsoft.teams2*` (318 MB) e
+    `~/Library/Group Containers/UBF8T346G9.com.microsoft.teams`, que o macOS protege do terminal; saem pelo Finder.
+
+  **Risco:** um app do Office instalado no futuro reinstala o AutoUpdate sozinho; o Teams, o driver. **Estado:** ativo.
+  **Como desfazer:** tudo está em `~/.Trash/microsoft-limpeza-2026-11-02/` (o de `/Library` em `root/`), até a Lixeira
+  ser esvaziada; voltar cada item ao lugar com `sudo mv` e `launchctl bootstrap`. O PowerShell 7.4.1 volta com
+  `brew install powershell/tap/powershell`.
 - **O quê e onde:** o `~/.config/brza/workspaces.toml`, criado pelo `brza-register`, com o par
   `~/Projects/brza-workspace` → `~/Projects/brza-studio` (PLN-006/P8, estágio 2). **Risco:** sem ele, o `claude-brza`
   e a função `claude` no `brza-studio` sobem sem hooks nem identidade (X16). **Estado:** ativo. **Como desfazer:** apagar

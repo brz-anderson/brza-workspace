@@ -65,3 +65,5 @@ Rodada respondida por Anderson em 2026-11-02:
 - **O commit `7cb41bb` na `master` do `brza-studio`**, só local; **como desfazer:** `git reset --hard d3d636f`, antes do push. O
   worktree e a branch da mudança foram removidos.
 - **`git fetch upstream --tags --prune`** no `brza-studio`: atualizou `upstream/main` (leitura, só refs remotas).
+- **A tag `v1.4.246-alpha.1` no origin do `brza-studio`** (`git push origin v1.4.246-alpha.1`, a pedido de Anderson), apontando para
+  `6d47623`; **risco:** tag publicada não se move sem `--force`; **como desfazer:** `git push origin :refs/tags/v1.4.246-alpha.1`.

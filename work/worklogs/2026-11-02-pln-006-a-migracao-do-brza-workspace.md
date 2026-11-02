@@ -94,8 +94,8 @@ não da trava em uso.
   - Para `~/.Trash/apps-sem-uso-2026-11-02/`: `uTorrent Web.app`, com `~/Library/Application Support/uTorrent Web`,
     `BitTorrentHelper` e `com.bitTorrent.utweb.plist`; o atalho quebrado `/Applications/Cliente Riot.app` e
     `/Users/Shared/Riot Games`; e, com a senha de Anderson, `The Unarchiver.app` e `AppIcons.app`, da App Store.
-  - **Ficaram:** `~/Library/Containers/cx.c3.theunarchiver` e `com.macd.developer.AppIcons`, que o macOS protege do
-    terminal; saem pelo Finder.
+  - Anderson removeu pelo Finder `~/Library/Containers/cx.c3.theunarchiver` e `com.macd.developer.AppIcons`, que o
+    macOS protege do terminal. Conferido: nada dos seis em `/Applications`, `Containers` nem `Group Containers`.
   - O `gnirehtet` já estava na última versão, a 2.5.1, e não mudou.
   - O PS Remote Play 7.0.1 → 9.5.0: o `RemotePlayInstaller.pkg` oficial, assinado pela Sony (8UT4NVUACP) e
     notarizado, baixado em `/private/tmp/remoteplay-dl/` e aberto no Installer para Anderson concluir.

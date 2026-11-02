@@ -5,7 +5,7 @@ metadata:
   type: reference
 ---
 
-Confirmado em 2026-10-31 para o PLN-006 (confira que os caminhos ainda existem).
+Confirmado em 2026-10-31 para o PLN-006, **antes da migração**: os caminhos de código abaixo (`brza_runtime.py`, `claude-brza`, `~/.zshrc:57-61`) mudaram em 2026-11-02, ver [[reference-brza-workflow-depois-da-migracao]].
 
 **Atalhos**
 - `git ls-tree -r --name-only master` dá 61 arquivos de norma; a master **não versiona** `wiki/` nem as subpastas de `work/` (só os dois `README.md` e `plans/README.md`). O `.gitkeep` de `wiki/guides` só existe no worktree.

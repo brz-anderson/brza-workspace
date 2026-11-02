@@ -82,9 +82,26 @@ o dia anterior está em
 
 ## O que ficou
 
-- **A pontuação do experimento**: as 3 revisões do Codex e as 3 do Claude estão prontas, e as do `agy` terminam; a
-  tabela de acerto, falso positivo e custo por runtime e foco vai a Anderson, e só então a R12.2 se decide. Depois,
-  dividir o plano, reescrever o rascunho do Desenho e mandá-lo à aprovação.
+- **A pontuação do experimento**, que ficou por fazer porque Anderson pediu para parar e reiniciar o BrzA Studio: as 9
+  revisões terminaram às 18:48, e a tabela de acerto, falso positivo, custo e tempo por runtime e foco vai a
+  Anderson, e só então a R12.2 se decide. Depois, dividir o plano, reescrever o rascunho do Desenho e mandá-lo à
+  aprovação. Para retomar:
+  - **Onde está tudo:** `/private/tmp/pln004/bench/` (o link aponta para o `chat-scratch` do app, que sobrevive ao
+    reinício): os prompts em `prompt-*.md`, o gabarito em `gabarito.md`, as saídas em `out/` — `claude-*.md`
+    (condensadas na gravação), `codex-*.md` e `codex-*.jsonl`, `agy-*.json` — e a cópia do diff em `ref-pln005/`.
+  - **Como pontuar:** casar cada achado de cada braço com A1 a A15 do `gabarito.md` (real, parcial, falso positivo ou
+    novo), com recall sobre A1, A2, A3, A4, A6, A7 e A8; e contar os novos que mais de um braço aponta. Um `collector`
+    com o gabarito faz o casamento mecânico, e a sessão confere os ambíguos.
+  - **O custo, por onde sai:** o Codex, do `turn.completed` do `codex-*.jsonl` (preço da `gpt-6-astra` na tabela da
+    Fixfy: US$ 10, 1 e 50 por milhão de entrada, cache e saída) e dos pontos de `rate_limits` dos rollouts em
+    `~/.codex/sessions/2026/11/02/` (18-13-24, 18-19-58 e 18-24-59); o `agy`, dos passos `PLANNER_RESPONSE` do
+    transcript em `~/.gemini/antigravity-cli/brain/` (o de defeito é `86119f93…`; os de convenção e simplicidade são
+    os dois diretórios novos de 18:31 e 18:37), com o preço da `gemini-4-argon` (US$ 4, 0,20 e 20 por milhão); o
+    Claude, das linhas `subagent` de `general-purpose` do `.measurements/measurements.jsonl` de hoje, depois das
+    18:13.
+  - **Os tempos medidos:** Codex 394, 301 e 561 s (defeito, convenção, simplicidade); `agy` 1.088, ~500 e 698 s, com a
+    de convenção sem o log do script, que eu interrompi; Claude de 2,5 a 5 min (153, 179 e 305 s, pelo
+    `duration_ms` dos subagentes).
 - **Os nomes de modelo do `agy` no rascunho**, a corrigir no Desenho: o `agy models` (1.4.12) lista
   `gemini-4-argon-{low,medium,high}`, `gemini-3.8-flash-{low,medium,high}`, `claude-opus-5-5-*`, `claude-sonnet-5-5-*` e
   `gpt-oss-120b-medium`, e nenhum `pro` nem `flash`; o mapa `opus`/`sonnet` para `pro` e `haiku` para `flash`, que veio

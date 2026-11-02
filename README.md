@@ -5,7 +5,7 @@ O workspace pessoal de Anderson para o **BrzA Studio** (`~/Projects/brza-studio`
 
 As pastas de notas não moram na `master`, que guarda só a norma: cada frente de trabalho é uma branch
 `workstream/<nome>`, com worktree em `.worktrees/<nome>`. Os de agora são o `studio` (o app), o `tools-kit` (o `brza`,
-os scripts e os plugins) e o `workspace` (a própria norma).
+os scripts e os plugins), o `workspace` (a própria norma) e o `brand` (a identidade visual da marca).
 
 | Pasta | O que guarda |
 | :---- | :----------- |
@@ -43,6 +43,10 @@ python3 scripts/fact_outcome.py <agente>:<F3> holds|fails "<porquê>" --ref <PLN
 A norma de agente está no [`AGENTS.md`](AGENTS.md), e o adaptador do Claude Code no [`CLAUDE.md`](CLAUDE.md). O commit
 é com o `brz-anderson`, pelo `env` do `.claude/settings.json`, e o push vai pela chave `personal`: a norma à `master`, e
 as notas à branch do workstream.
+
+**A chave de acesso e o `gh`.** O `origin` é `git@personal:brz-anderson/brza-workspace.git`, pelo alias `personal` do
+`~/.ssh/config` padrão, que o `GIT_SSH_COMMAND` do `env` aponta. O `gh` usa o perfil padrão, com a conta `brz-anderson`
+ativa (`gh auth switch`).
 
 ## Funções do shell
 

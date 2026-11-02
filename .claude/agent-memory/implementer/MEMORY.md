@@ -3,3 +3,4 @@
 - [Travas do lint após sync do upstream](brza-studio-lint-gates-after-sync.md) — max-lines, anti-slop, focus-read, tsc com sintaxe quebrada
 - [Teste que falha só no merge do upstream](brza-studio-sync-test-failures.md) — linha de base, URL do Orca, overrides do terminal que segue o chat
 - [Conflitos do merge do upstream](brza-studio-upstream-merge-conflicts.md) — git add por caminho, imports movidos, max-lines, catálogo RPC, linha do fork perdida
+- [Testes de CSS do renderer (brza-studio)](brza-studio-css-tests.md) — happy-dom resolve a cascata, sem import.meta.url, sem `as` no teste

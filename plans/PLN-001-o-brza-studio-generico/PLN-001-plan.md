@@ -3433,6 +3433,8 @@ da linha quando o teste entra.
   o P71 em `brza-studio@abc5e78c243`, com os X61 ao X64; o C24 espera o build do C22, com Anderson.
 - 2026-11-02 — [O P73 do PLN-001, o tipo do agente na lista de agentes do chat](../../work/worklogs/2026-11-02-pln-001-p73-tipo-do-agente-na-lista.md):
   o P73 em `brza-studio@563705a7aaf`, com os X65 e X66; o C26 espera o build do C22, com Anderson.
+- 2026-11-02 — [O P78 do PLN-001, o fundo do texto no bloco de código e o botão de copiar do visualizador de Markdown](../../work/worklogs/2026-11-02-pln-001-pedido-40-fundo-do-codigo-e-botao-copiar.md):
+  o pedido 40, com a R66, o D61 e o P78 em `brza-studio@2738100d3f5`; o C31 espera o build, com Anderson.
 - 2026-11-02 — [O PLN-001 e o merge da v1.4.246 do upstream](../../work/worklogs/2026-11-02-pln-001-coordenacao-com-o-sync-v1-4-246.md):
   o acordo com a sessão `studio-75`, sem código; o PLN-001 espera o merge.
 

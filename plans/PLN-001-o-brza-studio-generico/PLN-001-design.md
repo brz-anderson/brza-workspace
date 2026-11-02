@@ -681,3 +681,48 @@ ferramenta não (P52, resposta de 2026-10-27).
   receber o frontmatter tirado antes, como faz o `MarkdownPreviewSurface.tsx:60-63`, `:118-127`.
 - A posição do botão no diff sem cabeçalho (`left: rect.right - 28 - 4`, `BrzaExpandLayer.tsx:61`) não cobre conteúdo.
 - O clique em link relativo não navega a janela do app.
+
+### D55 — O prompt do `brza sessions` como cartão "Tarefa do coordenador" — `brza-studio/src/main/agent-launch/agent-launch-prompt-delivery.ts` e `src/main/runtime/rpc/methods/structured-agent-session.ts` (P72)
+
+- **Origem:** pedido 37, R63.1 e R63.2
+- **Contexto** (`brza-studio@384d4b08fd6`, lido sem rodar): a primeira mensagem do launch sai de
+  `launchPromptCreateInputs`, com `structuredAgentSessionSendBody(text, [])` e sem `from`
+  (`agent-launch-prompt-delivery.ts:24-34`); sem `from`, a mensagem é do usuário (`sendSource`,
+  `structured-agent-session-mutation-plans.ts:119-126`). O título "Tarefa do coordenador" sai de
+  `from.orchestration.message === 'task'` (`agent-message-presentation.ts:44`), e o texto do cartão, do
+  `agentMessageTranscriptText`, que cai no texto inteiro quando o corpo não tem o preâmbulo do Dispatch
+  (`agent-message-display-text.ts`). O remetente do cartão vem de `agentMessageSender(address, …)` com
+  `relation: 'coordinator'` (`dispatch-task-source.ts:15-28`). O chamador de chat é o do cartão "Entregue a um agente":
+  `isAgentRpcCaller(context.caller)` e `orchestrationCompatibilityEvidence?.agentSessionId`
+  (`agent-launch-handoff-card.ts:31-40`). Um `from` com o `task` só o título do cartão lê; o resto do app lê o
+  `mail-notice` (`structured-agent-session-native-responses.ts:187,232`; `claude-structured-message-options.ts:79`) — é
+  inferência, e o passo a confere.
+
+#### Como fica
+
+- **Um helper só** monta o `from` a partir do contexto do RPC: remetente = o chat que chama (`orca-session:<id>`), com
+  `relation: 'coordinator'`; `orchestration: { message: 'task', runId, taskId, dispatchId }` com os três iguais ao id
+  da operação (R63.1). Os ids não apontam registro nenhum.
+- **O launch** passa o `from` ao `launchPromptCreateInputs`, quando o chamador é o `orca` CLI local com
+  `agentSessionId`. O launch de uma janela, de um aparelho pareado ou de um terminal sem chat não leva `from`, e fica
+  como balão de usuário.
+- **O `agentSession.send`** (`structured-agent-session.ts:132`) leva o mesmo `from` quando o chamador é o `orca` CLI
+  local com `agentSessionId` **diferente** do chat de destino (R63.2). A mensagem que o chat manda a si mesmo, a da
+  janela e a do aparelho pareado ficam como hoje.
+- **O prompt que é só comando do catálogo** (`/rename x`, `isLocalCommandPrompt`) fica sem `from`: o chat novo já o
+  esconde do transcript, e o cartão repetiria o plumbing.
+- **Sem mudança no `brza-workflow`**, se o servidor decide pelo chamador: o `brza sessions` e o `brza run` não mandam
+  nada novo.
+
+#### A conferir no passo
+
+- O que o provedor Claude faz com uma mensagem que tem `from`: o texto chega ao modelo igual, e um `/skill` ou um
+  comando no corpo continua rodando como comando, ou vira texto?
+- O `agentSession.send` do `brza sessions send` e do `brza run` (`bin/brza-run:45,114`) usa o `send_to_chat` do
+  `brza_runtime`: o contrato `--json` do roteador do PLN-003 (`brza-sessions:41-44`) não muda, e o `brza run` não perde o
+  que lê do chat de volta.
+- A fila: a mensagem enviada com `delivery: 'queue-if-active'` e `from` aparece no cartão da fila
+  (`structured-agent-session-queued-cards.ts:103`) como cartão, e não como rascunho de pessoa.
+- Se o `Show more` e o texto longo do prompt (um `--prompt-file` de página inteira) funcionam no cartão, que dobra em 3
+  linhas.
+- Um `send` de um chat a si mesmo, ou de dois chats em turnos opostos, não faz laço nem cartão duplo.

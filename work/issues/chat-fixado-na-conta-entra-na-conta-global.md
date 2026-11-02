@@ -13,7 +13,8 @@ tags:
 
 Achado da revisão adversária do merge da v1.4.246 do upstream, em 2026-11-02. O defeito já existia na `master` do
 `brza-studio` antes do merge, em `abc5e78c243`. Anderson respondeu "Issue, fora do sync (Recomendado)", na rodada da
-sessão do merge no mesmo dia.
+sessão do merge no mesmo dia. O sync está em
+[O sync da v1.4.246 do upstream, que tirou o chat do experimental](../worklogs/2026-11-02-sync-da-v1-4-246-do-upstream.md).
 
 ## O defeito
 

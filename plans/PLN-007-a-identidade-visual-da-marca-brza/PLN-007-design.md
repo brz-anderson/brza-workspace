@@ -221,6 +221,8 @@ O mestre, `brza-symbol.svg`, com o tile na grade da Apple (R5.1):
 - **A construção:** o esqueleto vem do traço mono, já registrado sobre o raster, na grade de 24 escalada para o tile de
   824; as camadas de cor (a língua clara, as faíscas) se desenham sobre o `build/icon.png` posto como decalque num
   artboard do scratch, que não vai ao arquivo final. O grafo é traço com `stroke-linecap="round"` e nós em `<circle>`.
+- **Decidido na R10:** o mestre sai sem a língua clara e sem as faíscas, só a chama no degradê. A fonte aprovada está em
+  `PLN-007-fonte-do-simbolo/`, e é ela que o P4 copia, no lugar do esqueleto acima.
 - **O `}`** é um desenho só, `#brza-brace-close`, usado três vezes; o solto é o mesmo `}` na escala 1,143, a razão da
   altura do solto (2,88) pela do par (2,52).
 - **As variantes saem do mestre pelo `brza-brand-build.mjs`**, que troca só o que muda:

@@ -88,3 +88,26 @@ e avisa a `brand-24` pelo correio ao terminar. A issue fecha aqui, no `brand`.
 O conserto voltou: `8d554e7` na `master`, com o arquivo da lista achado pelo import do shell dos visuais; Anderson
 relatou os 98 `unittest` passando e o teste novo falhando antes. A sessão conferiu o commit na `origin/master` e rodou o
 `brza shot` oficial: o PNG saiu igual ao da cópia do scratch, e a issue fechou.
+
+## A execução do P1, às 16h30
+
+O P1 rodou no scratch (`/private/tmp/pln-007/brand/`), a pedido de Anderson, e fechou na R10, abaixo.
+
+- O `brza-brand-build.mjs` gera o mestre, o claro, o dev, o S1, o tray e o `logo.svg` a partir do
+  `resources/brza-flame-mono.svg` de hoje. O `}` solto sai do `}` do par na escala 1,143, em (9,06; 16,68), que é o D2.
+- O mestre desenha o `}` uma vez e o usa três vezes, por `<use>` (D1). O `{` é o `}` espelhado.
+- **Fora do D1:** a língua clara e as faíscas não entraram. Pedem o traço da arte de hoje, e isso é desenho à mão. A chama
+  sai no degradê sólido. Ponto para a rodada.
+- **Conferência:** o `brza shot` do `p1-simbolo.html`, a 736 px, mostra o mestre a 16, 32, 128 e 200 px nos dois temas, o S1
+  a 13, 16, 18 e 32 px e o tray em 1× e 4×. O 1024 px não cabe no artboard; saiu pelo `rsvg-convert`. Contra o traço
+  original, pelo `magick compare`, a diferença fica só no `}` solto e no `{`, que são a correção do D2 e o espelho.
+- O P3 abriu às 16h33, pelo agendamento `262ac74e`: sessão `pln-007-brand-tokens` (chat, `claude_cd58c58e_3ab0_46b3_9d9c_4f80e3996a95`),
+  checkout `~/Projects/brza-studio`, na conta padrão do app. A sessão confirmou na lista do `brza sessions list`, como
+  `working`. Esta sessão não executa passo do `brza-studio`.
+- **A opção 2 desenhada para a comparação**, a pedido de Anderson ("quero ver as opções 1 e 2 lado a lado"): o
+  `sparks.mjs` rastreia 15 faíscas do `build/icon.png`, registrado sobre o traço mono; a luz de borda é uma aproximação
+  da língua clara, e não rastreada. O `p1-opcoes.png` põe as duas no mesmo tile, nos dois fundos, de 240 a 16 px.
+- **A R10: Anderson aprovou a opção 1** ("aprovo a opção 1"), a chama no degradê, sem língua clara e sem faíscas. O PNG
+  foi à pasta do plano como `PLN-007-simbolo-a1.png`, e a fonte e o gerador, a `PLN-007-fonte-do-simbolo/`, porque o P4
+  copia dali e o scratch não dura. O `Executado` do P1 ficou em 0,25 h, o tempo de relógio do log (16h29 a 16h40), contra
+  as 6,5 h estimadas. O P2 espera o pedido de Anderson.

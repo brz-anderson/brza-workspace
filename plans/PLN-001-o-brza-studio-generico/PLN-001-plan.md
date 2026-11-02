@@ -3091,9 +3091,9 @@ da linha quando o teste entra.
   o pedido 36, a R62, o D54 e o P71, sem código; o P71 vai à sessão `pln-001-pedido-36`.
 - 2026-10-31 — [O P71 do PLN-001, o expandir em todo bloco e a prévia do Markdown](../../work/worklogs/2026-10-31-pln-001-p71-expandir-e-previa-do-markdown.md):
   o P71 em `brza-studio@abc5e78c243`, com os X61 ao X64; o C24 espera o build do C22, com Anderson.
-
 - 2026-11-02 — [O PLN-001 e o merge da v1.4.246 do upstream](../../work/worklogs/2026-11-02-pln-001-coordenacao-com-o-sync-v1-4-246.md):
   o acordo com a sessão `studio-75`, sem código; o PLN-001 espera o merge.
+
 ## Decisões
 
 Notas de decisão do workspace da Fixfy, ao lado deste clone:

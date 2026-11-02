@@ -1,11 +1,11 @@
 ---
 name: padroes-de-erro-nas-entregas
-description: Onde os defeitos das entregas de plano do workspace costumam se esconder (hooks de medição, auditoria por LLM, evidência de passo [x], desvios, cópia congelada contra a origem, sync e índice do brza-workflow), e as hipóteses que costumam cair
+description: Onde os defeitos das entregas de plano do workspace costumam se esconder (hooks, auditoria por LLM, evidência de passo [x], desvios, cópia congelada, sync, override da BRZA_WORKSPACE, arquivo local velho), as hipóteses que costumam cair e a higiene do experimento em clone
 metadata:
   type: project
 ---
 
-Padrões vistos na revisão do PLN-005 (2026-10-31), a primeira deste papel no workstream `workspace`.
+Padrões vistos nas revisões do PLN-005 (2026-10-31) e do PLN-006 (P1–P7 e P8, 2026-11-02), no workstream `workspace`.
 
 **Os que se repetem e onde se escondem:**
 - **O corte que alimenta outro consumidor.** Uma constante de limite (`TEXT_LIMIT`, `[:300]`) pensada para o log vai
@@ -24,6 +24,21 @@ Padrões vistos na revisão do PLN-005 (2026-10-31), a primeira deste papel no w
 - **Script que acha a raiz por `scripts/..` ou pela `BRZA_WORKSPACE`**: o `~/.zshrc` não exporta a variável, e no
   worktree a raiz vira o worktree, que pode ter um `.measurements/` velho; o log ausente vira "vazio" sem aviso. Testar
   com `env -u BRZA_WORKSPACE` no worktree e rodar da raiz da `master` (onde o workstream é `master`, não vazio).
+  Depois do PLN-006 o `brza_root` sobe pelo common dir, e esse caso caiu (ver os falsos).
+- **O override da `BRZA_WORKSPACE` vence o cwd no que escreve** (PLN-006/P8): o `brza_root.find` devolve a raiz do
+  override com `role=None` quando o cwd é de outro workspace; o `brza-where` recusa, mas o `brza sync` e o `brza note`
+  seguem e commitam no workspace da variável. Toda sessão lançada pelo `brza.zsh`/`claude-brza` tem a variável.
+  Procurar todo `find(...)` cujo chamador não confere o `role`. Confiança dada: 97, reproduzido em dois clones.
+- **Arquivo local que o sync não toca fica com a cópia velha** (o `README.md` com o bloco antigo do shell, que a
+  `rules/brza-client.md` do núcleo manda ler): o molde do `brza-workflow` muda, o arquivo local do workspace migrado
+  não. Cruzar cada ponteiro do núcleo ("está no `README.md`, em …") com o arquivo local. Confiança dada: 96.
+- **A norma que passou a ser do núcleo ainda manda editar no lugar antigo** (o `AGENTS.md` e a
+  `agent-instructions-writer` mandam editar na `master`, e o sync recusa o editado para sempre). Depois de mover dono
+  de arquivo, `git grep` pelo verbo "edite"/"grava" nos arquivos do lock. Confiança dada: 93.
+- **O `--dry-run` que diz "nada" e o real que commita** (o lock que só troca o sha): rodar o real num clone logo
+  depois do dry-run e comparar. Confiança dada: 97.
+- **Desvio que promete "sai no P_x"** (o legado do X10): conferir no código do último passo se saiu, e se outro desvio
+  registra que ficou.
 - **Teste de timeout que não distingue `killpg` de `kill`**: mutação numa cópia em `/private/tmp` mostra.
 - **Cópia que congelou num sha enquanto a origem andou** (PLN-006: o `brza-workflow` nasceu de `d85c783`, e a `master`
   ganhou o P11 do PLN-005 depois). O sync "sem entrada no lock → sobrescreve" desfaz a mudança alheia com saída 0.
@@ -54,10 +69,19 @@ Padrões vistos na revisão do PLN-005 (2026-10-31), a primeira deste papel no w
 - "o repositório público ganhou e-mail ou caminho pessoal" — conferir com `git grep` na `origin/master` do
   `brza-workspace`, que é público e já os tinha;
 - o `claude-brza` quebrando no 3.9 — o `import` falho cai num `except` e só perde o `--agents`, como antes (X6).
+- o worktree do workspace achando o próprio worktree como raiz — o `brza_root` e o `measure.script_root` sobem pelo
+  common dir desde o PLN-006;
+- os `hook_error` `KeyError(None)` na medição — são sonda do `compact_guard.py` sem modo, não a trava em uso;
+- script ou teste "perdido" na migração — conferir pelos links do `~/.local/bin` e pelo `ls tests/*` do
+  `brza-workflow` antes de acusar.
 
 **Ambiente de experimento:** o `rm -rf` com glob relativo é barrado pela trava do runtime. Crie um diretório novo por
 experimento (`/private/tmp/<plano>/expN`), com `HOME`, `GIT_CONFIG_GLOBAL`, `BRZA_REGISTRY` e `XDG_CONFIG_HOME`
-temporários, num `env.sh` que cada comando carrega.
+temporários, num `env.sh` que cada comando carrega. **O `env.sh` começa com `unset BRZA_WORKSPACE BRZA_STUDIO
+BRZA_WORKFLOW`, e nenhum comando que escreve roda sem ele**: a sessão do revisor herda a `BRZA_WORKSPACE` do lançador,
+e em 2026-11-02 um `brza-sync --no-push` rodado no clone commitou na `master` real; o `git reset` para desfazer é
+barrado pela trava do runtime e volta à sessão principal. Antes de cada ensaio que escreve, `--dry-run` primeiro e
+`git -C <real> log -1` depois.
 
 **Cuidado de leitura:** dois `sed -n` concatenados num só comando colam trechos de testes diferentes e fazem parecer
 código morto; ler o teste pelos limites do `def`.

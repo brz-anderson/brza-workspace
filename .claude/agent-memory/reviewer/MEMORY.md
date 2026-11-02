@@ -1,2 +1,2 @@
-- [Padrões de erro nas entregas](project_padroes-de-erro-nas-entregas.md) — corte, veredito LLM, D sem rodada, cópia congelada vs origem, reparo pela metade; o que cai
+- [Padrões de erro nas entregas](project_padroes-de-erro-nas-entregas.md) — override que vence o cwd, cópia local velha, dry-run que mente, D sem rodada; o que cai; higiene do clone
 - [O log de medição como dado](reference_o-log-de-medicao-como-dado.md) — onde ficam o log, o estado do fact_audit e os transcripts do auditor

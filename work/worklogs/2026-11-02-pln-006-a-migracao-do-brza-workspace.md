@@ -96,11 +96,19 @@ não da trava em uso.
   `brza-dev`, `brza-shot`, `brza-test` e `brza-tree` seguem no `scripts/brza/` do `brza-workspace`. O
   `agentCmdOverrides.claude` do app segue no `~/.local/bin/claude-brza`. **Risco:** toda sessão nova, do terminal ou
   do chat, roda o CLI do `brza-workflow`; um defeito dele chega a todas. **Estado:** ativo; o `brza doctor` dá `ok`.
-  **Como desfazer:** a lista de antes está em `/private/tmp/pln006/links-antes.txt`; refazer cada um com `ln -sfn`
-  ao `scripts/brza/` do `brza-workspace` num checkout em `a45018c`, o último commit antes de os scripts saírem de lá.
+  **Como desfazer:** antes, os 13 links (`brza-agents`, `-app`, `-dev`, `-doctor`, `-install`, `-note`, `-print`,
+  `-run`, `-sessions`, `-shot`, `-test`, `-tree` e `claude-brza`) apontavam todos para
+  `~/Projects/brza-workspace/scripts/brza/<nome>`, e oito desses alvos não existem mais desde o `bbe723b`. A volta pede
+  um checkout no `a45018c`, o último commit com eles:
+  `git -C ~/Projects/brza-workspace worktree add --detach ~/Projects/brza-workspace-volta a45018c`; depois,
+  `ln -sfn ~/Projects/brza-workspace-volta/scripts/brza/<nome> ~/.local/bin/<nome>` para cada um dos 13, e `rm` dos
+  quatro novos (`brza-init`, `brza-sync`, `brza-register`, `brza-where`). O revisor conferiu que os oito `--help`
+  saem com 0 por esse checkout.
 - **O quê e onde:** o `~/.zshrc`, onde as linhas 51–80 (as `BRZA_WORKSPACE` e `BRZA_STUDIO`, a `brza_where`, a
   `brza_claude` e a `claude`) dão lugar ao `source "$HOME/Projects/brza-workflow/packages/client/shell/brza.zsh"` e a
   uma `brza_claude_fallback` que chama a `fixfy_claude` (estágio 8). As `adm-claude` e `claude-adm` ficam. **Risco:**
   sem o checkout do `brza-workflow`, o `source` falha e a `claude` cai na de verdade, sem a Fixfy. **Estado:** ativo;
-  `zsh -n` ok, e a `claude` roteia nos três casos. **Como desfazer:** a cópia de antes está em
-  `/private/tmp/pln006/zshrc-antes`, e o bloco antigo também no README do `brza-workspace` em `d85c783`.
+  `zsh -n` ok, e a `claude` roteia nos três casos. **Como desfazer:** trocar as quatro linhas novas pelo bloco
+  antigo, que está na seção "Funções do shell" do `git -C ~/Projects/brza-workspace show d85c783:README.md`, com as
+  `BRZA_WORKSPACE` e `BRZA_STUDIO` de volta; uma cópia do `~/.zshrc` de antes ficou em `/private/tmp/pln006/zshrc-antes`,
+  que o macOS pode apagar.

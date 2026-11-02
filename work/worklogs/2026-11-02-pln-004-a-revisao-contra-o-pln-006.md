@@ -73,8 +73,13 @@ o dia anterior está em
 
 ## O que ficou
 
-- **A confirmação do experimento**, no chat, antes de gastar ~US$ 19 a 20; depois, dividir o plano, reescrever o
+- **A confirmação do experimento**, no chat, antes de gastar ~US$ 19 a 22; depois, dividir o plano, reescrever o
   rascunho do Desenho e mandá-lo à aprovação.
+- **Os nomes de modelo do `agy` no rascunho**, a corrigir no Desenho: o `agy models` (1.4.12) lista
+  `gemini-4-argon-{low,medium,high}`, `gemini-3.8-flash-{low,medium,high}`, `claude-opus-5-5-*`, `claude-sonnet-5-5-*` e
+  `gpt-oss-120b-medium`, e nenhum `pro` nem `flash`; o mapa `opus`/`sonnet` para `pro` e `haiku` para `flash`, que veio
+  da Fixfy, fica sem base até se provar que o `--model pro` é alias. Os do Codex (`gpt-6-astra`, `gpt-6.1-sol`,
+  `gpt-6-luna`) existem no `codex debug models`.
 - **O plano passa de 400 linhas** (548 hoje), e o `plans/README.md` manda a Entrevista ao `-interview.md`; a divisão vai
   depois da R11, junto com a gravação do Desenho, para fazer uma vez.
 - **O rascunho do Desenho** (556 linhas, no scratch) é reescrito depois da R10, e só então vai à aprovação.

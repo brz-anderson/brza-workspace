@@ -76,8 +76,10 @@ não da trava em uso.
     `/Library/Audio/Plug-Ins/HAL` foram para a Lixeira; `killall coreaudiod` descarregou o driver.
   - Para a Lixeira também: `~/Library/Preferences/com.microsoft.teams2.helper.plist`,
     `com.microsoft.autoupdate.fba.plist`, `com.microsoft.autoupdate2.plist` e o cache `com.microsoft.autoupdate.fba`.
-  - **Ficaram:** `~/Library/Containers/com.microsoft.teams2*` (318 MB) e
-    `~/Library/Group Containers/UBF8T346G9.com.microsoft.teams`, que o macOS protege do terminal; saem pelo Finder.
+  - Anderson removeu pelo Finder `~/Library/Group Containers/UBF8T346G9.com.microsoft.teams`, que o macOS protege do
+    terminal.
+  - **Ficaram:** `~/Library/Containers/com.microsoft.teams2*` (318 MB: cache do Teams, de 2025-08-26, e a sessão da
+    conta de trabalho), que o `mv` de Anderson no terminal também não moveu; saem pelo Finder.
 
   **Risco:** um app do Office instalado no futuro reinstala o AutoUpdate sozinho; o Teams, o driver. **Estado:** ativo.
   **Como desfazer:** tudo está em `~/.Trash/microsoft-limpeza-2026-11-02/` (o de `/Library` em `root/`), até a Lixeira

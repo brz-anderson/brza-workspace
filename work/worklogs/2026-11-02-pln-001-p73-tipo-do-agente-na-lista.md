@@ -26,7 +26,7 @@ a Anderson.
   `NativeChatBackgroundTasksStatus` passa. O `agentChildRowTypeBeforeTool`, no `agent-child-row-text.ts`, decide o tipo:
   só quando o detalhe é a ferramenta, e nunca `default`, `unknown`, em branco ou igual ao nome da linha.
 - O `agentChildRowLeadTrail` compartilhado, a barra lateral e o celular ficaram como estavam.
-- Sete testes novos no `NativeChatBackgroundTasksStatus.test.tsx`; o `agent-child-row-parity.test.tsx` passou a esperar,
+- Sete `it` (nove casos) novos no `NativeChatBackgroundTasksStatus.test.tsx`; o `agent-child-row-parity.test.tsx` passou a esperar,
   na faixa, o tipo antes da ferramenta, e a barra lateral igual à de antes.
 - `pnpm check:changed --base=origin/master`: 24 de 24 verdes. Push direto na `master` (`384d4b08fd6..563705a7aaf`), sem
   mexer na tag nem no app instalado.

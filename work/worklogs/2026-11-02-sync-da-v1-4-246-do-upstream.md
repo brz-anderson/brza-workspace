@@ -127,8 +127,8 @@ A `studio-89` encerrou antes do push, e o relatório que ela pediu fica aqui:
 - **Checkout raiz do `brza-studio` na `master` nova (`a70f63b6a92`), por fast-forward.**
   - **Risco:** o `node_modules` dele ficou com as dependências da versão anterior, e o build ou os testes dali falham
     até o `pnpm install`.
-  - **Estado:** pendente o `pnpm install` no checkout raiz.
-  - **Como desfazer:** rodar `pnpm install` no checkout raiz.
+  - **Estado:** resolvido. Anderson rodou o `pnpm install` no checkout raiz, em 2,9 s.
+  - **Como desfazer:** voltar a `master` local ao commit anterior e rodar o `pnpm install` de novo.
 - **Link `/private/tmp/brza-sync`, para o scratch da sessão.**
   - **Risco:** nenhum; some no reboot.
   - **Estado:** ativo.

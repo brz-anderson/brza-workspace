@@ -14,8 +14,8 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** R4 e R5 fechadas, sobre o rascunho do Desenho do `designer` (no scratch). Próximo: a R6, com artboards
-  (a borda, o botão, o anel e o M5), e a R7 (o azul no escuro e o CLI).
+- **Retomar:** R4 a R6 fechadas, sobre o rascunho do Desenho do `designer` (no scratch). Próximo: a R7 (o azul no
+  escuro e o CLI) e então o Desenho gravado em `PLN-007-design.md`.
 
 ## Pedido
 
@@ -329,10 +329,54 @@ Respondida em 2026-11-02, na sessão do `brand`.
 
    **Resposta:** "Texto vivo na Geist (Recomendado)". **Decidido.**
 
+### Rodada 6 — a borda, o botão, o anel e a chama no cabeçalho (enviada 2026-11-02)
+
+**Apresentado antes:** quatro artboards, conferidos pelo PNG com a cópia corrigida do `brza shot` — o composer em
+repouso e em foco, nos dois temas; o botão de enviar no foco; o anel a 30, 60, 90 e 97% e a 93% dentro do composer; três
+chats lado a lado, com o do meio em foco. A borda do composer tem largura constante de propósito, "Use a constant
+container border so focus changes cannot flash it" (`NativeChatComposerField.tsx:251`); o anel cheio já vai ao
+`text-destructive`; o painel com foco já leva `data-active-pane` (`NativeChatPaneHeader.tsx:43`).
+
+Respondida em 2026-11-02, na sessão do `brand`.
+
+1. **A largura do fio no foco (E2).** Opções:
+   - W1, 1 px nos dois estados, com um halo de 3 px a 10% no foco (recomendada) — custo: ~1 h, no D5; se paga: já, nada
+     pula ao focar;
+   - W2, 1,5 px nos dois estados, como o protótipo da R2.5 — custo: o mesmo, e a borda em repouso engrossa em todo chat;
+     se paga: se o fio fino não segurar o degradê no claro.
+
+   **Resposta:** "6.1.1". **Decidido — W1**: [o fio de 1 px](PLN-007-borda-fio-w1.png).
+
+2. **O botão de enviar com o composer em foco.** Opções:
+   - K1, o `primary` de hoje, que a norma do app reserva à ação (recomendada) — custo: nenhum; se paga: já;
+   - K2, o degradê da marca, branco sobre laranja a 3,2:1, o bastante para um ícone — custo: ~0,25 h; se paga: se o
+     foco do composer for o momento mais forte da marca.
+
+   **Resposta:** "6.2.2" e "refaça o artboard do 6.2 com o botão redondo". **Decidido — K2**, contra a recomendação. O
+   botão do app já é redondo, `size-8 rounded-full` (`NativeChatComposerActions.tsx:145`): os artboards da R2.5 e da
+   R6 o tinham desenhado quadrado e de 24 px, e o da R6.2 foi refeito fiel ao código:
+   [o botão no degradê](PLN-007-botao-k2.png). O PNG do E2 da R2.5 fica como foi aprovado, com o botão errado.
+
+3. **O anel de contexto a partir de 90% (M3).** Opções:
+   - N1, de âmbar a laranja até 89% e, de 90% para cima, o vermelho de alerta de hoje, chapado (recomendada) — custo:
+     ~0,5 h; se paga: já, o anel cheio vira outro estado;
+   - N2, o degradê que esquenta até a brasa — custo: ~0,5 h, e some o aviso de contexto cheio; se paga: nunca.
+
+   **Resposta:** "6.3.1". **Decidido — N1**: [o anel](PLN-007-anel-n1.png). Com a P1, fecha o risco do M3 da R2.6.
+
+4. **A chama no cabeçalho com vários chats (M5).** Opções:
+   - H1, apagada sem foco e no degradê só no painel com foco (recomendada) — custo: ~0,5 h; se paga: já, diz qual chat
+     recebe o teclado;
+   - H2, no degradê em todos — custo: ~0,5 h; se paga: só com um chat aberto;
+   - H3, só no painel com foco — custo: ~0,5 h, aparece e some a cada troca; se paga: se a apagada for ruído.
+
+   **Resposta:** "6.4.1". **Decidido — H1**: [a chama no cabeçalho](PLN-007-cabecalho-h1.png). Fecha o risco do M5 da
+   R2.6.
+
 ## Worklogs
 
 - 2026-10-31 — aberto; R1 gravada como chegou da sessão do `workspace`; Terreno pelo `collector`; R2 fechada, com os
   pedidos 2 e 3 da borda e da marca no chat; R3 fechada, com a issue dos restos da Orca. Parou antes do Desenho.
   [PLN-007: a abertura da marca BrzA](../../work/worklogs/2026-10-31-pln-007-a-abertura-da-marca-brza.md)
-- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 e R5 fechadas. Parou antes da R6.
+- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 a R6 fechadas. Parou antes da R7.
   [PLN-007: o Desenho da marca BrzA](../../work/worklogs/2026-11-02-pln-007-o-desenho-da-marca-brza.md)

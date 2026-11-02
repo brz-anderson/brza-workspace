@@ -1,0 +1,1 @@
+- [Artboard lê o componente antes](artboard-le-o-componente-antes.md) — forma e tamanho do artboard saem das classes do componente real

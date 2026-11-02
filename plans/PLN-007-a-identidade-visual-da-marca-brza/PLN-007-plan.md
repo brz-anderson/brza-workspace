@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 20.75
-executed_h: 0
-remaining_h: 20.75
+executed_h: 0.25
+remaining_h: 14.25
 scope:
   - brza-studio
   - workspace
@@ -17,8 +17,9 @@ tags:
 
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
-- **Retomar:** plano aceito na R9; nenhum passo executado. Próximo: o P1, o símbolo A1 e o corte S1, nesta sessão do
-  `brand`, a pedido de Anderson; o P3, os tokens, pode correr junto numa sessão do `brza-studio`.
+- **Retomar:** P1 executado e aprovado na R10 (a chama no degradê, sem língua nem faíscas); a fonte está em
+  `PLN-007-fonte-do-simbolo/`. O P3 abriu em 2026-11-02 às 16h33, na sessão `pln-007-brand-tokens` do `brza-studio`, e
+  para antes do merge. Próximo, a pedido de Anderson: o P2, os lockups L2, nesta sessão do `brand`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
 ## Pedido
@@ -72,21 +73,27 @@ explícito de Anderson. O P3 não depende do símbolo e pode correr junto do P1.
 
 Executa D1 (o desenho) e D2 (o `d` corrigido) · executor: sessão do `brand`, no scratch
 
-Estimado: 6,5 h · Executado: — h
+Estimado: 6,5 h · Executado: 0,25 h
 
-- [ ] **1. O S1** — o `d` corrigido do D2 em `/private/tmp/pln-007/brand/brza-symbol-mono.svg`, conferido a 13, 16, 18
+- [x] **1. O S1** — o `d` corrigido do D2 em `/private/tmp/pln-007/brand/brza-symbol-mono.svg`, conferido a 13, 16, 18
       e 32 px pelo `brza shot` de um artboard, nos dois temas.
-- [ ] **2. O mestre** — `brza-symbol.svg` no tile T1, com o esqueleto do mono e as camadas de cor sobre o
+- [x] **2. O mestre** — `brza-symbol.svg` no tile T1, com o esqueleto do mono e as camadas de cor sobre o
       `build/icon.png` como decalque; o `}` em `#brza-brace-close`, usado três vezes.
-- [ ] **3. As variantes** — o `brza-brand-build.mjs` gera o claro, o dev, o com selo (o selo entra no P2), o tray e o
+- [x] **3. As variantes** — o `brza-brand-build.mjs` gera o claro, o dev, o com selo (o selo entra no P2), o tray e o
       `logo.svg`, a partir do mestre.
-- [ ] **4. A conferência** — artboard com o mestre e as variantes a 16, 32, 128 e 1024 px, nos dois temas, conferido
+- [x] **4. A conferência** — artboard com o mestre e as variantes a 16, 32, 128 e 1024 px, nos dois temas, conferido
       pelo PNG antes da rodada: `brza shot <artboard>.html <scratch>/p1-simbolo.png --width 736`.
-- [ ] **5. A rodada do símbolo** — aprovação do texto e do artboard; o PNG aprovado vai à pasta do plano como
+- [x] **5. A rodada do símbolo** — aprovação do texto e do artboard; o PNG aprovado vai à pasta do plano como
       `PLN-007-simbolo-a1.png`.
-- [ ] **6. Commit** — o PNG e a linha do plano, pelo `brza note commit`.
+- [x] **6. Commit** — o PNG e a linha do plano, pelo `brza note commit`.
 
-**Evidência:** —
+**Evidência:** `brza shot` do artboard do mestre, das variantes, do S1 (13, 16, 18 e 32 px) e do tray, nos dois temas, em
+[`PLN-007-simbolo-a1.png`](PLN-007-simbolo-a1.png); `magick compare -metric AE` do traço mono original contra a chama do
+mestre, a 1024 px, dá 347 px de 1 milhão, todos no `}` solto e no `{`, que são a correção do D2 e o espelho; o S1 gerado
+tem 12 subpaths e o solto em 9,06–10,08 × 16,68–19,56, igual à sonda do Desenho. O 1024 px saiu pelo `rsvg-convert`, e
+não pelo artboard, que tem 736 px. A aprovação é a [R10](PLN-007-interview.md). A fonte e o gerador estão em
+`PLN-007-fonte-do-simbolo/`; o `brza-brand-build.mjs` regenera os SVG idênticos, pixel a pixel. O mestre sai sem a língua
+clara e sem as faíscas do D1, por decisão da R10.
 
 ### P2 — Os lockups L2 e o texto em paths
 
@@ -216,7 +223,7 @@ Estimado: 1,5 h · Executado: — h
 - 2026-10-31 — aberto; R1 gravada como chegou da sessão do `workspace`; Terreno pelo `collector`; R2 fechada, com os
   pedidos 2 e 3 da borda e da marca no chat; R3 fechada, com a issue dos restos da Orca. Parou antes do Desenho.
   [PLN-007: a abertura da marca BrzA](../../work/worklogs/2026-10-31-pln-007-a-abertura-da-marca-brza.md)
-- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 a R8 fechadas; Desenho gravado; R9, o aceite. Parou antes do P1.
+- 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 a R8 fechadas; Desenho gravado; R9, o aceite; P1 executado e aprovado na R10; P3 aberto no `brza-studio`. Parou antes do P2.
   [PLN-007: o Desenho da marca BrzA](../../work/worklogs/2026-11-02-pln-007-o-desenho-da-marca-brza.md)
 
 ## Casos manuais

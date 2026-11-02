@@ -387,3 +387,24 @@ Respondida em 2026-11-02, na sessão do `brand`, na mensagem.
 
    **Resposta:** "aceito". **Decidido — os seis passos**: é o aceite do plano, em 2026-11-02. O aceite não autoriza a
    execução; cada passo espera o pedido de Anderson.
+
+### Rodada 10 — o símbolo A1 do P1 (enviada 2026-11-02)
+
+**Apresentado antes:** o artboard do P1, conferido pelo `brza shot` a 736 px (`PLN-007-simbolo-a1.png`): o mestre no
+tile T1, as variantes, o S1 de 13 a 32 px e o tray. A sessão declarou o que ficou de fora do D1 — a língua clara e as
+faíscas, que pedem desenho à mão sobre o `build/icon.png` — e que o 1024 px saiu pelo `rsvg-convert`, e não pelo
+artboard.
+
+Respondida em 2026-11-02, na sessão do `brand`, na mensagem.
+
+1. **A aprovação do símbolo A1 e do S1.** Opções:
+   - aprovar a chama no degradê, sem língua nem faíscas (recomendada) — custo: nenhum; se paga: já, o P2 e o P4 dependem
+     do mestre, e a diferença some a 32 e 16 px;
+   - aprovar com a língua clara e as faíscas — custo: ~1,5 h de desenho à mão; se paga: se a marca aparece grande;
+   - refazer o símbolo — custo: um desenho novo, e do P2 ao P6 esperam; se paga: se nenhuma lê como a chama de hoje.
+
+   **Resposta em texto livre, antes da escolha:** "quero ver as opções 1 e 2 lado a lado". A sessão desenhou a opção 2
+   (15 faíscas rastreadas do ícone e uma luz de borda no lugar da língua) e mostrou as duas no mesmo tile, de 240 a 16 px.
+
+   **Resposta:** "aprovo a opção 1". **Decidido — a chama no degradê, sem língua clara e sem faíscas.** O mestre, as
+   variantes e o S1 do P1 valem como estão.

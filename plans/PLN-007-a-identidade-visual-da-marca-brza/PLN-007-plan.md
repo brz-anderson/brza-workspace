@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: sim
 estimate_h: 20.75
-executed_h: 0.25
-remaining_h: 14.25
+executed_h: 0.55
+remaining_h: 13.0
 scope:
   - brza-studio
   - workspace
@@ -18,8 +18,9 @@ tags:
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
 - **Retomar:** P1 executado e aprovado na R10 (a chama no degradê, sem língua nem faíscas); a fonte está em
-  `PLN-007-fonte-do-simbolo/`. O P3 abriu em 2026-11-02 às 16h33, na sessão `pln-007-brand-tokens` do `brza-studio`, e
-  para antes do merge. Próximo, a pedido de Anderson: o P2, os lockups L2, nesta sessão do `brand`.
+  `PLN-007-fonte-do-simbolo/`. O P3 executou em 2026-11-02, na sessão `pln-007-brand-tokens` do `brza-studio`, e está na
+  `master` do `brza-studio` em `a3a89e3aaf5`, com push; falta a conferência com uma pergunta real de agente no app.
+  Próximo, a pedido de Anderson: o P2, os lockups L2, nesta sessão do `brand`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
 ## Pedido
@@ -116,18 +117,34 @@ Estimado: 2,5 h · Executado: — h
 
 Executa D4 · executor: sessão do `brza-studio`, branch `feat/pln-007-brand-tokens`
 
-Estimado: 1,25 h · Executado: — h
+Estimado: 1,25 h · Executado: 0,3 h
 
-- [ ] **1. A conferência que falha antes** — sem teste novo, porque token de CSS não tem lógica
+- [x] **1. A conferência que falha antes** — sem teste novo, porque token de CSS não tem lógica
       (`docs/agents-md-refs/test-antipatterns.md`): `grep -c 'agent-question: var(--color-orange' src/renderer/src/assets/main.css`
       dá 2 antes e deve dar 0; `grep -c -- '--brand-gradient' src/renderer/src/assets/main.css` dá 0 antes.
-- [ ] **2. Implementar** — os tokens e o `@theme inline` do D4; o papel `brand` em `docs/styleguide/color.md` e a frase
+- [x] **2. Implementar** — os tokens e o `@theme inline` do D4; o papel `brand` em `docs/styleguide/color.md` e a frase
       no `docs/STYLEGUIDE.md:5`.
-- [ ] **3. Rodar e ver passar** — `pnpm check:changed --maxWorkers=2`; `pnpm fixtures:shot native-chat/NativeChatQuestionCard --theme both`,
+- [x] **3. Rodar e ver passar** — `pnpm check:changed --maxWorkers=2`; `pnpm fixtures:shot native-chat/NativeChatQuestionCard --theme both`,
       com o aviso em azul nos dois temas.
-- [ ] **4. Commit** — `feat(brand): BrzA brand tokens and a blue agent-question (PLN-007 P3)`, e o merge na `master`.
+- [x] **4. Commit** — `feat(brand): BrzA brand tokens and a blue agent-question (PLN-007 P3)`, e o merge na `master`.
 
-**Evidência:** —
+**Evidência:**
+
+- **1:** o `grep` do laranja deu 2 e o do `--brand-gradient` deu 0, antes; depois, 0 e 1 (a definição).
+- **2:** `41bfe6d1d4e` no `brza-studio`: `src/renderer/src/assets/main.css` (`:root`, `.dark`, `@theme inline`),
+  `docs/styleguide/color.md` (a linha `brand-*`) e `docs/STYLEGUIDE.md:5`. `oxfmt --check` dos três: passa. Os
+  `--chat-composer-focus-*` que o D4 mostra como contexto não existiam e ficaram para o D5, no P5.
+- **3:** `pnpm check:changed --base=master --maxWorkers=2` (não há `origin/main` no clone): 21 de 21 passam, depois do
+  conserto do `path-literal-ratchet`, que já falhava na `master` com as mesmas duas mensagens e era dos workflows do
+  sync do v1.4.246 (`computer-e2e.yml` e `pr.yml` apontavam para `src/main/providers/local-pty/`, que não existe);
+  conserto em `a3a89e3aaf5`. **Desvio:** o `fixtures:shot native-chat/NativeChatQuestionCard --theme both` rodou (6 PNG,
+  saída 0), mas o cartão de pergunta do chat não usa o `--agent-question` e não mostra o azul; o azul foi conferido no
+  `pnpm fixtures:shot AgentStateDot:allStates --theme both --scale 2`, no ícone de "Requer atenção" e no de "Aguardando
+  entrada", azul nos dois temas. O P5 e a Regressão devem citar o `AgentStateDot:allStates` onde dizem "o
+  `fixtures:shot` do P3".
+- **4:** `41bfe6d1d4e` e `a3a89e3aaf5`, fast-forward na `master` do `brza-studio`, `git push origin master`
+  (`a70f63b6a92..a3a89e3aaf5`).
+- **Falta:** a conferência com uma pergunta real de agente no app, da Regressão do aviso de pergunta.
 
 ### P4 — Os assets no app desktop
 
@@ -225,6 +242,9 @@ Estimado: 1,5 h · Executado: — h
   [PLN-007: a abertura da marca BrzA](../../work/worklogs/2026-10-31-pln-007-a-abertura-da-marca-brza.md)
 - 2026-11-02 — Desenho rascunhado pelo `designer`, 8 itens `D` e 14 pontos; R4 a R8 fechadas; Desenho gravado; R9, o aceite; P1 executado e aprovado na R10; P3 aberto no `brza-studio`. Parou antes do P2.
   [PLN-007: o Desenho da marca BrzA](../../work/worklogs/2026-11-02-pln-007-o-desenho-da-marca-brza.md)
+- 2026-11-02 — P3 executado no `brza-studio`: os tokens da marca, o `--agent-question` azul, o conserto do
+  `path-literal-ratchet`, o merge e o push na `master`. Falta a conferência com uma pergunta real de agente.
+  [PLN-007: os tokens da marca e o aviso de pergunta azul](../../work/worklogs/2026-11-02-pln-007-os-tokens-da-marca.md)
 
 ## Casos manuais
 

@@ -24,6 +24,12 @@ tags:
   `workstream/<nome>`, com worktree em `.worktrees/<nome>`, e o `brza note` ganhou o `workstream` e o `sync`
   ([As notas moram em workstreams, e a `master` guarda só a norma](../../work/decisions/as-notas-moram-em-workstreams-e-a-master-guarda-so-a-norma.md)).
   O Desenho que conta com as notas na `master` ou com o `brza note` de antes se ajusta antes dos itens `D`.
+- **Mudou o Terreno do plugin do Orca (2026-11-02):** o sistema da `v1.4.246` tem canal worker↔painel, frame isolado
+  ligado e manifesto v2, e `terminal.sendText` é só do worker, então a R1.2 ("HTML regenerado") e o C5 ficaram em
+  revisão (o Terreno e a matriz do Desenho). **Retomar pelo spike do C5, antes dos itens `D` do painel:** plugin mínimo
+  `trusted-worker` com um painel `html` e um `components`, nos dois apps, pelo `plugin dev watch --check --shot`; as sete
+  perguntas estão no C5 do [Desenho](PLN-003-design.md). Rodada respondida em 2026-11-02: o spike mede os dois caminhos. O plugin do Orca não contribui skills (reservado e
+  vazio): o veículo delas é o plugin do Claude ([As skills de documento da Fixfy num possível plugin do BrzA](../../work/issues/skills-de-documento-da-fixfy-num-plugin.md)).
 - **Dividido:** [PLN-003 — Entrevista](PLN-003-interview.md) · [PLN-003 — Desenho](PLN-003-design.md)
 
 ## Pedido
@@ -66,4 +72,5 @@ Anderson, em 2026-10-29, na mesma sessão.
 - 2026-10-29 — aberto; R1 a R7 fecharam a Entrevista; o Terreno e a matriz foram ao Desenho; o P7 saiu à sessão
   `pln-002-p7`. Parou antes dos itens `D`.
   [O PLN-003: a entrevista do workflow nos dois clients](../../work/worklogs/2026-10-29-pln-003-a-entrevista-do-workflow-nos-dois-clients.md)
-
+- 2026-11-02 — o Terreno do plugin do Orca reescrito contra a `v1.4.246`; o C5 virou hipótese e o spike foi ao `Retomar`.
+  [O PLN-003: o Terreno do plugin do Orca na 1.4.246](../../work/worklogs/2026-11-02-pln-003-o-terreno-do-plugin-do-orca-na-1-4-246.md)

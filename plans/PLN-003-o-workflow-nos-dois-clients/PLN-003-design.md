@@ -7,6 +7,8 @@
 
 - **R1.1:** o "Workflow" são os dois — o fluxo do workspace e o recurso Workflow do Claude Code.
 - **R1.2, R4.2:** o plugin do Orca tem painel e comandos; o painel é HTML regenerado, numa pasta em `devPluginPaths`.
+  **Em revisão desde 2026-11-02:** a premissa "sem canal worker→painel" caiu e os botões exigem worker (Terreno, "O plugin do
+  Orca"); o spike do C5 mede HTML+worker e TSX+worker antes de a R1.2 fechar.
 - **R1.4, R6.1:** o PLN-003 não espera o P7; o P7 roda já, na sessão `pln-002-p7`.
 - **R2.1:** o client se acha pelo env do app, depois `BRZA_CLIENT`, depois o app vivo.
 - **R2.2:** um `brza` próprio em `~/.local/bin` despacha aos `brza-*` e repassa o resto ao CLI do client.
@@ -29,15 +31,37 @@
 
 ### O plugin do Orca
 
-- Worker: child_process.fork, Node completo sem sandbox (plugin-host-process.ts); env só PATH/HOME/LANG/TZ/TMP (WORKER_ENV_ALLOWLIST, plugin-worker-env.ts); max 5 workers, 30 s por comando. Igual no Orca 1.4.244.
-- Painel: iframe sandbox allow-scripts, srcdoc; CSP connect-src 'none' (plugin-panel-shell.ts:9); HTML de panel.entry relido a cada open, até 10 MB.
-- Sem canal worker→painel (plugin-host-protocol.ts). Painel chama só workspace.readContext, terminal.sendText, notifications.show (plugin-host-api.ts panel:true). 64 KB/msg, 30 msg/10 s.
-- readContext: {branch, displayName, terminals[{id}]} sem caminho (plugin-host-method-bindings.ts:~70-85). sendText exige terminal existente do worktree em foco, ≤4096 chars; não abre terminal.
-- Eventos: worktree.created {worktreeId,path,branch}, removed {worktreeId,path}, agent.status.changed.
-- Compat: Orca 1.4.244 aceita manifestVersion 1 e 2; fork só 1. engines '>=1.4.242' serve aos dois. upstream/main renomeou storage→storage:own, secrets→secrets:own.
-- Instalação: devPluginPaths por app (hoje [] nos dois), mutável sem hash; ou local-path (copia, imutável). Consent por app. pluginSystemEnabled=true nos dois.
-- Contorno não testado: regravar panel.html na pasta dev com os dados embutidos.
-- Subagente rodou git fetch upstream no brza-studio (upstream/main → 12f9f8175cc).
+Reescrito em 2026-11-02 contra a `v1.4.246`, a base do fork, que é também a versão dos dois apps de Anderson (BrzA Studio `1.4.246-alpha.1`, Orca `1.4.246`, pelo `Info.plist`). A versão de 2026-10-29 era contra o Orca 1.4.244 e envelheceu em seis pontos, marcados **(envelheceu)**. `Fnn` é o fato do levantamento de 2026-11-02 (agregado no scratch, fora do git); a fonte vai ao lado, nos docs de `~/Projects/brza-studio/docs/reference/plugin-*.md` e no código na tag `v1.4.246`. Nada aqui foi rodado nos apps: o que não passou pelo spike do C5 é leitura.
+
+**O que envelheceu**
+
+- **(envelheceu) "Sem canal worker→painel".** Existe: o worker responde com `orca.panels.handle(nome, …)` e empurra com `orca.panels.post`; o painel pergunta com `plugin.request` e escuta com `plugin.on` (no frame HTML são os mesmos métodos, em `orca.plugin`). Pede `main` (`trusted-worker`) e sobe o worker sob demanda. Entrada de até 64 KiB, resposta de até 1 MiB, 30 s por pergunta (teto 120 s), posts de até 256 KiB e 200 por 10 s. Vale para os dois `ui` (`plugin-authoring.md:191-267`; `plugin-host-api.md`, `plugin.request`, desde a API 1.2) [F11, F103]. O "64 KB/msg, 30 msg/10 s" do Terreno antigo cai. O contorno "regravar `panel.html` com os dados embutidos" perde a razão de ser.
+- **(envelheceu) O painel chama `terminal.sendText`.** Na 1.4.244 era `panel: true`; na 1.4.246 é só do worker, com o comentário "text plus Enter runs shell commands, so only full-access workers get it" (`src/shared/plugins/workers/plugin-host-api.ts:146-155`, tag `v1.4.246`; `plugin-host-api.md:16`) [F53]. O painel segue com `workspace.readContext`, `notifications.show`, `agents.list` e os eventos. **Consequência:** um plugin só `sandboxed-ui` não manda `brza` ao terminal; os botões da R1.2 exigem worker e `plugin.request`.
+- **(envelheceu) O painel é `iframe srcdoc` com `connect-src 'none'`.** Na 1.4.246 o frame isolado vem ligado (`PLUGIN_ISOLATED_FRAMES_DEFAULT = true`, `src/main/plugins/panels/plugin-frame-isolation.ts:9`): um `<webview>` por plugin, partição própria, origem `orca-plugin-frame://<key>/`, rede negada na sessão e não por CSP, proxy de loopback que derruba conexão, WebRTC restrito, download e popup bloqueados (`plugin-isolated-frames.md:12-52`) [F36, F38]. A CSP do frame traz `connect-src 'self' data: blob:`; o `connect-src 'none'` ficou só no `srcdoc` dos clientes web ou com o frame desligado (`plugin-authoring.md:132-134`) [F39]. O HTML não é mais "relido a cada open, até 10 MB": o frame serve vários arquivos, documentos até 16 MiB, `.ts`/`.tsx` transpilados (`plugin-isolated-frames.md`, Serving e Source modules). O que sai do frame é só `orca.shell.openExternal` (clique e aviso por host novo) e `orca.files.saveAs` [F40]. **Inferência [inferido · 80]:** o painel não alcança `127.0.0.1`, porque o proxy fixado derruba até o loopback; então não fala com o MCP residente (R3.4); quem fala é o worker.
+- **(envelheceu) "Fork só manifest 1".** O formato 2 é o novo: `manifestVersion: 2`, `execution` obrigatório, `engines.orca >=1.4.245` (`plugin-manifest.md:15-16,30`); o 1 ainda carrega (`:234`) [F97]. A base do fork é a 1.4.246, então o fork lê os dois. O Terreno dizia "Orca 1.4.244 aceita manifestVersion 2"; o doc diz desde a 1.4.245, e a divergência fica sem importância agora. **O `engines` do plugin do PLN-003 passa a `>=1.4.246`** (`ui`, `.ts`/`.tsx`, `settings` e omitir o `publisher` pedem a 1.4.246: `plugin-manifest.md:18,45` e a tabela de `panels`), no lugar de `>=1.4.242`, versão em que o sistema vinha desligado e sem documentação [F84, F95].
+- **(envelheceu) "upstream/main renomeou storage→storage:own".** Já na 1.4.246 as capacidades são `workspace:read`, `agent:read`, `terminal:send`, `notifications:show`, `storage:own`, `secrets:own`, `settings:own` (`plugin-manifest.md:196`) [F13].
+- **(envelheceu) Os eventos.** `worktree.created {worktreeId,path,branch}` e `worktree.removed` eram os da 1.4.244 (`v1.4.244:src/shared/plugins/plugin-events.ts:44`). Na 1.4.246 o doc lista `workspace.created {workspaceId, kind, path, branch}`, `workspace.removed`, `agent.status.changed {…, state: working|blocked|waiting|done, mainAgent?}` e `workspace.changed {context}`, que entrega o contexto atual a cada novo assinante (`plugin-host-api.md:175-190`) [F15]. `readContext` ganhou `title?` em cada terminal e continua sem caminho (`plugin-host-api.md:36-40`).
+
+**O que segue valendo, sem reconferir** (de 2026-10-29): worker em `child_process.fork`, Node completo (`plugin-host-process.ts`); env só `PATH/HOME/LANG/TZ/TMP` (`plugin-worker-env.ts`; o levantamento confirma o recorte, `:1-16,44`, e que o worker não tem sandbox de arquivo nem de rede) [F50]; no máximo 5 workers e 30 s por comando; `sendText` exige terminal existente do worktree em foco e até 4096 caracteres; `pluginSystemEnabled=true` nos dois apps; `devPluginPaths` por app, hoje `[]` nos dois, mutável sem hash; consentimento por app. Não toquei no `~/.orca` para conferir.
+
+**O que o worker pode fazer no host (API 1.2)**
+
+- Ler o contexto do workspace em foco, listar agentes (`agents.list`) e ouvir o status deles, **digitar em terminal por id**, notificar, e usar `storage`/`secrets`/`settings` próprios [F14, F53]. Não abre workspace, não cria terminal, não lança agente, e não há hook que bloqueie prompt ou chamada de ferramenta [F54].
+- **Só no `upstream/main`** (API 1.3, `engines.orca >=1.4.248`): `workspace.list/open`, `editor.open`, `commands.run`, `terminal.create/read`, `agent.launch`, `statusBar.update`; hooks `agent.tool.before` (que só bloqueia no Claude Code), `agent.prompt.before`, `agent.launch.before`, `terminal.send`, `workspace.create.before/after`, `editor.save.before`; `commands[].replaces`; capacidades `workspace:write`, `agent:launch`, `terminal:read` [F55–F60, F105–F108]. **Um plugin com esse `engines` não carrega no fork** enquanto a base for 1.4.246 [F94]. A orquestração (R4.1) fica no MCP e no `brza`.
+- **Reservados e vazios, até no `upstream/main`:** `skills`, `mcpServers`, `agentHarnesses`, `taskSources`, `connections`, `sidebarCards` (`plugin-manifest.md:46-53`; `upstream/main:docs/reference/plugin-manifest.md`) [F8, F112]. `hooks` e `statusBarItems` também estão vazios na 1.4.246 e só existem no `upstream/main`. **O plugin do Orca não contribui skills nem MCP; o veículo é o plugin do Claude (R4.3, R4.4), e o plugin do Orca é só UI e eventos.**
+
+**Segurança e consentimento (entram na análise de risco da fase 0)**
+
+- `trusted-worker` só roda depois de aprovação explícita; pela CLI é `--approve <fingerprint>`, vindo de um `approval_required` anterior, sai com código 3 e a skill do Orca manda o agente nunca aprovar sem o pedido exato (`plugin-cli-approval.ts:36-66`; `plugin-authoring.md:493-494`) [F43, F46, F47, F63]. O fingerprint amarra capacidades e a confiança do worker [F45 · lido · 85]; update que pede acesso novo não instala e fica em "Update needs review" [F44].
+- O worker tem o acesso do usuário. O `audit.log` registra só as chamadas à API do host (`plugin-audit-log.ts:3,22-23`) [F49]. O painel HTML é "trusted code" e roda no frame isolado.
+- Pasta de desenvolvimento: salvar um painel ou um worker **não** pede aprovação de novo; subir capacidade ou perfil de execução, e mudar comando ou atalho, pede (`plugin-authoring.md:436-442`) [F68]. Isso responde, por documento e sem teste, a dúvida da R4 sobre regravar o `panel.html` "sem novo consentimento".
+
+**Autoria e spike**
+
+- O ciclo é do CLI do client: `plugin create --template panel|components|worker-panel`, `plugin dev watch --check --shot`, `plugin dev load|reload|request|emit`, `plugin test|check`, `plugin shot` (PNG do painel mesmo com a janela escondida) e `plugin open`; precisam do app desktop com um workspace aparecendo (`skill-guides/orca-plugin-authoring/references/cli.md:7-31`; `plugin-authoring.md:370-420`) [F61, F62, F64, F65]. No fork o shim `brza` e o `orca` são idênticos, byte a byte, e `ORCA_CLI_COMMAND` aponta ao launcher do app nos terminais gerenciados [F73, F76].
+- A skill `orca-plugin-authoring` é embutida no binário e sobe pelo `ORCA skills get orca-plugin-authoring` [F70, F71].
+- **Painel de componentes (`ui: "components"`):** módulo TSX que devolve uma árvore do catálogo do Orca (Stack, Text, Button, Table, Tree, Markdown, CodeView…), sem HTML, CSS nem hooks; hot reload preserva os átomos com chave (`plugin-declarative-ui.md:1-60`) [F9, F10]. O Orca o desenha com o tema e o teclado dele: o `DESIGN.md` da R6.2, que descreve um painel HTML, não vale para esse caminho.
+- **Não testado:** o painel e o `plugin.request` em nenhum dos dois apps; o `plugin shot` e o `plugin dev` com a sessão do chat do Studio [levantamento, item 4]; o `terminal.sendText` do worker no terminal em foco; o alcance do `127.0.0.1` pelo painel e pelo worker; a cobertura do catálogo de componentes para planos, notas e worklogs.
 
 ### O MCP e o chat
 
@@ -118,7 +142,21 @@ Horas: estimadas, na régua do PLN-002 (1,5–3 h estimado por `brza-*`, 0,2–0
   decisão consistente) → mcp.
 - **C4 Ciclo do Claude** — evento de hook, skill, definição de agente com modelo, roteiro `agent()`, `.mcp.json` →
   plugin do Claude.
-- **C5 UI nos dois apps** → plugin do Orca.
+- **C5 UI nos dois apps** → plugin do Orca. **Hipótese a medir no P0, reaberta em 2026-11-02** (era critério fixo):
+  o Terreno envelheceu, e nada do painel foi testado nos apps. O spike, antes de o desenho do painel fechar, num plugin
+  mínimo `trusted-worker`, `engines.orca >=1.4.246`, em pasta dev, pelo CLI do client (`plugin dev watch --check --shot`
+  e `plugin shot`), com **dois painéis**, um `ui: "html"` e um `ui: "components"`, e rodado nos dois apps. Responde:
+  1. o painel carrega e o `plugin.request` ao worker responde, nos dois apps;
+  2. o worker lê planos e notas do worktree e o painel os mostra; o catálogo de componentes (Tree, Markdown, Table) cobre
+     o que o HTML mostraria;
+  3. o `terminal.sendText` do worker roda um `brza` no terminal em foco, achado pelo `readContext`;
+  4. o painel não alcança `127.0.0.1` (inferido) e o worker alcança o MCP residente;
+  5. regravar um arquivo do painel na pasta dev recarrega sem nova aprovação (o doc diz que sim);
+  6. o `plugin shot` e o `plugin dev` funcionam com a janela escondida na sessão do chat do Studio;
+  7. o custo da aprovação `--approve` por app e o que o worker faz que o `audit.log` não registra (entra na análise de
+     risco da fase 0).
+
+  Se o item 1 falhar em qualquer dos dois apps, o C5 volta à rodada.
 - **C6 Dentro do app** — `tool_use_id`/cartão, seletor nativo, estado sem RPC → app (fork); só BrzA; entra só sem contorno.
 - **C7 Imposição** — regra cuja violação gasta cota, dinheiro ou cache e que cabe numa tabela → a norma declara a
   regra e a tabela, e o mcp (ou hook) impõe lendo a tabela. Regra de juízo fica só no texto (C1).
@@ -134,7 +172,7 @@ Horas: estimadas, na régua do PLN-002 (1,5–3 h estimado por `brza-*`, 0,2–0
 | B4 | pacote pip+pipx+uv e brew | R3.1, R3.2 | cli | 4–6 | fase 1, 1ª instalação fora | — | C2 |
 | B5 | `app install` pela release, `--from-source`, confirma antes | R3.3; F24 | cli | 3–3,5 | fase 1, 1ª máquina sem o repo | não (só o app BrzA) | C2 |
 | B6 | servidor HTTP residente, launchd, porta, token, `brza mcp start/stop/status` | R3.4 | mcp + verbo na cli | 4–6 | fase 2 | sim | C3 |
-| B7 | painel HTML regenerado + comandos `brza` | R1.2, R4.2; F28 (painel) | plugin do Orca (mostra) + cli `brza panel render` (gera) + mcp (regera a cada mudança de estado) | 6–10 | fase 2 | sim | C5, C2 |
+| B7 | painel HTML regenerado + comandos `brza` — **em revisão (C5):** painel HTML ou TSX com worker, a medir no spike | R1.2, R4.2; F28 (painel) | plugin do Orca (mostra) + cli `brza panel render` (gera) + mcp (regera a cada mudança de estado) | 6–10 | fase 2 | sim | C5, C2 |
 | B8 | skills e hooks no plugin, `brza:`; raiz por env | R4.3 | plugin do Claude + `CLAUDE.md`/glossário | 3 +1 (raiz do `measure.py`/`check_notes.py`) | fase 1 | sim | C4 |
 | B9 | piloto `workflows/*.js` (Terreno) | R4.4 | plugin do Claude | 2 | fase 2 | sim, a medir (`@internal`) | C4 |
 | B10 | shim npm/npx/pnpm | R3.1 | cli | 2 | fase 3 | — | C2 |
@@ -161,7 +199,7 @@ Alternativas viáveis na coluna "Alt"; o porquê em uma linha.
 | M14 | O fim volta ao chamador (espera × aviso; turno ocioso) | F11 | mcp (via `worker_done`) | bloquear até o fim | 2–3 | fase 2 | sim | C3 | sem isso o executor vira fogo-e-esquece |
 | M15 | Gate de aprovação (abrir executor, trocar conta) | conflito K3 | `AGENTS.md` (quando) + mcp devolve proposta + sessão principal pergunta | gate do `orca orchestration` | 1–2 | fase 2 | sim | C1 + C3 | preserva "quem pergunta é a principal" |
 | M16 | Medição do roteamento + conserto da conta `home` | R4.1; AGENTS.md:93-94 | hook `measure.py` (conserto) + mcp (linha `route`) | — | 0,5 + 1,5 | fase 1 (conserto) / fase 2 | sim | C3 | "a política se revê pela medição"; hoje conta errada |
-| M17 | Fila e sessões no painel | R4.1 + R4.2 | plugin do Orca (mostra o HTML que o mcp regera) | — | 1–2 | fase 2 | sim | C5 | o semáforo invisível vira mistério |
+| M17 | Fila e sessões no painel | R4.1 + R4.2 | plugin do Orca (mostra o HTML que o mcp regera — **em revisão**, C5) | — | 1–2 | fase 2 | sim | C5 | o semáforo invisível vira mistério |
 | M18 | `codex_reply(thread, msg)` | F9 | mcp | `codex exec resume` pela cli | 1–2 | fase 3 | sim | C3 | estado da thread entre chamadas |
 | M19 | Sandbox do Codex como argumento | F15 | mcp (impõe) | config do Codex | 1 | fase 3 | sim | C7 | a sandbox fica visível no `canUseTool` |
 | M20 | Aviso ao celular (notify + hook Stop de turno longo; gate pendente) | F31, F32 | cli `brza notify` + hook do plugin + mcp chama | — | 2–3 | fase 3 | sim (macOS) | C2 + C4 | gate parado precisa chamar Anderson |

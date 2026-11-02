@@ -27,6 +27,13 @@ para um possível plugin".
 O que as seis têm em comum é o `docs/` de um repositório de código, que o `brza-studio` não tem: sem `docs/adr`, manual
 nem constituição (`ls ~/Projects/brza-studio/docs`, no levantamento). O plugin faria sentido quando ele passar a ter.
 
+**O veículo é o plugin do Claude, não o do Orca.** Em 2026-11-02, o levantamento do sistema de plugins do Orca na
+`v1.4.246` achou `contributes.skills` reservado e obrigatoriamente vazio ("must be empty until their format is defined"),
+(`brza-studio/docs/reference/plugin-manifest.md:47`) e continua reservado no `upstream/main`, pelo levantamento. O plugin do Orca não entrega skill a
+agente; as seis, se virarem plugin, vão no plugin do Claude (`.claude-plugin/plugin.json` e `skills/`), com o namespace
+`brza:`. O gatilho segue o mesmo; o fato só tira o plugin do Orca das opções de veículo. Contexto em
+[PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`](../../plans/PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md).
+
 **O porte não é cópia.** Cada uma cita o `fixfy-context`, o `doc-governance` e os papéis do time da Fixfy
 (`architect`, `product-owner`), que aqui viram os subagentes por papel do `AGENTS.md`. A triagem inteira está em
 [O porte das skills da Fixfy para o workspace](../worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md), no workstream

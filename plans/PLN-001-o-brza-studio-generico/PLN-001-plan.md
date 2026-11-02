@@ -3,9 +3,9 @@ status: in_progress
 phase: execution
 origin: request
 ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 177.8
+estimate_h: 183.8
 executed_h: 33.8
-remaining_h: 3.9
+remaining_h: 9.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -41,6 +41,8 @@ tags:
   casa o remetente com a aba pelo que o app guarda. Medido no P9.1, para o P62: a mensagem chegou no transcript como
   `<cross-session-message from="uds:/tmp/cc-socks/60775.sock" from-name="brza-workspace-5b" from-mode="prompting">`,
   com o `origin.name` na linha do JSONL; o nome está no `from-name=`, e não no `from=` do `<agent-message>` do D48; o P62 lê os dois (X34).
+  **O pedido 37 entrou em 2026-11-02**, com a R63, o D55 e o P72, que a sessão `pln-001-pedido-37` executa, num worktree
+  do `brza-studio` a partir da `master` (a `master` anda com as correções do `v1.4.246-alpha.2`: parta do commit atual).
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
@@ -118,6 +120,11 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   destacado". No mesmo dia e na mesma sessão: "os de diff de código não está aparecendo o botão de expandir". Chegaram a
   esta sessão pelo pedido da sessão `compact-guard`, com as palavras e a data, e as imagens em
   `/private/tmp/brza-pedido-preview-md/`, fora do git
+- **Pedido 37 (2026-11-02, sessão `studio-achados-246` do workstream `studio`, no chat do BrzA Studio):** com a imagem
+  do cartão "Tarefa do coordenador" do chat do BrzA Studio ("Mover trabalho em cur…", "Show more"): "faça com que
+  mensagens enviadas ao criar sessões com `brza sessions` apareçam dessa forma e não como mensagem do usuário como é
+  hoje". A imagem está em `/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace--worktrees-studio/1cc6cebf-df5c-4f57-a8ad-cdddea824cf4/images/2.png`,
+  fora do git
 
 ### Cobertura
 
@@ -162,6 +169,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 34` | No chat estruturado do desktop, o cartão de pergunta e o de aprovação recolhem a uma faixa acima do composer, que fica usável; a seta da faixa reabre o cartão com a resposta pela metade; o "Steer" da fila espera a resposta (R60.1 a R60.3, R61.1) | P69 | teste da sessão estruturada e do cartão de aprovação (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 35` | A faixa recolhida tem a barra de 3 px e o ícone do tipo em `--primary` à esquerda e, à direita, o botão "Responder" ou "Revisar" com a seta, que reabre o cartão; a seta do cartão aberto não muda | P70 | teste da sessão estruturada e do chat do terminal (unidade); conferência no BrzA Studio (manual) |
 | `Pedido 36` | O expandir aparece em todo bloco de código e diff, role ou não; a tela cheia da cerca `markdown` ou `md` abre na prévia do olho do editor, com o `<>` para o cru e o frontmatter na caixa "Front Matter" (R62.1 a R62.3) | P71 | teste da camada do expandir (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 37` | O prompt que o `brza sessions` manda ao abrir uma sessão (`--prompt`, `--rename --prompt`) e o do `brza sessions send` aparecem no chat de destino como o cartão "Tarefa do coordenador", com o chat de origem como remetente, e não como balão de usuário; o `/rename` e o envio feito por uma pessoa seguem como estão (R63.1, R63.2) | P72 | teste do launch e do `agentSession.send` com e sem chamador de chat (unidade); conferência no BrzA Studio (manual) |
 | `X20` | O `executeRead`, o `executeWrite` e o `executeDestructive` do MCP da Atlassian ganham o ícone do produto do `name` e o título com a ferramenta interna; o `discover` ganha o ícone do produto citado na busca, e o título com a busca entre aspas (R55.1, R55.2) | P67 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual, com o C6) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
@@ -1134,6 +1142,37 @@ custos são estimativa.
    (recomendada) — custo: uma sessão a mais; depois, no `Retomar` — custo: nenhum agora.
    **Decidido — "Agora, num worktree (Recomendado)".** É a autorização do P71.
 
+### Rodada 63 — o prompt do `brza sessions` como cartão de tarefa (enviada 2026-11-02)
+
+> **Apresentado antes:** a leitura desta sessão, em `brza-studio@384d4b08fd6`, sem rodar. O prompt do launch entra como
+> primeira mensagem sem remetente (`agent-launch-prompt-delivery.ts:24-34`, `structuredAgentSessionSendBody(text, [])`),
+> e sem `from` a mensagem é do usuário. O cartão da imagem é o `NativeChatAgentMessageCard`, e o título "Tarefa do
+> coordenador" sai quando o `from` tem `orchestration.message === 'task'` (`agent-message-presentation.ts:44`); a
+> linha do remetente é o chat de origem. A identidade do chat de origem já chega ao launch, e o cartão "Entregue a um
+> agente" a usa (`agent-launch-handoff-card.ts:31-40`). Inferência apresentada como a confirmar: só o título e o texto
+> do cartão leem o `task`, e nenhum outro código do app procura o `runId`, o `taskId` ou o `dispatchId`. Com
+> `--rename`, o prompt sai depois, pelo `agentSession.send` (`brza-sessions:388-392`).
+
+Respondida em 2026-11-02, por Anderson na sessão `studio-achados-246` do workstream `studio`, pelo AskUserQuestion. Os
+custos são estimativa.
+
+1. **R63.1 — Como o cartão "Tarefa do coordenador" nasce, sem dispatch de orquestração por trás?** Seleção única.
+   Opções: a tarefa com ids sintéticos (recomendada) — custo: ~1 passo, sem mudar o esquema, e os ids não apontam
+   registro; se paga: já no passo; um tipo novo `launch-task` no esquema — custo: um passo maior e conflito em sync
+   futuro; se paga: só se o `task` sintético der problema; o cartão genérico "Mensagem de <chat>" — custo: o menor, mas
+   o título não é o da imagem; se paga: nunca, se o título da imagem é o que se quer.
+   **Decidido — "Tarefa, com ids sintéticos (Recomendado)".** Vai ao D55 e ao P72.
+2. **R63.2 — Quais envios do `brza sessions` viram cartão?** Seleção única. Opções: o prompt do launch e o do
+   `--rename` (recomendada) — custo: o trecho no RPC de envio e uma mudança no `brza-sessions`; se paga: já no passo;
+   só o prompt do launch — custo: só o `brza-studio`; se paga: só sem `--rename`; também o `brza sessions send` —
+   custo: o maior, porque o `send` é o que o roteador do PLN-003 usa, e o contrato dele não foi lido; se paga: só se
+   toda mensagem de sessão para sessão deve ser cartão.
+   **Decidido — "Também o `brza sessions send`".** Vai ao D55 e ao P72. A recomendada ficou de fora, por escolha de
+   Anderson: o `send` entra, e o contrato do roteador do PLN-003 e o `brza-run`, que usam o mesmo `send_to_chat`, são
+   "A conferir no passo" do D55.
+
+Sem rodada própria, por ser a ordem do pedido: o passo roda agora, numa sessão do `brza-studio` num worktree.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -1149,7 +1188,7 @@ base dos ícones, e o P42, o P52 e o P53 não dependem de nenhum; o P54 ao P57 v
 antes do P55, o P56 independente e o P57 por último; o P58 vem antes do P59 e do P60, que não dependem um do outro, e
 o P61 por último; o pedido 32 roda em paralelo com o 31 (R51.2), o P62 antes do P63, o P64 depois do P63 e o P65 por
 último; o P66 do pedido 33 roda em paralelo com os dois (R52.4), e o P69 do pedido 34, agora, em paralelo com o que espera
-build (R60.4), e o P70 do pedido 35 depois do P69, que criou a faixa; o P71 do pedido 36, agora, sem depender de nenhum (R62.4).
+build (R60.4), e o P70 do pedido 35 depois do P69, que criou a faixa; o P71 do pedido 36, agora, sem depender de nenhum (R62.4); o P72 do pedido 37, agora, sem depender de nenhum.
 
 **Outro runtime** marca o passo que o Codex ou o `agy` podem executar, e o mais indicado vem primeiro, com "indicado". É
 leitura, e não decisão: o runtime de cada passo se escolhe no pedido. O Codex e o `agy` abrem só a pedido, numa sessão
@@ -2727,6 +2766,27 @@ passed; `pnpm check:changed --base=origin/master --maxWorkers=2` → 21 de 21 ve
 numa fixture local, fora do commit, nos dois temas. A `origin/master` não andou entre o início e o push. O worktree e a
 branch saíram depois do push. A conferência no app é o C24.
 
+### P72 — O prompt do `brza sessions` como cartão "Tarefa do coordenador" (pedido 37)
+
+Executa D55 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-37`
+
+Estimado: 6 h · Executado: 0 h
+
+Agora (pedido 37). O passo nomeia o `brza-workflow` só para o ponto "A conferir no passo" do D55; o código é do
+`brza-studio`.
+
+- [ ] **1.** Os "A conferir no passo" do D55, lidos e respondidos no código antes de escrever: o que o provedor Claude faz
+      com uma mensagem que tem `from`, e o `/rename` como mensagem de agente
+- [ ] **2.** Testes que falham: o launch com chamador de chat grava a primeira mensagem com `from` (remetente, `task` de
+      ids sintéticos); sem chamador de chat, ou com prompt que é só comando do catálogo, grava como hoje; o
+      `agentSession.send` do `local-cli` com `agentSessionId` diferente do destino grava com `from`, e o da janela, o de
+      aparelho pareado e o do próprio chat gravam como hoje
+- [ ] **3.** O `from` no `launchPromptCreateInputs` e no `agentSession.send`, pelo mesmo helper, a partir do chamador
+- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+      push. A conferência no app é o C25
+
+**Evidência:** (a preencher)
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -3138,6 +3198,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C22 | `Pedido 34`: recolher a pergunta e a aprovação no chat estruturado (P69.4) | Num chat do Claude, uma pergunta do AskUserQuestion com uma opção marcada e uma aprovação; recolher, rolar a conversa, mandar uma mensagem pelo composer e reabrir | A faixa com o título no lugar do cartão e o composer usável; a mensagem vai à fila, sem "Steer", e sai depois do turno; reaberto, o cartão com a opção marcada; repetido com o "enfileirar follow-ups" desligado, a pergunta segue pendente e respondível, ou o caso falha (R61.2) | | |
 | C23 | `Pedido 35`: a faixa com ícone e ação (P70.3) | No build do C22, recolher uma pergunta e uma aprovação, no tema claro e no escuro | A barra e o ícone do tipo à esquerda e "Responder" ou "Revisar" com a seta à direita, que reabre o cartão; o título cortado no que sobra. A barra e o ícone saem pretos no claro e brancos no escuro, pelo `--primary` neutro; se a falta de cor incomodar, a escolha do token vai a Anderson como rodada | | |
 | C24 | `Pedido 36`: o expandir em todo bloco e a prévia do Markdown (P71.4) | No build do C22, passar o mouse sobre um bloco curto, uma cerca sem linguagem, uma cerca `diff`, o diff de um `Edit` e o da linha de ferramenta, com o botão sem cobrir texto (X61); expandir um SKILL.md numa cerca `markdown`, alternar para o `<>` e voltar, no tema claro e no escuro | O botão nos quatro; o SKILL.md renderizado como no olho do editor, com `name` e `description` na caixa "Front Matter"; o `<>` com o cru; o copiar com o cru | | |
+| C25 | `Pedido 37`: o prompt do `brza sessions` como cartão (P72.4) | No build do C22, de um chat qualquer, rodar `brza sessions <nome> --prompt "<tarefa longa>"` e, com `--rename`, o mesmo; depois `brza sessions send <nome> "outra coisa"`; num terminal fora de chat, rodar o mesmo `brza sessions … --prompt` | O chat novo abre com o cartão "Tarefa do coordenador", com o chat de origem como remetente e o texto dobrado em 3 linhas com "Show more"; o `/rename` não aparece; o `send` chega como cartão; no terminal fora de chat, a mensagem segue como balão de usuário | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,

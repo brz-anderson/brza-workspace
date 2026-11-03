@@ -105,6 +105,20 @@ a sessão que o executa, num worktree do `brza-studio`:
 - **O pedido 42 (D63, P80):** o botão de expandir do P71 com a aparência e a posição dos botões vizinhos (sem borda nem
   fundo, na mesma fileira, medido no grupo de ações real). Sessão `pln-001-pedido-42`; o C33 espera o build. Entra na
   `v1.4.246-alpha.2` junto do P79.
+- **A suíte completa do merge, em `origin/master@4bbaecabf18`** (os P72, P74 a P77, P79 e P80 dentro; 1.039 s, 17 min;
+  log em `/private/tmp/studio-246/suite-master.log`): **57 arquivos e 63 testes falham**, contra 25 arquivos e 50 testes
+  no sync (`a70f63b6a92`) e 39 na v1.4.246 pura. 13.405 arquivos passam. O que são:
+  - **29 `mobile-web-app-*-render`:** o Playwright novo pede o `chromium_headless_shell-1248`, que não está instalado
+    nesta máquina (`pnpm exec playwright install`). Ambiente, não código.
+  - **1 regressão das correções, do P75 (`f7490afab9e`):** `usage-credentials.test.ts`, 8 dos 13 testes. Passavam em
+    `ecc4a13d456` e falham em `f7490afab9e`, porque ainda esperam as chaves do MiniMax e do GLM em `.orca/` e o P75 as
+    moveu para `~/.brza`. A sessão do P75 rodou só os testes do alvo, pela regra da suíte única, e o vizinho que a
+    suíte pegou não estava entre eles. Os testes "nunca sobrescreve a chave que o outro app selou" também precisam ser
+    relidos: com as pastas separadas, a premissa deles mudou.
+  - **`wsl-host-deployment-store.test.ts`, 3 testes:** falham também na tag v1.4.246 pura e em `a70f63b6a92`; não são das
+    correções (e a lista dos 25 do sync não os trouxe: depende da máquina).
+  - **`git-admission-storm-measurement.test.ts`:** passa isolado; é instável sob carga.
+  - **O resto** são os 25 de sempre (macOS, `ssh -F`, `/private/tmp`), na lista da pura.
 - **O pedido 41 (R67, D62, P79):** o botão "Continuar em outra conta" volta, reabrindo o P40 e a R1 do sync, e o
   "Retomar automaticamente" agenda sozinho ao bater o limite. Sessão `pln-001-pedido-41`; o C32 espera o build.
 - **A limpeza de branches** (só local, a pedido): saíram os worktrees e as branches dos pedidos 37, 38, 39 (as quatro) e

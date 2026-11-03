@@ -14,11 +14,13 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** a Entrevista fechou nas rodadas 1 a 7. **Primeiro, o spike do C5** (2026-11-02): um plugin mínimo
-  `trusted-worker`, com um painel `html` e um `components`, nos dois apps, pelo `plugin dev watch --check --shot`, com as
-  sete perguntas do C5 no [Desenho](PLN-003-design.md). Depois, escrever os itens `D` a partir da matriz, com os riscos
-  da fase 0 como hipóteses (R7.3), e os Passos, com o P0 numa sessão `pln-003-p0`. O P7 do PLN-002 corre na sessão
-  `pln-002-p7`.
+- **Retomar:** a Entrevista fechou nas rodadas 1 a 8. **Primeiro, terminar o spike do C5**, que parou na aprovação em
+  2026-11-03: Anderson roda o `dev load` com `--approve` nos dois apps
+  ([O --approve do plugin é barrado no modo auto](../../work/issues/o-approve-do-plugin-e-barrado-no-modo-auto.md)), e a
+  sessão roda, sobre o plugin de `spikes/c5-plugin/`, os itens 1, 5 e 6 e a parte ao vivo de 2, 3 e 4. O resultado
+  parcial está no C5 do [Desenho](PLN-003-design.md); o Orca está agora na `1.4.247`. Depois, escrever os itens `D` a
+  partir da matriz, com os riscos da fase 0 como hipóteses (R7.3), e os Passos, com o P0 numa sessão `pln-003-p0`. O P7
+  do PLN-002 corre na sessão `pln-002-p7`.
 - **Mudou a norma (2026-10-29):** a trava de retomada saiu, e a sessão passou a ser por frente, não por tarefa
   ([Uma sessão por frente de trabalho, sem trava de retomada e com o cache de 1 h](../../work/decisions/uma-sessao-por-frente-e-sem-trava-de-retomada.md)). O Desenho ainda conta com a
   trava no roteador (M2) e na tabela de conflitos (`PLN-003-design.md:181-182`): ajustar antes dos itens `D`.
@@ -75,6 +77,12 @@ Anderson, em 2026-10-29, na mesma sessão.
 
 - [As skills de documento da Fixfy num possível plugin do BrzA](../../work/issues/skills-de-documento-da-fixfy-num-plugin.md)
   — o veículo é o plugin do Claude, não o do Orca; o gatilho é de Anderson.
+- [O --approve do plugin é barrado no modo auto](../../work/issues/o-approve-do-plugin-e-barrado-no-modo-auto.md)
+  — trava o resto do spike do C5 até Anderson aprovar nos dois apps.
+- [O CLI do Orca no chat do Studio fala com o Studio](../../work/issues/o-cli-do-orca-no-chat-do-studio-fala-com-o-studio.md)
+  — vai ao B1 e à R2.1: o env herdado escolhe o app.
+- [Os tipos de plugin faltam no pacote da 1.4.246](../../work/issues/os-tipos-de-plugin-faltam-no-pacote-da-1-4-246.md)
+  — o `plugin create` e o `plugin types` quebram nos dois apps.
 
 ## Worklogs
 
@@ -85,3 +93,5 @@ Anderson, em 2026-10-29, na mesma sessão.
   [O PLN-003: o Terreno do plugin do Orca na 1.4.246](../../work/worklogs/2026-11-02-pln-003-o-terreno-do-plugin-do-orca-na-1-4-246.md)
 - 2026-11-03 — a medição e a rodada do desempatador, do workstream `workspace`, foram ao M11 do Desenho.
   [O PLN-003: o desempatador do M11](../../work/worklogs/2026-11-03-pln-003-o-desempatador-do-m11.md)
+- 2026-11-03 — a Rodada 8 decidiu como rodar o spike do C5; o spike ficou parcial, parado na aprovação, com três issues.
+  [O PLN-003: o spike do C5 parou na aprovação](../../work/worklogs/2026-11-03-pln-003-o-spike-do-c5-parou-na-aprovacao.md)

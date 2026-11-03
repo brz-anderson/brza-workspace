@@ -1,0 +1,36 @@
+{
+  "manifestVersion": 2,
+  "id": "brza-spike-c5",
+  "name": "BrzA spike C5",
+  "version": "0.1.0",
+  "description": "Spike do C5 do PLN-003: um painel html e um components, com o worker que lê as notas do workspace.",
+  "engines": {
+    "orca": ">=1.4.246"
+  },
+  "execution": "trusted-worker",
+  "pluginApi": 1,
+  "main": "src/worker.ts",
+  "contributes": {
+    "panels": [
+      {
+        "id": "notas-tsx",
+        "title": "C5 · components",
+        "icon": "blocks",
+        "entry": "src/panel.tsx",
+        "ui": "components"
+      },
+      {
+        "id": "notas-html",
+        "title": "C5 · html",
+        "icon": "file-text",
+        "entry": "src/panel.html",
+        "ui": "html"
+      }
+    ]
+  },
+  "capabilities": [
+    { "kind": "workspace:read" },
+    { "kind": "agent:read" },
+    { "kind": "terminal:send" }
+  ]
+}

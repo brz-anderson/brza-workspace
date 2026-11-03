@@ -19,10 +19,11 @@ tags:
 
 # PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients
 
-- **Retomar:** o P1 a P6 estão implementados na `feat/pln-009-mcp` do `brza-workflow` (`1fa3e60`, sem push), e nenhum
-  tem `[x]`: o laço de revisão de cada passo segue. A rodada 1 do P2 a P6 (Flash, e o Opus no P2 a P5 pela medição da R4)
-  e a 2 do P1 deram 56 correções, que um `implementer` aplica e depois manda à próxima rodada do Flash; a rodada final é
-  a do Opus no `agy`, quando a cota voltar (R3). O próximo passo é ler essa rodada e fechar os passos que zerarem.
+- **Retomar:** o P1 a P6 estão implementados e corrigidos na `feat/pln-009-mcp` do `brza-workflow` (`77b917f`, sem
+  push; `tests/mcp` 286, `tests/hooks` 290 e `tests/cli` limpo 445, todos OK). A rodada do Flash depois da correção
+  aprovou os seis passos. Falta a rodada final pelo Opus no `agy` (R3), cuja cota volta por volta das 08:40 de
+  2026-11-03: `cd /private/tmp/pln009 && ./agy-review.sh <passo> final c7a9e68 extra-<passo>-final.md` com
+  `MODEL=claude-opus-5-5-high`, um por passo. O `[x]` de cada passo vem depois dela.
 
 ## Pedido
 
@@ -508,6 +509,22 @@ em [Revisões](#revisões)); "com correção" quer dizer que o passo ganhou o co
   `held`, `done`, `failed`. Afeta P6 e D5.
 - **X30 — O gancho `Queue.on_decision` é atributo único.** Afeta P6.
 - **X31 — O `build` nasce sem o desempatador; só o `serve` o liga.** Afeta P6.
+
+Os desvios abaixo vieram da rodada de correção (`brza-workflow@77b917f`), aceitos na rodada seguinte do Flash.
+
+- **X32 — O `status` traz `finished` (os 10 últimos do chamador) e o `error` de cada pedido em fila.** Afeta P5 e D3.
+- **X33 — O `dispatch` e o `approved` devolvem `model`, `effort` e `reason`; a proposta do gate leva o `reason`.** Afeta
+  P3, P4 e D3.
+- **X34 — O pedido sem `account` grava a conta ativa.** Afeta P2, P5 e D2.
+- **X35 — O `config` tem lista fechada de chaves, com tipo e faixa.** Afeta P3, P4 e D4.
+- **X36 — Com o `brza.toml` ilegível, o servidor sobe com os padrões e as três ferramentas respondem `isError` com o
+  caminho.** Afeta P4 e D4.
+- **X37 — A vaga do escolhido sai reservada no mesmo lock (`admit_next`, `release`, `set_session`), e o `Limits.scope()`
+  lê o uso e a máquina uma vez por passada.** Afeta P2, P5, D2 e D6.
+- **X38 — A conta que não é a ativa é recusada no `dispatch`**, e não só gateada, porque o `worker-start` não leva conta
+  (X20). Afeta P5 e D6.
+- **X39 — A limpeza do `worker-start` que falha usa `worker-release --dispatch` e `task-update --status failed`**, flags
+  lidas no CLI do `brza-studio` e não executadas. Fica para o C4. Afeta P5.
 
 ## Worklogs
 

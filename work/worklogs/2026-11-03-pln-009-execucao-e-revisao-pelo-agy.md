@@ -91,11 +91,30 @@ estão nas linhas `review` do log.
 - **Issue nova:** [O MCP propõe a conta do pedido](../issues/o-mcp-propoe-a-conta-do-pedido.md), de R4.3.
 - **Os desvios X1 a X31** estão no plano.
 
+## A rodada de correção
+
+Um `implementer` aplicou, na `feat/pln-009-mcp`, as 53 correções do P2 a P5, as 2 do P1 e a do P6, mais os
+encaminhamentos da R4: `brza-workflow@77b917f`. Para cada item, escreveu antes o teste e o viu falhar (74 testes), ou
+provou por mutante o teste que guarda sem falhar antes. O gate ficou verde: `tests/mcp` 286, `tests/hooks` 290,
+`tests/cli` limpo 445, e o `brza-mcp` e o `brza-quota` sobem no 3.9 do sistema.
+
+No fim, ele mesmo chamou a próxima rodada do Flash em cada passo. A do P2 achou que a reserva de vaga só segurava o
+escolhido e não os seguintes; corrigido, a rodada 3 aprovou. A do P4 pediu reforçar um caso da fixture do M11, que não
+barrava o teto inclusivo; corrigido. As outras aprovaram sem achado novo. Os desvios dessa rodada são o X32 a X39 do
+plano.
+
+Ficaram de fora: a fixture do `orca account list` segue com o formato, e não com uma captura real; o
+`ORCA_CLI_COMMAND` no header do client; e "o MCP propõe a conta", que é issue.
+
+- **Um tropeço do `implementer`:** ele usou `git stash push -- packages` no `brza-workflow` para medir o "falhou antes".
+  A pilha do `stash` é compartilhada com as outras sessões; conferida depois, estava vazia. Ele também gravou a memória
+  no scratch do chat, e não no worktree; a sessão a moveu para `.claude/agent-memory/`.
+
 ## Retomar
 
-O laço de revisão de cada passo. A rodada de correção da R4 (53 correções do P2 a P5, 2 do P1, 1 do P6) roda num
-`implementer` na `feat/pln-009-mcp`, que no fim chama a próxima rodada do Flash. Depois vem a rodada final pelo Opus no
-`agy`, quando a cota voltar, e só então o `[x]` de cada passo.
+A rodada final pelo Opus no `agy` (R3), um por passo, quando a cota voltar (por volta das 08:40): os pedidos estão no
+scratch (`extra-<passo>-final.md`), e o comando está no `Retomar` do plano. Com ela limpa, o `[x]` de cada passo, um
+parecer por passo em `work/reviews/` e a revisão da entrega.
 
 ## Fora do workspace
 

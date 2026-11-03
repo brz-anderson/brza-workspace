@@ -4,7 +4,7 @@ scope:
 date: 2026-11-02
 tags:
   - auth
-  - testing
+  - infra
 ---
 
 # O P75.5 do PLN-001, o teste das credenciais de uso que a suíte completa pegou

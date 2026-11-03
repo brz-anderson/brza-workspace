@@ -3,9 +3,9 @@ status: in_progress
 phase: execution
 origin: request
 ready: sim — P0 concluído (H1 a H6 medidas e D3–D7 ajustados); próximo passo: P1
-estimate_h: 58.0
+estimate_h: 37.5
 executed_h: 0.4
-remaining_h: 54.5
+remaining_h: 34.0
 scope:
   - workspace
   - brza-studio
@@ -17,7 +17,7 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** P0 concluído em 2026-11-03 (H1 a H6 confirmadas e itens `D3` a `D7` ajustados no [Desenho](PLN-003-design.md)); próximo passo: **P1** (o índice da `master` com `priority`, `blocks` e `deadline` em `scripts/brza/brza-note`).
+- **Retomar:** P0 concluído em 2026-11-03 (H1 a H6 confirmadas e itens `D3` a `D7` ajustados no [Desenho](PLN-003-design.md)); os passos de MCP (P6–P9) passaram ao [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md); próximo passo: **P1** (o índice da `master` com `priority`, `blocks` e `deadline` em `brza-note`).
 - **A fila do orquestrador (2026-11-03):** a R9, respondida na sessão `bb0fd632` do `workspace`, fez do coordenador o
   orquestrador e deu a ordem da fila e os três tetos de workers; o Desenho mudou nas premissas, no M8, no M17, na
   regra da fila e no M24 novo (o índice da `master` grava `priority`, `blocks` e `deadline`). Os itens `D` partem daí.
@@ -72,14 +72,14 @@ fechou lá e passou ao PLN-003 (R9.1).
 | :--------- | :------------------------------------------------------------------------------------------------------ | :---- | :------------ |
 | `Pedido 1` | o mesmo `orca-plugin.json` instala nos dois apps e mostra o painel do workspace com planos e notas abertos | P10   | `plugin test` / visual nos dois apps (manual) |
 | `Pedido 1` | os comandos do plugin mandam o `brza` certo ao terminal do worktree em foco                             | P10   | integração plugin + terminal (manual) |
-| `Pedido 2` | o plugin do Claude traz as skills, os hooks e o MCP do workspace, e sobe nos chats dos dois apps          | P4, P6| carregamento do plugin nos dois apps (integração) |
+| `Pedido 2` | o plugin do Claude traz as skills, os hooks e o MCP do workspace, e sobe nos chats dos dois apps          | P4, [PLN-009/P1](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md)| carregamento do plugin nos dois apps (integração) |
 | `Pedido 2` | o plugin traz roteiros de Workflow do Claude Code para o fluxo do workspace                               | P11   | execução de workflow piloto no chat (integração) |
 | `Pedido 4` | `pipx install brza` e `brew install brz-anderson/tap/brza` instalam o CLI, com o `brza` e os `brza-*` no PATH | P3    | instalação limpa em VM / ambiente de teste (sistema) |
 | `Pedido 4` | `brza app install` baixa o DMG da release e troca o app; `--from-source` compila da `origin/master`            | P2    | `test_brza_app.py` (unidade) |
-| `Pedido 4` | `brza mcp start`, `stop` e `status` controlam o servidor residente                                           | P6    | `test_brza_mcp.py` e healthcheck HTTP (unidade/integração) |
+| `Pedido 4` | `brza mcp start`, `stop` e `status` controlam o servidor residente                                           | [PLN-009/P1](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md) | `test_brza_mcp.py` e healthcheck HTTP (unidade/integração) |
 | `Pedido 3` | `brza <sub>` acha o app que está rodando — BrzA Studio ou Orca — sem caminho fixo                        | P2    | `test_brza_cli.py` (unidade) |
-| `Pedido 5` | com dois pedidos na fila, o de `deadline` mais próximo sai antes, e o de `blocks` antes do de `priority: high` | P1, P7| `test_orchestrator_queue.py` (unidade) |
-| `Pedido 5` | worker novo espera quando o teto do workspace, o da conta e runtime (com a projeção a 90% até o `resetsAt`) ou o da máquina está cheio, e o painel diz qual | P7, P10| `test_orchestrator_limits.py` (unidade) |
+| `Pedido 5` | com dois pedidos na fila, o de `deadline` mais próximo sai antes, e o de `blocks` antes do de `priority: high` | P1, [PLN-009/P2](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md)| `test_orchestrator_queue.py` (unidade) |
+| `Pedido 5` | worker novo espera quando o teto do workspace, o da conta e runtime (com a projeção a 90% até o `resetsAt`) ou o da máquina está cheio, e o painel diz qual | [PLN-009/P2](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md), P10| `test_orchestrator_limits.py` (unidade) |
 
 ## Passos
 
@@ -146,7 +146,7 @@ Executa D3 (B8, M3, M5, M12, M20) · executor: sessão do `tools-kit`
 
 Estimado: 4.5 h · Executado: — h
 
-- [ ] **1. Estrutura do plugin:** criar `plugins/claude/.claude-plugin/plugin.json` e `.mcp.json`.
+- [ ] **1. Estrutura do plugin:** criar `plugins/claude/.claude-plugin/plugin.json` e `.mcp.json` (com `"type": "http"`, a URL de `brza mcp url`, `"Authorization": "Bearer ${BRZA_MCP_TOKEN}"` e headers `"X-Brza-Session": "${ORCA_AGENT_SESSION_ID}"` e `"X-Brza-Client": "${ORCA_USER_DATA_PATH}"`).
 - [ ] **2. Skills com namespace:** expor skills sob prefixo `brza:`.
 - [ ] **3. Agente Codex:** definir `agents/codex.json` invocando `codex exec` com `-s read-only`.
 - [ ] **4. Hooks:** hook de nomeação de sessão `pln-NNN-pX` e hook `Stop` longo para `brza notify`.
@@ -168,69 +168,31 @@ Estimado: 2.0 h · Executado: — h
 
 **Evidência:** —
 
-### P6 — O servidor MCP residente em Python stdlib com controle de lifecycle
+### P6 — [-] O servidor MCP residente em Python stdlib com controle de lifecycle → [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md)
 
-Executa D4 (B6) · executor: sessão do `tools-kit`
+Passou ao [PLN-009/P1](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md) ([Os passos do MCP no PLN-003 passam ao PLN-009](../../work/issues/os-passos-do-mcp-no-pln-003-passam-ao-pln-009.md)).
 
-Estimado: 5.0 h · Executado: — h
+### P7 — [-] A fila de prioridade SQLite e os três tetos de concorrência → [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md)
 
-- [ ] **1. Testes que falham:** inicialização HTTP na porta local 4242, autenticação via Bearer token e controle start/stop/status.
-- [ ] **2. Implementar servidor:** daemon HTTP em Python stdlib com rotas SSE/POST do protocolo MCP.
-- [ ] **3. Plist do launchd:** template para `~/Library/LaunchAgents/com.brza.orchestrator.plist`.
-- [ ] **4. Comandos CLI:** `brza mcp start|stop|status`.
-- [ ] **5. Rodar e ver passar:** testes de integração e subida do serviço.
-- [ ] **6. Commit:** commit no repositório do projeto.
+Passou ao [PLN-009/P2](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md) ([Os passos do MCP no PLN-003 passam ao PLN-009](../../work/issues/os-passos-do-mcp-no-pln-003-passam-ao-pln-009.md)).
 
-**Evidência:** —
+### P8 — [-] A política de modelos e esforço com chave de desligamento e gates → [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md)
 
-### P7 — A fila de prioridade SQLite e os três tetos de concorrência
+Passou ao [PLN-009/P4](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md) ([Os passos do MCP no PLN-003 passam ao PLN-009](../../work/issues/os-passos-do-mcp-no-pln-003-passam-ao-pln-009.md)).
 
-Executa D5 (M8, M13, M14) · executor: sessão do `tools-kit`
+### P9 — [-] O desempate via `tev1:4b` e fallback Haiku com controle de contas → [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md)
 
-Estimado: 6.0 h · Executado: — h
-
-- [ ] **1. Testes que falham:** persistência no SQLite, ordenação (`deadline` > `blocks` > `priority` > chegada) e barramento pelos 3 tetos (workspace, cota 90% projetada, memória livre).
-- [ ] **2. Implementar fila:** módulo `queue.py` e integração com `orca orchestration` e ciclo `worker_done`.
-- [ ] **3. Rodar e ver passar:** suíte de testes de concorrência e limites.
-- [ ] **4. Commit:** commit no repositório do projeto.
-
-**Evidência:** —
-
-### P8 — A política de modelos e esforço com chave de desligamento e gates
-
-Executa D4, D6 (M1, M9, M10, M15, M16) · executor: sessão do `tools-kit`
-
-Estimado: 5.0 h · Executado: — h
-
-- [ ] **1. Testes que falham:** ferramenta `dispatch`, leitura de `brza.toml`, desligamento via `brza_config`, proposição de gate para executor e registro de telemetria `route`.
-- [ ] **2. Implementar:** módulo de política e ferramentas MCP correspondentes.
-- [ ] **3. Rodar e ver passar:** testes de unidade cobrindo todas as dimensões de política.
-- [ ] **4. Commit:** commit no repositório do projeto.
-
-**Evidência:** —
-
-### P9 — O desempate via `tev1:4b` e fallback Haiku com controle de contas
-
-Executa D6 (M6, M7, M11) · executor: sessão do `tools-kit`
-
-Estimado: 4.5 h · Executado: — h
-
-- [ ] **1. Testes que falham:** consulta local ao `tev1:4b` no Ollama, medição de score de confiança e fallback para `claude -p` com Haiku.
-- [ ] **2. Implementar:** módulo desempatador integrado ao fluxo de decisão do MCP.
-- [ ] **3. Calibração:** validação contra a suíte de 10 casos sintéticos e tarefas em texto livre.
-- [ ] **4. Commit:** commit no repositório do projeto.
-
-**Evidência:** —
+Passou ao [PLN-009/P5](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md) ([Os passos do MCP no PLN-003 passam ao PLN-009](../../work/issues/os-passos-do-mcp-no-pln-003-passam-ao-pln-009.md)).
 
 ### P10 — O plugin do Orca com painel declarativo TSX e integração com MCP
 
-Executa D8 (B7, M17) · executor: sessão do `tools-kit`
+Executa D8 (B7, M17) · executor: sessão do `tools-kit` · Pré-requisito: [PLN-009/P3](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md)
 
 Estimado: 7.0 h · Executado: — h
 
 - [ ] **1. Migrar spike:** consolidar `spikes/c5-plugin/` para `plugins/orca/` com `ui: "components"`.
 - [ ] **2. Visualização de fila:** implementar visualização em TSX mostrando pedidos, prioridades e o teto que segura cada worker parado (M17).
-- [ ] **3. Ações via MCP:** conectar botões de controle ao MCP residente via HTTP local no worker (R10.3).
+- [ ] **3. Ações via MCP:** conectar botões de controle ao MCP residente via HTTP local no worker (R10.3; pré-requisito: [PLN-009/P3](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md)).
 - [ ] **4. Testes:** rodar `plugin check` e validação visual nos dois apps (BrzA Studio e Orca).
 - [ ] **5. Commit:** commit no repositório do projeto.
 

@@ -257,7 +257,7 @@ Respondida em 2026-10-29, no chat do BrzA Studio.
    - `scripts/brza` do workspace. Custo: ~0,5 h e filtrar o pessoal a cada release. Se paga: agora, com dívida;
    - dentro do `brza-studio`. Custo: ~1 h e o atrito de merge. Se paga: nunca para o Orca.
 
-   **Decidido — o repositório próprio `brz-anderson/brza`.**
+   **Decidido — o repositório próprio `brz-anderson/brza`.** → reaberta em PLN-009/R1.1 para o código do MCP (`packages/mcp/` no `brza-workflow`); o repositório público segue valendo para a CLI e plugins (P3).
 
 4. **O `brza sessions list|send|close`, o P7 do PLN-002.** Opções:
    - o PLN-003 absorve o P7 (recomendada). Custo: 3 h na fase 1. Se paga: na fase 2, no roteador;

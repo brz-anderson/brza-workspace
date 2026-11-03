@@ -26,7 +26,7 @@
 - **R7.2, R10.2, R11.1:** a arquitetura e o contrato vão a um `ARCHITECTURE.md`. O `DESIGN.md`, o design system da
   R6.2, saiu do PLN-003 e foi ao workstream `brand`, por uma issue de lá: o painel de componentes usa o tema do app.
 - **R6.3:** a política mora num `brza.toml`, que o `AGENTS.md` cita.
-- **R6.4:** o orquestrador decide o modelo do que abre e sugere à sessão principal, por aviso.
+- **R6.4:** o orquestrador decide o modelo do que abre e sugere à sessão principal, por aviso (passou ao [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md)).
 - **R7.1:** o semáforo é por conta e por runtime, pelo `usedPercent`.
 - **R9.1–R9.4:** o coordenador do índice da `master` é este orquestrador. A fila ordena por `deadline` próximo, depois
   `blocks`, depois `priority`, depois a chegada. Worker novo só abre sob o menor de três tetos: o geral do workspace,
@@ -234,15 +234,15 @@ Alternativas viáveis na coluna "Alt"; o porquê em uma linha.
 | M3 | Nome de sessão como chave (`pln-NNN-pX`), chat-namer, `/rename` | F4, F5, F28 | `plans/README.md` (convenção) + hook do plugin (nomeia no arranque) + cli `brza sessions rename` | só convenção | 1,5–2 | fase 1 | parcial, a medir (rename de aba pela CLI) | C1 + C4 | o roteador acha sessão pelo nome; nome solto quebra o roteamento |
 | M4 | Escolha de runtime (Claude/Codex/agy) | R4.1; F10, F11 | mcp (regra) + cli `sessions open --agent` | ACP do app (F10 original) | 2–3 (+1 agy) | fase 3 | sim (`agent launch --agent`, `worker-start --agent`) | C3 | depende de M2 e de M8; Codex/agy ainda raros |
 | M5 | Codex como cartão via agente Claude que roda `codex exec` | F6 | plugin do Claude (agent `brza:codex`, `-s read-only` por padrão) | M4 (sessão de terminal) | 1–1,5 | fase 2, 1ª revisão pelo Codex | sim | C4 | dá o cartão nativo sem tocar o app |
-| M6 | Conta por chamada | R4.1; F13 | mcp decide; cli executa `claude -p` com `CLAUDE_CONFIG_DIR` (omitido na `systemDefault`); chat em repouso por RPC `agentSession.switchAccount` | flag de conta no fork | 2–4 | fase 2 (só consultor `-p`) / fase 3 (sessão) | sim (medido no P0, H2 e H3) | C3 | `agentSession.create` não tem conta; `-p` e `switchAccount` têm |
-| M7 | Sinal de cota por conta | R4.1; F14 | cli `brza quota` (sobre `orca account list --json`) + mcp consome | ler o JSON no mcp sem verbo | 1,5 | fase 2 | sim | C2 | o verbo serve ao humano e ao Codex; o mcp só lê |
+| M6 | Conta por chamada (passou ao PLN-009/D6) | R4.1; F13 | mcp decide; cli executa `claude -p` com `CLAUDE_CONFIG_DIR` (omitido na `systemDefault`); chat em repouso por RPC `agentSession.switchAccount` | flag de conta no fork | 2–4 | fase 2 (só consultor `-p`) / fase 3 (sessão) | sim (medido no P0, H2 e H3) | C3 | `agentSession.create` não tem conta; `-p` e `switchAccount` têm |
+| M7 | Sinal de cota por conta (passou ao PLN-009/D6) | R4.1; F14 | cli `brza quota` (sobre `orca account list --json`) + mcp consome | ler o JSON no mcp sem verbo | 1,5 | fase 2 | sim | C2 | o verbo serve ao humano e ao Codex; o mcp só lê |
 | M8 | Fila/semáforo persistente (SQLite stdlib): ordena por `deadline`, `blocks`, `priority` e chegada, lidos do índice da `master` (M24); worker novo só sob o menor de três tetos — o geral do workspace, somado; o por conta e runtime (R7.1), com o ritmo projetado até o `resetsAt` e o corte a 90%; e o da máquina, pela memória livre e o swap, com a CPU como segundo sinal | R4.1, R7.1, R9.2–R9.4 | mcp | global; só por conta; fila por chegada | 4–6, sem refazer com a R9 | fase 2, 1º choque de cota | sim | C3 | o `Coordinator.maxConcurrent` do Orca só vive em gates (terreno-orquestrador); a fila por chegada deixa o pedido que trava um plano atrás do que não trava |
 | M9 | Modelo/esforço pela política "O modelo segue a tarefa" | R4.1; F16 (parte) | `AGENTS.md` (prosa) + arquivo de política (tabela) + mcp (impõe no que abre) | só norma; mcp lê a tabela do `AGENTS.md` | 1,5–2 | fase 2 | sim (`--model --effort`) | C7 | hoje a regra é só texto e a medição mostra Opus em tudo |
 | M10 | Chave de desligamento por dimensão (modelo/esforço, agente, tudo → passthrough) | R4.1 | mcp (config) + cli `brza mcp config` | só env | 0,5–1 | fase 2 | sim | C3 | "pode ser desativado" é requisito do pedido |
 | M11 | Agente interno que desempata: a cota fica na tabela; o texto vai ao `tev1:4b` local (Ollama, `/v1/systemone`) e, abaixo do limiar de confiança, ao Haiku (`claude -p --json-schema`, `--max-budget-usd`) — rodada de 2026-11-03, abaixo | R4.1, R5.1 | mcp | agente em toda chamada; regra pura; só o Haiku; Jev em nuvem, para quem não tem Ollama | 3–4 | fase 2b, quando a medição mostrar empate | sim | C3 | regra é grátis e instantânea; o `tev1` desempata em ~0,09 s, sem custo, e o Haiku paga só na dúvida |
 | M12 | Quem chamou: header `X-Brza-Session: ${ORCA_AGENT_SESSION_ID}` + client | R3.4 (consequência); R4.1 | plugin do Claude (`.mcp.json` com `"type": "http"`) + mcp | argumento `caller` na ferramenta | 1–2 | fase 2 | sim (medido no P0, H1) | C4 + C3 | residente não herda `ORCA_*` |
-| M13 | Ciclo de vida pelo `orca orchestration` (task, dispatch, worker-start, ask/reply, worker_done) | R4.1; F19 | mcp chama a cli do client detectado | reimplementar no mcp | 3–4 | fase 2 | sim | C3 + C8 | reaproveita o ciclo; o roteamento é nosso ("does not schedule or place workers") |
-| M14 | O fim volta ao chamador (espera × aviso; turno ocioso) | F11 | mcp (via `worker_done`) | bloquear até o fim | 2–3 | fase 2 | sim | C3 | sem isso o executor vira fogo-e-esquece |
+| M13 | Ciclo de vida pelo `orca orchestration` (passou ao PLN-009/D2) | R4.1; F19 | mcp chama a cli do client detectado | reimplementar no mcp | 3–4 | fase 2 | sim | C3 + C8 | reaproveita o ciclo; o roteamento é nosso ("does not schedule or place workers") |
+| M14 | O fim volta ao chamador (passou ao PLN-009/D2) | F11 | mcp (via `worker_done`) | bloquear até o fim | 2–3 | fase 2 | sim | C3 | sem isso o executor vira fogo-e-esquece |
 | M15 | Gate de aprovação (abrir executor, trocar conta) | conflito K3 | `AGENTS.md` (quando) + mcp devolve proposta + sessão principal pergunta | gate do `orca orchestration` | 1–2 | fase 2 | sim | C1 + C3 | preserva "quem pergunta é a principal" |
 | M16 | Medição do roteamento + conserto da conta `home` | R4.1; AGENTS.md:93-94 | hook `measure.py` (conserto) + mcp (linha `route`) | — | 0,5 + 1,5 | fase 1 (conserto) / fase 2 | sim | C3 | "a política se revê pela medição"; hoje conta errada |
 | M17 | Fila e sessões no painel: a ordem da fila com o motivo de cada posição (`deadline`, `blocks`, `priority`), e o teto que segura cada pedido parado — o do workspace, o da conta e runtime, com a projeção até o `resetsAt`, ou o da máquina | R4.1 + R4.2, R9.2–R9.4 | plugin do Orca (painel de componentes; o worker lê do mcp, R10.1) | — | 1–2 | fase 2 | sim | C5 | o semáforo invisível vira mistério; com três tetos, quem espera precisa saber qual segura |
@@ -443,8 +443,9 @@ Todas foram confirmadas, com ajustes incorporados aos itens `D3` a `D7`.
 4. **Hooks:**
    - Hook de inicialização: renomeia a sessão para `pln-NNN-pX` ou slug do plano em foco (M3).
    - Hook `Stop` para turnos longos: emite alerta para o iPhone/iCloud via `brza notify` quando uma execução longa conclui (M20).
-5. **Configuração MCP (`.mcp.json`, validado em H1):** Conecta ao servidor residente declarando obrigatoriamente `"type": "http"`
-   (sem esse campo, o Claude Code assume `stdio` e ignora a URL):
+5. **Configuração MCP (`.mcp.json`, validado em H1 e PLN-009):** Conecta ao servidor residente declarando obrigatoriamente
+   `"type": "http"`, a URL do `brza mcp url`, `"Authorization": "Bearer ${BRZA_MCP_TOKEN}"` (PLN-009/D1) e os headers
+   `"X-Brza-Session": "${ORCA_AGENT_SESSION_ID}"` e `"X-Brza-Client": "${ORCA_USER_DATA_PATH}"` (PLN-009/D3):
    ```json
    {
      "mcpServers": {
@@ -452,7 +453,9 @@ Todas foram confirmadas, com ajustes incorporados aos itens `D3` a `D7`.
          "type": "http",
          "url": "http://127.0.0.1:4242/mcp",
          "headers": {
-           "X-Brza-Session": "${ORCA_AGENT_SESSION_ID}"
+           "X-Brza-Session": "${ORCA_AGENT_SESSION_ID}",
+           "X-Brza-Client": "${ORCA_USER_DATA_PATH}",
+           "Authorization": "Bearer ${BRZA_MCP_TOKEN}"
          }
        }
      }
@@ -463,7 +466,11 @@ Todas foram confirmadas, com ajustes incorporados aos itens `D3` a `D7`.
    `export` (resultado devolvido com `return` no nível superior do script), `phase("<título>")` como instrução simples e
    `await agent("<prompt>", { label, model, tools, schema })` com o prompt como 1º argumento posicional.
 
-## D4 — O servidor MCP residente e contratos de chamada — `packages/mcp/` (P6, P8)
+## D4 — O servidor MCP residente e contratos de chamada — `packages/mcp/` (passou ao PLN-009)
+
+> **Transferido ao PLN-009:** Este componente e seus contratos são especificados e executados no
+> [PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md)
+> (D1 e D3 de lá).
 
 - **Origem:** R3.4, R4.1, B6, M1, M10, M12, M15, M16.
 - **Contexto:** O orquestrador precisa de um ponto central com estado persistente que sirva ao mesmo tempo aos dois aplicativos,
@@ -491,7 +498,10 @@ Todas foram confirmadas, com ajustes incorporados aos itens `D3` a `D7`.
    - Cada decisão de roteamento gera uma entrada de auditoria tipada `route` em `~/.brza/orchestrator.log`, permitindo aferição
      periódica e calibração das políticas.
 
-## D5 — A fila de prioridade e os três tetos de concorrência — `packages/mcp/queue.py` (P7)
+## D5 — A fila de prioridade e os três tetos de concorrência — `packages/mcp/queue.py` (passou ao PLN-009)
+
+> **Transferido ao PLN-009:** Este componente e o escalonamento da fila são especificados e executados no
+> [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md) (D2 de lá).
 
 - **Origem:** R4.1, R7.1, R9.1–R9.4, M8, M13, M14.
 - **Contexto:** Para evitar exaustão de cotas das contas de IA e travamento da máquina de desenvolvimento, o orquestrador
@@ -519,7 +529,10 @@ Todas foram confirmadas, com ajustes incorporados aos itens `D3` a `D7`.
    CLI do client em subprocesso, o MCP injeta no `env` o `ORCA_AGENT_SESSION_ID` recebido no header `X-Brza-Session` (H1) e o
    `ORCA_USER_DATA_PATH` do client ativo, garantindo o vínculo da Run com o chat chamador sem depender de terminal ativo.
 
-## D6 — A política de modelos, esforço e o desempatador `tev1` + Haiku — `brza.toml` e `packages/mcp/policy.py` (P8, P9)
+## D6 — A política de modelos, esforço e o desempatador `tev1` + Haiku — `brza.toml` e `packages/mcp/policy.py` (passou ao PLN-009)
+
+> **Transferido ao PLN-009:** Este componente é especificado e executado no
+> [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md) (D4 e D6 de lá).
 
 - **Origem:** R5.1, R6.3, R6.4, R7.1, M6, M7, M9, M11.
 - **Contexto:** "O modelo segue a tarefa" (AGENTS.md). Modelos caros (Opus) só devem ser acionados para tarefas analíticas

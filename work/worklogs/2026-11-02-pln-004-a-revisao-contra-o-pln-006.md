@@ -125,6 +125,26 @@ o dia anterior está em
     `.measurements/measurements.jsonl` e 2 chaves de `/var/folders/…/sub.jsonl` em `fact-audit-state.json`, na raiz do
     workspace e fora do git. Removi só essas, depois de conferir que eram as duas últimas linhas e as duas chaves
     temporárias (1.971 linhas e 10 chaves ficaram).
+- **A repetição dos 6 braços do Claude e do `agy`** (R12.2, resposta "3"), com o mesmo prompt, diff e modelo; o `agy`
+  em paralelo (906 s de parede). A pontuação está em `out/pontuacao-repeticao.md`, e os `N1` a `N24` da primeira
+  rodada foram reusados.
+
+  | Runtime | Recall 1ª → 2ª (÷7) | Defeito natural 1ª → 2ª | Convenção natural 1ª → 2ª | Precisão 1ª → 2ª | Custo 1ª → 2ª |
+  | :-- | :-- | :-- | :-- | :-- | :-- |
+  | Claude | 0,43 → 0,50 (0,43 sem um parcial) | 0,20 → 0,30 (0,20 sem o parcial) | 1,00 → 1,00 | 1,00 → 0,85 | US$ 3,44 → 3,50 |
+  | `agy` | 0,50 → 0,29 | 0,40 → 0,20 | 0,75 → 0,50 | 0,95 → 0,90 | US$ 10,54 → 7,88 |
+
+  - **A vantagem do `agy` no defeito não se repetiu.** O A1 (corte aos 300 caracteres) só apareceu na primeira
+    execução; o A6 foi o único item do defeito achado nas 4 execuções. Na segunda, o Claude ficou à frente por um
+    parcial (A7, o log ausente), e sem ele empatam. Com uma amostra por braço e execução, a ordem não se sustenta.
+  - **Metade dos achados verdadeiros se repete.** Interseção ÷ união entre as duas execuções: 0,50 no Claude e 0,45 no
+    `agy` (0,48 contando os créditos secundários). Cada execução traz 5 a 7 verdadeiros que a outra não trouxe: a união
+    chega a 20 no Claude e 22 no `agy`, contra 15 e 17 de uma execução.
+  - **A convenção do Claude é estável** (A3 e A4 nas duas execuções); a do `agy` caiu de 0,75 para 0,50.
+  - **Custo e tempo:** Claude US$ 0,97 a 1,33 por revisão e 11 min nos três focos; `agy` US$ 2,10 a 3,30 por revisão
+    (tabela), com o custo variando 35% entre as duas execuções do mesmo foco, e 40 min de tempo somado.
+  - **7 achados novos verdadeiros inéditos** (`N25` a `N31`), nenhum apontado por mais de um braço; nenhum falso
+    positivo do gabarito nem novo falso. A2 e A8 seguem em 0 de 12 braços; o Codex não foi repetido.
 
 ## O que ficou
 

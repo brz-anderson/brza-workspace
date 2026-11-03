@@ -14,12 +14,12 @@ tags:
 
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** a R1 a R12 fecharam, menos a medição que a 12.2 mandou fazer antes de escolher qual foco vai a qual
-  runtime: o desenho do experimento (9 revisões do PLN-005, ~US$ 19 a 20) espera a confirmação de Anderson; o código
-  passa ao `brza-workflow`, executado pela sessão `workspace`, com o pacote `packages/runtimes`. O rascunho do Desenho
-  (`pln-004-design-rascunho.md`, D1 a D14, no scratch) ainda conta com tudo no `brza-workspace`; depois da medição,
-  dividir o plano em `-plan` e `-interview`, reescrever o rascunho e mandá-lo à aprovação, na mensagem, antes de
-  gravá-lo em `PLN-004-design.md`.
+- **Retomar:** a R1 a R12 fecharam, menos o mapa foco → runtime da 12.2: as 9 revisões do PLN-005 rodaram e foram
+  pontuadas; Anderson mandou repetir as do Claude e do `agy` ("3"), e a repetição rodou e foi pontuada: a diferença do
+  `agy` no defeito não se repetiu. Falta a resposta de Anderson à R12.2 revista; o código passa ao `brza-workflow`, executado pela sessão `workspace`, com o pacote
+  `packages/runtimes`. O rascunho do Desenho (`pln-004-design-rascunho.md`, D1 a D14, no scratch) ainda conta com tudo
+  no `brza-workspace`; depois da repetição e da R12.2, dividir o plano em `-plan` e `-interview`, reescrever o rascunho
+  e mandá-lo à aprovação, na mensagem, antes de gravá-lo em `PLN-004-design.md`.
 
 ## Pedido
 
@@ -627,7 +627,32 @@ Respondida em 2026-11-02, na sessão `workspace`: "11.3.2 / 12.1.1 / 12.2.2".
    reais e 5 hipóteses falsas, e o recall contado sobre os 7 achados que o diff permite (A5, A9 e A10 dependem do plano
    e do log). Anderson o confirmou em 2026-11-02, "confirmo o experimento", e as 9 revisões rodaram. **As 3 do Codex
    usaram exatamente os 100% do limite de 5 h**, na palavra de Anderson; os rollouts mostram a janela de 0% a 99% no
-   último evento, de 28 a 35 pontos por revisão. O resultado vem na rodada seguinte.
+   último evento, de 28 a 35 pontos por revisão.
+
+   **O resultado das 9 revisões, em uma execução por braço:**
+
+   | Runtime | Achados | Recall (÷7) | Precisão | Custo dos 3 focos | Tempo |
+   | :-- | --: | --: | --: | --: | --: |
+   | Claude | 17 | 0,43 | 17/17 | US$ 3,44 | 10,6 min |
+   | Codex | 14 | 0,21 | 13/14 | US$ 9,91 e a janela de 5 h | 20,9 min |
+   | `agy` | 21 | 0,50 | 20/21 | US$ 10,54 (tabela) | 37,9 min |
+
+   Por foco: defeito, Claude 0,20, Codex 0,10, `agy` 0,40; convenção, 1,00, 0,50 e 0,75. A2, A7 e A8: 0 dos 9 braços. O
+   detalhe está no worklog de 2026-11-02. O `qwen2.5:14b` local, medido à parte, ficou em recall 0 de 7 e fora das
+   revisões.
+
+   **A rodada que veio da pontuação** (a 12.2 de novo): 1, Claude nos 3 focos e o `agy` como segundo revisor do defeito,
+   recomendada; 2, cada foco no runtime de maior recall; 3, repetir os braços do Claude e do `agy` antes de decidir.
+   **Respondida "3"**, em 2026-11-02, na sessão `workspace`: repetir os 6 braços (Claude e `agy`, sem o Codex), para ver
+   se a diferença de 1 item no defeito sobrevive à variação entre execuções. Custo declarado: ~US$ 14 de tabela e
+   ~48 min. O mapa fica decidido depois da repetição.
+
+   **A repetição rodou** (Claude e `agy`, 6 braços, o `agy` em paralelo; custo real US$ 11,38 de tabela e ~15 min de
+   parede, abaixo do declarado). O recall do Claude foi de 0,43 a 0,50 e o do `agy` de 0,50 a 0,29; no defeito natural,
+   o `agy` foi de 0,40 a 0,20 e o Claude de 0,20 a 0,30, ou seja, **a vantagem do `agy` não se repetiu**; na convenção,
+   o Claude ficou em 1,00 duas vezes e o `agy` foi de 0,75 a 0,50. Só metade dos achados verdadeiros reaparece entre
+   as duas execuções (interseção ÷ união de 0,50 no Claude e 0,45 no `agy`). O detalhe está no worklog de 2026-11-02.
+   A R12.2 volta a Anderson, com a evidência da repetição.
 
 ## Worklogs
 

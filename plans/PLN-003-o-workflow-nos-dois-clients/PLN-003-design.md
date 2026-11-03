@@ -1,7 +1,8 @@
 # PLN-003 — Desenho
 
-> **Rascunho.** O Terreno e a matriz vêm do levantamento e da medição de 2026-10-29. Os itens `D` ainda não foram
-> escritos: saem da matriz na próxima sessão, com os riscos da fase 0 marcados como hipóteses (R7.3).
+> **Desenho consolidado (2026-11-03).** A matriz e os itens `D` (D1 a D9) foram definidos a partir do Terreno,
+> das rodadas R1 a R11 e dos resultados do spike do C5. Os riscos da fase 0 estão registrados como hipóteses H1 a H6 (R7.3),
+> a serem validadas no passo P0.
 
 ## O que este desenho assume
 
@@ -229,7 +230,7 @@ Alternativas viáveis na coluna "Alt"; o porquê em uma linha.
 | ID | Feature | Origem | Frente(s) e papel | Alt | h | Se paga | Orca? | Critério | Porquê |
 | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
 | M1 | Ferramenta `dispatch`: pedido tipado (tarefa, classe consultor/executor, alvo, runtime/conta/modelo opcionais) | R4.1; F3, F11 (sem cartão), F12 | mcp decide + plugin do Claude (a definição do agente declara a classe) + `AGENTS.md` (os três papéis) | só cli `brza dispatch` sem estado | 2–3 | fase 2, no 1º encadeamento | sim | C3 + C1 | é a porta única do "coração"; sem estado não há fila |
-| M2 | Roteador de sessão: achar por nome, abrir worktree+sessão, mandar, fechar; respeita a trava de cache | R4.1; F1 (P7), F2, F3, F5 | cli (verbos `brza sessions list/send/close/open`) + mcp (escolhe) | `orca terminal` direto do mcp | 3 (P7) + 1,5 | fase 1 (cli) / fase 2 (mcp) | sim (`orca terminal`, `agent launch`) | C2 + C3 | o verbo serve ao terminal e ao Codex; a escolha precisa ver todas as sessões |
+| M2 | Roteador de sessão: achar por nome, abrir worktree+sessão, mandar, fechar; segue a norma de uma sessão por frente (sem trava de retomada) | R4.1; F1 (P7), F2, F3, F5 | cli (verbos `brza sessions list/send/close/open`) + mcp (escolhe) | `orca terminal` direto do mcp | 3 (P7) + 1,5 | fase 1 (cli) / fase 2 (mcp) | sim (`orca terminal`, `agent launch`) | C2 + C3 | o verbo serve ao terminal e ao Codex; a escolha precisa ver todas as sessões |
 | M3 | Nome de sessão como chave (`pln-NNN-pX`), chat-namer, `/rename` | F4, F5, F28 | `plans/README.md` (convenção) + hook do plugin (nomeia no arranque) + cli `brza sessions rename` | só convenção | 1,5–2 | fase 1 | parcial, a medir (rename de aba pela CLI) | C1 + C4 | o roteador acha sessão pelo nome; nome solto quebra o roteamento |
 | M4 | Escolha de runtime (Claude/Codex/agy) | R4.1; F10, F11 | mcp (regra) + cli `sessions open --agent` | ACP do app (F10 original) | 2–3 (+1 agy) | fase 3 | sim (`agent launch --agent`, `worker-start --agent`) | C3 | depende de M2 e de M8; Codex/agy ainda raros |
 | M5 | Codex como cartão via agente Claude que roda `codex exec` | F6 | plugin do Claude (agent `brza:codex`, `-s read-only` por padrão) | M4 (sessão de terminal) | 1–1,5 | fase 2, 1ª revisão pelo Codex | sim | C4 | dá o cartão nativo sem tocar o app |
@@ -300,11 +301,11 @@ não é item `D`.
 | :-- | :-- | :-- |
 | O modelo segue a tarefa | `AGENTS.md` (prosa) | mcp lendo o arquivo de política (M9) |
 | A ordem da fila: `deadline`, `blocks`, `priority`, chegada | `work/README.md` ("As propriedades") | mcp lendo o índice da `master` (M8, M24) |
-| Uma tarefa, uma sessão | `AGENTS.md` | roteador (M2) prefere sessão nova a acordar sessão grande parada |
-| Trava de retomada | `CLAUDE.md` | hook `resume_guard.py` + roteador (o correio não passa pela trava, `CLAUDE.md:85`) |
+| Uma frente, uma sessão | `AGENTS.md` | roteador (M2) reutiliza a sessão da frente (nova sessão só ao mudar de frente, > 200 mil tokens ou a pedido) |
+| Cache de 1 h (sem trava de retomada) | `CLAUDE.md` | cache de 1 h na sessão principal; sem trava de retomada pelo roteador |
 | Quem pergunta é a principal | `AGENTS.md` | mcp devolve proposta (M15); nunca pergunta |
 | Nome de sessão | `plans/README.md` | hook do plugin (M3) |
-| Abrir sessão nova pela própria sessão | só na memória do agente | migra para `CLAUDE.md`/`AGENTS.md`; o roteador vira o caminho |
+| Abrir sessão nova pela própria sessão | `CLAUDE.md`/`AGENTS.md` | roteador (M2) vira o caminho padrão |
 | Vocabulários de nota | `work/README.md` | `check_notes.py` (já) |
 
 ### ARCHITECTURE.md — proposta (R7.2)
@@ -326,3 +327,284 @@ regra de comportamento (isso é `AGENTS.md`) nem mecânica do Claude (`CLAUDE.md
 
 O `DESIGN.md` no formato de design system para agentes de UI (o do Google Stitch) saiu do PLN-003 e foi ao workstream
 `brand` (R10.2, R11.1).
+
+## Hipóteses da fase 0 a medir no P0 (R7.3)
+
+Os riscos identificados na matriz e na R7.3 são formulados como hipóteses para medição na sessão `pln-003-p0`.
+Qualquer falha reescreve os itens `D` correspondentes antes do início da fase de código.
+
+- **H1 (sobre D3/D4 — M12):** O Claude Code e o SDK expandem `${ORCA_AGENT_SESSION_ID}` no `.mcp.json` para os headers
+  HTTP de chamada ao servidor MCP.
+  - *Se confirmar:* o MCP residente identifica a sessão chamadora diretamente no cabeçalho `X-Brza-Session`.
+  - *Se falhar:* a ferramenta `dispatch` exige `caller_session_id` como argumento obrigatório.
+- **H2 (sobre D4/D6 — M6, M11):** O `claude -p` com `CLAUDE_CONFIG_DIR` executa com sucesso e sem dependências de terminal
+  interativo a partir de um processo em background sob `launchd`.
+  - *Se confirmar:* o MCP invoca o agente desempatador Haiku via subprocesso direto.
+  - *Se falhar:* o daemon roda com wrapper de shell preservando o ambiente do usuário macOS ou usa fila externa.
+- **H3 (sobre D6/D7 — M6):** O comando `agentSession.switchAccount` no chat dos clients troca a conta de uma sessão
+  existente de forma limpa e sem perda de histórico.
+  - *Se confirmar:* o orquestrador pode reaproveitar sessões de chat abertas alternando contas.
+  - *Se falhar:* troca de conta requer abertura de nova sessão com ambiente isolado ou execução via `claude -p`.
+- **H4 (sobre D5 — M13):** O `orca orchestration` (run, task, worker-start) opera a partir de subprocesso sem herdar as
+  variáveis `ORCA_*` do chat ativo.
+  - *Se confirmar:* o MCP coordena o ciclo de vida dos workers chamando a CLI do client detectado.
+  - *Se falhar:* o MCP gerencia o estado e o ciclo dos workers diretamente no SQLite local sem o runtime do Orca.
+- **H5 (sobre D4 — B6):** O servidor MCP sobre HTTP/SSE pode ser implementado exclusivamente com a biblioteca padrão de
+  Python 3 (sem bibliotecas externas pesadas).
+  - *Se confirmar:* a distribuição do MCP permanece autocontida e de inicialização imediata.
+  - *Se falhar:* empacota-se uma dependência ASGI leve (`uvicorn`/`starlette`) no pacote Python do `brza`.
+- **H6 (sobre D3 — B9):** O recurso `@internal` de `workflows/*.js` em plugins do Claude é executado pelo SDK nos chats dos
+  dois aplicativos.
+  - *Se confirmar:* os roteiros de fluxo do workspace rodam como workflows nativos de Claude Code.
+  - *Se falhar:* os roteiros rodam via comandos slash do plugin ou pelo comando `brza workflow run` na CLI.
+
+## D1 — O repositório público e a CLI `brza` unificada — `brz-anderson/brza`, `~/.local/bin/brza` (P2, P3)
+
+- **Origem:** R2.1, R2.2, R2.3, R2.4, R3.1, R3.2, R3.3, R5.3, B1, B2, B3, B4, B5, B10, M23.
+- **Contexto:** Os comandos hoje vivem dispersos em `scripts/brza/` e dependem de caminhos locais. O usuário precisa de um
+  comando único no PATH que funcione igual no BrzA Studio, no Orca e no terminal puro, distribuível via gerenciadores de
+  pacotes públicos (`pipx`, `brew`, `npm`).
+
+#### Como fica
+
+1. **Repositório:** `brz-anderson/brza` concentra o código da CLI, do MCP, dos plugins e da documentação de arquitetura.
+2. **Despacho hierárquico:** O executável `~/.local/bin/brza` implementa o seguinte algoritmo:
+   - Se o subcomando é interno (`install`, `tree`, `test`, `app`, `doctor`, `mcp`, `quota`, `sessions`), executa internamente.
+   - Se existe um binário executável `brza-<subcomando>` no PATH, repassa os argumentos a ele.
+   - Se nenhuma das anteriores casar, detecta o app ativo (variáveis `BRZA_CLIENT`, env herdado ou processo vivo do Studio/Orca)
+     e repassa a chamada ao CLI do respectivo client (`orca <subcomando>` ou `brza <subcomando>`).
+3. **Distribuição:**
+   - Pacote Python puro (stdlib, sem wheels compiladas): `pip install brza`, `pipx install brza`.
+   - Fórmula Homebrew: `brew install brz-anderson/tap/brza`.
+   - Shims npm/npx para comandos legados.
+4. **Comandos universais:**
+   - `brza tree <nome> [--rm] [--list]`: cria/remove worktree em qualquer repositório git com convenção padrão.
+   - `brza test`: executa a suíte de testes detectada no repositório.
+   - `brza app install [--from-source]`: baixa a release mais recente do GitHub e substitui o app desktop, com confirmação prévia.
+   - `brza-run` mantém `SHELL_SESSIONS_DISABLE=1` para evitar saídas espúrias no terminal.
+
+## D2 — O índice da `master` com propriedades de ordenação — `scripts/brza/brza-note` (P1)
+
+- **Origem:** R9.2, M24.
+- **Contexto:** A ordenação dos pedidos na fila do orquestrador precisa avaliar `deadline`, `blocks` e `priority` em milissegundos.
+  Ler o frontmatter de cada branch `workstream/*` sob demanda custaria múltiplos comandos `git show` a cada tick do semáforo.
+
+#### Como fica
+
+1. O comando `brza note commit` (e `brza note new`) extrai os campos `priority`, `blocks` e `deadline` do frontmatter de notas,
+   planos e decisões ao atualizar o branch do workstream.
+2. Na sincronização com o índice geral (`.brza/index.jsonl` na branch `master`), cada registro JSON passa a conter:
+   ```json
+   {"id": "PLN-003", "title": "...", "status": "open", "priority": "high", "blocks": ["PLN-004"], "deadline": "2026-11-15", "workstream": "tools-kit"}
+   ```
+3. O orquestrador consome diretamente esse arquivo local para calcular as prioridades da fila sem overhead de git.
+
+## D3 — O plugin do Claude com skills, hooks e workflows — `plugins/claude/` (P4, P11)
+
+- **Origem:** R4.3, R4.4, B8, B9, M3, M5, M12, M20.
+- **Contexto:** O Claude Code nos dois apps consome extensões via plugin formal (`.claude-plugin/plugin.json`). As ferramentas
+  e convenções do workspace devem carregar em qualquer chat iniciado dentro de um worktree.
+
+#### Como fica
+
+1. Estrutura do plugin em `plugins/claude/`:
+   ```
+   plugins/claude/
+   ├── .claude-plugin/plugin.json
+   ├── .mcp.json
+   ├── agents/
+   │   └── codex.json
+   ├── hooks/
+   │   └── hooks.json
+   ├── skills/
+   │   ├── plan-runner/
+   │   └── notes-checker/
+   └── workflows/
+       └── review.js
+   ```
+2. **Namespace:** Todas as skills expostas adotam o prefixo `brza:` (ex.: `brza:plan-runner`, `brza:notes-checker`).
+3. **Agente Codex (M5):** O agente `brza:codex` roda `codex exec` com flags `-s read-only` por padrão para revisões de código
+   isoladas sem poluir o contexto da conversa principal.
+4. **Hooks:**
+   - Hook de inicialização: renomeia a sessão para `pln-NNN-pX` ou slug do plano em foco (M3).
+   - Hook `Stop` para turnos longos: emite alerta para o iPhone/iCloud via `brza notify` quando uma execução longa conclui (M20).
+5. **Configuração MCP (.mcp.json):** Conecta ao servidor residente:
+   ```json
+   {
+     "mcpServers": {
+       "brza-orchestrator": {
+         "url": "http://127.0.0.1:4242/mcp",
+         "headers": {
+           "X-Brza-Session": "${ORCA_AGENT_SESSION_ID}"
+         }
+       }
+     }
+   }
+   ```
+   *(Sob hipótese H1)*.
+
+## D4 — O servidor MCP residente e contratos de chamada — `packages/mcp/` (P6, P8)
+
+- **Origem:** R3.4, R4.1, B6, M1, M10, M12, M15, M16.
+- **Contexto:** O orquestrador precisa de um ponto central com estado persistente que sirva ao mesmo tempo aos dois aplicativos,
+  às sessões de chat e à CLI.
+
+#### Como fica
+
+1. **Daemon HTTP Local:**
+   - Processo residente escutando exclusivamente em `127.0.0.1:4242` (porta padrão com fallback automático).
+   - Gerenciado via `launchd` no macOS (`~/Library/LaunchAgents/com.brza.orchestrator.plist`) com comandos de controle:
+     `brza mcp start`, `brza mcp stop`, `brza mcp status`.
+   - Autenticação por token Bearer armazenado em `~/.brza/runtime/mcp.token` com permissões `0600`.
+2. **Ferramentas MCP expostas:**
+   - `brza_dispatch(task, role, target, model?, effort?, account?)`: ponto único de despacho de tarefas.
+   - `brza_status()`: retorna a visão consolidada da fila, dos workers em execução e dos limites vigentes.
+   - `brza_config(key, value?)`: ajusta ou desativa dimensões da política (modelo, esforço, agente desempatador) (M10).
+3. **Contratos e Gates (M15):**
+   - Papel `consultant`: processa diretamente sem bloqueio.
+   - Papel `executor` ou requisição de troca de conta: o MCP gera uma proposta e retorna ao chamador; a sessão principal é
+     responsável por solicitar confirmação explícita ao usuário antes de autorizar.
+4. **Medição (M16):**
+   - Cada decisão de roteamento gera uma entrada de auditoria tipada `route` em `~/.brza/orchestrator.log`, permitindo aferição
+     periódica e calibração das políticas.
+
+## D5 — A fila de prioridade e os três tetos de concorrência — `packages/mcp/queue.py` (P7)
+
+- **Origem:** R4.1, R7.1, R9.1–R9.4, M8, M13, M14.
+- **Contexto:** Para evitar exaustão de cotas das contas de IA e travamento da máquina de desenvolvimento, o orquestrador
+  precisa escalonar a entrada de novos workers considerando múltiplos recursos finitos.
+
+#### Como fica
+
+1. **Armazenamento:** Banco SQLite stdlib em `~/.brza/orchestrator.db` com tabelas `queue`, `workers` e `limits`.
+2. **Critério de ordenação da fila (R9.2):**
+   O próximo pedido a ser atendido é selecionado pela ordenação:
+   1. `deadline` mais próximo (pedidos com data limite de entrega têm prioridade máxima).
+   2. `blocks` (pedidos que bloqueiam o avanço de outras frentes têm preferência).
+   3. `priority` decrescente (`high` > `medium` > `low`).
+   4. Ordem cronológica de chegada (`timestamp`).
+3. **Os três tetos de admissão (R9.3, R9.4):**
+   Um novo worker só é disparado se satisfizer simultaneamente:
+   - **Teto 1 (Workspace):** Total de workers concorrentes não ultrapassa a cota global configurada no workspace.
+   - **Teto 2 (Conta e Runtime):** Consumo da conta não atingiu 90%. Projeta-se o ritmo de consumo (`usedPercent` atual em
+     relação ao tempo restante até `resetsAt`); se a extrapolação indicar estouro de 90% antes do reset, a conta é congelada
+     para novos workers.
+   - **Teto 3 (Máquina):** Memória RAM disponível acima de 4 GB e swap estável. Se a CPU estiver sob estresse contínuo (>90%),
+     novos disparos aguardam janela de alívio.
+4. **Ciclo de vida:** O ciclo é integrado via `orca orchestration` e sinalizado ao chamador através de `worker_done` (M13, M14).
+
+## D6 — A política de modelos, esforço e o desempatador `tev1` + Haiku — `brza.toml` e `packages/mcp/policy.py` (P8, P9)
+
+- **Origem:** R5.1, R6.3, R6.4, R7.1, M6, M7, M9, M11.
+- **Contexto:** "O modelo segue a tarefa" (AGENTS.md). Modelos caros (Opus) só devem ser acionados para tarefas analíticas
+  ou orquestração de alto nível; tarefas mecânicas ou de código repetitivo devem rodar em modelos rápidos (Sonnet/Haiku), sob
+  controle de cota rígido.
+
+#### Como fica
+
+1. **Configuração `brza.toml`:**
+   ```toml
+   [orchestrator]
+   max_workspace_workers = 6
+   
+   [policy.roles.consultant]
+   default_model = "sonnet"
+   default_effort = "low"
+   
+   [policy.roles.implementer]
+   default_model = "sonnet"
+   default_effort = "medium"
+   
+   [policy.roles.architect]
+   default_model = "opus"
+   default_effort = "high"
+   
+   [quota.limits]
+   soft_cap_percent = 55
+   hard_cap_percent = 90
+   reset_margin_hours = 6
+   ```
+2. **Desempate em duas etapas (M11):**
+   - **Etapa 1 (Tabela & Regras):** Checagem determinística de parâmetros (tipo de tarefa, tamanho do diff, cota disponível).
+   - **Etapa 2 (Decisão Local):** Se a classificação de texto permanecer ambígua, o MCP consulta o modelo de decisão local
+     `tev1:4b` via endpoint Ollama (`/v1/systemone`, latência ~0.09s, custo zero).
+   - **Fallback Haiku:** Se o escore de confiança do `tev1` ficar abaixo de 0,75, o pedido é repassado ao Haiku via
+     `claude -p --json-schema` com teto orçamentário `--max-budget-usd 0.01`.
+
+## D7 — O roteador de sessões e integração de runtimes — `scripts/brza/brza-sessions` e MCP (P12)
+
+- **Origem:** R4.1, M2, M4, M18, M19.
+- **Contexto:** As tarefas podem demandar Claude, Codex ou Antigravity CLI. O roteador deve localizar e reutilizar sessões
+  abertas sem criar worktrees desnecessários.
+
+#### Como fica
+
+1. **Sessão por frente:** O roteador busca sessões abertas associadas à frente/worktree atual. Uma nova sessão só é criada
+   ao mudar de plano/assunto, se o contexto passar de ~200 mil tokens, ou sob solicitação explícita.
+2. **Suporte a runtimes:**
+   - `brza sessions open <nome> --agent claude|codex|agy`.
+   - No runtime Codex: controle do canal via `codex exec`, com argumentos de sandbox isolados (M19) e suporte a continuidade
+     de conversas via `codex_reply` (M18).
+3. Saída JSON estendida e estável para consumo do orquestrador via CLI.
+
+## D8 — O plugin do Orca com painel de componentes declarativo e integração MCP — `plugins/orca/` (P10)
+
+- **Origem:** R1.2, R10.1, R10.3, B7, M17, C5.
+- **Contexto:** Validado no spike do C5: o painel declarativo em TSX (`ui: "components"`) integra-se perfeitamente aos temas
+  escuro e claro de ambos os apps e renderiza árvores e tabelas complexas sem as falhas de tema do HTML puro.
+
+#### Como fica
+
+1. **Manifesto (`orca-plugin.json`):**
+   ```json
+   {
+     "manifestVersion": 2,
+     "name": "brza-workflow",
+     "version": "1.0.0",
+     "engines": {
+       "orca": ">=1.4.246"
+     },
+     "execution": {
+       "main": "out/worker.js",
+       "mode": "trusted-worker"
+     },
+     "ui": {
+       "type": "components",
+       "entry": "out/panel.js"
+     },
+     "capabilities": [
+       "workspace:read",
+       "terminal:send",
+       "notifications:show"
+     ]
+   }
+   ```
+2. **Componentes visuais (TSX):**
+   - Árvore de navegação de planos e workstreams (`Tree`).
+   - Tabela de notas e status (`Table`).
+   - Visão consolidada da fila do orquestrador: pedidos pendentes, prioridade calculada e indicador explícito de qual dos
+     três tetos (workspace, cota ou máquina) está retendo cada item (M17).
+   - Renderização rica de markdown para leitura rápida (`Markdown`).
+3. **Comunicação e Ações:**
+   - O worker lê o contexto do worktree da branch ativa em disco.
+   - O worker consulta o MCP residente em `http://127.0.0.1:4242` para obter o estado das filas e cotas.
+   - Botões de ação do painel invocam comandos do MCP via requisições HTTP internas disparadas pelo worker (R10.3).
+
+## D9 — As atualizações na norma do workspace e contrato de arquitetura — `AGENTS.md`, `CLAUDE.md`, `ARCHITECTURE.md` (P5)
+
+- **Origem:** C1, R4.3, R7.2, R9, R10.2, R11.1.
+- **Contexto:** Garantir que agentes e desenvolvedores sigam as convenções duráveis do orquestrador, mantendo a integridade
+  do modelo de trabalho.
+
+#### Como fica
+
+1. **`ARCHITECTURE.md`:** Documento durável alocado no repositório público `brz-anderson/brza` detalhando os contratos entre
+   as frentes (CLI, MCP, Plugin Claude, Plugin Orca) e as garantias de compatibilidade.
+2. **`AGENTS.md`:**
+   - Formalização dos três papéis: consultores (sem gate), executores (com gate de aprovação da sessão principal), e arquitetos.
+   - Fixação da regra "O modelo segue a tarefa", referenciando o arquivo declarativo `brza.toml`.
+   - Confirmação da norma "Uma frente, uma sessão; uma tarefa, um worklog".
+3. **`CLAUDE.md`:**
+   - Definição do uso de skills com prefixo `brza:`.
+   - Documentação do cache estendido de 1 h e ausência de trava de retomada.
+

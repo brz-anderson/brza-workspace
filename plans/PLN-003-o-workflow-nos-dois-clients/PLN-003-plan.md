@@ -2,7 +2,10 @@
 status: open
 phase: design
 origin: request
-ready: não — faltam os itens D, os Passos e a medição da fase 0 (R7.3)
+ready: sim — os itens D e os Passos estão escritos; P0 aguarda sessão pln-003-p0
+estimate_h: 58.0
+executed_h: 0.0
+remaining_h: 58.0
 scope:
   - workspace
   - brza-studio
@@ -14,20 +17,17 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** a Entrevista fechou nas rodadas 1 a 11. O spike do C5 rodou nos dois apps, e a R10 fechou o painel: de
-  componentes, com worker, e os botões pelo MCP residente, na fase 2. O `DESIGN.md` saiu para o `brand` (R10.2, R11.1).
-  **Próximo: escrever os itens `D`** a partir da matriz, com os riscos da fase 0 como hipóteses (R7.3), e os Passos,
-  com o P0 numa sessão `pln-003-p0`. O P7 do PLN-002 corre na sessão `pln-002-p7`.
+- **Retomar:** os itens `D` (D1 a D9) e os Passos (P0 a P14) estão escritos. Aprovado para execução: o P0 (medição
+  das hipóteses H1 a H6 da fase 0) roda a pedido explícito numa sessão própria `pln-003-p0`.
 - **A fila do orquestrador (2026-11-03):** a R9, respondida na sessão `bb0fd632` do `workspace`, fez do coordenador o
   orquestrador e deu a ordem da fila e os três tetos de workers; o Desenho mudou nas premissas, no M8, no M17, na
   regra da fila e no M24 novo (o índice da `master` grava `priority`, `blocks` e `deadline`). Os itens `D` partem daí.
 - **Mudou a norma (2026-10-29):** a trava de retomada saiu, e a sessão passou a ser por frente, não por tarefa
-  ([Uma sessão por frente de trabalho, sem trava de retomada e com o cache de 1 h](../../work/decisions/uma-sessao-por-frente-e-sem-trava-de-retomada.md)). O Desenho ainda conta com a
-  trava no roteador (M2) e na tabela de conflitos (`PLN-003-design.md:181-182`): ajustar antes dos itens `D`.
+  ([Uma sessão por frente de trabalho, sem trava de retomada e com o cache de 1 h](../../work/decisions/uma-sessao-por-frente-e-sem-trava-de-retomada.md)). O Desenho foi ajustado no M2 e na tabela de regras.
 - **Mudou a norma (2026-10-30):** as notas saíram da `master`, que guarda só a norma, para as branches
   `workstream/<nome>`, com worktree em `.worktrees/<nome>`, e o `brza note` ganhou o `workstream` e o `sync`
   ([As notas moram em workstreams, e a `master` guarda só a norma](../../work/decisions/as-notas-moram-em-workstreams-e-a-master-guarda-so-a-norma.md)).
-  O Desenho que conta com as notas na `master` ou com o `brza note` de antes se ajusta antes dos itens `D`.
+  O Desenho foi ajustado no M8 e M24 com o índice da `master`.
 - **Mudou o Terreno do plugin do Orca (2026-11-02):** o sistema da `v1.4.246` tem canal worker↔painel, frame isolado
   ligado e manifesto v2, e `terminal.sendText` é só do worker, então a R1.2 ("HTML regenerado") e o C5 ficaram em
   revisão (o Terreno e a matriz do Desenho). Rodada respondida em 2026-11-02: o spike mede os dois caminhos,
@@ -69,20 +69,233 @@ fechou lá e passou ao PLN-003 (R9.1).
 
 ### Cobertura
 
-> Rascunho: os critérios são propostas até a rodada que os confirma; o passo e o teste saem do Desenho.
-
 | Origem     | Critério de aceite                                                                                      | Passo | Teste (nível) |
 | :--------- | :------------------------------------------------------------------------------------------------------ | :---- | :------------ |
-| `Pedido 1` | o mesmo `orca-plugin.json` instala nos dois apps e mostra o painel do workspace com planos e notas abertos | —     | —             |
-| `Pedido 1` | os comandos do plugin mandam o `brza` certo ao terminal do worktree em foco                             | —     | —             |
-| `Pedido 2` | o plugin do Claude traz as skills, os hooks e o MCP do workspace, e sobe nos chats dos dois apps          | —     | —             |
-| `Pedido 2` | o plugin traz roteiros de Workflow do Claude Code para o fluxo do workspace                               | —     | —             |
-| `Pedido 4` | `pipx install brza` e `brew install brz-anderson/tap/brza` instalam o CLI, com o `brza` e os `brza-*` no PATH | —     | —             |
-| `Pedido 4` | `brza app install` baixa o DMG da release e troca o app; `--from-source` compila da `origin/master`            | —     | —             |
-| `Pedido 4` | `brza mcp start`, `stop` e `status` controlam o servidor residente                                           | —     | —             |
-| `Pedido 3` | `brza <sub>` acha o app que está rodando — BrzA Studio ou Orca — sem caminho fixo                        | —     | —             |
-| `Pedido 5` | com dois pedidos na fila, o de `deadline` mais próximo sai antes, e o de `blocks` antes do de `priority: high` | —     | —             |
-| `Pedido 5` | worker novo espera quando o teto do workspace, o da conta e runtime (com a projeção a 90% até o `resetsAt`) ou o da máquina está cheio, e o painel diz qual | —     | —             |
+| `Pedido 1` | o mesmo `orca-plugin.json` instala nos dois apps e mostra o painel do workspace com planos e notas abertos | P10   | `plugin test` / visual nos dois apps (manual) |
+| `Pedido 1` | os comandos do plugin mandam o `brza` certo ao terminal do worktree em foco                             | P10   | integração plugin + terminal (manual) |
+| `Pedido 2` | o plugin do Claude traz as skills, os hooks e o MCP do workspace, e sobe nos chats dos dois apps          | P4, P6| carregamento do plugin nos dois apps (integração) |
+| `Pedido 2` | o plugin traz roteiros de Workflow do Claude Code para o fluxo do workspace                               | P11   | execução de workflow piloto no chat (integração) |
+| `Pedido 4` | `pipx install brza` e `brew install brz-anderson/tap/brza` instalam o CLI, com o `brza` e os `brza-*` no PATH | P3    | instalação limpa em VM / ambiente de teste (sistema) |
+| `Pedido 4` | `brza app install` baixa o DMG da release e troca o app; `--from-source` compila da `origin/master`            | P2    | `test_brza_app.py` (unidade) |
+| `Pedido 4` | `brza mcp start`, `stop` e `status` controlam o servidor residente                                           | P6    | `test_brza_mcp.py` e healthcheck HTTP (unidade/integração) |
+| `Pedido 3` | `brza <sub>` acha o app que está rodando — BrzA Studio ou Orca — sem caminho fixo                        | P2    | `test_brza_cli.py` (unidade) |
+| `Pedido 5` | com dois pedidos na fila, o de `deadline` mais próximo sai antes, e o de `blocks` antes do de `priority: high` | P1, P7| `test_orchestrator_queue.py` (unidade) |
+| `Pedido 5` | worker novo espera quando o teto do workspace, o da conta e runtime (com a projeção a 90% até o `resetsAt`) ou o da máquina está cheio, e o painel diz qual | P7, P10| `test_orchestrator_limits.py` (unidade) |
+
+## Passos
+
+> Os passos de código são executados sob pedido explícito de Anderson, passo a passo, nas sessões designadas.
+
+### P0 — Medição das hipóteses da fase 0 (H1 a H6)
+
+Executa R7.3, H1–H6 · executor: sessão `pln-003-p0`
+
+Estimado: 3.5 h · Executado: — h
+
+- [ ] **1. Medir H1:** expansão de `${ORCA_AGENT_SESSION_ID}` no header do `.mcp.json`.
+- [ ] **2. Medir H2:** execução de `claude -p` sob processo em background gerenciado por `launchd`.
+- [ ] **3. Medir H3:** comportamento do `agentSession.switchAccount` em chat ativo.
+- [ ] **4. Medir H4:** execução de `orca orchestration` fora do shell com env `ORCA_*`.
+- [ ] **5. Medir H5:** viabilidade do servidor MCP HTTP/SSE com Python 3 stdlib.
+- [ ] **6. Medir H6:** execução de `workflows/*.js` pelo SDK nos dois apps.
+- [ ] **7. Registrar:** worklog e atualização dos itens `D` afetados no Desenho.
+
+**Evidência:** —
+
+### P1 — O índice da `master` com propriedades de ordenação
+
+Executa D2 (M24) · executor: sessão do `tools-kit`
+
+Estimado: 1.0 h · Executado: — h
+
+- [ ] **1. Teste que falha:** `test_brza_note.py` validando extração de `priority`, `blocks` e `deadline` para o `.brza/index.jsonl`.
+- [ ] **2. Implementar:** atualizar `scripts/brza/brza-note` para extrair e gravar campos no índice unificado da master.
+- [ ] **3. Rodar e ver passar:** suíte de testes de `scripts/brza/tests/test_brza_note.py`.
+- [ ] **4. Commit:** commit na branch `workstream/tools-kit`.
+
+**Evidência:** —
+
+### P2 — A CLI `brza` unificada e o despacho nos dois clients
+
+Executa D1 (B1, B2, B3, B5, M23) · executor: sessão do `tools-kit`
+
+Estimado: 5.0 h · Executado: — h
+
+- [ ] **1. Testes que falham:** detecção de client (`BRZA_CLIENT`, env herdado, processo vivo), despacho hierárquico `brza <sub>`, generalização de `tree`/`test` e flags de `app install`.
+- [ ] **2. Implementar:** binário unificador `brza` em Python stdlib, preservando `SHELL_SESSIONS_DISABLE=1` no `brza-run`.
+- [ ] **3. Rodar e ver passar:** testes de unidade em `test_brza_cli.py`, `test_brza_tree.py` e `test_brza_app.py`.
+- [ ] **4. Commit:** commit na branch `workstream/tools-kit`.
+
+**Evidência:** —
+
+### P3 — O repositório público `brz-anderson/brza` e empacotamento (`pipx`, `brew`)
+
+Executa D1 (B4) · executor: sessão do `tools-kit`
+
+Estimado: 4.0 h · Executado: — h
+
+- [ ] **1. Estrutura do repo:** configurar `pyproject.toml` (hatchling/flit, stdlib), entrypoint `brza`.
+- [ ] **2. Fórmula Homebrew:** template da fórmula `brza.rb` para o tap `brz-anderson/homebrew-tap`.
+- [ ] **3. Testar instalação:** testar `pip install -e .` e conferir comandos no PATH em ambiente limpo.
+- [ ] **4. Commit:** commit no repositório `brz-anderson/brza`.
+
+**Evidência:** —
+
+### P4 — O plugin do Claude com skills e hooks de sessão
+
+Executa D3 (B8, M3, M5, M12, M20) · executor: sessão do `tools-kit`
+
+Estimado: 4.5 h · Executado: — h
+
+- [ ] **1. Estrutura do plugin:** criar `plugins/claude/.claude-plugin/plugin.json` e `.mcp.json`.
+- [ ] **2. Skills com namespace:** expor skills sob prefixo `brza:`.
+- [ ] **3. Agente Codex:** definir `agents/codex.json` invocando `codex exec` com `-s read-only`.
+- [ ] **4. Hooks:** hook de nomeação de sessão `pln-NNN-pX` e hook `Stop` longo para `brza notify`.
+- [ ] **5. Teste:** carregar plugin no Claude Code de ambos os clients e validar listagem de ferramentas e agentes.
+- [ ] **6. Commit:** commit na branch `workstream/tools-kit`.
+
+**Evidência:** —
+
+### P5 — As atualizações na norma do workspace e ARCHITECTURE.md
+
+Executa D9 (R7.2, C1) · executor: sessão do `tools-kit`
+
+Estimado: 2.0 h · Executado: — h
+
+- [ ] **1. Documento de Arquitetura:** redigir `ARCHITECTURE.md` no repositório `brz-anderson/brza`.
+- [ ] **2. Atualizar AGENTS.md:** registrar os 3 papéis (consultor livre, executor com gate), referência ao `brza.toml` e norma de sessão por frente.
+- [ ] **3. Atualizar CLAUDE.md:** registrar namespace `brza:`, cache de 1 h e ausência de trava de retomada.
+- [ ] **4. Commit:** commits correspondentes no workspace e no repo público.
+
+**Evidência:** —
+
+### P6 — O servidor MCP residente em Python stdlib com controle de lifecycle
+
+Executa D4 (B6) · executor: sessão do `tools-kit`
+
+Estimado: 5.0 h · Executado: — h
+
+- [ ] **1. Testes que falham:** inicialização HTTP na porta local 4242, autenticação via Bearer token e controle start/stop/status.
+- [ ] **2. Implementar servidor:** daemon HTTP em Python stdlib com rotas SSE/POST do protocolo MCP.
+- [ ] **3. Plist do launchd:** template para `~/Library/LaunchAgents/com.brza.orchestrator.plist`.
+- [ ] **4. Comandos CLI:** `brza mcp start|stop|status`.
+- [ ] **5. Rodar e ver passar:** testes de integração e subida do serviço.
+- [ ] **6. Commit:** commit no repositório do projeto.
+
+**Evidência:** —
+
+### P7 — A fila de prioridade SQLite e os três tetos de concorrência
+
+Executa D5 (M8, M13, M14) · executor: sessão do `tools-kit`
+
+Estimado: 6.0 h · Executado: — h
+
+- [ ] **1. Testes que falham:** persistência no SQLite, ordenação (`deadline` > `blocks` > `priority` > chegada) e barramento pelos 3 tetos (workspace, cota 90% projetada, memória livre).
+- [ ] **2. Implementar fila:** módulo `queue.py` e integração com `orca orchestration` e ciclo `worker_done`.
+- [ ] **3. Rodar e ver passar:** suíte de testes de concorrência e limites.
+- [ ] **4. Commit:** commit no repositório do projeto.
+
+**Evidência:** —
+
+### P8 — A política de modelos e esforço com chave de desligamento e gates
+
+Executa D4, D6 (M1, M9, M10, M15, M16) · executor: sessão do `tools-kit`
+
+Estimado: 5.0 h · Executado: — h
+
+- [ ] **1. Testes que falham:** ferramenta `dispatch`, leitura de `brza.toml`, desligamento via `brza_config`, proposição de gate para executor e registro de telemetria `route`.
+- [ ] **2. Implementar:** módulo de política e ferramentas MCP correspondentes.
+- [ ] **3. Rodar e ver passar:** testes de unidade cobrindo todas as dimensões de política.
+- [ ] **4. Commit:** commit no repositório do projeto.
+
+**Evidência:** —
+
+### P9 — O desempate via `tev1:4b` e fallback Haiku com controle de contas
+
+Executa D6 (M6, M7, M11) · executor: sessão do `tools-kit`
+
+Estimado: 4.5 h · Executado: — h
+
+- [ ] **1. Testes que falham:** consulta local ao `tev1:4b` no Ollama, medição de score de confiança e fallback para `claude -p` com Haiku.
+- [ ] **2. Implementar:** módulo desempatador integrado ao fluxo de decisão do MCP.
+- [ ] **3. Calibração:** validação contra a suíte de 10 casos sintéticos e tarefas em texto livre.
+- [ ] **4. Commit:** commit no repositório do projeto.
+
+**Evidência:** —
+
+### P10 — O plugin do Orca com painel declarativo TSX e integração com MCP
+
+Executa D8 (B7, M17) · executor: sessão do `tools-kit`
+
+Estimado: 7.0 h · Executado: — h
+
+- [ ] **1. Migrar spike:** consolidar `spikes/c5-plugin/` para `plugins/orca/` com `ui: "components"`.
+- [ ] **2. Visualização de fila:** implementar visualização em TSX mostrando pedidos, prioridades e o teto que segura cada worker parado (M17).
+- [ ] **3. Ações via MCP:** conectar botões de controle ao MCP residente via HTTP local no worker (R10.3).
+- [ ] **4. Testes:** rodar `plugin check` e validação visual nos dois apps (BrzA Studio e Orca).
+- [ ] **5. Commit:** commit no repositório do projeto.
+
+**Evidência:** —
+
+### P11 — O piloto de workflows de fluxo no plugin do Claude
+
+Executa D3 (B9) · executor: sessão do `tools-kit`
+
+Estimado: 2.0 h · Executado: — h
+
+- [ ] **1. Implementar piloto:** criar roteiro de fluxo em `plugins/claude/workflows/review.js`.
+- [ ] **2. Validar no chat:** executar nos chats do BrzA Studio e do Orca.
+- [ ] **3. Commit:** commit no repositório do projeto.
+
+**Evidência:** —
+
+### P12 — O roteador de sessões multiruntime (`brza sessions`)
+
+Executa D7 (M4, M18, M19) · executor: sessão do `tools-kit`
+
+Estimado: 3.5 h · Executado: — h
+
+- [ ] **1. Testes que falham:** abertura e roteamento com `--agent claude|codex|agy`, argumentos de sandbox e continuidade com `codex_reply`.
+- [ ] **2. Implementar:** suporte no `scripts/brza/brza-sessions` seguindo a norma de sessão por frente.
+- [ ] **3. Rodar e ver passar:** testes de unidade em `test_brza_sessions.py`.
+- [ ] **4. Commit:** commit no repositório do projeto.
+
+**Evidência:** —
+
+### P13 — Os shims universais npm/npx/pnpm
+
+Executa D1 (B10) · executor: sessão do `tools-kit`
+
+Estimado: 2.0 h · Executado: — h
+
+- [ ] **1. Implementar shims:** scripts wrapper em JavaScript delegando para o executável `brza` nativo.
+- [ ] **2. Publicar/Empacotar:** validar execução via `npx brza --version`.
+- [ ] **3. Commit:** commit no repositório do projeto.
+
+**Evidência:** —
+
+### P14 — Revisão da entrega, testes de ponta a ponta e encerramento
+
+Executa revisão geral contra Cobertura · executor: sessão de revisão
+
+Estimado: 3.0 h · Executado: — h
+
+- [ ] **1. Conferir Cobertura:** validar cada linha da tabela de Cobertura contra o comportamento real nos dois apps.
+- [ ] **2. Parecer de revisão:** gerar nota `work/reviews/pln-003-workflow-nos-dois-clients.md`.
+- [ ] **3. Documentação e fechamento:** migrar o durável para `ARCHITECTURE.md` e transicionar o plano para `status: done`.
+
+**Evidência:** —
+
+## Regressão
+
+- `brza install --all` continua funcionando e ligando os executáveis existentes em `scripts/brza/`.
+- Todos os testes unitários em `scripts/brza/tests` continuam passando sem regressão.
+- Worktrees existentes do workspace continuam sendo reconhecidos pelo `brza tree` e `brza note`.
+- A geração e sincronização de notas continua sendo validada pelo `check_notes.py` com zero erros e avisos.
+
+## Desvios
+
+*(Nenhum desvio registrado até o momento).*
 
 ## Pendências conhecidas
 
@@ -116,3 +329,5 @@ fechou lá e passou ao PLN-003 (R9.1).
   [O PLN-003: o spike do C5 nos dois apps](../../work/worklogs/2026-11-03-pln-003-o-spike-do-c5-nos-dois-apps.md)
 - 2026-11-03 — a R10 e a R11 fecharam o painel de componentes, os botões pelo MCP e o `DESIGN.md` no `brand`.
   [O PLN-003: o painel de componentes](../../work/worklogs/2026-11-03-pln-003-o-painel-de-componentes.md)
+- 2026-11-03 — o Desenho ajustado para sessão por frente; itens D1 a D9, hipóteses H1 a H6 e passos P0 a P14 escritos.
+  [O PLN-003: os itens D e os passos](../../work/worklogs/2026-11-03-pln-003-itens-d-e-passos-do-workflow-nos-dois-clients.md)

@@ -98,13 +98,39 @@ o dia anterior está em
     régua do `AGENTS.md`.
   - **Decisão de Anderson ("Parar aqui"):** o modelo local fica fora das revisões e não se mede mais agora; o uso de
     LLMs locais em outros fluxos se avalia no futuro. A R12.2 decide só entre Claude, Codex e `agy`.
+- **A pontuação dos 9 braços**, por um `collector` contra o `gabarito.md` (`out/pontuacao-9-bracos.md`, com os fatos
+  reproduzidos), e o custo a preço de tabela. Cada braço é uma execução só.
+
+  | Runtime | Achados | Recall (÷7) | Precisão | Custo dos 3 focos | Tempo dos 3 focos |
+  | :-- | --: | --: | --: | --: | --: |
+  | Claude (`opus-5-5`, sem a memória do `reviewer`) | 17 | 3,0 (0,43) | 17/17 | US$ 3,44 (estimado pelo hook) | 10,6 min |
+  | Codex (`gpt-6-astra`, `xhigh`) | 14 | 1,5 (0,21) | 13/14 | US$ 9,91, e a janela de 5 h inteira | 20,9 min |
+  | `agy` (`gemini-4-argon-high`) | 21 | 3,5 (0,50; 0,43 sem o crédito secundário de A4) | 20/21 | US$ 10,54 pelo preço da tabela | 37,9 min |
+
+  - **Por foco, sobre os itens do foco natural:** defeito, Claude 0,20, Codex 0,10, `agy` 0,40; convenção, Claude 1,00,
+    Codex 0,50, `agy` 0,75 (0,50 sem o crédito secundário). Simplicidade: 8 achados verdadeiros no Claude, 3 no Codex
+    e 7 mais 1 vago no `agy`, todos fora do gabarito.
+  - **Custo por braço:** Claude US$ 0,88, 1,21 e 1,35; Codex 3,39, 3,04 e 3,48 (por `input − cache`, `cache` e
+    `output` a US$ 10, 1 e 50 por milhão); `agy` 5,13, 2,17 e 3,24 (US$ 4, 0,20 e 20 por milhão, com o `thinking`
+    dentro da saída). O `agy` pode ser assinatura, então o US$ dele é equivalente, e não dinheiro.
+  - **A2, A7 e A8: 0 dos 9 braços.** A3 foi achado por 5 braços, dos 3 runtimes; nenhum braço de simplicidade o achou.
+    Nenhum dos 9 relatou uma hipótese A11–A15 como defeito; o `agy` descartou A11 e A15 de forma estrita.
+  - **O mais repetido não está no gabarito:** a faixa de 80 do `CLAUDE.md:129` contra o hook (5 braços), a leitura de
+    fatos duplicada entre `fact_outcome.py` e `summarize_measurements.py` (4) e a regra do PNG da issue escrita duas
+    vezes (3). 20 achados novos verdadeiros no total, 2 vagos e nenhum falso.
+  - **Cada runtime tem achados que só ele fez:** Claude, `designer:F3` que falha contra o `agent_id` e a linha de 161
+    colunas por inteiro; Codex, a resposta vazia do Haiku que vira sucesso; `agy`, o corte dos 300 caracteres (A1) e
+    o `fact_capture` espúrio. A confiança do Codex é 100 em todos os achados; a do Claude vai de 80 a 95.
+  - **O `collector` sujou o log real ao reproduzir um achado:** 2 linhas `fact_capture` (`s1`/`a1`) em
+    `.measurements/measurements.jsonl` e 2 chaves de `/var/folders/…/sub.jsonl` em `fact-audit-state.json`, na raiz do
+    workspace e fora do git. Removi só essas, depois de conferir que eram as duas últimas linhas e as duas chaves
+    temporárias (1.971 linhas e 10 chaves ficaram).
 
 ## O que ficou
 
-- **A pontuação do experimento**, que ficou por fazer porque Anderson pediu para parar e reiniciar o BrzA Studio: as 9
-  revisões terminaram às 18:48, e a tabela de acerto, falso positivo, custo e tempo por runtime e foco vai a
-  Anderson, e só então a R12.2 se decide. Depois, dividir o plano, reescrever o rascunho do Desenho e mandá-lo à
-  aprovação. Para retomar:
+- **A R12.2 aguarda a resposta de Anderson**, com a tabela da pontuação dos 9 braços, que está em "O que se fez". Depois
+  dela, dividir o plano, reescrever o rascunho do Desenho e mandá-lo à aprovação. De onde saiu cada número da
+  pontuação:
   - **Onde está tudo:** `/private/tmp/pln004/bench/` (o link aponta para o `chat-scratch` do app, que sobrevive ao
     reinício): os prompts em `prompt-*.md`, o gabarito em `gabarito.md`, as saídas em `out/` — `claude-*.md`
     (condensadas na gravação), `codex-*.md` e `codex-*.jsonl`, `agy-*.json` — e a cópia do diff em `ref-pln005/`.

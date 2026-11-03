@@ -30,6 +30,10 @@ tags:
   ligado e manifesto v2, e `terminal.sendText` é só do worker, então a R1.2 ("HTML regenerado") e o C5 ficaram em
   revisão (o Terreno e a matriz do Desenho). Rodada respondida em 2026-11-02: o spike mede os dois caminhos,
   HTML+worker e TSX+worker. O plugin do Orca não contribui skills (reservado e vazio): o veículo delas é o plugin do Claude.
+- **O desempatador do M11 (2026-11-03):** rodada respondida na sessão `bb0fd632` do `workspace`, "tev1 + Haiku
+  (Recomendado)". A cota fica na tabela; o texto vai ao `tev1:4b` local, e ao Haiku abaixo do limiar de confiança; a
+  Jev fica como backend de nuvem opcional. Na fase 2b, calibrar o limiar com empate real; antes do pacote público,
+  conferir a licença do `tev1`. A medição e os pontos estão no [Desenho](PLN-003-design.md), em "O desempatador do M11".
 - **Dividido:** [PLN-003 — Entrevista](PLN-003-interview.md) · [PLN-003 — Desenho](PLN-003-design.md)
 
 ## Pedido
@@ -79,3 +83,5 @@ Anderson, em 2026-10-29, na mesma sessão.
   [O PLN-003: a entrevista do workflow nos dois clients](../../work/worklogs/2026-10-29-pln-003-a-entrevista-do-workflow-nos-dois-clients.md)
 - 2026-11-02 — o Terreno do plugin do Orca reescrito contra a `v1.4.246`; o C5 virou hipótese e o spike foi ao `Retomar`.
   [O PLN-003: o Terreno do plugin do Orca na 1.4.246](../../work/worklogs/2026-11-02-pln-003-o-terreno-do-plugin-do-orca-na-1-4-246.md)
+- 2026-11-03 — a medição e a rodada do desempatador, do workstream `workspace`, foram ao M11 do Desenho.
+  [O PLN-003: o desempatador do M11](../../work/worklogs/2026-11-03-pln-003-o-desempatador-do-m11.md)

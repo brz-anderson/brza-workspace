@@ -3,7 +3,7 @@ status: open
 phase: design
 origin: request
 description: O brza note commit preenche o refs do worklog com os IDs que ele cita, e revisão e migração ganham REV-NNN e MIG-NNN
-ready: não — dependências definidas na R9; faltam extração de refs e os demais contratos do Desenho
+ready: não — extração de refs definida na R10; faltam renumeração, sessão no rebuild e demais contratos do Desenho
 scope:
   - workspace
 opened: 2026-11-03
@@ -14,9 +14,9 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** R9 definiu `depends_on`: só `done` satisfaz a dependência; alvo inexistente, autorreferência e ciclo
-  geram erro no checador. D1 e D2 registram a migration-runner e as dependências. Próximo: fechar extração do `refs:`;
-  depois renumeração e sessão no rebuild, concluir os itens `D` e derivar os Passos.
+- **Retomar:** R10 fechou a extração do `refs:`: fora de cercas, preservando crases inline, links e citações
+  históricas; menção textual desconhecida avisa e não entra no campo. D1 a D3 registram skill, dependências e refs.
+  Próximo: mapear as quatro REV e definir sessão no rebuild; concluir os demais contratos e derivar os Passos.
 - **Dividido:** [PLN-008 — Desenho](PLN-008-design.md)
 
 ## Pedido
@@ -65,6 +65,7 @@ mesma sessão.
 | `R7.2` | planos e issues aceitam `depends_on` opcional, também gravado no índice | — | — |
 | `R9.1` | só `done` satisfaz uma dependência; `dropped` exige revisão explícita da relação | — | — |
 | `R9.2` | o checador barra dependência com alvo inexistente, autorreferência ou ciclo, inclusive entre workstreams | — | — |
+| `R10` | refs é extraído fora de cercas, preserva crases inline, links e citações históricas; menção textual desconhecida avisa sem entrar no campo | — | — |
 
 ### Fora de escopo
 
@@ -331,9 +332,34 @@ Respondida em 2026-11-03, na sessão `workspace`: "ambos recomendado".
    **Decidido — "ambos recomendado".** O checador gera erro para alvo inexistente, autorreferência e ciclo,
    inclusive entre workstreams.
 
+### Rodada 10 — extração do refs (enviada 2026-11-03)
+
+**Apresentado antes:** o filtro atual remove cercas e crases inline (`brza-workflow/core/.claude/skills/notes-checker/scripts/check_notes.py:145-153`).
+Foi proposto preservar as crases e normalizar citações como `PLN-008/D1` para `PLN-008`.
+
+Respondida em 2026-11-03, na sessão `workspace`: "ambos recomendado".
+
+1. **De onde extrair as referências?** Opções:
+   - prosa, crases inline, links e citações históricas, excluindo blocos cercados (recomendada) — custo: filtro de
+     cercas que preserve crases inline; se paga: ao evitar que exemplos de código acrescentem referências;
+   - incluir também os blocos cercados — custo: aceitar referências que aparecem apenas em exemplos; se paga:
+     quando a única referência verdadeira estiver num comando cercado.
+
+   **Decidido — "ambos recomendado".** Extrair fora de cercas, preservando crases inline, links e citações
+   históricas. `PLN-008/D1` vira `PLN-008`; o refs aponta a nota, sem validar a existência do item D1.
+
+2. **E uma menção textual a ID inexistente?** Opções:
+   - avisar e não incluir no refs (recomendada) — custo: diagnóstico com ID e localização; se paga: no
+     preenchimento dos worklogs antigos com exemplos hipotéticos, preservando o texto histórico;
+   - gerar erro e impedir o commit — custo: corrigir cada ocorrência, inclusive exemplos históricos; se paga:
+     quando a menção for um erro de digitação que esconderia uma referência real.
+
+   **Decidido — "ambos recomendado".** Menção textual desconhecida gera aviso, sem entrar no refs. Nas duas opções,
+   ID inexistente escrito no próprio refs e link relativo quebrado continuam erros.
+
 ## Worklogs
 
 - 2026-11-03 — aberto; R1 a R6 fecharam a Entrevista; parou antes do Terreno.
   [A abertura do PLN-008: o refs nos worklogs, o REV e o MIG](../../work/worklogs/2026-11-03-pln-008-a-abertura-do-refs-do-rev-e-do-mig.md)
-- 2026-11-03 — retomada; Terreno conferido; R7 a R9 respondidas; D1 e D2 registram skill e dependências.
+- 2026-11-03 — retomada; Terreno conferido; R7 a R10 respondidas; D1 a D3 registram skill, dependências e refs.
   [O Terreno do PLN-008 para o Desenho](../../work/worklogs/2026-11-03-pln-008-o-terreno-para-o-desenho.md)

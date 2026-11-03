@@ -28,3 +28,7 @@ independente. O D1 registra esse contrato; as regras de dependência são o pró
 Na R9, Anderson respondeu "ambos recomendado": só `done` satisfaz uma dependência, e o checador barra alvo
 inexistente, autorreferência e ciclos, inclusive entre workstreams. O D2 registra as regras; a extração do `refs:`
 é o próximo ponto do Desenho. Não houve implementação.
+
+Na R10, Anderson respondeu "ambos recomendado": o refs considera prosa, crases inline, links e citações históricas
+fora de cercas; menção textual desconhecida gera aviso sem entrar no campo. ID inexistente no próprio refs e link
+quebrado continuam erros. O D3 registra o contrato; seguem o mapeamento das quatro REV e a sessão no rebuild.

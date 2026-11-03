@@ -11,6 +11,8 @@ O Desenho segue em elaboração. Além do Terreno, estão confirmados:
 - **R7.3:** a issue comum aparece no `refs:` como `issue:<slug>`, preservando a identidade do índice.
 
 - **R8.1:** uma única `migration-runner` reúne criação, revisão e execução, com revisor independente.
+- **R10:** refs considera prosa, crases inline, links e citações históricas fora de cercas; menção textual
+  desconhecida gera aviso sem entrar no campo.
 
 ## Terreno
 
@@ -45,8 +47,8 @@ Levantamento refeito em 2026-11-03. Os caminhos de código abaixo partem do `brz
 
 ### Lacunas para as rodadas
 
-Falta definir a extração do `refs:`, incluindo exemplos hipotéticos, o mapeamento das quatro revisões para
-REV-001 a REV-004 e o tratamento da sessão no rebuild. Não houve implementação.
+Falta definir o mapeamento das quatro revisões para REV-001 a REV-004 e o tratamento da sessão no rebuild,
+e concluir os contratos de numeração, preenchimento do acervo, índice e listagem. Não houve implementação.
 
 ## D1 — Uma única migration-runner conduz a MIG — `core/.claude/skills/migration-runner/`
 
@@ -103,3 +105,29 @@ o checador não garante impedir ciclos introduzidos simultaneamente em workstrea
 
 **Alternativas recusadas em R9:** aceitar `dropped` como dependência satisfeita; permitir referências inválidas ou
 ciclos com aviso. A escolha exige entrega e corrige a relação inválida antes do commit.
+
+## D3 — O refs extrai as menções fora das cercas — `bin/brza-note` e checador
+
+- **Origem:** R1.1; R7.3; R10.1 e R10.2.
+- **Contexto:** o filtro atual apaga crases inline, embora elas contenham citações reais; exemplos cercados podem
+  mencionar IDs sem relação com o trabalho.
+
+### Como fica
+
+O `brza note commit` preenche o `refs:` dos worklogs antes da conferência. A extração considera a prosa, crases
+inline, links e citações históricas do corpo, excluindo blocos cercados de código.
+
+| Entrada | Resultado |
+| :------ | :-------- |
+| `PLN-008/D1` fora de cerca | Referência `PLN-008`, sem validar o item D1. |
+| `PLN-003` somente em bloco cercado | Não gera referência. |
+| Link para issue comum existente | Referência `issue:<slug>` com a identidade do índice. |
+| Menção textual a ID inexistente | Aviso com ID e localização; não entra no refs. |
+| ID inexistente no próprio refs | Erro no checador, conforme R1.1. |
+| Link relativo quebrado fora de código | Continua erro no checador. |
+
+PLN, REV e MIG mantêm seus IDs próprios. Uma citação histórica de ID existente entra no campo mesmo quando for
+exemplo: refs representa menção, sem afirmar trabalho executado ou dependência.
+
+**Alternativas recusadas em R10:** extrair também de cercas; bloquear toda menção textual desconhecida.
+A escolha preserva o texto histórico e avisa sobre possíveis erros de digitação sem gravar alvos inexistentes.

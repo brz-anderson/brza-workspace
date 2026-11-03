@@ -4,8 +4,8 @@ phase: execution
 origin: request
 ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
 estimate_h: 202.3
-executed_h: 34.3
-remaining_h: 27.9
+executed_h: 35.1
+remaining_h: 26.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -49,7 +49,8 @@ tags:
   com a R66, o D61 e o P78: o fundo cinza do texto dentro do bloco de código do visualizador de Markdown e o botão de
   copiar fora do lugar. O P78 fechou em `brza-studio@2738100d3f5`, na `master`, e espera só o C31, num build, com
   Anderson. Dois pontos da R66 são leitura da sessão, a confirmar no C31: o que "aparece fora do hover" quer dizer
-  (R66.1) e o escopo (R66.3).
+  (R66.1) e o escopo (R66.3). O pedido 42 (o botão de expandir do bloco de código com a aparência e a fileira dos
+  vizinhos) entrou com o D63 e o P80, que fechou em `brza-studio@d501bb230ff`, com os X78 ao X80, e espera só o C33.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
   (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
@@ -3220,19 +3221,45 @@ Agora (pedido 41). **Reabre o P40**, que o sync tirou, e a R1 do worklog do sync
 
 Executa D63 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-42`
 
-Estimado: 1 h · Executado: 0 h
+Estimado: 1 h · Executado: 0,8 h
 
-Agora (pedido 42). Sem rodada, por ser a ordem do pedido; o desenho é do D63.
+Agora (pedido 42). Sem rodada, por ser a ordem do pedido; o desenho é do D63. Fechou em 2026-11-02.
 
-- [ ] **1.** Os "A conferir no passo" do D63, lidos no código antes de escrever
-- [ ] **2.** Testes que falham: o botão de expandir sem `border`, `bg-background` e `shadow-xs`, com as classes do
+- [x] **1.** Os "A conferir no passo" do D63, lidos no código antes de escrever
+- [x] **2.** Testes que falham: o botão de expandir sem `border`, `bg-background` e `shadow-xs`, com as classes do
       botão de copiar; a posição, no bloco com cabeçalho e no sem cabeçalho, encostada à esquerda do grupo de ações real,
       e não pelo deslocamento fixo de 96 px; o bloco sem grupo de ações (saída de ferramenta, diff) mantém o canto
-- [ ] **3.** A aparência e a posição do botão na `BrzaExpandLayer.tsx`
-- [ ] **4.** Os testes do que foi tocado, só por caminho; rebase na `origin/master` e push. **Sem a suíte completa**: ela
+- [x] **3.** A aparência e a posição do botão na `BrzaExpandLayer.tsx`
+- [x] **4.** Os testes do que foi tocado, só por caminho; rebase na `origin/master` e push. **Sem a suíte completa**: ela
       roda depois, uma vez, pela coordenação. A conferência no app é o C33
 
-**Evidência:** (a preencher)
+**Evidência:** `brza-studio@d501bb230ff`, na `master` (`9a8631369ac..d501bb230ff`), com o push direto da sessão
+`pln-001-pedido-42`, no worktree `.worktrees/pln-001-pedido-42`, sem rebase a fazer (a `origin/master` não tinha andado).
+- **Os "A conferir no passo" do D63**, lidos no código antes de escrever: a leitura se sustenta, com as linhas um pouco
+  deslocadas (o botão em `BrzaExpandLayer.tsx:77-90`, a posição em `:53-61`, o copiar em `NativeChatCopyButton.tsx:54-58`).
+  O grupo de ações se acha por um atributo `data-native-chat-code-actions` nos dois contêineres do
+  `NativeChatCodeBlock.tsx`: o arquivo já leva linhas do BrzA (o `BrzaRunCodeButton`, a quebra ligada por padrão), e o
+  atributo falha no conflito de um sync, em vez de quebrar calado como o "pai do primeiro botão". O grupo sem cabeçalho
+  some fora do hover, e o ⤢, portado ao `body`, tira o hover do bloco: enquanto o ⤢ aparece, o bloco leva
+  `data-brza-expand-shown`, e o `brza/brza-expand-button.css` mantém o grupo visível; os dois somem juntos, 200 ms depois de
+  o ponteiro sair (X79). O `BrzaExpandOverlay` não mudou.
+- **A aparência:** as classes do copiar (`text-chat-foreground-faint`, `hover:bg-accent`, o foco), sem `border`,
+  `bg-background` e `shadow-xs`; o `Maximize2` segue em `size-3.5`.
+- **A posição:** o `brzaExpandButtonPosition` mede o grupo (`getBoundingClientRect`): `top` = o topo dele, `left` = a
+  esquerda menos 2 px (`gap-0.5`) e 24 px; o bloco sem grupo (saída de ferramenta, diff) fica no canto de dentro, a 4 px.
+  O bloco sem cabeçalho reserva mais 26 px no `pre`, para o ⤢ não cobrir a primeira linha (X78).
+- **Antes do código:** os 5 testes novos do `BrzaExpandLayer.test.tsx`, com o `NativeChatCodeBlock` real com e sem
+  linguagem, falharam (a classe `border`; o `top` 204 e 188 px em vez de 209; o canto 288 em vez de 304; o bloco sem a
+  marca). **Depois:** `pnpm test` por caminho, com `--maxWorkers=2`, no `BrzaExpandLayer.test.tsx`, no
+  `NativeChatCodeBlock.test.tsx` e no `NativeChatCodeBlock.load-failure.test.tsx` → 3 arquivos, 26 testes passaram;
+  `pnpm tc:web` → sem erro; `pnpm check:changed --base=origin/master --maxWorkers=2` → 24 de 24, depois de trocar o
+  `:has()` do CSS, que a verificação "compiled :has() restyle scope" barrou, por `:first-child`; o `oxfmt --check`
+  arquivo por arquivo e o lint pelo `lint-staged` do commit (X80). **Suíte inteira: roda depois do push, pela coordenação.**
+- **Fixture local, fora do commit** (`BrzaExpandLayer.fixture.tsx`, apagada), pelo `pnpm fixtures:shot --theme both`:
+  nos temas claro e escuro, o ⤢ transparente na fileira do quebrar e do copiar, encostado à esquerda deles, no bloco sem
+  cabeçalho, no de `ts` e no de `bash` com o executar; no sem cabeçalho, a linha longa quebra antes do ⤢; o de cabeçalho
+  usa a largura toda.
+- Não rodei o app: a conferência é o C33, de Anderson, num build novo.
 
 ## Regressão
 
@@ -3525,6 +3552,18 @@ da linha quando o teste entra.
 - **X76 — O `check:changed` estourou os 30 min no passo de testes de unidade; rodei os arquivos por caminho.** Os tipos
   compartilhados (`ResumeSource`, o resultado do fork) abrem a seleção em leque. Pela regra de Anderson, rodei os tocados e
   os vizinhos por caminho, o `pnpm tc` e o lint dos arquivos. Afeta P74.
+- **X78 — O bloco sem cabeçalho reserva 90 px à direita do código, e não 64.** O `pr-16` do `pre` cabia só no quebrar e no
+  copiar; com o ⤢ na fileira, a primeira linha longa ficava sob ele, e o C33 pede "sem cobrir texto". A reserva está no
+  `brza/brza-expand-button.css` (`[data-native-chat-code-block] > [data-native-chat-code-content]:first-child`), sem mexer
+  na linha do upstream; o bloco de cabeçalho não muda. Afeta P80, e o D63 não muda.
+- **X79 — O ⤢ some quando o ponteiro sai do chat, e o teste do próprio botão no `mouseover` saiu.** O ⤢ vive no `body`,
+  fora da raiz, e o `mouseover` dele nunca chegava ao ouvinte; sair do chat deixava o botão aceso, e agora deixaria o
+  grupo aceso com ele. A raiz agenda o sumiço no `mouseleave`, e o botão o cancela no `mouseenter`. Afeta P80.
+- **X80 — O `oxfmt` e o `oxlint` diretos não acharam os arquivos do worktree.** Com os caminhos juntos, o `oxfmt` só
+  achou o CSS e o `oxlint` respondeu "No files found"; a suspeita, não confirmada, é o `.worktrees/` do
+  `.git/info/exclude` do `brza-studio`. O `oxfmt --check` passou arquivo por arquivo, com `--ignore-path=/dev/null`; o
+  lint que vale é o do `lint-staged` do commit (o `oxlint`, o `ast-grep` e o `react-doctor` nos 3 `.tsx`) e o do
+  `check:changed`. Afeta P80.
 
 ## Worklogs
 
@@ -3656,6 +3695,8 @@ da linha quando o teste entra.
   o P73 em `brza-studio@563705a7aaf`, com os X65 e X66; o C26 espera o build do C22, com Anderson.
 - 2026-11-02 — [O P78 do PLN-001, o fundo do texto no bloco de código e o botão de copiar do visualizador de Markdown](../../work/worklogs/2026-11-02-pln-001-pedido-40-fundo-do-codigo-e-botao-copiar.md):
   o pedido 40, com a R66, o D61 e o P78 em `brza-studio@2738100d3f5`; o C31 espera o build, com Anderson.
+- 2026-11-02 — [O P80 do PLN-001, o botão de expandir com a aparência e a fileira dos vizinhos](../../work/worklogs/2026-11-02-pln-001-p80-botao-de-expandir.md):
+  o pedido 42, o D63 e o P80 em `brza-studio@d501bb230ff`, com os X78 ao X80; o C33 espera um build novo, com Anderson.
 - 2026-11-02 — [O P75 do PLN-001, as credenciais de integração do BrzA numa pasta própria](../../work/worklogs/2026-11-02-pln-001-p75-credenciais-numa-pasta-propria.md):
   o P75 em `brza-studio@f7490afab9e`, com os X71 ao X73; o C28 espera o build do C22, com Anderson.
 - 2026-11-02 — [O P74 do PLN-001, o fork de um chat fixado nasce na conta fixada](../../work/worklogs/2026-11-02-pln-001-p74-fork-de-chat-fixado.md):

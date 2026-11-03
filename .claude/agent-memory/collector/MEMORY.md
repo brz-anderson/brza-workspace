@@ -1,0 +1,1 @@
+- [Comparar pareceres de revisão](feedback_comparar-pareceres.md) — atalhos para cruzar dois reviewers sobre os mesmos commits (PLN-009)

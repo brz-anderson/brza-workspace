@@ -48,7 +48,7 @@ a função `claude` os passam pelo `--agents`, com o JSON que o `brza-agents` mo
 ## A identidade é a do brz-anderson, pelo `env`
 
 O `env` do `.claude/settings.json` define `GIT_AUTHOR_*` e `GIT_COMMITTER_*`:
-`Anderson Pereira Brzezinski <240569289+brz-anderson@users.noreply.github.com>`. A chave de acesso e o perfil do `gh`
+`Anderson Pereira Brzezinski <brz.anderson.pereira@gmail.com>`. A chave de acesso e o perfil do `gh`
 estão no `README.md`.
 
 Isso vale para os commits deste repositório e do `brza-studio`, e vence o ambiente que uma sessão herde. O `git var

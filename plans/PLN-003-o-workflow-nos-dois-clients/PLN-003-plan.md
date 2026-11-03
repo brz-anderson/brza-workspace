@@ -21,6 +21,9 @@ tags:
   parcial está no C5 do [Desenho](PLN-003-design.md); o Orca está agora na `1.4.247`. Depois, escrever os itens `D` a
   partir da matriz, com os riscos da fase 0 como hipóteses (R7.3), e os Passos, com o P0 numa sessão `pln-003-p0`. O P7
   do PLN-002 corre na sessão `pln-002-p7`.
+- **A fila do orquestrador (2026-11-03):** a R9, respondida na sessão `bb0fd632` do `workspace`, fez do coordenador o
+  orquestrador e deu a ordem da fila e os três tetos de workers; o Desenho mudou nas premissas, no M8, no M17, na
+  regra da fila e no M24 novo (o índice da `master` grava `priority`, `blocks` e `deadline`). Os itens `D` partem daí.
 - **Mudou a norma (2026-10-29):** a trava de retomada saiu, e a sessão passou a ser por frente, não por tarefa
   ([Uma sessão por frente de trabalho, sem trava de retomada e com o cache de 1 h](../../work/decisions/uma-sessao-por-frente-e-sem-trava-de-retomada.md)). O Desenho ainda conta com a
   trava no roteador (M2) e na tabela de conflitos (`PLN-003-design.md:181-182`): ajustar antes dos itens `D`.
@@ -58,6 +61,15 @@ Os itens do pedido, numerados para a Cobertura:
 iniciar/parar tbm -, como fazemos para que o CLI possa ser instalado com `npm|npx|pnpm|brew|pip|winget install`?" —
 Anderson, em 2026-10-29, na mesma sessão.
 
+5. a fila do orquestrador, por prioridade, sob um teto de workers do workspace, das contas e da máquina (R9).
+
+"prioriza a fila considerando a prioridade do pedido - issue high, bloqueia avanço de plano, prazo de entrega curto e
+etc -, o limite de workers em paralelo é geral do workspace somado, o cálculo também leva em consideração ritmo das
+contas e o recurso disponível na máquina pra limitar workers" — Anderson, em 2026-11-03, na sessão `bb0fd632` do
+`workspace`. O pedido veio da issue
+[O coordenador se baseia no índice de notas da master](../../work/issues/o-coordenador-le-o-indice-da-master.md), que
+fechou lá e passou ao PLN-003 (R9.1).
+
 ### Cobertura
 
 > Rascunho: os critérios são propostas até a rodada que os confirma; o passo e o teste saem do Desenho.
@@ -72,6 +84,8 @@ Anderson, em 2026-10-29, na mesma sessão.
 | `Pedido 4` | `brza app install` baixa o DMG da release e troca o app; `--from-source` compila da `origin/master`            | —     | —             |
 | `Pedido 4` | `brza mcp start`, `stop` e `status` controlam o servidor residente                                           | —     | —             |
 | `Pedido 3` | `brza <sub>` acha o app que está rodando — BrzA Studio ou Orca — sem caminho fixo                        | —     | —             |
+| `Pedido 5` | com dois pedidos na fila, o de `deadline` mais próximo sai antes, e o de `blocks` antes do de `priority: high` | —     | —             |
+| `Pedido 5` | worker novo espera quando o teto do workspace, o da conta e runtime (com a projeção a 90% até o `resetsAt`) ou o da máquina está cheio, e o painel diz qual | —     | —             |
 
 ## Pendências conhecidas
 
@@ -95,3 +109,5 @@ Anderson, em 2026-10-29, na mesma sessão.
   [O PLN-003: o desempatador do M11](../../work/worklogs/2026-11-03-pln-003-o-desempatador-do-m11.md)
 - 2026-11-03 — a Rodada 8 decidiu como rodar o spike do C5; o spike ficou parcial, parado na aprovação, com três issues.
   [O PLN-003: o spike do C5 parou na aprovação](../../work/worklogs/2026-11-03-pln-003-o-spike-do-c5-parou-na-aprovacao.md)
+- 2026-11-03 — a R9, da sessão do `workspace`, levou a fila do coordenador ao orquestrador; o Desenho mudou no M8, no M17 e no M24.
+  [O PLN-003: a fila do orquestrador](../../work/worklogs/2026-11-03-pln-003-a-fila-do-orquestrador.md)

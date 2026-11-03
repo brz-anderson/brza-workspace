@@ -389,3 +389,32 @@ Respondida em 2026-11-03, no chat do BrzA Studio, na sessão do `tools-kit`.
    - pular o item 3. Custo: os botões da R1.2 sem prova. Se paga: nunca.
 
    **Respondida — "O worker escolhe sozinho".**
+
+### Rodada 9 — a fila do orquestrador (respondida 2026-11-03, na sessão do `workspace`)
+
+**O pedido:** o coordenador/orquestrador "prioriza a fila considerando a prioridade do pedido - issue high, bloqueia
+avanço de plano, prazo de entrega curto e etc -, o limite de workers em paralelo é geral do workspace somado, o cálculo
+também leva em consideração ritmo das contas e o recurso disponível na máquina pra limitar workers" — Anderson, em
+2026-11-03, na sessão `bb0fd632` do `workspace`.
+
+**Apresentado antes**, pela sessão do `workspace`: a R7.1 ("por conta e por runtime", pelo `usedPercent`); o M8 sem
+ordem de prioridade; e as notas com `priority`, `blocks` e `deadline` (`work/README.md`, "As propriedades"), que o
+índice da `master` não grava. A rodada foi feita e respondida lá. Aqui ficam as respostas literais e o texto das opções
+escolhidas, como chegaram no pedido da sessão `bb0fd632`; as opções que perderam não foram repassadas. Os registros
+estão no `workstream/workspace`, commit `19a9dda`:
+[O coordenador se baseia no índice de notas da master](../../work/issues/o-coordenador-le-o-indice-da-master.md) e
+[A fila do coordenador vai ao PLN-003](../../work/worklogs/2026-11-03-a-fila-do-coordenador-vai-ao-pln-003.md).
+
+Respondida em 2026-11-03, na sessão `bb0fd632` do `workspace`.
+
+1. **Quem é o coordenador.** **Respondida — "A mesma peça (Recomendado)":** o coordenador da issue
+   `o-coordenador-le-o-indice-da-master` é o orquestrador do PLN-003. A issue fechou no `workspace`, e o que ela pedia
+   passa ao PLN-003.
+2. **A ordem da fila.** **Respondida — "A ordem da norma (Recomendado)":** a fila ordena por `deadline` próximo, depois
+   `blocks`, depois `priority` (`high`, `medium`, `low`), depois a chegada; `blocks` vence `priority`. O índice da
+   `master` passa a gravar `priority`, `blocks` e `deadline` (~1 h no `brza note`).
+3. **O teto de workers.** **Respondida — "Soma às camadas (Recomendado)":** o teto geral de workers do workspace soma-se
+   ao limite por conta e runtime da R7.1 e ao da máquina; o menor manda. Não substitui a R7.1.
+4. **O ritmo das contas e a máquina.** **Respondida — "Projeção e memória (Recomendado)":** o ritmo é a variação do
+   `usedPercent` do `orca account list` projetada até o `resetsAt`, e a conta que chega a 90% antes do reset não recebe
+   worker novo; a máquina limita pela memória livre e pelo swap, com a CPU como segundo sinal.

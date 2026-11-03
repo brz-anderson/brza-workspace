@@ -15,8 +15,9 @@ tags:
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
 - **Retomar:** R12 fechou o `brza note ls`: abertos e `opened` recente primeiro, índice local por padrão;
-  `--refresh` atualiza antes de listar, com falha explícita. D1 a D6 registram os contratos fechados. Próximo:
-  consolidar numeração, preenchimento do acervo e índice; levar o corte em Passos ao aceite.
+  `--refresh` atualiza antes de listar, com falha explícita. A emenda à R12.3 faz fetch virar padrão se dados errados
+  forem listados com frequência. D1 a D6 registram os contratos fechados. Próximo: consolidar os contratos restantes
+  e obter a resposta da R13 sobre o corte em Passos, que continua pendente.
 - **Dividido:** [PLN-008 — Entrevista](PLN-008-interview.md) · [PLN-008 — Desenho](PLN-008-design.md)
 
 ## Pedido

@@ -15,7 +15,8 @@ O Desenho segue em elaboração. Além do Terreno, estão confirmados:
   desconhecida gera aviso sem entrar no campo.
 - **R11.1:** as quatro revisões recebem REV-001 a REV-004 pela primeira inclusão no git.
 - **R11.2:** `session` identifica a sessão que produziu a linha do índice, inclusive no rebuild.
-- **R12:** ls mostra abertos e `opened` recente primeiro, usando o índice local por padrão; `--refresh` atualiza.
+- **R12, com emenda:** ls mostra abertos e `opened` recente primeiro, usando inicialmente o índice local;
+  `--refresh` atualiza. Dados errados listados com frequência fazem fetch passar a ser o padrão.
 
 ## Terreno
 
@@ -193,5 +194,9 @@ do nome continua sujeita à verificação de R4.1.
 Em toda ordenação, campo ausente fica no fim e empate usa ID ascendente. O padrão local pode refletir dados
 anteriores ao último push de outro workstream; `--refresh` é a escolha explícita para atualizar essa visão.
 
-**Alternativas recusadas em R12:** listar todos os estados por padrão; mais antigos primeiro; fetch automático
-com `--offline`. A listagem não calcula prontidão nem autoriza execução.
+**Gatilho de mudança do padrão — emenda à R12.3:** se dados errados forem listados com frequência, fetch passa a
+ser o padrão. O limiar numérico de frequência não foi definido; o contrato registra o gatilho qualitativo pedido.
+
+**Alternativas recusadas como padrão inicial em R12:** listar todos os estados; mais antigos primeiro; fetch
+automático com `--offline`. O fetch padrão fica condicionado ao gatilho acima. A listagem não calcula prontidão
+nem autoriza execução.

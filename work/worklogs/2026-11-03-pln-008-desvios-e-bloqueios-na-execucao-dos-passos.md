@@ -35,6 +35,13 @@ Ao percorrer o fluxo de execução dos passos P1 a P7, foram identificados e reg
    - Tentar aplicar a migração de forma manual diretamente no `workspace` violaria o contrato de idempotência, geraria quebras no `check_notes.py` atual (que ainda não suporta `depends_on` e `issue:<slug>` em `refs:`) e quebraria a trava de hashes do `.brza/core.lock`.
    - Registrado na issue [Bloqueio de P6 e P7 sem a entrega publicada de P1 a P5 e sincronização do core](../issues/bloqueio-de-p6-e-p7-sem-entrega-e-sync-do-core.md).
 
+4. **Abertura de sessões e desvios no `brza sessions --agent agy`:**
+   - Anderson orientou: *"abra as sessões que precisar, utilizando `brza sessions --agent agy`"*.
+   - Ao testar `brza sessions test --agent agy`, o wrapper em `packages/client/bin/brza-sessions` recusou o argumento (`error: unrecognized arguments: --agent agy`), pois aceita apenas opções voltadas ao Claude Code.
+   - Ao tentar `brza agent launch --agent agy`, o backend do BrzA Studio rejeitou com `Unknown TUI agent "agy"`, pois o identificador canônico no enum `TuiAgent` é `'antigravity'` (ou `'gemini'`).
+   - A sessão foi aberta com sucesso diretamente via `brza agent launch --agent antigravity --surface chat --worktree path:/Users/andepb/Projects/brza-workflow`, renomeada para `PLN-008: Implementação P1-P5 (brza-workflow)` e despachada com a especificação de P1 a P5.
+   - Registrado na issue [brza sessions sem suporte ao argumento --agent e alias agy não reconhecido](../issues/brza-sessions-sem-suporte-ao-agente-antigravity-e-alias-agy.md).
+
 ## Estado do plano e próximos passos
 
-O plano permanece em `status: in_progress`, `phase: execution`, com 0 h executadas dos passos de implementação no código. As três issues foram registradas em `work/issues/` para direcionar a execução na sessão apropriada do `brza-workflow`.
+O plano permanece em `status: in_progress`, `phase: execution`, com 0 h executadas dos passos de implementação no código. A sessão de implementação no `brza-workflow` foi iniciada no BrzA Studio para executar P1 a P5. Quatro issues foram registradas em `work/issues/` para documentar os desvios e preparar o terreno.

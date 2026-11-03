@@ -76,6 +76,7 @@ a ordem acima aplicou com saída 0 nas seis passagens (1 + 3 pareceres renomeado
   no ensaio; checador com 74 arquivos, 0 erros e 0 avisos; worklog do `tools-kit` em `57c29b5`.
 - **Fora do mapa D4:** três pareceres do PLN-009 criados em 2026-11-03 no `tools-kit` (`3d94663`, `8b622f8`, `5ef53de`)
   sem `REV-NNN`. Anderson escolheu, nesta data, "Issue no tools-kit (Recomendado)": a sessão dona do PLN-009 os numera.
+  Issue gravada pela sessão `tools-kit-rev-pln009` em `6292986`: [Os pareceres do PLN-009 sem número REV](os-pareceres-do-pln-009-sem-numero-rev.md).
   Não entram nesta MIG.
 - **Pendentes:** as aplicações em `brand`, `studio` e `playground`.
 

@@ -71,3 +71,19 @@ As descrições acima registram os relatos do upstream; o checkout local do Stud
 - **Transporte e conclusão são distintos:** `src/main/runtime/orchestration/send-agent-turn.ts:143-164` distingue recusa, fila e submissão pendente. A reconciliação de `worker_done` continua exigindo tarefa, dispatch e autoridade (`lifecycle-reconciliation.ts:182-254`). Texto no histórico não substitui esse protocolo.
 
 O aprofundamento é levantamento técnico. O recorte de implementação ainda depende de escolha; nenhum código foi alterado e nenhuma mensagem foi enviada a outra sessão.
+
+## Foco escolhido para detalhamento em 2026-11-03
+
+Anderson respondeu nesta sessão:
+
+> Coordenação entre sessões (Recomendado). Custo: adaptar list/read/send à CLI e integrar nomes, recibos e retry ao wrapper existente. Se paga: ao encaminhar trabalho para chats já abertos e acompanhar suas respostas.
+
+A resposta orienta a proposta técnica; não autoriza iniciar a implementação. O detalhamento cobre identificação da sessão existente, leitura, envio, recibos e retry. O levantamento de plugins permanece como referência para outra etapa.
+
+### Restrições verificadas para o contrato
+
+- `AgentSessionSendResult` distingue fila de submissão (`brza-studio/src/shared/agent-session/agent-session-wire.ts:317-332`). A submissão pode estar `pending`, `accepted`, `rejected` ou `unknown`; este último não significa envio nem falha confirmada (`src/shared/agent-session/journal/agent-session-journal-types.ts:396-411`).
+- Os testes de envio documentam replay com a mesma operação sem novo disparo e preservação de `unknown` mesmo com `retryUnknown` (`src/main/native-chat/agent-session-wire/structured-agent-session-send.test.ts:176-227`). Um retry não pode prometer resolver uma entrega incerta.
+- O cliente da CLI atual encaminha a origem do coordenador em orquestração e launch, mas não em `agentSession.send` (`src/cli/runtime/client.ts:134-142`). O wrapper já a encaminha; migrar o transporte exige manter essa informação.
+
+**Próxima rodada:** definir o acompanhamento das respostas e a política de envio durante trabalho em andamento. O foco de coordenação já foi escolhido; esses comportamentos ainda não foram aprovados.

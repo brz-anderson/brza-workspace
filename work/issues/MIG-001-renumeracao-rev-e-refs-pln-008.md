@@ -32,7 +32,7 @@ Prévia de 2026-11-03: 4 pareceres e 97 worklogs em `tools-kit` (29), `workspace
 
 ## Passos
 
-- [ ] P1 — Conferir as reservas `REV-001`..`REV-004` e `MIG-001` no índice da master.
+- [x] P1 — Conferir as reservas `REV-001`..`REV-004` e `MIG-001` no índice da master: bootstrap `4bb114e`; a aplicação respondeu "bootstrap em dia".
 - [ ] P2 — Aplicar em cada workstream pela sessão dona, no comando e na ordem de "Aplicação".
 - [ ] P3 — Provar os quatro nomes novos, a ausência dos antigos e os links resolvidos nos workstreams donos.
 - [ ] P4 — Conferir refs dos worklogs e remoção de date com tags e demais campos preservados, pelo bloco de
@@ -62,6 +62,22 @@ A ordem, porque os links cruzados só se reescrevem quando o destino já existe 
 Ensaio de 2026-11-03, num clone isolado em `/private/tmp/pln008-sandbox`, com remoto local e sem `BRZA_WORKSPACE`:
 a ordem acima aplicou com saída 0 nas seis passagens (1 + 3 pareceres renomeados; 29, 22, 4 e 43 worklogs em
 `tools-kit`, `workspace`, `brand` e `studio`), e os três blocos do critério passaram. O acervo real não foi tocado.
+
+## Execução
+
+- **`tools-kit`, item 1**, pela sessão `tools-kit-mig001`, em 2026-11-03: prévia igual ao ensaio (REV-001, 5 notas
+  com links, 29 worklogs); `--apply` com saída 0; commit `bf36704`, com push; índice `81620e3` e reconstrução
+  `6e10fd0` na master; checador com 73 arquivos, 0 erros e 0 avisos; worklog do `tools-kit` em `8600fa1`.
+- **`workspace`, item 2**, pela sessão `workspace-a6`, em 2026-11-03: prévia igual ao ensaio (REV-002 a REV-004, 5
+  notas com links, 22 worklogs); `--apply` com saída 0; commit `361d0d4`, com push; checador com 59 arquivos, 0
+  erros e 4 avisos `unknown-ref-mention` (PLN-029 e PLN-011, menções históricas que o D3 só avisa). O bloco de
+  preservação, restrito às duas árvores, conferiu 60 notas, 51 delas worklogs.
+- **`tools-kit`, item 3**, pela sessão `tools-kit-mig001`: prévia e `--apply` zerados, sem commit da migração, como
+  no ensaio; checador com 74 arquivos, 0 erros e 0 avisos; worklog do `tools-kit` em `57c29b5`.
+- **Fora do mapa D4:** três pareceres do PLN-009 criados em 2026-11-03 no `tools-kit` (`3d94663`, `8b622f8`, `5ef53de`)
+  sem `REV-NNN`. Anderson escolheu, nesta data, "Issue no tools-kit (Recomendado)": a sessão dona do PLN-009 os numera.
+  Não entram nesta MIG.
+- **Pendentes:** as aplicações em `brand`, `studio` e `playground`.
 
 ## Revisão antes da aplicação
 

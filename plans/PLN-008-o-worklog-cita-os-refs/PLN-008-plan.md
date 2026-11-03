@@ -17,11 +17,10 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** P6 em curso. A rodada da REV-005 fechou em 2026-11-03: A1 e A2 corrigidos na MIG-001 (bloco de
-  preservação e seção "Aplicação"), A3 falso; o ensaio num clone isolado passou nos três blocos do critério. Próximo:
-  a aplicação real, pelas sessões donas, na ordem da MIG-001 — `tools-kit`, `workspace`, `tools-kit` de novo e depois
-  `brand`, `studio` e `playground` —; esta sessão aplica o `workspace` quando Anderson pedir, depois do `tools-kit`.
-  P1–P4 continuam sem atestado integral; horas históricas não aferidas. P7 não iniciado.
+- **Retomar:** P6 em curso. MIG-001 aplicada em `tools-kit` (`bf36704`, segunda passagem sem mudança) e `workspace`
+  (`361d0d4`), com checador sem erros e preservação conferida em 60 notas. Próximo: aplicar em `brand`, `studio` e
+  `playground`, cada um pela sessão dona, e então rodar os três blocos do critério e concluir a MIG-001. P7 confere o
+  ponto do checador sobre parecer sem `REV-NNN`. P1–P4 sem atestado integral; horas históricas não aferidas.
 - **Histórico desta retomada:** tentativa de execução integral em 2026-11-03 encontrou a fronteira de repositório entre `workspace` e
   `brza-workflow` no Antigravity, registrando 4 issues:
   [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md),
@@ -248,7 +247,10 @@ Prévia: quatro renomeações e 97 worklogs (29 tools-kit, 21 workspace, 4 brand
 Revisão prévia em REV-005: A1 e A2 corrigidos na MIG-001, A3 falso, por rodada de 2026-11-03. Ensaio em clone
 isolado (`/private/tmp/pln008-sandbox`): seis passagens de `migrate_pln008.py --apply` na ordem da MIG saíram com 0, e
 os três blocos do critério passaram, o de preservação com 107 notas (98 worklogs); um commit mutante sem `tags` foi
-barrado. O acervo real ainda não foi migrado. P6 ainda não concluído; horas não aferidas.
+barrado. Aplicação real em 2026-11-03: `tools-kit` em `bf36704` (prévia igual ao ensaio; segunda passagem zerada) e
+`workspace` em `361d0d4` (REV-002 a REV-004, 22 worklogs); checador sem erros nas duas árvores; bloco de preservação
+restrito a elas: 60 notas, 51 worklogs. Faltam `brand`, `studio` e `playground`. P6 ainda não concluído; horas não
+aferidas.
 
 ### P7 — Revisar a entrega e fechar o plano
 
@@ -257,6 +259,8 @@ Executa D1 a D10 · executores: revisor independente e sessão principal · depe
 Estimado: 2 h · Executado: — h
 
 - [ ] Revisor independente confere Pedido/Cobertura contra disco e evidências; devolve achados com fonte e confiança.
+  Ponto a conferir, por escolha de Anderson em 2026-11-03 ("Achado para P7 (Recomendado)"): o checador não avisa
+  parecer novo sem `REV-NNN` em `work/reviews/`; três do PLN-009 no `tools-kit` nasceram assim, um deles depois do sync.
 - [ ] Sessão principal refaz evidências, conduz rodadas de destino e grava parecer REV numerado.
 - [ ] Rodar regressão final pertinente, registrar evidências/Executado e dar destino a todo achado.
 - [ ] Fechar o worklog e o plano quando os itens de Fechamento forem verdadeiros; nenhum achado aberto é ocultado.

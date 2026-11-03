@@ -1,8 +1,9 @@
 ---
-status: open
+status: done
 scope:
   - workspace
 opened: 2026-10-31
+completed: 2026-11-03
 owner: Anderson
 tags:
   - planning
@@ -27,3 +28,22 @@ A R5 fechou o índice: planos, issues e decisões; uma linha por evento, só acr
 - **Se o índice basta**, ou se ele precisa de campo que o PLN-006 não grava — `blocks`, `priority`, `owner`.
 
 O índice nasce no PLN-006; esta issue espera por ele.
+
+## Desfecho (2026-11-03)
+
+Anderson pediu, na sessão do `workspace`: o coordenador/orquestrador "prioriza a fila considerando a prioridade do
+pedido - issue high, bloqueia avanço de plano, prazo de entrega curto e etc -, o limite de workers em paralelo é geral
+do workspace somado, o cálculo também leva em consideração ritmo das contas e o recurso disponível na máquina pra
+limitar workers". A rodada que seguiu respondeu:
+
+- **"A mesma peça (Recomendado)":** o coordenador é o orquestrador do PLN-003, o MCP da fila, da conta e do runtime.
+  Esta issue fecha aqui e segue no [PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`](../../plans/PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md),
+  no workstream `tools-kit`.
+- **"A ordem da norma (Recomendado)":** a fila ordena por `deadline` próximo, depois `blocks`, depois `priority`
+  (`high`, `medium`, `low`), depois a chegada; `blocks` vence `priority` quando discordam. Por isso o índice da `master`
+  passa a gravar `priority`, `blocks` e `deadline` — a resposta ao terceiro ponto acima.
+- **"Soma às camadas (Recomendado)":** o teto geral de workers do workspace soma-se ao limite por conta e runtime da R7.1
+  do PLN-003 e ao da máquina; o menor manda.
+- **"Projeção e memória (Recomendado)":** o ritmo é a variação do `usedPercent` projetada até o `resetsAt`, e a conta
+  que chega a 90% antes do reset não recebe worker novo; a máquina limita pela memória livre e pelo swap, com a CPU como
+  segundo sinal.

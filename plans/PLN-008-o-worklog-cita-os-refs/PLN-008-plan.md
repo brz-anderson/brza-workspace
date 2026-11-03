@@ -14,13 +14,13 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** a Entrevista fechou nas rodadas 1 a 5. O levantamento do frontmatter (R4) ficou no scratch da sessão de
+- **Retomar:** a Entrevista fechou nas rodadas 1 a 6. O levantamento do frontmatter (R4) ficou no scratch da sessão de
   2026-11-03, fora do git: os números estão na R4. Próximo: pedir o Terreno a um subagente — o `brza note commit`,
   o `plan-open`, o `check_notes.py`, o `measure.py` e o índice, no `brza-workflow` — e escrever os itens `D`: o `refs:`
   preenchido sozinho, os IDs `REV-NNN` e `MIG-NNN`, a issue `type: migration` com o molde da R3.3, o preenchimento
   dos worklogs existentes e as skills que criam, revisam e executam a MIG e a REV (Pedido 4) — criar ou adaptar vai a
   uma rodada no Desenho —, e o item 5: as fontes da medição (R4.1), o aviso de `priority` (R4.2), o índice (R4.3),
-  `estimate_h` na issue (R5.2), o `date` dos worklogs (R5.3) e o `depends_on` (R5.1).
+  `estimate_h` na issue (R5.2), o `date` dos worklogs (R5.3), o `depends_on` (R5.1) e o `brza note ls` (R6.1).
 
 ## Pedido
 
@@ -64,6 +64,7 @@ mesma sessão.
 | `R4.3` | a linha do índice grava `priority`, `blocks`, `deadline`, `owner`, e no plano `estimate_h` e `remaining_h`; o `index --rebuild` refaz as antigas | — | — |
 | `R5.2` | a issue aceita `estimate_h` opcional, e o índice a grava | — | — |
 | `R5.3` | os worklogs perdem o `date`, mantêm o `tags`, e o checador avisa o `date` | — | — |
+| `R6.1` | o `brza note ls` lista issues e decisões de todos os workstreams, pelo índice, ordenadas por `opened`, `priority` ou `deadline` | — | — |
 
 ### Fora de escopo
 
@@ -240,7 +241,25 @@ Respondida em 2026-11-03, na sessão `workspace`.
 
    **Decidido — "Tirar o date, manter tags (Recomendado)".**
 
+### Rodada 6 — a data no nome de issues e decisões (enviada 2026-11-03)
+
+**Apresentado antes:** Anderson perguntou: "E se issues/ e decisions/ começarem a levar a data como prefixo no nome do
+arquivo, pode ajudar?". A chegada já está no `ts` da linha `created` do índice e no `opened` (32 de 32 issues, 5 de 5
+decisões); o id do índice é o slug da criação, que o rename não muda (`brza-workflow/bin/brza-note:61-62`); renomear
+atinge 37 notas, 95 links nas 4 branches e o `origin_ref` dos planos (`check_notes.py:286`); a decisão tem duas datas,
+`opened` e `decided`.
+
+Respondida em 2026-11-03, na sessão `workspace`.
+
+1. **A data como prefixo.** Opções: não, e um `brza note ls` que lista issues e decisões por `opened`, `priority` ou
+   `deadline`, lendo o índice (recomendada) — custo: ~1 h, estimado; se paga: na primeira busca pela mais recente ou
+   pela mais urgente; só nas novas — custo: ~0,5 h, dois padrões de nome e a data no id; se paga: só para o `ls`;
+   renomear todas — custo: ~1,5–2 h, 95 links, o `origin_ref` e o id descolado do nome; se paga: nunca para o
+   coordenador.
+
+   **Decidido — "Não; listar pelo opened (Recomendado)".**
+
 ## Worklogs
 
-- 2026-11-03 — aberto; R1 a R5 fecharam a Entrevista; parou antes do Terreno.
+- 2026-11-03 — aberto; R1 a R6 fecharam a Entrevista; parou antes do Terreno.
   [A abertura do PLN-008: o refs nos worklogs, o REV e o MIG](../../work/worklogs/2026-11-03-pln-008-a-abertura-do-refs-do-rev-e-do-mig.md)

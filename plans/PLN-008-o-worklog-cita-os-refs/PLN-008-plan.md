@@ -17,8 +17,12 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** corte em sete passos aceito na R13, em 2026-11-03; D1 a D10 e Cobertura consolidados. P1 é o primeiro
-  pendente e aguarda pedido explícito de execução. Estimado: 18 h; executado dos passos: 0 h. O ls começa local e
+- **Retomar:** tentativa de execução integral em 2026-11-03 encontrou a fronteira de repositório entre `workspace` e
+  `brza-workflow` no Antigravity, registrando 3 issues:
+  [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md),
+  [Falso negativo em test_brza_note quando TMPDIR contém brza-studio no caminho](../../work/issues/falso-negativo-em-test-brza-note-por-caminho-com-brza-studio.md) e
+  [Bloqueio de P6 e P7 sem a entrega publicada de P1 a P5 e sincronização do core](../../work/issues/bloqueio-de-p6-e-p7-sem-entrega-e-sync-do-core.md).
+  P1 a P5 aguardam sessão no repositório `brza-workflow`. Estimado: 18 h; executado dos passos: 0 h. O ls começa local e
   passa a fetch padrão se dados errados forem listados com frequência, conforme a emenda à R12.3.
 - **Dividido:** [PLN-008 — Entrevista](PLN-008-interview.md) · [PLN-008 — Desenho](PLN-008-design.md)
 
@@ -79,6 +83,11 @@ Os cenários abaixo são provas a implementar ou executar nos passos; não afirm
   fechado do checador.
 - **Uma pasta `work/migrations/` e o MIG como plano.** Perderam na R3.2.
 - **`session_id`, runtime, conta e modelo no frontmatter.** Ficam na medição e no `brza sessions` (R4.1).
+
+## Pendências conhecidas
+
+- [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md)
+- [Bloqueio de P6 e P7 sem a entrega publicada de P1 a P5 e sincronização do core](../../work/issues/bloqueio-de-p6-e-p7-sem-entrega-e-sync-do-core.md)
 
 ## Entrevista
 
@@ -257,6 +266,8 @@ python3 .claude/skills/notes-checker/scripts/check_notes.py
   [A abertura do PLN-008: o refs nos worklogs, o REV e o MIG](../../work/worklogs/2026-11-03-pln-008-a-abertura-do-refs-do-rev-e-do-mig.md)
 - 2026-11-03 — retomada; R7 a R13 respondidas; D1 a D10 e corte P1–P7 aceitos; execução aguarda pedido de P1.
   [O Terreno do PLN-008 para o Desenho](../../work/worklogs/2026-11-03-pln-008-o-terreno-para-o-desenho.md)
+- 2026-11-03 — tentativa de execução integral até o fim do plano; problemas e desvios registrados em 3 issues.
+  [Desvios e bloqueios na execução dos passos do PLN-008](../../work/worklogs/2026-11-03-pln-008-desvios-e-bloqueios-na-execucao-dos-passos.md)
 
 ## Fechamento
 

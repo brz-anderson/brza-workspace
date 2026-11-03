@@ -13,6 +13,8 @@ O Desenho segue em elaboração. Além do Terreno, estão confirmados:
 - **R8.1:** uma única `migration-runner` reúne criação, revisão e execução, com revisor independente.
 - **R10:** refs considera prosa, crases inline, links e citações históricas fora de cercas; menção textual
   desconhecida gera aviso sem entrar no campo.
+- **R11.1:** as quatro revisões recebem REV-001 a REV-004 pela primeira inclusão no git.
+- **R11.2:** `session` identifica a sessão que produziu a linha do índice, inclusive no rebuild.
 
 ## Terreno
 
@@ -47,8 +49,8 @@ Levantamento refeito em 2026-11-03. Os caminhos de código abaixo partem do `brz
 
 ### Lacunas para as rodadas
 
-Falta definir o mapeamento das quatro revisões para REV-001 a REV-004 e o tratamento da sessão no rebuild,
-e concluir os contratos de numeração, preenchimento do acervo, índice e listagem. Não houve implementação.
+Falta concluir os contratos de numeração, preenchimento do acervo, índice e listagem. O mapeamento das quatro REV
+e a sessão no rebuild estão definidos em D4 e D5. Não houve implementação.
 
 ## D1 — Uma única migration-runner conduz a MIG — `core/.claude/skills/migration-runner/`
 
@@ -131,3 +133,39 @@ exemplo: refs representa menção, sem afirmar trabalho executado ou dependênci
 
 **Alternativas recusadas em R10:** extrair também de cercas; bloquear toda menção textual desconhecida.
 A escolha preserva o texto histórico e avisa sobre possíveis erros de digitação sem gravar alvos inexistentes.
+
+## D4 — As quatro revisões recebem IDs em ordem cronológica — `work/reviews/`
+
+- **Origem:** R2.2; R3.4; R11.1.
+- **Contexto:** a ordem segue a primeira inclusão verificável no git, sem afirmar hora de redação ou autoria.
+
+### Como fica
+
+Cada caminho abaixo parte de `work/reviews/` no workstream indicado:
+
+| Workstream | Arquivo atual | Arquivo após a MIG-001 |
+| :--------- | :------------ | :-------------------- |
+| tools-kit | `pln-002-os-comandos-brza.md` | `REV-001-pln-002-os-comandos-brza.md` |
+| workspace | `pln-005-a-confianca-dos-fatos.md` | `REV-002-pln-005-a-confianca-dos-fatos.md` |
+| workspace | `pln-006-o-brza-init.md` | `REV-003-pln-006-o-brza-init.md` |
+| workspace | `pln-006-a-migracao.md` | `REV-004-pln-006-a-migracao.md` |
+
+O H1 troca somente `REV:` pelo ID correspondente seguido de dois-pontos. A MIG-001 registra este mapa, usa
+`move_note.py` e corrige os links nos workstreams donos; o mover de uma árvore não atualiza as demais.
+
+**Alternativa recusada em R11.1:** ordenar por plano e nome atual, que inverteria os dois pareceres PLN-006.
+O mapa é contrato para execução posterior; nenhuma nota foi renomeada nesta rodada.
+
+## D5 — Session identifica a operação que produziu a linha — `bin/brza-note`
+
+- **Origem:** R4.1; R11.2.
+- **Contexto:** o índice atual resolve a sessão corrente, inclusive ao reconstruir linhas de notas antigas.
+
+### Como fica
+
+`session` é o nome da sessão que produziu a linha do índice. Em `index --rebuild`, registra a sessão que executa
+a reconstrução; não recupera nem certifica a sessão de autoria da nota. Sem nome resolvido, o campo fica ausente.
+A documentação do índice explicita essa semântica. O comportamento atual de atribuição é mantido; a resolução
+do nome continua sujeita à verificação de R4.1.
+
+**Alternativa recusada em R11.2:** preservar a sessão registrada anteriormente e omitir a desconhecida no rebuild.

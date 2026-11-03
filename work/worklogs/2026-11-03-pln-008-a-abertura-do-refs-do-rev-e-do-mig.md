@@ -18,5 +18,12 @@ parado antes do Desenho.
   `.claude/agent-memory/designer/project_porte-da-fixfy-regua-sem-lastro.md`.
 - **As skills entraram no pedido.** Depois da R3, Anderson pediu: "Temos também que criar/adaptar skills para a
   criação, revisão e execução dessas novas notas". É o item 4 do Pedido; criar ou adaptar vai ao Desenho.
+- **O frontmatter para o coordenador entrou como item 5.** Anderson pediu um levantamento de "como o frontmatter das
+  notas pode melhorar visando um nelhor desempenhi no fluxo do coordenador", com o `sessionId` e o runtime. Um
+  `collector` varreu as 4 branches: nenhuma nota com `blocks` nem `deadline`, `priority` em 8 de 32 issues, e o índice
+  sem esses campos. As R4 e R5 deixaram sessão, runtime, conta e modelo na medição (consertando o `workstream` nulo, a
+  conta `home` e o `session` do índice), puseram aviso de `priority` no commit, os campos de pressão, o `owner` e as
+  horas no índice, `estimate_h` opcional na issue, tiraram o `date` dos worklogs e deixaram o `depends_on` para depois
+  do `refs:`.
 - **O que é norma comum:** o `work/README.md`, o `plans/README.md`, o checador e o `brza-note` moram no
   `brza-workflow`; os passos do PLN-008 mexem lá e chegam aqui pelo `brza sync`.

@@ -14,11 +14,13 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** a Entrevista fechou nas rodadas 1 a 3. Próximo: pedir o Terreno a um subagente — o `brza note commit`,
+- **Retomar:** a Entrevista fechou nas rodadas 1 a 5. O levantamento do frontmatter (R4) ficou no scratch da sessão de
+  2026-11-03, fora do git: os números estão na R4. Próximo: pedir o Terreno a um subagente — o `brza note commit`,
   o `plan-open`, o `check_notes.py`, o `measure.py` e o índice, no `brza-workflow` — e escrever os itens `D`: o `refs:`
   preenchido sozinho, os IDs `REV-NNN` e `MIG-NNN`, a issue `type: migration` com o molde da R3.3, o preenchimento
   dos worklogs existentes e as skills que criam, revisam e executam a MIG e a REV (Pedido 4) — criar ou adaptar vai a
-  uma rodada no Desenho.
+  uma rodada no Desenho —, e o item 5: as fontes da medição (R4.1), o aviso de `priority` (R4.2), o índice (R4.3),
+  `estimate_h` na issue (R5.2), o `date` dos worklogs (R5.3) e o `depends_on` (R5.1).
 
 ## Pedido
 
@@ -38,6 +40,12 @@ Os itens, numerados para a Cobertura:
 "Temos também que criar/adaptar skills para a criação, revisão e execução dessas novas notas" — Anderson, em
 2026-11-03, na mesma sessão, depois da R3.
 
+5. o frontmatter das notas e o índice servem ao coordenador do PLN-003 (R4, R5).
+
+"E o sessionId, runtime e infos assim no frontmatter do worklogs/ ou outras notas, faça um levantamento geral de como o
+frontmatter das notas pode melhorar visando um nelhor desempenhi no fluxo do coordenador" — Anderson, em 2026-11-03, na
+mesma sessão.
+
 ### Cobertura
 
 > Rascunho: o passo e o teste saem do Desenho.
@@ -51,12 +59,19 @@ Os itens, numerados para a Cobertura:
 | `Pedido 3` | a migração é issue `type: migration`, `work/issues/MIG-NNN-<assunto>.md`, com o molde da R3.3, e a MIG-001 é a renumeração das revisões | — | — |
 | `Pedido 4` | uma skill cria a MIG no molde, outra a revisa e outra a executa até o critério de conclusão, criadas ou adaptadas das que existem (`plan-runner`, `notes-checker`) | — | — |
 | `Pedido 4` | a revisão nasce com o `REV-NNN` pela skill que a escreve, a `plan-runner` em `references/conduct.md` | — | — |
+| `R4.1` | toda linha do `measurements.jsonl` dentro de um worktree tem `workstream`, a conta não sai `home`, e o `session` do índice resolve sempre que a sessão tem nome | — | — |
+| `R4.2` | o `brza note commit` avisa, sem barrar, a issue ou o plano aberto sem `priority` | — | — |
+| `R4.3` | a linha do índice grava `priority`, `blocks`, `deadline`, `owner`, e no plano `estimate_h` e `remaining_h`; o `index --rebuild` refaz as antigas | — | — |
+| `R5.2` | a issue aceita `estimate_h` opcional, e o índice a grava | — | — |
+| `R5.3` | os worklogs perdem o `date`, mantêm o `tags`, e o checador avisa o `date` | — | — |
 
 ### Fora de escopo
 
 - **Os IDs em `tags`, como na proposta.** Ficou o campo `refs:` (R1.1); o `tags` segue só para assunto, no vocabulário
   fechado do checador.
 - **Uma pasta `work/migrations/` e o MIG como plano.** Perderam na R3.2.
+- **`session_id`, runtime, conta e modelo no frontmatter.** Ficam na medição e no `brza sessions` (R4.1).
+- **`depends_on`.** Espera o `refs:`, e se decide no Desenho daqui (R5.1).
 
 ## Entrevista
 
@@ -163,7 +178,69 @@ Respondida em 2026-11-03, na sessão `workspace`.
 
    **Decidido — "Sim (Recomendado)".**
 
+### Rodada 4 — o frontmatter para o coordenador (enviada 2026-11-03)
+
+**Apresentado antes:** o levantamento de um `collector` nas 4 branches `workstream/*`: 8 planos, 32 issues, 93
+worklogs, 5 decisões e 4 revisões; nenhuma nota com `blocks` nem `deadline`, e `priority` em 8 de 32 issues (conferido
+por `git grep`). O índice da `master` grava `ts`, `event`, `kind`, `id`, `path`, `title`, `description`, `status`,
+`workstream`, `worktree`, `commit`, `phase` (só plano) e `session`, o nome da sessão, em 14 de 50 linhas
+(`brza-workflow/bin/brza-note:524-551`). A medição já guarda, por turno, `session_id`, `cwd`, `workstream`, conta,
+modelo e esforço, mas o `workstream` é nulo em 176 de 573 turnos e a conta sai `home` (`measure.py:84-87`; o M16 do
+PLN-003); o `brza sessions list` dá o runtime pelo prefixo do id. A recomendação: o frontmatter guarda o que se julga e
+o que liga as notas, e o fato da execução fica na medição.
+
+Respondida em 2026-11-03, na sessão `workspace`.
+
+1. **`session_id`, runtime, conta e modelo no frontmatter.** Opções: não, e consertar as fontes — o `workstream` nulo,
+   a conta `home` e o `session` do índice (recomendada) — custo: ~2–3 h, estimado; se paga: no primeiro dia da fila;
+   `session_id` no worklog — custo: ~1 h e um id que troca no `/clear`; se paga: só se a retomada pelo id exato virar
+   requisito; todos no frontmatter — custo: ~2 h e cópias que envelhecem; se paga: nunca.
+
+   **Decidido — "Não; consertar as fontes (Recomendado)".**
+
+2. **O preenchimento de `priority`, `blocks` e `deadline`.** Opções: aviso no `brza note commit`, e a ausência vai ao
+   fim da fila (recomendada) — custo: ~0,5 h; se paga: na primeira semana da fila; o checador barra — custo: ~0,5 h e
+   atrito; se paga: só depois que a omissão atrapalhar; nada muda — custo: 0; se paga: nunca.
+
+   **Decidido — "Aviso no commit (Recomendado)".**
+
+3. **Os campos do índice.** Opções: os três decididos, `owner` e as horas do plano, com o `index --rebuild`
+   (recomendada) — custo: ~1,5 h, estimado; se paga: no primeiro plano despachado; só os três — custo: ~1 h; se paga:
+   agora, com o coordenador abrindo o plano para as horas.
+
+   **Decidido — "Os 3 + owner e horas (Recomendado)".**
+
+4. **O destino.** Opções: o PLN-008 (recomendada) — custo: ~4–5 h a mais, estimado; se paga: agora, com um desenho só;
+   o PLN-003 — custo: um pedido ao `tools-kit` e dois planos no mesmo `brza-note`; se paga: só se a fila vier antes; um
+   PLN novo — custo: ~20 min e um terceiro plano; se paga: só se o PLN-008 tiver de fechar logo.
+
+   **Decidido — "No PLN-008 (Recomendado)".** É o item 5 do Pedido.
+
+### Rodada 5 — dependência, estimativa e os worklogs do studio (enviada 2026-11-03)
+
+**Apresentado antes:** os três pontos restantes do mesmo levantamento.
+
+Respondida em 2026-11-03, na sessão `workspace`.
+
+1. **A dependência.** Opções: esperar o `refs:` e decidir `depends_on` no Desenho daqui (recomendada) — custo: 0;
+   se paga: no Desenho; `depends_on` agora — custo: ~1 h e duplica `blocks` e `refs`; se paga: só se o `refs` não
+   cobrir; o agente do M11 lê `blocks` — custo: chamada e erro de prosa; se paga: nunca.
+
+   **Decidido — "Esperar o refs (Recomendado)".**
+
+2. **A estimativa na issue.** Opções: só no plano (recomendada) — custo: 0; se paga: agora, mas o teto não vê a issue
+   sem plano; opcional na issue — custo: ~0,3 h no checador e no índice; se paga: só se a issue que vira tarefa direta
+   for frequente.
+
+   **Decidido — "Opcional na issue".**
+
+3. **Os 40 worklogs do studio com `date` e `tags`.** Opções: tirar o `date` e manter o `tags`, com o checador avisando
+   (recomendada) — custo: ~0,3 h de script; se paga: quando o coordenador consultar por data; só o `scope` — custo: o
+   mesmo; se paga: nunca; deixar como está — custo: 0; se paga: agora, com duas formas.
+
+   **Decidido — "Tirar o date, manter tags (Recomendado)".**
+
 ## Worklogs
 
-- 2026-11-03 — aberto; R1 a R3 fecharam a Entrevista; parou antes do Terreno.
+- 2026-11-03 — aberto; R1 a R5 fecharam a Entrevista; parou antes do Terreno.
   [A abertura do PLN-008: o refs nos worklogs, o REV e o MIG](../../work/worklogs/2026-11-03-pln-008-a-abertura-do-refs-do-rev-e-do-mig.md)

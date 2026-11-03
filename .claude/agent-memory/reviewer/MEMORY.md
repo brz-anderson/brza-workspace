@@ -1,3 +1,4 @@
 - [Erros em plano extraído](padroes-de-erro-em-planos-extraidos.md) — itens que caem entre planos, limiar sem rodada, P0 não absorvido, papel trocado
 - [Estado muda na revisão](estado-muda-durante-a-revisao.md) — outras sessões commitam no worktree; reconferir git log antes de devolver
-- [Achados que caem](achados-que-costumam-cair.md) — limiar no texto da opção, endpoint que existe, despacho brza que funciona
+- [Achados que caem](achados-que-costumam-cair.md) — limiar no texto da opção, endpoint que existe, despacho brza que funciona, KeepAlive após bootout
+- [Erros no brza-mcp](padroes-de-erro-em-codigo-brza-mcp.md) — teste sem conferir o código de saída, timeout menor que o shutdown, erro antes do unlink

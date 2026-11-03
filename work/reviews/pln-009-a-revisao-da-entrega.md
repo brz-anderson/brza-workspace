@@ -57,3 +57,34 @@ A conta explícita divergente fica retida; a conta resolvida fica no worker; con
 A3 foi corrigido no checklist. Todos os achados têm destino; os casos manuais seguem pendentes.
 O cache de contas continua com TTL de 30 s e o CLI não oferece transação de conta com o app: a correção não
 prova ausência de troca externa entre a leitura e a abertura. Esse limite permanece para avaliação no C4.
+
+### P8 — O `stop` que apaga o plist
+
+O C1 no launchd real achou o plist com `RunAtLoad` depois do `stop` (PLN-009/R7.1). O P8 o corrigiu, e a correção
+foi revisada em duas rodadas, sobre o diff sem commit em cima do `354d004`.
+
+**r1, em paralelo:**
+- **O `agy` (`gemini-3.8-flash-high`):** 6 achados.
+- **O `reviewer` (Opus):** 4 achados e 1 ponto para rodada.
+- **Destinos,** pela recomendada:
+  - **O teste do `start` depois do `stop`** passava com o `start` saindo 1 e levava 15 s (Flash 1, Opus A2). →
+    corrigido aqui.
+  - **O `bootout` que falha com o agente já fora** deixava o plist (Flash 2, ponto do Opus). Agora conta como
+    descarregado; com o agente carregado, o plist fica. → corrigido aqui.
+  - **O teste do CLI com plist órfão** chamava o `launchd.stop()` antes (Flash 3). → corrigido aqui.
+  - **O `stop` sem `timeout` e o prazo de 5 s,** abaixo do `join(5.0)` do scheduler e do `ExitTimeOut` de 20 s do
+    launchd (Flash 4 e 6, Opus A1). Agora `stop(timeout=25)` e `--timeout`. → corrigido aqui.
+  - **A ajuda e a mensagem do `stop`** não falavam do plist (Opus A4). → corrigido aqui.
+  - **A corrida entre `start` e `stop` concorrentes** (Flash 5, Opus A3). → issue
+    [O start e o stop do MCP concorrentes](../issues/o-start-e-o-stop-do-mcp-concorrentes.md).
+
+**r2 pelo `agy` (Flash):** sem achado.
+- Os 5 achados corrigidos aqui foram conferidos.
+- Dos 3 testes novos, 1 falha no código da r1. Os outros 2 barram as mutações M1 e M2 do código novo.
+
+**Gate:**
+- `tests/mcp` → 358 OK, um pulado.
+- `tests/cli` limpo → 445 OK.
+- `test_mcp_lifecycle` em 8 s.
+
+**Commit:** `brza-workflow@007383a`. O C1 refeito com ele foi aprovado.

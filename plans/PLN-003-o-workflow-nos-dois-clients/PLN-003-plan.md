@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: sim
+ready: sim — P0 concluído (H1 a H6 medidas e D3–D7 ajustados); próximo passo: P1
 estimate_h: 58.0
-executed_h: 0.0
-remaining_h: 58.0
+executed_h: 0.4
+remaining_h: 54.5
 scope:
   - workspace
   - brza-studio
@@ -17,7 +17,7 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** o P0 (medição das hipóteses H1 a H6 da fase 0) está em execução na sessão Antigravity `antigravity_462439a0_03c3_483b_a0db_e72f48caf392` ("PLN-003 P0: Medição da fase 0").
+- **Retomar:** P0 concluído em 2026-11-03 (H1 a H6 confirmadas e itens `D3` a `D7` ajustados no [Desenho](PLN-003-design.md)); próximo passo: **P1** (o índice da `master` com `priority`, `blocks` e `deadline` em `scripts/brza/brza-note`).
 - **A fila do orquestrador (2026-11-03):** a R9, respondida na sessão `bb0fd632` do `workspace`, fez do coordenador o
   orquestrador e deu a ordem da fila e os três tetos de workers; o Desenho mudou nas premissas, no M8, no M17, na
   regra da fila e no M24 novo (o índice da `master` grava `priority`, `blocks` e `deadline`). Os itens `D` partem daí.
@@ -89,17 +89,17 @@ fechou lá e passou ao PLN-003 (R9.1).
 
 Executa R7.3, H1–H6 · executor: sessão `pln-003-p0`
 
-Estimado: 3.5 h · Executado: — h
+Estimado: 3.5 h · Executado: 0.4 h
 
-- [ ] **1. Medir H1:** expansão de `${ORCA_AGENT_SESSION_ID}` no header do `.mcp.json`.
-- [ ] **2. Medir H2:** execução de `claude -p` sob processo em background gerenciado por `launchd`.
-- [ ] **3. Medir H3:** comportamento do `agentSession.switchAccount` em chat ativo.
-- [ ] **4. Medir H4:** execução de `orca orchestration` fora do shell com env `ORCA_*`.
-- [ ] **5. Medir H5:** viabilidade do servidor MCP HTTP/SSE com Python 3 stdlib.
-- [ ] **6. Medir H6:** execução de `workflows/*.js` pelo SDK nos dois apps.
-- [ ] **7. Registrar:** worklog e atualização dos itens `D` afetados no Desenho.
+- [x] **1. Medir H1:** expansão de `${ORCA_AGENT_SESSION_ID}` no header do `.mcp.json` (confirmada no CLI `2.1.317` e no SDK `0.3.284`; exige `"type": "http"` em `D3`).
+- [x] **2. Medir H2:** execução de `claude -p` sob processo em background gerenciado por `launchd` (confirmada sem TTY via `setsid()` nos perfis gerenciados; exige omitir `CLAUDE_CONFIG_DIR` na conta `systemDefault` em `D6` e `~/.local/bin` no `PATH` em `D4`).
+- [x] **3. Medir H3:** comportamento do `agentSession.switchAccount` em chat ativo (confirmada por RPC no socket local `orca-runtime.json` para sessão em repouso `at-rest`, com cópia de transcripts e 15 testes de unidade verdes; bloqueada em `turnActive`).
+- [x] **4. Medir H4:** execução de `orca orchestration` fora do shell com env `ORCA_*` (confirmada injetando `ORCA_AGENT_SESSION_ID` do header `X-Brza-Session` e `ORCA_USER_DATA_PATH` no `env` do subprocesso em `D5`).
+- [x] **5. Medir H5:** viabilidade do servidor MCP HTTP/SSE com Python 3 stdlib (confirmada com `ThreadingHTTPServer` atendendo Streamable HTTP `/mcp` e SSE legado `/sse` em `D4`).
+- [x] **6. Medir H6:** execução de `workflows/*.js` pelo SDK nos dois apps (confirmada com ferramenta `Workflow` e `local_workflow` no SDK `0.3.284`; gramática AST documentada em `D3`).
+- [x] **7. Registrar:** worklog e atualização dos itens `D` afetados no Desenho (`D3` a `D7`).
 
-**Evidência:** —
+**Evidência:** [O PLN-003: a medição das hipóteses da fase 0 (P0)](../../work/worklogs/2026-11-03-pln-003-medicao-das-hipoteses-p0.md) e ajustes em `D3`–`D7` no [Desenho](PLN-003-design.md).
 
 ### P1 — O índice da `master` com propriedades de ordenação
 
@@ -330,3 +330,5 @@ Estimado: 3.0 h · Executado: — h
   [O PLN-003: o painel de componentes](../../work/worklogs/2026-11-03-pln-003-o-painel-de-componentes.md)
 - 2026-11-03 — o Desenho ajustado para sessão por frente; itens D1 a D9, hipóteses H1 a H6 e passos P0 a P14 escritos.
   [O PLN-003: os itens D e os passos](../../work/worklogs/2026-11-03-pln-003-itens-d-e-passos-do-workflow-nos-dois-clients.md)
+- 2026-11-03 — o P0 mediu e confirmou as hipóteses H1 a H6 da fase 0; ajustes técnicos incorporados aos itens `D3` a `D7` do Desenho.
+  [O PLN-003: a medição das hipóteses da fase 0 (P0)](../../work/worklogs/2026-11-03-pln-003-medicao-das-hipoteses-p0.md)

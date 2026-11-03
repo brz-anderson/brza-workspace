@@ -1,8 +1,8 @@
 # PLN-003 — Desenho
 
 > **Desenho consolidado (2026-11-03).** A matriz e os itens `D` (D1 a D9) foram definidos a partir do Terreno,
-> das rodadas R1 a R11 e dos resultados do spike do C5. Os riscos da fase 0 estão registrados como hipóteses H1 a H6 (R7.3),
-> a serem validadas no passo P0.
+> das rodadas R1 a R11 e dos resultados do spike do C5. As hipóteses da fase 0 (H1 a H6, R7.3) foram medidas e
+> confirmadas no passo P0 (2026-11-03), com ajustes incorporados aos itens `D3` a `D7`.
 
 ## O que este desenho assume
 
@@ -220,7 +220,7 @@ Horas: estimadas, na régua do PLN-002 (1,5–3 h estimado por `brza-*`, 0,2–0
 | B6 | servidor HTTP residente, launchd, porta, token, `brza mcp start/stop/status` | R3.4 | mcp + verbo na cli | 4–6 | fase 2 | sim | C3 |
 | B7 | painel de componentes com worker: planos, notas e worklogs em Tree, Table e Markdown; os botões chamam o MCP (R10.3) | R1.2, R10.1, R10.3; F28 (painel) | plugin do Orca (painel e worker) + mcp (os verbos dos botões, fase 2) | 6–10, sem refazer com a R10 | fase 2 | sim | C5 |
 | B8 | skills e hooks no plugin, `brza:`; raiz por env | R4.3 | plugin do Claude + `CLAUDE.md`/glossário | 3 +1 (raiz do `measure.py`/`check_notes.py`) | fase 1 | sim | C4 |
-| B9 | piloto `workflows/*.js` (Terreno) | R4.4 | plugin do Claude | 2 | fase 2 | sim, a medir (`@internal`) | C4 |
+| B9 | piloto `workflows/*.js` (Terreno) | R4.4 | plugin do Claude | 2 | fase 2 | sim (medido no P0, H6) | C4 |
 | B10 | shim npm/npx/pnpm | R3.1 | cli | 2 | fase 3 | — | C2 |
 
 ### O orquestrador (R4.1) fundido com as issues
@@ -234,13 +234,13 @@ Alternativas viáveis na coluna "Alt"; o porquê em uma linha.
 | M3 | Nome de sessão como chave (`pln-NNN-pX`), chat-namer, `/rename` | F4, F5, F28 | `plans/README.md` (convenção) + hook do plugin (nomeia no arranque) + cli `brza sessions rename` | só convenção | 1,5–2 | fase 1 | parcial, a medir (rename de aba pela CLI) | C1 + C4 | o roteador acha sessão pelo nome; nome solto quebra o roteamento |
 | M4 | Escolha de runtime (Claude/Codex/agy) | R4.1; F10, F11 | mcp (regra) + cli `sessions open --agent` | ACP do app (F10 original) | 2–3 (+1 agy) | fase 3 | sim (`agent launch --agent`, `worker-start --agent`) | C3 | depende de M2 e de M8; Codex/agy ainda raros |
 | M5 | Codex como cartão via agente Claude que roda `codex exec` | F6 | plugin do Claude (agent `brza:codex`, `-s read-only` por padrão) | M4 (sessão de terminal) | 1–1,5 | fase 2, 1ª revisão pelo Codex | sim | C4 | dá o cartão nativo sem tocar o app |
-| M6 | Conta por chamada | R4.1; F13 | mcp decide; cli executa `claude -p` com `CLAUDE_CONFIG_DIR`; chat por `agentSession.switchAccount` | flag de conta no fork | 2–4 | fase 2 (só consultor `-p`) / fase 3 (sessão) | a medir (`switchAccount`) | C3 | `agentSession.create` não tem conta; `-p` tem |
+| M6 | Conta por chamada | R4.1; F13 | mcp decide; cli executa `claude -p` com `CLAUDE_CONFIG_DIR` (omitido na `systemDefault`); chat em repouso por RPC `agentSession.switchAccount` | flag de conta no fork | 2–4 | fase 2 (só consultor `-p`) / fase 3 (sessão) | sim (medido no P0, H2 e H3) | C3 | `agentSession.create` não tem conta; `-p` e `switchAccount` têm |
 | M7 | Sinal de cota por conta | R4.1; F14 | cli `brza quota` (sobre `orca account list --json`) + mcp consome | ler o JSON no mcp sem verbo | 1,5 | fase 2 | sim | C2 | o verbo serve ao humano e ao Codex; o mcp só lê |
 | M8 | Fila/semáforo persistente (SQLite stdlib): ordena por `deadline`, `blocks`, `priority` e chegada, lidos do índice da `master` (M24); worker novo só sob o menor de três tetos — o geral do workspace, somado; o por conta e runtime (R7.1), com o ritmo projetado até o `resetsAt` e o corte a 90%; e o da máquina, pela memória livre e o swap, com a CPU como segundo sinal | R4.1, R7.1, R9.2–R9.4 | mcp | global; só por conta; fila por chegada | 4–6, sem refazer com a R9 | fase 2, 1º choque de cota | sim | C3 | o `Coordinator.maxConcurrent` do Orca só vive em gates (terreno-orquestrador); a fila por chegada deixa o pedido que trava um plano atrás do que não trava |
 | M9 | Modelo/esforço pela política "O modelo segue a tarefa" | R4.1; F16 (parte) | `AGENTS.md` (prosa) + arquivo de política (tabela) + mcp (impõe no que abre) | só norma; mcp lê a tabela do `AGENTS.md` | 1,5–2 | fase 2 | sim (`--model --effort`) | C7 | hoje a regra é só texto e a medição mostra Opus em tudo |
 | M10 | Chave de desligamento por dimensão (modelo/esforço, agente, tudo → passthrough) | R4.1 | mcp (config) + cli `brza mcp config` | só env | 0,5–1 | fase 2 | sim | C3 | "pode ser desativado" é requisito do pedido |
 | M11 | Agente interno que desempata: a cota fica na tabela; o texto vai ao `tev1:4b` local (Ollama, `/v1/systemone`) e, abaixo do limiar de confiança, ao Haiku (`claude -p --json-schema`, `--max-budget-usd`) — rodada de 2026-11-03, abaixo | R4.1, R5.1 | mcp | agente em toda chamada; regra pura; só o Haiku; Jev em nuvem, para quem não tem Ollama | 3–4 | fase 2b, quando a medição mostrar empate | sim | C3 | regra é grátis e instantânea; o `tev1` desempata em ~0,09 s, sem custo, e o Haiku paga só na dúvida |
-| M12 | Quem chamou: header `X-Brza-Session: ${ORCA_AGENT_SESSION_ID}` + client | R3.4 (consequência); R4.1 | plugin do Claude (`.mcp.json`) + mcp | argumento `caller` na ferramenta | 1–2 | fase 2 | sim, a medir | C4 + C3 | residente não herda `ORCA_*` |
+| M12 | Quem chamou: header `X-Brza-Session: ${ORCA_AGENT_SESSION_ID}` + client | R3.4 (consequência); R4.1 | plugin do Claude (`.mcp.json` com `"type": "http"`) + mcp | argumento `caller` na ferramenta | 1–2 | fase 2 | sim (medido no P0, H1) | C4 + C3 | residente não herda `ORCA_*` |
 | M13 | Ciclo de vida pelo `orca orchestration` (task, dispatch, worker-start, ask/reply, worker_done) | R4.1; F19 | mcp chama a cli do client detectado | reimplementar no mcp | 3–4 | fase 2 | sim | C3 + C8 | reaproveita o ciclo; o roteamento é nosso ("does not schedule or place workers") |
 | M14 | O fim volta ao chamador (espera × aviso; turno ocioso) | F11 | mcp (via `worker_done`) | bloquear até o fim | 2–3 | fase 2 | sim | C3 | sem isso o executor vira fogo-e-esquece |
 | M15 | Gate de aprovação (abrir executor, trocar conta) | conflito K3 | `AGENTS.md` (quando) + mcp devolve proposta + sessão principal pergunta | gate do `orca orchestration` | 1–2 | fase 2 | sim | C1 + C3 | preserva "quem pergunta é a principal" |
@@ -328,35 +328,50 @@ regra de comportamento (isso é `AGENTS.md`) nem mecânica do Claude (`CLAUDE.md
 O `DESIGN.md` no formato de design system para agentes de UI (o do Google Stitch) saiu do PLN-003 e foi ao workstream
 `brand` (R10.2, R11.1).
 
-## Hipóteses da fase 0 a medir no P0 (R7.3)
+## Hipóteses da fase 0 medidas no P0 (R7.3)
 
-Os riscos identificados na matriz e na R7.3 são formulados como hipóteses para medição na sessão `pln-003-p0`.
-Qualquer falha reescreve os itens `D` correspondentes antes do início da fase de código.
+As seis hipóteses da fase 0 foram medidas em 2026-11-03 no passo P0
+([O PLN-003: a medição das hipóteses da fase 0 (P0)](../../work/worklogs/2026-11-03-pln-003-medicao-das-hipoteses-p0.md)).
+Todas foram confirmadas, com ajustes incorporados aos itens `D3` a `D7`.
 
-- **H1 (sobre D3/D4 — M12):** O Claude Code e o SDK expandem `${ORCA_AGENT_SESSION_ID}` no `.mcp.json` para os headers
-  HTTP de chamada ao servidor MCP.
-  - *Se confirmar:* o MCP residente identifica a sessão chamadora diretamente no cabeçalho `X-Brza-Session`.
-  - *Se falhar:* a ferramenta `dispatch` exige `caller_session_id` como argumento obrigatório.
-- **H2 (sobre D4/D6 — M6, M11):** O `claude -p` com `CLAUDE_CONFIG_DIR` executa com sucesso e sem dependências de terminal
-  interativo a partir de um processo em background sob `launchd`.
-  - *Se confirmar:* o MCP invoca o agente desempatador Haiku via subprocesso direto.
-  - *Se falhar:* o daemon roda com wrapper de shell preservando o ambiente do usuário macOS ou usa fila externa.
-- **H3 (sobre D6/D7 — M6):** O comando `agentSession.switchAccount` no chat dos clients troca a conta de uma sessão
-  existente de forma limpa e sem perda de histórico.
-  - *Se confirmar:* o orquestrador pode reaproveitar sessões de chat abertas alternando contas.
-  - *Se falhar:* troca de conta requer abertura de nova sessão com ambiente isolado ou execução via `claude -p`.
-- **H4 (sobre D5 — M13):** O `orca orchestration` (run, task, worker-start) opera a partir de subprocesso sem herdar as
-  variáveis `ORCA_*` do chat ativo.
-  - *Se confirmar:* o MCP coordena o ciclo de vida dos workers chamando a CLI do client detectado.
-  - *Se falhar:* o MCP gerencia o estado e o ciclo dos workers diretamente no SQLite local sem o runtime do Orca.
-- **H5 (sobre D4 — B6):** O servidor MCP sobre HTTP/SSE pode ser implementado exclusivamente com a biblioteca padrão de
-  Python 3 (sem bibliotecas externas pesadas).
-  - *Se confirmar:* a distribuição do MCP permanece autocontida e de inicialização imediata.
-  - *Se falhar:* empacota-se uma dependência ASGI leve (`uvicorn`/`starlette`) no pacote Python do `brza`.
-- **H6 (sobre D3 — B9):** O recurso `@internal` de `workflows/*.js` em plugins do Claude é executado pelo SDK nos chats dos
-  dois aplicativos.
-  - *Se confirmar:* os roteiros de fluxo do workspace rodam como workflows nativos de Claude Code.
-  - *Se falhar:* os roteiros rodam via comandos slash do plugin ou pelo comando `brza workflow run` na CLI.
+- **H1 (sobre D3/D4 — M12) — CONFIRMADA (com ajuste em D3):** O Claude Code (`2.1.317`) e o `@anthropic-ai/claude-agent-sdk`
+  (`0.3.284`) expandem `${ORCA_AGENT_SESSION_ID}` nos headers HTTP do `.mcp.json` em todas as requisições do protocolo
+  (`server/discover`, `initialize`, `notifications/initialized`, `GET /mcp` SSE, `tools/list`, `tools/call`).
+  - *Ajuste em D3:* o `.mcp.json` precisa declarar explicitamente `"type": "http"` (ou `"type": "sse"`); sem `"type"`, o
+    Claude Code assume `stdio` e ignora o servidor HTTP.
+- **H2 (sobre D4/D6 — M6, M11) — CONFIRMADA (com ajuste em D4 e D6):** O `claude -p --model haiku --effort low --output-format json --json-schema ... --max-budget-usd 0.01 --no-session-persistence`
+  executa em processo desanexado sem TTY (`start_new_session=True` / `setsid()`, `stdin=DEVNULL`, `cwd=/tmp`, env mínimo de
+  `launchd`) em 3,3–4,6 s com `CLAUDE_CONFIG_DIR` apontando aos perfis gerenciados (`~/.claude-adm` e `claude-profiles/<id>/home`).
+  - *Ajuste em D6:* para a conta `systemDefault` (`~/.claude`), `CLAUDE_CONFIG_DIR` **deve ser omitido** do `env`; defini-lo
+    explicitamente como `~/.claude` muda o sufixo de hash da chave no Keychain do macOS (`Claude Code-credentials-<hash>`)
+    e falha com `OAuth session expired`.
+  - *Ajuste em D4:* o plist do `launchd` deve incluir `~/.local/bin` no `PATH`.
+- **H3 (sobre D6/D7 — M6) — CONFIRMADA (para sessão em repouso via RPC local, com ajuste em D6 e D7):** O método RPC
+  `agentSession.switchAccount` no socket local (`orca-runtime.json`) troca a conta de uma sessão existente em repouso
+  (`at-rest`), incrementando `fence` e copiando atomicamente o transcript `.jsonl` e a pasta de subagentes para o diretório
+  `projects/` da conta de destino (`copyClaudeTranscriptsToAccount`), além de passar nos 15 testes de unidade de
+  `claude-account-switch.test.ts` e `structured-agent-session-account-switch.test.ts`.
+  - *Ajuste em D6 e D7:* `agentSession.switchAccount` é um método RPC do socket `orca-runtime.json` (exige `MutationEnvelope`),
+    não um subcomando da CLI, e recusa troca enquanto um turno está ativo (`reason: "turnActive"`).
+- **H4 (sobre D5 — M13) — CONFIRMADA (injetando `ORCA_AGENT_SESSION_ID` no subprocesso, com ajuste em D5):** Chamadas de
+  leitura (`run-list`) funcionam sem variáveis `ORCA_*`, mas `run-create`, `task-create` e `task-update` exigem
+  `ORCA_AGENT_SESSION_ID` no `env` do subprocesso para vincular a Run ao chat chamador sem cair em `no_active_sender_terminal`
+  ou `consumer_fenced` (passar `--from orca_session_id:<id>` sem a variável no `env` é barrado com
+  `session_caller_chat_not_declarable`).
+  - *Ajuste em D5:* o daemon MCP injeta `ORCA_AGENT_SESSION_ID=<valor do header X-Brza-Session>` e `ORCA_USER_DATA_PATH` no
+    `env` de cada subprocesso `orca orchestration`, usando `--task-title` e `--status completed`.
+- **H5 (sobre D4 — B6) — CONFIRMADA (com ajuste em D4):** Um servidor MCP em Python 3 stdlib (~160 linhas com
+  `http.server.ThreadingHTTPServer`) atende tanto o transporte **Streamable HTTP** (`POST /mcp` + `GET /mcp` SSE) quanto o
+  **SSE legado** (`GET /sse` + `POST /messages`) no CLI e no SDK dos dois apps, sem dependências externas.
+  - *Ajuste em D4:* usar obrigatoriamente `ThreadingHTTPServer` com `protocol_version = "HTTP/1.1"` e `Content-Length`,
+    pois o Claude Code mantém uma conexão `GET /mcp` (SSE) aberta enquanto dispara `POST /mcp` (`tools/list`, `tools/call`)
+    em paralelo.
+- **H6 (sobre D3 — B9) — CONFIRMADA (com gramática exata em D3):** O `@anthropic-ai/claude-agent-sdk@0.3.284` dos dois apps
+  carrega `workflows/*.js` de plugins locais e expõe a ferramenta nativa `Workflow` sem exigir flags extras de ambiente,
+  executando subagentes via `await agent(...)` em `local_workflow`.
+  - *Ajuste em D3:* o validador AST (Acorn) do Claude Code exige `export const meta = { ... }` literal no topo, proíbe
+    qualquer outro `export` (como `export default`; usa-se `return` no nível superior do script) e define `phase("<título>")`
+    como instrução simples e `await agent("<prompt>", { label, model, tools, schema })` com o prompt como 1º argumento.
 
 ## D1 — O repositório público e a CLI `brza` unificada — `brz-anderson/brza`, `~/.local/bin/brza` (P2, P3)
 
@@ -428,11 +443,13 @@ Qualquer falha reescreve os itens `D` correspondentes antes do início da fase d
 4. **Hooks:**
    - Hook de inicialização: renomeia a sessão para `pln-NNN-pX` ou slug do plano em foco (M3).
    - Hook `Stop` para turnos longos: emite alerta para o iPhone/iCloud via `brza notify` quando uma execução longa conclui (M20).
-5. **Configuração MCP (.mcp.json):** Conecta ao servidor residente:
+5. **Configuração MCP (`.mcp.json`, validado em H1):** Conecta ao servidor residente declarando obrigatoriamente `"type": "http"`
+   (sem esse campo, o Claude Code assume `stdio` e ignora a URL):
    ```json
    {
      "mcpServers": {
        "brza-orchestrator": {
+         "type": "http",
          "url": "http://127.0.0.1:4242/mcp",
          "headers": {
            "X-Brza-Session": "${ORCA_AGENT_SESSION_ID}"
@@ -441,7 +458,10 @@ Qualquer falha reescreve os itens `D` correspondentes antes do início da fase d
      }
    }
    ```
-   *(Sob hipótese H1)*.
+6. **Gramática de `workflows/*.js` (validada em H6):** Os roteiros em `workflows/` seguem a gramática exigida pelo validador
+   AST do Claude Code: `export const meta = { name, description, whenToUse, phases }` literal no topo do arquivo, nenhum outro
+   `export` (resultado devolvido com `return` no nível superior do script), `phase("<título>")` como instrução simples e
+   `await agent("<prompt>", { label, model, tools, schema })` com o prompt como 1º argumento posicional.
 
 ## D4 — O servidor MCP residente e contratos de chamada — `packages/mcp/` (P6, P8)
 
@@ -451,9 +471,12 @@ Qualquer falha reescreve os itens `D` correspondentes antes do início da fase d
 
 #### Como fica
 
-1. **Daemon HTTP Local:**
-   - Processo residente escutando exclusivamente em `127.0.0.1:4242` (porta padrão com fallback automático).
-   - Gerenciado via `launchd` no macOS (`~/Library/LaunchAgents/com.brza.orchestrator.plist`) com comandos de controle:
+1. **Daemon HTTP Local (validado em H1, H2 e H5):**
+   - Processo residente em Python 3 stdlib baseado em `http.server.ThreadingHTTPServer` (`protocol_version = "HTTP/1.1"` e
+     `Content-Length` explícito), escutando exclusivamente em `127.0.0.1:4242` (porta padrão com fallback automático) e
+     atendendo tanto Streamable HTTP (`POST /mcp` + `GET /mcp` SSE concorrente) quanto SSE legado (`GET /sse` + `POST /messages`).
+   - Gerenciado via `launchd` no macOS (`~/Library/LaunchAgents/com.brza.orchestrator.plist`, com `~/.local/bin` incluído em
+     `EnvironmentVariables.PATH` para resolver o binário `claude` em subprocessos desanexados) e comandos de controle:
      `brza mcp start`, `brza mcp stop`, `brza mcp status`.
    - Autenticação por token Bearer armazenado em `~/.brza/runtime/mcp.token` com permissões `0600`.
 2. **Ferramentas MCP expostas:**
@@ -491,7 +514,10 @@ Qualquer falha reescreve os itens `D` correspondentes antes do início da fase d
      para novos workers.
    - **Teto 3 (Máquina):** Memória RAM disponível acima de 4 GB e swap estável. Se a CPU estiver sob estresse contínuo (>90%),
      novos disparos aguardam janela de alívio.
-4. **Ciclo de vida:** O ciclo é integrado via `orca orchestration` e sinalizado ao chamador através de `worker_done` (M13, M14).
+4. **Ciclo de vida (validado em H4):** O ciclo é integrado via `orca orchestration` (`run-create`, `task-create --task-title ... --spec ...`,
+   `task-update --status completed` e `worker-start`) e sinalizado ao chamador através de `worker_done` (M13, M14). Ao invocar a
+   CLI do client em subprocesso, o MCP injeta no `env` o `ORCA_AGENT_SESSION_ID` recebido no header `X-Brza-Session` (H1) e o
+   `ORCA_USER_DATA_PATH` do client ativo, garantindo o vínculo da Run com o chat chamador sem depender de terminal ativo.
 
 ## D6 — A política de modelos, esforço e o desempatador `tev1` + Haiku — `brza.toml` e `packages/mcp/policy.py` (P8, P9)
 
@@ -528,8 +554,15 @@ Qualquer falha reescreve os itens `D` correspondentes antes do início da fase d
    - **Etapa 1 (Tabela & Regras):** Checagem determinística de parâmetros (tipo de tarefa, tamanho do diff, cota disponível).
    - **Etapa 2 (Decisão Local):** Se a classificação de texto permanecer ambígua, o MCP consulta o modelo de decisão local
      `tev1:4b` via endpoint Ollama (`/v1/systemone`, latência ~0.09s, custo zero).
-   - **Fallback Haiku:** Se o escore de confiança do `tev1` ficar abaixo de 0,75, o pedido é repassado ao Haiku via
-     `claude -p --json-schema` com teto orçamentário `--max-budget-usd 0.01`.
+   - **Fallback Haiku (validado em H2):** Se o escore de confiança do `tev1` ficar abaixo de 0,75, o pedido é repassado ao Haiku
+     via `claude -p --model haiku --effort low --output-format json --json-schema ... --max-budget-usd 0.01 --no-session-persistence`.
+3. **Seleção de conta por chamada (M6, validada em H2 e H3):**
+   - Em chamadas `claude -p` (consultor ou desempatador Haiku), os perfis gerenciados recebem `CLAUDE_CONFIG_DIR` apontando ao
+     diretório `home` do perfil (`~/.claude-adm` ou `claude-profiles/<id>/home`), enquanto para a conta `systemDefault`
+     (`~/.claude`) a variável `CLAUDE_CONFIG_DIR` **deve ser omitida** do `env` para preservar a leitura de `"Claude Code-credentials"`
+     no Keychain do macOS.
+   - Em sessões de chat existentes, a troca de conta usa o método RPC `agentSession.switchAccount` no socket local do client e
+     só pode ocorrer com a sessão em repouso (`at-rest`).
 
 ## D7 — O roteador de sessões e integração de runtimes — `scripts/brza/brza-sessions` e MCP (P12)
 
@@ -541,11 +574,16 @@ Qualquer falha reescreve os itens `D` correspondentes antes do início da fase d
 
 1. **Sessão por frente:** O roteador busca sessões abertas associadas à frente/worktree atual. Uma nova sessão só é criada
    ao mudar de plano/assunto, se o contexto passar de ~200 mil tokens, ou sob solicitação explícita.
-2. **Suporte a runtimes:**
+2. **Troca de conta em sessão existente (validada em H3):** Quando o orquestrador reutiliza uma sessão de chat aberta em outra
+   conta Claude, aguarda a sessão ficar em repouso (`at-rest`) e invoca o método RPC `agentSession.switchAccount` diretamente
+   no socket `orca-runtime.json` do client com `MutationEnvelope` (que copia os transcripts `.jsonl` e subagentes para a conta
+   de destino antes do próximo turno `--resume`); se a sessão estiver com turno ativo (`turnActive`), o roteador aguarda o fim
+   do turno ou abre nova sessão.
+3. **Suporte a runtimes:**
    - `brza sessions open <nome> --agent claude|codex|agy`.
    - No runtime Codex: controle do canal via `codex exec`, com argumentos de sandbox isolados (M19) e suporte a continuidade
      de conversas via `codex_reply` (M18).
-3. Saída JSON estendida e estável para consumo do orquestrador via CLI.
+4. Saída JSON estendida e estável para consumo do orquestrador via CLI.
 
 ## D8 — O plugin do Orca com painel de componentes declarativo e integração MCP — `plugins/orca/` (P10)
 

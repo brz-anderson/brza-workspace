@@ -1,3 +1,4 @@
 - [Artboard lê o componente antes](artboard-le-o-componente-antes.md) — forma e tamanho do artboard saem das classes do componente real
 - [Artboard fica na raiz do scratch](artboard-fica-na-raiz-do-scratch.md) — o `::orca-visual` não renderiza `.html` em subpasta do scratch
 - [O implementer grava a memória no cwd](implementer-grava-memoria-no-cwd.md) — no chat o cwd é o scratch; passe o caminho do workstream no pedido
+- [Fechar a tarefa após o push](fechar-a-tarefa-apos-o-push.md) — concluída a tarefa, rode o close-task sem esperar pedido

@@ -6,7 +6,8 @@ As respostas das R1 a R6 estão no
 [PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca](PLN-008-plan.md).
 O Desenho segue em elaboração. Além do Terreno, estão confirmados:
 
-- **R7.2:** `depends_on` opcional em planos e issues, também no índice; semântica e validação ainda por desenhar.
+- **R7.2 e R9:** `depends_on` opcional em planos e issues, também no índice; só `done` satisfaz; alvo inexistente,
+  autorreferência e ciclo geram erro no checador.
 - **R7.3:** a issue comum aparece no `refs:` como `issue:<slug>`, preservando a identidade do índice.
 
 - **R8.1:** uma única `migration-runner` reúne criação, revisão e execução, com revisor independente.
@@ -44,8 +45,8 @@ Levantamento refeito em 2026-11-03. Os caminhos de código abaixo partem do `brz
 
 ### Lacunas para as rodadas
 
-Falta definir a semântica e a validação do `depends_on`, a regra para exemplos hipotéticos, o mapeamento das quatro
-revisões para REV-001 a REV-004 e o tratamento da sessão no rebuild. Não houve implementação.
+Falta definir a extração do `refs:`, incluindo exemplos hipotéticos, o mapeamento das quatro revisões para
+REV-001 a REV-004 e o tratamento da sessão no rebuild. Não houve implementação.
 
 ## D1 — Uma única migration-runner conduz a MIG — `core/.claude/skills/migration-runner/`
 
@@ -68,3 +69,37 @@ sai do git (R3.3). A numeração MIG/REV e os comandos de abertura dependem dos 
 **Alternativas recusadas em R7.1/R8.1:** três skills separadas; duas novas mais revisão pela `plan-runner`;
 `migration-runner` limitada à execução. A escolha mantém as três operações numa única entrada, preservando a
 independência do revisor.
+
+## D2 — Dependência exige entrega concluída — `core/work/README.md`, checador e índice
+
+- **Origem:** R5.1; R7.2; R9.1 e R9.2.
+- **Contexto:** referências agrupam assuntos; dependências declaram pré-requisitos e não são inferidas das citações.
+
+### Como fica
+
+Planos e issues aceitam a lista opcional `depends_on`, também gravada no índice:
+
+```yaml
+depends_on:
+  - PLN-003
+  - MIG-001
+  - issue:erro-na-retomada
+```
+
+| Condição do alvo | Resultado |
+| :-------------- | :-------- |
+| `status: done` | Dependência satisfeita. |
+| `open`, `in_progress`, `in_review`, `dropped` ou estado ausente | Dependência não satisfeita; `dropped` exige rever explicitamente a relação. |
+| Alvo inexistente | Erro no checador. |
+| Autorreferência ou ciclo, inclusive entre workstreams | Erro no checador. |
+
+A validação resolve os alvos e percorre o grafo na árvore atual e nas branches conhecidas. A falta de entrega é
+dependência pendente, não erro de integridade: uma nota pode declarar dependência de outra ainda aberta.
+O diagnóstico identifica o alvo inválido ou o caminho do ciclo.
+
+Esta regra não autoriza execução nem substitui o `ready` do plano. O índice fornece a relação e o estado das notas;
+o despacho do coordenador continua no PLN-003. Branches desatualizadas exigem nova validação após atualização;
+o checador não garante impedir ciclos introduzidos simultaneamente em workstreams isolados.
+
+**Alternativas recusadas em R9:** aceitar `dropped` como dependência satisfeita; permitir referências inválidas ou
+ciclos com aviso. A escolha exige entrega e corrige a relação inválida antes do commit.

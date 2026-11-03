@@ -2874,22 +2874,52 @@ branch saíram depois do push. A conferência no app é o C24.
 
 Executa D55 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-37`
 
-Estimado: 6 h · Executado: 0 h
+Estimado: 6 h · Executado: 2 h
 
 Agora (pedido 37). O passo nomeia o `brza-workflow` só para o ponto "A conferir no passo" do D55; o código é do
 `brza-studio`.
 
-- [ ] **1.** Os "A conferir no passo" do D55, lidos e respondidos no código antes de escrever: o que o provedor Claude faz
+- [x] **1.** Os "A conferir no passo" do D55, lidos e respondidos no código antes de escrever: o que o provedor Claude faz
       com uma mensagem que tem `from`, e o `/rename` como mensagem de agente
-- [ ] **2.** Testes que falham: o launch com chamador de chat grava a primeira mensagem com `from` (remetente, `task` de
+- [x] **2.** Testes que falham: o launch com chamador de chat grava a primeira mensagem com `from` (remetente, `task` de
       ids sintéticos); sem chamador de chat, ou com prompt que é só comando do catálogo, grava como hoje; o
       `agentSession.send` do `local-cli` com `agentSessionId` diferente do destino grava com `from`, e o da janela, o de
       aparelho pareado e o do próprio chat gravam como hoje
-- [ ] **3.** O `from` no `launchPromptCreateInputs` e no `agentSession.send`, pelo mesmo helper, a partir do chamador
-- [ ] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
+- [x] **3.** O `from` no `launchPromptCreateInputs` e no `agentSession.send`, pelo mesmo helper, a partir do chamador
+- [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C25
 
-**Evidência:** (a preencher)
+**Evidência:** commits [`9a8631369ac`](https://github.com/brz-anderson/brza-studio/commit/9a8631369ac), na `master` do
+`brza-studio` (`bdb2b55be14..9a8631369ac`), e [`d48ee31`](https://github.com/brz-anderson/brza-workflow/commit/d48ee31),
+na `master` do `brza-workflow` (`adf9229..d48ee31`), pela sessão `pln-001-pedido-37`, com o push direto e a identidade do
+`brz-anderson`. **O D55 não se sustentou num ponto, e a pergunta foi a Anderson antes de escrever:** o
+`brza sessions send` e o prompt do `--rename` saem pelo `send_to_chat`, que chama o socket por um `rpc()` em Python
+(`brza_runtime.py`) sem nenhuma identidade de chat, e o `orca` CLI só leva o `agentSessionId` no `agent.launch`
+(`AGENT_LAUNCH_METHODS`, `cli/runtime/client.ts:58`); o servidor não tinha como saber de que chat vinha o `send`.
+Anderson escolheu mexer no `brza-workflow` (X74). Os outros "A conferir no passo": o provedor Claude só lê o `from` no
+`mail-notice` (`claude-structured-message-options.ts:79`), então o texto chega igual e um `/skill` no corpo segue
+rodando; o `/rename x` do launch é só comando do catálogo e fica sem `from`, como hoje; o `brza run` usa o mesmo
+`send_to_chat`, mas pelo que li roda numa aba de pessoa, sem `ORCA_AGENT_SESSION_ID`, ou manda ao próprio chat, e nos
+dois fica como balão (não rodei); o contrato `--json` do roteador não muda, porque o servidor só acrescenta o `from`; a mensagem com
+`delivery: 'queue-if-active'` entra na fila com o `from` e o cartão da fila mostra o remetente
+(`NativeChatQueuedMessageCard.tsx:173`); o cartão dobra em 3 linhas pela altura renderizada, qualquer que seja o texto;
+um `send` de um chat a si mesmo fica sem `from`, e nada no host reage a um `task`, então não há laço. No
+`brza-studio`: o `chat-task-source.ts` (os três ids iguais ao id da operação), o `caller-chat-sender.ts` (o chat
+chamador, só do `orca` CLI local com `agentSessionId`), o `isLocalCommandPrompt` movido para
+`agent-launch-local-command-prompt.ts`, o `launchPromptCreateInputs` com o `from`, o `firstMessage` com o `from` só do
+host (o schema do wire segue `strict`) gravado como mensagem de agente, e o `sendStructuredAgentSessionForClient` com o
+`from` no corpo e sem `userSend` quando o chamador é outro chat. No `brza-workflow`, o `rpc()` manda o
+`orchestrationCompatibilityEvidence` com o `ORCA_AGENT_SESSION_ID` só no `agentSession.send`. Antes do código: os 2
+casos positivos do `send` e o do launch falharam, e os 4 negativos do `send` e os 3 do launch passavam (comportamento de
+hoje); depois: `structured-agent-session-chat-task-send.test.ts` (6) e `agent-launch-handoff-card.test.ts` (13) verdes,
+mais os vizinhos `structured-agent-session-legacy-command-wait.test.ts` e `agent-launch-executor.test.ts` (4 arquivos,
+86 testes, depois do rebase); `pnpm tc:node` limpo; `pnpm check:changed --base=origin/master --maxWorkers=2` →
+24 de 25 verdes, entre elas formato, lint, typecheck e os ratchets; o que falhou foi o grupo "unit tests", em 3 arquivos
+de `tests/e2e/cross-version-wire` (o checkout da v1.4.246 não existe no worktree e a contagem de métodos do
+`cross-version-agent-session-wire` dá 51 em vez de 46), que falham igual na `master` sem a mudança, rodados por caminho
+no checkout principal. No `brza-workflow`: 3 testes novos no `test_brza_runtime.py` (27 passam); a pasta `tests/cli` tem
+20 falhas, as mesmas na `master` sem a mudança (X77). Suíte inteira: roda no merge, pela coordenação. Não rodei o app:
+a conferência é o C25, de Anderson, num build novo, e o `brza-workflow` precisa estar instalado onde o chat o roda.
 
 ### P73 — O tipo do agente na linha da lista de agentes do chat (pedido 38)
 

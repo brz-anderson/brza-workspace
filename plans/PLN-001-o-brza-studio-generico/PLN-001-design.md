@@ -712,7 +712,8 @@ ferramenta não (P52, resposta de 2026-10-27).
 - **O prompt que é só comando do catálogo** (`/rename x`, `isLocalCommandPrompt`) fica sem `from`: o chat novo já o
   esconde do transcript, e o cartão repetiria o plumbing.
 - **Sem mudança no `brza-workflow`**, se o servidor decide pelo chamador: o `brza sessions` e o `brza run` não mandam
-  nada novo.
+  nada novo. _Não se sustentou no P72 para o `send`: o `rpc()` do `brza_runtime.py` não identifica o chat, e Anderson
+  escolheu mudá-lo (X74)._
 
 #### A conferir no passo
 

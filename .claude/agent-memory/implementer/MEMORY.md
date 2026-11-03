@@ -1,0 +1,1 @@
+- [brza-workflow MCP](brza-workflow-mcp.md) — tempo da suíte cli, falhas de base, armadilhas de signal/poll_interval no servidor

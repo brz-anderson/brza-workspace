@@ -3,9 +3,9 @@ status: in_progress
 phase: execution
 origin: request
 ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 202.3
+estimate_h: 202.8
 executed_h: 35.1
-remaining_h: 26.9
+remaining_h: 27.4
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -1331,6 +1331,23 @@ Respondida em 2026-11-02, por Anderson, na sessão `pln-001-pedido-41`, pelo Ask
    do upstream.
    **Decidido — "Esconder o do upstream".** Quando o "Continuar em outra conta" aparece, o seletor da linha some (o
    global e o do chat fixado, que ocupava o mesmo lugar), e o Hand Off fica. Vai ao D62 e ao P79.
+
+### Rodada 69 — o teste do P75 que a suíte completa pegou (enviada 2026-11-02)
+
+> **Apresentado antes:** a suíte completa em `origin/master@4bbaecabf18` (1.039 s): 57 arquivos e 63 testes falham, dos
+> quais 29 são `mobile-web-app` por falta do Chromium do Playwright, 3 são do `wsl-host-deployment-store` (também na tag
+> v1.4.246 pura) e 1 é instável sob carga. Sobra `usage-credentials.test.ts`, 8 de 13 testes, que passavam em
+> `ecc4a13d456` e falham em `f7490afab9e` (o P75), porque esperam as chaves em `.orca/`. Reproduzido isolado, na
+> bisseção do commit. O que não conferi: se o DMG é afetado (inferido que não, por ser só teste).
+
+Respondida em 2026-11-02, por Anderson na sessão `studio-achados-246` do workstream `studio`, pelo AskUserQuestion. Os
+custos são estimativa.
+
+1. **R69.1 — Como avisar a `brand` para a v1.4.246-alpha.2 com esse teste vermelho?** Seleção única. Opções: corrigir o
+   teste antes e avisar com o HEAD novo (recomendada) — ~0,5 h e um commit a mais; avisar já com `4bbaecabf18` e a
+   ressalva — 0 h, com um vermelho nosso na `master`; esperar a leitura de Anderson — 0 h.
+   **Decidido — "Corrigir o teste do P75 antes (Recomendado)".** Vai ao P75.5. A suíte completa **não** repete: só esse
+   arquivo e os vizinhos de credenciais.
 
 ## Passos
 
@@ -3075,6 +3092,12 @@ Agora (R65.2).
       outra); o usuário reconecta
 - [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C28
+- [ ] **5.** (R69.1, 2026-11-02) O vizinho que a suíte completa pegou em `origin/master@4bbaecabf18`:
+      `src/main/runtime/rpc/methods/usage-credentials.test.ts`, 8 dos 13 testes, que ainda esperam as chaves do MiniMax e
+      do GLM em `.orca/` e passavam em `ecc4a13d456`. Atualizar para `~/.brza`, e reler os testes "never overwrites a
+      key the other BrzA Studio app sealed" e "does not blame the other app", cuja premissa mudou com as pastas
+      separadas: manter o que ainda vale, e tirar ou reescrever o que perdeu o sentido, dizendo qual. Rodar só esse
+      arquivo e os de credenciais vizinhos
 
 **Evidência:** commit [`f7490afab9e`](https://github.com/brz-anderson/brza-studio/commit/f7490afab9e), na `master` do
 `brza-studio`, pela sessão do `brza-studio` no worktree `.worktrees/pln-001-pedido-39-credenciais`, com o push direto

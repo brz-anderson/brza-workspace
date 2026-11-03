@@ -99,9 +99,12 @@ a sessão que o executa, num worktree do `brza-studio`:
   `suite-master` saiu. Roda **uma vez**, na `origin/master`, depois que o P79 der push, pela sessão de coordenação, e a
   comparação é com a linha de base de 25 arquivos vermelhos da v1.4.246 pura.
 - **O pedido da sessão `brand`, para a `v1.4.246-alpha.2`:** quando todas as correções que esta sessão coordena estiverem
-  na `master` (falta o P79) e a suíte completa estiver concluída, avisar a `brand` por `brza sessions send brand "…"` com
+  na `master` (faltam o P79 e o P80) e a suíte completa estiver concluída, avisar a `brand` por `brza sessions send brand "…"` com
   o hash do HEAD da `master` e o resumo da suíte, para ela gerar o commit `release`, a tag `v1.4.246-alpha.2` e o DMG
   final. A suíte roda uma vez, na `origin/master` desse HEAD, num worktree limpo.
+- **O pedido 42 (D63, P80):** o botão de expandir do P71 com a aparência e a posição dos botões vizinhos (sem borda nem
+  fundo, na mesma fileira, medido no grupo de ações real). Sessão `pln-001-pedido-42`; o C33 espera o build. Entra na
+  `v1.4.246-alpha.2` junto do P79.
 - **O pedido 41 (R67, D62, P79):** o botão "Continuar em outra conta" volta, reabrindo o P40 e a R1 do sync, e o
   "Retomar automaticamente" agenda sozinho ao bater o limite. Sessão `pln-001-pedido-41`; o C32 espera o build.
 - **A limpeza de branches** (só local, a pedido): saíram os worktrees e as branches dos pedidos 37, 38, 39 (as quatro) e

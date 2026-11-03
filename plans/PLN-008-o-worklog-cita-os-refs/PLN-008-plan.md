@@ -17,13 +17,17 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** tentativa de execução integral em 2026-11-03 encontrou a fronteira de repositório entre `workspace` e
+- **Retomar:** P5 entregue em 2026-11-03, no commit a666e78 do `brza-workflow`, com fixture e suíte CLI conferidas.
+  P6 e P7 seguem pendentes: preparar publicação/sync, reconciliar evidências e horas de P1–P4 e tratar a identidade
+  dos quatro commits anteriores, sem reescrevê-los automaticamente. Nenhuma migração foi aplicada ao acervo real nesta entrega.
+- **Histórico desta retomada:** tentativa de execução integral em 2026-11-03 encontrou a fronteira de repositório entre `workspace` e
   `brza-workflow` no Antigravity, registrando 4 issues:
   [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md),
   [Falso negativo em test_brza_note quando TMPDIR contém brza-studio no caminho](../../work/issues/falso-negativo-em-test-brza-note-por-caminho-com-brza-studio.md),
   [Bloqueio de P6 e P7 sem a entrega publicada de P1 a P5 e sincronização do core](../../work/issues/bloqueio-de-p6-e-p7-sem-entrega-e-sync-do-core.md) e
   [brza sessions sem suporte ao argumento --agent e alias agy não reconhecido](../../work/issues/brza-sessions-sem-suporte-ao-agente-antigravity-e-alias-agy.md).
-  Sessão de implementação no repositório `brza-workflow` foi aberta pelo Studio (`antigravity`) para conduzir P1 a P5. Estimado: 18 h; executado dos passos: 0 h. O ls começa local e
+  Naquela tentativa, a sessão de implementação no repositório `brza-workflow` foi aberta pelo Studio (`antigravity`)
+  para conduzir P1 a P5; o plano ainda registrava 0 h executadas, sem aferição dos commits posteriores. O ls começa local e
   passa a fetch padrão se dados errados forem listados com frequência, conforme a emenda à R12.3.
 - **Dividido:** [PLN-008 — Entrevista](PLN-008-interview.md) · [PLN-008 — Desenho](PLN-008-design.md)
 
@@ -115,7 +119,11 @@ indisponível volta à rodada, conforme D7/D10.
 
 ## Passos
 
-Corte aceito em 2026-11-03, R13: sete entregas e 18 h estimadas. Nenhum passo foi executado. Cada passo fecha com
+Corte aceito em 2026-11-03, R13: sete entregas e 18 h estimadas. P5 está entregue com evidência abaixo. Existem commits
+de P1–P4 (`b7fb3d2`, `b7e8727`, `3fc3935`, `a168f73`); sua existência não atesta o cumprimento integral desses passos.
+Os campos `executed_h: 0` e `remaining_h: 18` permanecem como valores legados ainda não reconciliados, não como medição
+do trabalho entregue. Não há aferição recuperável de horas nesta retomada; P6 deve reconciliá-las sem inferir duração dos commits.
+Cada passo fecha com
 comando/resultado e commit do repositório correspondente; o plano recebe a evidência e as horas no mesmo ato.
 
 ### P1 — Referências e dependências são conferidas antes do commit
@@ -197,13 +205,19 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/cli -p 'test_brz
 
 Executa D4 e D8, usando D3/D7 · executor: sessão de implementação no `brza-workflow` · depende de P4.
 
-Estimado: 3 h · Executado: — h
+Estimado: 3 h · Executado: concluído; horas não aferidas, sem estimativa retrospectiva.
 
-- [ ] Criar fixture de dois workstreams que prove bootstrap repetido/conflitante, mapa D4, H1, links cruzados,
+- [x] Criar fixture de dois workstreams que prove bootstrap repetido/conflitante, mapa D4, H1, links cruzados,
   refs antigo inválido, remoção de date sem perder tags e worktree ausente.
-- [ ] Implementar `scripts/migrate_pln008.py` com prévia padrão e aplicação explícita por workstream; reutilizar extrator e reserva.
-- [ ] Provar que prévia não commita e a segunda aplicação não muda bytes nem acrescenta eventos desnecessários.
-- [ ] Integrar os casos à suíte CLI, rodá-la, commitar e registrar evidência/Executado.
+- [x] Implementar `scripts/migrate_pln008.py` com prévia padrão e aplicação explícita por workstream; reutilizar extrator e reserva.
+- [x] Provar que prévia não commita e a segunda aplicação não muda bytes nem acrescenta eventos desnecessários.
+- [x] Integrar os casos à suíte CLI, rodá-la, commitar e registrar evidência/Executado.
+
+Evidência de 2026-11-03: commit `a666e78` no `brza-workflow`, com `scripts/migrate_pln008.py` e
+`tests/cli/test_migrate_pln008.py`. A suíte focal passou com 10 testes; a suíte CLI completa passou com 467 testes em 169,983 s.
+Ambas rodaram com `TMPDIR=/tmp PYTHONDONTWRITEBYTECODE=1`, usando fixtures locais, sem migração real nem push de P5.
+Refs explícitos inválidos são recusados antes de reservas/escritas; a MIG nasce aberta, sem datas históricas inferidas
+nem conclusão automática. Trabalho alheio fora dos caminhos da entrega foi preservado.
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/cli
@@ -263,6 +277,9 @@ python3 .claude/skills/notes-checker/scripts/check_notes.py
 ```
 
 ## Worklogs
+
+- 2026-11-03 — P5 entregue em fixture; P6/P7 pendentes; horas e identidade histórica exigem reconciliação.
+  [A conclusão de P5 do PLN-008 em acervo de teste](../../work/worklogs/2026-11-03-pln-008-p5-migracao-em-fixture.md)
 
 - 2026-11-03 — aberto; R1 a R6 fecharam a Entrevista; parou antes do Terreno.
   [A abertura do PLN-008: o refs nos worklogs, o REV e o MIG](../../work/worklogs/2026-11-03-pln-008-a-abertura-do-refs-do-rev-e-do-mig.md)

@@ -148,7 +148,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   grifado, o bloco se mantém igual". As imagens estão em
   `/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace--worktrees-studio/3c979448-152e-4d39-8083-1ed021e930bd/images/3.png`
   e `…/4.png`, fora do git
-- **Pedido 41 (2026-11-03, sessão `studio-achados-246` do workstream `studio`, no chat do BrzA Studio):** "o botão
+- **Pedido 41 (2026-11-02, sessão `studio-achados-246` do workstream `studio`, no chat do BrzA Studio):** "o botão
   `Transferir para outro agente` do `upstream` só transfere entre `runtimes`, retorne o botão que criamos, ao lado do
   `Retomar automaticamente` e deixe o `Retomar automaticamente` marcado por padrão". O botão que criamos é o P40, o
   "Continuar em outra conta", que o sync da v1.4.246 tirou pela R1 do worklog do sync ("Fica o do upstream"): o pedido

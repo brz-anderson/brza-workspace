@@ -23,7 +23,8 @@ tags:
   os agentes não instalados e os pedidos 37 a 42 do PLN-001), e o DMG final em
   `~/Projects/brza-studio/dist/brza-studio-1.4.246-alpha.2-macos-arm64.dmg`. O plano **não fecha** (`status` segue
   `in_progress`) até Anderson conferir o DMG (os casos C1 a C8 no app), dar o push do commit e da tag e decidir o `.ico` de
-  6 ou 7 quadros; depois, `status: done`, `phase: closed` e `completed`.
+  6 ou 7 quadros; fora dos passos, o `BrzA Dark Theme` (tema grafite do chat) está na `master` em `50333c6ffd5` e falta
+  Anderson vê-lo no `pnpm dev` do worktree `brza-dark-theme`; depois, `status: done`, `phase: closed` e `completed`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)
 
 ## Pedido
@@ -350,6 +351,9 @@ Estimado: 1,5 h · Executado: 0,75 h
 - 2026-11-02 — P3 executado no `brza-studio`: os tokens da marca, o `--agent-question` azul, o conserto do
   `path-literal-ratchet`, o merge e o push na `master`. Falta a conferência com uma pergunta real de agente.
   [PLN-007: os tokens da marca e o aviso de pergunta azul](../../work/worklogs/2026-11-02-pln-007-os-tokens-da-marca.md)
+- 2026-11-03 — o `BrzA Dark Theme`: artboards do chat em grafite, o tema no catálogo do chat com o composer no tom do foco
+  em repouso, e o push na `master` do `brza-studio`. Falta a conferência no app em execução.
+  [PLN-007: o BrzA Dark Theme, o tema grafite do chat](../../work/worklogs/2026-11-03-pln-007-o-brza-dark-theme.md)
 
 ## Documentação
 

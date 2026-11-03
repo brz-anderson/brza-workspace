@@ -1,10 +1,11 @@
 ---
-status: open
+status: done
 description: O wrapper brza sessions não implementa o argumento --agent e o BrzA Studio reconhece antigravity mas rejeita o alias agy.
 scope:
   - brza-workflow
   - workspace
 opened: 2026-11-03
+completed: 2026-11-03
 owner: Anderson
 tags:
   - tooling
@@ -44,7 +45,12 @@ Ao executar o comando indicado, dois desvios técnicos foram constatados:
   ```
   e teve sua aba renomeada para `PLN-008: Implementação P1-P5 (brza-workflow)` com o despacho da instrução dos passos P1 a P5.
 
-## O que falta decidir
+## A resolução em 2026-11-03
 
-- Implementar no `brza-sessions` o suporte a `--agent <id>`, repassando o agente escolhido ao `brza agent launch`.
-- Mapear no BrzA Studio ou no wrapper o alias `agy` para o identificador canônico `antigravity`.
+O wrapper passou a aceitar `--agent <id>` e repassar o agente ao `agent launch`, preservando `claude` como padrão.
+O alias `agy` é normalizado para `antigravity` no wrapper, sem alteração no app. As checagens de hooks, processos e
+transcripts Claude ficam restritas a Claude; `--rename` e `--wait` com outros agentes são recusados antes do launch.
+O mapa continua permitindo `list`, `send`, `title` e `close`, com os mesmos JSON públicos.
+
+Implementação e resultados no worklog [Correção do agente no brza sessions](../worklogs/2026-11-03-correcao-do-agente-no-brza-sessions.md),
+em tarefa separada do P5 do PLN-008.

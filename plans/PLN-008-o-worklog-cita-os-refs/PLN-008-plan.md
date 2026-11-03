@@ -3,7 +3,7 @@ status: open
 phase: design
 origin: request
 description: O brza note commit preenche o refs do worklog com os IDs que ele cita, e revisão e migração ganham REV-NNN e MIG-NNN
-ready: não — Terreno levantado; faltam as rodadas do Desenho e os itens D antes dos Passos
+ready: não — R7.2 e R7.3 respondidas; falta confirmar o escopo da migration-runner e concluir o Desenho
 scope:
   - workspace
 opened: 2026-11-03
@@ -14,10 +14,9 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** R1 a R6 respondidas; Terreno refeito no brza-workflow em 2026-11-03. Próximo: responder as rodadas do
-  Desenho sobre skills, `depends_on` e identidade das issues no `refs:`; depois fechar extração, renumeração e sessão
-  no rebuild, escrever os itens `D` e derivar os Passos. A medição atual já resolve o workstream nesta árvore e a conta
-  `.claude`; a R4 permanece como histórico, sem presumir que o defeito antigo continua.
+- **Retomar:** R7.2 escolheu `depends_on` opcional em planos e issues, também no índice; R7.3 escolheu `issue:<slug>`
+  no `refs:`. R7.1 respondeu "só `migration-runner`"; confirmar na R8.1 se ela reúne criação, revisão e execução.
+  Depois fechar dependências, extração, renumeração e sessão no rebuild, escrever os itens `D` e derivar os Passos.
 - **Dividido:** [PLN-008 — Desenho](PLN-008-design.md)
 
 ## Pedido
@@ -55,7 +54,7 @@ mesma sessão.
 | `Pedido 1` | os worklogs que existem ganham o `refs:` por um preenchimento automático                                               | —     | —             |
 | `Pedido 2` | toda revisão de `work/reviews/` tem `REV-NNN`, numerado em sequência pelo índice, e as 4 de hoje são REV-001 a REV-004 | —     | —             |
 | `Pedido 3` | a migração é issue `type: migration`, `work/issues/MIG-NNN-<assunto>.md`, com o molde da R3.3, e a MIG-001 é a renumeração das revisões | — | — |
-| `Pedido 4` | uma skill cria a MIG no molde, outra a revisa e outra a executa até o critério de conclusão, criadas ou adaptadas das que existem (`plan-runner`, `notes-checker`) | — | — |
+| `Pedido 4` | o fluxo cobre criação, revisão e execução da MIG até o critério de conclusão; R7.1 pediu só `migration-runner`, com o escopo a confirmar em R8.1 | — | — |
 | `Pedido 4` | a revisão nasce com o `REV-NNN` pela skill que a escreve, a `plan-runner` em `references/conduct.md` | — | — |
 | `R4.1` | toda linha do `measurements.jsonl` dentro de um worktree tem `workstream`, a conta não sai `home`, e o `session` do índice resolve sempre que a sessão tem nome | — | — |
 | `R4.2` | o `brza note commit` avisa, sem barrar, a issue ou o plano aberto sem `priority` | — | — |
@@ -63,6 +62,7 @@ mesma sessão.
 | `R5.2` | a issue aceita `estimate_h` opcional, e o índice a grava | — | — |
 | `R5.3` | os worklogs perdem o `date`, mantêm o `tags`, e o checador avisa o `date` | — | — |
 | `R6.1` | o `brza note ls` lista issues e decisões de todos os workstreams, pelo índice, ordenadas por `opened`, `priority` ou `deadline` | — | — |
+| `R7.2` | planos e issues aceitam `depends_on` opcional, também gravado no índice | — | — |
 
 ### Fora de escopo
 
@@ -70,7 +70,6 @@ mesma sessão.
   fechado do checador.
 - **Uma pasta `work/migrations/` e o MIG como plano.** Perderam na R3.2.
 - **`session_id`, runtime, conta e modelo no frontmatter.** Ficam na medição e no `brza sessions` (R4.1).
-- **`depends_on`.** Espera o `refs:`, e se decide no Desenho daqui (R5.1).
 
 ## Entrevista
 
@@ -225,7 +224,7 @@ Respondida em 2026-11-03, na sessão `workspace`.
    se paga: no Desenho; `depends_on` agora — custo: ~1 h e duplica `blocks` e `refs`; se paga: só se o `refs` não
    cobrir; o agente do M11 lê `blocks` — custo: chamada e erro de prosa; se paga: nunca.
 
-   **Decidido — "Esperar o refs (Recomendado)".**
+   **Decidido — "Esperar o refs (Recomendado)".** A escolha no Desenho foi respondida em R7.2.
 
 2. **A estimativa na issue.** Opções: só no plano (recomendada) — custo: 0; se paga: agora, mas o teto não vê a issue
    sem plano; opcional na issue — custo: ~0,3 h no checador e no índice; se paga: só se a issue que vira tarefa direta
@@ -257,9 +256,42 @@ Respondida em 2026-11-03, na sessão `workspace`.
 
    **Decidido — "Não; listar pelo opened (Recomendado)".**
 
+### Rodada 7 — skills, dependências e identidade das issues (enviada 2026-11-03)
+
+**Apresentado antes:** o Terreno mostrou que o índice já preserva `issue:<slug>` no rename; `refs:` informa relação
+temática, sem direção de dependência; a revisão substantiva exige revisor independente, enquanto o checador confere
+a forma. Os custos apresentados contam alterações propostas, sem estimativa de horas.
+
+Respondida em 2026-11-03, na sessão `workspace`: "7.1 só `migration-runner` / 7.2.1 / 7.3.1".
+
+1. **As skills da MIG.** Opções:
+   - três skills próprias, `migration-writer`, `migration-reviewer` e `migration-runner` (recomendada) — custo:
+     três `SKILL.md` e um molde; se paga: na primeira MIG conduzida sem PLN;
+   - duas novas e adaptar a `plan-runner` para revisar MIG — custo: dois `SKILL.md`, um molde e ampliação do fluxo
+     de revisão; se paga: quando PLN e MIG compartilharem essa condução.
+
+   **Resposta — "só `migration-runner`".** Contraproposta: uma única skill nova. A leitura de que ela reúne criação,
+   revisão e execução volta para confirmação em R8.1, sem converter essa inferência em contrato aprovado.
+
+2. **O `depends_on`.** Opções:
+   - lista opcional em planos e issues, também no índice (recomendada) — custo: um campo nas notas e no índice,
+     validação e documentação; se paga: quando o coordenador precisar distinguir referência de dependência;
+   - concluir sem o campo — custo: nenhum campo novo, mas cada despacho dependente exige leitura dos
+     pré-requisitos; se paga: agora, enquanto a fila depender dessa leitura.
+
+   **Decidido — "7.2.1".** Entra no escopo; semântica e validação ainda vão ao Desenho.
+
+3. **A issue comum no `refs:`.** Opções:
+   - `issue:erro-na-retomada`, preservando a identidade do índice (recomendada) — custo: adotar a notação existente,
+     com conversão automática dos links; se paga: na primeira referência entre workstreams;
+   - `erro-na-retomada` — custo: conversão adicional para o ID do índice e regra para distinguir slug de prosa;
+     se paga: apenas na leitura manual do campo.
+
+   **Decidido — "7.3.1".** As issues comuns usam `issue:<slug>`; não ganham número nem renomeação.
+
 ## Worklogs
 
 - 2026-11-03 — aberto; R1 a R6 fecharam a Entrevista; parou antes do Terreno.
   [A abertura do PLN-008: o refs nos worklogs, o REV e o MIG](../../work/worklogs/2026-11-03-pln-008-a-abertura-do-refs-do-rev-e-do-mig.md)
-- 2026-11-03 — retomada; Terreno conferido; itens D aguardam as rodadas do Desenho.
+- 2026-11-03 — retomada; Terreno conferido; R7.2 e R7.3 respondidas; R7.1 volta como confirmação em R8.1.
   [O Terreno do PLN-008 para o Desenho](../../work/worklogs/2026-11-03-pln-008-o-terreno-para-o-desenho.md)

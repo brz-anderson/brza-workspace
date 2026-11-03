@@ -4,7 +4,13 @@
 
 As respostas das R1 a R6 estão no
 [PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca](PLN-008-plan.md).
-Os itens `D` aguardam as rodadas de desenho; este arquivo registra somente o Terreno.
+Os itens `D` aguardam as rodadas de desenho. Além do Terreno, estão confirmados:
+
+- **R7.2:** `depends_on` opcional em planos e issues, também no índice; semântica e validação ainda por desenhar.
+- **R7.3:** a issue comum aparece no `refs:` como `issue:<slug>`, preservando a identidade do índice.
+
+**R7.1:** Anderson respondeu "só `migration-runner`". A contraproposta de uma única skill nova está registrada;
+reunir criação, revisão e execução nela é a leitura a confirmar em R8.1.
 
 ## Terreno
 
@@ -39,6 +45,6 @@ Levantamento refeito em 2026-11-03. Os caminhos de código abaixo partem do `brz
 
 ### Lacunas para as rodadas
 
-O Pedido 4 exige escolher como criar ou adaptar as skills; a R5.1 deixou `depends_on` para o Desenho.
-Também faltam a identidade das issues no `refs:`, a regra para exemplos hipotéticos, o mapeamento das quatro
-revisões para REV-001 a REV-004 e o tratamento da sessão no rebuild. Nenhuma proposta desses pontos foi aplicada.
+Falta confirmar o escopo da `migration-runner` (R8.1), definir a semântica e a validação do `depends_on`, a regra
+para exemplos hipotéticos, o mapeamento das quatro revisões para REV-001 a REV-004 e o tratamento da sessão no
+rebuild. As escolhas de R7.2 e R7.3 estão registradas; não houve implementação.

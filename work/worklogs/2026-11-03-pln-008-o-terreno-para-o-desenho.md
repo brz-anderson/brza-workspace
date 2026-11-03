@@ -44,3 +44,23 @@ do teto de leitura. Segue a consolidação dos demais contratos e do corte em Pa
 
 Anderson emendou a R12.3: "dados errados listados com frequência, o fetch vira padrão". O gatilho foi registrado
 na Entrevista, no D6 e no Retomar, sem inventar um limiar numérico. O corte proposto na R13 continua sem aceite.
+
+## Aceite da R13 em 2026-11-03
+
+Anderson respondeu "aceito" ao corte em sete passos, com 18 h estimadas. A resposta está na Entrevista; o Desenho
+consolida D1 a D10, incluindo validar refs explícito antes de recalcular, distinguir reserva de nota materializada
+e preservar o gatilho da R12.3. O plano recebeu Passos, Cobertura, pré-requisitos e Regressão.
+
+| Passo | Entrega | Estimado |
+| :---- | :------ | -------: |
+| P1 | Referências e dependências | 3 h |
+| P2 | Reservas, índice e listagem | 4 h |
+| P3 | Skills e norma | 2 h |
+| P4 | Fontes de medição e sessão | 2 h |
+| P5 | Script e fixture de migração | 3 h |
+| P6 | Publicação, sync e aplicação no acervo | 2 h |
+| P7 | Revisão independente e fechamento | 2 h |
+
+O plano está em execution/in_progress, ready sim, com estimate_h 18, executed_h 0 e remaining_h 18. Esses números
+medem os passos; nenhum foi executado. P1 aguarda pedido explícito. Conferência desta gravação: checador das notas
+e diff; as suítes de implementação não foram rodadas novamente por esta alteração documental.

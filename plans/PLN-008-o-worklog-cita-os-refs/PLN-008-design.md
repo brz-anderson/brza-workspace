@@ -4,7 +4,7 @@
 
 As respostas das R1 a R6 estão no
 [PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca](PLN-008-plan.md).
-O Desenho segue em elaboração. Além do Terreno, estão confirmados:
+Desenho e corte em sete passos aceitos na R13, em 2026-11-03. Além do Terreno, estão confirmados:
 
 - **R7.2 e R9:** `depends_on` opcional em planos e issues, também no índice; só `done` satisfaz; alvo inexistente,
   autorreferência e ciclo geram erro no checador.
@@ -49,10 +49,11 @@ Levantamento refeito em 2026-11-03. Os caminhos de código abaixo partem do `brz
   `brza-workflow`: 36 testes passaram em 5,319 s.
 - O collector também executou a suíte `test_brza_note_index.py`: 45 testes passaram.
 
-### Lacunas para as rodadas
+### Limites da execução
 
-Falta consolidar numeração, preenchimento do acervo e índice, e levar o corte em Passos ao aceite. O mapeamento
-das quatro REV, a sessão no rebuild e a listagem estão definidos em D4 a D6. Não houve implementação.
+Colisão real de IDs reservados e integração nova de runtime sem fonte disponível voltam à rodada com evidência.
+O gatilho qualitativo da R12.3 foi preservado; não se inventa limiar.
+Não houve implementação; o aceite do corte não autoriza executar os passos.
 
 ## D1 — Uma única migration-runner conduz a MIG — `core/.claude/skills/migration-runner/`
 
@@ -118,8 +119,12 @@ ciclos com aviso. A escolha exige entrega e corrige a relação inválida antes 
 
 ### Como fica
 
-O `brza note commit` preenche o `refs:` dos worklogs antes da conferência. A extração considera a prosa, crases
-inline, links e citações históricas do corpo, excluindo blocos cercados de código.
+Antes de reescrever qualquer worklog solicitado, o `brza note commit` valida o `refs:` explícito atual contra notas
+existentes. ID inexistente gera erro sem reescrita, para que o recálculo não esconda a referência inválida.
+Depois extrai do corpo, confere os alvos e links e atualiza somente os caminhos pedidos, antes do checador completo.
+A extração considera prosa, crases inline, links e citações históricas, excluindo blocos cercados de código.
+O resultado é ordenado e sem duplicatas; sem referências, o campo é omitido. O preenchimento do acervo reutiliza
+essa sequência e é idempotente.
 
 | Entrada | Resultado |
 | :------ | :-------- |
@@ -200,3 +205,78 @@ ser o padrão. O limiar numérico de frequência não foi definido; o contrato r
 **Alternativas recusadas como padrão inicial em R12:** listar todos os estados; mais antigos primeiro; fetch
 automático com `--offline`. O fetch padrão fica condicionado ao gatilho acima. A listagem não calcula prontidão
 nem autoriza execução.
+
+## D7 — REV e MIG reservam números pelo índice — `bin/brza-note`
+
+- **Origem:** R1.2; R2.2; R3.2 e R3.4; R11.1; contratos aceitos na R13.
+- **Contexto:** a reserva precisa suportar concorrência entre workstreams e distinguir número reservado de nota existente.
+
+### Como fica
+
+| Comando | Saída após reserva confirmada |
+| :------ | :--------------------------- |
+| `brza note review-open <slug> --title <texto> --description <texto> [--workstream <nome>]` | REV-NNN e `work/reviews/REV-NNN-<slug>.md`. |
+| `brza note migration-open <slug> --title <texto> --description <texto> [--workstream <nome>]` | MIG-NNN e `work/issues/MIG-NNN-<slug>.md`. |
+
+A skill escreve o arquivo. REV usa `kind: review`; MIG usa `kind: issue`, `type: migration`; seus IDs são REV-NNN
+e MIG-NNN. Cada família tem sequência independente; máximo + 1 é recalculado no callback a cada tentativa de
+fetch/push, até três tentativas. Reserva abandonada não é reciclada. Sem remote ou sucesso, recusar sem imprimir
+ID utilizável. Os comandos funcionam sem client; nome de sessão ausente não impede reserva.
+
+Antes de liberar novas reservas, uma operação atômica reserva REV-001 a REV-004 conforme D4 e MIG-001 para a
+renumeração. Reexecução aceita o mesmo mapa; colisão diferente recusa e volta à rodada, sem renumerar silenciosamente.
+Reserva sem arquivo não satisfaz referências/dependências nem aparece como nota materializada no ls. O primeiro
+commit registra a passagem de reserva para nota mesmo quando título e estado coincidem; a ausência de `commit`
+distingue a reserva inicial.
+
+## D8 — A migração tem prévia e aplicação idempotente — `scripts/migrate_pln008.py`
+
+- **Origem:** R1.1; R2.2; R3.4; R5.3; R11.1; contratos aceitos na R13.
+- **Contexto:** o acervo atravessa workstreams; o script compartilha o extrator do commit e o mecanismo de reserva.
+
+### Como fica
+
+Script específico no `brza-workflow`, com prévia por padrão, aplicação explícita e seleção de workstream:
+
+1. Reservar os IDs de D7 e criar MIG-001 no molde de D1.
+2. Aplicar as quatro renomeações e H1 de D4; corrigir links nas árvores donas.
+3. Recalcular refs dos worklogs pelo D3; remover date preservando tags e demais campos.
+4. Conferir cada workstream; commitar por caminhos e reconstruir o índice.
+
+A prévia informa arquivos e alterações e não commita. Worktree ausente é reportado; o script não cria workstreams.
+Segunda aplicação não altera arquivos nem acrescenta eventos desnecessários. Não inferir datas ou prioridade,
+nem reescrever medição histórica. A conclusão da MIG-001 prova quatro nomes novos, ausência dos antigos e links
+resolvidos. A sessão dona de cada workstream grava suas notas e evidências.
+
+## D9 — O índice preserva os campos aprovados — `bin/brza-note` e norma
+
+- **Origem:** R4.2 e R4.3; R5.2 e R5.3; R6.1; R7.2; R11.2; R12; contratos aceitos na R13.
+- **Contexto:** extração, serialização e comparação precisam acompanhar os mesmos campos para o rebuild reparar o acervo.
+
+### Como fica
+
+| Campo | Contrato |
+| :---- | :------- |
+| `opened`, `priority`, `blocks`, `deadline`, `owner`, `type`, `depends_on` | Extração, serialização e comparação; ausência permanece ausência. |
+| `estimate_h` | Número em plano e issue; opcional na issue. |
+| `remaining_h` | Número no plano. |
+| Listas | Preservar os elementos, sem limitar o parser aos escalares. |
+| `session` | Nome da sessão da operação, inclusive no rebuild, conforme D5. |
+
+O rebuild recompõe o estado pelas branches. O commit avisa sem barrar a falta de priority em plano/issue abertos;
+o checador avisa date no worklog. A norma permite priority também em planos. O ls segue D6 e exclui reservas ainda
+não materializadas; índice indisponível gera diagnóstico, sem fingir fila vazia. Colunas: ID, workstream, status,
+opened, priority, deadline e título. A listagem não calcula prontidão nem despacha tarefas.
+
+## D10 — Medição e sessão são verificadas nas fontes atuais — hook e CLI
+
+- **Origem:** R4.1; R11.2; contratos aceitos na R13.
+- **Contexto:** a versão atual já identifica conta e workstream nesta árvore; dados históricos não provam defeito presente.
+
+### Como fica
+
+Verificar entradas atuais de eventos em worktrees de notas e código, branch de plano e conta configurada; corrigir
+apenas falhas reproduzidas. O nome da sessão usa as fontes disponíveis: variável de sessão e, com client, mapa e
+provedor. Nome vazio permite fallback disponível. Sem fonte, o nome fica ausente; não inventar autoria.
+Não acrescentar runtime, session_id ou modelo às notas nem reconstruir a medição histórica. Integração nova de
+runtime sem fonte disponível volta à rodada com evidência, sem expansão silenciosa do core.

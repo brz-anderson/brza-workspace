@@ -5,8 +5,8 @@ origin: plan
 origin_ref: PLN-003
 description: O servidor MCP residente gerencia o fluxo com fila de prioridade sob três tetos, política declarativa e desempate com tev1 e Haiku
 ready: sim
-estimate_h: 30.5
-executed_h: 3.5
+estimate_h: 31.3
+executed_h: 4.3
 remaining_h: 2.0
 scope:
   - workspace
@@ -20,10 +20,11 @@ tags:
 
 # PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients
 
-- **Retomar:** P1 a P7 `[x]`; revisão independente da entrega concluída, com A1 a A3 corrigidos.
-  Código em `brza-workflow@354d004`, branch `feat/pln-009-mcp`: MCP 349 OK (um pulado), hooks 290 OK e CLI limpo 445 OK.
-  Faltam C1 a C4, com Anderson; confirmar o pré-requisito do C3 com a sessão do PLN-003; e a confirmação
-  de Anderson para o merge na `master` do `brza-workflow`. A revisão e os testes com dublês não aprovam os casos reais.
+- **Retomar:** P1 a P8 `[x]`; C1 aprovado no launchd real (R7).
+  Código em `brza-workflow@007383a`, branch `feat/pln-009-mcp`: MCP 358 OK (um pulado), CLI limpo 445 OK.
+  Faltam C2 a C4, com Anderson; confirmar o pré-requisito do C3 com a sessão do PLN-003; e a confirmação
+  de Anderson para o merge na `master` do `brza-workflow`. Depois do merge, `brza install --mcp --relink` do checkout
+  principal, porque os links de `~/.local/bin` apontam o worktree da `feat`.
 
 ## Pedido
 
@@ -204,6 +205,19 @@ Respondida em 2026-11-03, nesta sessão, pela regra de Anderson ("opção `recom
    depois de N voltas sem `dispatch`; sem ferramenta `cancel`.
 5. **Os achados que iam a issue** (P2 A5, P5 A5): pela preferência por `corrigir aqui`, corrigidos na branch integrada,
    que já tem os passos que eles tocam.
+
+### Rodada 7 — o que o C1 achou no launchd real (2026-11-03)
+
+> **Apresentado antes:** o C1 passou no roteiro, mas o `stop` deixava o plist com `RunAtLoad`, e o login subiria o
+> serviço de novo; e a fila real tinha dois pedidos de teste de 04:55 (`t`, caller `s`), um deles despachado ao Studio
+> na subida e recusado com `session_caller_unknown`, sem efeito.
+
+Respondida por Anderson em 2026-11-03, nesta sessão.
+
+1. **O plist depois do `stop`.** **Respondida — a recomendada:** "P8: stop apaga plist" — o `stop` apaga o plist depois
+   do `bootout` e espera o agente descarregar; o `start` volta a gravá-lo; o C1 se refaz antes do merge.
+2. **Os pedidos de teste na fila real.** **Respondida — a recomendada:** "Copiar e zerar a fila" — a
+   `orchestrator.db` copiada para o scratch da sessão (`orchestrator.db.c1-residuo`) e apagada.
 
 ## Desenho
 
@@ -491,10 +505,35 @@ Estimado: 0,5 h · Executado: 0,3 h
 **Evidência:** [REV: a entrega do PLN-009 contra o Pedido e a Cobertura](../../work/reviews/pln-009-a-revisao-da-entrega.md).
 O gate MCP rodou no worktree real, com leitura de `sysctl` liberada. Desvios X46 e X47.
 
+### P8 — O `stop` apaga o plist e espera o agente descarregar
+
+Executa R7.1 e D1 · executor: subagente `implementer`, com revisão pelo `agy` e pelo `reviewer`
+
+Estimado: 0,8 h · Executado: 0,8 h
+
+- [x] **1. Testes antes:** 6 testes novos do `stop`; 4 falharam e 2 deram erro no `354d004`.
+- [x] **2. Corrigir:** o `stop` apaga o plist depois do `bootout`, espera o descarregamento e apaga o plist órfão.
+- [x] **3. Revisar:** r1 pelo `agy` (Flash, 6 achados) e pelo `reviewer` (Opus, 4 achados), em paralelo; 5 corrigidos
+  aqui na r2, a corrida `start` × `stop` em issue; r2 pelo `agy` sem achado.
+- [x] **4. Refazer o C1:** no launchd real, com o `stop` novo.
+- [x] **5. Commit:** `brza-workflow@007383a`, na `feat/pln-009-mcp`.
+
+**Evidência:** `tests/mcp` → 358 OK (um pulado), `tests/cli` limpo → 445 OK, `test_mcp_lifecycle` em 8 s (o teste do
+`start` depois do `stop` levava 15 s e passava com o `start` falhando); pareceres na seção do P8 de
+[REV: a entrega do PLN-009 contra o Pedido e a Cobertura](../../work/reviews/pln-009-a-revisao-da-entrega.md). Desvio X48.
+
 ### Casos manuais
 
 - **C1 — O launchd real:** `brza install --mcp`, `brza mcp start`, `brza mcp status` → 0, `curl` do `/health` com o
   token, `brza mcp stop`, `brza mcp status` → 3. Com Anderson, porque carrega um LaunchAgent na máquina.
+  - **Observado (2026-11-03, `354d004`):** o roteiro passou — `status` 3 → `start` 0 (pid 77306) → `status` 0 →
+    `/health` 200 com o token, 401 sem ele e com token errado, só em `127.0.0.1:4242` → `stop` 0 → `status` 3 → `stop`
+    repetido 0. Dois achados (R7): o plist ficava com `RunAtLoad` depois do `stop`; e a subida despachou um pedido de
+    teste da fila real, recusado pelo Studio sem efeito.
+  - **Observado (2026-11-03, `007383a`, depois do P8):** `status` 3 → `start` 0 (pid 29443), plist gravado → `status`
+    0 → `/health` 200 com o token e 401 sem ele → `stop` 0 em 1 s, plist apagado → `status` 3 logo depois, porta livre,
+    `launchctl print` 113 → `stop` repetido 0. Fila nova vazia.
+  - **Veredito:** aprovado.
 - **C2 — O `tev1` real:** um desempate com o Ollama de pé, frio e carregado, medindo o tempo.
 - **C4 — O ciclo real:** um `dispatch` de consultor no Studio abre run, task e worker, e o `--json` de cada verbo traz
   as chaves que o `cycle.py` procura (X24); o fim volta pelo `task-list`.
@@ -589,6 +628,9 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 - **X46 — A conta explícita é reconferida na admissão**; divergência deixa o pedido na fila com `account_active`.
   O worker guarda a conta resolvida; pedido implícito continua `''` até admitir. Corrige A1, sem trocar conta (X38).
 - **X47 — As contas e o cache preservam `user_data`**, como a abertura do worker já fazia (X42). Corrige A2.
+- **X48 — O `stop` apaga o plist e espera o descarregamento até 25 s (`--timeout`)**, acima do `ExitTimeOut` de 20 s do
+  launchd; o `bootout` que falha com o agente já fora conta como descarregado, e com o agente carregado mantém o plist.
+  O D1 dizia só `bootout`. Afeta P1 e D1 (R7.1).
 
 ## Worklogs
 
@@ -601,6 +643,9 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 
 - 2026-11-03 — revisão independente da entrega; A1 a A3 corrigidos e P7 concluído.
   [O PLN-009: a revisão da entrega e a correção da conta e do perfil](../../work/worklogs/2026-11-03-pln-009-revisao-da-entrega-conta-e-perfil.md)
+
+- 2026-11-03 — C1 no launchd real; R7; P8 (o `stop` apaga o plist) e o C1 refeito, aprovado.
+  [O PLN-009: o C1 no launchd real e o stop que apaga o plist](../../work/worklogs/2026-11-03-pln-009-c1-no-launchd-real.md)
 
 ## Revisões
 
@@ -620,10 +665,12 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
   — no P1, 20 falhas do `tests/cli` vindas do ambiente do chat; o gate deste plano roda o `tests/cli` em ambiente limpo.
 - [O MCP propõe a conta do pedido](../../work/issues/o-mcp-propoe-a-conta-do-pedido.md) — de R4.3 (P4 O-A8); o
   `choose_account` sem chamador, até a decisão.
+- [O start e o stop do MCP concorrentes](../../work/issues/o-start-e-o-stop-do-mcp-concorrentes.md) — do P8 (Flash 5,
+  Opus A3); sem trava entre processos, até a primeira automação que chame os dois verbos.
 
 ## Fechamento
 
-- [x] Todo passo `[x]`, com revisão independente e os achados com destino (R3 a R6; P7).
+- [x] Todo passo `[x]`, com revisão independente e os achados com destino (R3 a R6; P7; P8).
 - [ ] Os casos C1 a C4 com o Observado e o veredito.
 - [ ] O `feat/pln-009-mcp` integrado à `master` do `brza-workflow`, com a confirmação de Anderson.
 - [ ] A R5.3 reaberta no PLN-003, e os P6 a P9 de lá passados a este plano.

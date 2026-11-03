@@ -19,7 +19,7 @@ tags:
 
 # PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients
 
-- **Retomar:** o P1 a P6 estão `[x]` (`brza-workflow@b2c87a6`, branch `feat/pln-009-mcp`, sem push): cada passo
+- **Retomar:** o P1 a P6 estão `[x]` (`brza-workflow@b2c87a6`, branch `feat/pln-009-mcp`, no `origin` desde 2026-11-03): cada passo
   passou pelas 3 rodadas de revisão (o `agy` e o Opus), e a última correção fechou com o gate verde. Falta a revisão da
   entrega contra o `## Pedido` e a Cobertura, por um revisor que não executou; os casos C1 a C4, com Anderson; e o merge
   na `master` do `brza-workflow`, com a confirmação dele.
@@ -372,8 +372,8 @@ haiku_max_budget_usd = 0.01   # o da sonda do H2, que custou de US$ 0,0016 a 0,0
 ## Passos
 
 > Os passos executam a pedido de Anderson (2026-11-03: "execute todos os passos que não dependem de decisões minhas"),
-> no worktree `~/Projects/brza-workflow/.worktrees/pln-009-mcp`, branch `feat/pln-009-mcp`; o commit vai a essa branch,
-> sem push. Cada passo só recebe `[x]` depois do laço de revisão pelo `agy`. O gate é
+> no worktree `~/Projects/brza-workflow/.worktrees/pln-009-mcp`, branch `feat/pln-009-mcp`; o commit vai a essa branch
+> (enviada ao `origin` depois do `[x]`). Cada passo só recebe `[x]` depois do laço de revisão pelo `agy`. O gate é
 > `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/mcp` e `-s tests/cli`, este num ambiente limpo
 > (`env -i HOME="$HOME" PATH="<dir do python3 3.10+>:/usr/bin:/bin"`), pela issue dos testes no chat.
 

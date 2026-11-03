@@ -135,9 +135,12 @@ Anderson; e o merge da `feat/pln-009-mcp` na `master` do `brza-workflow`, com a 
 ## Fora do workspace
 
 - **O quê e onde:** os worktrees `~/Projects/brza-workflow/.worktrees/pln-009-mcp` e `pln-009-p2` a `p6`, com as
-  branches locais `feat/pln-009-*`, sem push. **Risco:** nenhum; a `master` do `brza-workflow` não foi tocada.
+  branches locais `feat/pln-009-*`; só a `feat/pln-009-mcp` foi ao `origin` (ver o item seguinte). **Risco:** nenhum; a `master` do `brza-workflow` não foi tocada.
   **Estado:** ativos. **Como desfazer:** `git -C ~/Projects/brza-workflow worktree remove .worktrees/<nome>` e
   `git branch -D feat/<nome>`.
+- **O quê e onde:** `git push -u origin feat/pln-009-mcp` (`b2c87a6`), a pedido de Anderson, para
+  `brz-anderson/brza-workflow`. **Risco:** nenhum; branch nova, a `master` não foi tocada. **Estado:** publicada.
+  **Como desfazer:** `git push origin --delete feat/pln-009-mcp`.
 - **O quê e onde:** a cota individual do `agy`, gasta nas revisões: o Gemini 4 Argon e o Claude Opus esgotaram.
   **Risco:** o `agy` fica sem esses modelos até o reset, também para outro trabalho. **Estado:** o Argon volta em ~164 h
   e o Opus em ~5 h, a partir de ~03:50. **Como desfazer:** não se desfaz; espera o reset.

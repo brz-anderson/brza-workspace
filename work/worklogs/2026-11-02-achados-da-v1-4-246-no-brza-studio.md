@@ -142,3 +142,11 @@ a sessão que o executa, num worktree do `brza-studio`:
   volta das 21h31 passou ao `/private/tmp/studio-246/voltar-conta.py`, desligado da sessão (duplo fork, pid 70493 às
   21h11), que seleciona o padrão do sistema (a `anderson@`) só se a conta ativa ainda for a `admin`. **Como desfazer:**
   `kill 70493` e escolher a conta no seletor do app; o log é `/private/tmp/studio-246/limite-conta.log`.
+- **A volta da conta às 21h31 aconteceu:** o `voltar-conta.py` selecionou o padrão do sistema (a `anderson@`) às 21h31 e
+  terminou; o uso da janela de 5h dela está em 0%. O `limite-conta.py` e o `voltar-conta.py` não rodam mais.
+- **A regra das aspas nos blocos ▶, na norma comum** (a `brand`, em Antigravity, passou `head $(which brza)` sem aspas, e o
+  caminho `/Applications/BrzA Studio.app/…` tem espaço): `brza-workflow@c7a9e68`, no `core/AGENTS.md` e na lista fechada
+  do teste de ouro (`tests/hooks/golden_differences.py`, o `why` `aspas`), com push no `origin/master` do `brza-workflow`;
+  `brza sync` escreveu o `AGENTS.md` (`44ec360` na `master` do workspace) e mesclou e enviou `brand`, `studio`,
+  `tools-kit` e `workspace`. **Risco:** nenhum para o código; os quatro worktrees ganharam um merge da `master`.
+  **Como desfazer:** reverter o `c7a9e68` no `brza-workflow` e rodar o `brza sync`.

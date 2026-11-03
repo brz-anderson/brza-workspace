@@ -3,7 +3,7 @@ status: open
 phase: design
 origin: request
 description: O brza note commit preenche o refs do worklog com os IDs que ele cita, e revisão e migração ganham REV-NNN e MIG-NNN
-ready: não — falta o Desenho (Terreno no brza-workflow e itens D), e ele trava os Passos
+ready: não — Terreno levantado; faltam as rodadas do Desenho e os itens D antes dos Passos
 scope:
   - workspace
 opened: 2026-11-03
@@ -14,13 +14,11 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** a Entrevista fechou nas rodadas 1 a 6. O levantamento do frontmatter (R4) ficou no scratch da sessão de
-  2026-11-03, fora do git: os números estão na R4. Próximo: pedir o Terreno a um subagente — o `brza note commit`,
-  o `plan-open`, o `check_notes.py`, o `measure.py` e o índice, no `brza-workflow` — e escrever os itens `D`: o `refs:`
-  preenchido sozinho, os IDs `REV-NNN` e `MIG-NNN`, a issue `type: migration` com o molde da R3.3, o preenchimento
-  dos worklogs existentes e as skills que criam, revisam e executam a MIG e a REV (Pedido 4) — criar ou adaptar vai a
-  uma rodada no Desenho —, e o item 5: as fontes da medição (R4.1), o aviso de `priority` (R4.2), o índice (R4.3),
-  `estimate_h` na issue (R5.2), o `date` dos worklogs (R5.3), o `depends_on` (R5.1) e o `brza note ls` (R6.1).
+- **Retomar:** R1 a R6 respondidas; Terreno refeito no brza-workflow em 2026-11-03. Próximo: responder as rodadas do
+  Desenho sobre skills, `depends_on` e identidade das issues no `refs:`; depois fechar extração, renumeração e sessão
+  no rebuild, escrever os itens `D` e derivar os Passos. A medição atual já resolve o workstream nesta árvore e a conta
+  `.claude`; a R4 permanece como histórico, sem presumir que o defeito antigo continua.
+- **Dividido:** [PLN-008 — Desenho](PLN-008-design.md)
 
 ## Pedido
 
@@ -263,3 +261,5 @@ Respondida em 2026-11-03, na sessão `workspace`.
 
 - 2026-11-03 — aberto; R1 a R6 fecharam a Entrevista; parou antes do Terreno.
   [A abertura do PLN-008: o refs nos worklogs, o REV e o MIG](../../work/worklogs/2026-11-03-pln-008-a-abertura-do-refs-do-rev-e-do-mig.md)
+- 2026-11-03 — retomada; Terreno conferido; itens D aguardam as rodadas do Desenho.
+  [O Terreno do PLN-008 para o Desenho](../../work/worklogs/2026-11-03-pln-008-o-terreno-para-o-desenho.md)

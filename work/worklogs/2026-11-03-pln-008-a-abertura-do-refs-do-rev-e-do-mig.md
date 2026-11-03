@@ -25,5 +25,7 @@ parado antes do Desenho.
   conta `home` e o `session` do índice), puseram aviso de `priority` no commit, os campos de pressão, o `owner` e as
   horas no índice, `estimate_h` opcional na issue, tiraram o `date` dos worklogs e deixaram o `depends_on` para depois
   do `refs:`.
+- **A data no nome de issues e decisões ficou de fora (R6).** A chegada já está no índice e no `opened`, e o rename
+  mexeria em 95 links e descolaria o id do nome. No lugar, um `brza note ls` que lista pelo índice.
 - **O que é norma comum:** o `work/README.md`, o `plans/README.md`, o checador e o `brza-note` moram no
   `brza-workflow`; os passos do PLN-008 mexem lá e chegam aqui pelo `brza sync`.

@@ -18,9 +18,10 @@ tags:
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
 - **Retomar:** os seis passos executados; P1 a P6 estão na `master` do `brza-studio` (o P6 em `5c286937e0c`) e o README
-  do workspace na `master` daqui (`b30b6bc`). Há o commit `release: v1.4.246-alpha.1` (`6d47623`) e a tag anotada
-  `v1.4.246-alpha.1`, **só locais**, e o DMG final em
-  `~/Projects/brza-studio/dist/brza-studio-1.4.246-alpha.1-macos-arm64.dmg`. O plano **não fecha** (`status` segue
+  do workspace na `master` daqui (`b30b6bc`). O commit `6d47623` e a tag `v1.4.246-alpha.1` estão no origin; agora há o
+  commit `release: v1.4.246-alpha.2` (`2511b6298d7`) e a tag anotada `v1.4.246-alpha.2`, **só locais** (com o menu "+" sem
+  os agentes não instalados e os pedidos 37 a 42 do PLN-001), e o DMG final em
+  `~/Projects/brza-studio/dist/brza-studio-1.4.246-alpha.2-macos-arm64.dmg`. O plano **não fecha** (`status` segue
   `in_progress`) até Anderson conferir o DMG (os casos C1 a C8 no app), dar o push do commit e da tag e decidir o `.ico` de
   6 ou 7 quadros; depois, `status: done`, `phase: closed` e `completed`.
 - **Dividido:** [PLN-007 — Entrevista](PLN-007-interview.md) · [PLN-007 — Desenho](PLN-007-design.md)

@@ -53,9 +53,11 @@ Rodada respondida por Anderson em 2026-11-02:
 
 ## Pendente
 
-- Um build novo, para o menu sem os não instalados chegar ao app: Anderson fixou a próxima tag em `v1.4.246-alpha.2` (o
-  `v1.4.246-alpha.1` do pedido anterior era typo), depois das correções dos achados que outra sessão faz na `master`. A
-  `v1.4.246-alpha.1` segue em `6d47623`, sem esta mudança.
+- O commit `release: v1.4.246-alpha.2` (`2511b6298d7`) e a tag anotada `v1.4.246-alpha.2` estão gerados localmente na
+  `master` do `brza-studio` (sobre `0efb501da52`, após os pedidos 37 a 42 do PLN-001 e a suíte completa na sessão
+  `studio-achados-246`), e o DMG final está em
+  `~/Projects/brza-studio/dist/brza-studio-1.4.246-alpha.2-macos-arm64.dmg` (250 MB, com `Resources/ad-hoc-signed`
+  presente). Falta Anderson instalar/conferir o DMG e pedir o push do commit e da tag.
 - Anderson decide o que fazer com as chamadas a `onorca.dev` e com os catálogos da `stablyai`.
 - A sessão `pln-003-plugins` atualiza o Terreno e o C5 do PLN-003.
 
@@ -69,5 +71,12 @@ Rodada respondida por Anderson em 2026-11-02:
 - **A tag `v1.4.246-alpha.1` no origin do `brza-studio`** (`git push origin v1.4.246-alpha.1`, a pedido de Anderson), apontando para
   `6d47623`; **risco:** tag publicada não se move sem `--force`; **como desfazer:** `git push origin :refs/tags/v1.4.246-alpha.1`.
 - **A sessão `studio-achados-246`** ("Studio: achados da 1.4.246") aberta pelo `brza sessions` no worktree `studio`, a pedido de
-  Anderson, para procurar achados novos da v1.4.246; o pedido está em `/private/tmp/studio-prompt-achados-246.md`. Só acha e
-  registra; **estado:** ativa; **como desfazer:** `brza sessions close studio-achados-246`.
+  Anderson, para procurar achados novos da v1.4.246; o pedido está em `/private/tmp/studio-prompt-achados-246.md`. Coordenou os
+  pedidos 37 a 42 do PLN-001 e a suíte completa, e avisou a sessão `brand`; **estado:** concluída (`done`); **como desfazer:**
+  `brza sessions close studio-achados-246`.
+- **O commit `2511b6298d7` (`release: v1.4.246-alpha.2`) e a tag anotada `v1.4.246-alpha.2` no `brza-studio`**, só locais,
+  sobre `0efb501da52`; **risco:** a `master` local está 1 commit à frente do origin; **estado:** ativos; **como desfazer:**
+  `git tag -d v1.4.246-alpha.2` e `git reset --hard origin/master`, antes do push.
+- **O DMG `~/Projects/brza-studio/dist/brza-studio-1.4.246-alpha.2-macos-arm64.dmg`** (250 317 900 bytes, SHA-256
+  `8d04beff619b3aa02f3c8a048bc3568bcfb27bdc5a9fb273c9298a46e0c180b4`), gerado num worktree temporário `.worktrees/pln-007-build`
+  já removido; **risco:** nenhum (`dist/` está no `.gitignore`); **estado:** ativo; **como desfazer:** apagar o arquivo.

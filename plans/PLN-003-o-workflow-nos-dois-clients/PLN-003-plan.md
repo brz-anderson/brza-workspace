@@ -306,6 +306,8 @@ Estimado: 3.0 h · Executado: — h
   — fechada em 2026-11-03: passou depois do "Aprovar nos dois apps" de Anderson.
 - [O DESIGN.md do BrzA vem do PLN-003](../../work/issues/o-design-md-do-brza-vem-do-pln-003.md) — no workstream
   `brand` (R10.2, R11.1); o PLN-003 não espera por ela.
+- [Os passos do MCP no PLN-003 passam ao PLN-009](../../work/issues/os-passos-do-mcp-no-pln-003-passam-ao-pln-009.md)
+  — os P6 a P9 daqui passam ao PLN-009; a R5.3 reabre aqui.
 - [O CLI do Orca no chat do Studio fala com o Studio](../../work/issues/o-cli-do-orca-no-chat-do-studio-fala-com-o-studio.md)
   — vai ao B1 e à R2.1: o env herdado escolhe o app.
 - [Os tipos de plugin faltam no pacote da 1.4.246](../../work/issues/os-tipos-de-plugin-faltam-no-pacote-da-1-4-246.md)

@@ -52,7 +52,7 @@ O `env` do `.claude/settings.json` define `GIT_AUTHOR_*` e `GIT_COMMITTER_*`:
 estão no `README.md`.
 
 Isso vale para os commits deste repositório e do `brza-studio`, e vence o ambiente que uma sessão herde. O `git var
-GIT_AUTHOR_IDENT` confere: deve sair o noreply do `brz-anderson`.
+GIT_AUTHOR_IDENT` confere: deve sair o e-mail do `brz-anderson`.
 
 ## Os plugins são habilitados só aqui
 

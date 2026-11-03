@@ -1,8 +1,8 @@
 ---
-status: open
-phase: design
+status: in_progress
+phase: execution
 origin: request
-ready: sim — os itens D e os Passos estão escritos; P0 aguarda sessão pln-003-p0
+ready: sim
 estimate_h: 58.0
 executed_h: 0.0
 remaining_h: 58.0
@@ -17,8 +17,7 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** os itens `D` (D1 a D9) e os Passos (P0 a P14) estão escritos. Aprovado para execução: o P0 (medição
-  das hipóteses H1 a H6 da fase 0) roda a pedido explícito numa sessão própria `pln-003-p0`.
+- **Retomar:** o P0 (medição das hipóteses H1 a H6 da fase 0) está em execução na sessão Antigravity `antigravity_462439a0_03c3_483b_a0db_e72f48caf392` ("PLN-003 P0: Medição da fase 0").
 - **A fila do orquestrador (2026-11-03):** a R9, respondida na sessão `bb0fd632` do `workspace`, fez do coordenador o
   orquestrador e deu a ordem da fila e os três tetos de workers; o Desenho mudou nas premissas, no M8, no M17, na
   regra da fila e no M24 novo (o índice da `master` grava `priority`, `blocks` e `deadline`). Os itens `D` partem daí.

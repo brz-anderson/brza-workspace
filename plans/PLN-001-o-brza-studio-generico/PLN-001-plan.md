@@ -3,9 +3,9 @@ status: in_progress
 phase: execution
 origin: request
 ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 201.3
+estimate_h: 202.3
 executed_h: 34.3
-remaining_h: 26.9
+remaining_h: 27.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -153,6 +153,12 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   `Retomar automaticamente` e deixe o `Retomar automaticamente` marcado por padrão". O botão que criamos é o P40, o
   "Continuar em outra conta", que o sync da v1.4.246 tirou pela R1 do worklog do sync ("Fica o do upstream"): o pedido
   **reabre** essa resposta
+- **Pedido 42 (2026-11-02, sessão `studio-achados-246` do workstream `studio`, no chat do BrzA Studio), com a imagem de
+  um bloco de código do chat:** "esse também, deixe o botão de expandir da mesma cor que o restante e corrija o
+  alinhamento". Na imagem, o botão de expandir do P71 tem fundo escuro e borda, e fica sobre a borda de cima do bloco,
+  fora da fileira do botão de quebra de linha e do de copiar. A imagem está em
+  `/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace--worktrees-studio/1cc6cebf-df5c-4f57-a8ad-cdddea824cf4/images/4.png`,
+  fora do git
 
 ### Cobertura
 
@@ -204,6 +210,7 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 39` | O atualizador fica desligado no build ad hoc, e o nudge a `onorca.dev` não roda com ele desligado (R65.3) | P76 | teste da guarda (unidade); conferência no log do app instalado (manual) |
 | `Pedido 39` | O CLI empacotado acha o resolvedor, o contrato cruzado lista os 5 métodos do fork, o coreano sem `ORCA` de produto e o fundo do código do Markdown segue o modo do Monaco (R65.4) | P77 | os 4 testes vermelhos ou novos (unidade); `brza foo` pelo app empacotado (manual) |
 | `Pedido 40` | No visualizador de Markdown, o texto dentro do bloco de código não tem fundo próprio, como se estivesse grifado: o bloco, com o fundo e a borda, fica como está; o botão de copiar fica dentro do bloco, a 8 px do topo, sem cobrir a borda (R66.1, R66.2) | P78 | teste do CSS do fundo e da posição (unidade); conferência no BrzA Studio (manual) |
+| `Pedido 42` | O botão de expandir do bloco de código tem a mesma aparência dos botões vizinhos (sem fundo nem borda, `text-chat-foreground-faint`, fundo de destaque só no hover) e fica na mesma fileira deles, encostado à esquerda do último, no bloco com e sem cabeçalho de linguagem | P80 | teste da posição e das classes (unidade); conferência no BrzA Studio (manual) |
 | `X20` | O `executeRead`, o `executeWrite` e o `executeDestructive` do MCP da Atlassian ganham o ícone do produto do `name` e o título com a ferramenta interna; o `discover` ganha o ícone do produto citado na busca, e o título com a busca entre aspas (R55.1, R55.2) | P67 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual, com o C6) |
 
 Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
@@ -3209,6 +3216,24 @@ Agora (pedido 41). **Reabre o P40**, que o sync tirou, e a R1 do worklog do sync
 
 **Evidência:** (a preencher)
 
+### P80 — O botão de expandir com a aparência e a posição dos botões vizinhos (pedido 42)
+
+Executa D63 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-42`
+
+Estimado: 1 h · Executado: 0 h
+
+Agora (pedido 42). Sem rodada, por ser a ordem do pedido; o desenho é do D63.
+
+- [ ] **1.** Os "A conferir no passo" do D63, lidos no código antes de escrever
+- [ ] **2.** Testes que falham: o botão de expandir sem `border`, `bg-background` e `shadow-xs`, com as classes do
+      botão de copiar; a posição, no bloco com cabeçalho e no sem cabeçalho, encostada à esquerda do grupo de ações real,
+      e não pelo deslocamento fixo de 96 px; o bloco sem grupo de ações (saída de ferramenta, diff) mantém o canto
+- [ ] **3.** A aparência e a posição do botão na `BrzaExpandLayer.tsx`
+- [ ] **4.** Os testes do que foi tocado, só por caminho; rebase na `origin/master` e push. **Sem a suíte completa**: ela
+      roda depois, uma vez, pela coordenação. A conferência no app é o C33
+
+**Evidência:** (a preencher)
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -3693,6 +3718,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C30 | `Pedido 39`: o CLI empacotado e os consertos (P77.4) | No build do C22, rodar `brza foo` pelo app empacotado; abrir o Markdown no modo código com o "Match Terminal" invertido; ver o idioma coreano | O CLI acha o resolvedor; o texto legível; sem `ORCA` de produto no coreano | | |
 | C31 | `Pedido 40`: o fundo do texto e o botão de copiar no bloco de código (P78.4) | No build que levar o P78, abrir um `.md` com blocos de código no olho, no tema escuro e no claro, com e sem a linguagem na cerca; passar o mouse sobre o bloco e fora dele; clicar no copiar; abrir o mesmo arquivo no lápis | O texto do bloco sem fundo atrás, e o bloco com o fundo e a borda de antes; o botão invisível fora do bloco, dentro dele a 8 px do topo, sem cobrir a borda, e o "Copiado" aparece no clique; o lápis igual ao de antes. Se o botão aparecer sem o mouse em cima (R66.1), anotar onde | | |
 | C32 | `Pedido 41`: o Continuar em outra conta e o Retomar por padrão (P79.4) | No build que levar o P79, num chat da conta que bateu o limite com o horário de reset | A linha do aviso mostra "Retomada às HH:MM · Cancelar" sem clique, e ao lado o "Continuar em outra conta", com o menu das outras contas; escolher uma conta troca e continua o chat, e cancela a retomada; o Cancelar mantém cancelado nesse corte | | |
+| C33 | `Pedido 42`: o botão de expandir com a aparência e a posição dos vizinhos (P80.4) | No build que levar o P80, passar o mouse sobre um bloco de código sem cabeçalho, um com cabeçalho de linguagem e um de comando com o botão de executar | O expandir é transparente como o copiar, na mesma altura e encostado à esquerda do último botão, sem cobrir texto nem a borda | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,

@@ -1312,6 +1312,26 @@ custos são estimativa.
    **Decidido — "relance depois da correção".** A suíte completa roda uma vez, na `origin/master`, depois que o P79 der
    push; quem a roda é a sessão de coordenação.
 
+### Rodada 68 — onde o Retomar agenda sozinho e os dois menus de conta (enviada 2026-11-02)
+
+> **Apresentado antes:** os "A conferir no passo" do D62, lidos pela sessão `pln-001-pedido-41` em
+> `brza-studio@9a8631369ac`. O `useNativeChatUsageLimitAutoResume` roda no `NativeChatStructuredSession`
+> (`NativeChatInterruptedContinue.tsx:91`), só com o chat aberto. O host não tem um evento de "bateu o limite": o corte
+> sai do journal a cada leitura (`latestNativeChatUsageLimitCut`), mas dá para ligá-lo no `onJournalActivity`. O Cancelar
+> só apaga a entrada, e o `list` não diz que um corte foi cancelado. A linha do upstream já tem um seletor de conta
+> embaixo, e o botão do P40 voltaria em cima.
+
+Respondida em 2026-11-02, por Anderson, na sessão `pln-001-pedido-41`, pelo AskUserQuestion. Os custos são estimativa.
+
+1. **R68.1 — Onde o agendamento sai sozinho, e onde fica a marca do Cancelar?** Seleção única. Opções: no host, com a
+   marca no host (recomendada) — ~4 h; no app, com a marca no host — ~2,5 h; no app, com a marca local — ~1,5 h.
+   **Decidido — "No app, marca no host".** Agenda só com o chat aberto numa aba; o host guarda o corte cancelado (ou já
+   enviado) e recusa o agendamento automático dele. Vai ao D62 e ao P79.
+2. **R68.2 — Os dois menus de conta na linha do aviso.** Seleção única. Opções: ficam os dois (recomendada); esconder o
+   do upstream.
+   **Decidido — "Esconder o do upstream".** Quando o "Continuar em outra conta" aparece, o seletor da linha some (o
+   global e o do chat fixado, que ocupava o mesmo lugar), e o Hand Off fica. Vai ao D62 e ao P79.
+
 ## Passos
 
 Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-studio` (antes `orca-dev`), que commita com o
@@ -3201,21 +3221,46 @@ Agora (pedido 40). Fechou em 2026-11-02.
 
 Executa D62 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-41`
 
-Estimado: 3 h · Executado: 0 h
+Estimado: 3 h · Executado: 1,4 h
 
 Agora (pedido 41). **Reabre o P40**, que o sync tirou, e a R1 do worklog do sync.
 
-- [ ] **1.** Os "A conferir no passo" do D62, lidos no código antes de escrever
-- [ ] **2.** Testes que falham: o `BrzaContinueInOtherAccount.test.tsx` do `15b028ba23f`, adaptado ao v1.4.246 (o
+- [x] **1.** Os "A conferir no passo" do D62, lidos no código antes de escrever
+- [x] **2.** Testes que falham: o `BrzaContinueInOtherAccount.test.tsx` do `15b028ba23f`, adaptado ao v1.4.246 (o
       Continue só sai depois que a troca de conta deu certo, e nada sai se ela falha; some sem outra conta salva); a
       linha do aviso de limite mostra o botão ao lado do "Retomar automaticamente"; o agendamento sai sozinho uma vez
       por corte, e não de novo depois do Cancelar
-- [ ] **3.** O botão volta (a troca do P36 para o chat fixado, a global para o sem pino, como a R2 do sync mandou) e o
+- [x] **3.** O botão volta (a troca do P36 para o chat fixado, a global para o sem pino, como a R2 do sync mandou) e o
       "Retomar automaticamente" agenda ao aparecer o aviso com horário de reset
-- [ ] **4.** Os testes do que foi tocado, só por caminho; rebase na `origin/master` e push. **Sem a suíte completa**: ela
+- [x] **4.** Os testes do que foi tocado, só por caminho; rebase na `origin/master` e push. **Sem a suíte completa**: ela
       roda depois, uma vez, pela coordenação (R67.2). A conferência no app é o C32
 
-**Evidência:** (a preencher)
+**Rodada:** R68 — o agendamento sai do app, com o chat aberto, e a marca do Cancelar fica no host; o seletor da linha
+some quando o botão aparece, e o Hand Off fica.
+
+**Evidência:** commit `[`4bbaecabf18`](https://github.com/brz-anderson/brza-studio/commit/4bbaecabf18)` na `master` do `brza-studio`, pela sessão `pln-001-pedido-41`, com o autor
+`brz-anderson` conferido.
+- **O botão:** `brza/BrzaContinueInOtherAccount.tsx` volta do `15b028ba23f`, montado na `NativeChatNoticeRow` ao lado do
+  "Retomar automaticamente"; a troca vem do `brza/use-brza-continue-in-other-account.ts` (a troca por chat no chat
+  fixado; no sem pino, o `agentSession.options` e o `selectClaudeProviderAccount` global, como o seletor do upstream).
+  Depois da troca, cancela a retomada agendada e envia o Continue. O `NativeChatUsageLimitActions` não mostra mais o
+  seletor quando o botão aparece, e o `brza/BrzaPinnedAccountSwitch.tsx` saiu (X82).
+- **O Retomar por padrão:** o `useNativeChatUsageLimitAutoResume` pede ao host, uma vez por corte, o agendamento com
+  `automatic: true` quando o `list` não traz nada; o host (`structured-agent-session-usage-limit-auto-resume.ts`)
+  guarda no arquivo da agenda, um por chat, o corte cancelado ou já enviado (`declined`), e recusa o automático dele; o
+  clique no botão ainda agenda. A capability nova `agent-session.usage-limit-auto-resume-automatic.v1` separa o host
+  novo: no antigo fica só o botão (X81).
+- **Testes que falharam antes do código:** 4 no host (o cancelado, o enviado, o corte seguinte e o Cancelar depois do
+  restart), 1 do hook, os 2 do `BrzaContinueInOtherAccount.test.tsx` e 3 da linha
+  (`NativeChatUsageLimitActions.continue-in-other-account.test.tsx`, que substitui o `.pinned.test.tsx`).
+- **O que rodou:** `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts --maxWorkers=2`, por
+  caminho, no teste do host e nos 8 do renderer (o hook, o botão, a linha nova, `NativeChatUsageLimitActions.test.tsx`,
+  `.scaling.test.tsx`, `NativeChatNoticeRow.test.tsx`, `.auto-resume.test.tsx` e `NativeChatInterruptedContinue.test.tsx`)
+  → 13 e 85 passaram, também depois do rebase. `pnpm tc:web` e `pnpm tc:node` sem erro.
+  `pnpm check:code-quality:changed origin/master` passou. `pnpm check:changed --base=origin/master --maxWorkers=2`:
+  29 de 30; o vermelho é o de unit tests (1344 s), em dois pontos preexistentes, fora do que o P79 toca (X83). Depois do rebase sobre a `d501bb230ff`, os 9 arquivos por caminho → 98 passed, e o `tc:web` sem erro.
+- Suíte inteira: roda depois do push, pela coordenação (R67.2). Não conferido em tela: é o C32, de Anderson, num build
+  novo. Desvios X81 a X83.
 
 ### P80 — O botão de expandir com a aparência e a posição dos botões vizinhos (pedido 42)
 
@@ -3564,6 +3609,17 @@ da linha quando o teste entra.
   `.git/info/exclude` do `brza-studio`. O `oxfmt --check` passou arquivo por arquivo, com `--ignore-path=/dev/null`; o
   lint que vale é o do `lint-staged` do commit (o `oxlint`, o `ast-grep` e o `react-doctor` nos 3 `.tsx`) e o do
   `check:changed`. Afeta P80.
+- **X81 — O Retomar por padrão pediu protocolo novo no host.** O D62 previa só o renderer; o Cancelar que dura depois de
+  remontar a linha não cabe sem o host (R68.1): entraram o `automatic` no agendamento, a marca `declined` no arquivo da
+  agenda e a capability `agent-session.usage-limit-auto-resume-automatic.v1`. Afeta P79.
+- **X82 — O seletor do chat fixado saiu junto com o do upstream.** Pela R68.2 o seletor da linha some; o
+  `BrzaPinnedAccountSwitch` (a R4 do sync, "Seletor do chat") ocupava o mesmo lugar, e o botão já usa a troca por chat
+  no chat fixado. O teste dele virou o `NativeChatUsageLimitActions.continue-in-other-account.test.tsx`. Afeta P79.
+- **X83 — O `check:changed` ficou vermelho nos unit tests, por dois pontos preexistentes.** O
+  `src/main/runtime/rpc/methods/usage-credentials.test.ts` falha sozinho (8 de 13): ainda espera as chaves em `~/.orca`,
+  que o P75 (`f7490afab9e`) levou a `~/.brza` sem atualizá-lo. Os dois `tests/e2e/cross-version-wire/*.unit.test.ts` não
+  acham arquivos na cópia em cache da v1.4.246 deste worktree (`tests/e2e/.cross-version-checkouts/`). O P79 não toca
+  nenhum dos dois. Afeta P79 e P75.
 
 ## Worklogs
 
@@ -3695,6 +3751,8 @@ da linha quando o teste entra.
   o P73 em `brza-studio@563705a7aaf`, com os X65 e X66; o C26 espera o build do C22, com Anderson.
 - 2026-11-02 — [O P78 do PLN-001, o fundo do texto no bloco de código e o botão de copiar do visualizador de Markdown](../../work/worklogs/2026-11-02-pln-001-pedido-40-fundo-do-codigo-e-botao-copiar.md):
   o pedido 40, com a R66, o D61 e o P78 em `brza-studio@2738100d3f5`; o C31 espera o build, com Anderson.
+- 2026-11-02 — [O P79 do PLN-001, o Continuar em outra conta de volta e o Retomar automaticamente por padrão](../../work/worklogs/2026-11-02-pln-001-p79-continuar-em-outra-conta-e-retomar-por-padrao.md):
+  o pedido 41, a R68, o D62 e o P79 em `brza-studio@4bbaecabf18`, com os X81 ao X83; o C32 espera um build novo, com Anderson.
 - 2026-11-02 — [O P80 do PLN-001, o botão de expandir com a aparência e a fileira dos vizinhos](../../work/worklogs/2026-11-02-pln-001-p80-botao-de-expandir.md):
   o pedido 42, o D63 e o P80 em `brza-studio@d501bb230ff`, com os X78 ao X80; o C33 espera um build novo, com Anderson.
 - 2026-11-02 — [O P75 do PLN-001, as credenciais de integração do BrzA numa pasta própria](../../work/worklogs/2026-11-02-pln-001-p75-credenciais-numa-pasta-propria.md):

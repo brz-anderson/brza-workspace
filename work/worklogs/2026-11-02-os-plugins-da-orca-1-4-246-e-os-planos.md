@@ -2,6 +2,11 @@
 scope:
   - brza-studio
   - workspace
+refs:
+  - PLN-001
+  - PLN-003
+  - PLN-007
+  - issue:os-restos-da-orca-a-vista-no-brza-studio
 ---
 
 # Os plugins da Orca 1.4.246 e o que mudam nos planos

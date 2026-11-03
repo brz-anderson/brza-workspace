@@ -2,6 +2,9 @@
 scope:
   - brza-studio
   - workspace
+refs:
+  - PLN-007
+  - issue:os-restos-da-orca-a-vista-no-brza-studio
 ---
 
 # PLN-007: a abertura da marca BrzA

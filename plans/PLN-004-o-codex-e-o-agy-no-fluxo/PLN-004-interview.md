@@ -590,3 +590,43 @@ Respondida em 2026-11-02, na sessão `workspace`: "11.3.2 / 12.1.1 / 12.2.2".
    runtime padrão de revisão nos três focos; o `agy` e o Codex entram como segundo passe, pedido por quem pede, com
    `--runtime` além do `--focus`, e não há mapa foco → runtime. O D11 do Desenho segue o `--focus` da 12.1 e ganha o
    `--runtime`, sem padrão por foco.
+
+### Rodada 13 — a norma, o nome do workspace e o `tomllib` (enviada 2026-11-03, no chat)
+
+**Apresentado antes:** o `designer` reescreveu o Desenho para o `brza-workflow` (`pln-004-design-v2.md`, no scratch,
+com os D1 a D14 mantidos, o D13 fora e o D15 e o D16 novos) e devolveu 11 pontos sem lastro, que viraram as rodadas 13 a
+16. Conferi os fatos desta: o sync só renderiza `.md` (`bin/brza-sync:188`), o `brza_root` recusa string de várias linhas
+(`core/.claude/hooks/brza_root.py:189-190`), o README do `brza-workflow` pede Python 3.10 (`README.md:26`) e o `python3`
+do PATH é o 3.15, o do sistema o 3.9; o `core/AGENTS.md:35` lista o que mora na `master` sem `.codex/` nem `.agents/`.
+
+Respondida em 2026-11-03, na sessão `workspace`: "todos recomendado".
+
+1. **A norma do pacote `runtimes` toca o núcleo?** (D1) Opções:
+   - nada no núcleo; a regra `brza-runtimes.md` do pacote completa a lista (recomendada) — custo: a lista do `AGENTS.md`
+     fica incompleta para quem lê só ela; se paga: agora, sem diferença no teste de ouro;
+   - uma linha genérica no `core/AGENTS.md:35` e outra na tabela da `agent-instructions-writer` — custo: 2 linhas no
+     núcleo e 2 entradas no `golden_differences.py`, que todo workspace recebe; se paga: quando um segundo pacote
+     trouxer arquivos fora do `.claude/`.
+
+   **Decidido — nada no núcleo**, a regra do pacote. O precedente é o pacote `client`.
+
+2. **Como o nome do workspace chega ao papel do Codex** (D7, D15, D2). Opções:
+   - o sync renderiza também o `.toml` (recomendada) — custo: ~3 linhas no `render_file` e 2 testes, junto do D15; se
+     paga: agora, no primeiro sync do pacote, e o adaptador do D2 também usa o molde;
+   - o gerador troca cada `{{…}}` por um texto neutro — custo: o papel do Codex diverge do do Claude no texto, e o
+     `--check` compara contra o texto trocado; se paga: só se o sync não puder tocar o `.toml`;
+   - o papel do Codex só manda ler o `.claude/agents/<papel>.md` — custo: o contorno por texto que a R2.2 e a R3.2
+     recusaram; se paga: nunca.
+
+   **Decidido — o sync renderiza também o `.toml`.** O gerado usa a string literal `'''`, e o gerador recusa o corpo
+   que tenha `'''`.
+
+3. **O `codex-brza` lê o `developer_instructions` multilinha do `.codex/config.toml`** (D5), só no repositório de
+   código. Opções:
+   - `tomllib`; sem ele, o wrapper segue sem o adaptador e avisa no stderr (recomendada) — custo: ~6 linhas e um teste;
+     numa máquina com 3.10 o Codex no código sobe sem a norma; se paga: agora, com a premissa de que o app e o
+     `subprocess` da delegação usam o `python3` do PATH;
+   - o `parse_toml` do `brza_root` aprende a string `"""` — custo: ~25 linhas e testes num módulo que roda no 3.9 dos
+     hooks; se paga: se aparecer uma máquina em 3.10.
+
+   **Decidido — `tomllib`, e o aviso no stderr sem ele.**

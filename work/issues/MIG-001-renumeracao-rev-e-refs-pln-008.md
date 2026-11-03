@@ -1,7 +1,8 @@
 ---
-status: open
+status: done
 type: migration
 opened: 2026-11-03
+completed: 2026-11-03
 owner: Anderson
 description: Renomeia os quatro pareceres históricos para REV-001..REV-004 e recalcula refs dos worklogs.
 scope:
@@ -33,11 +34,12 @@ Prévia de 2026-11-03: 4 pareceres e 97 worklogs em `tools-kit` (29), `workspace
 ## Passos
 
 - [x] P1 — Conferir as reservas `REV-001`..`REV-004` e `MIG-001` no índice da master: bootstrap `4bb114e`; a aplicação respondeu "bootstrap em dia".
-- [ ] P2 — Aplicar em cada workstream pela sessão dona, no comando e na ordem de "Aplicação".
-- [ ] P3 — Provar os quatro nomes novos, a ausência dos antigos e os links resolvidos nos workstreams donos.
-- [ ] P4 — Conferir refs dos worklogs e remoção de date com tags e demais campos preservados, pelo bloco de
-  preservação do critério.
-- [ ] P5 — Registrar os comandos, resultados e commits antes de concluir esta MIG.
+- [x] P2 — Aplicar em cada workstream pela sessão dona, no comando e na ordem de "Aplicação": ver "Execução".
+- [x] P3 — Provar os quatro nomes novos, a ausência dos antigos e os links resolvidos nos workstreams donos:
+  blocos 1 e 2 do critério, saída 0.
+- [x] P4 — Conferir refs dos worklogs e remoção de date com tags e demais campos preservados, pelo bloco de
+  preservação do critério: 107 notas, 98 worklogs.
+- [x] P5 — Registrar os comandos, resultados e commits antes de concluir esta MIG: "Execução" e "Conclusão".
 
 ## Aplicação
 
@@ -78,7 +80,22 @@ a ordem acima aplicou com saída 0 nas seis passagens (1 + 3 pareceres renomeado
   sem `REV-NNN`. Anderson escolheu, nesta data, "Issue no tools-kit (Recomendado)": a sessão dona do PLN-009 os numera.
   Issue gravada pela sessão `tools-kit-rev-pln009` em `6292986`: [Os pareceres do PLN-009 sem número REV](os-pareceres-do-pln-009-sem-numero-rev.md).
   Não entram nesta MIG.
-- **Pendentes:** as aplicações em `brand`, `studio` e `playground`.
+- **`brand`, item 4**, pela sessão `brand-mig001`: prévia igual ao ensaio (4 worklogs); commit `0e80b71`, com push;
+  checador com 63 arquivos, 0 erros e 0 avisos; worklog de lá em `2a40e3a`.
+- **`studio`, item 4**, pela sessão `studio-mig001`: prévia igual ao ensaio (43 worklogs); commit `d5abc5e`, com
+  push; checador com 0 erros e os avisos que já havia, menos os 39 `date-on-worklog`; worklog de lá em `3aeb36d`.
+- **`playground`, item 4**, pela sessão `playground-mig001`: prévia e `--apply` zerados, sem commit da migração;
+  checador com 0 erros e 0 avisos; worklog de lá em `70c4a68`.
+- **Texto de link:** o `refs:` dos worklogs de `brand` e `playground` pegou REV-001 e REV-004 do título desta MIG no
+  texto do link ("REV-001..REV-004"), como o D3 conta. Anderson escolheu "Ponto para P7" em 2026-11-03.
+
+## Conclusão
+
+Concluída em 2026-11-03 pela sessão `workspace-a6`, no worktree `workspace`, com as cinco árvores atualizadas pelo
+remoto: os três blocos do critério saíram com 0 — "Mapa D4 conferido", "H1, mapa D4, links, refs e ausência de date
+conferidos nas cinco árvores" e "Frontmatter preservado em 107 nota(s) migrada(s), 98 worklog(s)" —, com o checador sem
+erros nas cinco. Dois `brza note index --rebuild` seguidos responderam "em dia, nada a acrescentar", e a master
+continuou em `e8606a4`.
 
 ## Revisão antes da aplicação
 

@@ -8,17 +8,22 @@ completed: 2026-11-03
 tags:
   - tooling
 refs:
+  - issue:abas-de-navegador-sem-moldura-e-ergonomia-de-workspace
+  - issue:abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao
   - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
   - issue:ler-e-enviar-mensagens-a-chats-pela-cli-e-expor-native-chat-aos-plugins
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
   - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
   - issue:preservar-o-dono-do-painel-do-antigravity-em-subagentes-aninhados
+  - issue:seguranca-macos-remocao-de-allow-dyld-environment-variables-dos-entitlements
   - issue:subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent
 ---
 
 # Radar de issues e PRs do upstream e automação de 6h
 
 ## O que foi feito
+
+### 1. Varredura inicial e configuração (03:00 BRT)
 
 1. **Varredura de issues e PRs abertos em `stablyai/orca`:** consultadas 530 issues e PRs abertos nas categorias
    `workflow`, `workspace`, `studio`, `cli`, `skills` e `ferramental` via API do GitHub (`gh api search/issues`).
@@ -34,6 +39,24 @@ refs:
    (`f75b8281-8ae3-4558-afe4-7ab5bbc35601`) com cron `0 */6 * * *` (00:00, 06:00, 12:00, 18:00 em `America/Sao_Paulo`),
    `provider: antigravity`, `surface: chat`, `workspaceMode: existing` apontando para `.worktrees/playground` e
    `reuseSession: true`.
+
+### 2. Ciclo de 6h (06:00 BRT / 09:00 UTC)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisadas 42 issues e dezenas de PRs criados ou
+   atualizados desde `2026-11-03T03:00:00Z`.
+2. **Atualização de 3 issues existentes em `work/issues/`:**
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados PR `#37696` (fase 4 / expressividade, i18n, timestamps dinâmicos e spoofing guards), PR `#37730` e issue `#37761`;
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     adicionadas issues `#37741` ("Work together..." / conexão entre chats), `#37702` (fechamento de worker transferido),
+     `#37693` (permissões Full access em reabertura), `#37731` (entrega a workers Hermes), `#37683` / `#37684` (filtros e host reads de Runs)
+     e PR `#37703` (identidade de agente retida);
+   - [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):
+     adicionado PR `#37659` (renomeação de `computer use` para `orca-computer-use` para isolamento de namespace).
+3. **Criação de 3 novas issues priorizadas em `work/issues/`:**
+   - `priority: high` — [Abertura de agentes no Chat UI pela CLI e superfície chat na orquestração](../issues/abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao.md) (`#37710`, `#37701`, `#37707`, `#37733`);
+   - `priority: medium` — [Segurança no macOS: remoção de allow-dyld-environment-variables dos entitlements](../issues/seguranca-macos-remocao-de-allow-dyld-environment-variables-dos-entitlements.md) (`#37674`, `#37685`);
+   - `priority: low` — [Abas de navegador sem moldura e ergonomia de workspace](../issues/abas-de-navegador-sem-moldura-e-ergonomia-de-workspace.md) (`#37708`, `#37700`, `#37718`, `#37716`, `#37713`, `#37746`).
 
 ## Fora do workspace
 

@@ -36,3 +36,8 @@ quebrado continuam erros. O D3 registra o contrato; seguem o mapeamento das quat
 Na R11, Anderson respondeu "11.1.1 / 11.2.2": a numeração REV segue a inclusão cronológica no git, e `session`
 identifica a sessão da operação, inclusive no rebuild. D4 contém o mapa das quatro revisões; D5 explicita a
 semântica da sessão. Nenhuma revisão foi renomeada; seguem listagem e demais contratos antes dos Passos.
+
+Na R12, Anderson respondeu "12.3.2 / restante recomendado": ls mostra abertos, ordena por opened recente primeiro
+e consulta o índice local por padrão; `--refresh` atualiza, com falha explícita. O D6 registra o contrato. A
+Entrevista foi extraída para arquivo próprio, preservando R1 a R11 e acrescentando R12, para manter o plano abaixo
+do teto de leitura. Segue a consolidação dos demais contratos e do corte em Passos; não houve implementação.

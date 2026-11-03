@@ -14,13 +14,11 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** a Entrevista fechou nas rodadas 1 a 8. **Primeiro, terminar o spike do C5**, que parou na aprovação em
-  2026-11-03: Anderson roda o `dev load` com `--approve` nos dois apps
-  ([O --approve do plugin é barrado no modo auto](../../work/issues/o-approve-do-plugin-e-barrado-no-modo-auto.md)), e a
-  sessão roda, sobre o plugin de `spikes/c5-plugin/`, os itens 1, 5 e 6 e a parte ao vivo de 2, 3 e 4. O resultado
-  parcial está no C5 do [Desenho](PLN-003-design.md); o Orca está agora na `1.4.247`. Depois, escrever os itens `D` a
-  partir da matriz, com os riscos da fase 0 como hipóteses (R7.3), e os Passos, com o P0 numa sessão `pln-003-p0`. O P7
-  do PLN-002 corre na sessão `pln-002-p7`.
+- **Retomar:** a Entrevista fechou nas rodadas 1 a 9. **O spike do C5 rodou nos dois apps em 2026-11-03**, e o item 1
+  passou: o C5 não volta à rodada. O resultado por item está no C5 do [Desenho](PLN-003-design.md). **Primeiro, a
+  rodada da R1.2**, o caminho do painel, com os dados do spike. Depois, B7, M17 e as premissas R1.2 e R4.2 deixam o "em
+  revisão", e se escrevem os itens `D` a partir da matriz, com os riscos da fase 0 como hipóteses (R7.3), e os Passos,
+  com o P0 numa sessão `pln-003-p0`. O P7 do PLN-002 corre na sessão `pln-002-p7`.
 - **A fila do orquestrador (2026-11-03):** a R9, respondida na sessão `bb0fd632` do `workspace`, fez do coordenador o
   orquestrador e deu a ordem da fila e os três tetos de workers; o Desenho mudou nas premissas, no M8, no M17, na
   regra da fila e no M24 novo (o índice da `master` grava `priority`, `blocks` e `deadline`). Os itens `D` partem daí.
@@ -91,8 +89,10 @@ fechou lá e passou ao PLN-003 (R9.1).
 
 - [As skills de documento da Fixfy num possível plugin do BrzA](../../work/issues/skills-de-documento-da-fixfy-num-plugin.md)
   — o veículo é o plugin do Claude, não o do Orca; o gatilho é de Anderson.
+- [O dev watch deixa carregado o plugin que já estava](../../work/issues/o-dev-watch-deixa-carregado-o-plugin-que-ja-estava.md)
+  — o fim de um spike roda o `dev unload` nos dois apps e confere o `devPluginPaths`.
 - [O --approve do plugin é barrado no modo auto](../../work/issues/o-approve-do-plugin-e-barrado-no-modo-auto.md)
-  — trava o resto do spike do C5 até Anderson aprovar nos dois apps.
+  — fechada em 2026-11-03: passou depois do "Aprovar nos dois apps" de Anderson.
 - [O CLI do Orca no chat do Studio fala com o Studio](../../work/issues/o-cli-do-orca-no-chat-do-studio-fala-com-o-studio.md)
   — vai ao B1 e à R2.1: o env herdado escolhe o app.
 - [Os tipos de plugin faltam no pacote da 1.4.246](../../work/issues/os-tipos-de-plugin-faltam-no-pacote-da-1-4-246.md)
@@ -111,3 +111,5 @@ fechou lá e passou ao PLN-003 (R9.1).
   [O PLN-003: o spike do C5 parou na aprovação](../../work/worklogs/2026-11-03-pln-003-o-spike-do-c5-parou-na-aprovacao.md)
 - 2026-11-03 — a R9, da sessão do `workspace`, levou a fila do coordenador ao orquestrador; o Desenho mudou no M8, no M17 e no M24.
   [O PLN-003: a fila do orquestrador](../../work/worklogs/2026-11-03-pln-003-a-fila-do-orquestrador.md)
+- 2026-11-03 — Anderson aprovou o plugin nos dois apps; o spike do C5 rodou as sete perguntas, e o item 1 passou.
+  [O PLN-003: o spike do C5 nos dois apps](../../work/worklogs/2026-11-03-pln-003-o-spike-do-c5-nos-dois-apps.md)

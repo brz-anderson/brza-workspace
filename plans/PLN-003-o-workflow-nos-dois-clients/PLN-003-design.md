@@ -163,38 +163,44 @@ Horas: estimadas, na régua do PLN-002 (1,5–3 h estimado por `brza-*`, 0,2–0
 
   Se o item 1 falhar em qualquer dos dois apps, o C5 volta à rodada.
 
-  **O spike de 2026-11-03 ficou parcial: parou na aprovação.** O plugin está em `spikes/c5-plugin/` (R8.1). O `dev load`
-  sai com `approval_required` nos dois apps, com o mesmo fingerprint, e o `--approve` foi barrado pelo modo auto do
-  Claude Code
-  ([O --approve do plugin é barrado no modo auto](../../work/issues/o-approve-do-plugin-e-barrado-no-modo-auto.md)).
-  Sem aprovação, o app não mostra os painéis nem sobe o worker. O que se mediu fora do app, no `plugin check` e no
-  `plugin test`, que rodam o worker e o painel num host simulado com o Node do CLI:
-  1. **Em aberto.** Nenhum painel carregou em app.
-  2. **Parcial, a favor.** Com o contexto do worktree `tools-kit` simulado, o worker leu `plans/` e `work/` de verdade
-     (2 planos, 7 notas abertas), e o painel de componentes desenhou Tree, Table e Markdown com o `Retomar` do PLN-003,
-     sem aviso nem recusa do host. O catálogo cobre o que o HTML mostraria. O `readContext` não traz caminho, e o worker
-     acha o worktree pela branch, no `git worktree list` do `brza-workspace`.
-  3. **Parcial, a favor.** O worker escolhe o primeiro terminal sem agente no `agents.list` e sem título de agente, e
-     chama `terminal.sendText` com `brza --version`; sem terminal livre, não digita (`plugin test`, 3 de 3). Não digitou
-     em terminal de verdade.
-  4. **Parcial.** O worker, no Node do CLI, alcança `127.0.0.1` (HTTP 200). No app, o worker é `child_process.fork` sem
-     sandbox de rede (Terreno, F50), então deve alcançar também. O frame html não foi medido.
-  5. **Por documento, a favor.** O próprio `approval_required` diz "Later code edits in this development folder run
-     without asking again". Não foi rodado.
-  6. **Por documento, a favor; uma ressalva medida.** O `plugin shot --help` diz que captura com a janela escondida e
-     nunca a mostra. Medido: o CLI do Orca, chamado do chat do Studio, fala com o Studio pelo `ORCA_USER_DATA_PATH`
-     herdado, e só acha o Orca com o env limpo
+  **O spike rodou em 2026-11-03 nos dois apps — BrzA Studio `1.4.246-alpha.1` e Orca `1.4.247` —, com o item 1
+  aprovado nos dois: o C5 não volta à rodada.** O plugin é o de `spikes/c5-plugin/` (R8.1), aprovado pela CLI depois do
+  "Aprovar nos dois apps" de Anderson. A evidência está no worklog
+  [O PLN-003: o spike do C5 nos dois apps](../../work/worklogs/2026-11-03-pln-003-o-spike-do-c5-nos-dois-apps.md).
+  1. **Passa nos dois.** Os dois painéis carregaram, e o `plugin.request` respondeu do worker: `ping` em 0,19 s (Node
+     24.22.1), `settled: true`.
+  2. **Passa no Studio; no Orca, só o caminho do erro.** No Studio, o worker achou o worktree pela branch em foco e leu
+     planos e notas (`brand`: 1 plano e 4 issues; `tools-kit`: 2 planos e 10 notas), e o painel de componentes mostrou o
+     mesmo que o HTML, com Tree, Table e Markdown. O `readContext` não traz caminho. No Orca, que só tem os repositórios
+     da Fixfy, o painel mostrou o erro do worker ("a branch não é de um worktree do brza-workspace"): o `brza install`
+     do plugin precisa cadastrar o `brza-workspace` no Orca. **Medido:** o painel HTML não herda o tema do app (texto
+     claro em fundo branco no tema escuro); o de componentes herda.
+  3. **Passa nos dois, com duas ressalvas.** O worker escolheu sozinho o terminal sem agente (R8.4), digitou `brza
+     --version` e o terminal respondeu, nos dois apps, inclusive pelo botão do painel. **Ressalvas:** o workspace só
+     com o chat não tem terminal — o agente do chat sai no `agents.list` com `terminalId: null` —, então o botão não
+     tem onde digitar sem abrir um shell antes; e, no terminal do Orca, `brza` é o CLI do BrzA Studio, que vem antes no
+     PATH do shell
      ([O CLI do Orca no chat do Studio fala com o Studio](../../work/issues/o-cli-do-orca-no-chat-do-studio-fala-com-o-studio.md)).
-  7. **Respondido.** A aprovação é uma chamada de CLI por app, com o fingerprint que o `dev load` imprime, e não passa
-     por agente no modo auto. O `dev load` sem aprovação já grava a pasta no `devPluginPaths`, carregada e parada. O
-     `audit.log` (`plugins-data/audit.log`) registra só as chamadas à API do host, com o `terminal.sendText` resumido
-     em bytes, e a aprovação pela CLI como `cli:<caller>`; o acesso do worker pelo Node — ler arquivos, rodar `git`,
-     abrir HTTP — não entra (`src/main/plugins/plugin-audit-log.ts:4,8`, tag `v1.4.246`).
+  4. **Confirmado nos dois.** O worker alcança `127.0.0.1` (HTTP 200, 15–17 ms). O frame html não alcança: a CSP
+     `connect-src 'self' data: blob:` barra o `fetch` antes do proxy. Quem fala com o MCP residente é o worker.
+  5. **Passa nos dois.** No Studio, o `dev reload` depois de salvar saiu `already-approved`, sem `needsReconsent`. No
+     Orca, o `dev watch --check --shot` emitiu `reloaded`, `check` e `shot` ao salvar, e o painel mostrou "Reloaded". O
+     fingerprint `ap1-…` ficou o mesmo depois das edições: ele amarra a pasta, a versão e o acesso, não o conteúdo.
+  6. **Passa nos dois.** O `plugin shot` com a janela escondida saiu `settled: true`, sem erros, e a janela não voltou
+     à frente. O CLI do Orca, de dentro do chat do Studio, só acha o Orca com o env limpo (a mesma issue do item 3).
+  7. **Respondido ao vivo.** A aprovação é uma chamada de CLI por app, com o fingerprint que o `dev load` imprime. No
+     modo auto, ela só passou depois da aprovação explícita de Anderson na conversa: sem isso, o classificador barra
+     ([O --approve do plugin é barrado no modo auto](../../work/issues/o-approve-do-plugin-e-barrado-no-modo-auto.md)).
+     O `audit.log` gravou a aprovação como `cli:local` e cada `terminal.sendText` só com `bytes=14`, sem o texto. Não
+     gravou a leitura de `plans/` e `work/`, o `git worktree list`, o HTTP para `127.0.0.1` nem as chamadas de leitura
+     (`readContext`, `agents.list`).
 
-  Também saiu do spike: o pacote da `1.4.246` não traz os tipos de plugin, e o `plugin create` e o `plugin types`
-  quebram
-  ([Os tipos de plugin faltam no pacote da 1.4.246](../../work/issues/os-tipos-de-plugin-faltam-no-pacote-da-1-4-246.md));
-  e o Orca se atualizou para a `1.4.247` ao fechar, então a base do fork e o Orca não são mais a mesma versão.
+  Também saiu do spike:
+  - o `dev watch` interrompido emite `unloaded`, mas deixa no `devPluginPaths` a pasta que um `dev load` anterior pôs
+    ([O dev watch deixa carregado o plugin que já estava](../../work/issues/o-dev-watch-deixa-carregado-o-plugin-que-ja-estava.md));
+  - o pacote da `1.4.246` e o da `1.4.247` não trazem os tipos de plugin
+    ([Os tipos de plugin faltam no pacote da 1.4.246](../../work/issues/os-tipos-de-plugin-faltam-no-pacote-da-1-4-246.md));
+  - o Orca se atualizou para a `1.4.247` ao fechar, e a base do fork ficou na `1.4.246`.
 - **C6 Dentro do app** — `tool_use_id`/cartão, seletor nativo, estado sem RPC → app (fork); só BrzA; entra só sem contorno.
 - **C7 Imposição** — regra cuja violação gasta cota, dinheiro ou cache e que cabe numa tabela → a norma declara a
   regra e a tabela, e o mcp (ou hook) impõe lendo a tabela. Regra de juízo fica só no texto (C1).

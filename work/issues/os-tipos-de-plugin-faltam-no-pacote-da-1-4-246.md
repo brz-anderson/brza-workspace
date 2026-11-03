@@ -24,8 +24,8 @@ saiu com erro ao escrever os tipos:
 
 O molde nasce com o `tsconfig.json` estendendo `./.orca/types/tsconfig.json`, que não existe. Sem ele, o
 `npx tsc -p .` que a skill `orca-plugin-authoring` manda rodar não tem os tipos de `orca` e `orca/worker`. O `plugin dev
-watch`, que segundo a skill também roda o `plugin types`, deve bater no mesmo erro; não chegou a rodar, porque o spike
-parou na aprovação.
+watch`, que segundo a skill também roda o `plugin types`, rodou no Orca em 2026-11-03 sem emitir erro e sem gravar
+`.orca/types/`: a falha ali é silenciosa.
 
 ## A evidência
 
@@ -34,9 +34,10 @@ parou na aprovação.
   `1.4.246` (`ls`, 2026-11-03). Não é defeito só do fork.
 - **No código, os arquivos existem:** `resources/plugins/declarative/orca-components*.d.ts` no `brza-studio`, e o
   `src/cli/plugin-authoring/plugin-type-files.ts:46` os lista entre os que o `plugin types` copia.
+- **A `1.4.247` também não traz:** o Orca, atualizado em 2026-11-03, tem os mesmos quatro `.mjs` na pasta.
 - **O transpile não depende deles:** o `plugin validate`, o `plugin check` e o `plugin test` passaram sem os tipos.
 
 ## O que fazer
 
-Conferir se o empacotamento (`electron-builder`, `asarUnpack`) do upstream leva os `.d.ts`, e se a `1.4.247`, a que o
-Orca baixou em 2026-11-03, já corrige. Se não corrigir, o conserto vai ao fork e, como PR, ao upstream.
+Conferir se o empacotamento (`electron-builder`, `asarUnpack`) do upstream leva os `.d.ts`; a `1.4.247` não corrige. O
+conserto vai ao fork e, como PR, ao upstream.

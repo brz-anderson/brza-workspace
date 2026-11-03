@@ -40,6 +40,20 @@ foi para ele.
 - **Erro silencioso:** o comando não falha; ele age no app errado. O `plugin dev load` de um teste "no Orca" teria
   gravado o `devPluginPaths` do Studio.
 
+## O inverso, no terminal do Orca (2026-11-03)
+
+No terminal que o Orca `1.4.247` abriu num worktree dele, o `brza` é o CLI do BrzA Studio:
+
+```text
+PATH0=/Applications/Orca.app/Contents/Resources/bin
+/Applications/BrzA Studio.app/Contents/Resources/bin/brza
+/Applications/Orca.app/Contents/Resources/bin/orca
+```
+
+O `brza --version` que o worker do spike digitou ali respondeu `1.4.246-alpha.1`. Um botão do plugin do Orca que manda
+`brza <sub>` ao terminal chama o CLI do outro app. O `brza` próprio da R2.2, em `~/.local/bin`, precisa vir antes dos
+dois no PATH, ou o botão chama o binário por caminho.
+
 ## O que fazer
 
 Levar ao Desenho do PLN-003, no B1: o `brza` que chama o CLI de um client passa a ele só o env daquele client. Conferir

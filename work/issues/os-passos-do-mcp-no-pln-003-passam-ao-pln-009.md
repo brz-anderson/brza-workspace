@@ -36,6 +36,8 @@ PLN-003:
 5. marcar no Desenho do PLN-003 que o M6, o M7, o M13, o M14 e a R6.4 passaram ao PLN-009 (PLN-009/R2.1, D6 e P5),
    e que o D4 a D6 de lá são substituídos pelo D1 a D6 do PLN-009;
 6. no PLN-003/P4, montar o `.mcp.json` do plugin com `"type": "http"`, a URL do `brza mcp url` e
-   `"Authorization": "Bearer ${BRZA_MCP_TOKEN}"` (PLN-009/D1; a porta é a chave `[mcp] port` do `brza.toml`, R2.2).
+   `"Authorization": "Bearer ${BRZA_MCP_TOKEN}"` (PLN-009/D1; a porta é a chave `[mcp] port` do `brza.toml`, R2.2), e
+   os headers `"X-Brza-Session": "${ORCA_AGENT_SESSION_ID}"` e `"X-Brza-Client": "${ORCA_USER_DATA_PATH}"` (PLN-009/D3,
+   R4.3), de que o MCP tira a sessão chamadora e o client.
 
 Os ajustes do P0 que tocam o MCP já estão no Desenho do PLN-009, desde a reescrita da R2 (2026-11-03).

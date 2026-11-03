@@ -33,13 +33,41 @@ Prévia de 2026-11-03: 4 pareceres e 97 worklogs em `tools-kit` (29), `workspace
 ## Passos
 
 - [ ] P1 — Conferir as reservas `REV-001`..`REV-004` e `MIG-001` no índice da master.
-- [ ] P2 — Provar os quatro nomes novos, a ausência dos antigos e os links resolvidos nos workstreams donos.
-- [ ] P3 — Conferir refs dos worklogs e remoção de date com tags e demais campos preservados.
-- [ ] P4 — Registrar os comandos, resultados e commits antes de concluir esta MIG.
+- [ ] P2 — Aplicar em cada workstream pela sessão dona, no comando e na ordem de "Aplicação".
+- [ ] P3 — Provar os quatro nomes novos, a ausência dos antigos e os links resolvidos nos workstreams donos.
+- [ ] P4 — Conferir refs dos worklogs e remoção de date com tags e demais campos preservados, pelo bloco de
+  preservação do critério.
+- [ ] P5 — Registrar os comandos, resultados e commits antes de concluir esta MIG.
+
+## Aplicação
+
+Cada sessão dona roda, no worktree do próprio workstream, com `plans/`, `work/` e `wiki/` sem alteração por commitar:
+
+```bash
+python3 "$HOME/Projects/brza-workflow/scripts/migrate_pln008.py" --apply --workstream <dono>
+```
+
+O script recusa a aplicação sem `--workstream`, com nota suja ou com a branch de outro workstream. Ele mesmo commita
+por caminhos, dá o push e reconstrói o índice, com o assunto `docs(pln-008): migração MIG-001 em <dono>` ou
+`docs(pln-008): links cruzados em <dono>`: são esses commits que o bloco de preservação do critério compara com o pai.
+
+A ordem, porque os links cruzados só se reescrevem quando o destino já existe na branch dona:
+
+1. `tools-kit`: renomeia REV-001.
+2. `workspace`: renomeia REV-002 a REV-004 e reescreve os links para REV-001.
+3. `tools-kit` de novo: reescreve links para REV-002 a REV-004, se houver; no ensaio, nenhuma mudança.
+4. `brand`, `studio` e `playground`, cada um na própria sessão, em qualquer ordem depois do item 3; `playground` não
+   muda no ensaio.
+
+Ensaio de 2026-11-03, num clone isolado em `/private/tmp/pln008-sandbox`, com remoto local e sem `BRZA_WORKSPACE`:
+a ordem acima aplicou com saída 0 nas seis passagens (1 + 3 pareceres renomeados; 29, 22, 4 e 43 worklogs em
+`tools-kit`, `workspace`, `brand` e `studio`), e os três blocos do critério passaram. O acervo real não foi tocado.
 
 ## Revisão antes da aplicação
 
-Revisão independente registrada em [REV-005: A revisão prévia da MIG-001 em P6 do PLN-008](../reviews/REV-005-pln-008-p6-previa-da-mig-001.md). A aplicação aguarda o destino de A1 a A3 na rodada desta sessão.
+Revisão independente registrada em [REV-005: A revisão prévia da MIG-001 em P6 do PLN-008](../reviews/REV-005-pln-008-p6-previa-da-mig-001.md).
+Destinos de 2026-11-03: A1 corrigido aqui, com o bloco de preservação no critério; A2 corrigido aqui, com a seção
+"Aplicação"; A3 falso.
 
 ## Critério de conclusão
 
@@ -92,4 +120,63 @@ for name in ('tools-kit', 'workspace', 'brand', 'studio', 'playground'):
     subprocess.run(['python3', str(tree / '.claude/skills/notes-checker/scripts/check_notes.py')], check=True)
 print('H1, mapa D4, links, refs e ausência de date conferidos nas cinco árvores.')
 PYVERIFY
+```
+
+Por fim, a preservação: cada nota que um commit da MIG-001 tocou mantém o frontmatter do pai, linha a linha, exceto `refs:` e
+`date:` nos worklogs. A renomeação compara o caminho antigo com o novo; arquivo criado ou apagado falha.
+
+```bash
+python3 - <<'PYPRESERVE'
+from pathlib import Path
+import subprocess
+import re
+
+root = Path.cwd().parent.parent
+SUBJECTS = ('docs(pln-008): migração MIG-001 em ', 'docs(pln-008): links cruzados em ')
+EXPECTED = ('tools-kit', 'workspace', 'brand', 'studio')
+WORKLOG = re.compile(r'work/worklogs/(?!README\.md$)[^/]+\.md')
+
+
+def git(tree, *args):
+    return subprocess.run(['git', '-C', str(tree), *args], check=True, capture_output=True, text=True).stdout
+
+
+def frontmatter_lines(text, drop):
+    if not text.startswith('---\n') or (end := text.find('\n---', 4)) < 0:
+        return []
+    kept, skipping = [], False
+    for line in text[4:end].split('\n'):
+        key = re.match(r'^([A-Za-z_][\w-]*):', line)
+        if key:
+            skipping = key.group(1) in drop
+        elif not line.startswith((' ', '\t')):
+            skipping = False
+        if not skipping:
+            kept.append(line)
+    return kept
+
+
+total, worklogs = 0, 0
+for name in ('tools-kit', 'workspace', 'brand', 'studio', 'playground'):
+    tree = root / '.worktrees' / name
+    commits = [line.split(' ', 1)[0] for line in git(tree, 'log', '--format=%H %s').splitlines()
+               if any(line.split(' ', 1)[1] == s + name for s in SUBJECTS)]
+    assert commits or name not in EXPECTED, f'sem commit da MIG-001 em {name}'
+    for c in commits:
+        for row in git(tree, 'diff-tree', '-r', '-M', '--no-commit-id', '--name-status', c + '^', c,
+                       '--', 'plans', 'work', 'wiki').splitlines():
+            status, *paths = row.split('\t')
+            old, new = paths[0], paths[-1]
+            assert status[0] in 'MR', f'{name}:{c[:7]} {status} {new}: só edição ou renomeação'
+            if not new.endswith('.md'):
+                continue
+            drop = ('refs', 'date') if WORKLOG.fullmatch(new) else ()
+            before = frontmatter_lines(git(tree, 'show', f'{c}^:{old}'), drop)
+            after = frontmatter_lines(git(tree, 'show', f'{c}:{new}'), drop)
+            assert before == after, f'{name}:{c[:7]} {new}: frontmatter mudou além de refs/date\n{before}\n{after}'
+            total += 1
+            worklogs += bool(drop)
+print(f'Frontmatter preservado em {total} nota(s) migrada(s), {worklogs} worklog(s): '
+      'só refs/date mudaram, comparando cada commit da MIG-001 com o pai.')
+PYPRESERVE
 ```

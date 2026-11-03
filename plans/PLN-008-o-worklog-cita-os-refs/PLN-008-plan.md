@@ -17,11 +17,11 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** P6 iniciado por Anderson em 2026-11-03 ("Iniciar P6"). Regressão passou: CLI 467, hooks 288 e
-  checador 26 casos. Core `a666e78` sincronizado em `5dcc2b3`; bootstrap dos cinco IDs gravado em `4bb114e`.
-  MIG-001 criada para revisão prévia. Aplicação aguarda o destino do achado sobre preservação de tags/demais campos
-  no critério de conclusão e, depois, execução pelas sessões donas. P1–P4 continuam sem atestado integral; horas
-  históricas não aferidas e commits preservados. P7 não iniciado.
+- **Retomar:** P6 em curso. A rodada da REV-005 fechou em 2026-11-03: A1 e A2 corrigidos na MIG-001 (bloco de
+  preservação e seção "Aplicação"), A3 falso; o ensaio num clone isolado passou nos três blocos do critério. Próximo:
+  a aplicação real, pelas sessões donas, na ordem da MIG-001 — `tools-kit`, `workspace`, `tools-kit` de novo e depois
+  `brand`, `studio` e `playground` —; esta sessão aplica o `workspace` quando Anderson pedir, depois do `tools-kit`.
+  P1–P4 continuam sem atestado integral; horas históricas não aferidas. P7 não iniciado.
 - **Histórico desta retomada:** tentativa de execução integral em 2026-11-03 encontrou a fronteira de repositório entre `workspace` e
   `brza-workflow` no Antigravity, registrando 4 issues:
   [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md),
@@ -245,8 +245,10 @@ Evidência parcial de P6 em 2026-11-03: `brza-workflow@a666e78` já publicado; C
 `TMPDIR=/tmp PYTHONDONTWRITEBYTECODE=1`. `brza-sync --ref a666e78` publicou `brza-workspace@5dcc2b3` e levou a norma
 às cinco árvores. `brza-note index --bootstrap-pln008` reservou REV-001 a REV-004 e MIG-001 em `4bb114e`.
 Prévia: quatro renomeações e 97 worklogs (29 tools-kit, 21 workspace, 4 brand, 43 studio); playground sem mudanças.
-Revisão prévia exige prova da preservação dos campos além de refs/date; destino em rodada antes da aplicação.
-P6 ainda não concluído; horas não aferidas.
+Revisão prévia em REV-005: A1 e A2 corrigidos na MIG-001, A3 falso, por rodada de 2026-11-03. Ensaio em clone
+isolado (`/private/tmp/pln008-sandbox`): seis passagens de `migrate_pln008.py --apply` na ordem da MIG saíram com 0, e
+os três blocos do critério passaram, o de preservação com 107 notas (98 worklogs); um commit mutante sem `tags` foi
+barrado. O acervo real ainda não foi migrado. P6 ainda não concluído; horas não aferidas.
 
 ### P7 — Revisar a entrega e fechar o plano
 
@@ -289,11 +291,12 @@ python3 .claude/skills/notes-checker/scripts/check_notes.py
 
 ## Revisões
 
-- [REV-005: A revisão prévia da MIG-001 em P6 do PLN-008](../../work/reviews/REV-005-pln-008-p6-previa-da-mig-001.md) — prévia de P6; três destinos em rodada; não substitui P7.
+- [REV-005: A revisão prévia da MIG-001 em P6 do PLN-008](../../work/reviews/REV-005-pln-008-p6-previa-da-mig-001.md) — prévia de P6; A1 e A2 corrigidos na MIG-001, A3 falso; não substitui P7.
 
 ## Worklogs
 
-- 2026-11-03 — P6 iniciado: regressão, sync e bootstrap feitos; migração real aguarda revisão prévia.
+- 2026-11-03 — P6 iniciado: regressão, sync e bootstrap feitos; REV-005 com destinos, MIG-001 corrigida e ensaiada em
+  clone isolado; migração real aguarda as sessões donas.
   [O início de P6 do PLN-008: regressão, sincronização e reservas](../../work/worklogs/2026-11-03-pln-008-p6-regressao-sync-e-reservas.md)
 
 - 2026-11-03 — P5 entregue em fixture; P6/P7 pendentes; horas e identidade histórica exigem reconciliação.

@@ -865,6 +865,10 @@ ferramenta não (P52, resposta de 2026-10-27).
   por corte (`turnItemId`), mostrando "Retomada às HH:MM · Cancelar". Sem a capacidade do host, ou sem `resetsAt`, nada
   agenda, como hoje. O Cancelar cancela, e o corte não agenda de novo.
 - **Escolher "Continuar em outra conta"** cancela a retomada daquele corte, porque o chat continua agora.
+- **Pela R68**, lida no código no P79: o agendamento automático sai do app (`useNativeChatUsageLimitAutoResume`), só com
+  o chat aberto, e pede ao host com `automatic: true`; o host guarda o corte cancelado ou já enviado e recusa o
+  automático dele, atrás da capability `agent-session.usage-limit-auto-resume-automatic.v1`. O seletor de conta da linha
+  (o global e o do chat fixado) some quando o botão aparece; o Hand Off fica.
 
 #### A conferir no passo
 

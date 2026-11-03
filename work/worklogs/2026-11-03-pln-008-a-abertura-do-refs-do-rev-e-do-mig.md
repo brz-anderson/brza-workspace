@@ -1,0 +1,22 @@
+---
+scope:
+  - workspace
+---
+
+# A abertura do PLN-008: o refs nos worklogs, o REV e o MIG
+
+Anderson propôs IDs de plano, revisão e migração em `tags` nos worklogs. Três rodadas trocaram o `tags` por um `refs:`
+preenchido pelo `brza note commit`, deram `REV-NNN` às revisões e `MIG-NNN` às migrações, e abriram o
+[PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca](../../plans/PLN-008-o-worklog-cita-os-refs/PLN-008-plan.md),
+parado antes do Desenho.
+
+- **O MIG veio do modelo da Fixfy, com dois ajustes.** Lidos o `docs/migrations/README.md` do `flutter-template` e o
+  `docs/migration/README.md` do `fixfy_flutter`: a migração é divergência entre o disco e a norma, e sai do diretório ao
+  concluir. Aqui ela é issue `type: migration` e fica com `status: done`, porque o `refs:` confere a existência.
+- **Dois `designer` em paralelo**, um defendendo o MIG como plano e outro atacando, a pedido de Anderson. A síntese mudou
+  a recomendação: a definição do ataque, no lugar que a defesa apontou para a fila. Os dois gravaram o aprendizado em
+  `.claude/agent-memory/designer/project_porte-da-fixfy-regua-sem-lastro.md`.
+- **As skills entraram no pedido.** Depois da R3, Anderson pediu: "Temos também que criar/adaptar skills para a
+  criação, revisão e execução dessas novas notas". É o item 4 do Pedido; criar ou adaptar vai ao Desenho.
+- **O que é norma comum:** o `work/README.md`, o `plans/README.md`, o checador e o `brza-note` moram no
+  `brza-workflow`; os passos do PLN-008 mexem lá e chegam aqui pelo `brza sync`.

@@ -3080,7 +3080,7 @@ segue como antes, e o fork pelo celular não existe, então não há paridade a 
 
 Executa D58 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-39-credenciais`
 
-Estimado: 6 h · Executado: 2,5 h
+Estimado: 6 h · Executado: 2,9 h
 
 Agora (R65.2).
 
@@ -3092,7 +3092,7 @@ Agora (R65.2).
       outra); o usuário reconecta
 - [x] **4.** Os testes do que foi tocado e o `pnpm check:changed --base=origin/master`; rebase na `origin/master` e
       push. A conferência no app é o C28
-- [ ] **5.** (R69.1, 2026-11-02) O vizinho que a suíte completa pegou em `origin/master@4bbaecabf18`:
+- [x] **5.** (R69.1, 2026-11-02) O vizinho que a suíte completa pegou em `origin/master@4bbaecabf18`:
       `src/main/runtime/rpc/methods/usage-credentials.test.ts`, 8 dos 13 testes, que ainda esperam as chaves do MiniMax e
       do GLM em `.orca/` e passavam em `ecc4a13d456`. Atualizar para `~/.brza`, e reler os testes "never overwrites a
       key the other BrzA Studio app sealed" e "does not blame the other app", cuja premissa mudou com as pastas
@@ -3128,6 +3128,28 @@ espalha por quase tudo, não terminou em 29 min e foi interrompido (X73). No ún
 4 testes falham por `/tmp` contra `/private/tmp` no sandbox, e não importam nenhum arquivo tocado. Suíte inteira: roda no
 merge, pela coordenação. Não rodei o app, não li nenhum `.enc` nem toquei em `~/.orca`, no Keychain nem no perfil real:
 os testes usam diretório temporário. A conferência é o C28, de Anderson, num build novo.
+
+Subpasso 5: commit [`0efb501da52`](https://github.com/brz-anderson/brza-studio/commit/0efb501da52), na `master` do
+`brza-studio`, pela sessão `pln-001-p75-teste` no worktree `.worktrees/pln-001-p75-teste`, com o push direto
+(`4bbaecabf18..0efb501da52`; a `origin/master` não tinha andado). Só o teste mudou: as 8 ocorrências de `'.orca'` em
+`usage-credentials.test.ts` viraram `'.brza'`, com o título do primeiro teste. Os dois pares de "outro app" **ainda
+valem, e só trocaram o caminho**: o "outro app" nunca foi o Orca, e sim o desktop (safeStorage) e o orcad (chave do
+host), que não abrem o arquivo um do outro (`saved-credential-readability.ts:5`); os dois são do BrzA e resolvem a pasta
+pelo mesmo `getIntegrationCredentialsDir()`, a partir do `homedir()` (o X71 já dizia que o orcad grava em `~/.brza`).
+Então "never overwrites a key the other BrzA Studio app sealed" segue provando que o `sealed-elsewhere` recusa a gravação
+e deixa esquecer, e "does not blame the other app" segue provando que, sem a chave do host carregada, o erro é
+`unreadable`. Um comentário de uma linha no teste diz quem é o "outro app". Três asserções que passavam à toa com a
+pasta nova (o cookie recusado, a chave grande demais e o "storing nothing" esperavam que `.orca` não existisse) também
+foram a `.brza`, onde uma gravação indevida cairia. O que o `~/.orca` do Orca garante segue no
+`integration-credentials-location.test.ts`. Nenhum comportamento do P75 se perdeu, e não houve pergunta a Anderson.
+Rodou, por caminho: `usage-credentials.test.ts`, `src/main/credentials/`, `bitbucket/credential-store.test.ts`,
+`jira/client.test.ts` e `client-scoped-token.test.ts`, `linear/client.test.ts` e `linear-workspace-registry.test.ts`
+(Jira e Linear não têm `credential-store.test.ts`: os stores são testados nesses), `minimax-cookie-store`,
+`ipc/minimax-credentials`, `opencode-go-api-key-store`, `openai-api-key-store`, `src/main/zcode/`, a migração do orcad e
+os três de OpenCode Go do `rate-limits` e do `loading-store` → 22 arquivos, 316 passed, 3 skipped (os de ACL nativa do
+Windows), com os 13 de `usage-credentials.test.ts` verdes; nenhum outro teste de credencial esperava `.orca`. `pnpm
+tc:node` → exit 0; `pnpm check:changed --base=origin/master --maxWorkers=2` → 22 checks passaram, unit tests inclusive
+(57 s). Suíte completa: não repetiu (R69.1). Não rodei o app nem toquei em `~/.orca`, `~/.brza` ou no perfil real.
 
 ### P76 — O atualizador desligado no build ad hoc (pedido 39)
 
@@ -3642,7 +3664,10 @@ da linha quando o teste entra.
   `src/main/runtime/rpc/methods/usage-credentials.test.ts` falha sozinho (8 de 13): ainda espera as chaves em `~/.orca`,
   que o P75 (`f7490afab9e`) levou a `~/.brza` sem atualizá-lo. Os dois `tests/e2e/cross-version-wire/*.unit.test.ts` não
   acham arquivos na cópia em cache da v1.4.246 deste worktree (`tests/e2e/.cross-version-checkouts/`). O P79 não toca
-  nenhum dos dois. Afeta P79 e P75.
+  nenhum dos dois. Afeta P79 e P75. O primeiro foi corrigido no P75.5 (`brza-studio@0efb501da52`).
+- **X84 — Um comentário de produção ainda diz `~/.orca`.** O `saved-credential-readability.ts:5` explica o
+  `sealed-elsewhere` "in ~/.orca"; o comportamento está certo, só a pasta do comentário ficou para trás. O P75.5 só podia
+  mudar teste e não o tocou. Afeta P75.
 
 ## Worklogs
 
@@ -3778,6 +3803,8 @@ da linha quando o teste entra.
   o pedido 41, a R68, o D62 e o P79 em `brza-studio@4bbaecabf18`, com os X81 ao X83; o C32 espera um build novo, com Anderson.
 - 2026-11-02 — [O P80 do PLN-001, o botão de expandir com a aparência e a fileira dos vizinhos](../../work/worklogs/2026-11-02-pln-001-p80-botao-de-expandir.md):
   o pedido 42, o D63 e o P80 em `brza-studio@d501bb230ff`, com os X78 ao X80; o C33 espera um build novo, com Anderson.
+- 2026-11-02 — [O P75.5 do PLN-001, o teste das credenciais de uso que a suíte completa pegou](../../work/worklogs/2026-11-02-pln-001-p75-5-teste-das-credenciais-de-uso.md):
+  o P75.5 (R69.1) em `brza-studio@0efb501da52`, com o X84; a `brand` gera a v1.4.246-alpha.2 desse HEAD.
 - 2026-11-02 — [O P75 do PLN-001, as credenciais de integração do BrzA numa pasta própria](../../work/worklogs/2026-11-02-pln-001-p75-credenciais-numa-pasta-propria.md):
   o P75 em `brza-studio@f7490afab9e`, com os X71 ao X73; o C28 espera o build do C22, com Anderson.
 - 2026-11-02 — [O P74 do PLN-001, o fork de um chat fixado nasce na conta fixada](../../work/worklogs/2026-11-02-pln-001-p74-fork-de-chat-fixado.md):

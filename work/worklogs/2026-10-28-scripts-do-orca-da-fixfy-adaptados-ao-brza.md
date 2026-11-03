@@ -2,6 +2,9 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-001
+  - issue:scripts-da-fixfy-fora-do-port-para-o-brza
 ---
 
 # Os scripts do Orca da Fixfy adaptados ao BrzA Studio

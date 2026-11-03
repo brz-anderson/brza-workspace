@@ -8,7 +8,7 @@ tags:
   - tooling
 ---
 
-# REV: a entrega do PLN-002, do P0 ao P9
+# REV-001: a entrega do PLN-002, do P0 ao P9
 
 O parecer da entrega do
 [PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`](../../plans/PLN-002-os-comandos-brza/PLN-002-plan.md),

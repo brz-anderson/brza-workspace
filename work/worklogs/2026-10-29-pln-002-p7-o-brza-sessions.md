@@ -1,6 +1,9 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-002
+  - PLN-003
 ---
 
 # O PLN-002/P7: o brza sessions list, send e close

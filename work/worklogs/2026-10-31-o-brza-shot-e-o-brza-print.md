@@ -2,6 +2,8 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-001
 ---
 
 # O brza shot e o brza print

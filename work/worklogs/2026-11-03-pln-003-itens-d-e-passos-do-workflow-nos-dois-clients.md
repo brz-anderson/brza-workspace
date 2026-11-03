@@ -2,6 +2,8 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-003
 ---
 
 # O PLN-003: os itens D e os passos

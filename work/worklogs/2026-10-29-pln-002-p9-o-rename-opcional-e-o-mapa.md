@@ -1,6 +1,9 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-001
+  - PLN-002
 ---
 
 # O PLN-002/P9: o /rename opcional, o título da aba e o mapa de sessões

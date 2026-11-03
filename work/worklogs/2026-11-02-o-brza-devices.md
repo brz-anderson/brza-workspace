@@ -1,6 +1,9 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-006
+  - issue:testes-do-brza-workflow-falham-dentro-do-chat-do-app
 ---
 
 # O brza devices, que lista, cria e abre os simuladores e os emuladores

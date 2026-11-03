@@ -2,6 +2,8 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-002
 ---
 
 # O PLN-002 escrito: os comandos brza, com as rodadas de desenho

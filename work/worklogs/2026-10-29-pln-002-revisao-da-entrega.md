@@ -1,6 +1,10 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-002
+  - REV-001
+  - issue:brza-test-sai-0-com-testes-fora-do-vitest-da-raiz
 ---
 
 # A revisão da entrega do PLN-002, do P0 ao P9
@@ -23,7 +27,7 @@ no código antes da rodada.
 worktree vazio, o que reabre a R1.4; a R15 manda o A5 a issue e o A6, o X3, ao P10.
 
 **O registro:** o parecer em
-[REV: a entrega do PLN-002, do P0 ao P9](../reviews/pln-002-os-comandos-brza.md); a issue
+[REV-001: a entrega do PLN-002, do P0 ao P9](../reviews/REV-001-pln-002-os-comandos-brza.md); a issue
 [O brza test sai 0 com os testes de mobile/ e cloud/, que o vitest da raiz não roda](../issues/brza-test-sai-0-com-testes-fora-do-vitest-da-raiz.md);
 a R14 e a R15 na Entrevista; o D2 e o D6 reescritos; o P10 (2,1 h), as seções `## Revisões` e `## Pendências
 conhecidas` e o plano de volta a `in_progress`.

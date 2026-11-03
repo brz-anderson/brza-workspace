@@ -1,6 +1,8 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-002
 ---
 
 # O PLN-002/P1: o runtime comum e o brza-install --all

@@ -2,6 +2,12 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-003
+  - issue:o-approve-do-plugin-e-barrado-no-modo-auto
+  - issue:o-cli-do-orca-no-chat-do-studio-fala-com-o-studio
+  - issue:o-dev-watch-deixa-carregado-o-plugin-que-ja-estava
+  - issue:os-tipos-de-plugin-faltam-no-pacote-da-1-4-246
 ---
 
 # O PLN-003: o spike do C5 nos dois apps

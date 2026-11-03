@@ -1,6 +1,9 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-001
+  - PLN-002
 ---
 
 # O PLN-002, pedido 8: o /rename opcional e o mapa de sessões, desenhados

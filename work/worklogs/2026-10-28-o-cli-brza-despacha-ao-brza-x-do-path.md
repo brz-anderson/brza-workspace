@@ -1,6 +1,10 @@
 ---
 scope:
   - brza-studio
+refs:
+  - PLN-002
+  - issue:cli-brza-manda-subcomando-desconhecido-ao-brza-x-do-path
+  - issue:os-comandos-brza-que-viram-o-pln-002
 ---
 
 # O CLI `brza` despacha o subcomando desconhecido ao `brza-X` do PATH

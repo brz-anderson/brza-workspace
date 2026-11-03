@@ -538,7 +538,7 @@ Respondida em 2026-10-29, na sessão `pln-002-sessions-rename`.
 ### Rodada 14 — os achados de código da revisão (enviada 2026-10-29)
 
 **Apresentado antes:** o parecer
-[REV: a entrega do PLN-002, do P0 ao P9](../../work/reviews/pln-002-os-comandos-brza.md), com o A1 ao A4 conferidos no
+[REV-001: a entrega do PLN-002, do P0 ao P9](../../work/reviews/REV-001-pln-002-os-comandos-brza.md), com o A1 ao A4 conferidos no
 código nesta sessão: `brza-test:50-59` sem a trava de `brza-dev:56-57`; `brza-tree:127-152`, que com `--force` não
 imprime as razões; `brza-note:111`, com o `--autostash` sempre; `brza-app:134-150`, com o `keep` dado só no retorno.
 

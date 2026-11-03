@@ -2,6 +2,8 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-003
 ---
 
 # O PLN-003: a medição das hipóteses da fase 0 (P0)

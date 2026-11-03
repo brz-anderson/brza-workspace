@@ -2,6 +2,9 @@
 scope:
   - workspace
   - tools-kit
+refs:
+  - PLN-003
+  - issue:o-coordenador-le-o-indice-da-master
 ---
 
 # O PLN-003: a fila do orquestrador

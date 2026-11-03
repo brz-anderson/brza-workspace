@@ -336,3 +336,7 @@ Respondida em 2026-11-03, na sessão `workspace`: "12.3.2 / restante recomendado
 
    **Decidido — "12.3.2".** Consultar o índice local por padrão; `--refresh` atualiza antes da consulta.
    Falha de atualização é explícita, sem fallback silencioso para dados antigos.
+
+   **Emenda de Anderson em 2026-11-03, na sessão `workspace`:** "mas adicione um gatilho na 12.3.2 - dados errados
+   listados com frequência, o fetch vira padrão". O índice local é o padrão inicial; se dados errados forem
+   listados com frequência, fetch passa a ser o padrão. Não foi definido limiar numérico de frequência.

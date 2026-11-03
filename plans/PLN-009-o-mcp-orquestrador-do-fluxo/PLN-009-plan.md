@@ -667,6 +667,8 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
   `choose_account` sem chamador, até a decisão.
 - [O start e o stop do MCP concorrentes](../../work/issues/o-start-e-o-stop-do-mcp-concorrentes.md) — do P8 (Flash 5,
   Opus A3); sem trava entre processos, até a primeira automação que chame os dois verbos.
+- [Os pareceres do PLN-009 sem número REV](../../work/issues/os-pareceres-do-pln-009-sem-numero-rev.md) — da MIG-001
+  do `workspace`; os três pareceres de `work/reviews/` ganham o `REV-NNN` antes do fechamento deste plano.
 
 ## Fechamento
 

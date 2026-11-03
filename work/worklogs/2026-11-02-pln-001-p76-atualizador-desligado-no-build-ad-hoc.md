@@ -1,9 +1,11 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - release
+refs:
+  - PLN-001
+  - issue:o-atualizador-esta-ligado-no-build-ad-hoc
 ---
 
 # P76: o atualizador desligado no build ad hoc

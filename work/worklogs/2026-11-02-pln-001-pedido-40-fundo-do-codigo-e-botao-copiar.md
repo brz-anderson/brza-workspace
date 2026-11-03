@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P78 do PLN-001, o fundo do texto no bloco de código e o botão de copiar do visualizador de Markdown

@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-29
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O pedido 32 do PLN-001, as mensagens entre sessões no chat

@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-29
 tags:
   - tooling
+refs:
+  - PLN-001
 ---
 
 # O P59 do PLN-001, o terminal segue o chat

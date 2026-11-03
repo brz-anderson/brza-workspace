@@ -1,9 +1,11 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - release
+refs:
+  - PLN-001
+  - issue:pequenos-consertos-do-fork-depois-do-sync-da-v1-4-246
 ---
 
 # P77: os quatro pequenos consertos depois do sync da v1.4.246

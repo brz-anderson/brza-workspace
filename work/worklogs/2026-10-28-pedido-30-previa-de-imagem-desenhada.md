@@ -1,10 +1,11 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-28
 tags:
   - chat
   - design
+refs:
+  - PLN-001
 ---
 
 # O pedido 30, a prévia de imagem no chat, desenhado

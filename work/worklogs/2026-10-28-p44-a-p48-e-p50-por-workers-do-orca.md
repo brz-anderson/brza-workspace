@@ -1,6 +1,10 @@
 ---
 scope:
   - brza-studio
+refs:
+  - PLN-001
+  - PLN-002
+  - issue:pln-001-passos-e-desvios-no-molde-depois-da-run
 ---
 
 # O P44 ao P48 e o P50 por workers do Orca em paralelo

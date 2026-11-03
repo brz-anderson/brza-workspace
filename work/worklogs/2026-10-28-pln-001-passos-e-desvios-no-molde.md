@@ -1,9 +1,11 @@
 ---
 scope:
   - workspace
-date: 2026-10-28
 tags:
   - tooling
+refs:
+  - PLN-001
+  - issue:pln-001-passos-e-desvios-no-molde-depois-da-run
 ---
 
 # Os Passos e os Desvios do PLN-001 levados ao molde, depois da Run do P44 ao P50

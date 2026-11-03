@@ -1,9 +1,11 @@
 ---
 scope:
   - workspace
-date: 2026-10-28
 tags:
   - tooling
+refs:
+  - PLN-001
+  - issue:pln-001-passos-e-desvios-no-molde-depois-da-run
 ---
 
 # O PLN-001 conferido contra a norma de planos da Fixfy e levado ao molde

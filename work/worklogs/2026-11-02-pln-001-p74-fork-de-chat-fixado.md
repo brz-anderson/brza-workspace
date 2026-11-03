@@ -1,10 +1,12 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - chat
   - auth
+refs:
+  - PLN-001
+  - issue:o-fork-de-um-chat-fixado-abre-na-conta-global-e-sem-contexto
 ---
 
 # P74: o fork de um chat fixado nasce na conta fixada

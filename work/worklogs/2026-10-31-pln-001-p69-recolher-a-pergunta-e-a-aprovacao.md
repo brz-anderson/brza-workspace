@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-31
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P69 do PLN-001, recolher a pergunta e a aprovação no chat estruturado

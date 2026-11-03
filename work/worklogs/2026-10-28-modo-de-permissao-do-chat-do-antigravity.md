@@ -1,6 +1,8 @@
 ---
 scope:
   - brza-studio
+refs:
+  - PLN-002
 ---
 
 # O modo de permissão do chat do Antigravity se aplica ao servidor vivo

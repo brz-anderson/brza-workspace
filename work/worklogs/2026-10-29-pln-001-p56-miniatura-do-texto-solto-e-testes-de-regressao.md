@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-29
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P56 do PLN-001 e os testes de regressão do P26.4, do P43.4 e do P44.4

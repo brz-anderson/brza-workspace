@@ -1,10 +1,12 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-31
 tags:
   - chat
   - design
+refs:
+  - PLN-001
+  - issue:a-faixa-recolhida-com-icone-e-acao
 ---
 
 # O P70 do PLN-001, a faixa recolhida com ícone e ação

@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-31
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P68 e o P37 do PLN-001, o mock compartilhado do lucide e a ortografia conferida

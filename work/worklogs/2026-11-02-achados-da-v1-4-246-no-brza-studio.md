@@ -1,10 +1,16 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - release
   - chat
+refs:
+  - PLN-001
+  - issue:as-credenciais-de-integracao-em-orca-sao-cifradas-por-app
+  - issue:o-atualizador-esta-ligado-no-build-ad-hoc
+  - issue:o-fork-de-um-chat-fixado-abre-na-conta-global-e-sem-contexto
+  - issue:o-worker-de-plugin-sem-sandbox-alcanca-o-token-do-runtime
+  - issue:pequenos-consertos-do-fork-depois-do-sync-da-v1-4-246
 ---
 
 # Mais achados que a v1.4.246 trouxe ao BrzA Studio

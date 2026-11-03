@@ -1,10 +1,12 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - auth
   - infra
+refs:
+  - PLN-001
+  - issue:as-credenciais-de-integracao-em-orca-sao-cifradas-por-app
 ---
 
 # O P75 do PLN-001, as credenciais de integração do BrzA numa pasta própria

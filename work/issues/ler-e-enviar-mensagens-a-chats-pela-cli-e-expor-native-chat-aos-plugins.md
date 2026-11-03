@@ -57,3 +57,17 @@ Rastreado das issues abertas no upstream [`stablyai/orca#33114`](https://github.
 
 Implementar `brza chat list/read/send/focus`, incluir Native Chat na Jump Palette e na seleção da barra lateral, e
 expor Native Chat em `agents.list` no `brza-studio`, alinhando com as necessidades do `brza-workflow`.
+
+## Aprofundamento verificado em 2026-11-03
+
+As descrições acima registram os relatos do upstream; o checkout local do Studio `8f41dd56a33` e o workflow já cobrem parte delas:
+
+- **Há implementação candidata:** o PR aberto [#33115](https://github.com/stablyai/orca/pull/33115), ausente do levantamento inicial, acrescenta `chat list/read/send` em 11 arquivos, reutilizando RPCs existentes. Não inclui `focus`, `wait`, `read --since` ou envio condicionado atomicamente à ociosidade. Seus recibos não comprovam conclusão da tarefa.
+- **Envio por nome já existe:** `brza-workflow/packages/client/bin/brza-sessions:68` oferece `open/list/send/title/close`. Em `:283-287`, o envio imprime `sent: true`; `bin/brza_runtime.py:141-145` descarta o resultado da mutação. O RPC verifica apenas o sucesso externo (`:115-117`), embora a mutação possa retornar recusa interna. A lacuna é leitura e resultado fiel do envio, não ausência total de acesso a chats.
+- **O wrapper tem limites próprios:** usa socket Unix local, não negocia a capability de fila e cria nova identidade de operação a cada envio. Já preserva a origem do coordenador por `orchestrationCompatibilityEvidence` (`bin/brza_runtime.py:84-145`). Uma substituição precisa preservar essa origem.
+- **O backend de leitura já existe:** `src/main/runtime/rpc/methods/structured-agent-session.ts:195-225` expõe histórico e assinatura incremental com permissão `workspace`. A CLI pode reutilizá-los.
+- **O protocolo evoluiu:** `src/shared/agent-session/lifecycle/agent-session-mutation-envelope.ts:66` documenta que o host atual ignora `expectedRuntimeFence` na admissão; hosts antigos ainda o verificam. A fila atual tem contrato `agent-session.queued-messages.v2` (`src/shared/rpc-contract/structured-agent-session-params.ts:113`). Portar o PR exige conferir a semântica atual, não prometer proteção universal por fence.
+- **Plugins têm cobertura parcial:** o hook server já ingere status estruturados (`src/main/agent-hooks/server/server-ingest-structured.ts:147-169`) e os inclui no snapshot (`server-listeners.ts:216-217`). A projeção de `agents.list` admite linhas sem terminal, mas omite identidade de sessão, superfície e modelo (`src/main/plugins/workers/plugin-workspace-projection.ts:74-93`). O contexto omite caminhos deliberadamente (`:45-60`); ampliá-lo muda o contrato público.
+- **Transporte e conclusão são distintos:** `src/main/runtime/orchestration/send-agent-turn.ts:143-164` distingue recusa, fila e submissão pendente. A reconciliação de `worker_done` continua exigindo tarefa, dispatch e autoridade (`lifecycle-reconciliation.ts:182-254`). Texto no histórico não substitui esse protocolo.
+
+O aprofundamento é levantamento técnico. O recorte de implementação ainda depende de escolha; nenhum código foi alterado e nenhuma mensagem foi enviada a outra sessão.

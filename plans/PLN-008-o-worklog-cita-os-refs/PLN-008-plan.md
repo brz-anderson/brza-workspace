@@ -3,7 +3,7 @@ status: open
 phase: design
 origin: request
 description: O brza note commit preenche o refs do worklog com os IDs que ele cita, e revisão e migração ganham REV-NNN e MIG-NNN
-ready: não — R8.1 confirmou a migration-runner; faltam as regras de dependência e os demais contratos do Desenho
+ready: não — dependências definidas na R9; faltam extração de refs e os demais contratos do Desenho
 scope:
   - workspace
 opened: 2026-11-03
@@ -14,10 +14,9 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** R8.1 confirmou uma única `migration-runner` para criar, revisar e executar MIG, com revisor
-  independente. R7.2 e R7.3 mantêm `depends_on` em planos/issues/índice e `issue:<slug>` no `refs:`. Próximo:
-  fechar semântica e validação das dependências; depois extração, renumeração e sessão no rebuild, concluir os
-  itens `D` e derivar os Passos.
+- **Retomar:** R9 definiu `depends_on`: só `done` satisfaz a dependência; alvo inexistente, autorreferência e ciclo
+  geram erro no checador. D1 e D2 registram a migration-runner e as dependências. Próximo: fechar extração do `refs:`;
+  depois renumeração e sessão no rebuild, concluir os itens `D` e derivar os Passos.
 - **Dividido:** [PLN-008 — Desenho](PLN-008-design.md)
 
 ## Pedido
@@ -64,6 +63,8 @@ mesma sessão.
 | `R5.3` | os worklogs perdem o `date`, mantêm o `tags`, e o checador avisa o `date` | — | — |
 | `R6.1` | o `brza note ls` lista issues e decisões de todos os workstreams, pelo índice, ordenadas por `opened`, `priority` ou `deadline` | — | — |
 | `R7.2` | planos e issues aceitam `depends_on` opcional, também gravado no índice | — | — |
+| `R9.1` | só `done` satisfaz uma dependência; `dropped` exige revisão explícita da relação | — | — |
+| `R9.2` | o checador barra dependência com alvo inexistente, autorreferência ou ciclo, inclusive entre workstreams | — | — |
 
 ### Fora de escopo
 
@@ -306,9 +307,33 @@ Respondida em 2026-11-03, na sessão `workspace`.
    **Decidido — "sim".** Uma única `migration-runner` reúne criação, revisão e execução; a revisão usa revisor
    independente. Isso fecha a contraproposta de R7.1; não autoriza executar passos do plano.
 
+### Rodada 9 — satisfação e validação de dependências (enviada 2026-11-03)
+
+**Apresentado antes:** a norma distingue `done`, encerrado com desfecho, de `dropped`, encerrado sem desfecho por
+escolha (`brza-workflow/core/work/README.md:207`). R7.2 já confirmou a presença do campo; esta rodada define as regras.
+
+Respondida em 2026-11-03, na sessão `workspace`: "ambos recomendado".
+
+1. **Quando uma dependência fica satisfeita?** Opções:
+   - somente com `done` (recomendada) — custo: rever explicitamente a dependência quando o antecedente for
+     abandonado; se paga: no primeiro cancelamento, evitando considerar entregue um pré-requisito abandonado;
+   - com `done` ou `dropped` — custo: conferir o resultado antes de executar; a relação significa apenas aguardar
+     encerramento; se paga: quando o trabalho puder continuar mesmo sem a entrega anterior.
+
+   **Decidido — "ambos recomendado".** Somente `done` satisfaz; `dropped` exige revisar explicitamente a relação.
+
+2. **Como tratar alvo inexistente, autorreferência e ciclos?** Opções:
+   - erro no checador (recomendada) — custo: resolução dos IDs, percurso do grafo e correção antes do commit;
+     se paga: na primeira referência errada ou circular;
+   - aviso, permitindo o commit — custo: as mesmas verificações e tratamento posterior da pendência inválida;
+     se paga: quando for necessário registrar dependências antes de criar suas notas.
+
+   **Decidido — "ambos recomendado".** O checador gera erro para alvo inexistente, autorreferência e ciclo,
+   inclusive entre workstreams.
+
 ## Worklogs
 
 - 2026-11-03 — aberto; R1 a R6 fecharam a Entrevista; parou antes do Terreno.
   [A abertura do PLN-008: o refs nos worklogs, o REV e o MIG](../../work/worklogs/2026-11-03-pln-008-a-abertura-do-refs-do-rev-e-do-mig.md)
-- 2026-11-03 — retomada; Terreno conferido; R7.2, R7.3 e R8.1 respondidas; D1 registra a única migration-runner.
+- 2026-11-03 — retomada; Terreno conferido; R7 a R9 respondidas; D1 e D2 registram skill e dependências.
   [O Terreno do PLN-008 para o Desenho](../../work/worklogs/2026-11-03-pln-008-o-terreno-para-o-desenho.md)

@@ -24,3 +24,7 @@ Retomar do plano.
 
 Na R8.1, Anderson confirmou com "sim" a única `migration-runner` reunindo criação, revisão e execução, com revisor
 independente. O D1 registra esse contrato; as regras de dependência são o próximo ponto do Desenho.
+
+Na R9, Anderson respondeu "ambos recomendado": só `done` satisfaz uma dependência, e o checador barra alvo
+inexistente, autorreferência e ciclos, inclusive entre workstreams. O D2 registra as regras; a extração do `refs:`
+é o próximo ponto do Desenho. Não houve implementação.

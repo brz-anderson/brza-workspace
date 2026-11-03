@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Spike C5 · html</title>
+    <style>
+      body { font: 12px/1.4 var(--orca-font-sans, system-ui); color: var(--orca-foreground, inherit); margin: 8px; }
+      h1 { font-size: 14px; margin: 0 0 6px; }
+      table { width: 100%; border-collapse: collapse; }
+      td, th { text-align: left; padding: 2px 4px; border-bottom: 1px solid var(--orca-border, #8884); vertical-align: top; }
+      .muted { opacity: .65; } .erro { color: #d55; } button { margin: 6px 4px 0 0; }
+    </style>
+  </head>
+  <body>
+    <h1>Spike C5 · html</h1>
+    <div id="ping" class="muted">worker: …</div>
+    <div id="rede" class="muted">rede: …</div>
+    <h2 style="font-size:12px">Planos</h2><table id="planos"></table>
+    <h2 style="font-size:12px">Notas abertas</h2><table id="notas"></table>
+    <pre id="retomar" style="white-space:pre-wrap"></pre>
+    <button id="recarregar">Recarregar</button>
+    <script type="module" src="./panel-html.js"></script>
+  </body>
+</html>

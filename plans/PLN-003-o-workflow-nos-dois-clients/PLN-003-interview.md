@@ -341,3 +341,51 @@ Respondida em 2026-10-29, no chat do BrzA Studio.
    - medir em cada passo. Custo: 0 agora. Se paga: só se nenhum risco falhar.
 
    **Decidido — o Desenho com hipóteses, e o P0 numa sessão própria.**
+
+### Rodada 8 — como rodar o spike do C5 (enviada 2026-11-03)
+
+**Apresentado antes:** o BrzA Studio `1.4.246-alpha.1` rodando, e o Orca `1.4.246` parado, com o CLI em
+`/Applications/Orca.app/Contents/Resources/bin/orca`; `pluginSystemEnabled: true` e `devPluginPaths: []` nos dois, pelo
+`profile-state.db`, só leitura; o atualizador do Orca checou em 2026-10-31, e o `upstream/main` tem commit de
+2026-11-02; o `--approve <fingerprint>` só com o pedido exato (Desenho, "Segurança e consentimento"); o
+`terminal.sendText` digita num terminal que já existe, e o worker da API 1.2 não cria terminal; o MCP residente não
+existe ainda, e o item 4 mede contra um servidor HTTP descartável em `127.0.0.1`.
+
+Respondida em 2026-11-03, no chat do BrzA Studio, na sessão do `tools-kit`.
+
+1. **Onde mora o código do plugin do spike.** Opções:
+   - o scratch da sessão, fora do git, com o manifesto no worklog (recomendada). Custo: nenhum agora; o código some
+     com o scratch. Se paga: agora;
+   - uma pasta no worktree `tools-kit`, como `spikes/c5-plugin/`, versionada no workstream. Custo: ~10 min e um gênero
+     de pasta que a norma de `work/` não prevê, a acertar numa rodada de norma. Se paga: se o spike virar a base do
+     plugin real;
+   - o repositório `brz-anderson/brza` (R5.3). Custo: criar o repositório agora, ~20 min, e publicar um spike
+     descartável. Se paga: nunca, para o spike.
+
+   **Respondida — "Pasta no worktree tools-kit".**
+
+2. **Como aprovar o `trusted-worker`.** Opções:
+   - pela CLI, com a aprovação de Anderson na conversa: o `dev load` traz o fingerprint e as capacidades, Anderson diz
+     "aprovado" e a sessão passa o `--approve`; no fim, `dev unload` nos dois apps (recomendada). Custo: uma rodada por
+     app. Se paga: agora, porque mede o custo da aprovação pela CLI (item 7);
+   - Anderson aprova pela interface de cada app. Custo: ~2–3 min por app. Se paga: se o item 7 medir o custo humano;
+   - só o painel html, sem worker. Custo: os itens 1, 3, 4 e 7 sem resposta. Se paga: nunca.
+
+   **Respondida — "CLI, com sua aprovação aqui (Recomendado)".**
+
+3. **Como o Orca entra.** Opções:
+   - a sessão abre com `open -a Orca` e fecha no fim, depois do BrzA Studio; versão acima da `1.4.246`, se o
+     atualizador baixar, vai ao worklog (recomendada). Custo: ~5 min. Se paga: agora;
+   - Anderson abre. Custo: ~2 min dele. Se paga: se quiser controlar o atualizador;
+   - só o BrzA Studio nesta sessão. Custo: o C5 não fecha hoje. Se paga: se o Orca não puder abrir.
+
+   **Respondida — "Eu abro e fecho no fim (Recomendado)".**
+
+4. **Em que terminal o worker digita `brza --version` no item 3.** Opções:
+   - um shell sem agente que Anderson deixa em foco (recomendada). Custo: ~1 min por app. Se paga: agora, sem risco de
+     digitar numa sessão do Claude;
+   - o worker escolhe sozinho: o primeiro terminal do workspace em foco sem agente no `agents.list`. Custo: risco de
+     digitar numa sessão viva, se o `agents.list` não marcar o terminal. Se paga: agora, e mede também a escolha;
+   - pular o item 3. Custo: os botões da R1.2 sem prova. Se paga: nunca.
+
+   **Respondida — "O worker escolhe sozinho".**

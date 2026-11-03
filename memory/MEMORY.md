@@ -1,2 +1,2 @@
 - [A edição renderizada, com o removido em callout](edicao-renderizada-com-o-removido-em-callout.md) — só o trecho renderizado, removido em CAUTION, sem a cerca diff; em medição
-- [LLM local fora da revisão](llm-local-fora-da-revisao-avaliar-em-outros-fluxos.md) — o `qwen2.5:14b` falhou na revisão (recall 0 de 7); parar, e avaliar em outros fluxos depois
+- [LLM local fora da revisão](llm-local-fora-da-revisao-avaliar-em-outros-fluxos.md) — falhou na revisão; no desempate, o `tev1:4b` classifica texto, mas nenhum local faz regra numérica

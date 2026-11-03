@@ -119,6 +119,12 @@ a sessão que o executa, num worktree do `brza-studio`:
     correções (e a lista dos 25 do sync não os trouxe: depende da máquina).
   - **`git-admission-storm-measurement.test.ts`:** passa isolado; é instável sob carga.
   - **O resto** são os 25 de sempre (macOS, `ssh -F`, `/private/tmp`), na lista da pura.
+- **A regressão do P75 corrigida e o aviso à `brand` enviado** (R69.1, "Corrigir o teste do P75 antes"): a sessão
+  `pln-001-p75-teste` deu push em `brza-studio@0efb501da52` (só o `usage-credentials.test.ts`, 9 linhas a mais e 8 a
+  menos). Conferi nesse HEAD, num worktree próprio: `usage-credentials`, `src/main/credentials`, Jira, Linear e Bitbucket →
+  59 arquivos, 513 testes, todos passam. A `master` do `brza-studio` ficou em `0efb501da52`, e a `brand` recebeu, por
+  `brza sessions send brand` (entregue a `antigravity_5464ba06…`), o hash, o resumo da suíte e o que não se confirmou: os
+  casos manuais C22 a C33 e o marcador `ad-hoc-signed` do P76 no bundle empacotado.
 - **O pedido 41 (R67, D62, P79):** o botão "Continuar em outra conta" volta, reabrindo o P40 e a R1 do sync, e o
   "Retomar automaticamente" agenda sozinho ao bater o limite. Sessão `pln-001-pedido-41`; o C32 espera o build.
 - **A limpeza de branches** (só local, a pedido): saíram os worktrees e as branches dos pedidos 37, 38, 39 (as quatro) e

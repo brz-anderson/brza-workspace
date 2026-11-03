@@ -15,6 +15,7 @@ O Desenho segue em elaboração. Além do Terreno, estão confirmados:
   desconhecida gera aviso sem entrar no campo.
 - **R11.1:** as quatro revisões recebem REV-001 a REV-004 pela primeira inclusão no git.
 - **R11.2:** `session` identifica a sessão que produziu a linha do índice, inclusive no rebuild.
+- **R12:** ls mostra abertos e `opened` recente primeiro, usando o índice local por padrão; `--refresh` atualiza.
 
 ## Terreno
 
@@ -49,8 +50,8 @@ Levantamento refeito em 2026-11-03. Os caminhos de código abaixo partem do `brz
 
 ### Lacunas para as rodadas
 
-Falta concluir os contratos de numeração, preenchimento do acervo, índice e listagem. O mapeamento das quatro REV
-e a sessão no rebuild estão definidos em D4 e D5. Não houve implementação.
+Falta consolidar numeração, preenchimento do acervo e índice, e levar o corte em Passos ao aceite. O mapeamento
+das quatro REV, a sessão no rebuild e a listagem estão definidos em D4 a D6. Não houve implementação.
 
 ## D1 — Uma única migration-runner conduz a MIG — `core/.claude/skills/migration-runner/`
 
@@ -169,3 +170,28 @@ A documentação do índice explicita essa semântica. O comportamento atual de 
 do nome continua sujeita à verificação de R4.1.
 
 **Alternativa recusada em R11.2:** preservar a sessão registrada anteriormente e omitir a desconhecida no rebuild.
+
+## D6 — A listagem consulta as pendências no índice local — `bin/brza-note`
+
+- **Origem:** R6.1; R12.1–R12.3.
+- **Contexto:** consultar o índice disponível evita rede nas consultas repetidas; a atualização é uma ação explícita.
+
+### Como fica
+
+`brza note ls` lista issues e decisões de todos os workstreams pelo estado vigente do índice. MIG continua issue.
+
+| Opção | Comportamento |
+| :---- | :------------ |
+| Sem opções | Estados `open`, `in_progress`, `in_review`; `opened` mais recente primeiro; índice local. |
+| `--status all` | Inclui os estados encerrados. |
+| `--status open` | Explicita o conjunto dos três estados abertos. |
+| `--sort opened` | Mais recente primeiro. |
+| `--sort priority` | high → medium → low. |
+| `--sort deadline` | Menor data primeiro, incluindo vencidos. |
+| `--refresh` | Atualiza o índice antes de listar; falha de atualização é explícita, sem fallback silencioso. |
+
+Em toda ordenação, campo ausente fica no fim e empate usa ID ascendente. O padrão local pode refletir dados
+anteriores ao último push de outro workstream; `--refresh` é a escolha explícita para atualizar essa visão.
+
+**Alternativas recusadas em R12:** listar todos os estados por padrão; mais antigos primeiro; fetch automático
+com `--offline`. A listagem não calcula prontidão nem autoriza execução.

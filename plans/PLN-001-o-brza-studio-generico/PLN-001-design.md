@@ -841,3 +841,39 @@ ferramenta não (P52, resposta de 2026-10-27).
 - Se a margem passada ao wrapper muda o espaçamento do bloco dentro de lista, citação e callout.
 - O P77 mexe no `markdown-surface-theme.ts` (o fundo do código no modo cru): o P78 não toca esse arquivo, e os dois não
   se pisam.
+
+### D62 — O Continuar em outra conta de volta, e o Retomar automaticamente por padrão — `brza-studio/src/renderer/src/components/native-chat/` (P79)
+
+- **Origem:** pedido 41, R67.1. Reabre o D34 (P40) e a R1 do worklog do sync da v1.4.246 ("Fica o do upstream").
+- **Contexto** (`brza-studio@9a8631369ac`, lido sem rodar): a linha de ações do limite do upstream
+  (`NativeChatUsageLimitActions.tsx`) leva o seletor de conta (`ClaudeSwitcherMenu` ou, no chat fixado, o
+  `BrzaPinnedAccountSwitch`) e o "Hand Off to Another Agent", que só serve a agente de terminal e abre outro agente. O
+  "Retomar automaticamente" é o `NativeChatUsageLimitAutoResume`, montado na linha do aviso
+  (`NativeChatNoticeRow.tsx:285`), alimentado pelo `useNativeChatUsageLimitAutoResume`
+  (`use-native-chat-usage-limit-auto-resume.ts`), que lê o agendamento do host (`agentSession.usageLimitAutoResumeList`)
+  e o cria e cancela por `agentSession.usageLimitAutoResume` e `…Cancel`. O P40 original é o commit `15b028ba23f`:
+  `brza/BrzaContinueInOtherAccount.tsx` e o teste, montados na `NativeChatNoticeRow` ao lado do "Retomar
+  automaticamente", com o menu das outras contas sempre (R46.5, o `UserRound` do `NativeChatAccountPicker`), a troca e só
+  depois o `continueUsageLimit` (`NativeChatInterruptedContinue.tsx:112`).
+
+#### Como fica
+
+- **O botão "Continuar em outra conta" volta** do `15b028ba23f`, adaptado ao v1.4.246, na linha do aviso, ao lado do
+  "Retomar automaticamente". Usa a troca do P36 no chat fixado e a global no sem pino (R2 do sync: o pino vence), e o
+  Continue só sai depois que a troca deu certo. O "Hand Off to Another Agent" do upstream **fica como está**.
+- **O "Retomar automaticamente" agenda sozinho** quando o aviso de limite aparece com horário de reset (R67.1): uma vez
+  por corte (`turnItemId`), mostrando "Retomada às HH:MM · Cancelar". Sem a capacidade do host, ou sem `resetsAt`, nada
+  agenda, como hoje. O Cancelar cancela, e o corte não agenda de novo.
+- **Escolher "Continuar em outra conta"** cancela a retomada daquele corte, porque o chat continua agora.
+
+#### A conferir no passo
+
+- **Onde o agendamento automático roda:** o hook só existe com a linha do aviso montada, ou seja, com o chat aberto no
+  app. Se o host puder agendar ao registrar o corte, vale mais (agenda com a janela fechada e no chat não visitado); se
+  só o renderer puder, o padrão vale só para chat aberto. Devolver a escolha a Anderson, se mudar o custo.
+- **O Cancelar tem de continuar cancelado** depois de remontar a linha ou reabrir o app: o `usageLimitAutoResumeList`
+  só lista o agendado, e o cancelado precisa de uma marca que a sessão guarde (por corte).
+- **Duas telas de conta na mesma linha:** a linha do upstream já tem um seletor (`ClaudeSwitcherMenu`), e o botão volta
+  com o próprio menu; ver se os dois aparecem juntos, e como o P40 convivia com o seletor da v1.4.242.
+- **O que o `BrzaContinueInOtherAccount` de 2026-10-28 usava** e o que o v1.4.246 mudou nesses pontos (a troca por chat,
+  o `acquiredAccount`, o `useNativeChatAccountSwitch`).

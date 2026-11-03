@@ -3,9 +3,9 @@ status: in_progress
 phase: execution
 origin: request
 ready: "sim — o P57, o P61, o P65 e os casos manuais com Anderson"
-estimate_h: 198.3
+estimate_h: 201.3
 executed_h: 34.3
-remaining_h: 23.9
+remaining_h: 26.9
 scope:
   - brza-studio
 opened: 2026-10-26
@@ -148,6 +148,11 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   grifado, o bloco se mantém igual". As imagens estão em
   `/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace--worktrees-studio/3c979448-152e-4d39-8083-1ed021e930bd/images/3.png`
   e `…/4.png`, fora do git
+- **Pedido 41 (2026-11-03, sessão `studio-achados-246` do workstream `studio`, no chat do BrzA Studio):** "o botão
+  `Transferir para outro agente` do `upstream` só transfere entre `runtimes`, retorne o botão que criamos, ao lado do
+  `Retomar automaticamente` e deixe o `Retomar automaticamente` marcado por padrão". O botão que criamos é o P40, o
+  "Continuar em outra conta", que o sync da v1.4.246 tirou pela R1 do worklog do sync ("Fica o do upstream"): o pedido
+  **reabre** essa resposta
 
 ### Cobertura
 
@@ -1276,6 +1281,28 @@ estimativa.
    de fora, porque ninguém o pediu. Vai ao D61 e ao P78.
 
 Sem rodada própria, por ser a ordem do pedido: o passo roda agora, num worktree do `brza-studio`.
+
+### Rodada 67 — o Continuar em outra conta de volta e o Retomar automaticamente por padrão (enviada 2026-11-02)
+
+> **Apresentado antes:** a leitura desta sessão, em `brza-studio@9a8631369ac`, sem rodar. A linha de ações do limite do
+> upstream (`NativeChatUsageLimitActions.tsx`) tem o seletor de conta e o "Hand Off to Another Agent", que só serve a
+> agente de terminal e abre outro agente (`isTuiAgent`, `avoidSourceAgent`). O "Retomar automaticamente" é um botão da
+> linha do aviso (`NativeChatNoticeRow.tsx:285`) que agenda no host (`agentSession.usageLimitAutoResume`). O P40 original
+> está no commit `15b028ba23f` (`brza/BrzaContinueInOtherAccount.tsx`), e o sync o tirou na R1 do worklog do sync.
+
+Respondida em 2026-11-02, por Anderson na sessão `studio-achados-246` do workstream `studio`, pelo AskUserQuestion. Os
+custos são estimativa.
+
+1. **R67.1 — O que "Retomar automaticamente marcado por padrão" quer dizer?** Seleção única. Opções: agenda sozinho ao
+   bater o limite, mostrando "Retomada às HH:MM · Cancelar" (recomendada) — ~1,5 h; o mesmo, com um interruptor nas
+   configurações do chat — ~3 h; uma caixa marcada na linha — ~3 h. Risco apresentado: todo chat que bater o limite manda
+   "Continue" 1 min depois do reset, até o abandonado, mesmo com o app fechado.
+   **Decidido — "Agenda sozinho ao bater o limite (Recomendado)".** Vai ao D62 e ao P79. **O botão volta** (o P40) por
+   ordem do pedido, e a R1 do sync fica reaberta por ele.
+2. **R67.2 — Quando a suíte completa do merge roda?** Seleção única. Opções: relançar agora, desligada da sessão
+   (recomendada); depois das 21h31; não rodar.
+   **Decidido — "relance depois da correção".** A suíte completa roda uma vez, na `origin/master`, depois que o P79 der
+   push; quem a roda é a sessão de coordenação.
 
 ## Passos
 
@@ -3162,6 +3189,26 @@ Agora (pedido 40). Fechou em 2026-11-02.
 - O editor rico não tem o defeito (`rich-markdown-editor.css:999` vence o `:930`): não foi tocado.
 - Não conferido em tela: o happy-dom não tem layout, e a posição do botão se prova no C31.
 
+### P79 — O Continuar em outra conta de volta, e o Retomar automaticamente por padrão (pedido 41)
+
+Executa D62 · executor: sessão do `brza-studio`, no worktree `.worktrees/pln-001-pedido-41`
+
+Estimado: 3 h · Executado: 0 h
+
+Agora (pedido 41). **Reabre o P40**, que o sync tirou, e a R1 do worklog do sync.
+
+- [ ] **1.** Os "A conferir no passo" do D62, lidos no código antes de escrever
+- [ ] **2.** Testes que falham: o `BrzaContinueInOtherAccount.test.tsx` do `15b028ba23f`, adaptado ao v1.4.246 (o
+      Continue só sai depois que a troca de conta deu certo, e nada sai se ela falha; some sem outra conta salva); a
+      linha do aviso de limite mostra o botão ao lado do "Retomar automaticamente"; o agendamento sai sozinho uma vez
+      por corte, e não de novo depois do Cancelar
+- [ ] **3.** O botão volta (a troca do P36 para o chat fixado, a global para o sem pino, como a R2 do sync mandou) e o
+      "Retomar automaticamente" agenda ao aparecer o aviso com horário de reset
+- [ ] **4.** Os testes do que foi tocado, só por caminho; rebase na `origin/master` e push. **Sem a suíte completa**: ela
+      roda depois, uma vez, pela coordenação (R67.2). A conferência no app é o C32
+
+**Evidência:** (a preencher)
+
 ## Regressão
 
 Caminhos relativos à raiz do `brza-studio`. Os testes rodam como diz a `## Restrições`; em 2026-10-28, os 25 arquivos
@@ -3645,6 +3692,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
 | C29 | `Pedido 39`: o atualizador desligado (P76.4) | No app instalado do build do C22 (o `1.4.246-alpha.1` já instalado não tem o marcador, então não serve), abrir e esperar 1 min, e procurar o breadcrumb `updater_macos_installer_scheduling_configured` no log | Sem o breadcrumb, e sem GET a `onorca.dev` pelo nudge | | |
 | C30 | `Pedido 39`: o CLI empacotado e os consertos (P77.4) | No build do C22, rodar `brza foo` pelo app empacotado; abrir o Markdown no modo código com o "Match Terminal" invertido; ver o idioma coreano | O CLI acha o resolvedor; o texto legível; sem `ORCA` de produto no coreano | | |
 | C31 | `Pedido 40`: o fundo do texto e o botão de copiar no bloco de código (P78.4) | No build que levar o P78, abrir um `.md` com blocos de código no olho, no tema escuro e no claro, com e sem a linguagem na cerca; passar o mouse sobre o bloco e fora dele; clicar no copiar; abrir o mesmo arquivo no lápis | O texto do bloco sem fundo atrás, e o bloco com o fundo e a borda de antes; o botão invisível fora do bloco, dentro dele a 8 px do topo, sem cobrir a borda, e o "Copiado" aparece no clique; o lápis igual ao de antes. Se o botão aparecer sem o mouse em cima (R66.1), anotar onde | | |
+| C32 | `Pedido 41`: o Continuar em outra conta e o Retomar por padrão (P79.4) | No build que levar o P79, num chat da conta que bateu o limite com o horário de reset | A linha do aviso mostra "Retomada às HH:MM · Cancelar" sem clique, e ao lado o "Continuar em outra conta", com o menu das outras contas; escolher uma conta troca e continua o chat, e cancela a retomada; o Cancelar mantém cancelado nesse corte | | |
 
 O C1 e o C2 esperavam a Run `run_de875fc52a75`, que fechou em `fc7f07a8a1e`: o build instalado (`de3fb921ad1`) não tem o `9b8a3e2e672` nem o
 `fbff699fa58`, e a coordenadora da Run roda do app instalado. Na R46.4,

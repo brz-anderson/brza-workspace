@@ -630,3 +630,40 @@ Respondida em 2026-11-03, na sessão `workspace`: "todos recomendado".
      hooks; se paga: se aparecer uma máquina em 3.10.
 
    **Decidido — `tomllib`, e o aviso no stderr sem ele.**
+
+### Rodada 14 — os modelos (enviada 2026-11-03, no chat)
+
+**Apresentado antes:** no papel, o `agy agents` só aceita `pro`, `flash`, `inherit` ou nada, e descarta calado o nome
+completo (sonda do `designer`, sem turno de modelo, em `agy` 1.4.12); na chamada, o `--model` usa os nomes do
+`agy models`. O que o `pro` resolve é desconhecido. O experimento da 12.2 usou `gemini-4-argon-high` no `agy` e
+`gpt-6-astra` em `xhigh` no Codex; o padrão do `~/.codex/config.toml` de Anderson é `gpt-6.1-sol` em `medium`; cada
+revisão do Codex gastou de 28 a 35 pontos da janela de 5 h.
+
+Respondida em 2026-11-03, na sessão `workspace`: "14.1.1 / 14.2 opção 1, mas `gpt-6-astra` em `high`" e "sem mais
+rodadas, por ora".
+
+1. **O mapa de modelos do `agy` por camada** (D3, D7, D11). Opções:
+   - no papel, `opus` e `sonnet` viram `pro` e `haiku` vira `flash`; na chamada, a revisão usa `gemini-4-argon-high` e a
+     leitura `gemini-4-argon-medium`; antes de gerar, um turno de `agy --agent` com `model: pro` lê o `modelName` do
+     `Stop` (recomendada) — custo: um turno, ~US$ 0,01 a 0,05; se paga: no D7, com o nível do `pro` como fato;
+   - `model: inherit` em todo papel gerado, e o modelo sempre pelo `--model` da sessão ou da chamada — custo: o
+     subagente do `agy` perde a camada e roda no modelo do pai; se paga: se o `pro` resolver a um nível que não serve
+     ao `designer`.
+
+   **Decidido — a recomendada.** O turno que lê o `modelName` do `pro` roda no D7, antes de gerar os papéis.
+
+2. **O modelo e o esforço do Codex no `brza delegate`** (D11). Opções:
+   - pela camada do papel: revisão em `gpt-6-astra` com `xhigh`, o que a R12.2 mediu; leitura em `gpt-6.1-sol` com
+     `medium`, o padrão do usuário (recomendada) — custo: cada revisão gasta de 28 a 35 pontos da janela de 5 h; se paga:
+     no segundo passe ocasional que a R12.2 prevê;
+   - o mesmo, com `--effort` repassado ao filho e `xhigh` como padrão — custo: ~5 linhas e um teste; o recall com
+     menos esforço não foi medido; se paga: quando a janela de 5 h apertar.
+
+   **Decidido — a opção 1, mas a revisão em `gpt-6-astra` com `high`, e não `xhigh`**, nas palavras de Anderson, sem o
+   porquê. É a variante que a sessão deixou de fora por não ter o custo medido: o recall e os pontos da janela de 5 h
+   com `high` não foram medidos, e o experimento da 12.2 só tem `xhigh`. A leitura segue em `gpt-6.1-sol` com `medium`.
+
+**Parada de Anderson ("sem mais rodadas, por ora"):** as R15 (a delegação: o papel no `brza delegate`, onde o
+`--runtime` pega o padrão e o texto dos três focos) e R16 (a medição e a máquina: onde fica a captura de fatos, a
+tabela por runtime, o `~/.zshrc` e a conferência do override) ficam abertas, com as opções que o `designer` deixou no
+fim do `pln-004-design-v2.md` (P5 a P11). A aprovação do Desenho só vem depois delas.

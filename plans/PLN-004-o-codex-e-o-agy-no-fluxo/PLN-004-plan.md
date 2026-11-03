@@ -14,12 +14,13 @@ tags:
 
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** a Entrevista fechou, da R1 à R12. A 12.2 saiu decidida pela medição (as 9 revisões, e a repetição do
-  Claude e do `agy`): o Claude é o padrão nos três focos, e o `agy` e o Codex ficam como segundo passe, por
-  `--runtime`. Falta o Desenho: o código passa ao `brza-workflow`, executado pela sessão `workspace`, com o pacote
-  `packages/runtimes`, e o rascunho (`pln-004-design-rascunho.md`, D1 a D14, no scratch) ainda conta com tudo no
-  `brza-workspace`. O próximo passo é reescrevê-lo e mandá-lo à aprovação, na mensagem, antes de gravá-lo em
-  `PLN-004-design.md`.
+- **Retomar:** a Entrevista fechou até a R14; Anderson pediu "sem mais rodadas, por ora". A 12.2 saiu decidida pela
+  medição (o Claude padrão nos três focos; o `agy` e o Codex como segundo passe, por `--runtime`), e a R13 e a R14
+  fixaram a norma do pacote, o render do `.toml`, o `tomllib` e os modelos (`agy`: `pro`/`flash` no papel,
+  `gemini-4-argon-high` na revisão; Codex: `gpt-6-astra` em `high`, sem a medição do `high`). Faltam a R15 (a delegação)
+  e a R16 (a medição e a máquina), com os pontos P5 a P11 do `designer` no fim do `pln-004-design-v2.md`, no scratch, e
+  depois a aprovação do Desenho, na mensagem, antes de gravá-lo em `PLN-004-design.md`. O código passa ao
+  `brza-workflow`, com o pacote `packages/runtimes`, executado pela sessão `workspace`.
 - **Dividido:** [PLN-004 — Entrevista](PLN-004-interview.md)
 
 ## Pedido

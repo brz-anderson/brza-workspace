@@ -12,7 +12,7 @@ tags:
 
 ## O pedido
 
-O A5 da [REV: a entrega do PLN-002, do P0 ao P9](../reviews/pln-002-os-comandos-brza.md), mandado a issue na R15.1 do
+O A5 da [REV-001: a entrega do PLN-002, do P0 ao P9](../reviews/REV-001-pln-002-os-comandos-brza.md), mandado a issue na R15.1 do
 [PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`](../../plans/PLN-002-os-comandos-brza/PLN-002-plan.md):
 "Issue, com as opções", de Anderson, em 2026-10-29.
 

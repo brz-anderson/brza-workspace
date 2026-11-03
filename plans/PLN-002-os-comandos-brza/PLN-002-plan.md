@@ -346,7 +346,7 @@ Estimado: 2,5 h · Executado: 0,3 h
 
 ### P10 — As correções da revisão: o A1 ao A4 e o A6
 
-Executa D2, D4, D5 e D6, nos achados da [REV: a entrega do PLN-002, do P0 ao P9](../../work/reviews/pln-002-os-comandos-brza.md)
+Executa D2, D4, D5 e D6, nos achados da [REV-001: a entrega do PLN-002, do P0 ao P9](../../work/reviews/REV-001-pln-002-os-comandos-brza.md)
 · executor: sessão `pln-002-sessions-rename`, autorizada por Anderson ("sim")
 
 Estimado: 2,1 h · Executado: 0,3 h
@@ -487,7 +487,7 @@ Estimado: 2,1 h · Executado: 0,3 h
 
 ## Revisões
 
-- [REV: a entrega do PLN-002, do P0 ao P9](../../work/reviews/pln-002-os-comandos-brza.md) — 2026-10-29, a revisão
+- [REV-001: a entrega do PLN-002, do P0 ao P9](../../work/reviews/REV-001-pln-002-os-comandos-brza.md) — 2026-10-29, a revisão
   única depois do P9 (R11.2); seis achados, o A1 ao A4 e o A6 no P10, o A5 em issue.
 
 ## Pendências conhecidas

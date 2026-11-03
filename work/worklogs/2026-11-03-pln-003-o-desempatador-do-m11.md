@@ -2,6 +2,8 @@
 scope:
   - workspace
   - tools-kit
+refs:
+  - PLN-003
 ---
 
 # O PLN-003: o desempatador do M11

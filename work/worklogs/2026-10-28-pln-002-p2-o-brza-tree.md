@@ -1,6 +1,8 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-002
 ---
 
 # O PLN-002/P2: o brza tree

@@ -2,6 +2,10 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-003
+  - PLN-007
+  - issue:o-design-md-do-brza-vem-do-pln-003
 ---
 
 # O PLN-003: o painel de componentes

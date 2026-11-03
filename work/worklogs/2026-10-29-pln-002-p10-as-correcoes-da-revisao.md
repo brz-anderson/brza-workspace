@@ -1,13 +1,17 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-001
+  - PLN-002
+  - REV-001
 ---
 
 # O PLN-002/P10: as correções da revisão
 
 O pedido, em 2026-10-29, na sessão `pln-002-sessions-rename`: "sim", de Anderson, à pergunta "O P10 espera a sua
 autorização. Posso executar nesta sessão?". O passo corrige o A1 ao A4 e o A6 da
-[REV: a entrega do PLN-002, do P0 ao P9](../reviews/pln-002-os-comandos-brza.md), com os destinos da R14 e da R15 do
+[REV-001: a entrega do PLN-002, do P0 ao P9](../reviews/REV-001-pln-002-os-comandos-brza.md), com os destinos da R14 e da R15 do
 [PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`](../../plans/PLN-002-os-comandos-brza/PLN-002-plan.md).
 
 ## O que se fez

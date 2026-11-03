@@ -2,6 +2,9 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-002
+  - PLN-003
 ---
 
 # O PLN-003: a entrevista do workflow nos dois clients

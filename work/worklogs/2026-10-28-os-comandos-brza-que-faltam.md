@@ -2,6 +2,10 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-001
+  - PLN-002
+  - issue:os-comandos-brza-que-viram-o-pln-002
 ---
 
 # Os comandos brza que faltam, levantados nas notas e nos scripts

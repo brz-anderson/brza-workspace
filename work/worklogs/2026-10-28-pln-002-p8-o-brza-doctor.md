@@ -1,6 +1,9 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-002
+  - issue:brza-run-imprime-saving-session-fora-da-aba-do-app
 ---
 
 # O PLN-002/P8: o brza doctor

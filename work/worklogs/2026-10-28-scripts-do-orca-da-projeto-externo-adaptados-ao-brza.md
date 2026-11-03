@@ -2,6 +2,9 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-001
+  - issue:scripts-da-projeto-externo-fora-do-port-para-o-brza
 ---
 
 # Os scripts do Orca da projeto-externo adaptados ao BrzA Studio

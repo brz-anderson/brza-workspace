@@ -4,13 +4,12 @@
 
 As respostas das R1 a R6 estão no
 [PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca](PLN-008-plan.md).
-Os itens `D` aguardam as rodadas de desenho. Além do Terreno, estão confirmados:
+O Desenho segue em elaboração. Além do Terreno, estão confirmados:
 
 - **R7.2:** `depends_on` opcional em planos e issues, também no índice; semântica e validação ainda por desenhar.
 - **R7.3:** a issue comum aparece no `refs:` como `issue:<slug>`, preservando a identidade do índice.
 
-**R7.1:** Anderson respondeu "só `migration-runner`". A contraproposta de uma única skill nova está registrada;
-reunir criação, revisão e execução nela é a leitura a confirmar em R8.1.
+- **R8.1:** uma única `migration-runner` reúne criação, revisão e execução, com revisor independente.
 
 ## Terreno
 
@@ -45,6 +44,27 @@ Levantamento refeito em 2026-11-03. Os caminhos de código abaixo partem do `brz
 
 ### Lacunas para as rodadas
 
-Falta confirmar o escopo da `migration-runner` (R8.1), definir a semântica e a validação do `depends_on`, a regra
-para exemplos hipotéticos, o mapeamento das quatro revisões para REV-001 a REV-004 e o tratamento da sessão no
-rebuild. As escolhas de R7.2 e R7.3 estão registradas; não houve implementação.
+Falta definir a semântica e a validação do `depends_on`, a regra para exemplos hipotéticos, o mapeamento das quatro
+revisões para REV-001 a REV-004 e o tratamento da sessão no rebuild. Não houve implementação.
+
+## D1 — Uma única migration-runner conduz a MIG — `core/.claude/skills/migration-runner/`
+
+- **Origem:** Pedido 4; R3.1–R3.3; R7.1 e R8.1.
+- **Contexto:** Anderson substituiu a proposta de skills separadas por uma única entrada e confirmou as três operações.
+
+### Como fica
+
+Uma skill `migration-runner`, com um molde MIG, oferece três operações:
+
+| Operação | Contrato |
+| :------- | :------- |
+| Criar | Registrar a divergência entre disco e norma ou decisão vigente como issue `type: migration`, no molde da R3.3. |
+| Revisar | Pedir parecer a revisor independente, com achados e evidências; a sessão principal conduz a rodada e grava o parecer REV. |
+| Executar | Conduzir os passos autorizados, registrar evidências e conferir o comando do critério de conclusão. |
+
+O molde contém Estado-alvo, Estado atual, Passos e Critério de conclusão; Como desfazer só aparece quando a mudança
+sai do git (R3.3). A numeração MIG/REV e os comandos de abertura dependem dos demais itens do Desenho.
+
+**Alternativas recusadas em R7.1/R8.1:** três skills separadas; duas novas mais revisão pela `plan-runner`;
+`migration-runner` limitada à execução. A escolha mantém as três operações numa única entrada, preservando a
+independência do revisor.

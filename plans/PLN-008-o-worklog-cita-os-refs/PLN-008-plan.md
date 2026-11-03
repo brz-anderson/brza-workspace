@@ -3,7 +3,7 @@ status: open
 phase: design
 origin: request
 description: O brza note commit preenche o refs do worklog com os IDs que ele cita, e revisão e migração ganham REV-NNN e MIG-NNN
-ready: não — R7.2 e R7.3 respondidas; falta confirmar o escopo da migration-runner e concluir o Desenho
+ready: não — R8.1 confirmou a migration-runner; faltam as regras de dependência e os demais contratos do Desenho
 scope:
   - workspace
 opened: 2026-11-03
@@ -14,9 +14,10 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** R7.2 escolheu `depends_on` opcional em planos e issues, também no índice; R7.3 escolheu `issue:<slug>`
-  no `refs:`. R7.1 respondeu "só `migration-runner`"; confirmar na R8.1 se ela reúne criação, revisão e execução.
-  Depois fechar dependências, extração, renumeração e sessão no rebuild, escrever os itens `D` e derivar os Passos.
+- **Retomar:** R8.1 confirmou uma única `migration-runner` para criar, revisar e executar MIG, com revisor
+  independente. R7.2 e R7.3 mantêm `depends_on` em planos/issues/índice e `issue:<slug>` no `refs:`. Próximo:
+  fechar semântica e validação das dependências; depois extração, renumeração e sessão no rebuild, concluir os
+  itens `D` e derivar os Passos.
 - **Dividido:** [PLN-008 — Desenho](PLN-008-design.md)
 
 ## Pedido
@@ -54,7 +55,7 @@ mesma sessão.
 | `Pedido 1` | os worklogs que existem ganham o `refs:` por um preenchimento automático                                               | —     | —             |
 | `Pedido 2` | toda revisão de `work/reviews/` tem `REV-NNN`, numerado em sequência pelo índice, e as 4 de hoje são REV-001 a REV-004 | —     | —             |
 | `Pedido 3` | a migração é issue `type: migration`, `work/issues/MIG-NNN-<assunto>.md`, com o molde da R3.3, e a MIG-001 é a renumeração das revisões | — | — |
-| `Pedido 4` | o fluxo cobre criação, revisão e execução da MIG até o critério de conclusão; R7.1 pediu só `migration-runner`, com o escopo a confirmar em R8.1 | — | — |
+| `Pedido 4` | a única `migration-runner` cria, revisa e executa a MIG até o critério de conclusão, com revisor independente (R8.1) | — | — |
 | `Pedido 4` | a revisão nasce com o `REV-NNN` pela skill que a escreve, a `plan-runner` em `references/conduct.md` | — | — |
 | `R4.1` | toda linha do `measurements.jsonl` dentro de um worktree tem `workstream`, a conta não sai `home`, e o `session` do índice resolve sempre que a sessão tem nome | — | — |
 | `R4.2` | o `brza note commit` avisa, sem barrar, a issue ou o plano aberto sem `priority` | — | — |
@@ -289,9 +290,25 @@ Respondida em 2026-11-03, na sessão `workspace`: "7.1 só `migration-runner` / 
 
    **Decidido — "7.3.1".** As issues comuns usam `issue:<slug>`; não ganham número nem renomeação.
 
+### Rodada 8 — o escopo da única migration-runner (enviada 2026-11-03)
+
+**Apresentado antes:** R7.1 pediu "só `migration-runner`". A confirmação separou a organização em uma única skill
+do alcance das operações e preservou o revisor independente.
+
+Respondida em 2026-11-03, na sessão `workspace`.
+
+1. **A única migration-runner reúne as três operações?** Opções:
+   - sim: criar, revisar e executar, com revisor independente (recomendada) — custo: uma skill com três operações
+     e um molde; se paga: na primeira MIG completa, com uma única entrada;
+   - só executar; criação e revisão ficam nas skills existentes — custo: uma skill nova e adaptação dos fluxos
+     existentes para MIG; se paga: ao compartilhar esses fluxos com os planos.
+
+   **Decidido — "sim".** Uma única `migration-runner` reúne criação, revisão e execução; a revisão usa revisor
+   independente. Isso fecha a contraproposta de R7.1; não autoriza executar passos do plano.
+
 ## Worklogs
 
 - 2026-11-03 — aberto; R1 a R6 fecharam a Entrevista; parou antes do Terreno.
   [A abertura do PLN-008: o refs nos worklogs, o REV e o MIG](../../work/worklogs/2026-11-03-pln-008-a-abertura-do-refs-do-rev-e-do-mig.md)
-- 2026-11-03 — retomada; Terreno conferido; R7.2 e R7.3 respondidas; R7.1 volta como confirmação em R8.1.
+- 2026-11-03 — retomada; Terreno conferido; R7.2, R7.3 e R8.1 respondidas; D1 registra a única migration-runner.
   [O Terreno do PLN-008 para o Desenho](../../work/worklogs/2026-11-03-pln-008-o-terreno-para-o-desenho.md)

@@ -21,3 +21,6 @@ Na R7, Anderson respondeu "7.1 só `migration-runner` / 7.2.1 / 7.3.1": escolheu
 issues e índice, e `issue:<slug>` no `refs:`. A contraproposta de uma única skill nova volta em R8.1 para confirmar
 se ela reúne criação, revisão e execução. Nenhum passo de implementação foi iniciado; o próximo ponto está no
 Retomar do plano.
+
+Na R8.1, Anderson confirmou com "sim" a única `migration-runner` reunindo criação, revisão e execução, com revisor
+independente. O D1 registra esse contrato; as regras de dependência são o próximo ponto do Desenho.

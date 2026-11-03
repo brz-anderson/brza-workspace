@@ -1,9 +1,10 @@
 ---
-status: open
+status: done
 description: Os P6 a P9 do PLN-003 repetem os P1 a P5 do PLN-009; a sessão do PLN-003 os marca como passados ao PLN-009, liga o P10 a ele e reabre a R5.3 para o código do MCP no brza-workflow.
 scope:
   - workspace
 opened: 2026-11-03
+completed: 2026-11-03
 priority: high
 tags:
   - planning
@@ -41,3 +42,14 @@ PLN-003:
    R4.3), de que o MCP tira a sessão chamadora e o client.
 
 Os ajustes do P0 que tocam o MCP já estão no Desenho do PLN-009, desde a reescrita da R2 (2026-11-03).
+
+## Resolução (2026-11-03)
+
+Todos os 6 itens foram executados e reconciliados no PLN-003:
+1. P6 a P9 marcados como `[-]` apontando para o PLN-009 (P1, P2, P4 e P5 respectivamente) e horas ajustadas no frontmatter (`estimate_h: 37.5`, `remaining_h: 34.0`).
+2. Linhas da Cobertura do Pedido 2, Pedido 4 e Pedido 5 redirecionadas para o PLN-009.
+3. Pré-requisito `PLN-009/P3` registrado no PLN-003/P10.
+4. R5.3 atualizada na Entrevista com a anotação `→ reaberta em PLN-009/R1.1` para o MCP, preservando P3 para a CLI pública e plugins.
+5. M6, M7, M13, M14, R6.4 e D4–D6 marcados no Desenho como transferidos para o PLN-009.
+6. PLN-003/P4 e D3.5 atualizados com a especificação de `.mcp.json` usando `"type": "http"`, Authorization e headers de sessão/client.
+

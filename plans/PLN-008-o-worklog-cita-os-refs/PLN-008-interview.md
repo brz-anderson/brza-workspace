@@ -340,3 +340,21 @@ Respondida em 2026-11-03, na sessão `workspace`: "12.3.2 / restante recomendado
    **Emenda de Anderson em 2026-11-03, na sessão `workspace`:** "mas adicione um gatilho na 12.3.2 - dados errados
    listados com frequência, o fetch vira padrão". O índice local é o padrão inicial; se dados errados forem
    listados com frequência, fetch passa a ser o padrão. Não foi definido limiar numérico de frequência.
+
+### Rodada 13 — aceite do corte em Passos (enviada 2026-11-03)
+
+**Apresentado antes:** contratos restantes de referências, reserva concorrente, bootstrap, migração, índice e
+fontes de medição; sete entregas, com arquivos, provas, executores e estimativa de 18 h. Estimativas de planejamento,
+sem medição de execução. O gatilho emendado na R12.3 permanece no contrato.
+
+Respondida em 2026-11-03, na sessão `workspace`: "aceito".
+
+1. **Aceitar o corte proposto?** Opções:
+   - sete passos, conforme a tabela e contratos apresentados (recomendada) — custo: sete entregas, estimadas em
+     18 h; se paga: na validação de cada conjunto antes de aplicar a migração no acervo;
+   - separar reservas/índice da listagem, ficando oito passos — custo: uma fronteira adicional de entrega e commit,
+     mantendo a previsão técnica de 18 h; se paga: se os IDs precisarem ser disponibilizados antes do ls.
+
+   **Decidido — "aceito".** Sete passos, estimados em 18 h; contratos consolidados em D1 a D10, com numeração dos
+   itens restantes ajustada ao Desenho vigente. O plano passa a execution/in_progress, sem passo iniciado.
+   Cada passo continua dependendo de pedido explícito de execução; o aceite não autoriza executar P1.

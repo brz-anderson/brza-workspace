@@ -2,6 +2,8 @@
 scope:
   - brza-studio
   - workspace
+refs:
+  - PLN-007
 ---
 
 # PLN-007: os tokens da marca e o aviso de pergunta azul

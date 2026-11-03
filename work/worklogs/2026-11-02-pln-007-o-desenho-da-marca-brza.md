@@ -2,6 +2,12 @@
 scope:
   - brza-studio
   - workspace
+refs:
+  - PLN-007
+  - issue:brza-shot-quebra-com-os-tokens-do-painel-movidos
+  - issue:o-brza-sessions-abre-na-conta-ativa-do-app
+  - issue:o-ico-do-app-sai-com-6-quadros-sem-o-24px
+  - issue:os-testes-e2e-de-sqlite-falham-na-master-do-brza-studio
 ---
 
 # PLN-007: o Desenho da marca BrzA

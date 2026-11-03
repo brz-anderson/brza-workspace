@@ -1,5 +1,5 @@
 # .brza/core.lock — gerado pelo brza sync; não edite
-commit = "a313ec5b459e4dc83412e63ad2a5e8963d5fe6c2"
+commit = "c7a9e6858f9e0a6b1fd6ce15f12a77e525a62f64"
 ref = "master"
 synced = "2026-11-02"
 
@@ -26,7 +26,7 @@ synced = "2026-11-02"
 ".claude/skills/plan-runner/references/plan-template.md" = "sha256:341da3803e84f8d14d9e3394d8f5e1305b153658b1caa43394558d89b73f432f"
 ".gitattributes" = "sha256:6c7640100cad284568218e9edf6408e9819e424ba304fda738eb8c86641d935d"
 ".gitignore" = "sha256:bd8f1997fa84d6af967d7a5807e5c7aee0bedd3da752694141cdba0af74a9cc0"
-"AGENTS.md" = "sha256:b226432444ab4470b756f1d7d17ee702a4b09de4836a73b8a451c5a15193c802"
+"AGENTS.md" = "sha256:77174ce9c10c02b3a8ed76bf9b36420bad2b3246fb1f171467ff8f42cfaeed53"
 "CLAUDE.md" = "sha256:6fdd74729cf11b92dd64fe8c9c25ef9b3fa5894501fbaa6add66d3dd6e0235bb"
 "plans/README.md" = "sha256:c50e6fc8ba46b53221dce3f027a4a4b6b98f7773f27e2a995d9000fea9922b64"
 "scripts/fact_outcome.py" = "sha256:ac87d22c1a849cb8965e36f9f1cc07d934c1da98c1963e0a8e80e62c547f740d"

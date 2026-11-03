@@ -14,8 +14,10 @@ tags:
 Rastreado dos PRs abertos no upstream [`stablyai/orca#35220`](https://github.com/stablyai/orca/pull/35220),
 [`stablyai/orca#36897`](https://github.com/stablyai/orca/pull/36897),
 [`stablyai/orca#37659`](https://github.com/stablyai/orca/pull/37659) e
-[`stablyai/orca#19680`](https://github.com/stablyai/orca/pull/19680), além da issue
-[`stablyai/orca#14690`](https://github.com/stablyai/orca/issues/14690).
+[`stablyai/orca#19680`](https://github.com/stablyai/orca/pull/19680), além das issues
+[`stablyai/orca#14690`](https://github.com/stablyai/orca/issues/14690),
+[`stablyai/orca#37875`](https://github.com/stablyai/orca/issues/37875) e
+[`stablyai/orca#32573`](https://github.com/stablyai/orca/issues/32573).
 
 ## O problema
 
@@ -27,6 +29,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#35220`](https://github.com
 3. **Colisão de nomes no seletor `/` (`#19680`) e colisão com skills empacotadas (`#37659`):** skills vindas de plugins
    perdiam o namespace `plugin:skill` nos pickers de comando `/`; além disso, a skill bundled `computer use` colidia com
    ferramentas externas de mesmo nome.
+4. **Falta de ponto de contribuição para subagentes e skills em plugins (`#37875`, `#32573`):** plugins modernos
+   (ex.: ecossistemas de Claude Code e Cursor) empacotam definições de subagentes (`agents/*.md`) junto às suas skills,
+   disparando-os pelo nome de tipo do subagente. No runtime do app, `contributes` não aceitava subagentes nem entregava
+   skills completas, quebrando plugins que delegam tarefas a subagentes específicos.
 
 ## O que os PRs fazem
 
@@ -36,8 +42,11 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#35220`](https://github.com
 - **PR `#19680`:** mantém o identificador qualificado `plugin:skill` nos seletores `/` do chat.
 - **PR `#37659`:** renomeia a skill empacotada para `orca-computer-use` na descoberta, configurações e documentação,
   mantendo links legados e aliases do CLI para evitar quebras.
+- **Issues `#37875` e `#32573`:** propõem expor pontos de contribuição declarativos `skills` e `subagents` no manifesto
+  do plugin para carregar arquivos de agentes e skills embutidos.
 
 ## O que fazer
 
 Aplicar primeiro o [`stablyai/orca#35220`](https://github.com/stablyai/orca/pull/35220) (4 arquivos autocontidos em
-`src/main/skills/`) no `brza-studio` e acompanhar o fechamento do `#19680`, `#36897` e `#37659` para incorporação.
+`src/main/skills/`) no `brza-studio`, incorporar o `#37659` e preparar o sistema de plugins para registrar subagentes
+nativos entregues por pacotes de terceiros.

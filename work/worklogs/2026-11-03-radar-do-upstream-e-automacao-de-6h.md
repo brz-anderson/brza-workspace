@@ -10,6 +10,7 @@ tags:
 refs:
   - issue:abas-de-navegador-sem-moldura-e-ergonomia-de-workspace
   - issue:abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao
+  - issue:adaptadores-acp-customizados-e-isolamento-de-permissoes-de-sessao
   - issue:gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache
   - issue:isolamento-de-sessoes-de-titulacao-acp-e-status-de-conclusao-de-workers
   - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
@@ -17,6 +18,7 @@ refs:
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
   - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
   - issue:preservar-o-dono-do-painel-do-antigravity-em-subagentes-aninhados
+  - issue:repositorios-vinculados-no-source-control-e-escopo-de-worktree-na-cli
   - issue:seguranca-macos-remocao-de-allow-dyld-environment-variables-dos-entitlements
   - issue:subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent
   - issue:workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh
@@ -76,6 +78,21 @@ refs:
    - `priority: high` — [Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md) (`#37833`, `#37567`, `#37568`, `#37569`);
    - `priority: high` — [Isolamento de sessões de titulação ACP e status de conclusão de workers](../issues/isolamento-de-sessoes-de-titulacao-acp-e-status-de-conclusao-de-workers.md) (`#37832`, `#37063`, `#37781`, `#37815`);
    - `priority: medium` — [Workers de plugins em hosts remotos e gerenciamento CLI de SSH](../issues/workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh.md) (`#37788`, `#37826`, `#37806`).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisadas 32 novas issues e 25 novos PRs criados
+   ou atualizados desde `2026-11-03T15:00:00Z`.
+2. **Atualização de 2 issues existentes em `work/issues/`:**
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     adicionados PR `#37868` / issue `#37867` (espera agendada `--wait-until` e supressão de alertas falsos de parada ociosa),
+     PR `#37866` / issue `#37865` (preservação de tail de saída de workers que morrem no arranque), PR `#37891` (mensagens
+     de orquestração limpas sem envelope nem boilerplate) e PR `#37850` / issue `#37849` (desduplicação de stub da skill);
+   - [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):
+     adicionadas issues `#37875` e `#32573` (suporte a pontos de contribuição `skills` e `subagents` em plugins de terceiros).
+3. **Criação de 2 novas issues priorizadas em `work/issues/`:**
+   - `priority: high` — [Adaptadores ACP customizados e isolamento de permissões de sessão](../issues/adaptadores-acp-customizados-e-isolamento-de-permissoes-de-sessao.md) (`#37842`, `#37895`, `#37889`, `#37861`, `#37859`, `#37862`, `#37883`);
+   - `priority: high` — [Repositórios vinculados no Source Control e escopo de worktree na CLI](../issues/repositorios-vinculados-no-source-control-e-escopo-de-worktree-na-cli.md) (`#37896`, `#37892`, `#37899`, `#37838`, `#37903`).
 
 ## Fora do workspace
 

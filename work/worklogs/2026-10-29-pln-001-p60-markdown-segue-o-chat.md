@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-29
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P60 do PLN-001, o Markdown segue o chat

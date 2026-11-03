@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O PLN-001 e o merge da v1.4.246 do upstream

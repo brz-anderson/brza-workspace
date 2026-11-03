@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P73 do PLN-001, o tipo do agente na lista de agentes do chat

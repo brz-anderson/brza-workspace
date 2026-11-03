@@ -1,10 +1,12 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - release
   - chat
+refs:
+  - PLN-001
+  - issue:chat-fixado-na-conta-entra-na-conta-global
 ---
 
 # O sync da v1.4.246 do upstream, que tirou o chat do experimental

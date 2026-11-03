@@ -1,10 +1,11 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-31
 tags:
   - chat
   - design
+refs:
+  - PLN-001
 ---
 
 # O P71 do PLN-001, o expandir em todo bloco e a prévia do Markdown

@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-31
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O pedido 36 do PLN-001, a prévia do Markdown e o expandir em todo bloco

@@ -2,9 +2,10 @@
 scope:
   - brza-studio
   - brza-workflow
-date: 2026-11-02
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P72 do PLN-001, o prompt do `brza sessions` como cartão "Tarefa do coordenador"

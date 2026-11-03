@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P80 do PLN-001, o botão de expandir com a aparência e a fileira dos vizinhos

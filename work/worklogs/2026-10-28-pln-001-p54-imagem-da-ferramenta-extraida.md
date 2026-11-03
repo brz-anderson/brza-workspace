@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-28
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P54 do PLN-001, a imagem da ferramenta extraída para arquivo

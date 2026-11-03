@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-31
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O pedido 34 do PLN-001, recolher a pergunta no chat estruturado

@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-28
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P55 do PLN-001, a miniatura na linha da ferramenta

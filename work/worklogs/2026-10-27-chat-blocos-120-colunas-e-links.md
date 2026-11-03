@@ -1,6 +1,8 @@
 ---
 scope:
   - brza-studio
+refs:
+  - PLN-001
 ---
 
 # Os blocos de 120 colunas na largura "Total" e os links em azul claro no chat

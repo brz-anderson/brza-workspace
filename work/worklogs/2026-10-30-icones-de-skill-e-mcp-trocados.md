@@ -1,7 +1,6 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-30
 tags:
   - chat
 ---

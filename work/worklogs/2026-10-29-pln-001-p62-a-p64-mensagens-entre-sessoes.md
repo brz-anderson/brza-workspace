@@ -1,9 +1,11 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-29
 tags:
   - chat
+refs:
+  - PLN-001
+  - PLN-002
 ---
 
 # O P62 ao P64 do PLN-001, as mensagens entre sessões no chat

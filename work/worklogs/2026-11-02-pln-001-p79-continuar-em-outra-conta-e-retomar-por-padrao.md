@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P79 do PLN-001, o Continuar em outra conta de volta e o Retomar automaticamente por padrão

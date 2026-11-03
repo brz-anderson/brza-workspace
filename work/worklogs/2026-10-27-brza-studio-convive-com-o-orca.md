@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-27
 tags:
   - release
+refs:
+  - PLN-001
 ---
 
 # O BrzA Studio passa a conviver com o Orca original

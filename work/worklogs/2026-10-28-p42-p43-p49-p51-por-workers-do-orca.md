@@ -1,6 +1,9 @@
 ---
 scope:
   - brza-studio
+refs:
+  - PLN-001
+  - issue:tailscale-para-acesso-remoto-ao-brza-studio
 ---
 
 # O P42, o P43, o P49 e o P51 por workers do Orca em paralelo

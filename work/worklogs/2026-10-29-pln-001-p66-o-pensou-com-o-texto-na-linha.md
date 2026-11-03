@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-29
 tags:
   - chat
+refs:
+  - PLN-001
 ---
 
 # O P66 do PLN-001, o "Pensou" com o texto na linha

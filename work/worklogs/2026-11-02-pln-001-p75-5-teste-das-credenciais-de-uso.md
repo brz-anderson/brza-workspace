@@ -1,10 +1,11 @@
 ---
 scope:
   - brza-studio
-date: 2026-11-02
 tags:
   - auth
   - infra
+refs:
+  - PLN-001
 ---
 
 # O P75.5 do PLN-001, o teste das credenciais de uso que a suíte completa pegou

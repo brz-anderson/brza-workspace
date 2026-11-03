@@ -1,10 +1,11 @@
 ---
 scope:
   - brza-studio
-date: 2026-10-28
 tags:
   - chat
   - design
+refs:
+  - PLN-001
 ---
 
 # A chama do BrzA, monocromática, nas chamadas ao CLI no chat

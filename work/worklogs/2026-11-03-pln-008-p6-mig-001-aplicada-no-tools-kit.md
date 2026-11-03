@@ -8,17 +8,19 @@ refs:
   - PLN-008
   - PLN-009
   - REV-001
+  - REV-002
+  - REV-004
   - REV-005
 ---
 
-# O PLN-008 P6: a MIG-001 aplicada no tools-kit, primeira passagem
+# O PLN-008 P6: a MIG-001 aplicada no tools-kit, nas duas passagens
 
 A pedido da sessão `workspace-a6`, com a autorização de Anderson de 2026-11-03 ("sim", à pergunta "Quer que eu abra
-essa sessão pelo `brza sessions` com o pedido da aplicação?"), esta sessão rodou o item 1 da "Aplicação" da
-`MIG-001` no workstream `tools-kit`: a renomeação do REV-001. A `MIG-001`, a `REV-005` e o PLN-008 moram no
+essa sessão pelo `brza sessions` com o pedido da aplicação?"), esta sessão rodou os itens 1 e 3 da "Aplicação" da
+`MIG-001` no workstream `tools-kit`: a renomeação do REV-001 e, depois do `workspace`, a passagem dos links cruzados. A `MIG-001`, a `REV-005` e o PLN-008 moram no
 workstream `workspace` e não foram editados daqui; a consolidação é da `workspace-a6`.
 
-## O que rodou e o que deu
+## A primeira passagem, item 1
 
 1. `git status --short -- plans work wiki`: vazio, conferido de novo logo antes de aplicar, porque as sessões do
    PLN-009 e do PLN-003 também trabalham neste worktree.
@@ -43,7 +45,13 @@ renomeia: `pln-009-o-desenho-antes-da-execucao.md` (`3d94663`), `pln-009-a-revis
 `pln-009-a-revisao-da-entrega.md` (`5ef53de`). O checador não os acusa. Ficaram como estão, e o achado foi à
 `workspace-a6`, que decide se entram na MIG-001.
 
-## Pendente
+## A segunda passagem, item 3
 
-A segunda passagem no `tools-kit`, item 3 da "Aplicação", quando a `workspace-a6` pedir, depois que o `workspace`
-aplicar.
+A `workspace-a6` pediu a passagem depois de o `workspace` aplicar em `361d0d4` (REV-002 a REV-004 renomeados).
+
+1. `git status --short -- plans work wiki`: vazio, antes da prévia e antes do `--apply`.
+2. Prévia: 0 criados, 0 pareceres, 0 notas com links reescritos, 0 worklogs — igual ao ensaio.
+3. `--apply`: saída 0, o mesmo resultado zerado, sem commit da migração; o índice já estava em dia.
+4. Checador: 74 arquivos, 0 links não resolvidos, 0 erros, 0 avisos.
+
+O `tools-kit` não tem mais passo na `MIG-001`; o fechamento da MIG é da `workspace-a6`.

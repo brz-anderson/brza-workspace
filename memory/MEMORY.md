@@ -4,3 +4,4 @@
 - [Procedimento do sync do upstream](upstream-sync-procedure.md) — rebrand por script, linha de base na tag pura, --no-verify no merge, uma suíte por vez
 - [Worklog sem pedir autorização](worklog-sem-pedir-autorizacao.md) — fechou a tarefa, grave o worklog e commite sem perguntar
 - [Suíte completa uma vez, no merge](suite-completa-uma-vez-no-merge.md) — sessões paralelas rodam só o alvo; a coordenação roda a suíte inteira uma vez na master
+- [oxfmt/oxlint no worktree](oxfmt-oxlint-no-worktree.md) — com vários caminhos não acham arquivo; um por um, e o lint vale pelo lint-staged

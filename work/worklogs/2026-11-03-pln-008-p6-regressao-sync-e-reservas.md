@@ -5,6 +5,7 @@ scope:
 refs:
   - MIG-001
   - PLN-008
+  - PLN-009
   - REV-001
   - REV-002
   - REV-004
@@ -75,6 +76,21 @@ Anderson respondeu a rodada nesta sessão, nas opções recomendadas: A1, "Corri
   `tags` em `work/worklogs/2026-10-27-brza-studio-convive-com-o-orca.md` foi barrado.
 
 O acervo real segue sem migração. A próxima etapa é a aplicação pelas sessões donas.
+
+## Aplicação real em `tools-kit` e `workspace`
+
+Anderson pediu "aplique". A sessão `tools-kit-mig001`, aberta por esta com o `brza sessions`, aplicou primeiro o
+`tools-kit`: `bf36704`, 1 parecer, 5 notas com links e 29 worklogs, com checador sem erros. Esta sessão esperou o
+commit chegar ao remoto e aplicou o `workspace`: a prévia saiu igual ao ensaio; o `--apply` gravou `361d0d4`, com push,
+e o checador deu 59 arquivos, 0 erros e 4 avisos de menções históricas a planos de fora do acervo. O bloco de preservação,
+restrito às duas árvores, conferiu 60 notas. A segunda passagem do `tools-kit` não mudou nada (worklog de lá em
+`57c29b5`).
+
+O `tools-kit` achou três pareceres do PLN-009 sem `REV-NNN`, fora do D4. Na rodada desta sessão, Anderson escolheu
+"Issue no tools-kit (Recomendado)" para eles, gravada pela sessão de lá, e "Achado para P7 (Recomendado)" para a falta
+de aviso do checador, registrado em P7 do PLN-008.
+
+Faltam `brand`, `studio` e `playground`.
 
 ## Fora do workspace
 

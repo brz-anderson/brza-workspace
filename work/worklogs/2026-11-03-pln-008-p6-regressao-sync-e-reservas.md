@@ -90,7 +90,17 @@ O `tools-kit` achou três pareceres do PLN-009 sem `REV-NNN`, fora do D4. Na rod
 "Issue no tools-kit (Recomendado)" para eles, gravada pela sessão de lá, e "Achado para P7 (Recomendado)" para a falta
 de aviso do checador, registrado em P7 do PLN-008.
 
-Faltam `brand`, `studio` e `playground`.
+## `brand`, `studio`, `playground` e a conclusão da MIG-001
+
+Anderson respondeu "sim" à abertura das três sessões. `brand-mig001` aplicou em `0e80b71` (4 worklogs),
+`studio-mig001` em `d5abc5e` (43 worklogs), e `playground-mig001` não teve mudança; as três saíram sem divergência do
+ensaio e com checador sem erros. Com as cinco árvores atualizadas, os três blocos do critério saíram com 0, a
+preservação conferiu 107 notas (98 worklogs), e dois `brza note index --rebuild` seguidos não acrescentaram nada. A
+MIG-001 ficou `done` e o P6 fechou, sem horas aferidas.
+
+O `brand` notou que o `refs:` pegou REV-001 e REV-004 do título da MIG-001 no texto do link. É o que o D3 conta como
+menção; na rodada, Anderson escolheu "Ponto para P7". A issue dos pareceres do PLN-009 foi gravada no `tools-kit`
+em `6292986`, pela sessão `tools-kit-rev-pln009`.
 
 ## Fora do workspace
 

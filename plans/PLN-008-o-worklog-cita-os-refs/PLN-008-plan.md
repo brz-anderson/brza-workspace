@@ -17,10 +17,10 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** P6 em curso. MIG-001 aplicada em `tools-kit` (`bf36704`, segunda passagem sem mudança) e `workspace`
-  (`361d0d4`), com checador sem erros e preservação conferida em 60 notas. Próximo: aplicar em `brand`, `studio` e
-  `playground`, cada um pela sessão dona, e então rodar os três blocos do critério e concluir a MIG-001. P7 confere o
-  ponto do checador sobre parecer sem `REV-NNN`. P1–P4 sem atestado integral; horas históricas não aferidas.
+- **Retomar:** P6 feito em 2026-11-03: MIG-001 aplicada nas cinco árvores e concluída. Próximo: P7, a revisão
+  independente da entrega, quando Anderson pedir; ela leva dois pontos registrados no passo (checador sem aviso para
+  parecer sem `REV-NNN`; ID no texto de link entrando no `refs`). P1–P4 sem atestado integral; horas históricas não
+  aferidas.
 - **Histórico desta retomada:** tentativa de execução integral em 2026-11-03 encontrou a fronteira de repositório entre `workspace` e
   `brza-workflow` no Antigravity, registrando 4 issues:
   [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md),
@@ -92,7 +92,7 @@ Os cenários abaixo são provas a implementar ou executar nos passos; não afirm
 
 ## Pendências conhecidas
 
-- [MIG-001: Renumeração dos pareceres REV-001..REV-004 e backfill de refs nos worklogs](../../work/issues/MIG-001-renumeracao-rev-e-refs-pln-008.md) — execução pendente da revisão prévia.
+- [MIG-001: Renumeração dos pareceres REV-001..REV-004 e backfill de refs nos worklogs](../../work/issues/MIG-001-renumeracao-rev-e-refs-pln-008.md) — concluída em 2026-11-03.
 - [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md)
 - [Bloqueio de P6 e P7 sem a entrega publicada de P1 a P5 e sincronização do core](../../work/issues/bloqueio-de-p6-e-p7-sem-entrega-e-sync-do-core.md)
 - [brza sessions sem suporte ao argumento --agent e alias agy não reconhecido](../../work/issues/brza-sessions-sem-suporte-ao-agente-antigravity-e-alias-agy.md)
@@ -230,13 +230,13 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/cli
 Executa D1 a D10 · executores: sessão do `brza-workflow` publica; sessões donas dos workstreams aplicam nas notas;
 sessão principal consolida evidências · depende de P5.
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: concluído; horas não aferidas.
 
 - [x] Rodar as três suítes completas da Regressão, publicar a entrega e levar a norma por `brza sync`/`brza note sync`.
-- [ ] Produzir e conferir a prévia no acervo atual; só então aplicar o bootstrap e criar MIG-001 no molde aprovado.
-- [ ] Aplicar o mapa REV, links e backfill em cada workstream; concluir MIG-001 pelo comando que prova os quatro
+- [x] Produzir e conferir a prévia no acervo atual; só então aplicar o bootstrap e criar MIG-001 no molde aprovado.
+- [x] Aplicar o mapa REV, links e backfill em cada workstream; concluir MIG-001 pelo comando que prova os quatro
   nomes novos, os antigos ausentes e links resolvidos. Registrar mudanças fora dos repositórios no worklog quando houver.
-- [ ] Rodar checador em cada árvore e rebuild duas vezes, comprovando idempotência; commitar por caminhos pelo
+- [x] Rodar checador em cada árvore e rebuild duas vezes, comprovando idempotência; commitar por caminhos pelo
   `brza note commit` nas sessões donas e registrar commits, comandos/resultados e Executado neste plano.
 
 Evidência parcial de P6 em 2026-11-03: `brza-workflow@a666e78` já publicado; CLI completa (467 testes em
@@ -249,8 +249,10 @@ isolado (`/private/tmp/pln008-sandbox`): seis passagens de `migrate_pln008.py --
 os três blocos do critério passaram, o de preservação com 107 notas (98 worklogs); um commit mutante sem `tags` foi
 barrado. Aplicação real em 2026-11-03: `tools-kit` em `bf36704` (prévia igual ao ensaio; segunda passagem zerada) e
 `workspace` em `361d0d4` (REV-002 a REV-004, 22 worklogs); checador sem erros nas duas árvores; bloco de preservação
-restrito a elas: 60 notas, 51 worklogs. Faltam `brand`, `studio` e `playground`. P6 ainda não concluído; horas não
-aferidas.
+restrito a elas: 60 notas, 51 worklogs. Depois, `brand` em `0e80b71`, `studio` em `d5abc5e` e `playground` sem
+mudança, cada um pela sessão dona, com checador sem erros. Conclusão: os três blocos do critério da MIG-001 saíram com
+0 nas cinco árvores (preservação em 107 notas, 98 worklogs); dois `brza note index --rebuild` seguidos responderam "em
+dia, nada a acrescentar", com a master parada em `e8606a4`. MIG-001 `done`. P6 concluído; horas não aferidas.
 
 ### P7 — Revisar a entrega e fechar o plano
 
@@ -261,6 +263,8 @@ Estimado: 2 h · Executado: — h
 - [ ] Revisor independente confere Pedido/Cobertura contra disco e evidências; devolve achados com fonte e confiança.
   Ponto a conferir, por escolha de Anderson em 2026-11-03 ("Achado para P7 (Recomendado)"): o checador não avisa
   parecer novo sem `REV-NNN` em `work/reviews/`; três do PLN-009 no `tools-kit` nasceram assim, um deles depois do sync.
+  Outro ponto, por escolha de Anderson em 2026-11-03 ("Ponto para P7"): ID no texto de link entra no `refs`, como o
+  D3 conta, e o intervalo "REV-001..REV-004" marca só as pontas (worklogs da MIG-001 em `brand` e `playground`).
 - [ ] Sessão principal refaz evidências, conduz rodadas de destino e grava parecer REV numerado.
 - [ ] Rodar regressão final pertinente, registrar evidências/Executado e dar destino a todo achado.
 - [ ] Fechar o worklog e o plano quando os itens de Fechamento forem verdadeiros; nenhum achado aberto é ocultado.
@@ -299,8 +303,8 @@ python3 .claude/skills/notes-checker/scripts/check_notes.py
 
 ## Worklogs
 
-- 2026-11-03 — P6 iniciado: regressão, sync e bootstrap feitos; REV-005 com destinos, MIG-001 corrigida e ensaiada em
-  clone isolado; migração real aguarda as sessões donas.
+- 2026-11-03 — P6 feito: regressão, sync e bootstrap; REV-005 com destinos; MIG-001 ensaiada, aplicada nas cinco
+  árvores e concluída; dois pontos para P7.
   [O início de P6 do PLN-008: regressão, sincronização e reservas](../../work/worklogs/2026-11-03-pln-008-p6-regressao-sync-e-reservas.md)
 
 - 2026-11-03 — P5 entregue em fixture; P6/P7 pendentes; horas e identidade histórica exigem reconciliação.
@@ -318,6 +322,6 @@ python3 .claude/skills/notes-checker/scripts/check_notes.py
 - [ ] P1 a P7 feitos com evidência/Executado ou descartados com motivo; horas reconciliadas.
 - [ ] Todo achado tem destino existente; parecer numerado e apontado pelo plano.
 - [ ] Norma durável entregue no core, sincronizada e documentada nos commits do `brza-workflow`.
-- [ ] MIG-001 concluída e acervo conferido em todos os workstreams afetados.
+- [x] MIG-001 concluída e acervo conferido em todos os workstreams afetados.
 - [ ] Resumo da entrega com link do plano nos commits; worklog final gravado.
 - [ ] `status: done`, `phase: closed` e `completed` no frontmatter.

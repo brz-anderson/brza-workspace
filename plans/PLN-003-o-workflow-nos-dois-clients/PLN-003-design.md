@@ -26,6 +26,11 @@
 - **R6.3:** a política mora num `brza.toml`, que o `AGENTS.md` cita.
 - **R6.4:** o orquestrador decide o modelo do que abre e sugere à sessão principal, por aviso.
 - **R7.1:** o semáforo é por conta e por runtime, pelo `usedPercent`.
+- **R9.1–R9.4:** o coordenador do índice da `master` é este orquestrador. A fila ordena por `deadline` próximo, depois
+  `blocks`, depois `priority`, depois a chegada. Worker novo só abre sob o menor de três tetos: o geral do workspace,
+  somado entre as contas; o por conta e runtime da R7.1, que fica; e o da máquina. O ritmo da conta é o `usedPercent`
+  projetado até o `resetsAt`: a conta que chega a 90% antes do reset não recebe worker novo. A máquina limita pela
+  memória livre e pelo swap, e a CPU é o segundo sinal.
 
 ## Terreno
 
@@ -223,7 +228,7 @@ Alternativas viáveis na coluna "Alt"; o porquê em uma linha.
 | M5 | Codex como cartão via agente Claude que roda `codex exec` | F6 | plugin do Claude (agent `brza:codex`, `-s read-only` por padrão) | M4 (sessão de terminal) | 1–1,5 | fase 2, 1ª revisão pelo Codex | sim | C4 | dá o cartão nativo sem tocar o app |
 | M6 | Conta por chamada | R4.1; F13 | mcp decide; cli executa `claude -p` com `CLAUDE_CONFIG_DIR`; chat por `agentSession.switchAccount` | flag de conta no fork | 2–4 | fase 2 (só consultor `-p`) / fase 3 (sessão) | a medir (`switchAccount`) | C3 | `agentSession.create` não tem conta; `-p` tem |
 | M7 | Sinal de cota por conta | R4.1; F14 | cli `brza quota` (sobre `orca account list --json`) + mcp consome | ler o JSON no mcp sem verbo | 1,5 | fase 2 | sim | C2 | o verbo serve ao humano e ao Codex; o mcp só lê |
-| M8 | Fila/semáforo por conta e runtime, persistente (SQLite stdlib) | R4.1 | mcp | global; só por conta | 4–6 | fase 2, 1º choque de cota | sim | C3 | o `Coordinator.maxConcurrent` do Orca só vive em gates (terreno-orquestrador) |
+| M8 | Fila/semáforo persistente (SQLite stdlib): ordena por `deadline`, `blocks`, `priority` e chegada, lidos do índice da `master` (M24); worker novo só sob o menor de três tetos — o geral do workspace, somado; o por conta e runtime (R7.1), com o ritmo projetado até o `resetsAt` e o corte a 90%; e o da máquina, pela memória livre e o swap, com a CPU como segundo sinal | R4.1, R7.1, R9.2–R9.4 | mcp | global; só por conta; fila por chegada | 4–6, sem refazer com a R9 | fase 2, 1º choque de cota | sim | C3 | o `Coordinator.maxConcurrent` do Orca só vive em gates (terreno-orquestrador); a fila por chegada deixa o pedido que trava um plano atrás do que não trava |
 | M9 | Modelo/esforço pela política "O modelo segue a tarefa" | R4.1; F16 (parte) | `AGENTS.md` (prosa) + arquivo de política (tabela) + mcp (impõe no que abre) | só norma; mcp lê a tabela do `AGENTS.md` | 1,5–2 | fase 2 | sim (`--model --effort`) | C7 | hoje a regra é só texto e a medição mostra Opus em tudo |
 | M10 | Chave de desligamento por dimensão (modelo/esforço, agente, tudo → passthrough) | R4.1 | mcp (config) + cli `brza mcp config` | só env | 0,5–1 | fase 2 | sim | C3 | "pode ser desativado" é requisito do pedido |
 | M11 | Agente interno que desempata: a cota fica na tabela; o texto vai ao `tev1:4b` local (Ollama, `/v1/systemone`) e, abaixo do limiar de confiança, ao Haiku (`claude -p --json-schema`, `--max-budget-usd`) — rodada de 2026-11-03, abaixo | R4.1, R5.1 | mcp | agente em toda chamada; regra pura; só o Haiku; Jev em nuvem, para quem não tem Ollama | 3–4 | fase 2b, quando a medição mostrar empate | sim | C3 | regra é grátis e instantânea; o `tev1` desempata em ~0,09 s, sem custo, e o Haiku paga só na dúvida |
@@ -232,13 +237,14 @@ Alternativas viáveis na coluna "Alt"; o porquê em uma linha.
 | M14 | O fim volta ao chamador (espera × aviso; turno ocioso) | F11 | mcp (via `worker_done`) | bloquear até o fim | 2–3 | fase 2 | sim | C3 | sem isso o executor vira fogo-e-esquece |
 | M15 | Gate de aprovação (abrir executor, trocar conta) | conflito K3 | `AGENTS.md` (quando) + mcp devolve proposta + sessão principal pergunta | gate do `orca orchestration` | 1–2 | fase 2 | sim | C1 + C3 | preserva "quem pergunta é a principal" |
 | M16 | Medição do roteamento + conserto da conta `home` | R4.1; AGENTS.md:93-94 | hook `measure.py` (conserto) + mcp (linha `route`) | — | 0,5 + 1,5 | fase 1 (conserto) / fase 2 | sim | C3 | "a política se revê pela medição"; hoje conta errada |
-| M17 | Fila e sessões no painel | R4.1 + R4.2 | plugin do Orca (mostra o HTML que o mcp regera — **em revisão**, C5) | — | 1–2 | fase 2 | sim | C5 | o semáforo invisível vira mistério |
+| M17 | Fila e sessões no painel: a ordem da fila com o motivo de cada posição (`deadline`, `blocks`, `priority`), e o teto que segura cada pedido parado — o do workspace, o da conta e runtime, com a projeção até o `resetsAt`, ou o da máquina | R4.1 + R4.2, R9.2–R9.4 | plugin do Orca (mostra o que o worker lê do mcp — **em revisão**, C5) | — | 1–2 | fase 2 | sim | C5 | o semáforo invisível vira mistério; com três tetos, quem espera precisa saber qual segura |
 | M18 | `codex_reply(thread, msg)` | F9 | mcp | `codex exec resume` pela cli | 1–2 | fase 3 | sim | C3 | estado da thread entre chamadas |
 | M19 | Sandbox do Codex como argumento | F15 | mcp (impõe) | config do Codex | 1 | fase 3 | sim | C7 | a sandbox fica visível no `canUseTool` |
 | M20 | Aviso ao celular (notify + hook Stop de turno longo; gate pendente) | F31, F32 | cli `brza notify` + hook do plugin + mcp chama | — | 2–3 | fase 3 | sim (macOS) | C2 + C4 | gate parado precisa chamar Anderson |
 | M21 | "Selecionar automaticamente" no seletor | F16 | app | M9 cobre o que o orquestrador abre | 4–6 (não medido) | fora → issue | não | C6 | toca a principal, que segue "o de quem a abriu" |
 | M22 | Passos do Codex dentro do cartão (`tool_use_id`) | F8, F11 (cartão) | app | — | ~15 | fora → issue | não | C6 | só BrzA, atrito de merge |
 | M23 | `SHELL_SESSIONS_DISABLE=1` no `brza-run` | F26 | cli | — | 0,3 | fase 1 | sim | C2 | conserto pequeno no que o executor usa |
+| M24 | O índice da `master` (`.brza/index.jsonl`) grava `priority`, `blocks` e `deadline` de plano, issue e decisão | R9.2; issue `o-coordenador-le-o-indice-da-master` (workspace) | cli (`brza note commit`, que acrescenta a linha) | o mcp lê o frontmatter de cada branch `workstream/*` | ~1 | fase 1, antes do M8 | sim | C2 | o índice é a visão de todas as frentes num arquivo só; ler as branches a cada pedido custa um `git show` por nota |
 
 Saíram por não serem de fluxo ou por já resolvidos: F7 (flag experimental), F17 (feito), F18 (`ship`, já fora no
 PLN-002), F22 (substituído por B1), F23 (bug do fork), F27 (telemetria), F29 (descartados com gatilho), F30 (não
@@ -286,6 +292,7 @@ não é item `D`.
 | Regra | Texto em | Imposta por |
 | :-- | :-- | :-- |
 | O modelo segue a tarefa | `AGENTS.md` (prosa) | mcp lendo o arquivo de política (M9) |
+| A ordem da fila: `deadline`, `blocks`, `priority`, chegada | `work/README.md` ("As propriedades") | mcp lendo o índice da `master` (M8, M24) |
 | Uma tarefa, uma sessão | `AGENTS.md` | roteador (M2) prefere sessão nova a acordar sessão grande parada |
 | Trava de retomada | `CLAUDE.md` | hook `resume_guard.py` + roteador (o correio não passa pela trava, `CLAUDE.md:85`) |
 | Quem pergunta é a principal | `AGENTS.md` | mcp devolve proposta (M15); nunca pergunta |

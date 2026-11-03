@@ -1,6 +1,12 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-005
+  - PLN-006
+  - REV-003
+  - REV-004
+  - issue:as-sobras-do-pln-006
 ---
 
 # PLN-006: a migração do brza-workspace
@@ -25,7 +31,7 @@ a sessão não o tomou por resposta.
 ## A revisão e os consertos
 
 O `reviewer` achou 11 defeitos e derrubou 5 hipóteses de dano, em
-[REV: o `brza-workflow` dos passos P1–P7 do PLN-006, em `b9210a6`](../reviews/pln-006-o-brza-init.md). Pela regra
+[REV-003: o `brza-workflow` dos passos P1–P7 do PLN-006, em `b9210a6`](../reviews/REV-003-pln-006-o-brza-init.md). Pela regra
 da recomendada, o porte fechou o A1 (`brza-workflow@ebeb779`), um `implementer` consertou A4–A9 e A11
 (`@2286f31`), e a migração fechou A2, A3 e A10.
 
@@ -48,7 +54,7 @@ não da trava em uso.
 ## A segunda revisão e o fechamento
 
 A revisão da migração está em
-[REV: a migração do `brza-workspace` para cliente do `brza-workflow`, o P8 do PLN-006](../reviews/pln-006-a-migracao.md).
+[REV-004: a migração do `brza-workspace` para cliente do `brza-workflow`, o P8 do PLN-006](../reviews/REV-004-pln-006-a-migracao.md).
 
 - **O incidente:** o ensaio do revisor, rodado de um clone, escreveu o `fa4152f` na `master` real, porque a
   `BRZA_WORKSPACE` herdada venceu o cwd (A1).

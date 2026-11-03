@@ -8,7 +8,7 @@ tags:
   - tooling
 ---
 
-# REV: PLN-005 — a confiança dos fatos do desenho
+# REV-002: PLN-005 — a confiança dos fatos do desenho
 
 O parecer da entrega do
 [PLN-005: A confiança dos fatos do desenho se mede contra o que se sustentou](../../plans/PLN-005-a-confianca-dos-fatos-do-desenho/PLN-005-plan.md),

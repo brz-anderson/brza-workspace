@@ -2,6 +2,8 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-004
 ---
 
 # O PLN-004: as sondas da R6 e o Desenho do Codex e do agy

@@ -327,10 +327,10 @@ com a `BRZA_WORKSPACE`, o `brza sync` recusa e diz os dois caminhos · o README 
 
 ## Revisões
 
-- [REV: o `brza-workflow` dos passos P1–P7 do PLN-006, em `b9210a6`](../../work/reviews/pln-006-o-brza-init.md) —
+- [REV-003: o `brza-workflow` dos passos P1–P7 do PLN-006, em `b9210a6`](../../work/reviews/REV-003-pln-006-o-brza-init.md) —
   2026-11-02, 11 achados e 5 falsos; A1 corrigido no porte (`ebeb779`), A2, A3 e A10 no P8, os outros num conserto
   antes dele, todos pela regra da recomendada.
-- [REV: a migração do `brza-workspace` para cliente do `brza-workflow`, o P8 do PLN-006](../../work/reviews/pln-006-a-migracao.md)
+- [REV-004: a migração do `brza-workspace` para cliente do `brza-workflow`, o P8 do PLN-006](../../work/reviews/REV-004-pln-006-a-migracao.md)
   — 2026-11-02, 8 achados e 4 falsos, e o incidente do `fa4152f`, desfeito por Anderson; A2, A6 e A7 corrigidos no
   `brza-workspace`, e A1, A3, A4, A5 e A8 no `brza-workflow`, pela regra da recomendada.
 

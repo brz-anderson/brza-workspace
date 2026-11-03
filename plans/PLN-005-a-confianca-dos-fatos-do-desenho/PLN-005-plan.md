@@ -734,7 +734,7 @@ Estimado: 1 h · Executado: 0.3 h
 - [x] **1.** O parecer, com dez achados reais e cinco falsos; a sessão refez a evidência dos que pesavam, e a R11 deu
   o destino de cada um: todos `corrigido aqui`.
 
-**Evidência:** [REV: PLN-005 — a confiança dos fatos do desenho](../../work/reviews/pln-005-a-confianca-dos-fatos.md).
+**Evidência:** [REV-002: PLN-005 — a confiança dos fatos do desenho](../../work/reviews/REV-002-pln-005-a-confianca-dos-fatos.md).
 
 ### P11 — As correções da revisão
 
@@ -784,7 +784,7 @@ O `implementer` fez uma chamada real ao `claude` (Haiku, US$ 0,002) para ver a f
 
 ## Revisões
 
-- [REV: PLN-005 — a confiança dos fatos do desenho](../../work/reviews/pln-005-a-confianca-dos-fatos.md) — 2026-10-31,
+- [REV-002: PLN-005 — a confiança dos fatos do desenho](../../work/reviews/REV-002-pln-005-a-confianca-dos-fatos.md) — 2026-10-31,
   dez achados e cinco falsos, todos com destino (R11).
 
 ## Pendências conhecidas

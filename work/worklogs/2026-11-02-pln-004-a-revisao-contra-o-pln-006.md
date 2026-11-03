@@ -2,6 +2,10 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-004
+  - PLN-005
+  - PLN-006
 ---
 
 # O PLN-004: a revisão do plano contra a migração ao brza-workflow

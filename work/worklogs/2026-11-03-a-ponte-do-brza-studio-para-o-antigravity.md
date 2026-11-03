@@ -2,6 +2,8 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - issue:integrar-o-brza-studio-ao-antigravity-ide
 ---
 
 # A ponte do BrzA Studio para o Antigravity IDE

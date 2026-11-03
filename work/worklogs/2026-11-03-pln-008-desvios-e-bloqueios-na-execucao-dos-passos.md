@@ -1,6 +1,15 @@
 ---
 scope:
   - workspace
+refs:
+  - MIG-001
+  - PLN-008
+  - REV-001
+  - REV-004
+  - issue:bloqueio-de-p6-e-p7-sem-entrega-e-sync-do-core
+  - issue:brza-sessions-sem-suporte-ao-agente-antigravity-e-alias-agy
+  - issue:falso-negativo-em-test-brza-note-por-caminho-com-brza-studio
+  - issue:fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity
 ---
 
 # Desvios e bloqueios na execução dos passos do PLN-008

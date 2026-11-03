@@ -1,6 +1,11 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-002
+  - PLN-004
+  - issue:close-task-sem-varredura-de-notes-nem-worktrees-sujos
+  - issue:skills-de-documento-da-fixfy-num-plugin
 ---
 
 # O porte das skills da Fixfy para o workspace

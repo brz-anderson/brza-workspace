@@ -8,7 +8,7 @@ tags:
   - tooling
 ---
 
-# REV: o `brza-workflow` dos passos P1–P7 do PLN-006, em `b9210a6`
+# REV-003: o `brza-workflow` dos passos P1–P7 do PLN-006, em `b9210a6`
 
 Revisão adversária do `reviewer`, em 2026-11-02, de
 [PLN-006: O `brza init` monta a norma num workspace do zero](../../plans/PLN-006-o-brza-init-monta-a-norma-do-zero/PLN-006-plan.md),

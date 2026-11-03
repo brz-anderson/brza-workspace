@@ -1,9 +1,10 @@
 ---
 scope:
   - brza-workspace
-date: 2026-10-27
 tags:
   - tooling
+refs:
+  - PLN-001
 ---
 
 # O brza-workspace nasce com a norma, o PLN-001, a medição e as skills de notas e de plano

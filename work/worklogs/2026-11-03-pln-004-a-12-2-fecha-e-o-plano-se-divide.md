@@ -1,6 +1,8 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-004
 ---
 
 # O PLN-004: a R12.2 fecha e o plano se divide

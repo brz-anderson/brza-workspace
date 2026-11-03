@@ -1,6 +1,9 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-001
+  - PLN-003
 ---
 
 # As notas em workstreams, e a `master` só com a norma

@@ -1,6 +1,8 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-008
 ---
 
 # O Terreno do PLN-008 para o Desenho

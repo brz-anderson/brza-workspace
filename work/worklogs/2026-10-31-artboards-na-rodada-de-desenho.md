@@ -2,6 +2,9 @@
 scope:
   - workspace
   - brza-studio
+refs:
+  - PLN-001
+  - issue:a-faixa-recolhida-com-icone-e-acao
 ---
 
 # Os artboards na rodada de desenho de interface

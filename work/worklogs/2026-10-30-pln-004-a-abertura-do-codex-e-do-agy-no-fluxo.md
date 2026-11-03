@@ -1,6 +1,8 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-004
 ---
 
 # O PLN-004: a abertura do Codex e do agy no fluxo

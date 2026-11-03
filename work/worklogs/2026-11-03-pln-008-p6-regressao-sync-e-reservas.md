@@ -5,6 +5,9 @@ scope:
 refs:
   - MIG-001
   - PLN-008
+  - REV-001
+  - REV-002
+  - REV-004
   - REV-005
 ---
 

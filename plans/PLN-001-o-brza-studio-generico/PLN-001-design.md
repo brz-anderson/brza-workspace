@@ -877,3 +877,37 @@ ferramenta não (P52, resposta de 2026-10-27).
   com o próprio menu; ver se os dois aparecem juntos, e como o P40 convivia com o seletor da v1.4.242.
 - **O que o `BrzaContinueInOtherAccount` de 2026-10-28 usava** e o que o v1.4.246 mudou nesses pontos (a troca por chat,
   o `acquiredAccount`, o `useNativeChatAccountSwitch`).
+
+### D63 — O botão de expandir com a aparência e a posição dos vizinhos — `brza-studio/src/renderer/src/components/native-chat/brza/BrzaExpandLayer.tsx` (P80)
+
+- **Origem:** pedido 42. Corrige o D54 (P71), cujo botão nasceu com borda e fundo próprios e com a posição a um
+  deslocamento fixo.
+- **Contexto** (`brza-studio@9a8631369ac`, lido sem rodar): o botão é um `fixed` portado ao `body`
+  (`BrzaExpandLayer.tsx:84-100`) com `border border-border bg-background text-muted-foreground shadow-xs`, enquanto o de
+  quebra de linha (`NativeChatCodeBlock.tsx:101-110`) e o de copiar (`NativeChatCopyButton.tsx`, `:50-56`) são
+  `size-6 rounded-md text-chat-foreground-faint hover:bg-accent hover:text-accent-foreground`, sem borda nem fundo. A
+  posição é `left: rect.right - 28 - (block ? 96 : 4)` e `top: rect.top + (header ? 4 : -12)`
+  (`BrzaExpandLayer.tsx:56-62`): o 96 supõe a largura do grupo de ações, que muda com o botão de executar
+  (`BrzaRunCodeButton`) e com o bloco; sem cabeçalho de linguagem, o grupo é `absolute right-2 top-2`
+  (`NativeChatCodeBlock.tsx:82`), e o expandir cai 12 px acima da borda do bloco, fora da fileira. Com cabeçalho, o
+  grupo é `-mr-1 flex items-center gap-0.5` numa linha `h-7.5` (`:55-62`).
+
+#### Como fica
+
+- **A mesma aparência:** as classes do botão de copiar, sem `border`, `bg-background` e `shadow-xs`; o ícone
+  `Maximize2` no tamanho dos vizinhos (`size-3.5`); o foco e o hover como os dele.
+- **A mesma fileira:** a posição sai do grupo de ações real do bloco, medido no DOM (o `getBoundingClientRect` do
+  contêiner dos botões), e não do 96 fixo: `left` = a esquerda do grupo menos o espaço entre botões (`gap-0.5`) e a
+  largura do botão (24 px), e `top` = o topo do grupo, na mesma altura. Vale com e sem cabeçalho de linguagem e com o
+  botão de executar.
+- **Bloco sem grupo de ações** (a saída de ferramenta, o diff): fica no canto superior direito de dentro do bloco, com a
+  aparência nova e sem passar da borda de cima.
+
+#### A conferir no passo
+
+- Como achar o grupo de ações sem depender de classe: um atributo `data-native-chat-code-actions` nos dois contêineres
+  de `NativeChatCodeBlock.tsx` (upstream, uma linha cada, com conflito pequeno em sync futuro), ou o pai dos botões do
+  bloco; escolher o de menor conflito.
+- O grupo some com opacidade fora do hover (`can-hover:opacity-0`, `NativeChatCodeBlock.tsx:82`): o expandir, que vem da
+  camada delegada, tem de aparecer e sumir junto, e não ficar sozinho no canto.
+- O botão de `Maximize2` e o do P71 na tela cheia (`BrzaExpandOverlay`) não mudam.

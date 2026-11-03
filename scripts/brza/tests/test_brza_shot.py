@@ -43,13 +43,18 @@ MAIN_CSS = '''@import 'tailwindcss';
 @layer base { :root { --background: #abcdef; } }
 '''
 TAILWIND = '@theme default {\n  --color-blue-300: oklch(80.9% 0.105 251.813);\n}\n'
-PANEL = """export const PANEL_DESIGN_TOKEN_ALLOWLIST = [
+# A lista mora fora dos caminhos que o brza-studio já usou: o brza-shot a acha pelo import do shell dos visuais.
+PANEL_PATH = 'src/shared/design/panel-tokens.ts'
+PANEL = """/** Os tokens do painel. */
+export const PANEL_DESIGN_TOKEN_ALLOWLIST = [
   '--background',
   '--foreground',
   '--destructive'
 ] as const
 """
-VISUAL = """export const NATIVE_CHAT_VISUAL_CDN_ORIGINS = [
+VISUAL = """import { PANEL_DESIGN_TOKEN_ALLOWLIST } from '../design/panel-tokens'
+
+export const NATIVE_CHAT_VISUAL_CDN_ORIGINS = [
   'https://cdn.jsdelivr.net',
   'https://unpkg.com'
 ] as const
@@ -65,7 +70,7 @@ const BASE_CSS =
 
 
 def fake_studio(root: Path, tailwind: bool = True) -> Path:
-    files = {SHOT['MAIN_CSS']: MAIN_CSS, SHOT['PANEL_SHELL']: PANEL, SHOT['VISUAL_SHELL']: VISUAL}
+    files = {SHOT['MAIN_CSS']: MAIN_CSS, PANEL_PATH: PANEL, SHOT['VISUAL_SHELL']: VISUAL}
     if tailwind:
         files[SHOT['TAILWIND_THEME']] = TAILWIND
     for rel, text in files.items():
@@ -138,6 +143,42 @@ class ShellTest(unittest.TestCase):
         self.assertEqual(parts['cdns'], ['https://cdn.jsdelivr.net', 'https://unpkg.com'])
         self.assertEqual(parts['base_css'],
                          'html{background:var(--background);color:var(--foreground);font-size:14px}body{margin:0}')
+
+    def test_token_list_follows_the_import_through_a_reexport(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            studio = fake_studio(Path(tmp))
+            (studio / PANEL_PATH).unlink()
+            moved = studio / 'src/shared/plugins/frames/plugin-panel-design-tokens.ts'
+            moved.parent.mkdir(parents=True)
+            moved.write_text(PANEL)
+            (studio / 'src/shared/design/index.ts').write_text(
+                "export {\n  PANEL_DESIGN_TOKEN_ALLOWLIST,\n  type Other\n} from '../plugins/frames/plugin-panel-design-tokens'\n")
+            visual = VISUAL.replace("from '../design/panel-tokens'", 'from "../design"')
+            (studio / SHOT['VISUAL_SHELL']).write_text(visual)
+            parts = SHOT['shell_parts'](studio)
+        self.assertEqual(parts['tokens'][:3], ['--background', '--foreground', '--destructive'])
+
+    def test_token_list_defined_in_the_visual_shell_needs_no_import(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            studio = fake_studio(Path(tmp))
+            visual = VISUAL.split('\n', 1)[1] + PANEL
+            (studio / SHOT['VISUAL_SHELL']).write_text(visual)
+            parts = SHOT['shell_parts'](studio)
+        self.assertEqual(parts['tokens'][:3], ['--background', '--foreground', '--destructive'])
+
+    def test_unresolved_import_says_what_it_looked_for(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            studio = fake_studio(Path(tmp))
+            (studio / PANEL_PATH).unlink()
+            with self.assertRaisesRegex(ShotError, r'PANEL_DESIGN_TOKEN_ALLOWLIST.*\.\./design/panel-tokens.*panel-tokens\.ts'):
+                SHOT['shell_parts'](studio)
+
+    def test_missing_import_says_what_it_looked_for(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            studio = fake_studio(Path(tmp))
+            (studio / SHOT['VISUAL_SHELL']).write_text(VISUAL.split('\n', 1)[1])
+            with self.assertRaisesRegex(ShotError, r'PANEL_DESIGN_TOKEN_ALLOWLIST.*native-chat-visual-shell\.ts'):
+                SHOT['shell_parts'](studio)
 
     def test_changed_studio_code_stops_with_the_name(self):
         with tempfile.TemporaryDirectory() as tmp:

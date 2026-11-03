@@ -1,13 +1,13 @@
 ---
-status: open
-phase: design
+status: in_progress
+phase: execution
 origin: plan
 origin_ref: PLN-003
 description: O servidor MCP residente gerencia o fluxo com fila de prioridade sob três tetos, política declarativa e desempate com tev1 e Haiku
-ready: não — aguarda revisão do desenho e aprovação para execução
-estimate_h: 22.5
+ready: sim
+estimate_h: 30.0
 executed_h: 0.0
-remaining_h: 22.5
+remaining_h: 30.0
 scope:
   - workspace
   - brza-studio
@@ -19,172 +19,434 @@ tags:
 
 # PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients
 
-- **Retomar:** o plano foi aberto a partir da extração do componente MCP do [PLN-003](../PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md). O desenho está consolidado com base nas decisões R3.4, R4.1, R5.1, R7.1, R9.1–R9.4 e R10.3 do PLN-003; os passos P1 a P5 aguardam aprovação de Anderson para início da execução.
+- **Retomar:** em execução desde 2026-11-03, a pedido de Anderson ("execute todos os passos que não dependem de
+  decisões minhas"), no worktree `~/Projects/brza-workflow/.worktrees/pln-009-mcp`, branch `feat/pln-009-mcp`. Cada
+  passo só fecha depois do laço de revisão pelo `agy` (até 3 rodadas, `corrigido aqui` por um `implementer`). O
+  Desenho foi revisado antes da execução ([REV: o Desenho do PLN-009 antes da execução](../../work/reviews/pln-009-o-desenho-antes-da-execucao.md))
+  e reescrito pela R2. O próximo passo é o primeiro sem `[x]`.
 
 ## Pedido
 
-- **Origem:** [PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`](../PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md), por pedido de Anderson em 2026-11-03: "crie um plano só pro `MCP`".
+- **Origem:** [PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`](../PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md),
+  por pedido de Anderson em 2026-11-03: "crie um plano só pro `MCP`". O que o MCP deve fazer vem das palavras dele no
+  PLN-003.
 
-O MCP é o coordenador e orquestrador central do fluxo nos dois aplicativos (BrzA Studio e Orca). É um servidor residente em segundo plano que expõe ferramentas padronizadas para despacho de tarefas, enfileiramento com semáforo sob três tetos, imposição de modelo/esforço e mediação de decisões.
+"o MCP é o orquestrador/coordenador, é por ele - rodando um agente - que decide qual sessão chamar, com qual conta e por
+qual runtime, funcionando como um semaforo enfileirando chamadas, tbm decide o modelo/esforço da sessão (pode ser
+desativado), em resumo, é o coração do fluxo" — Anderson, em 2026-10-29, na R4.1 do PLN-003.
+
+"o `BrzA CLI` deve conseguir instalar/atualizar o app `BrzA Studio`, o plugin do `Orca`, o plugin do `Claude`, o MCP -
+iniciar/parar tbm -" — Anderson, em 2026-10-29, no Pedido do PLN-003.
+
+"prioriza a fila considerando a prioridade do pedido - issue high, bloqueia avanço de plano, prazo de entrega curto e
+etc -, o limite de workers em paralelo é geral do workspace somado, o cálculo também leva em consideração ritmo das
+contas e o recurso disponível na máquina pra limitar workers" — Anderson, em 2026-11-03, na R9 do PLN-003.
 
 Os itens do pedido, numerados para a Cobertura:
 
-1. Servidor HTTP local residente (127.0.0.1) gerenciado por launchd, com controle CLI (`brza mcp start|stop|status`) e autenticação Bearer token;
-2. Protocolo MCP sobre HTTP/SSE com a ferramenta `dispatch` e reconhecimento da sessão chamadora (`X-Brza-Session`);
-3. Fila de prioridade persistente (SQLite) com ordenação por `deadline`, `blocks`, `priority` e ordem de chegada;
-4. Admissão de workers regulada por três tetos simultâneos: teto do workspace somado, teto por conta/runtime (bloqueando a 90% do consumo projetado até `resetsAt`) e teto da máquina (RAM/swap/CPU);
-5. Política declarativa de modelo e esforço em `brza.toml` com chaves de desligamento (`brza mcp config`);
-6. Mecanismo de desempate em duas etapas: tabela de regras e cotas, modelo local `tev1:4b` via Ollama (`/v1/systemone`) e fallback Haiku (`claude -p --json-schema`);
-7. Gates de aprovação da sessão principal para executores e troca de contas, com registro de telemetria `route`.
+1. o MCP residente, que a CLI inicia e para;
+2. o MCP decide qual sessão chamar, com qual conta e por qual runtime;
+3. o semáforo enfileira as chamadas, pela prioridade do pedido — issue high, o que bloqueia plano, o prazo curto;
+4. o limite de workers soma o do workspace, o ritmo das contas e o recurso da máquina;
+5. o MCP decide o modelo e o esforço da sessão, e isso pode ser desativado;
+6. o MCP decide "rodando um agente" — o desempatador da rodada do M11;
+7. o consultor roda livre, e o executor e a troca de conta passam pelo gate da sessão principal (PLN-003/R5.2).
 
 ### Cobertura
 
-| Origem     | Critério de aceite                                                                                      | Passo | Teste (nível) |
-| :--------- | :------------------------------------------------------------------------------------------------------ | :---- | :------------ |
-| `Pedido 1` | `brza mcp start`, `stop` e `status` gerenciam o daemon sob `launchd` e respondem na porta local           | P1    | `test_mcp_lifecycle.py` (unidade/integração) |
-| `Pedido 1` | conexões sem Bearer token válido são rejeitadas com HTTP 401                                            | P1    | `test_mcp_auth.py` (unidade) |
-| `Pedido 2` | a ferramenta `dispatch` aceita tarefas tipadas e identifica a sessão chamadora pelo header ou argumento | P3    | `test_mcp_dispatch.py` (unidade) |
-| `Pedido 3` | pedidos com `deadline` mais próximo ou marcados com `blocks` saem na frente de pedidos `priority: high` | P2    | `test_mcp_queue.py` (unidade) |
-| `Pedido 4` | novos workers aguardam quando qualquer um dos três tetos atinge o limite, com status explícito          | P2    | `test_mcp_limits.py` (unidade) |
-| `Pedido 5` | a tarefa segue o modelo definido em `brza.toml`, e a chave de desligamento desativa a imposição         | P4    | `test_mcp_policy.py` (unidade) |
-| `Pedido 6` | a tabela decide a cota; o `tev1` desempata o texto em <0,1 s e repassa ao Haiku se a confiança for baixa| P4    | `test_mcp_resolver.py` (integração) |
-| `Pedido 7` | chamada de executor ou troca de conta retorna proposta de gate sem disparar o worker diretamente        | P3, P5| `test_mcp_gates.py` (unidade) |
+| Origem     | Critério de aceite | Passo | Teste (nível) |
+| :--------- | :----------------- | :---- | :------------ |
+| `Pedido 1` | `brza mcp start`, `stop` e `status` gravam o plist, chamam o `launchctl` e conferem o `/health`; o servidor sobe e para limpo por `SIGTERM` | P1 | `tests/mcp/test_mcp_lifecycle.py` (unidade, `launchctl` trocado); C1 (manual, launchd real) |
+| `Pedido 1` | requisição sem Bearer válido recebe 401; o token nasce `0600` | P1 | `tests/mcp/test_mcp_auth.py` (unidade) |
+| `Pedido 1` | o `brza install --mcp` liga o `brza-mcp`, e o chat recebe o `BRZA_MCP_TOKEN` | P1 | `tests/cli/test_brza_install.py`, `tests/cli/test_brza_shell.py` (unidade) |
+| `Pedido 2` | o `dispatch` identifica a sessão chamadora pelo `X-Brza-Session` e devolve o pedido enfileirado | P3 | `tests/mcp/test_mcp_dispatch.py` (unidade) |
+| `Pedido 2` | o worker admitido abre pelo `orca orchestration` com o env do H4, e o fim volta ao chamador | P5 | `tests/mcp/test_mcp_cycle.py` (unidade, CLI do client trocada) |
+| `Pedido 2` | a conta da chamada vai no `CLAUDE_CONFIG_DIR`, omitido na `systemDefault`; o `brza quota` mostra o uso por conta | P5 | `tests/mcp/test_mcp_accounts.py`, `tests/mcp/test_brza_quota.py` (unidade) |
+| `Pedido 3` | com dois pedidos, o de `deadline` mais próximo sai antes, e o de `blocks` antes do de `priority: high` | P2 | `tests/mcp/test_mcp_queue.py` (unidade) |
+| `Pedido 4` | worker novo espera quando o teto do workspace, o de sessões por conta e runtime ou a projeção a 90% está cheio, e o `status` diz qual | P2 | `tests/mcp/test_mcp_limits.py` (unidade) |
+| `Pedido 4` | a máquina só registra memória livre, swap e CPU, sem segurar, enquanto o `brza.toml` não der o número | P2 | `tests/mcp/test_mcp_limits.py` (unidade) |
+| `Pedido 5` | a tarefa segue o modelo e o esforço do `brza.toml`, e a chave de desligamento devolve o pedido sem imposição | P4 | `tests/mcp/test_mcp_policy.py` (unidade) |
+| `Pedido 5` | cada decisão de rota grava uma linha `event: "route"` no `.measurements/measurements.jsonl` do workspace | P6 | `tests/mcp/test_mcp_telemetry.py` (unidade) |
+| `Pedido 6` | a tabela decide a cota; o texto vai ao `tev1:4b` e, sem limiar calibrado ou abaixo dele, ao Haiku; sem Ollama, vai direto ao Haiku sem travar | P4 | `tests/mcp/test_mcp_resolver.py` (unidade, Ollama e `claude` trocados); C2 (manual, `tev1` real) |
+| `Pedido 7` | papel diferente de `consultant`, ou troca de conta, devolve proposta de gate e não abre worker | P3 | `tests/mcp/test_mcp_gates.py` (unidade) |
+
+### Fora de escopo
+
+- **Outros runtimes (Codex, `agy`), o M4:** fase 3; ficam no PLN-003/P12. O `dispatch` aceita só `runtime: "claude"` e
+  recusa o resto com erro claro.
+- **O `.mcp.json` do plugin do Claude:** é do PLN-003/P4; daqui sai só o `brza mcp url`, que ele usa.
+- **O painel do Orca (R10.3):** o PLN-003/P10 consome o `status` deste plano.
+
+## Pré-requisitos
+
+- **O índice da `master` com `priority`, `blocks` e `deadline` (PLN-003/P1):** sem ele, a fila usa só os campos que o
+  `dispatch` recebe. Não trava o P2; trava o caso C3.
+- **Python 3.10 ou mais** no interpretador que roda `brza mcp start`, que o plist fixa.
+- **Ollama com o `tev1:4b`**, só para o C2; a ausência é coberta pelo fallback.
+
+## Entrevista
+
+### Rodada 1 — onde mora o código e quem é o dono do trabalho (enviada 2026-11-03)
+
+> **Apresentado antes:** a R5.3 do PLN-003 decidiu "o repositório próprio `brz-anderson/brza`"
+> (`PLN-003-interview.md:253-260`, 2026-10-29), que não existe no GitHub (`gh repo view brz-anderson/brza` → "Could not
+> resolve to a Repository"); o `brza-workflow` nasceu depois, em 2026-10-31 (PLN-006/P1), com `packages/client`,
+> `bin/brza-*` e o `brza install`. Os P6 a P9 do PLN-003 (`PLN-003-plan.md:171-222`) repetem os P1 a P5 deste plano, e
+> o PLN-003 não aponta para cá.
+
+Respondida em 2026-11-03, na sessão do `tools-kit` que retomou o plano.
+
+1. **Onde mora o código do MCP.** Opções:
+   - `~/Projects/brza-workflow/packages/mcp/`, com o `bin/brza-mcp` ligado pelo `brza install`, reabrindo a R5.3
+     (recomendada). Custo: ~0 agora; o PLN-003 P3 passa a publicar o `brza-workflow`. Se paga: agora;
+   - um repositório local `~/Projects/brza`, sem push. Custo: ~15 min e uma segunda base de testes e instalação. Se
+     paga: na 1ª publicação no PyPI, se o pacote tiver de ser separado do núcleo;
+   - o PLN-003 P3 antes, publicando `brz-anderson/brza`. Custo: ~4 h e um push público sem código. Se paga: na 1ª
+     publicação;
+   - esperar. Custo: 22,5 h paradas. Se paga: nunca, por si.
+
+   **Respondida — "brza-workflow (Recomendado)".** Reabre a PLN-003/R5.3 para o código do MCP.
+
+2. **Quem é o dono do trabalho do MCP.** Opções:
+   - o PLN-009; uma issue pede à sessão do PLN-003 que marque os P6 a P9 como `[-]` → PLN-009 (recomendada). Custo:
+     ~10 min na sessão do PLN-003. Se paga: agora;
+   - os dois, com ponteiro. Custo: marcar duas vezes. Se paga: nunca;
+   - volta ao PLN-003, e este plano vira `dropped`. Custo: perde o plano próprio. Se paga: só se o MCP não precisar de
+     frente própria.
+
+   **Respondida — "PLN-009 (Recomendado)".**
+
+### Rodada 2 — os pontos da revisão do Desenho (2026-11-03)
+
+> **Apresentado antes:** o parecer [REV: o Desenho do PLN-009 antes da execução](../../work/reviews/pln-009-o-desenho-antes-da-execucao.md),
+> com 14 achados e quatro pontos para rodada.
+
+Respondida em 2026-11-03, nesta sessão, pela regra que Anderson deu antes dela: "escolha o encaminhamento dos achados
+sempre pela opção `recomendada`" e "prefira sempre optar por `corrigir aqui`". As opções estão no parecer, com o custo.
+
+1. **Para onde vão o M6, o M7, o M13, o M14 e a PLN-003/R6.4** (A2, A3). **Respondida — a recomendada:** entram neste
+   plano, num D6 "o ciclo e a conta", com o `brza quota` como verbo; ~7 h a mais.
+2. **Os limiares sem rodada** (A6). **Respondida — as duas recomendadas:** a porta é chave do `brza.toml`, `4242` o
+   padrão, sem fallback automático; os tetos da máquina e a confiança do `tev1` nascem como chaves sem valor imposto —
+   a máquina só registra até a medição dar o número, e o `tev1` manda tudo ao Haiku até a calibração da fase 2b.
+3. **O `tev1:4b` ocupa 7,7 GB carregado** (A6). **Respondida — a recomendada:** o desempate não conta no teto de
+   workers, e o `keep_alive` do Ollama fica em 1 min.
+4. **Onde vai a linha `route`** (D5). **Respondida — a recomendada:** no `.measurements/measurements.jsonl` do
+   workspace, com `event: "route"`.
+5. **A conta sem dado de uso e o teto de sessões** (A9), sem opção no parecer. **Escolha desta sessão, pela regra de
+   preferir `corrigir aqui`:** o teto de sessões por conta e runtime da PLN-003/R7.1 entra como chave; a conta sem dado
+   de uso admite worker só dentro dele, com a linha `route` dizendo `quota_unknown`. Revisável por Anderson.
+6. **Como o chat põe o token no `Authorization`** (A12), sem opção no parecer. **Escolha desta sessão, pela mesma
+   regra:** o `claude-brza` e a função `claude` exportam `BRZA_MCP_TOKEN`, lido do arquivo, quando ele existe.
+   Revisável por Anderson.
 
 ## Desenho
 
-### D1 — Servidor HTTP residente e controle de ciclo de vida (`packages/mcp/server.py`)
+### O que este desenho assume
 
-- **Origem:** PLN-003/R3.4, PLN-003/B6.
-- **Implementação:** Daemon HTTP local em Python 3 stdlib escutando exclusivamente em `127.0.0.1:4242`.
-- **Segurança:** Token criptográfico gerado na primeira inicialização e armazenado em `~/.brza/runtime/mcp.token` com permissão restrita (`0600`).
-- **Controle:**
-  - Launchd: agente configurado em `~/Library/LaunchAgents/com.brza.orchestrator.plist`.
-  - CLI: verbos `brza mcp start`, `brza mcp stop`, `brza mcp status`.
+- **PLN-003/R4.1:** o MCP é o coordenador do fluxo, com um agente que roteia e uma fila.
+- **PLN-003/R5.2:** o consultor roda livre; o executor e a troca de conta passam pelo gate da sessão principal.
+- **PLN-003/R6.3 e R6.4:** a política mora num `brza.toml`; o MCP decide o modelo da sessão que abre e sugere à
+  principal, por aviso.
+- **PLN-003/R7.1 e R9.1–R9.4:** a fila e os três tetos.
+- **O P0 do PLN-003 (H1 a H6), medido em 2026-11-03** ([O PLN-003: a medição das hipóteses da fase 0 (P0)](../../work/worklogs/2026-11-03-pln-003-medicao-das-hipoteses-p0.md)):
+  os ajustes valem como requisito.
+- **R1 e R2 deste plano.**
 
-### D2 — Fila de prioridade e os três tetos de concorrência (`packages/mcp/queue.py`)
+### D1 — O servidor residente e o ciclo de vida (`packages/mcp/brza_mcp/server.py`, `launchd.py`, `bin/brza-mcp`)
 
-- **Origem:** PLN-003/R7.1, PLN-003/R9.1–R9.4, PLN-003/M8.
-- **Armazenamento:** SQLite stdlib em `~/.brza/orchestrator.db`.
-- **Algoritmo de Priorização:**
-  1. `deadline` mais próximo.
-  2. `blocks` (bloqueadores têm preferência sobre independentes).
-  3. `priority` (`high` > `medium` > `low`).
-  4. Timestamp de chegada.
-- **Regras dos Três Tetos:**
-  - **Teto Workspace:** limite global somado de processos ativos.
-  - **Teto Conta & Runtime:** consumo obtido via `orca account list --json`. Se o ritmo extrapolado até `resetsAt` alcançar 90%, nenhum novo worker daquela conta é admitido.
-  - **Teto Máquina:** memória RAM livre > 4 GB e swap estável; CPU > 90% segura novos disparos.
+- **Origem:** PLN-003/R3.4, PLN-003/B6, R1.1, R2.2, R2.6; H1, H2 e H5 do P0.
+- **Repositório:** `~/Projects/brza-workflow`, pacote `packages/mcp/brza_mcp/` e executável `packages/mcp/bin/brza-mcp`
+  (R1.1). O `brza install --mcp` o liga em `~/.local/bin`, e o `brza mcp <verbo>` chega a ele pelo despacho `brza-<sub>`
+  do CLI do app.
+- **Servidor:** `http.server.ThreadingHTTPServer` com `protocol_version = "HTTP/1.1"` e `Content-Length` explícito,
+  porque o Claude Code mantém um `GET /mcp` (SSE) aberto em paralelo aos `POST /mcp` (H5). Streamable HTTP: `POST /mcp`
+  (JSON-RPC: `initialize`, `notifications/*` → 202, `ping`, `tools/list`, `tools/call`; método desconhecido, como o
+  `server/discover` que o Claude Code manda primeiro, → `-32601`) e `GET /mcp` (SSE com keep-alive). `GET /health`.
+- **Porta:** só em `127.0.0.1`; a chave `[mcp] port` do `brza.toml`, `4242` por padrão, sem fallback automático: porta
+  ocupada é erro (R2.2). `brza mcp url` imprime a URL, para o `.mcp.json` do PLN-003/P4.
+- **Token:** `~/.brza/runtime/mcp.token`, criado `0600` na primeira subida; toda rota exige o Bearer, senão 401.
+  `brza mcp token` o imprime; o `claude-brza` e a função `claude` do pacote do cliente exportam `BRZA_MCP_TOKEN` a partir
+  dele (R2.6), para o `"Authorization": "Bearer ${BRZA_MCP_TOKEN}"` do `.mcp.json` (H1).
+- **Launchd:** `~/Library/LaunchAgents/com.brza.orchestrator.plist`, com `ProgramArguments` fixando o interpretador que
+  rodou o `brza mcp start` (3.10 ou mais; o `/usr/bin/python3` é o 3.9.6), `EnvironmentVariables` com `HOME` e um `PATH`
+  que tem `~/.local/bin` (H2), `KeepAlive` só em saída com erro, e os logs em `~/.brza/runtime/`.
+- **A base `~/.brza`** troca por `BRZA_HOME`, e o diretório dos LaunchAgents por `BRZA_LAUNCH_AGENTS_DIR`: é assim que
+  os testes ficam fora do estado da máquina.
 
-### D3 — Ferramentas MCP e protocolo de despacho (`packages/mcp/dispatch.py`)
+```text
+brza mcp start   # grava o plist, launchctl bootstrap gui/<uid>, espera o /health
+brza mcp stop    # launchctl bootout gui/<uid>/com.brza.orchestrator
+brza mcp status  # carregado? /health responde? sai 0 de pé, 3 parado
+brza mcp token   # imprime o token
+brza mcp url     # imprime http://127.0.0.1:<porta>/mcp
+brza mcp config [<chave> [<valor>]]   # D4, a chave de desligamento
+```
 
-- **Origem:** PLN-003/R4.1, PLN-003/M1, PLN-003/M12, PLN-003/M15.
-- **Ferramentas:**
-  - `dispatch(task, role, target, model?, effort?, account?)`: submissão de pedidos. Se `role == 'consultant'`, executa de forma autônoma. Se `role == 'implementer'` ou demanda troca de conta, devolve proposta para a sessão principal solicitar aprovação do usuário (gate M15).
-  - `status()`: retorna o estado das filas, workers em execução e o teto que está retendo cada pedido pendente.
-  - `config(key, value?)`: consulta e altera chaves de bypass e desligamento da política.
+### D2 — A fila e os três tetos (`packages/mcp/brza_mcp/queue.py`, `limits.py`)
 
-### D4 — Política declarativa e o desempatador `tev1` + Haiku (`packages/mcp/policy.py`)
+- **Origem:** PLN-003/R7.1, PLN-003/R9.1–R9.4, PLN-003/M8, PLN-003/M24, R2.2, R2.3, R2.5.
+- **Armazenamento:** SQLite da stdlib em `~/.brza/orchestrator.db`, tabelas `requests` e `workers`.
+- **De onde vêm `deadline`, `blocks` e `priority`:** do `dispatch` (D3), quando vêm; senão, do índice da `master` pelo
+  `ref` do pedido (`PLN-NNN`, o caminho da issue), lendo a última linha de cada `id` no `.brza/index.jsonl` — que é um
+  log de eventos, e não um retrato. Sem nenhum dos dois, o pedido entra sem eles.
+- **A ordem (R9.2):** `deadline` mais próximo; depois quem tem `blocks`; depois `priority` (`high`, `medium`, `low`,
+  ausente por último); depois a chegada.
+- **Os tetos (R9.3: o menor manda):**
+  - **workspace:** `[orchestrator] max_workers`;
+  - **conta e runtime:** `[quota] max_sessions_per_account` (R7.1) e a projeção — a variação do `usedPercent` até o
+    `resetsAt`; a conta que chega a `hard_cap_percent` (90) antes do reset não recebe worker. A conta sem dado de uso
+    admite só dentro do teto de sessões, com `quota_unknown` na linha `route` (R2.5). O uso vem do `orca account list
+    --json` do client detectado, pelo D6;
+  - **máquina:** memória livre, swap e CPU medidos a cada admissão. As chaves `[machine] min_free_mem_gb`,
+    `max_swap_gb` e `max_cpu_percent` nascem sem valor: sem valor, a máquina só registra na linha `route` e não segura
+    (R2.2).
+- **O desempatador não conta como worker** (R2.3).
+- **O `status`** diz, para cada pedido parado, o teto que o segura.
 
-- **Origem:** PLN-003/R5.1, PLN-003/R6.3, PLN-003/M9, PLN-003/M11.
-- **Arquivo `brza.toml`:**
-  - Mapeia papéis e tarefas para modelo padrão e esforço (`opus`, `sonnet`, `haiku`; `high`, `medium`, `low`).
-  - Define cotas e limiares de segurança (soft cap 55%, hard cap 90%).
-- **Resolução de Desempates:**
-  1. Parâmetros estáticos e cotas são avaliados via tabela determinística.
-  2. Dúvidas na classificação do texto da tarefa são submetidas ao modelo local `tev1:4b` via endpoint Ollama (`/v1/systemone`).
-  3. Se a confiança calculada ficar abaixo de 0,75, aciona o Haiku com `--max-budget-usd 0.01` via `claude -p --json-schema`.
+### D3 — As ferramentas MCP, o despacho e os gates (`packages/mcp/brza_mcp/tools.py`)
 
-### D5 — Telemetria e auditoria (`packages/mcp/telemetry.py`)
+- **Origem:** PLN-003/R4.1, PLN-003/R5.2, PLN-003/M1, PLN-003/M12, PLN-003/M15, H1.
+- **Quem chamou:** o header `X-Brza-Session` (H1), e o argumento `caller` quando o header falta.
+- **Os gates (R5.2, M15):** só `role: "consultant"` sem troca de conta entra direto na fila. Qualquer outro papel — o
+  executor, o arquiteto, o desconhecido — ou a troca de conta devolve `{"gate": {...}}` com a proposta, sem abrir worker;
+  a sessão principal pergunta a Anderson e chama `dispatch` de novo com `approved: <id do gate>`.
+- **As ferramentas:**
 
-- **Origem:** PLN-003/M16.
-- Toda operação de roteamento, admissão ou bloqueio na fila grava uma linha estruturada em `~/.brza/orchestrator.log` no formato:
-  ```json
-  {"ts": "2026-11-03T12:00:00Z", "event": "route", "caller": "pln-003", "target": "worker-1", "model": "sonnet", "reason": "policy"}
-  ```
+```json
+{"name": "dispatch", "inputSchema": {"type": "object", "required": ["task", "role"], "properties": {
+  "task": {"type": "string"}, "role": {"type": "string"}, "target": {"type": "string"},
+  "runtime": {"enum": ["claude"]}, "model": {"type": "string"}, "effort": {"type": "string"},
+  "account": {"type": "string"}, "ref": {"type": "string"}, "deadline": {"type": "string", "format": "date"},
+  "blocks": {"type": "array", "items": {"type": "string"}}, "priority": {"enum": ["high", "medium", "low"]},
+  "caller": {"type": "string"}, "approved": {"type": "string"}}}}
+{"name": "status", "inputSchema": {"type": "object", "properties": {}}}
+{"name": "config", "inputSchema": {"type": "object", "properties": {"key": {"type": "string"}, "value": {}}}}
+```
+
+### D4 — A política e o desempatador (`brza.toml`, `packages/mcp/brza_mcp/policy.py`, `resolver.py`)
+
+- **Origem:** PLN-003/R5.1, PLN-003/R6.3, PLN-003/R6.4, PLN-003/M9, PLN-003/M10, PLN-003/M11, R2.2, R2.3; H2.
+- **O `brza.toml`** fica na raiz do workspace e é lido por `tomllib`, ou pelo `parse_toml` do `brza-workflow` abaixo do
+  3.11. Os papéis seguem a R5.2: `consultant`, `executor`, `architect`.
+
+```toml
+[mcp]
+port = 4242
+
+[orchestrator]
+max_workers = 6
+
+[policy]
+enforce = true            # a chave de desligamento (M10); false devolve o pedido sem imposição
+suggest_to_main = true    # R6.4: o status traz a sugestão para a principal
+
+[policy.roles.consultant]
+model = "sonnet"
+effort = "low"
+
+[policy.roles.executor]
+model = "sonnet"
+effort = "medium"
+
+[policy.roles.architect]
+model = "opus"
+effort = "high"
+
+[quota]
+soft_cap_percent = 55     # PLN-003/R7.1
+hard_cap_percent = 90     # PLN-003/R7.1, R9.4
+max_sessions_per_account = 2
+
+[machine]                 # sem valor: só registra (R2.2)
+# min_free_mem_gb =
+# max_swap_gb =
+# max_cpu_percent =
+
+[resolver]
+ollama_url = "http://127.0.0.1:11434"
+tev1_model = "tev1:4b"
+tev1_keep_alive = "1m"    # R2.3
+# tev1_min_confidence =   # sem valor: tudo ao Haiku até a calibração da fase 2b (R2.2)
+haiku_max_budget_usd = 0.01   # o da sonda do H2, que custou de US$ 0,0016 a 0,0039
+```
+
+- **O desempate (M11):** a tabela decide o que é determinístico (papel, cota); o texto ambíguo vai ao `tev1:4b`
+  (`POST /v1/systemone`), e ao Haiku quando o limiar não tem valor ou a confiança fica abaixo dele, por `claude -p --model
+  haiku --effort low --output-format json --json-schema … --max-budget-usd <chave> --no-session-persistence`. Sem
+  Ollama, ou com erro dele, vai direto ao Haiku; sem `claude`, fica a tabela, e a linha `route` diz o motivo.
+
+### D5 — A telemetria `route` (`packages/mcp/brza_mcp/telemetry.py`)
+
+- **Origem:** PLN-003/M16, R2.4.
+- **Onde:** `<workspace>/.measurements/measurements.jsonl`, o mesmo log do hook de medição, com `event: "route"`. O
+  workspace é o `BRZA_WORKSPACE` do `brza mcp start`, gravado no plist.
+- **A linha:**
+
+```json
+{"ts": "2026-11-03T12:00:00Z", "event": "route", "workstream": "tools-kit", "caller": "<X-Brza-Session>", "request": 12, "decision": "admitted", "model": "sonnet", "effort": "low", "account": "dot-claude-adm", "reason": "policy", "held_by": null, "machine": {"free_mem_gb": 9.1, "swap_gb": 0.4, "cpu_percent": 31}, "resolver": null}
+```
+
+### D6 — O ciclo e a conta (`packages/mcp/brza_mcp/cycle.py`, `accounts.py`, `bin/brza-quota`)
+
+- **Origem:** PLN-003/M6, PLN-003/M7, PLN-003/M13, PLN-003/M14, R2.1; H2, H3 e H4.
+- **O ciclo (M13, H4):** o worker admitido abre pelo `orca orchestration` do client detectado (`run-create`,
+  `task-create`, `worker-start`), com `ORCA_AGENT_SESSION_ID` (o `X-Brza-Session`) e `ORCA_USER_DATA_PATH` do client no
+  `env` do subprocesso; sem eles, o `run-create` cai noutro terminal ou falha (`no_active_sender_terminal`).
+- **O fim volta ao chamador (M14):** o `worker_done` muda o pedido para `done` e libera o teto; o `status` do chamador
+  o mostra.
+- **A conta (M6, H2, H3):** o `claude -p` de uma conta gerenciada recebe `CLAUDE_CONFIG_DIR` do perfil; o da
+  `systemDefault` vai sem a variável. A troca numa sessão de chat é o RPC `agentSession.switchAccount`, só em repouso, e
+  passa pelo gate.
+- **O `brza quota` (M7):** lê o `orca account list --json` e mostra, por conta, o `usedPercent`, o `resetsAt` e a
+  projeção; `--json` para o MCP.
 
 ## Passos
 
-> Os passos executam sob pedido explícito de Anderson, nas sessões designadas.
+> Os passos executam a pedido de Anderson (2026-11-03: "execute todos os passos que não dependem de decisões minhas"),
+> no worktree `~/Projects/brza-workflow/.worktrees/pln-009-mcp`, branch `feat/pln-009-mcp`; o commit vai a essa branch,
+> sem push. Cada passo só recebe `[x]` depois do laço de revisão pelo `agy`. O gate é
+> `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/mcp` e `-s tests/cli`, este num ambiente limpo
+> (`env -i HOME="$HOME" PATH="<dir do python3 3.10+>:/usr/bin:/bin"`), pela issue dos testes no chat.
 
-### P1 — O servidor HTTP residente em Python stdlib e controle de lifecycle
+### P1 — O servidor residente e o ciclo de vida
 
-Executa D1 · executor: sessão do `tools-kit`
-
-Estimado: 4.5 h · Executado: — h
-
-- [ ] **1. Testes que falham:** inicialização HTTP em `127.0.0.1:4242`, Bearer token e comandos start/stop/status.
-- [ ] **2. Implementar servidor:** daemon HTTP em Python stdlib com rotas SSE e POST.
-- [ ] **3. Plist do launchd:** template para `~/Library/LaunchAgents/com.brza.orchestrator.plist`.
-- [ ] **4. Comandos CLI:** `brza mcp start|stop|status`.
-- [ ] **5. Rodar e ver passar:** testes de integração de lifecycle.
-- [ ] **6. Commit:** na branch de trabalho.
-
-**Evidência:** —
-
-### P2 — A fila SQLite e o controle dos três tetos
-
-Executa D2 · executor: sessão do `tools-kit`
-
-Estimado: 5.5 h · Executado: — h
-
-- [ ] **1. Testes que falham:** persistência no SQLite, ordenação (`deadline` > `blocks` > `priority` > chegada) e retenção pelos três tetos.
-- [ ] **2. Implementar fila:** módulo `queue.py` com cálculo de projeção de cota e medição de recursos de máquina.
-- [ ] **3. Integração de ciclo:** vinculação com eventos de conclusão (`worker_done`).
-- [ ] **4. Rodar e ver passar:** suíte de testes de concorrência e limites.
-- [ ] **5. Commit:** na branch de trabalho.
-
-**Evidência:** —
-
-### P3 — As ferramentas MCP, despacho e gates de aprovação
-
-Executa D3 · executor: sessão do `tools-kit`
-
-Estimado: 4.5 h · Executado: — h
-
-- [ ] **1. Testes que falham:** dispatch tipado, leitura de headers `X-Brza-Session`, gates para executores e ferramenta `status`.
-- [ ] **2. Implementar ferramentas:** endpoints MCP compatíveis com os clientes.
-- [ ] **3. Rodar e ver passar:** testes de integração de despacho e autorização.
-- [ ] **4. Commit:** na branch de trabalho.
-
-**Evidência:** —
-
-### P4 — A política declarativa e o desempatador `tev1` + Haiku
-
-Executa D4 · executor: sessão do `tools-kit`
+Executa D1 · executor: `implementer`, pela sessão do `tools-kit`
 
 Estimado: 5.0 h · Executado: — h
 
-- [ ] **1. Testes que falham:** parser de `brza.toml`, integração com `brza quota`, chamada local ao `tev1:4b` e fallback Haiku.
-- [ ] **2. Implementar:** módulo de resolução e conexão com o Ollama local e `claude -p`.
-- [ ] **3. Calibração:** validação contra os casos de teste do M11.
-- [ ] **4. Commit:** na branch de trabalho.
+- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_auth.py` (sem header, token errado → 401; token `0600`) e
+  `tests/mcp/test_mcp_lifecycle.py` (`initialize`, 202, `-32601`, SSE, porta ocupada, plist, `start`/`stop`/`status` com
+  o `launchctl` trocado, `serve` parado por `SIGTERM`).
+- [ ] **2. Implementar o servidor e o `brza-mcp`.**
+- [ ] **3. O `brza install --mcp` e o `BRZA_MCP_TOKEN` no `claude-brza` e na função `claude`.**
+- [ ] **4. Rodar e ver passar:** o gate.
+- [ ] **5. Commit** no `brza-workflow`, branch `feat/pln-009-mcp`.
+- [ ] **6. Revisão pelo `agy`** até 3 rodadas.
 
 **Evidência:** —
 
-### P5 — Telemetria de roteamento, testes de integração e revisão
+### P2 — A fila e os três tetos
 
-Executa D5 · executor: sessão do `tools-kit`
+Executa D2 · executor: `implementer`, pela sessão do `tools-kit`
+
+Estimado: 5.5 h · Executado: — h
+
+- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_queue.py` (persistência; a ordem `deadline` > `blocks` > `priority`
+  > chegada; o índice lido pelo `ref`, com o log reduzido à última linha) e `tests/mcp/test_mcp_limits.py` (cada teto
+  segura e o `status` diz qual; a conta sem uso dentro do teto de sessões; a máquina sem valor só registra).
+- [ ] **2. Implementar a fila e os tetos.**
+- [ ] **3. Rodar e ver passar:** o gate.
+- [ ] **4. Commit.**
+- [ ] **5. Revisão pelo `agy`** até 3 rodadas.
+
+**Evidência:** —
+
+### P3 — As ferramentas, o despacho e os gates
+
+Executa D3 · executor: `implementer`, pela sessão do `tools-kit`
+
+Estimado: 4.5 h · Executado: — h
+
+- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_dispatch.py` (o schema, o `X-Brza-Session` e o `caller`, o
+  `runtime` fora de `claude` recusado) e `tests/mcp/test_mcp_gates.py` (só o consultor entra; o resto e a troca de conta
+  devolvem gate; o `approved` admite).
+- [ ] **2. Implementar `dispatch`, `status` e `config`.**
+- [ ] **3. Rodar e ver passar:** o gate.
+- [ ] **4. Commit.**
+- [ ] **5. Revisão pelo `agy`** até 3 rodadas.
+
+**Evidência:** —
+
+### P4 — A política e o desempatador
+
+Executa D4 · executor: `implementer`, pela sessão do `tools-kit`
+
+Estimado: 5.0 h · Executado: — h
+
+- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_policy.py` (o `brza.toml` no 3.10 e no 3.11; o `enforce = false`;
+  o `brza mcp config`) e `tests/mcp/test_mcp_resolver.py` (Ollama e `claude` trocados por dublês: o `tev1` sem limiar
+  manda ao Haiku; sem Ollama, direto ao Haiku; sem `claude`, fica a tabela; o `keep_alive`).
+- [ ] **2. Implementar.**
+- [ ] **3. Os casos do M11 no git:** `tests/mcp/fixtures/m11_cases.json`, refeitos a partir da medição do M11 (os
+  scripts dela ficaram fora do git).
+- [ ] **4. Rodar e ver passar:** o gate.
+- [ ] **5. Commit.**
+- [ ] **6. Revisão pelo `agy`** até 3 rodadas.
+
+**Evidência:** —
+
+### P5 — O ciclo e a conta
+
+Executa D6 · executor: `implementer`, pela sessão do `tools-kit`
+
+Estimado: 7.0 h · Executado: — h
+
+- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_cycle.py` (a CLI do client trocada recebe o env do H4; o
+  `worker_done` libera o teto), `tests/mcp/test_mcp_accounts.py` (o `CLAUDE_CONFIG_DIR` omitido na `systemDefault`) e
+  `tests/mcp/test_brza_quota.py` (a projeção a partir de um JSON gravado do `orca account list`).
+- [ ] **2. Implementar o ciclo, a conta e o `brza-quota`.**
+- [ ] **3. Rodar e ver passar:** o gate.
+- [ ] **4. Commit.**
+- [ ] **5. Revisão pelo `agy`** até 3 rodadas.
+
+**Evidência:** —
+
+### P6 — A telemetria `route` e a ponta a ponta
+
+Executa D5 · executor: `implementer`, pela sessão do `tools-kit`
 
 Estimado: 3.0 h · Executado: — h
 
-- [ ] **1. Telemetria:** implementação de logs tipados `route` em `~/.brza/orchestrator.log`.
-- [ ] **2. Testes de ponta a ponta:** fluxo completo de despacho com concorrência e desempate.
-- [ ] **3. Parecer de revisão:** gerar parecer em `work/reviews/pln-009-servidor-mcp.md`.
-- [ ] **4. Fechamento:** atualização de status para `done`.
+- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_telemetry.py` (a linha `route` no `measurements.jsonl` de um
+  workspace temporário) e `tests/mcp/test_mcp_e2e.py` (servidor de verdade, `dispatch` de dois pedidos com os tetos e
+  o desempate trocados).
+- [ ] **2. Implementar.**
+- [ ] **3. Rodar e ver passar:** o gate.
+- [ ] **4. Commit.**
+- [ ] **5. Revisão pelo `agy`** até 3 rodadas.
 
 **Evidência:** —
 
+### Casos manuais
+
+- **C1 — O launchd real:** `brza install --mcp`, `brza mcp start`, `brza mcp status` → 0, `curl` do `/health` com o
+  token, `brza mcp stop`, `brza mcp status` → 3. Com Anderson, porque carrega um LaunchAgent na máquina.
+- **C2 — O `tev1` real:** um desempate com o Ollama de pé, frio e carregado, medindo o tempo.
+- **C3 — A fila pelo índice:** depois do PLN-003/P1, dois pedidos com `ref` de notas com `priority` e `deadline`.
+
 ## Regressão
 
-- O servidor MCP não interfere em sessões locais que não utilizam o orquestrador.
-- A ausência do Ollama ou do `tev1:4b` causa fallback automático e transparente para a tabela ou Haiku sem travar a requisição.
-- Os comandos de CLI `brza` continuam operando normalmente sem o servidor MCP em execução.
+- **O `brza` sem o servidor:** os outros `brza <sub>` seguem iguais com o MCP parado. Como se confere: o gate
+  `tests/cli` verde.
+- **A sessão que não usa o orquestrador:** nada muda sem o `.mcp.json` do plugin. Como se confere: o
+  `claude-brza` sem o token exporta só o que já exportava (`tests/cli/test_brza_shell.py`).
+- **Sem Ollama, sem `tev1`, sem `claude`:** o pedido não trava. Como se confere: `tests/mcp/test_mcp_resolver.py`.
 
 ## Desvios
 
-*(Nenhum desvio registrado até o momento).*
+*(Nenhum desvio registrado até o momento.)*
 
 ## Worklogs
 
 - 2026-11-03 — plano criado e desenhado a partir da extração do componente MCP do PLN-003.
   [O PLN-009: abertura do plano do MCP residente](../../work/worklogs/2026-11-03-pln-009-abertura-do-plano-do-mcp-residente.md)
+
+## Revisões
+
+- [REV: o Desenho do PLN-009 antes da execução](../../work/reviews/pln-009-o-desenho-antes-da-execucao.md) —
+  2026-11-03, 14 achados, todos com destino.
+
+## Pendências conhecidas
+
+- [Os passos do MCP no PLN-003 passam ao PLN-009](../../work/issues/os-passos-do-mcp-no-pln-003-passam-ao-pln-009.md)
+  — de R1.2 e A2; a sessão do PLN-003 marca os P6 a P9 como passados a este plano e reabre a R5.3.
+- [Os testes do brza-workflow falham quando rodam dentro do chat do BrzA Studio](../../work/issues/testes-do-brza-workflow-falham-dentro-do-chat-do-app.md)
+  — no P1, 20 falhas do `tests/cli` vindas do ambiente do chat; o gate deste plano roda o `tests/cli` em ambiente limpo.
+
+## Fechamento
+
+- [ ] Todo passo `[x]`, com a revisão do `agy` e os achados com destino.
+- [ ] Os casos C1 a C3 com o Observado e o veredito.
+- [ ] O `feat/pln-009-mcp` integrado à `master` do `brza-workflow`, com a confirmação de Anderson.
+- [ ] A R5.3 reaberta no PLN-003, e os P6 a P9 de lá passados a este plano.

@@ -48,3 +48,10 @@ ambiente limpo:
 ```bash
 env -i HOME="$HOME" PATH="$(dirname "$(command -v python3)"):/opt/homebrew/bin:/usr/bin:/bin" python3 -m unittest discover -s tests/cli
 ```
+
+## Emenda de 2026-11-03 — o `test_brza_note` também
+
+No P1 do [PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients](../../plans/PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md),
+a suíte `tests/cli` rodada no chat, sobre o `c7a9e68` do `brza-workflow`, deu 20 falhas: 16 no `test_brza_note.py` e 4
+no `test_brza_sessions.CommandTest`. Os dois arquivos, no ambiente limpo do bloco acima, dão `Ran 106 tests` → `OK`. A
+limpeza do ambiente no `setUp` vale também para o `test_brza_note.py`.

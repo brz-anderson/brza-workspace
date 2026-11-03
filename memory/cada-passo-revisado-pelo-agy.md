@@ -19,7 +19,12 @@ modelo não ancora na leitura do Claude que executou.
 
 **How to apply:**
 - O `agy` não tem o papel `reviewer`: o prompt leva o corpo de `.claude/agents/reviewer.md` e o pedido.
-- Rode `agy -p "<prompt>" --model gemini-4-argon-high --mode plan --print-timeout 900s` no worktree do código. Em `--mode plan`, ele lê e roda comandos; o parecer volta pela saída, e a sessão o grava.
+- Rode `agy -p "<prompt>" --model <modelo> --add-dir <worktree das notas> --add-dir <scratch> --mode plan
+  --print-timeout 1200s` no worktree do código. Sem o `--add-dir`, o sandbox do modo plan não lê fora do worktree, e
+  no `-p` o pedido de permissão fica sem resposta. O parecer volta pela saída, e a sessão o grava.
+- **A cota do `agy` acaba:** em 2026-11-03, o Gemini 4 Argon (high e medium) esgotou com reset em ~7 dias, e o Opus em
+  ~5 h. Confira com um `agy -p "OK"` antes de um laço longo; `RESOURCE_EXHAUSTED` na saída é revisão que não rodou.
+  Anderson escolheu (PLN-009/R3): seguir no `gemini-3.8-flash-high` e fazer uma rodada final pelo Opus antes do `[x]`.
 - **O destino preferido é `corrigido aqui`** (pedido seguinte, mesmo dia: "prefira sempre optar por `corrigir aqui`").
   Issue ou decisão só quando o conserto não cabe no passo; `falso` fica no parecer.
 - **Laço de até 3 rodadas por passo:** os achados de código vão direto a um `implementer`; ao terminar, nova revisão

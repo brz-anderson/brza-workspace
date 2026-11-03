@@ -19,11 +19,10 @@ tags:
 
 # PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients
 
-- **Retomar:** em execução desde 2026-11-03, a pedido de Anderson ("execute todos os passos que não dependem de
-  decisões minhas"), no worktree `~/Projects/brza-workflow/.worktrees/pln-009-mcp`, branch `feat/pln-009-mcp`. Cada
-  passo só fecha depois do laço de revisão pelo `agy` (até 3 rodadas, `corrigido aqui` por um `implementer`). O
-  Desenho foi revisado antes da execução ([REV: o Desenho do PLN-009 antes da execução](../../work/reviews/pln-009-o-desenho-antes-da-execucao.md))
-  e reescrito pela R2. O próximo passo é o primeiro sem `[x]`.
+- **Retomar:** o P1 a P6 estão implementados na `feat/pln-009-mcp` do `brza-workflow` (`1fa3e60`, sem push), e nenhum
+  tem `[x]`: o laço de revisão de cada passo segue. A rodada 1 do P2 a P6 (Flash, e o Opus no P2 a P5 pela medição da R4)
+  e a 2 do P1 deram 56 correções, que um `implementer` aplica e depois manda à próxima rodada do Flash; a rodada final é
+  a do Opus no `agy`, quando a cota voltar (R3). O próximo passo é ler essa rodada e fechar os passos que zerarem.
 
 ## Pedido
 
@@ -140,6 +139,40 @@ sempre pela opção `recomendada`" e "prefira sempre optar por `corrigir aqui`".
    regra:** o `claude-brza` e a função `claude` exportam `BRZA_MCP_TOKEN`, lido do arquivo, quando ele existe.
    Revisável por Anderson.
 
+### Rodada 3 — o revisor do laço sem a cota do `agy` (enviada 2026-11-03)
+
+> **Apresentado antes:** o `agy` esgotou a cota individual do Gemini 4 Argon (volta em ~164 h) e do Claude Opus (volta
+> em ~5 h) nas rodadas 1 do P2 a P4 e na 2 do P1, que não rodaram; só o Gemini 3.8 Flash ainda respondia.
+
+Respondida em 2026-11-03, na sessão do `tools-kit`.
+
+1. **Com que revisor segue o laço.** Opções:
+   - o `gemini-3.8-flash-high` no `agy`, e uma rodada final de cada passo pelo Opus quando a cota voltar, antes do `[x]`
+     (recomendada). Custo: uma rodada a mais por passo e a camada rápida no meio do laço. Se paga: agora;
+   - esperar o Opus. Custo: ~5 h de espera no laço. Se paga: se a camada alta em toda rodada importa mais que o prazo;
+   - só o Flash. Custo: revisão na camada rápida, contra a norma. Se paga: se a cota do Opus tiver de ficar para outro
+     trabalho;
+   - o `reviewer` do Claude, fora do `agy`. Custo: sai da instrução de usar o `agy`. Se paga: agora, sem esperar.
+
+   **Respondida — "Flash agora, Opus depois (Recomendado)".**
+
+### Rodada 4 — a medição Flash × Opus e os achados que pediam escolha (2026-11-03)
+
+> **Apresentado antes:** o pedido de Anderson, "compare os achado do `Gemini Flash 3.8` e do `Opus 5.5`, registre como
+> medição".
+
+Respondida em 2026-11-03, na sessão do `tools-kit`.
+
+1. **De onde vem a revisão do Opus.** Opções: o Opus pelo `agy`, quando a cota voltar (recomendada); o `reviewer` do
+   Claude Code, agora; só o que já existe. **Respondida — "Opus pelo reviewer, agora".** O Opus revisou os mesmos
+   commits do P2 a P5 com o mesmo prompt do Flash.
+2. **Onde fica o registro.** Opções: o log e o worklog (recomendada); só o worklog; uma nota de medição própria.
+   **Respondida — "Log e worklog (Recomendado)".**
+3. **Os achados que pediam escolha**, pela regra de Anderson ("opção `recomendada`", "prefira `corrigir aqui`"):
+   P2 O-A6 e O-A7 corrigidos no P5 (o uso por conta, e o pedido sem conta vale a ativa); P4 O-A7, a recomendada
+   (`suggest_to_main` nasce `false`); P4 O-A8, corrigido o que cabe (o `choose_account` pelo cálculo do `Limits`), e "o
+   MCP propõe a conta" numa issue; P5 O-A7, o conserto proposto (o client sai do `ORCA_USER_DATA_PATH` no header).
+
 ## Desenho
 
 ### O que este desenho assume
@@ -197,7 +230,8 @@ brza mcp config [<chave> [<valor>]]   # D4, a chave de desligamento
   - **conta e runtime:** `[quota] max_sessions_per_account` (R7.1) e a projeção — a variação do `usedPercent` até o
     `resetsAt`; a conta que chega a `hard_cap_percent` (90) antes do reset não recebe worker. A conta sem dado de uso
     admite só dentro do teto de sessões, com `quota_unknown` na linha `route` (R2.5). O uso vem do `orca account list
-    --json` do client detectado, pelo D6;
+    --json` do client detectado, pelo D6, por conta: a ativa em `rateLimits.claude` e as outras em
+    `inactiveClaudeAccounts`; o pedido sem `account` conta como a ativa (R4.3);
   - **máquina:** memória livre, swap e CPU medidos a cada admissão. As chaves `[machine] min_free_mem_gb`,
     `max_swap_gb` e `max_cpu_percent` nascem sem valor: sem valor, a máquina só registra na linha `route` e não segura
     (R2.2).
@@ -207,7 +241,9 @@ brza mcp config [<chave> [<valor>]]   # D4, a chave de desligamento
 ### D3 — As ferramentas MCP, o despacho e os gates (`packages/mcp/brza_mcp/tools.py`)
 
 - **Origem:** PLN-003/R4.1, PLN-003/R5.2, PLN-003/M1, PLN-003/M12, PLN-003/M15, H1.
-- **Quem chamou:** o header `X-Brza-Session` (H1), e o argumento `caller` quando o header falta.
+- **Quem chamou:** o header `X-Brza-Session` (H1), e o argumento `caller` quando o header falta. **De que client:** o
+  header `X-Brza-Client: ${ORCA_USER_DATA_PATH}`, de que o MCP tira o client (Studio ou Orca) e o `ORCA_USER_DATA_PATH`
+  do H4 (R4.3).
 - **Os gates (R5.2, M15):** só `role: "consultant"` sem troca de conta entra direto na fila. Qualquer outro papel — o
   executor, o arquiteto, o desconhecido — ou a troca de conta devolve `{"gate": {...}}` com a proposta, sem abrir worker;
   a sessão principal pergunta a Anderson e chama `dispatch` de novo com `approved: <id do gate>`.
@@ -239,7 +275,7 @@ max_workers = 6
 
 [policy]
 enforce = true            # a chave de desligamento (M10); false devolve o pedido sem imposição
-suggest_to_main = true    # R6.4: o status traz a sugestão para a principal
+suggest_to_main = false   # R6.4; nasce desligada até haver sinal do que a principal faz (R4.3)
 
 [policy.roles.consultant]
 model = "sonnet"
@@ -413,6 +449,8 @@ Estimado: 3.0 h · Executado: — h
 - **C1 — O launchd real:** `brza install --mcp`, `brza mcp start`, `brza mcp status` → 0, `curl` do `/health` com o
   token, `brza mcp stop`, `brza mcp status` → 3. Com Anderson, porque carrega um LaunchAgent na máquina.
 - **C2 — O `tev1` real:** um desempate com o Ollama de pé, frio e carregado, medindo o tempo.
+- **C4 — O ciclo real:** um `dispatch` de consultor no Studio abre run, task e worker, e o `--json` de cada verbo traz
+  as chaves que o `cycle.py` procura (X24); o fim volta pelo `task-list`.
 - **C3 — A fila pelo índice:** depois do PLN-003/P1, dois pedidos com `ref` de notas com `priority` e `deadline`.
 
 ## Regressão
@@ -425,12 +463,59 @@ Estimado: 3.0 h · Executado: — h
 
 ## Desvios
 
-*(Nenhum desvio registrado até o momento.)*
+- **X1 — A porta padrão troca por `BRZA_MCP_PORT`.** Para o teste de `start`/`status` não depender da 4242 real; a
+  precedência é `--port` > `BRZA_MCP_PORT` > `[mcp] port` > 4242. Afeta P1 e D1.
+- **X2 — O plist leva `BRZA_HOME` e `BRZA_MCP_PORT` quando estão no ambiente do `start`.** A base do agente é a mesma
+  de quem o subiu. Afeta P1.
+- **X3 — `GET /mcp` sem `Accept: text/event-stream` responde 406**, como o Streamable HTTP pede. Afeta P1.
+- **X4 — `brza mcp start --timeout` (15 s) e `bootstrap` repetido até 5 vezes**, porque o `bootout` termina de forma
+  assíncrona. Afeta P1.
+- **X5 — `brza mcp stop` com o agente descarregado sai 0.** Idempotente. Afeta P1.
+- **X6 — A revisão do `agy` roda com o `claude-opus-5-5-high`, e não com o Gemini 4 Argon.** A cota do Argon (high e
+  medium) acabou na 1ª rodada do P2, com reset em ~164 h; o Opus pelo `agy` mantém o `agy` e a camada alta. Afeta o
+  laço de revisão de todos os passos. Substituído pela R3.
+
+Os desvios abaixo foram propostos pelo `implementer` e aceitos na rodada 1 de revisão de cada passo (os pareceres estão
+em [Revisões](#revisões)); "com correção" quer dizer que o passo ganhou o conserto que a revisão pediu.
+
+- **X7 — O `pending()` lista só os `queued`; os `gated` vão à parte no `status`.** Afeta P2 e D2.
+- **X8 — Só o pedido que um teto segura recebe `held_by`, com a coluna `held_reason`.** Afeta P2 e D2.
+- **X9 — A avaliação para no primeiro teto que segura** (workspace, sessões, cota, máquina). Afeta P2 e D2.
+- **X10 — `hard_cap_percent` sem valor vale 90**, o do D4. Afeta P2 e D2.
+- **X11 — A memória livre é livre + inativa + especulativa do `vm_stat`; a CPU é o `getloadavg()[0]` por núcleo.** Afeta P2.
+- **X12 — O `dispatch` recusa argumento fora do schema**, para um `acount` não escapar do gate. Afeta P3 e D3.
+- **X13 — `config` com `value: null` apaga a sobreposição; o tipo do valor se confere pela chave** (com correção). Afeta P3.
+- **X14 — Com `approved`, vale a proposta guardada no gate, e não a `task`/`role` da 2ª chamada** (com correção). Afeta P3.
+- **X15 — A resposta do `dispatch` leva `held_reason`; o `config` gravado vale nos tetos na hora** (com correção). Afeta P3.
+- **X16 — O `parse_toml` do núcleo não lê float, e o `policy` contorna sem tocar no `core`.** Afeta P4.
+- **X17 — O `config` não muda `policy.roles.*`**: os papéis só pelo `brza.toml`. Afeta P4 e D4.
+- **X18 — A regra de conta do `choose_account`**: descarta a janela no teto, prefere a menos cheia e desempata em 5 pontos
+  pela ordem alfabética, agora pelo mesmo cálculo do `Limits` (com correção). Afeta P4 e D4.
+- **X19 — A camada vira papel: alta → `architect`, média → `executor`, rápida → `consultant`.** Afeta P4 e D4.
+- **X20 — O `worker-start` não tem flag de conta**: a conta vai só ao `claude -p`, e o `dispatch` recusa `account`
+  diferente da ativa com erro claro (com correção). Afeta P5 e D6.
+- **X21 — O fim do worker é sabido pelo `task-list`, a cada 15 s**: não há `worker_done` por mensagem no CLI. Afeta P5 e D6.
+- **X22 — A coluna `requests.client`, com migração.** Afeta P5.
+- **X23 — O `switch_chat_account` não se liga ao gate**: o `dispatch` não tem a sessão alvo (com correção). Afeta P5 e D6.
+- **X24 — O `--json` do `run-create`, `task-create`, `worker-start` e `task-list` não foi conferido sem run real**: o
+  `cycle.py` procura as chaves em qualquer profundidade. Fica para o C4. Afeta P5.
+- **X25 — Sem client conhecido, o pedido fica `queued` com o erro no `status`** (com correção). Afeta P5.
+- **X26 — A conta se resolve por id, e-mail ou rótulo; o formato de `inactiveClaudeAccounts` vem do `brza-studio`.** Afeta P5.
+- **X27 — A linha `route` usa `timestamp`, como o hook, e não o `ts` do exemplo do D5.** Afeta P6 e D5.
+- **X28 — O `workstream` da linha `route` sai da branch do `BRZA_WORKSPACE` do daemon**, e não do workstream de quem
+  pediu, que o `dispatch` não recebe. Afeta P6 e D5.
+- **X29 — As decisões da linha `route` vão além de `admitted`**: `policy`, `resolved`, `queued`, `gated`, `approved`,
+  `held`, `done`, `failed`. Afeta P6 e D5.
+- **X30 — O gancho `Queue.on_decision` é atributo único.** Afeta P6.
+- **X31 — O `build` nasce sem o desempatador; só o `serve` o liga.** Afeta P6.
 
 ## Worklogs
 
 - 2026-11-03 — plano criado e desenhado a partir da extração do componente MCP do PLN-003.
   [O PLN-009: abertura do plano do MCP residente](../../work/worklogs/2026-11-03-pln-009-abertura-do-plano-do-mcp-residente.md)
+- 2026-11-03 — R1 a R4; o Desenho revisado e reescrito; P1 a P6 implementados, em revisão pelo `agy` (sem `[x]`); a
+  medição Flash × Opus. Travou na cota do `agy` (R3).
+  [O PLN-009: a execução do P1 a P6 e a revisão pelo `agy`, com a medição Flash × Opus](../../work/worklogs/2026-11-03-pln-009-execucao-e-revisao-pelo-agy.md)
 
 ## Revisões
 
@@ -443,6 +528,8 @@ Estimado: 3.0 h · Executado: — h
   — de R1.2 e A2; a sessão do PLN-003 marca os P6 a P9 como passados a este plano e reabre a R5.3.
 - [Os testes do brza-workflow falham quando rodam dentro do chat do BrzA Studio](../../work/issues/testes-do-brza-workflow-falham-dentro-do-chat-do-app.md)
   — no P1, 20 falhas do `tests/cli` vindas do ambiente do chat; o gate deste plano roda o `tests/cli` em ambiente limpo.
+- [O MCP propõe a conta do pedido](../../work/issues/o-mcp-propoe-a-conta-do-pedido.md) — de R4.3 (P4 O-A8); o
+  `choose_account` sem chamador, até a decisão.
 
 ## Fechamento
 

@@ -87,3 +87,10 @@ A resposta orienta a proposta técnica; não autoriza iniciar a implementação.
 - O cliente da CLI atual encaminha a origem do coordenador em orquestração e launch, mas não em `agentSession.send` (`src/cli/runtime/client.ts:134-142`). O wrapper já a encaminha; migrar o transporte exige manter essa informação.
 
 **Próxima rodada:** definir o acompanhamento das respostas e a política de envio durante trabalho em andamento. O foco de coordenação já foi escolhido; esses comportamentos ainda não foram aprovados.
+
+### Respostas da rodada de 2026-11-03
+
+- **Acompanhamento:** Anderson escolheu leitura incremental por cursor, com tratamento de cursor inválido.
+- **Envio durante atividade:** Anderson escolheu preservar `queue-if-active` e expor que a mensagem está enfileirada, inclusive quando uma pergunta pendente retém a fila.
+
+Com essas respostas, a proposta da primeira versão fica delimitada a coordenação por cursor e fila existente, integrada aos aliases de `brza sessions`, com recibos e retry seguros. A implementação ainda não foi iniciada.

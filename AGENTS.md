@@ -68,7 +68,7 @@ vai à `.claude/rules/workspace.md` ou ao `README.md` local, que se editam na `m
 
 ## Quem commita é o brz-anderson
 
-Os commits deste repositório e do `brza-studio` saem com o noreply do `brz-anderson`
+Os commits deste repositório e do `brza-studio` saem com o e-mail do `brz-anderson`
 (`brz.anderson.pereira@gmail.com`) e vão ao GitHub, com a chave de acesso que o `README.md` documenta. A identidade vem do
 ambiente da sessão, como diz o adaptador do runtime, e não depende do `.git/config`. O push vai direto, sem PR: daqui, a norma
 na `master` e as notas na branch do workstream; do `brza-studio`, na `master`.

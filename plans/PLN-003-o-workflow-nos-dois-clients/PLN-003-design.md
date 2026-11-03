@@ -6,9 +6,9 @@
 ## O que este desenho assume
 
 - **R1.1:** o "Workflow" são os dois — o fluxo do workspace e o recurso Workflow do Claude Code.
-- **R1.2, R4.2:** o plugin do Orca tem painel e comandos; o painel é HTML regenerado, numa pasta em `devPluginPaths`.
-  **Em revisão desde 2026-11-02:** a premissa "sem canal worker→painel" caiu e os botões exigem worker (Terreno, "O plugin do
-  Orca"); o spike do C5 mede HTML+worker e TSX+worker antes de a R1.2 fechar.
+- **R1.2, R10.1, R10.3:** o plugin do Orca tem painel e comandos. O painel é de componentes (`ui: "components"`), com
+  um worker que lê `plans/` e `work/` do worktree da branch em foco; o HTML regenerado da R4.2 saiu, pelo spike do C5.
+  Os botões chamam o MCP residente, e por isso só existem na fase 2, com o B6; até lá, o painel só mostra.
 - **R1.4, R6.1:** o PLN-003 não espera o P7; o P7 roda já, na sessão `pln-002-p7`.
 - **R2.1:** o client se acha pelo env do app, depois `BRZA_CLIENT`, depois o app vivo.
 - **R2.2:** um `brza` próprio em `~/.local/bin` despacha aos `brza-*` e repassa o resto ao CLI do client.
@@ -22,7 +22,8 @@
   `workflows/*.js`.
 - **R5.1, R5.2:** a tabela decide e um agente desempata; o consultor roda direto, o executor passa por gate.
 - **R5.3:** o código público mora em `brz-anderson/brza`; o workspace fica com notas, planos e a instância da norma.
-- **R6.2, R7.2:** o `DESIGN.md` é o design system do painel; a arquitetura e o contrato vão a um `ARCHITECTURE.md`.
+- **R7.2, R10.2, R11.1:** a arquitetura e o contrato vão a um `ARCHITECTURE.md`. O `DESIGN.md`, o design system da
+  R6.2, saiu do PLN-003 e foi ao workstream `brand`, por uma issue de lá: o painel de componentes usa o tema do app.
 - **R6.3:** a política mora num `brza.toml`, que o `AGENTS.md` cita.
 - **R6.4:** o orquestrador decide o modelo do que abre e sugere à sessão principal, por aviso.
 - **R7.1:** o semáforo é por conta e por runtime, pelo `usedPercent`.
@@ -66,7 +67,7 @@ Reescrito em 2026-11-02 contra a `v1.4.246`, a base do fork, que é também a ve
 - O ciclo é do CLI do client: `plugin create --template panel|components|worker-panel`, `plugin dev watch --check --shot`, `plugin dev load|reload|request|emit`, `plugin test|check`, `plugin shot` (PNG do painel mesmo com a janela escondida) e `plugin open`; precisam do app desktop com um workspace aparecendo (`skill-guides/orca-plugin-authoring/references/cli.md:7-31`; `plugin-authoring.md:370-420`) [F61, F62, F64, F65]. No fork o shim `brza` e o `orca` são idênticos, byte a byte, e `ORCA_CLI_COMMAND` aponta ao launcher do app nos terminais gerenciados [F73, F76].
 - A skill `orca-plugin-authoring` é embutida no binário e sobe pelo `ORCA skills get orca-plugin-authoring` [F70, F71].
 - **Painel de componentes (`ui: "components"`):** módulo TSX que devolve uma árvore do catálogo do Orca (Stack, Text, Button, Table, Tree, Markdown, CodeView…), sem HTML, CSS nem hooks; hot reload preserva os átomos com chave (`plugin-declarative-ui.md:1-60`) [F9, F10]. O Orca o desenha com o tema e o teclado dele: o `DESIGN.md` da R6.2, que descreve um painel HTML, não vale para esse caminho.
-- **Não testado:** o painel e o `plugin.request` em nenhum dos dois apps; o `plugin shot` e o `plugin dev` com a sessão do chat do Studio [levantamento, item 4]; o `terminal.sendText` do worker no terminal em foco; o alcance do `127.0.0.1` pelo painel e pelo worker; a cobertura do catálogo de componentes para planos, notas e worklogs.
+- **Testado no spike de 2026-11-03**, nos dois apps: o painel e o `plugin.request`, o `plugin shot` e o `plugin dev` a partir do chat do Studio, o `terminal.sendText` do worker, o alcance do `127.0.0.1` e a cobertura do catálogo de componentes. O resultado está no C5, nos critérios de alocação.
 
 ### O MCP e o chat
 
@@ -212,11 +213,11 @@ Horas: estimadas, na régua do PLN-002 (1,5–3 h estimado por `brza-*`, 0,2–0
 | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
 | B1 | `brza` próprio + detecção env → app vivo; canonicalize | R2.1, R2.2; F21, F22 | cli | 3–5 | fase 1, no 1º uso do Orca | sim | C2 |
 | B2 | `tree`/`test` generalizados; `tree --list` órfãos | R2.3; F20 | cli | 4–6 +1 | fase 1 | sim | C2 |
-| B3 | `install`/`doctor` no client detectado; ajuda | R2.4; F25 | cli + `CLAUDE.md` (o que o install liga) | 1,5–2,5 | fase 1, 1ª sessão no chat do Orca | sim | C2, C1 |
+| B3 | `install`/`doctor` no client detectado; ajuda; no Orca, cadastra o repositório do workspace, que o worker do painel precisa (C5, item 2) | R2.4; F25 | cli + `CLAUDE.md` (o que o install liga) | 1,5–2,5 | fase 1, 1ª sessão no chat do Orca | sim | C2, C1 |
 | B4 | pacote pip+pipx+uv e brew | R3.1, R3.2 | cli | 4–6 | fase 1, 1ª instalação fora | — | C2 |
 | B5 | `app install` pela release, `--from-source`, confirma antes | R3.3; F24 | cli | 3–3,5 | fase 1, 1ª máquina sem o repo | não (só o app BrzA) | C2 |
 | B6 | servidor HTTP residente, launchd, porta, token, `brza mcp start/stop/status` | R3.4 | mcp + verbo na cli | 4–6 | fase 2 | sim | C3 |
-| B7 | painel HTML regenerado + comandos `brza` — **em revisão (C5):** painel HTML ou TSX com worker, a medir no spike | R1.2, R4.2; F28 (painel) | plugin do Orca (mostra) + cli `brza panel render` (gera) + mcp (regera a cada mudança de estado) | 6–10 | fase 2 | sim | C5, C2 |
+| B7 | painel de componentes com worker: planos, notas e worklogs em Tree, Table e Markdown; os botões chamam o MCP (R10.3) | R1.2, R10.1, R10.3; F28 (painel) | plugin do Orca (painel e worker) + mcp (os verbos dos botões, fase 2) | 6–10, sem refazer com a R10 | fase 2 | sim | C5 |
 | B8 | skills e hooks no plugin, `brza:`; raiz por env | R4.3 | plugin do Claude + `CLAUDE.md`/glossário | 3 +1 (raiz do `measure.py`/`check_notes.py`) | fase 1 | sim | C4 |
 | B9 | piloto `workflows/*.js` (Terreno) | R4.4 | plugin do Claude | 2 | fase 2 | sim, a medir (`@internal`) | C4 |
 | B10 | shim npm/npx/pnpm | R3.1 | cli | 2 | fase 3 | — | C2 |
@@ -243,7 +244,7 @@ Alternativas viáveis na coluna "Alt"; o porquê em uma linha.
 | M14 | O fim volta ao chamador (espera × aviso; turno ocioso) | F11 | mcp (via `worker_done`) | bloquear até o fim | 2–3 | fase 2 | sim | C3 | sem isso o executor vira fogo-e-esquece |
 | M15 | Gate de aprovação (abrir executor, trocar conta) | conflito K3 | `AGENTS.md` (quando) + mcp devolve proposta + sessão principal pergunta | gate do `orca orchestration` | 1–2 | fase 2 | sim | C1 + C3 | preserva "quem pergunta é a principal" |
 | M16 | Medição do roteamento + conserto da conta `home` | R4.1; AGENTS.md:93-94 | hook `measure.py` (conserto) + mcp (linha `route`) | — | 0,5 + 1,5 | fase 1 (conserto) / fase 2 | sim | C3 | "a política se revê pela medição"; hoje conta errada |
-| M17 | Fila e sessões no painel: a ordem da fila com o motivo de cada posição (`deadline`, `blocks`, `priority`), e o teto que segura cada pedido parado — o do workspace, o da conta e runtime, com a projeção até o `resetsAt`, ou o da máquina | R4.1 + R4.2, R9.2–R9.4 | plugin do Orca (mostra o que o worker lê do mcp — **em revisão**, C5) | — | 1–2 | fase 2 | sim | C5 | o semáforo invisível vira mistério; com três tetos, quem espera precisa saber qual segura |
+| M17 | Fila e sessões no painel: a ordem da fila com o motivo de cada posição (`deadline`, `blocks`, `priority`), e o teto que segura cada pedido parado — o do workspace, o da conta e runtime, com a projeção até o `resetsAt`, ou o da máquina | R4.1 + R4.2, R9.2–R9.4 | plugin do Orca (painel de componentes; o worker lê do mcp, R10.1) | — | 1–2 | fase 2 | sim | C5 | o semáforo invisível vira mistério; com três tetos, quem espera precisa saber qual segura |
 | M18 | `codex_reply(thread, msg)` | F9 | mcp | `codex exec resume` pela cli | 1–2 | fase 3 | sim | C3 | estado da thread entre chamadas |
 | M19 | Sandbox do Codex como argumento | F15 | mcp (impõe) | config do Codex | 1 | fase 3 | sim | C7 | a sandbox fica visível no `canUseTool` |
 | M20 | Aviso ao celular (notify + hook Stop de turno longo; gate pendente) | F31, F32 | cli `brza notify` + hook do plugin + mcp chama | — | 2–3 | fase 3 | sim (macOS) | C2 + C4 | gate parado precisa chamar Anderson |
@@ -306,7 +307,7 @@ não é item `D`.
 | Abrir sessão nova pela própria sessão | só na memória do agente | migra para `CLAUDE.md`/`AGENTS.md`; o roteador vira o caminho |
 | Vocabulários de nota | `work/README.md` | `check_notes.py` (já) |
 
-### DESIGN.md — proposta
+### ARCHITECTURE.md — proposta (R7.2)
 
 Casa dona do durável do Desenho do PLN-003 (`plans/README.md:37`): arquitetura e contrato entre as frentes. Não é
 regra de comportamento (isso é `AGENTS.md`) nem mecânica do Claude (`CLAUDE.md`).
@@ -323,4 +324,5 @@ regra de comportamento (isso é `AGENTS.md`) nem mecânica do Claude (`CLAUDE.md
 10. Segurança: 127.0.0.1, token, o que o agente interno pode fazer
 11. Medição: linhas `route`, como rever a política
 
-Leitura alternativa: DESIGN.md no formato de design system para agentes de UI (o do Google Stitch), para o painel HTML.
+O `DESIGN.md` no formato de design system para agentes de UI (o do Google Stitch) saiu do PLN-003 e foi ao workstream
+`brand` (R10.2, R11.1).

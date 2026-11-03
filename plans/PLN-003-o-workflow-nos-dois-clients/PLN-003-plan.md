@@ -14,10 +14,9 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** a Entrevista fechou nas rodadas 1 a 9. **O spike do C5 rodou nos dois apps em 2026-11-03**, e o item 1
-  passou: o C5 não volta à rodada. O resultado por item está no C5 do [Desenho](PLN-003-design.md). **Primeiro, a
-  rodada da R1.2**, o caminho do painel, com os dados do spike. Depois, B7, M17 e as premissas R1.2 e R4.2 deixam o "em
-  revisão", e se escrevem os itens `D` a partir da matriz, com os riscos da fase 0 como hipóteses (R7.3), e os Passos,
+- **Retomar:** a Entrevista fechou nas rodadas 1 a 11. O spike do C5 rodou nos dois apps, e a R10 fechou o painel: de
+  componentes, com worker, e os botões pelo MCP residente, na fase 2. O `DESIGN.md` saiu para o `brand` (R10.2, R11.1).
+  **Próximo: escrever os itens `D`** a partir da matriz, com os riscos da fase 0 como hipóteses (R7.3), e os Passos,
   com o P0 numa sessão `pln-003-p0`. O P7 do PLN-002 corre na sessão `pln-002-p7`.
 - **A fila do orquestrador (2026-11-03):** a R9, respondida na sessão `bb0fd632` do `workspace`, fez do coordenador o
   orquestrador e deu a ordem da fila e os três tetos de workers; o Desenho mudou nas premissas, no M8, no M17, na
@@ -93,6 +92,8 @@ fechou lá e passou ao PLN-003 (R9.1).
   — o fim de um spike roda o `dev unload` nos dois apps e confere o `devPluginPaths`.
 - [O --approve do plugin é barrado no modo auto](../../work/issues/o-approve-do-plugin-e-barrado-no-modo-auto.md)
   — fechada em 2026-11-03: passou depois do "Aprovar nos dois apps" de Anderson.
+- [O DESIGN.md do BrzA vem do PLN-003](../../work/issues/o-design-md-do-brza-vem-do-pln-003.md) — no workstream
+  `brand` (R10.2, R11.1); o PLN-003 não espera por ela.
 - [O CLI do Orca no chat do Studio fala com o Studio](../../work/issues/o-cli-do-orca-no-chat-do-studio-fala-com-o-studio.md)
   — vai ao B1 e à R2.1: o env herdado escolhe o app.
 - [Os tipos de plugin faltam no pacote da 1.4.246](../../work/issues/os-tipos-de-plugin-faltam-no-pacote-da-1-4-246.md)
@@ -113,3 +114,5 @@ fechou lá e passou ao PLN-003 (R9.1).
   [O PLN-003: a fila do orquestrador](../../work/worklogs/2026-11-03-pln-003-a-fila-do-orquestrador.md)
 - 2026-11-03 — Anderson aprovou o plugin nos dois apps; o spike do C5 rodou as sete perguntas, e o item 1 passou.
   [O PLN-003: o spike do C5 nos dois apps](../../work/worklogs/2026-11-03-pln-003-o-spike-do-c5-nos-dois-apps.md)
+- 2026-11-03 — a R10 e a R11 fecharam o painel de componentes, os botões pelo MCP e o `DESIGN.md` no `brand`.
+  [O PLN-003: o painel de componentes](../../work/worklogs/2026-11-03-pln-003-o-painel-de-componentes.md)

@@ -193,7 +193,7 @@ Alternativas viáveis na coluna "Alt"; o porquê em uma linha.
 | M8 | Fila/semáforo por conta e runtime, persistente (SQLite stdlib) | R4.1 | mcp | global; só por conta | 4–6 | fase 2, 1º choque de cota | sim | C3 | o `Coordinator.maxConcurrent` do Orca só vive em gates (terreno-orquestrador) |
 | M9 | Modelo/esforço pela política "O modelo segue a tarefa" | R4.1; F16 (parte) | `AGENTS.md` (prosa) + arquivo de política (tabela) + mcp (impõe no que abre) | só norma; mcp lê a tabela do `AGENTS.md` | 1,5–2 | fase 2 | sim (`--model --effort`) | C7 | hoje a regra é só texto e a medição mostra Opus em tudo |
 | M10 | Chave de desligamento por dimensão (modelo/esforço, agente, tudo → passthrough) | R4.1 | mcp (config) + cli `brza mcp config` | só env | 0,5–1 | fase 2 | sim | C3 | "pode ser desativado" é requisito do pedido |
-| M11 | Agente interno que desempata (`claude -p --json-schema`, Haiku/Sonnet, `--max-budget-usd`) | R4.1 | mcp | agente em toda chamada; regra pura | 3–4 | fase 2b, quando a medição mostrar empate | sim | C3 | regra é grátis e instantânea; o agente paga só no empate |
+| M11 | Agente interno que desempata: a cota fica na tabela; o texto vai ao `tev1:4b` local (Ollama, `/v1/systemone`) e, abaixo do limiar de confiança, ao Haiku (`claude -p --json-schema`, `--max-budget-usd`) — rodada de 2026-11-03, abaixo | R4.1, R5.1 | mcp | agente em toda chamada; regra pura; só o Haiku; Jev em nuvem, para quem não tem Ollama | 3–4 | fase 2b, quando a medição mostrar empate | sim | C3 | regra é grátis e instantânea; o `tev1` desempata em ~0,09 s, sem custo, e o Haiku paga só na dúvida |
 | M12 | Quem chamou: header `X-Brza-Session: ${ORCA_AGENT_SESSION_ID}` + client | R3.4 (consequência); R4.1 | plugin do Claude (`.mcp.json`) + mcp | argumento `caller` na ferramenta | 1–2 | fase 2 | sim, a medir | C4 + C3 | residente não herda `ORCA_*` |
 | M13 | Ciclo de vida pelo `orca orchestration` (task, dispatch, worker-start, ask/reply, worker_done) | R4.1; F19 | mcp chama a cli do client detectado | reimplementar no mcp | 3–4 | fase 2 | sim | C3 + C8 | reaproveita o ciclo; o roteamento é nosso ("does not schedule or place workers") |
 | M14 | O fim volta ao chamador (espera × aviso; turno ocioso) | F11 | mcp (via `worker_done`) | bloquear até o fim | 2–3 | fase 2 | sim | C3 | sem isso o executor vira fogo-e-esquece |
@@ -210,6 +210,43 @@ Alternativas viáveis na coluna "Alt"; o porquê em uma linha.
 Saíram por não serem de fluxo ou por já resolvidos: F7 (flag experimental), F17 (feito), F18 (`ship`, já fora no
 PLN-002), F22 (substituído por B1), F23 (bug do fork), F27 (telemetria), F29 (descartados com gatilho), F30 (não
 descrita no inventário; não é de fluxo), F33 (Tailscale; o mcp escuta só em 127.0.0.1), F34 (funnel).
+
+### O desempatador do M11 (rodada de 2026-11-03)
+
+A medição é a do worklog
+[O desempatador local do M11: o `tev1:4b` no lugar do Haiku](../../work/worklogs/2026-11-03-o-desempatador-local-do-m11.md),
+do workstream `workspace` (commit `b67fcea`): a mesma sonda — 10 tarefas em texto livre para a camada e 5 escolhas de
+conta por cota, nas duas ordens — no `qwen2.5:7b`, no `qwen2.5:14b`, no `tev1:4b` e no Haiku, num M5 Pro de 24 GB.
+
+| | `qwen2.5:7b` | `qwen2.5:14b` | `tev1:4b` | Haiku |
+| :-- | :-- | :-- | :-- | :-- |
+| Camada pelo texto | 10/10 | 10/10 | 10/10 (PT e EN) | 10/10 |
+| Conta, 5 casos × 2 ordens | 4/10 | 7/10 | 10/10 PT · 8/10 EN | 10/10 |
+| Conta, 60 casos aleatórios | — | — | 53/60 PT · 53/60 EN | — |
+| Latência mediana, carregado | ~1,1 s | ~2,6 s | ~0,09 s (2,4 s frio) | ~7 s |
+| Memória carregado | 6,6 GB | 15 GB, com swap | 7,7 GB | 0 |
+| Custo | 0 | 0 | 0 | ~US$ 0,0008 por chamada |
+
+Rodada respondida em 2026-11-03, na sessão `bb0fd632` do `workspace`: **"tev1 + Haiku (Recomendado)"**. A opção dizia:
+"Registrar no M11: a cota fica na tabela; o tev1 desempata o texto e manda ao Haiku quando a confiança ficar abaixo do
+limiar; a Jev fica como opção de nuvem para o pacote público." Isso detalha a R5.1 ("a regra, e o agente desempata");
+não é item `D`.
+
+- **A cota é regra da tabela, não do agente.** O uso semanal e de 5 h, o teto de 90% e a margem de 5 pontos ficam no
+  `brza.toml` (R6.3): nenhum modelo local acertou sempre, e o `tev1:4b` errou 7 de 60, todos no teto e na margem.
+- **O desempate de texto vai ao `tev1:4b`**, um modelo de decisão do Ollama (`/v1/systemone`), que devolve a
+  probabilidade de cada opção sem gerar texto, em ~0,09 s e com 7,7 GB carregado. É determinístico: a segunda rodada
+  dos casos fixos deu o mesmo resultado.
+- **Abaixo de um limiar de confiança, a chamada vai ao Haiku** por `claude -p --json-schema`, com `--max-budget-usd`.
+  A confiança separa, mas não basta sozinha: em PT, mediana de 0,80 nos acertos e 0,37 nos erros, com acerto a 0,02 e
+  erro a 0,66.
+- **O limiar se calibra com empate real na fase 2b**: as 10 tarefas eram fáceis e as contas, sintéticas.
+- **A licença do `tev1` não aparece na página do Ollama**, que também diz que idiomas fora do inglês não foram
+  testados; confere-se antes do pacote público (B4).
+- **A Jev, da TypeSafe AI**, é o mesmo formato de chamada, em nuvem: fica como backend opcional para quem não tem
+  Ollama. Está em acesso antecipado, e a própria TypeSafe a diz fraca em precisão numérica — mais um motivo para a cota
+  ficar na tabela.
+- **As 3–4 h do M11 são de antes do `tev1`**, e não foram refeitas com o segundo backend.
 
 ### Regra × mecanismo (onde cada regra mora e quem a impõe)
 

@@ -1,13 +1,13 @@
 ---
-status: in_progress
-phase: execution
+status: in_review
+phase: review
 origin: plan
 origin_ref: PLN-003
 description: O servidor MCP residente gerencia o fluxo com fila de prioridade sob três tetos, política declarativa e desempate com tev1 e Haiku
 ready: sim
 estimate_h: 30.0
-executed_h: 0.0
-remaining_h: 30.0
+executed_h: 3.2
+remaining_h: 2.0
 scope:
   - workspace
   - brza-studio
@@ -19,11 +19,10 @@ tags:
 
 # PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients
 
-- **Retomar:** o P1 a P6 estão implementados e corrigidos na `feat/pln-009-mcp` do `brza-workflow` (`77b917f`, sem
-  push; `tests/mcp` 286, `tests/hooks` 290 e `tests/cli` limpo 445, todos OK). A rodada do Flash depois da correção
-  aprovou os seis passos. Falta a rodada final pelo Opus no `agy` (R3), cuja cota volta por volta das 08:40 de
-  2026-11-03: `cd /private/tmp/pln009 && ./agy-review.sh <passo> final c7a9e68 extra-<passo>-final.md` com
-  `MODEL=claude-opus-5-5-high`, um por passo. O `[x]` de cada passo vem depois dela.
+- **Retomar:** o P1 a P6 estão `[x]` (`brza-workflow@b2c87a6`, branch `feat/pln-009-mcp`, sem push): cada passo
+  passou pelas 3 rodadas de revisão (o `agy` e o Opus), e a última correção fechou com o gate verde. Falta a revisão da
+  entrega contra o `## Pedido` e a Cobertura, por um revisor que não executou; os casos C1 a C4, com Anderson; e o merge
+  na `master` do `brza-workflow`, com a confirmação dele.
 
 ## Pedido
 
@@ -68,7 +67,7 @@ Os itens do pedido, numerados para a Cobertura:
 | `Pedido 5` | a tarefa segue o modelo e o esforço do `brza.toml`, e a chave de desligamento devolve o pedido sem imposição | P4 | `tests/mcp/test_mcp_policy.py` (unidade) |
 | `Pedido 5` | cada decisão de rota grava uma linha `event: "route"` no `.measurements/measurements.jsonl` do workspace | P6 | `tests/mcp/test_mcp_telemetry.py` (unidade) |
 | `Pedido 6` | a tabela decide a cota; o texto vai ao `tev1:4b` e, sem limiar calibrado ou abaixo dele, ao Haiku; sem Ollama, vai direto ao Haiku sem travar | P4 | `tests/mcp/test_mcp_resolver.py` (unidade, Ollama e `claude` trocados); C2 (manual, `tev1` real) |
-| `Pedido 7` | papel diferente de `consultant`, ou troca de conta, devolve proposta de gate e não abre worker | P3 | `tests/mcp/test_mcp_gates.py` (unidade) |
+| `Pedido 7` | papel diferente de `consultant` devolve proposta de gate e não abre worker; a conta diferente da ativa é recusada enquanto o `worker-start` não levar conta (X38, R6.1) | P3 | `tests/mcp/test_mcp_gates.py` (unidade) |
 
 ### Fora de escopo
 
@@ -174,6 +173,37 @@ Respondida em 2026-11-03, na sessão do `tools-kit`.
    (`suggest_to_main` nasce `false`); P4 O-A8, corrigido o que cabe (o `choose_account` pelo cálculo do `Limits`), e "o
    MCP propõe a conta" numa issue; P5 O-A7, o conserto proposto (o client sai do `ORCA_USER_DATA_PATH` no header).
 
+### Rodada 5 — a rodada final sem o Opus do `agy` (2026-11-03)
+
+> **Apresentado antes:** Anderson avisou que "a cota do semanal `Opus` no `agy` reseta daqui 3 dias e já está em 93%";
+> o Argon volta em ~7 dias. As seis rodadas finais da R3 não cabem.
+
+Respondida em 2026-11-03, na sessão do `tools-kit`.
+
+1. **Com que revisor vai a rodada final, a que dá o `[x]`.** Opções: seis `reviewer` Opus do Claude Code, um por passo
+   (recomendada; ~6 × 130 a 175 mil tokens; se paga agora); um `reviewer` Opus para a entrega inteira (~250 a 350 mil
+   tokens, um contexto só); esperar o Opus do `agy` (~3 dias); fechar com o Flash (perde ~3 de cada 4 achados
+   importantes, pela medição). **Respondida — "reviewer Opus, por passo (Recomendado)".** Substitui a rodada final da
+   R3.
+
+### Rodada 6 — os pontos da rodada final pelo Opus (2026-11-03)
+
+> **Apresentado antes:** os pareceres da rodada final (R5), um por passo, com 4 pontos para rodada e 3 achados que o
+> revisor mandaria a issue.
+
+Respondida em 2026-11-03, nesta sessão, pela regra de Anderson ("opção `recomendada`", "prefira `corrigir aqui`").
+
+1. **A troca de conta no gate (P3 A2).** **Respondida — a recomendada:** aceitar o X38 e ajustar o texto; o gate de
+   conta só abre quando a conta difere da ativa, e a troca real segue recusada enquanto o `worker-start` não levar conta.
+2. **O `brza.toml` que deixa de ler com o servidor de pé (P4 A3).** **Respondida — a recomendada:** mantém a última
+   configuração lida e escreve o erro no stderr; na subida, sem anterior, os padrões (X36).
+3. **A conta gravada no `dispatch` envelhece até a abertura (P5).** **Respondida — a recomendada:** o pedido sem
+   `account` grava `''`, e o `Limits` o trata como a ativa da hora da admissão (o X34 revisto).
+4. **Como sai o pedido `running` preso (P5 A3).** **Respondida — a recomendada:** só a recuperação, no `start()` e
+   depois de N voltas sem `dispatch`; sem ferramenta `cancel`.
+5. **Os achados que iam a issue** (P2 A5, P5 A5): pela preferência por `corrigir aqui`, corrigidos na branch integrada,
+   que já tem os passos que eles tocam.
+
 ## Desenho
 
 ### O que este desenho assume
@@ -245,9 +275,10 @@ brza mcp config [<chave> [<valor>]]   # D4, a chave de desligamento
 - **Quem chamou:** o header `X-Brza-Session` (H1), e o argumento `caller` quando o header falta. **De que client:** o
   header `X-Brza-Client: ${ORCA_USER_DATA_PATH}`, de que o MCP tira o client (Studio ou Orca) e o `ORCA_USER_DATA_PATH`
   do H4 (R4.3).
-- **Os gates (R5.2, M15):** só `role: "consultant"` sem troca de conta entra direto na fila. Qualquer outro papel — o
-  executor, o arquiteto, o desconhecido — ou a troca de conta devolve `{"gate": {...}}` com a proposta, sem abrir worker;
-  a sessão principal pergunta a Anderson e chama `dispatch` de novo com `approved: <id do gate>`.
+- **Os gates (R5.2, M15):** só `role: "consultant"` entra direto na fila. Qualquer outro papel — o executor, o
+  arquiteto, o desconhecido — devolve `{"gate": {...}}` com a proposta, sem abrir worker; a sessão principal pergunta a
+  Anderson e chama `dispatch` de novo com `approved: <id do gate>`. **A troca de conta** é recusada com erro claro
+  enquanto o `worker-start` não levar conta (X20, X38, R6.1); a conta igual à ativa entra como se não viesse.
 - **As ferramentas:**
 
 ```json
@@ -350,100 +381,100 @@ haiku_max_budget_usd = 0.01   # o da sonda do H2, que custou de US$ 0,0016 a 0,0
 
 Executa D1 · executor: `implementer`, pela sessão do `tools-kit`
 
-Estimado: 5.0 h · Executado: — h
+Estimado: 5.0 h · Executado: 0.7 h
 
-- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_auth.py` (sem header, token errado → 401; token `0600`) e
+- [x] **1. Testes que falham:** `tests/mcp/test_mcp_auth.py` (sem header, token errado → 401; token `0600`) e
   `tests/mcp/test_mcp_lifecycle.py` (`initialize`, 202, `-32601`, SSE, porta ocupada, plist, `start`/`stop`/`status` com
   o `launchctl` trocado, `serve` parado por `SIGTERM`).
-- [ ] **2. Implementar o servidor e o `brza-mcp`.**
-- [ ] **3. O `brza install --mcp` e o `BRZA_MCP_TOKEN` no `claude-brza` e na função `claude`.**
-- [ ] **4. Rodar e ver passar:** o gate.
-- [ ] **5. Commit** no `brza-workflow`, branch `feat/pln-009-mcp`.
-- [ ] **6. Revisão pelo `agy`** até 3 rodadas.
+- [x] **2. Implementar o servidor e o `brza-mcp`.**
+- [x] **3. O `brza install --mcp` e o `BRZA_MCP_TOKEN` no `claude-brza` e na função `claude`.**
+- [x] **4. Rodar e ver passar:** o gate.
+- [x] **5. Commit** no `brza-workflow`, branch `feat/pln-009-mcp`.
+- [x] **6. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** —
+**Evidência:** `brza-workflow@1dfc9d9`, correções `f8829f4`, `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Argon r1 (6 corrigidos), Flash r2 e r3, Opus final (5 corrigidos) — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md). O `launchd` real fica no C1.
 
 ### P2 — A fila e os três tetos
 
 Executa D2 · executor: `implementer`, pela sessão do `tools-kit`
 
-Estimado: 5.5 h · Executado: — h
+Estimado: 5.5 h · Executado: 0.5 h
 
-- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_queue.py` (persistência; a ordem `deadline` > `blocks` > `priority`
+- [x] **1. Testes que falham:** `tests/mcp/test_mcp_queue.py` (persistência; a ordem `deadline` > `blocks` > `priority`
   > chegada; o índice lido pelo `ref`, com o log reduzido à última linha) e `tests/mcp/test_mcp_limits.py` (cada teto
   segura e o `status` diz qual; a conta sem uso dentro do teto de sessões; a máquina sem valor só registra).
-- [ ] **2. Implementar a fila e os tetos.**
-- [ ] **3. Rodar e ver passar:** o gate.
-- [ ] **4. Commit.**
-- [ ] **5. Revisão pelo `agy`** até 3 rodadas.
+- [x] **2. Implementar a fila e os tetos.**
+- [x] **3. Rodar e ver passar:** o gate.
+- [x] **4. Commit.**
+- [x] **5. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** —
+**Evidência:** `brza-workflow@084cc62`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash e Opus r1 (medição, R4), Flash r2 e r3, Opus final — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md).
 
 ### P3 — As ferramentas, o despacho e os gates
 
 Executa D3 · executor: `implementer`, pela sessão do `tools-kit`
 
-Estimado: 4.5 h · Executado: — h
+Estimado: 4.5 h · Executado: 0.5 h
 
-- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_dispatch.py` (o schema, o `X-Brza-Session` e o `caller`, o
-  `runtime` fora de `claude` recusado) e `tests/mcp/test_mcp_gates.py` (só o consultor entra; o resto e a troca de conta
-  devolvem gate; o `approved` admite).
-- [ ] **2. Implementar `dispatch`, `status` e `config`.**
-- [ ] **3. Rodar e ver passar:** o gate.
-- [ ] **4. Commit.**
-- [ ] **5. Revisão pelo `agy`** até 3 rodadas.
+- [x] **1. Testes que falham:** `tests/mcp/test_mcp_dispatch.py` (o schema, o `X-Brza-Session` e o `caller`, o
+  `runtime` fora de `claude` recusado) e `tests/mcp/test_mcp_gates.py` (só o consultor entra; o resto devolve gate; a
+  conta diferente da ativa é recusada (X38); o `approved` admite).
+- [x] **2. Implementar `dispatch`, `status` e `config`.**
+- [x] **3. Rodar e ver passar:** o gate.
+- [x] **4. Commit.**
+- [x] **5. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** —
+**Evidência:** `brza-workflow@e7d8fa6`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash e Opus r1, Flash r2, Opus final — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md).
 
 ### P4 — A política e o desempatador
 
 Executa D4 · executor: `implementer`, pela sessão do `tools-kit`
 
-Estimado: 5.0 h · Executado: — h
+Estimado: 5.0 h · Executado: 0.5 h
 
-- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_policy.py` (o `brza.toml` no 3.10 e no 3.11; o `enforce = false`;
+- [x] **1. Testes que falham:** `tests/mcp/test_mcp_policy.py` (o `brza.toml` no 3.10 e no 3.11; o `enforce = false`;
   o `brza mcp config`) e `tests/mcp/test_mcp_resolver.py` (Ollama e `claude` trocados por dublês: o `tev1` sem limiar
   manda ao Haiku; sem Ollama, direto ao Haiku; sem `claude`, fica a tabela; o `keep_alive`).
-- [ ] **2. Implementar.**
-- [ ] **3. Os casos do M11 no git:** `tests/mcp/fixtures/m11_cases.json`, refeitos a partir da medição do M11 (os
+- [x] **2. Implementar.**
+- [x] **3. Os casos do M11 no git:** `tests/mcp/fixtures/m11_cases.json`, refeitos a partir da medição do M11 (os
   scripts dela ficaram fora do git).
-- [ ] **4. Rodar e ver passar:** o gate.
-- [ ] **5. Commit.**
-- [ ] **6. Revisão pelo `agy`** até 3 rodadas.
+- [x] **4. Rodar e ver passar:** o gate.
+- [x] **5. Commit.**
+- [x] **6. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** —
+**Evidência:** `brza-workflow@8801c77`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); casos do M11 em `tests/mcp/fixtures/m11_cases.json` (o `tev1` real: 9/10); revisão: Flash e Opus r1, Flash r2, Opus final — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md). O `tev1` frio fica no C2.
 
 ### P5 — O ciclo e a conta
 
 Executa D6 · executor: `implementer`, pela sessão do `tools-kit`
 
-Estimado: 7.0 h · Executado: — h
+Estimado: 7.0 h · Executado: 0.6 h
 
-- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_cycle.py` (a CLI do client trocada recebe o env do H4; o
+- [x] **1. Testes que falham:** `tests/mcp/test_mcp_cycle.py` (a CLI do client trocada recebe o env do H4; o
   `worker_done` libera o teto), `tests/mcp/test_mcp_accounts.py` (o `CLAUDE_CONFIG_DIR` omitido na `systemDefault`) e
   `tests/mcp/test_brza_quota.py` (a projeção a partir de um JSON gravado do `orca account list`).
-- [ ] **2. Implementar o ciclo, a conta e o `brza-quota`.**
-- [ ] **3. Rodar e ver passar:** o gate.
-- [ ] **4. Commit.**
-- [ ] **5. Revisão pelo `agy`** até 3 rodadas.
+- [x] **2. Implementar o ciclo, a conta e o `brza-quota`.**
+- [x] **3. Rodar e ver passar:** o gate.
+- [x] **4. Commit.**
+- [x] **5. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** —
+**Evidência:** `brza-workflow@a4ff8db`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash e Opus r1, Flash r2, Opus final — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md). O `--json` real do `orchestration` fica no C4.
 
 ### P6 — A telemetria `route` e a ponta a ponta
 
 Executa D5 · executor: `implementer`, pela sessão do `tools-kit`
 
-Estimado: 3.0 h · Executado: — h
+Estimado: 3.0 h · Executado: 0.4 h
 
-- [ ] **1. Testes que falham:** `tests/mcp/test_mcp_telemetry.py` (a linha `route` no `measurements.jsonl` de um
+- [x] **1. Testes que falham:** `tests/mcp/test_mcp_telemetry.py` (a linha `route` no `measurements.jsonl` de um
   workspace temporário) e `tests/mcp/test_mcp_e2e.py` (servidor de verdade, `dispatch` de dois pedidos com os tetos e
   o desempate trocados).
-- [ ] **2. Implementar.**
-- [ ] **3. Rodar e ver passar:** o gate.
-- [ ] **4. Commit.**
-- [ ] **5. Revisão pelo `agy`** até 3 rodadas.
+- [x] **2. Implementar.**
+- [x] **3. Rodar e ver passar:** o gate.
+- [x] **4. Commit.**
+- [x] **5. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** —
+**Evidência:** `brza-workflow@1fa3e60`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash r1 e r2, Opus final — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md).
 
 ### Casos manuais
 
@@ -506,7 +537,7 @@ em [Revisões](#revisões)); "com correção" quer dizer que o passo ganhou o co
 - **X28 — O `workstream` da linha `route` sai da branch do `BRZA_WORKSPACE` do daemon**, e não do workstream de quem
   pediu, que o `dispatch` não recebe. Afeta P6 e D5.
 - **X29 — As decisões da linha `route` vão além de `admitted`**: `policy`, `resolved`, `queued`, `gated`, `approved`,
-  `held`, `done`, `failed`. Afeta P6 e D5.
+  `held`, `done`, `failed`, com as chaves `measures`, `gate`, `passthrough` e `machine.enforced`. Afeta P6 e D5.
 - **X30 — O gancho `Queue.on_decision` é atributo único.** Afeta P6.
 - **X31 — O `build` nasce sem o desempatador; só o `serve` o liga.** Afeta P6.
 
@@ -515,7 +546,8 @@ Os desvios abaixo vieram da rodada de correção (`brza-workflow@77b917f`), acei
 - **X32 — O `status` traz `finished` (os 10 últimos do chamador) e o `error` de cada pedido em fila.** Afeta P5 e D3.
 - **X33 — O `dispatch` e o `approved` devolvem `model`, `effort` e `reason`; a proposta do gate leva o `reason`.** Afeta
   P3, P4 e D3.
-- **X34 — O pedido sem `account` grava a conta ativa.** Afeta P2, P5 e D2.
+- **X34 — O pedido sem `account` grava `''`, e o `Limits` o trata como a conta ativa da hora da admissão** (revisto
+  pela R6.3; antes gravava a ativa da hora do `dispatch`). Afeta P2, P5 e D2.
 - **X35 — O `config` tem lista fechada de chaves, com tipo e faixa.** Afeta P3, P4 e D4.
 - **X36 — Com o `brza.toml` ilegível, o servidor sobe com os padrões e as três ferramentas respondem `isError` com o
   caminho.** Afeta P4 e D4.
@@ -526,18 +558,34 @@ Os desvios abaixo vieram da rodada de correção (`brza-workflow@77b917f`), acei
 - **X39 — A limpeza do `worker-start` que falha usa `worker-release --dispatch` e `task-update --status failed`**, flags
   lidas no CLI do `brza-studio` e não executadas. Fica para o C4. Afeta P5.
 
+Os desvios abaixo vieram da correção da rodada final (`brza-workflow@b2c87a6`), sem nova revisão: o teto de 3 rodadas
+por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
+
+- **X40 — O `status` aceita `caller` opcional, com a precedência do `dispatch`.** Afeta P3, P5 e D3.
+- **X41 — O gate de conta só abre quando a conta difere da ativa, ou sem leitor de contas** (o X38, aceito na R6.1).
+  Afeta P3 e D3.
+- **X42 — O `X-Brza-Client` com a pasta de um perfil que tem `orca-runtime.json` vira o client `studio`, com o caminho
+  guardado no pedido** (`requests.user_data`). Afeta P5 e D3.
+- **X43 — O `brza.toml` é conferido pela tabela do `config`, mais `mcp.port` e `policy.roles.<papel>.{model,effort}`**,
+  só nos namespaces do MCP. Afeta P4 e D4.
+- **X44 — O gate guarda o `policy_reason`, e o `approved` devolve o `reason`**, como o X33 prometia. Afeta P3 e P4.
+- **X45 — A linha `admitted` sai depois do `open` que deu certo, e não da prévia do `status`.** Afeta P6 e D5.
+
 ## Worklogs
 
 - 2026-11-03 — plano criado e desenhado a partir da extração do componente MCP do PLN-003.
   [O PLN-009: abertura do plano do MCP residente](../../work/worklogs/2026-11-03-pln-009-abertura-do-plano-do-mcp-residente.md)
 - 2026-11-03 — R1 a R4; o Desenho revisado e reescrito; P1 a P6 implementados, em revisão pelo `agy` (sem `[x]`); a
-  medição Flash × Opus. Travou na cota do `agy` (R3).
+  medição Flash × Opus; R5 e R6, a rodada final pelo Opus e a correção dela; P1 a P6 `[x]`, e o plano em revisão.
+  Travou na cota do `agy` (R3, R5).
   [O PLN-009: a execução do P1 a P6 e a revisão pelo `agy`, com a medição Flash × Opus](../../work/worklogs/2026-11-03-pln-009-execucao-e-revisao-pelo-agy.md)
 
 ## Revisões
 
 - [REV: o Desenho do PLN-009 antes da execução](../../work/reviews/pln-009-o-desenho-antes-da-execucao.md) —
   2026-11-03, 14 achados, todos com destino.
+- [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md) —
+  2026-11-03, 3 rodadas por passo, todos os achados com destino.
 
 ## Pendências conhecidas
 

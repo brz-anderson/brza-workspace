@@ -17,9 +17,11 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** P5 entregue em 2026-11-03, no commit a666e78 do `brza-workflow`, com fixture e suíte CLI conferidas.
-  P6 e P7 seguem pendentes: preparar publicação/sync, reconciliar evidências e horas de P1–P4 e tratar a identidade
-  dos quatro commits anteriores, sem reescrevê-los automaticamente. Nenhuma migração foi aplicada ao acervo real nesta entrega.
+- **Retomar:** P6 iniciado por Anderson em 2026-11-03 ("Iniciar P6"). Regressão passou: CLI 467, hooks 288 e
+  checador 26 casos. Core `a666e78` sincronizado em `5dcc2b3`; bootstrap dos cinco IDs gravado em `4bb114e`.
+  MIG-001 criada para revisão prévia. Aplicação aguarda o destino do achado sobre preservação de tags/demais campos
+  no critério de conclusão e, depois, execução pelas sessões donas. P1–P4 continuam sem atestado integral; horas
+  históricas não aferidas e commits preservados. P7 não iniciado.
 - **Histórico desta retomada:** tentativa de execução integral em 2026-11-03 encontrou a fronteira de repositório entre `workspace` e
   `brza-workflow` no Antigravity, registrando 4 issues:
   [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md),
@@ -91,6 +93,7 @@ Os cenários abaixo são provas a implementar ou executar nos passos; não afirm
 
 ## Pendências conhecidas
 
+- [MIG-001: Renumeração dos pareceres REV-001..REV-004 e backfill de refs nos worklogs](../../work/issues/MIG-001-renumeracao-rev-e-refs-pln-008.md) — execução pendente da revisão prévia.
 - [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md)
 - [Bloqueio de P6 e P7 sem a entrega publicada de P1 a P5 e sincronização do core](../../work/issues/bloqueio-de-p6-e-p7-sem-entrega-e-sync-do-core.md)
 - [brza sessions sem suporte ao argumento --agent e alias agy não reconhecido](../../work/issues/brza-sessions-sem-suporte-ao-agente-antigravity-e-alias-agy.md)
@@ -230,12 +233,20 @@ sessão principal consolida evidências · depende de P5.
 
 Estimado: 2 h · Executado: — h
 
-- [ ] Rodar as três suítes completas da Regressão, publicar a entrega e levar a norma por `brza sync`/`brza note sync`.
+- [x] Rodar as três suítes completas da Regressão, publicar a entrega e levar a norma por `brza sync`/`brza note sync`.
 - [ ] Produzir e conferir a prévia no acervo atual; só então aplicar o bootstrap e criar MIG-001 no molde aprovado.
 - [ ] Aplicar o mapa REV, links e backfill em cada workstream; concluir MIG-001 pelo comando que prova os quatro
   nomes novos, os antigos ausentes e links resolvidos. Registrar mudanças fora dos repositórios no worklog quando houver.
 - [ ] Rodar checador em cada árvore e rebuild duas vezes, comprovando idempotência; commitar por caminhos pelo
   `brza note commit` nas sessões donas e registrar commits, comandos/resultados e Executado neste plano.
+
+Evidência parcial de P6 em 2026-11-03: `brza-workflow@a666e78` já publicado; CLI completa (467 testes em
+199,593 s), hooks completos (288 em 21,128 s) e notes-checker (26 casos) passaram, com
+`TMPDIR=/tmp PYTHONDONTWRITEBYTECODE=1`. `brza-sync --ref a666e78` publicou `brza-workspace@5dcc2b3` e levou a norma
+às cinco árvores. `brza-note index --bootstrap-pln008` reservou REV-001 a REV-004 e MIG-001 em `4bb114e`.
+Prévia: quatro renomeações e 97 worklogs (29 tools-kit, 21 workspace, 4 brand, 43 studio); playground sem mudanças.
+Revisão prévia exige prova da preservação dos campos além de refs/date; destino em rodada antes da aplicação.
+P6 ainda não concluído; horas não aferidas.
 
 ### P7 — Revisar a entrega e fechar o plano
 
@@ -276,7 +287,14 @@ No workspace e nos worktrees de notas afetados:
 python3 .claude/skills/notes-checker/scripts/check_notes.py
 ```
 
+## Revisões
+
+- [REV-005: A revisão prévia da MIG-001 em P6 do PLN-008](../../work/reviews/REV-005-pln-008-p6-previa-da-mig-001.md) — prévia de P6; três destinos em rodada; não substitui P7.
+
 ## Worklogs
+
+- 2026-11-03 — P6 iniciado: regressão, sync e bootstrap feitos; migração real aguarda revisão prévia.
+  [O início de P6 do PLN-008: regressão, sincronização e reservas](../../work/worklogs/2026-11-03-pln-008-p6-regressao-sync-e-reservas.md)
 
 - 2026-11-03 — P5 entregue em fixture; P6/P7 pendentes; horas e identidade histórica exigem reconciliação.
   [A conclusão de P5 do PLN-008 em acervo de teste](../../work/worklogs/2026-11-03-pln-008-p5-migracao-em-fixture.md)

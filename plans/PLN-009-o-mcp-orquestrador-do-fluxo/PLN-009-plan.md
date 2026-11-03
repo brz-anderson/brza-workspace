@@ -5,8 +5,8 @@ origin: plan
 origin_ref: PLN-003
 description: O servidor MCP residente gerencia o fluxo com fila de prioridade sob três tetos, política declarativa e desempate com tev1 e Haiku
 ready: sim
-estimate_h: 30.0
-executed_h: 3.2
+estimate_h: 30.5
+executed_h: 3.5
 remaining_h: 2.0
 scope:
   - workspace
@@ -20,10 +20,10 @@ tags:
 
 # PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients
 
-- **Retomar:** o P1 a P6 estão `[x]` (`brza-workflow@b2c87a6`, branch `feat/pln-009-mcp`, no `origin` desde 2026-11-03): cada passo
-  passou pelas 3 rodadas de revisão (o `agy` e o Opus), e a última correção fechou com o gate verde. Falta a revisão da
-  entrega contra o `## Pedido` e a Cobertura, por um revisor que não executou; os casos C1 a C4, com Anderson; e o merge
-  na `master` do `brza-workflow`, com a confirmação dele.
+- **Retomar:** P1 a P7 `[x]`; revisão independente da entrega concluída, com A1 a A3 corrigidos.
+  Código em `brza-workflow@354d004`, branch `feat/pln-009-mcp`: MCP 349 OK (um pulado), hooks 290 OK e CLI limpo 445 OK.
+  Faltam C1 a C4, com Anderson; confirmar o pré-requisito do C3 com a sessão do PLN-003; e a confirmação
+  de Anderson para o merge na `master` do `brza-workflow`. A revisão e os testes com dublês não aprovam os casos reais.
 
 ## Pedido
 
@@ -477,6 +477,20 @@ Estimado: 3.0 h · Executado: 0.4 h
 
 **Evidência:** `brza-workflow@1fa3e60`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash r1 e r2, Opus final — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md).
 
+### P7 — Corrigir conta e perfil encontrados na revisão da entrega
+
+Executa D2, D3 e D6 · executor: subagente `implementer`, com revisão independente
+
+Estimado: 0,5 h · Executado: 0,3 h
+
+- [x] **1. Reproduzir A1 e A2:** três regressões falharam antes no `b2c87a6`.
+- [x] **2. Corrigir:** revalidar conta explícita na admissão; fixar a conta do worker; preservar perfil nas contas e no cache.
+- [x] **3. Revisar e testar:** revisor independente, 63 testes pontuais OK; MCP 349 OK (um pulado).
+- [x] **4. Commit:** `brza-workflow@354d004`, na `feat/pln-009-mcp`.
+
+**Evidência:** [REV: a entrega do PLN-009 contra o Pedido e a Cobertura](../../work/reviews/pln-009-a-revisao-da-entrega.md).
+O gate MCP rodou no worktree real, com leitura de `sysctl` liberada. Desvios X46 e X47.
+
 ### Casos manuais
 
 - **C1 — O launchd real:** `brza install --mcp`, `brza mcp start`, `brza mcp status` → 0, `curl` do `/health` com o
@@ -572,6 +586,10 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 - **X44 — O gate guarda o `policy_reason`, e o `approved` devolve o `reason`**, como o X33 prometia. Afeta P3 e P4.
 - **X45 — A linha `admitted` sai depois do `open` que deu certo, e não da prévia do `status`.** Afeta P6 e D5.
 
+- **X46 — A conta explícita é reconferida na admissão**; divergência deixa o pedido na fila com `account_active`.
+  O worker guarda a conta resolvida; pedido implícito continua `''` até admitir. Corrige A1, sem trocar conta (X38).
+- **X47 — As contas e o cache preservam `user_data`**, como a abertura do worker já fazia (X42). Corrige A2.
+
 ## Worklogs
 
 - 2026-11-03 — plano criado e desenhado a partir da extração do componente MCP do PLN-003.
@@ -581,12 +599,18 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
   Travou na cota do `agy` (R3, R5).
   [O PLN-009: a execução do P1 a P6 e a revisão pelo `agy`, com a medição Flash × Opus](../../work/worklogs/2026-11-03-pln-009-execucao-e-revisao-pelo-agy.md)
 
+- 2026-11-03 — revisão independente da entrega; A1 a A3 corrigidos e P7 concluído.
+  [O PLN-009: a revisão da entrega e a correção da conta e do perfil](../../work/worklogs/2026-11-03-pln-009-revisao-da-entrega-conta-e-perfil.md)
+
 ## Revisões
 
 - [REV: o Desenho do PLN-009 antes da execução](../../work/reviews/pln-009-o-desenho-antes-da-execucao.md) —
   2026-11-03, 14 achados, todos com destino.
 - [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md) —
   2026-11-03, 3 rodadas por passo, todos os achados com destino.
+
+- [REV: a entrega do PLN-009 contra o Pedido e a Cobertura](../../work/reviews/pln-009-a-revisao-da-entrega.md) —
+  2026-11-03, três achados corrigidos; delta revisado; C1 a C4 pendentes.
 
 ## Pendências conhecidas
 
@@ -599,7 +623,7 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 
 ## Fechamento
 
-- [ ] Todo passo `[x]`, com a revisão do `agy` e os achados com destino.
-- [ ] Os casos C1 a C3 com o Observado e o veredito.
+- [x] Todo passo `[x]`, com revisão independente e os achados com destino (R3 a R6; P7).
+- [ ] Os casos C1 a C4 com o Observado e o veredito.
 - [ ] O `feat/pln-009-mcp` integrado à `master` do `brza-workflow`, com a confirmação de Anderson.
 - [ ] A R5.3 reaberta no PLN-003, e os P6 a P9 de lá passados a este plano.

@@ -1,6 +1,8 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-008
 ---
 
 # A abertura do PLN-008: o refs nos worklogs, o REV e o MIG

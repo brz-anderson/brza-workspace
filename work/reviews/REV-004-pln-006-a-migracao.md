@@ -8,12 +8,12 @@ tags:
   - tooling
 ---
 
-# REV: a migração do `brza-workspace` para cliente do `brza-workflow`, o P8 do PLN-006
+# REV-004: a migração do `brza-workspace` para cliente do `brza-workflow`, o P8 do PLN-006
 
 Revisão adversária do `reviewer`, em 2026-11-02, do P8 de
 [PLN-006: O `brza init` monta a norma num workspace do zero](../../plans/PLN-006-o-brza-init-monta-a-norma-do-zero/PLN-006-plan.md),
 contra o D12, a Regressão e o parecer anterior,
-[REV: o `brza-workflow` dos passos P1–P7 do PLN-006, em `b9210a6`](pln-006-o-brza-init.md). Os destinos seguiram a
+[REV-003: o `brza-workflow` dos passos P1–P7 do PLN-006, em `b9210a6`](REV-003-pln-006-o-brza-init.md). Os destinos seguiram a
 regra de Anderson para o plano, "escolha sempre o recomendado".
 
 **Incidente.** O ensaio do segundo sync, rodado de um clone temporário, escreveu na `master` real o commit `fa4152f`,

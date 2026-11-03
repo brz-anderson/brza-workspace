@@ -1,6 +1,11 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-005
+  - PLN-006
+  - REV-002
+  - issue:a-confianca-do-reviewer-medida-contra-o-desfecho
 ---
 
 # PLN-005: a abertura da confiança dos fatos do desenho
@@ -73,7 +78,7 @@ do `--facts` com outro flag. Com a expressão nova, o transcript real dá F1–F
 ## A revisão, as correções e o fechamento (P9, P11)
 
 O `reviewer` achou dez defeitos reais e derrubou cinco hipóteses
-([REV: PLN-005 — a confiança dos fatos do desenho](../reviews/pln-005-a-confianca-dos-fatos.md)). Os dois que pesavam
+([REV-002: PLN-005 — a confiança dos fatos do desenho](../reviews/REV-002-pln-005-a-confianca-dos-fatos.md)). Os dois que pesavam
 estavam nos dados: o fato chegava ao auditor cortado nos 300 primeiros caracteres (A1), e o Haiku dava `holds` sem abrir
 o arquivo citado em 7 de uns 35 vereditos (A2). A R11 mandou corrigir todos aqui, e o P11 fez: o parágrafo inteiro ao
 auditor, a leitura conferida pelo `stream-json`, o teto de US$ 0,02 por fato, a raiz dos scripts pelo git e o aviso do

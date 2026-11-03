@@ -1,6 +1,8 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-002
 ---
 
 # A aprovação de texto vai na mensagem, e não na caixa de perguntas

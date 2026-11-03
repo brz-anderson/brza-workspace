@@ -2,6 +2,9 @@
 scope:
   - workspace
   - tools-kit
+refs:
+  - PLN-003
+  - issue:o-coordenador-le-o-indice-da-master
 ---
 
 # A fila do coordenador vai ao PLN-003

@@ -1,6 +1,8 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-004
 ---
 
 # O /compact, o nome em inglês e o arquivo gravado à vista

@@ -1,6 +1,10 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-005
+  - PLN-006
+  - issue:o-coordenador-le-o-indice-da-master
 ---
 
 # PLN-006: a abertura do brza init

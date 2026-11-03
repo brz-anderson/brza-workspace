@@ -2,6 +2,8 @@
 scope:
   - workspace
   - tools-kit
+refs:
+  - PLN-003
 ---
 
 # O desempatador local do M11: o `tev1:4b` no lugar do Haiku

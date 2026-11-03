@@ -1,6 +1,9 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-002
+  - PLN-003
 ---
 
 # A sessão por frente e a trava de retomada desligada

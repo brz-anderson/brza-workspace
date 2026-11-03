@@ -1,6 +1,8 @@
 ---
 scope:
   - workspace
+refs:
+  - PLN-004
 ---
 
 # A trava de fechamento antes do /compact

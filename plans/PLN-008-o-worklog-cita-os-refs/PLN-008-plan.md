@@ -3,7 +3,7 @@ status: open
 phase: design
 origin: request
 description: O brza note commit preenche o refs do worklog com os IDs que ele cita, e revisão e migração ganham REV-NNN e MIG-NNN
-ready: não — extração de refs definida na R10; faltam renumeração, sessão no rebuild e demais contratos do Desenho
+ready: não — R11 definiu renumeração e sessão no rebuild; faltam listagem e demais contratos antes dos Passos
 scope:
   - workspace
 opened: 2026-11-03
@@ -14,9 +14,9 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** R10 fechou a extração do `refs:`: fora de cercas, preservando crases inline, links e citações
-  históricas; menção textual desconhecida avisa e não entra no campo. D1 a D3 registram skill, dependências e refs.
-  Próximo: mapear as quatro REV e definir sessão no rebuild; concluir os demais contratos e derivar os Passos.
+- **Retomar:** R11 escolheu REV-001 a REV-004 pela inclusão cronológica no git e `session` como sessão da operação,
+  inclusive no rebuild. D1 a D5 registram os contratos fechados. Próximo: fechar a listagem `brza note ls`, completar
+  numeração, preenchimento do acervo e índice; derivar os Passos e levar o corte ao aceite.
 - **Dividido:** [PLN-008 — Desenho](PLN-008-design.md)
 
 ## Pedido
@@ -357,9 +357,33 @@ Respondida em 2026-11-03, na sessão `workspace`: "ambos recomendado".
    **Decidido — "ambos recomendado".** Menção textual desconhecida gera aviso, sem entrar no refs. Nas duas opções,
    ID inexistente escrito no próprio refs e link relativo quebrado continuam erros.
 
+### Rodada 11 — numeração das revisões e sessão do rebuild (enviada 2026-11-03)
+
+**Apresentado antes:** primeira inclusão no git: PLN-002 em 29/10 (`f77e28c`), PLN-005 em 31/10 (`a875f64`),
+PLN-006 P1–P7 em 02/11 às 12:24 (`e4d457f`), PLN-006 P8 às 13:53 (`f3db26b`). A sessão atual é inserida pelo
+`index_line`, inclusive no rebuild (`brza-workflow/bin/brza-note:539-549,654-661`), sem recuperar autoria histórica.
+
+Respondida em 2026-11-03, na sessão `workspace`: "11.1.1 / 11.2.2".
+
+1. **Numeração das quatro revisões.** Opções: ordem cronológica (recomendada) — custo: quatro renomeações, quatro
+   H1 e correção dos links em dois workstreams; se paga: agora, mantendo P1–P7 antes de P8; ordenar por plano e nome
+   atual — custo: as mesmas alterações, trocando REV-003 com REV-004; se paga: na conferência pelos nomes atuais,
+   mas inverte a ordem dos dois pareceres.
+
+   **Decidido — "11.1.1".** REV-001 PLN-002; REV-002 PLN-005; REV-003 PLN-006 P1–P7; REV-004 PLN-006 P8.
+   O nome recebe o prefixo REV-NNN; o H1 troca `REV:` por `REV-NNN:`. O D4 contém o mapa exato.
+
+2. **Sessão no rebuild.** Opções: preservar valor conhecido e omitir desconhecido (recomendada) — custo: sessão
+   explícita e tratamento dos dois casos; se paga: na primeira reconstrução feita por outra sessão; registrar a
+   sessão da operação — custo: documentar essa definição, mantendo o comportamento atual; se paga: ao auditar quem
+   reconstruiu o índice. Preservar um valor não certificaria autoria histórica.
+
+   **Decidido — "11.2.2".** `session` identifica a sessão que produziu a linha, inclusive no rebuild; não identifica
+   necessariamente quem escreveu a nota. A alternativa recomendada de preservar a sessão anterior foi recusada.
+
 ## Worklogs
 
 - 2026-11-03 — aberto; R1 a R6 fecharam a Entrevista; parou antes do Terreno.
   [A abertura do PLN-008: o refs nos worklogs, o REV e o MIG](../../work/worklogs/2026-11-03-pln-008-a-abertura-do-refs-do-rev-e-do-mig.md)
-- 2026-11-03 — retomada; Terreno conferido; R7 a R10 respondidas; D1 a D3 registram skill, dependências e refs.
+- 2026-11-03 — retomada; Terreno conferido; R7 a R11 respondidas; D1 a D5 registram os contratos fechados.
   [O Terreno do PLN-008 para o Desenho](../../work/worklogs/2026-11-03-pln-008-o-terreno-para-o-desenho.md)

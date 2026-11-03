@@ -32,3 +32,7 @@ inexistente, autorreferência e ciclos, inclusive entre workstreams. O D2 regist
 Na R10, Anderson respondeu "ambos recomendado": o refs considera prosa, crases inline, links e citações históricas
 fora de cercas; menção textual desconhecida gera aviso sem entrar no campo. ID inexistente no próprio refs e link
 quebrado continuam erros. O D3 registra o contrato; seguem o mapeamento das quatro REV e a sessão no rebuild.
+
+Na R11, Anderson respondeu "11.1.1 / 11.2.2": a numeração REV segue a inclusão cronológica no git, e `session`
+identifica a sessão da operação, inclusive no rebuild. D4 contém o mapa das quatro revisões; D5 explicita a
+semântica da sessão. Nenhuma revisão foi renomeada; seguem listagem e demais contratos antes dos Passos.

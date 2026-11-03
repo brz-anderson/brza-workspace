@@ -187,7 +187,7 @@ Respondida em 2026-10-29, no chat do BrzA Studio.
    - API push no fork e PR ao upstream. Custo: alto; o manifesto diverge até o upstream aceitar. Se paga: só se o
      contorno não bastar.
 
-   **Decidido — HTML regenerado, na pasta dev.**
+   **Decidido — HTML regenerado, na pasta dev.** → reaberta em R10.1 e R10.3
 
 3. **Onde moram as skills e os hooks.** Opções:
    - no plugin, com o `.claude/` só com o `settings.json`; namespace `brza:`, raiz por argumento ou env (recomendada).
@@ -290,7 +290,7 @@ Respondida em 2026-10-29, no chat do BrzA Studio.
    - o design system do painel, no formato do Stitch. Custo: ~1–2 h. Se paga: quando o painel tiver mais de uma tela;
    - sem `DESIGN.md`. Custo: 0. Se paga: nunca.
 
-   **Decidido — o design system do painel.** A arquitetura e o contrato ficam sem casa nomeada: vão a uma rodada
+   **Decidido — o design system do painel.** → reaberta em R10.2 A arquitetura e o contrato ficam sem casa nomeada: vão a uma rodada
    própria.
 
 3. **Onde mora a tabela de política.** Opções:
@@ -418,3 +418,58 @@ Respondida em 2026-11-03, na sessão `bb0fd632` do `workspace`.
 4. **O ritmo das contas e a máquina.** **Respondida — "Projeção e memória (Recomendado)":** o ritmo é a variação do
    `usedPercent` do `orca account list` projetada até o `resetsAt`, e a conta que chega a 90% antes do reset não recebe
    worker novo; a máquina limita pela memória livre e pelo swap, com a CPU como segundo sinal.
+
+### Rodada 10 — o painel depois do spike do C5 (enviada 2026-11-03)
+
+**Apresentado antes:** o spike do C5 nos dois apps (Desenho, C5). O painel de componentes herdou o tema e mostrou
+planos e notas em Tree, Table e Markdown, e o `plugin check` o renderiza. O painel HTML saiu ilegível no tema escuro,
+o `check` não o renderiza, e a CSP barra o `fetch` para `127.0.0.1`. O workspace que só tem o chat não tem terminal
+(`agents.list` com `terminalId: null`), e no terminal do Orca o `brza` é o CLI do Studio. A R4.2 decidira "HTML
+regenerado, na pasta dev", e a R6.2, o `DESIGN.md` como design system do painel.
+
+Respondida em 2026-11-03, no chat do BrzA Studio, na sessão do `tools-kit`.
+
+1. **O caminho do painel.** Opções:
+   - componentes (TSX) com worker (recomendada). Custo: o painel fica no catálogo, sem CSS nem gráfico próprios; as
+     6–10 h do B7 não foram refeitas. Se paga: na 1ª versão, nos dois apps;
+   - HTML com worker. Custo: tema próprio e nenhum `plugin check` do desenho; a CSP também barra `127.0.0.1`. Se paga:
+     só com tela fora do catálogo;
+   - componentes, e HTML só por exceção. Custo: dois caminhos de tema e teste quando a exceção vier. Se paga: na
+     primeira tela que o catálogo não desenhar.
+
+   **Respondida — "Componentes (TSX) + worker (Recomendado)".**
+
+2. **O que vira o `DESIGN.md` da R6.2, com o painel de componentes.** Opções:
+   - sai do PLN-003 (recomendada). Custo: 0. Se paga: agora;
+   - guia de composição do catálogo. Custo: ~1 h na fase 2. Se paga: com mais de uma tela ou outro autor;
+   - só para a tela HTML de exceção. Custo: 0 agora. Se paga: só com a exceção.
+
+   **Respondida em texto livre — "vai para o `workstream/brand`".** É contraproposta: o `DESIGN.md` sai do PLN-003 e
+   vai ao workstream `brand`. A forma da entrega vai à Rodada 11.
+
+3. **Como os botões do painel rodam o `brza`.** Opções:
+   - o worker roda o `brza` direto, por caminho absoluto, com a saída no painel (recomendada). Custo: o que ele roda não
+     entra no `audit.log`. Se paga: na 1ª versão;
+   - digita no terminal e avisa sem ele. Custo: no Studio, com o foco no chat, o botão quase sempre só avisa. Se paga:
+     só com verbos interativos;
+   - o botão chama o MCP residente. Custo: o botão só existe na fase 2, com o B6. Se paga: na fase 2, com a medição e
+     a fila no mesmo lugar.
+
+   **Respondida — "O botão chama o MCP residente".**
+
+
+### Rodada 11 — a entrega do `DESIGN.md` ao `brand` (enviada 2026-11-03)
+
+**Apresentado antes:** a R10.2, em texto livre, "vai para o `workstream/brand`"; o worktree do `brand` limpo, no
+`c7c4630`; o PLN-007, da marca, em execução e sem `DESIGN.md`.
+
+Respondida em 2026-11-03, no chat do BrzA Studio, na sessão do `tools-kit`.
+
+1. **Como entregar o pedido ao `brand`.** Opções:
+   - uma issue em `work/issues/` do `brand`, gravada daqui pelo `brza note commit --workstream` (recomendada). Custo:
+     ~5 min e um arquivo novo no worktree da sessão `brand`. Se paga: agora;
+   - uma linha no `Retomar` do PLN-007. Custo: edita um plano em execução de outra sessão. Se paga: se o `DESIGN.md`
+     for passo do PLN-007;
+   - só no PLN-003. Custo: 0 agora; o pedido pode se perder. Se paga: se o `brand` não for pegar isso logo.
+
+   **Respondida — "Issue no brand, gravada daqui (Recomendado)".**

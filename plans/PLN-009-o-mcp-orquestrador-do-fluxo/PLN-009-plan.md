@@ -13,6 +13,7 @@ scope:
   - brza-studio
 opened: 2026-11-03
 owner: Anderson
+priority: high
 tags:
   - tooling
 ---

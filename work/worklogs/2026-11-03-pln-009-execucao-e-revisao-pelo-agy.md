@@ -110,11 +110,27 @@ Ficaram de fora: a fixture do `orca account list` segue com o formato, e não co
   A pilha do `stash` é compartilhada com as outras sessões; conferida depois, estava vazia. Ele também gravou a memória
   no scratch do chat, e não no worktree; a sessão a moveu para `.claude/agent-memory/`.
 
+## A rodada final e o `[x]`
+
+Anderson avisou que o Opus semanal do `agy` estava em 93%, com reset em 3 dias. A R5 escolheu "reviewer Opus, por passo
+(Recomendado)": seis subagentes `reviewer`, um por passo, sobre o `77b917f`. Eles deram, ao todo, 31 achados
+`corrigido aqui`, 4 pontos para rodada e 3 achados que iam a issue. A R6 os encaminhou pela regra: as opções
+recomendadas, e as issues corrigidas na branch integrada. O mais grave era o Haiku do desempate, que não autenticava sem
+o `USER` no env, e por isso todo desempate caía no `fallback`; o revisor o provou com duas chamadas reais ao `claude -p`
+(~US$ 0,005), o que reabriu um achado que a rodada 1 tinha derrubado só pela leitura.
+
+Com isso, o P2 a P6 completaram as 3 rodadas do teto, e o P1, quatro. A última correção (`brza-workflow@b2c87a6`) não
+teve revisão própria; a prova é o gate, com cada teste visto falhando antes: `tests/mcp` 346, `tests/hooks` 290 e
+`tests/cli` limpo 445, todos OK. Os seis passos ganharam o `[x]`, e o plano foi a `phase: review`. O parecer
+consolidado é [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../reviews/pln-009-a-revisao-dos-passos.md).
+
+- **A cota de 5 h do Claude:** Anderson pediu para parar a 90% e voltar às 8h. A vigia lê o `orca account list --json`,
+  que o app só renova de tempos em tempos (a leitura das 06:30 era das 06:05, em 58%): ela não vê o uso em tempo real.
+
 ## Retomar
 
-A rodada final pelo Opus no `agy` (R3), um por passo, quando a cota voltar (por volta das 08:40): os pedidos estão no
-scratch (`extra-<passo>-final.md`), e o comando está no `Retomar` do plano. Com ela limpa, o `[x]` de cada passo, um
-parecer por passo em `work/reviews/` e a revisão da entrega.
+A revisão da entrega contra o `## Pedido` e a Cobertura, por um revisor que não executou; os casos C1 a C4, com
+Anderson; e o merge da `feat/pln-009-mcp` na `master` do `brza-workflow`, com a confirmação dele.
 
 ## Fora do workspace
 
@@ -125,5 +141,7 @@ parecer por passo em `work/reviews/` e a revisão da entrega.
 - **O quê e onde:** a cota individual do `agy`, gasta nas revisões: o Gemini 4 Argon e o Claude Opus esgotaram.
   **Risco:** o `agy` fica sem esses modelos até o reset, também para outro trabalho. **Estado:** o Argon volta em ~164 h
   e o Opus em ~5 h, a partir de ~03:50. **Como desfazer:** não se desfaz; espera o reset.
+- **O quê e onde:** duas chamadas reais ao `claude -p --model haiku` pelo revisor da rodada final do P4, para provar o
+  achado do `USER`. **Risco:** custo, ~US$ 0,005. **Estado:** encerradas. **Como desfazer:** não se desfaz.
 - **O quê e onde:** as sondas do `implementer` do P4 ao `tev1:4b` do Ollama local (`/v1/systemone`, `keep_alive` de
   1 min). **Risco:** nenhum. **Estado:** o modelo se descarrega sozinho. **Como desfazer:** já desfeito.

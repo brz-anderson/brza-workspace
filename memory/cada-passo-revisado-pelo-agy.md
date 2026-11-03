@@ -25,6 +25,8 @@ modelo não ancora na leitura do Claude que executou.
 - **A cota do `agy` acaba:** em 2026-11-03, o Gemini 4 Argon (high e medium) esgotou com reset em ~7 dias, e o Opus em
   ~5 h. Confira com um `agy -p "OK"` antes de um laço longo; `RESOURCE_EXHAUSTED` na saída é revisão que não rodou.
   Anderson escolheu (PLN-009/R3): seguir no `gemini-3.8-flash-high` e fazer uma rodada final pelo Opus antes do `[x]`.
+  Com o Opus semanal do `agy` em 93% (R5), a rodada final foi pelo subagente `reviewer` (Opus) do Claude Code, um por
+  passo. A medição Flash × Opus (R4) mostrou que o Flash sozinho perde ~3 de cada 4 achados importantes.
 - **O destino preferido é `corrigido aqui`** (pedido seguinte, mesmo dia: "prefira sempre optar por `corrigir aqui`").
   Issue ou decisão só quando o conserto não cabe no passo; `falso` fica no parecer.
 - **Laço de até 3 rodadas por passo:** os achados de código vão direto a um `implementer`; ao terminar, nova revisão

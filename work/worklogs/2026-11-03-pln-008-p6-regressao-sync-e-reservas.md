@@ -52,9 +52,30 @@ A revisão prévia está em [REV-005: A revisão prévia da MIG-001 em P6 do PLN
 A1, prova de preservação; A2, comando e ordem por sessões; A3, hipótese recomendada como falsa sobre a raiz do checador.
 Todos os destinos aguardam a mesma rodada antes da aplicação.
 
+## Destinos da REV-005 e ensaio da aplicação
+
+Anderson respondeu a rodada nesta sessão, nas opções recomendadas: A1, "Corrigir o critério antes de aplicar"; A2,
+"Completar os passos agora"; A3, "Registrar como falso". O texto literal está na REV-005.
+
+- **A1:** o critério da MIG-001 ganhou o bloco de preservação, que compara o frontmatter de cada nota tocada por um
+  commit `docs(pln-008): migração MIG-001 em <dono>` ou `links cruzados em <dono>` com o do pai, linha a linha,
+  tirando só `refs:` e `date:` dos worklogs. Compara com o pai do commit, e não com os HEADs de
+  `/tmp/pln008-p6-baseline.json`, porque o workspace já andou depois daquela captura.
+- **A2:** a MIG-001 ganhou a seção "Aplicação", com o comando por sessão dona e a ordem `tools-kit`, `workspace`,
+  `tools-kit` de novo, e depois `brand`, `studio` e `playground`; os passos da MIG passaram a cinco.
+- **A3:** registrado como falso no parecer.
+- **Ensaio:** clone bare do repositório local em `/private/tmp/pln008-sandbox`, com worktrees dos cinco workstreams, rodando
+  sem `BRZA_WORKSPACE`, que senão apontaria para o workspace real. As seis passagens saíram com 0: REV-001 em
+  `tools-kit`; REV-002 a REV-004 em `workspace`; worklogs 29, 22, 4 e 43; a segunda passagem de `tools-kit` e o
+  `playground` não mudaram nada. Os três blocos do critério, extraídos da própria MIG, passaram: preservação em 107
+  notas, 98 worklogs. Antes de aplicar, o bloco falhou com `sem commit da MIG-001 em tools-kit`; um commit mutante sem
+  `tags` em `work/worklogs/2026-10-27-brza-studio-convive-com-o-orca.md` foi barrado.
+
+O acervo real segue sem migração. A próxima etapa é a aplicação pelas sessões donas.
+
 ## Fora do workspace
 
 - **O quê e onde:** logs, relatórios, baseline de HEADs e sonda complementar temporários em `/tmp/pln008-p6-*`,
-  incluindo repositórios e remotes locais de fixture. **Risco:** consumo temporário de disco; nenhum acervo real
+  incluindo repositórios e remotes locais de fixture, e o clone de ensaio em `/private/tmp/pln008-sandbox`. **Risco:** consumo temporário de disco; nenhum acervo real
   foi migrado pelas sondas. **Estado:** artefatos locais para conferência. **Como desfazer:** remover apenas esses
   artefatos temporários depois de consolidar as evidências; isso não desfaz commits do workspace.

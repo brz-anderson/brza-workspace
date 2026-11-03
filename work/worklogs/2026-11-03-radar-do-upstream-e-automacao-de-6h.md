@@ -10,6 +10,8 @@ tags:
 refs:
   - issue:abas-de-navegador-sem-moldura-e-ergonomia-de-workspace
   - issue:abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao
+  - issue:gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache
+  - issue:isolamento-de-sessoes-de-titulacao-acp-e-status-de-conclusao-de-workers
   - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
   - issue:ler-e-enviar-mensagens-a-chats-pela-cli-e-expor-native-chat-aos-plugins
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
@@ -17,6 +19,7 @@ refs:
   - issue:preservar-o-dono-do-painel-do-antigravity-em-subagentes-aninhados
   - issue:seguranca-macos-remocao-de-allow-dyld-environment-variables-dos-entitlements
   - issue:subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent
+  - issue:workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh
 ---
 
 # Radar de issues e PRs do upstream e automação de 6h
@@ -57,6 +60,22 @@ refs:
    - `priority: high` — [Abertura de agentes no Chat UI pela CLI e superfície chat na orquestração](../issues/abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao.md) (`#37710`, `#37701`, `#37707`, `#37733`);
    - `priority: medium` — [Segurança no macOS: remoção de allow-dyld-environment-variables dos entitlements](../issues/seguranca-macos-remocao-de-allow-dyld-environment-variables-dos-entitlements.md) (`#37674`, `#37685`);
    - `priority: low` — [Abas de navegador sem moldura e ergonomia de workspace](../issues/abas-de-navegador-sem-moldura-e-ergonomia-de-workspace.md) (`#37708`, `#37700`, `#37718`, `#37716`, `#37713`, `#37746`).
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisadas 27 novas issues e 25 novos PRs criados
+   ou atualizados desde `2026-11-03T09:00:00Z`.
+2. **Atualização de 2 issues existentes em `work/issues/`:**
+   - [Ler e enviar mensagens a chats pela CLI e expor Native Chat aos plugins](../issues/ler-e-enviar-mensagens-a-chats-pela-cli-e-expor-native-chat-aos-plugins.md):
+     adicionadas issues `#37801` (comando CLI para focar/abrir chat específico e sincronização de seleção na barra lateral)
+     e `#37807` (inclusão de native chats na Jump Palette), além dos PRs `#37774` (isolamento de drafts) e `#37802` (escrita de journal em background);
+   - [Abas de navegador sem moldura e ergonomia de workspace](../issues/abas-de-navegador-sem-moldura-e-ergonomia-de-workspace.md):
+     adicionados PR `#37810` / issue `#37808` (recolhimento e restauração de splits de navegador) e issue `#37784` / PR `#37803`
+     (chaveamento de status de workspace via `Cmd+J`).
+3. **Criação de 3 novas issues priorizadas em `work/issues/`:**
+   - `priority: high` — [Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md) (`#37833`, `#37567`, `#37568`, `#37569`);
+   - `priority: high` — [Isolamento de sessões de titulação ACP e status de conclusão de workers](../issues/isolamento-de-sessoes-de-titulacao-acp-e-status-de-conclusao-de-workers.md) (`#37832`, `#37063`, `#37781`, `#37815`);
+   - `priority: medium` — [Workers de plugins em hosts remotos e gerenciamento CLI de SSH](../issues/workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh.md) (`#37788`, `#37826`, `#37806`).
 
 ## Fora do workspace
 

@@ -1,6 +1,6 @@
 ---
-status: in_progress
-phase: execution
+status: done
+phase: closed
 origin: request
 description: O brza sessions abre o Grok com nome e espera, e o MCP despacha ao Grok, ao Codex e ao Antigravity com conta e cota por runtime
 ready: sim
@@ -10,6 +10,7 @@ remaining_h: 0
 scope:
   - brza-workflow
 opened: 2026-11-03
+completed: 2026-11-04
 owner: Anderson
 priority: high
 tags:
@@ -18,7 +19,8 @@ tags:
 
 # PLN-013: O Grok, o Codex e o Antigravity abrem pelo `brza sessions` e recebem tarefas do MCP
 
-- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. A E1 está mesclada em `brza-workflow@975fe88`; a E2 está mesclada em `7c1684f`; a E3 está mesclada em `591f0ed`; os onze passos fecharam; a revisão final do plano roda.
+- **Retomar:** fechado em 2026-11-04. As três entregas estão na `master` do `brza-workflow` (`975fe88`, `7c1684f`,
+  `591f0ed`), e a revisão final do Grok aprovou. O que sobrou está em `## Pendências conhecidas`.
 - **Dividido:** [PLN-013 — Entrevista](PLN-013-interview.md) · [PLN-013 — Desenho](PLN-013-design.md)
 
 ## Pedido
@@ -354,13 +356,16 @@ Estimado: 1 h · Executado: 1 h
 
 - 2026-11-03 — Passos 0 a 2, a R1, a R2, o Terreno e a R3; o plano abriu e a issue irmã nasceu. Parou nos itens `D`.
   [Abertura e entrevista do PLN-013, o Grok no `brza sessions` e no MCP](../../work/worklogs/2026-11-03-pln-013-abertura-e-entrevista.md)
-- 2026-11-04 — R5: o plano aceito e a execução, de ponta a ponta.
+- 2026-11-04 — R5: o plano aceito e executado de ponta a ponta, P1 a P11, com as três entregas mescladas e a revisão
+  final; o plano fechou.
   [A execução do PLN-013, o Grok, o Codex e o Antigravity no `brza sessions` e no MCP](../../work/worklogs/2026-11-04-pln-013-execucao.md)
 
 ## Revisões
 
 - [REV-010: O Desenho do PLN-013, revisado pela sessão Grok](../../work/reviews/REV-010-pln-013-o-desenho-pelo-grok.md)
   — 2026-11-03, 16 achados: 15 corrigidos no Desenho e o A15 falso.
+- [REV-013: A entrega do PLN-013, revisada pelo Grok a cada passo e no fim](../../work/reviews/REV-013-pln-013-a-entrega-pelo-grok.md)
+  — 2026-11-04: as revisões de cada passo, com os achados corrigidos, e a final ("aprova"), com dois achados a issue.
 
 ## Pendências conhecidas
 
@@ -369,3 +374,21 @@ Estimado: 1 h · Executado: 1 h
 - [O `status` do MCP não diz o runtime do pedido](../../work/issues/o-status-do-mcp-nao-diz-o-runtime-do-pedido.md) — do P4.
 - [O `/rename` pelo chat não chega ao Grok](../../work/issues/o-rename-pelo-chat-nao-chega-ao-grok.md) — do P8.
 - [O `/rename` pelo chat não chega ao Antigravity](../../work/issues/o-rename-pelo-chat-nao-chega-ao-antigravity.md) — do P8, com o `yolo`.
+- [O texto do ciclo e o `CHECK` do `--rename` fora do Claude](../../work/issues/o-texto-do-ciclo-e-o-check-do-rename-fora-do-claude.md) — da revisão final (REV-013/A1, A2).
+
+## Documentação
+
+- `brza-workflow/README.md`, o `brza sessions`: o `--wait` e o `--rename` deixam de ser exclusivos do Claude, emendado
+  no P9 (`3944b6b`).
+
+## Fechamento
+
+- [x] Todo passo `[x]` com evidência, ou `[-]` com motivo: P1 a P11 `[x]`.
+- [x] Todo achado com destino que existe: os das revisões por passo corrigidos nos commits do REV-013; os dois da final
+      na issue do texto do ciclo; os do Desenho no REV-010.
+- [x] Resumo por commit ou PR do `brza-studio`: não há; a entrega é do `brza-workflow`, com merge direto na `master`
+      pela R5, e cada merge diz o PLN-013 e a entrega.
+- [x] O durável na casa dona: a tabela de modelo por runtime da R4.1 mora nos `DEFAULTS` do `policy.py`; o `README.md`
+      em `## Documentação`; as pendências em issues. Nenhuma rodada pede nota de `work/decisions/`.
+- [x] As decisões que o plano respondeu: nenhuma nota de `work/decisions/`.
+- [x] `status: done`, `phase: closed` e `completed` no frontmatter.

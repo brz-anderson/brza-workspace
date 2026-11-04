@@ -28,7 +28,7 @@ Storage` do Keychain, e o BrzA se renomeia antes do `ready` (`main-process-prefl
 
 **O que está na máquina de Anderson** (só leitura, sem ler segredo):
 - `~/.orca/jira-tokens/*.enc`, de 2026-10-24, começa com `v10`, o formato do `safeStorage`, e `jira-sites.json` aponta
-  `fixfy.atlassian.net`;
+  o site Atlassian do workspace de origem;
 - o Keychain tem `orca Safe Storage`, criado em 2026-10-17, e `BrzA Studio Safe Storage`, criado em 2026-10-28.
 
 **O efeito:**

@@ -5,20 +5,21 @@ scope:
 
 # O ▶ que executa o bloco de shell, o ⤢ que expande o bloco e o copiar sem o `\n` final no chat
 
-Dois itens do `orca-fixfy` levados ao BrzA Studio, mais um pedido extra no mesmo arquivo, executados em 2026-10-27 na
-sessão `brza-studio-itens-do-orca-fixfy`. O pedido veio da sessão `fixfy-35`, em
-`/private/tmp/claude-501/brza-studio-pedido-itens-do-orca-fixfy.md`. O `orca-fixfy` está congelado, conforme
-`~/Projects/fixfy/work/decisions/orca-fixfy-congelado-ate-decidir-entre-fork-e-plugins-do-brza-studio.md`.
+Dois itens do fork de origem levados ao BrzA Studio, mais um pedido extra no mesmo arquivo, executados em 2026-10-27
+numa sessão do `brza-studio`. O pedido veio da sessão 35 do workspace de origem, num arquivo de pedido em
+`/private/tmp/claude-501/`. O fork de origem está congelado, conforme uma decisão de lá, até se escolher entre o fork
+e os plugins do BrzA Studio.
 
 Commits `650a0e62cd8`, `0f3f4b9e445` e `41a0df162aa` na `master` do `brza-studio`, sobre `52f7051a45d`.
 
 ## O que Anderson respondeu
 
-- **Itens do `orca-fixfy`** (sessão `fixfy-35`, relatado no pedido): "▶ executar bloco de shell" e "⤢ expandir bloco".
-  Ficam de fora o `/rename` da aba, o painel da Fixfy, o `CLAUDE.md` da Fixfy e o `.gitignore`.
+- **Itens do fork de origem** (sessão 35 de lá, relatado no pedido): "▶ executar bloco de shell" e "⤢ expandir bloco".
+  Ficam de fora o `/rename` da aba, o painel de lá, o `CLAUDE.md` de lá e o `.gitignore`.
 - **Nome dos arquivos**, em rodada desta sessão: `native-chat/brza/` com `Brza*`. Também mudam a chave de i18n e os
-  atributos `data-brza-expand-*`. As outras opções eram ficar `fixfy/` e `Fixfy*`, ou nomes sem marca pelo que fazem.
-- **Copiar sem o `\n` final** (sessão `fixfy-35`, chegou por correio): "tire o /n no final do texto copiado ao clicar
+  atributos `data-brza-expand-*`. As outras opções eram ficar a pasta e o prefixo com o nome de lá, ou nomes sem marca
+  pelo que fazem.
+- **Copiar sem o `\n` final** (sessão 35 de lá, chegou por correio): "tire o /n no final do texto copiado ao clicar
   no botão do bloco de código do chat".
 - **Conferência:** pelo dev build visível, aberto do worktree, com o push na `master` só depois dela. O resultado foi
   "funciona".
@@ -29,12 +30,12 @@ Commits `650a0e62cd8`, `0f3f4b9e445` e `41a0df162aa` na `master` do `brza-studio
   copiar e o "Copy code" do menu de contexto passaram a usá-la, e um teste do upstream exige que os dois copiem o mesmo
   texto. Há teste novo em `NativeChatCodeBlock.test.tsx`, e dois testes do upstream que esperavam o `\n` foram
   ajustados.
-- **▶ (`0f3f4b9e445`).** Porte do `6228828c66` do `orca-fixfy` para `native-chat/brza/`. O ▶ recebe o mesmo texto do
+- **▶ (`0f3f4b9e445`).** Porte do `6228828c66` do fork de origem para `native-chat/brza/`. O ▶ recebe o mesmo texto do
   copiar, que para ele não muda nada: o `shellCommandFromCodeBlock` já fazia `trimEnd`.
 - **⤢ (`41a0df162aa`).** Porte do `0ddb42cda4`, com o dock do `72348d6a46` sem nada do painel. Os textos, que eram
   português fixo no código, passaram pelo i18n: em inglês no `en.json` e no `en-runtime-required.json`, com tradução no
   `pt.json`.
-- **A montagem do dock mudou de lugar.** No `orca-fixfy` ela fica no `NativeChatStructuredSession.tsx`, com
+- **A montagem do dock mudou de lugar.** No fork de origem ela fica no `NativeChatStructuredSession.tsx`, com
   `oxlint-disable max-lines`. Aqui o `max-lines-ratchet` recusa supressão nova, e o arquivo está no teto de 400 linhas.
   O dock entrou então no `NativeChatContextClearFade.tsx`, que só a sessão estruturada usa e que fica sempre dentro do
   `data-native-chat-root`.
@@ -66,7 +67,7 @@ Commits `650a0e62cd8`, `0f3f4b9e445` e `41a0df162aa` na `master` do `brza-studio
   `brz-anderson/brza-studio`. **Risco:** o copiar passa a ir sem o `\n` final, e os blocos de shell ganham um ▶ que
   executa sem confirmar, em todo build feito da `master`. **Estado:** ativo. **Como desfazer:** `git revert` dos três
   commits, com push.
-- **O quê e onde:** o worktree `~/Projects/brza-studio/.worktrees/itens-orca-fixfy`, a branch `itens-do-orca-fixfy` e o
+- **O quê e onde:** o worktree dos itens em `~/Projects/brza-studio/.worktrees/`, a branch dele e o
   dev build aberto dele. **Risco:** nenhum. **Estado:** encerrados e removidos no fim. **Como desfazer:** nada a
   desfazer.
 - **O quê e onde:** o `node_modules` da raiz do `brza-studio`, quebrado pelo install via symlink descrito acima.

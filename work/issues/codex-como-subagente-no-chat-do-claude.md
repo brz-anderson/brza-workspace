@@ -11,8 +11,9 @@ tags:
 
 # O Codex chamado pela sessão Claude aparece como subagente no chat do BrzA Studio
 
-Sugestão de melhoria de Anderson, em 2026-10-28, numa sessão da Fixfy que estudava como o chat nativo lê e escreve
-arquivos: uma chamada ao Codex, feita pela sessão principal em Claude, aparecer no chat como se fosse um subagente.
+Sugestão de melhoria de Anderson, em 2026-10-28, numa sessão do workspace de origem que estudava como o chat nativo lê e
+escreve arquivos: uma chamada ao Codex, feita pela sessão principal em Claude, aparecer no chat como se fosse um
+subagente.
 
 ## Como o chat monta um subagente hoje
 
@@ -29,7 +30,7 @@ fora do processo `claude` não vira subagente. Os caminhos foram conferidos no `
 sessão principal o chama pelo `Agent`, e o chat mostra o cartão de subagente com nome, estado, duração e resposta final.
 Dentro do cartão aparece só a chamada de Bash, e não os passos do Codex. O custo é o de um Claude intermediário. Depende
 do `delegate.py`, que está adiado em
-[Os scripts de orquestração da Fixfy que ficaram fora do port para o BrzA](scripts-da-fixfy-fora-do-port-para-o-brza.md),
+[Os scripts de orquestração do workspace de origem que ficaram fora do port para o BrzA](scripts-do-workspace-de-origem-fora-do-port-para-o-brza.md),
 ou de chamar o `codex exec` direto.
 
 **1b. Um colega de equipe que embrulha o Codex.** É o caminho 1 com as equipes de agentes do Claude Code
@@ -53,7 +54,8 @@ registro das linhas é genérico: cada uma diz qual agente a produziu e quem é 
 `--json` ou o rollout em `~/.codex/sessions/`, traduziria os itens com o tradutor que já existe e os gravaria como
 filhos da chamada que disparou o Codex. Reconhecer a chamada fica mais firme com o agente do caminho 1, ou com uma
 ferramenta de MCP própria, do que com `codex exec` dentro de um Bash qualquer. A mudança cai nos arquivos de chat mais
-mexidos no upstream. É da família do correio recolhível, estimado em ~15 h na medição da Fixfy, e não foi medida.
+mexidos no upstream. É da família do correio recolhível, estimado em ~15 h numa medição do workspace de origem, e não
+foi medida.
 
 **A forma do caminho 2 é um MCP do BrzA Studio.** Hoje o app não serve MCP nenhum: só lê e espelha a configuração de
 MCP dos runtimes, e as sessões ACP abrem com `mcpServers: []` (`src/main/acp/acp-session-runtime.ts:143`). Mas o

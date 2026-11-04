@@ -19,9 +19,9 @@ push direto na `master`, sem PR. A evidência detalhada está no passo, no plano
 
 - **O código.** O `atlassianProduct` escolhia Jira ou Confluence só pelo nome da ferramenta, e o `match` do resolvedor
   recebia o input mas não o passava ao `matchesMcpTool`.
-- **As chamadas reais.** Nos transcripts da Fixfy, o `executeRead` (53), o `executeWrite` (7) e o `executeDestructive`
-  (9) levam `{ cloudId, name, inputs }`, com a ferramenta interna no `name`; o `discover` (49) leva só `{ query }`. O
-  `executeDestructive` não estava no X20 e entrou junto.
+- **As chamadas reais.** Nos transcripts do workspace de origem, o `executeRead` (53), o `executeWrite` (7) e o
+  `executeDestructive` (9) levam `{ cloudId, name, inputs }`, com a ferramenta interna no `name`; o `discover` (49) leva
+  só `{ query }`. O `executeDestructive` não estava no X20 e entrou junto.
 
 ## As rodadas
 

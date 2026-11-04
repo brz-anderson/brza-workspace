@@ -10,9 +10,9 @@ tags:
 
 # Os Passos e os Desvios do PLN-001 no molde, depois da Run do P44 ao P50
 
-Em 2026-10-28, na sessão `pln-001-norma-fixfy`, Anderson respondeu "Levar tudo ao molde" à pergunta sobre o formato que
+Em 2026-10-28, na sessão que levou o PLN-001 ao molde, Anderson respondeu "Levar tudo ao molde" à pergunta sobre o formato que
 o [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](../../plans/PLN-001-o-brza-studio-generico/PLN-001-plan.md)
-herdou do PLN-029 da Fixfy. O Desenho, as seções novas (`## Restrições`, `## Regressão` e `## Casos manuais`), a
+herdou do plano do workspace de origem. O Desenho, as seções novas (`## Restrições`, `## Regressão` e `## Casos manuais`), a
 Cobertura, o `## Decisões` e o Fechamento já foram levados ao molde nessa sessão. Os Passos e os Desvios ficaram para
 depois, porque a sessão `pln-001-p44-p50`, que coordena a Run `run_de875fc52a75`, grava neles a evidência de cada
 `worker_done`. Ela respondeu pela orquestração: "depois-da-run", e também a `## Entrevista` e o frontmatter.

@@ -9,12 +9,11 @@ refs:
 
 # O BrzA Studio passa a conviver com o Orca original
 
-Sessão `brza-studio-rebrand`, no `brza-studio`, de 2026-10-27 a 2026-10-28. O pedido veio da sessão `fixfy-35` do
-workspace da Fixfy, gravado em `/private/tmp/claude-501/brza-studio-pedido.md`: terminar o rebrand para o BrzA Studio
-rodar ao lado do Orca do site (`com.stablyai.orca`), com "Estado isolado + marca visível", comando `brza`, migração
-"Começar limpo" e o dev separado do dev do Orca. O levantamento das colisões estava em
-`/private/tmp/claude-501/brza-studio-colisoes.md`. Este worklog vem para cá, e não para a Fixfy, pela rodada R32 do
-PLN-001 e pelo aviso da `fixfy-9b`.
+Sessão `brza-studio-rebrand`, no `brza-studio`, de 2026-10-27 a 2026-10-28. O pedido veio da sessão 35 do workspace de
+origem, gravado em `/private/tmp/claude-501/brza-studio-pedido.md`: terminar o rebrand para o BrzA Studio rodar ao lado
+do Orca do site (`com.stablyai.orca`), com "Estado isolado + marca visível", comando `brza`, migração "Começar limpo" e
+o dev separado do dev do Orca. O levantamento das colisões estava em `/private/tmp/claude-501/brza-studio-colisoes.md`.
+Este worklog vem para cá, e não para o workspace de origem, pela rodada R32 do PLN-001 e pelo aviso da sessão 9b de lá.
 
 ## O que foi feito
 
@@ -48,7 +47,7 @@ PLN-001 e pelo aviso da `fixfy-9b`.
   `orca-terminal-daemon.exe` e o `%LOCALAPPDATA%\Orca` saíram.
 - **De carona.**
   - O título "ORCA" da tela inicial vira BrzA Studio nos 7 locales; o achado foi da sessão
-    `brza-studio-itens-do-orca-fixfy`.
+    que trouxe os itens do fork de origem.
   - Dois testes quebrados desde o rebrand anterior, o label do serve e o texto "non-Orca", foram corrigidos.
   - Um teste novo trava a sincronia entre o `electron-builder.config.cjs` e o `brand-identity.ts`.
 - **Testes.** Typecheck, lint e formato passam.
@@ -111,8 +110,8 @@ também descarta o carimbo de origem e a identidade do terminal.
   - **Como desfazer:** `rm -rf ~/Projects/brza-studio/dist`.
 - **O `node_modules` da raiz do `brza-studio`.**
   - **O quê e onde:** o `pnpm install --frozen-lockfile --offline` reescreveu os links do store. Um install feito pelo
-    worktree `.worktrees/itens-orca-fixfy` tinha deixado os links apontando para `/Library/pnpm`, e não para
-    `~/Library/pnpm`.
+    worktree dos itens do fork de origem, em `.worktrees/`, tinha deixado os links apontando para `/Library/pnpm`, e não
+    para `~/Library/pnpm`.
   - **Risco:** nenhum.
   - **Estado:** corrigido.
   - **Como desfazer:** não se aplica.

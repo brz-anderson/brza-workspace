@@ -8,7 +8,7 @@ refs:
 # Os blocos de 120 colunas na largura "Total" e os links em azul claro no chat
 
 O P52 e o P53 do [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](../../plans/PLN-001-o-brza-studio-generico/PLN-001-plan.md),
-executados em 2026-10-27 na sessão `brza-studio-chat-blocos-120-colunas`, a partir do pedido da sessão `fixfy-9b`.
+executados em 2026-10-27 na sessão `brza-studio-chat-blocos-120-colunas`, a partir do pedido da sessão 9b do workspace de origem.
 Commits `f130a85e578`, `9d289d2b631` e `52f7051a45d` na `master` do `brza-studio`. A evidência detalhada está nos
 passos do plano.
 

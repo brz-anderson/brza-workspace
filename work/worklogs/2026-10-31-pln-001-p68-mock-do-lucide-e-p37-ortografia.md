@@ -12,7 +12,7 @@ refs:
 Depois do P67, Anderson pediu o "próximo passo" duas vezes, na sessão do workstream `studio` do `brza-workspace`. A
 primeira levou ao X47 do
 [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](../../plans/PLN-001-o-brza-studio-generico/PLN-001-plan.md),
-que virou o P68. A segunda, enquanto o P68 rodava, levou à conferência do P37, aberto desde a Fixfy. A evidência
+que virou o P68. A segunda, enquanto o P68 rodava, levou à conferência do P37, aberto desde o workspace de origem. A evidência
 detalhada está nos passos, no plano.
 
 ## O P68 — os testes do transcript do mobile voltam a carregar

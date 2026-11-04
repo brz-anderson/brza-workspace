@@ -37,8 +37,8 @@ está nos passos do plano.
 ## O que se aprendeu
 
 - **O worktree que o Orca cria fica em `~/orca/workspaces/…`, fora do `brza_where`** do `~/.zshrc`, e o `claude` dali
-  cairia na função da Fixfy. Criar o worktree em `.worktrees/` e passá-lo ao `worker-start` por `path:` resolve, mas o
-  worker roda o `pnpm install` sozinho.
+  cairia na função do workspace de origem. Criar o worktree em `.worktrees/` e passá-lo ao `worker-start` por `path:`
+  resolve, mas o worker roda o `pnpm install` sozinho.
 - **O `pnpm check:changed` procura `origin/main`**, e no `brza-studio` precisa de `--base=origin/master`.
 - **No zsh, `set -- $var` não divide palavras**, e o laço que confirmava heartbeats parou no primeiro: o ack foi à mão.
 - **O worker que esbarra em decisão pergunta pelo `ask`**, e a resposta volta por `orchestration reply`; o

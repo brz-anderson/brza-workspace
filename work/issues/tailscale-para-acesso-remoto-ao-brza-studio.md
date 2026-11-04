@@ -22,7 +22,7 @@ Nada foi levantado ainda. A sessão nova começa pela entrevista:
 - o que "via web" quer dizer: o pareamento remoto do próprio BrzA Studio (o `orca://pair`, os servidores conectados
   do Orca) por cima da tailnet, ou outra interface web;
 - o SSH: o Tailscale SSH ou o `sshd` do macOS dentro da tailnet;
-- a conta do Tailscale, que não pode ser a da Fixfy.
+- a conta do Tailscale, que não pode ser a do workspace de origem.
 
 ## A primeira rodada, em 2026-10-29
 

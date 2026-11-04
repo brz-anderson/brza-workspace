@@ -6,8 +6,6 @@ tags:
 refs:
   - MIG-001
   - PLN-008
-  - REV-001
-  - REV-004
 ---
 
 # A MIG-001 aplicada no workstream `studio`
@@ -23,7 +21,8 @@ na P6 do PLN-008, pedido pela sessão `workspace-a6` com a autorização de Ande
 2. Prévia, `python3 "$HOME/Projects/brza-workflow/scripts/migrate_pln008.py" --workstream studio`: saída 0,
    `0 criado(s), 0 parecer(es) renomeado(s), 0 nota(s) com links reescritos, 43 worklog(s) atualizado(s)`, igual ao
    ensaio. Dos 44 worklogs da pasta, um já estava na forma final. Três avisos `unknown-ref-mention` em
-   `2026-10-28-pln-001-no-molde-da-fixfy.md`: PLN-029 e duas vezes PLN-025, menções históricas que o D3 só avisa.
+   `2026-10-28-pln-001-no-molde-do-workspace-de-origem.md`: menções históricas a planos do workspace de origem, que o D3
+   só avisa.
 3. `--apply --workstream studio`: saída 0, mesmas contagens. Commit `d5abc5e`
    (`docs(pln-008): migração MIG-001 em studio`), 43 arquivos, com push na `workstream/studio`. Índice da `master`: em
    dia, nada a acrescentar.

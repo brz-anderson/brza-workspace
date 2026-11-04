@@ -52,24 +52,23 @@ tags:
   (R66.1) e o escopo (R66.3). O pedido 42 (o botão de expandir do bloco de código com a aparência e a fileira dos
   vizinhos) entrou com o D63 e o P80, que fechou em `brza-studio@d501bb230ff`, com os X78 ao X80, e espera só o C33.
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
-  a Entrevista, o Terreno e o Log até a divisão ficam no PLN-025 do workspace da Fixfy
-  (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-interview.md` e `PLN-025-design.md`, R28.3); as rodadas
+  a Entrevista, o Terreno e o Log até a divisão ficam no plano de origem, no workspace de origem
+  (na entrevista e no desenho de lá, R28.3); as rodadas
   deste plano, da R29 em diante, estão na `## Entrevista` abaixo. As R até a R28, citadas nos passos e nos itens `D`, são as do
-  PLN-025 da Fixfy.
+  plano de origem.
 
 ## Pedido
 
-- **Origem:** o PLN-029 do workspace da Fixfy, movido para cá em 2026-10-27 a pedido de Anderson (rodada D, R32). O PLN-029
-  nasceu da divisão do PLN-025 do workspace da Fixfy (`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-plan.md`, "O
-  Orca — Desktop, CLI, App e Web — é a ferramenta permanente da Fixfy, em um plano por repositório"), pedida por
-  Anderson na sessão do checkout da raiz do workspace da Fixfy de 2026-10-26 ("divida o PLN-025 em 2, um para o
-  fixfy-orca e outro para o orca-dev") e desenhada na R28 de lá; os passos e os itens `D` vieram com os IDs de antes
-  (PLN-025/R28.2)
+- **Origem:** um plano do workspace de origem, movido para cá em 2026-10-27 a pedido de Anderson (rodada D, R32). Ele
+  nasceu da divisão do plano de origem, o do Orca como ferramenta permanente, em um plano por repositório, pedida por
+  Anderson na sessão do checkout da raiz do workspace de origem em 2026-10-26 (dividir aquele plano em dois, um para o
+  fork de origem e outro para o `orca-dev`) e desenhada na R28 de lá; os passos e os itens `D` vieram com os IDs de
+  antes (R28.2 de lá)
 
-Os pedidos que o `brza-studio` executa, os 1 a 26 copiados do PLN-025 da Fixfy com o número de lá, e os 27 a 29,
-de 2026-10-27, numerados aqui na sequência. O build local e o atualizador desligado
-saíram do pedido 1 ("abra um plano, vamos adaptar o Orca ao nosso fluxo de trabalho, a ferramenta será adotada
-permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que serviria a um projeto fora da Fixfy.
+Os pedidos que o `brza-studio` executa, os 1 a 26 copiados do plano de origem com o número de lá, e os 27 a 29, de
+2026-10-27, numerados aqui na sequência. O build local e o atualizador desligado saíram do pedido 1 ("abra um plano,
+vamos adaptar o Orca ao nosso fluxo de trabalho, a ferramenta será adotada permanentemente") pela R7.2, que leva ao
+`orca-dev` (hoje `brza-studio`) o que serviria a um projeto fora do workspace de origem.
 
 - **Pedido 5:** "arquivos de diff, quando expandido, tem 3 abas, a de diff, a versão atual e a versão passada.
   - arquivos na versão atual/anterior devem ser renderizados por ferramenta de prévisualizaçõa;
@@ -100,12 +99,14 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
   Continuar, adicione os botões: Continuar em <seletor de conta>: faz a mesma coisa que o seletor de conta do chat,
   passa a conversa para a conta selecionada; Retomar automaticamente: adiciona uma tarefa agendada que dispara ao
   resetar o limite da conta, continuando a tarefa"
-- **Pedido 27 (2026-10-27, sessão `fixfy-35` da Fixfy):** "melhorias para o BrzA Studio: no bloco de Perguntou: no chat, as perguntas do agente ficam da mesma cor
-  do texto normal (branco); no bloco de comandos e ferramentas usadas, conseguimos adicionar mais icones/titulos
-  personalizados que interajam de forma diferente? git com o icone do git, jira e etc; se for possível, sugira alguns"
-- **Pedido 28 (2026-10-27, sessão `fixfy-9b` da Fixfy):** "blocos de código - ``` - e as tabelas, largura sempre de 120 colunas + padding, quando selecionado
-  `largura total` nas configs de largura do conteudo"
-- **Pedido 29 (2026-10-27, sessão `fixfy-9b` da Fixfy):** "e links no chat, na cor azul padrão de link, mais clarinho"
+- **Pedido 27 (2026-10-27, sessão 35 do workspace de origem):** "melhorias para o BrzA Studio: no bloco de Perguntou:
+  no chat, as perguntas do agente ficam da mesma cor do texto normal (branco); no bloco de comandos e ferramentas
+  usadas, conseguimos adicionar mais icones/titulos personalizados que interajam de forma diferente? git com o icone do
+  git, jira e etc; se for possível, sugira alguns"
+- **Pedido 28 (2026-10-27, sessão 9b do workspace de origem):** "blocos de código - ``` - e as tabelas, largura sempre
+  de 120 colunas + padding, quando selecionado `largura total` nas configs de largura do conteudo"
+- **Pedido 29 (2026-10-27, sessão 9b do workspace de origem):** "e links no chat, na cor azul padrão de link, mais
+  clarinho"
 - **Pedido 30 (2026-10-28, sessão do `brza-workspace` que orquestrou o P42 e o P43):** "seria mto bom se conseguicemos
   adicionar image preview no chat"
 - **Pedido 31 (2026-10-29, sessão do `brza-workspace` que orquestrou o P54 ao P56):** "o fundo do visualizador de
@@ -214,17 +215,18 @@ permanentemente") pela R7.2, que leva ao `orca-dev` (hoje `brza-studio`) o que s
 | `Pedido 42` | O botão de expandir do bloco de código tem a mesma aparência dos botões vizinhos (sem fundo nem borda, `text-chat-foreground-faint`, fundo de destaque só no hover) e fica na mesma fileira deles, encostado à esquerda do último, no bloco com e sem cabeçalho de linguagem | P80 | teste da posição e das classes (unidade); conferência no BrzA Studio (manual) |
 | `X20` | O `executeRead`, o `executeWrite` e o `executeDestructive` do MCP da Atlassian ganham o ícone do produto do `name` e o título com a ferramenta interna; o `discover` ganha o ícone do produto citado na busca, e o título com a busca entre aspas (R55.1, R55.2) | P67 | teste da categoria e do título (unidade); conferência no BrzA Studio (manual, com o C6) |
 
-Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no PLN-028 do workspace da Fixfy.
+Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão no plano do fork de origem, no workspace de
+origem.
 
 ### Fora de escopo
 
 - **O "Selecionar automaticamente" no seletor de modelo e esforço** (pedido 22, "para futuramente"). Volta por rodada
   própria.
-- **O que é da Fixfy no fork** — o painel, o chat nativo da Fixfy, o ADM Claude e o quadro de planos. Está no
-  PLN-028 do workspace da Fixfy (`plans/PLN-028-o-orca-fixfy-com-a-fixfy/PLN-028-plan.md`).
-- **A sincronização em cadeia e a conferência no Orca da Fixfy.** A sincronização era o PLN-025/P4, e a conferência, o
-  PLN-028/P8, com o build do `orca-fixfy`, que está congelado. A conferência de cada passo é no BrzA Studio, com
-  Anderson.
+- **O que é do workspace de origem no fork** — o painel, o chat nativo de lá, o ADM Claude e o quadro de planos. Está
+  no plano do fork de origem, no workspace de origem.
+- **A sincronização em cadeia e a conferência no fork de origem.** A sincronização era o P4 do plano de origem, e a
+  conferência, o P8 do plano do fork de origem, com o build do fork de origem, que está congelado. A conferência de cada
+  passo é no BrzA Studio, com Anderson.
 
 ## Restrições
 
@@ -239,9 +241,9 @@ Do pedido 5, só o tema Islands Dark é daqui; as abas do diff e o lint estão n
 
 ## Entrevista
 
-As R até a R28 são as rodadas do PLN-025 do workspace da Fixfy, citadas pelo número de lá; as rodadas deste plano
-começam na R29. Transcritas de `/private/tmp/claude-501/brza-rodadas-2026-10-27.md`, que as sessões `fixfy-35` e
-`fixfy-9b` do workspace da Fixfy gravaram com as perguntas, as opções e as respostas literais.
+As R até a R28 são as rodadas do plano de origem, no workspace de origem, citadas pelo número de lá; as rodadas deste
+plano começam na R29. Transcritas de `/private/tmp/claude-501/brza-rodadas-2026-10-27.md`, que as sessões 35 e 9b do
+workspace de origem gravaram com as perguntas, as opções e as respostas literais.
 
 ### Rodada 29 — o "Perguntou:" e os ícones das ferramentas (enviada 2026-10-27)
 
@@ -252,7 +254,7 @@ começam na R29. Transcritas de `/private/tmp/claude-501/brza-rodadas-2026-10-27
 Pedido de Anderson: "melhorias para o BrzA Studio: no bloco de Perguntou: no chat, as perguntas do agente ficam da mesma
 cor do texto normal (branco); no bloco de comandos e ferramentas usadas, conseguimos adicionar mais icones/titulos
 personalizados que interajam de forma diferente? git com o icone do git, jira e etc; se for possível, sugira alguns".
-Respondida em 2026-10-27, na sessão `fixfy-35`.
+Respondida em 2026-10-27, na sessão 35 do workspace de origem.
 
 1. **R29.1 — Que cor a pergunta do agente ganha no bloco "Perguntou:"?** Seleção única. Opções:
    - cor de destaque do tema (recomendada) — `primary` do tema, a mesma do ✓ — custo: ~0,3 h; se paga: na primeira
@@ -301,7 +303,7 @@ Respondida em 2026-10-27, na sessão `fixfy-35`.
 > `native-chat-appearance-style.ts:88`; o `<pre>` usa `max-w-full` em `NativeChatCodeBlock.tsx:62`.
 
 Pedido de Anderson: "blocos de código - ``` - e as tabelas, largura sempre de 120 colunas + padding, quando selecionado
-`largura total` nas configs de largura do conteudo". Respondida em 2026-10-27, na sessão `fixfy-9b`.
+`largura total` nas configs de largura do conteudo". Respondida em 2026-10-27, na sessão 9b do workspace de origem.
 
 1. **R30.1 — Em "largura total", o bloco ou a tabela mais curto que 120 colunas fica com quanto de largura?** Seleção
    única. Opções:
@@ -322,7 +324,7 @@ Pedido de Anderson: "blocos de código - ``` - e as tabelas, largura sempre de 1
 > **Apresentado antes:** o link usa `--chat-foreground-strong` em `native-chat-markdown.css:18`.
 
 Pedido de Anderson: "e links no chat, na cor azul padrão de link, mais clarinho". Respondida em 2026-10-27, na sessão
-`fixfy-9b`.
+9b do workspace de origem.
 
 1. **R31.1 — Qual azul para os links do chat?** Seleção única. Opções:
    - `#79C0FF` no escuro (recomendada) — `#0969DA` no claro, sublinhado a 40% — custo: ~0,3 h; se paga: na hora;
@@ -335,20 +337,22 @@ Pedido de Anderson: "e links no chat, na cor azul padrão de link, mais clarinho
 
 Pedido de Anderson: "criei um repo pra servir de workspace do brza-studio, git:
 git@github.com:brz-anderson/brza-workspace.git - clone em Projects/ ao lado de brza-studio e envie o plano de melhorias
-do BrzA Studio para lá (brza-workspace)". Respondida em 2026-10-27, nas sessões `fixfy-35` e `fixfy-9b`.
+do BrzA Studio para lá (brza-workspace)". Respondida em 2026-10-27, nas sessões 35 e 9b do workspace de origem.
 
 1. **R32.1 — O que vai para o brza-workspace?** Seleção única. Opções:
-   - o PLN-029 mais os pedidos de hoje (recomendada) — plano e desenho, com os pedidos das rodadas A, B e C como passos
-     novos no F7 — custo: ~0,5 h; se paga: na hora;
-   - só o PLN-029 — custo: ~0,3 h; se paga: agora, mas os pedidos ficam no `/tmp`;
-   - só um plano novo com os pedidos de hoje — custo: ~0,3 h; se paga: só se o PLN-029 terminar na Fixfy.
+   - o plano de lá mais os pedidos de hoje (recomendada) — plano e desenho, com os pedidos das rodadas A, B e C como
+     passos novos no F7 — custo: ~0,5 h; se paga: na hora;
+   - só o plano de lá — custo: ~0,3 h; se paga: agora, mas os pedidos ficam no `/tmp`;
+   - só um plano novo com os pedidos de hoje — custo: ~0,3 h; se paga: só se o plano de lá terminar no workspace de
+     origem.
 
-   **Decidido — "PLN-029 + os pedidos de hoje (Recomendado)".**
+   **Decidido — "O plano de lá + os pedidos de hoje (Recomendado)".**
 
-2. **R32.2 — O que acontece com o PLN-029 no workspace da Fixfy?** Seleção única. Opções:
-   - mover e deixar um aviso (recomendada) — fica só o `PLN-029-plan.md` com `status: dropped` e a linha de para onde
-     foi — custo: ~0,3 h; se paga: na hora;
-   - mover e reescrever os 18 links — custo: ~1 h; se paga: só se a Fixfy não puder ter vestígio do BrzA Studio;
+2. **R32.2 — O que acontece com o plano de lá no workspace de origem?** Seleção única. Opções:
+   - mover e deixar um aviso (recomendada) — fica só o arquivo do plano de lá com `status: dropped` e a linha de para
+     onde foi — custo: ~0,3 h; se paga: na hora;
+   - mover e reescrever os 18 links — custo: ~1 h; se paga: só se o workspace de origem não puder ter vestígio do BrzA
+     Studio;
    - copiar e deixar o original — custo: zero, e divergência logo; se paga: nunca.
 
    **Decidido — "Mover e deixar um aviso (Recomendado)".**
@@ -356,15 +360,15 @@ do BrzA Studio para lá (brza-workspace)". Respondida em 2026-10-27, nas sessõe
 3. **R32.3 — Onde as sessões do brza-studio gravam worklog e evidência daqui em diante?** Seleção única. Opções:
    - no brza-workspace (recomendada) — `~/Projects/brza-workspace/work/worklogs/` — custo: ~0,2 h; se paga: no
      primeiro worklog;
-   - continua na Fixfy — custo: zero; se paga: nunca.
+   - continua no workspace de origem — custo: zero; se paga: nunca.
 
    **Decidido — "No brza-workspace (Recomendado)".**
 
 4. **R32.4 — Que forma o plano tem no brza-workspace, que ainda não tem norma?** Seleção única. Opções:
-   - mesma norma, renumerado PLN-001 (recomendada) — copia o `plans/README.md` e a norma de `work/` sem o que é só da
-     Fixfy; `plans/PLN-001-o-brza-studio-generico/`, com a linha de que veio do PLN-029 — custo: ~0,5 h; se paga: no
-     próximo plano;
-   - mesma norma, mantém PLN-029 — custo: ~0,4 h; se paga: agora;
+   - mesma norma, renumerado PLN-001 (recomendada) — copia o `plans/README.md` e a norma de `work/` sem o que é só do
+     workspace de origem; `plans/PLN-001-o-brza-studio-generico/`, com a linha de que veio do plano de lá — custo: ~0,5
+     h; se paga: no próximo plano;
+   - mesma norma, mantém o número de lá — custo: ~0,4 h; se paga: agora;
    - sem norma, só o arquivo — custo: ~0,1 h; se paga: agora.
 
    **Decidido — "Mesma norma, renumerado PLN-001 (Recomendado)".**
@@ -373,7 +377,7 @@ do BrzA Studio para lá (brza-workspace)". Respondida em 2026-10-27, nas sessõe
 
 > **Apresentado antes:** o P43 é a base do P49 e do P51 (`PLN-001-plan.md`, P43: "Antes do P44 ao P51"), e o P42 é
 > independente; um worktree novo do Orca vai para `~/orca/workspaces/brza-studio/…`, fora do `brza_where` do
-> `~/.zshrc:57`, e o `claude` dali cairia na função da Fixfy.
+> `~/.zshrc:57`, e o `claude` dali cairia na função do workspace de origem.
 
 Pedido de Anderson: "retome o plano 001, utilize /orchestration para organizar e executar os passos em paralelo".
 Respondida em 2026-10-28, na sessão do `brza-workspace` que orquestrou o pacote.
@@ -744,8 +748,8 @@ Respondida em 2026-10-28, na sessão `pln-001-p44-p50` do `brza-workspace`.
 > chave `interruptedContinue.usageLimitExplanation` nas 7 línguas. Manteve o `continueUsageLimit`, o
 > `usageLimitTurnItemId` e o `usageLimitContinuationOfTurnItemId` do host, e com eles a agenda do main.
 
-Respondida em 2026-10-26, por Anderson na sessão `fixfy-orca`, pelo AskUserQuestion, e levada à sessão do `orca-dev`
-(`sync/v1.4.242`). Transcrita dos passos P1, P40 e P41 em 2026-10-28.
+Respondida em 2026-10-26, por Anderson na sessão do fork de origem, pelo AskUserQuestion, e levada à sessão do
+`orca-dev` (`sync/v1.4.242`). Transcrita dos passos P1, P40 e P41 em 2026-10-28.
 
 1. **R45.1 — O helper Swift do Computer Use depois da v1.4.242.** Opções:
    - a da v1.4.242 (recomendada): o arquivo volta a ser igual ao do upstream; custo: nenhum agora, e ~20 min para trazer
@@ -995,10 +999,10 @@ custos são estimativa.
 
 ### Rodada 55 — as meta-ferramentas do MCP da Atlassian (enviada 2026-10-31)
 
-> **Apresentado antes:** o `atlassianProduct` (`brza-atlassian-tool.ts:25-34`) escolhe o produto só pelo nome da
+>  **Apresentado antes:** o `atlassianProduct` (`brza-atlassian-tool.ts:25-34`) escolhe o produto só pelo nome da
 > ferramenta, e o `match` (`brza-tool-categories.ts:133-141`) recebe o input mas não o passa ao `matchesMcpTool`. Nos
-> transcripts da Fixfy, o `executeRead` (53 chamadas), o `executeWrite` (7) e o `executeDestructive` (9), este fora do
-> X20, levam `{ cloudId, name, inputs }`, com o `name` da ferramenta interna (`getJiraBoardSprintData`,
+> transcripts do workspace de origem, o `executeRead` (53 chamadas), o `executeWrite` (7) e o `executeDestructive` (9),
+> este fora do X20, levam `{ cloudId, name, inputs }`, com o `name` da ferramenta interna (`getJiraBoardSprintData`,
 > `manageJiraSprint`, `createConfluenceAttachment`); o `discover` (49) leva só `{ query }`, em texto livre. O `inputs`
 > não traz o `issueIdOrKey` em que o título do P48 se apoia.
 
@@ -1355,7 +1359,7 @@ Executor "sessão do `brza-studio`" é a sessão aberta em `~/Projects/brza-stud
 `brz-anderson` e dá push na `master` do `brza-studio` (os feitos até 2026-10-26, na `main` do `orca-dev`, como a
 evidência diz); "worker do Orca" é o worker que a sessão que conduz dispara, num worktree em `.worktrees/`. Cada passo
 só executa a pedido explícito de Anderson, e os do chat (P33 em diante) se conferem no BrzA Studio, com ele, fora da
-trava do PLN-025/P28 da Fixfy (R25.3). Os IDs são os do PLN-025 da Fixfy, e a numeração salta onde o passo foi para
+trava do P28 do plano de origem (R25.3). Os IDs são os do plano de origem, e a numeração salta onde o passo foi para
 outro plano (R28.2); os P42 em diante são novos, daqui.
 
 A ordem é a de execução, e não a do número: o P34 vem antes do P33 e do P35, porque leva o id da mensagem à barra; o P40
@@ -1394,7 +1398,7 @@ system novo grava os dois triples no mesmo `.build/out/Products/Release`; o scri
 pelo `--show-bin-path` antes do `lipo`, e o helper sai `x86_64 arm64`. Clone limpo no scratch, `pnpm install
 --frozen-lockfile && pnpm run build:mac`: 2 min 22 s, `dist/mac-arm64/Orca.app` de 667 MB, arm64, versão
 `1.4.214-local.1792864828830.eabec4de25f1`, `com.stablyai.orca`; `codesign --verify --deep --strict` passa (na medição
-falhava) e a assinatura é ad hoc. O `electron-builder` acha `Apple Development: anderson@fixfy.com.br (V72RV8BZY4)` pelo
+falhava) e a assinatura é ad hoc. O `electron-builder` acha `Apple Development: anderson@… (V72RV8BZY4)` pelo
 nome dado no `CSC_NAME` (conferido no `findIdentity`, sem assinar); o build assinado e o hardened runtime ficam para o
 P5. Testes: `build-mac-local.test.mjs` (passos e ambiente) e o `windows-cmd-shim-spawn-boundary.test.mjs`, que perdeu a
 entrada do script. O `.github/CONTRIBUTING.md` diz o novo `build:mac`. Efeito: o `build:mac` não gera mais o
@@ -1402,18 +1406,18 @@ entrada do script. O `.github/CONTRIBUTING.md` diz o novo `build:mac`. Efeito: o
 `.app` troca à mão (D5) e o atualizador está desligado (P2).
 
 **Evidência do item 4:** commit [`b7c21f26f11`](https://github.com/brz-anderson/orca-dev/commit/b7c21f26f11), na
-`main`, mesmo autor. O primeiro build assinado do `orca-fixfy` (PLN-028/P5.1) falhou em 19 min 52 s no `codesign
+`main`, mesmo autor. O primeiro build assinado do fork de origem (P5.1 do plano dele) falhou em 19 min 52 s no `codesign
 --timestamp` de um `locale.pak` ("A timestamp was expected but was not found"); o `@electron/osx-sign` 1.3.3 assina
 arquivo a arquivo e, sem `timestamp`, põe `--timestamp` em cada um (`sign.js:229-233`). O
 `electron-builder.config.cjs` agora dá `mac.timestamp: 'none'` quando `isMacRelease` é falso, e o electron-builder
 26.15.3 o repassa (`MacTargetHelper.js:183`), o que vira `--timestamp=none`; o release segue com o carimbo (o
 `sign-mac-app.mjs` não lê a chave). Os dois `codesign` dos helpers no config (`signMacStandaloneHelper` e
 `codesignArgs`) e o do `build-computer-macos.mjs` já só põem `--timestamp` no release, e ficam como estão: medido no
-Mac de Anderson com `Apple Development: anderson@fixfy.com.br (V72RV8BZY4)`, o `codesign` sem a flag não carimba (só
+Mac de Anderson com `Apple Development: anderson@… (V72RV8BZY4)`, o `codesign` sem a flag não carimba (só
 `Signed Time`, sem `Timestamp=`) e custa 0,07 s por arquivo, o mesmo de `--timestamp=none`. Teste em
 `electron-builder-mac-channel-config.test.mjs`: o release e o hourly sem `mac.timestamp`, o local com `'none'`. Os
 testes do config e do `build-mac-local` (52) passam, o `check:code-quality:changed` e o `oxfmt` passam, e o `pnpm tc`
-passa. O build assinado de novo fica com a sessão `fixfy-orca`, depois da sincronização no `orca-fixfy`.
+passa. O build assinado de novo fica com a sessão do fork de origem, depois da sincronização nele.
 
 **Rodada:** R45.1 — o helper Swift do Computer Use volta a ser o do upstream no merge `f57841688f5` da v1.4.242
 (`--build-system native`, #21145); se o SwiftPM o remover, volta o `--show-bin-path` do `eabec4de25f` (~20 min).
@@ -1457,7 +1461,7 @@ Estimado: 4,5 h · Executado: 0,5 h
 - [x] **1.** O tema do Monaco registrado em `monaco-setup.ts`, com as cores do `patch_orca_monaco.py:49-90`, no lugar do
       `vs-dark`
 - [x] **2.** O tema do Shiki no `syntax-highlighter.ts`, no lugar do `dark-plus`
-- [x] **3.** Os testes do renderer tocado passam; commit e push; o `orca-fixfy` puxa na sincronização seguinte
+- [x] **3.** Os testes do renderer tocado passam; commit e push; o fork de origem puxa na sincronização seguinte
 
 **Evidência:** commit [`f9c5de8c183`](https://github.com/brz-anderson/orca-dev/commit/f9c5de8c183), na `main`, autor e
 committer `240569289+brz-anderson@users.noreply.github.com`. Uma paleta só, em `src/renderer/src/lib/islands-dark-theme.ts`,
@@ -1473,7 +1477,7 @@ e a do JSON `#C77DBB`. Testes: os de `syntax-highlighting/` e o `MonacoEditor.sy
 novas; `components/editor/`, `components/automations/` e o destacador, 493 arquivos e 3927 testes, passam; `tc:web` e
 `check:code-quality:changed` passam. Achados: o bloco de código do chat só troca a cor dos tokens, e o fundo segue a
 superfície do design system; o `.app` não foi aberto, porque divide o `userData` com o Orca instalado — destino de
-ambos: a conferência no Orca do PLN-028/P8.
+ambos: a conferência no Orca do plano do fork de origem.
 
 ### P25 — O olho no visualizador de Markdown (pedido 14)
 
@@ -1484,8 +1488,8 @@ Estimado: 1,5 h · Executado: 0,3 h
 - [x] **1.** Teste que falha: na aba do arquivo Markdown, os modos são `preview`, `rich` e `source`, nessa ordem, e o
       padrão é `preview`; na aba de diff, seguem `source` e `rich`, com o padrão `source`
 - [x] **2.** `MARKDOWN_EDIT_VIEW_MODES` e `getDefaultMarkdownViewMode` em `markdown-preview-controls.ts`
-- [x] **3.** Os testes do editor passam; commit e push; o `orca-fixfy` puxa na sincronização seguinte, e o olho se
-      confere no Orca com o PLN-028/P8
+- [x] **3.** Os testes do editor passam; commit e push; o fork de origem puxa na sincronização seguinte, e o olho se
+      confere no Orca com o plano do fork de origem
 
 **Evidência:** commit [`5ded04d6bd1`](https://github.com/brz-anderson/orca-dev/commit/5ded04d6bd1), na `main`
 (`952a232c8ba..5ded04d6bd1`, fast-forward), autor e committer `240569289+brz-anderson@users.noreply.github.com`. Em
@@ -1496,7 +1500,7 @@ vence o padrão no `editor-panel-render-model.ts` e no `editor-save-disk-precond
 `markdown-preview-controls.test.ts` falhou antes (2 de 8: os modos e o padrão) e passa depois. Testes:
 `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/renderer/src/components/editor src/renderer/src/store/slices`
 — 7118 passam e 68 pulados (7186); `pnpm tc:web` sai com 0; `pnpm run check:code-quality:changed` sem achado novo. A
-conferência no Orca fica com o PLN-028/P8.
+conferência no Orca fica com o plano do fork de origem.
 
 ### P26 — O build local de Windows sai em um comando (pedido 15)
 
@@ -1602,7 +1606,7 @@ botão (X2). O `native-chat-new-chat-from-message.test.tsx` falhou antes (2 de 3
 Testes: `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/renderer/src/components/native-chat
 src/renderer/src/lib/launch-agent-in-new-tab.test.ts src/renderer/src/lib/structured-agent-session-launch.test.ts
 src/renderer/src/i18n` — 405 arquivos, 4466 testes passam, antes e depois do rebase; `pnpm tc:web` sai com 0; `pnpm run
-check:code-quality:changed` sem achado novo. A conferência no Orca fica com o PLN-028/P8.
+check:code-quality:changed` sem achado novo. A conferência no Orca fica com o plano do fork de origem.
 
 ### P33 — O Bifurcar (pedido 19)
 
@@ -1651,7 +1655,7 @@ suíte larga (as pastas de Claude, RPC, native-chat, i18n e shared) foi interrom
 com as outras sessões do P33 ao P41 rodando, e não voltou a rodar. `pnpm tc:node` e `pnpm tc:web` saem com 0 depois do último
 rebase; `pnpm run check:code-quality:changed` sem achado novo; `verify:rpc-params-catalog`,
 `verify:localization-catalogs` e `verify:localization-coverage` saem com 0. A conferência no Orca fica com o
-PLN-028/P8.
+plano do fork de origem.
 
 ### P35 — O Fixar Capítulo na régua de prompts (pedido 21)
 
@@ -1681,7 +1685,7 @@ botão e a marca ausentes) e passa depois. Testes: `node config/scripts/run-vite
 config/vitest.config.ts src/renderer/src/components/native-chat src/renderer/src/i18n` — 405 arquivos, 4423 testes
 passam depois do último rebase (antes dele, um teste do `use-native-chat-context-menu.targets.test.tsx` falhou uma vez
 sob carga e passou sozinho três vezes); `pnpm tc:web` sai com 0; `pnpm run check:code-quality:changed` sem achado
-novo. A conferência no Orca fica com o PLN-028/P8.
+novo. A conferência no Orca fica com o plano do fork de origem.
 
 ### P36 — O seletor de conta (pedido 22)
 
@@ -1700,8 +1704,8 @@ Estimado: 29 h · Executado: 1,2 h
 
 **Evidência:** commit [`65a2506c3c2`](https://github.com/brz-anderson/orca-dev/commit/65a2506c3c2), na `main`
 (`5f7fdaf68bf..65a2506c3c2`, fast-forward, depois do rebase sobre o P34 e o P39), autor e committer
-`240569289+brz-anderson@users.noreply.github.com`. **1:** o login do `~/.claude-adm` (`admin@fixfy.com.br`) já é conta
-do Orca instalado, na pasta gerenciada `claude-accounts/d2f4f519…`, ao lado de `anderson@fixfy.com.br`, no
+`240569289+brz-anderson@users.noreply.github.com`. **1:** o login do `~/.claude-adm` (a conta `admin@`) já é conta
+do Orca instalado, na pasta gerenciada `claude-accounts/d2f4f519…`, ao lado da conta `anderson@`, no
 `claudeManagedAccounts` do `profile-state.db`; sem registro nem rodada. As pastas de conta ligam `projects ->
 ~/.claude/projects`, então a cópia do transcript quase sempre acha o `.jsonl` já lá e não copia. **2:** o
 `claude-account-switch.test.ts` monta duas contas com `projects/` próprios: a troca copia o `.jsonl` e a pasta da
@@ -1733,7 +1737,7 @@ passou antes da última refatoração (1940 arquivos), fora o `claude-stop-ack-r
 rodada final foi interrompida pelo Claude Code por falta de memória na máquina. `pnpm tc:node`, `tc:web` e `tc:cli`
 saem com 0; `pnpm run check:code-quality:changed` sem achado novo; `oxlint` e o ratchet do `max-lines` limpos — o
 `claude-profile-router.ts`, o host e o `NativeChatComposer.tsx` estavam no teto, e a troca saiu para módulos próprios.
-Sem `.app` aberto; a troca `claude` → `adm` no Orca se confere com o PLN-028/P8.
+Sem `.app` aberto; a troca `claude` → `adm` no Orca se confere com o plano do fork de origem.
 
 ### P37 — As sugestões de ortografia (pedido 23)
 
@@ -1791,7 +1795,7 @@ src/renderer/src/components/editor src/renderer/src/components/settings src/rend
 testes passam (2 arquivos e 3 testes pulados, como antes), sobre o P35; depois do rebase sobre o P41 e o P33, os de
 `native-chat`, `settings` e `i18n` — 664 arquivos, 6245 testes; `pnpm tc:web` sai com 0; `pnpm run
 check:code-quality:changed` sem achado novo. Fora do escopo: o app móvel não tem a caixa Tiptap, e o servidor remoto só
-recebe o texto, que segue em Markdown. A conferência no Orca fica com o PLN-028/P8.
+recebe o texto, que segue em Markdown. A conferência no Orca fica com o plano do fork de origem.
 
 ### P39 — O Editar na mensagem do usuário (pedido 25)
 
@@ -1819,7 +1823,7 @@ config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/renderer/
 src/renderer/src/i18n` — 404 arquivos, 4419 de 4420 testes passam; a falha, no
 `use-native-chat-context-menu.targets.test.tsx`, é de tempo sob carga e passa sozinha (8 de 8), sem tocar no que
 mudou; `pnpm tc:web` sai com 0; `pnpm run check:code-quality:changed` sem achado novo. A conferência no Orca fica com
-o PLN-028/P8.
+o plano do fork de origem.
 
 ### P40 — O Continuar em outra conta, no aviso de limite (pedido 26)
 
@@ -1896,7 +1900,7 @@ capabilities publicadas, o runtime, a varredura de visuais, os limites do Claude
 `pnpm tc:web` limpos; `pnpm run check:code-quality:changed` sem achado; `verify:rpc-params-catalog`,
 `verify:localization-catalogs`, `verify:localization-coverage` e `check:max-lines-ratchet` ok. Depois do rebase sobre o
 P35, de novo os catálogos, o `tc:web` e os testes da linha e da agenda (52). Sem abrir o `.app`; a conferência no Orca é
-o PLN-028/P8.
+a do plano do fork de origem.
 
 ### P42 — O "Perguntou:" em cor de destaque (pedido 27)
 
@@ -2212,7 +2216,7 @@ Estimado: 0,3 h · Executado: 1,1 h
       tom `faint` segue herdando a cor (`:55`); os testes; commit e push
 - [ ] **3.** Conferir um link em azul claro nos dois temas, no BrzA Studio, com Anderson
 - [x] **4.** O link sobre código inline também em azul: em 2026-10-28, numa sessão de chat do `brza-workspace`, Anderson
-      viu o caminho `~/Projects/fixfy`, escrito como código inline e virado link pelo chat, em branco e não em azul
+      viu o caminho do outro workspace, escrito como código inline e virado link pelo chat, em branco e não em azul
       ("nesse link, o texto ficou branco e não azul"); o `color: var(--chat-code-foreground)` de
       `.native-chat-markdown code` (`native-chat-markdown.css:35`) vence a cor que o `code` herdaria do link
 
@@ -3671,51 +3675,56 @@ da linha quando o teste entra.
 
 ## Worklogs
 
-- 2026-10-26 — nasceu da divisão do PLN-025, na R28 de lá, com os passos P1, P2, P6, P25 a P27 e P33 a P41, os itens
-  D1, D2, D6, D20, D21 e D27 a D35, e a evidência e as horas que já tinham; o Log até a divisão fica no PLN-025.
-  Worklog `work/worklogs/2026-10-26-divisao-do-pln-025.md` do workspace da Fixfy.
-- 2026-10-26 — sessão do `orca-dev` em `feat/markdown-eye-view`, a pedido da `fixfy-13`: P25 feito, com push na `main`
-  do `orca-dev` (`952a232c8ba..5ded04d6bd1`); o olho é o padrão da aba do arquivo Markdown. Executado 0,3 h.
-- 2026-10-26 — sessão do `orca-dev` em `feat/build-win-local`, a pedido da `fixfy-26`: P26 feito, com push na `main`
-  do `orca-dev` (`5ded04d6bd1..342d85f66c9`); o `build:win` sai num instalador x64 sem assinatura e com o atualizador
-  desligado, e compila os executáveis Rust do Windows (X1). Executado 0,4 h. Segue o P27, com Anderson.
-- 2026-10-26 — sessão do `orca-dev` em `feat/native-chat-new-chat`, a pedido da `fixfy-26`: P34 feito, com push na
-  `main` do `orca-dev` (`342d85f66c9..273d2cc6420`); a barra da mensagem do agente recebe o id, e o Novo Chat abre uma
-  aba de chat com a mensagem como rascunho, sem enviar (X2). Executado 0,3 h. O P33 e o P35 podem abrir.
+- 2026-10-26 — nasceu da divisão do plano de origem, na R28 de lá, com os passos P1, P2, P6, P25 a P27 e P33 a P41, os
+  itens D1, D2, D6, D20, D21 e D27 a D35, e a evidência e as horas que já tinham; o Log até a divisão fica no plano de
+  origem. O worklog da divisão está no workspace de origem.
+- 2026-10-26 — sessão do `orca-dev` em `feat/markdown-eye-view`, a pedido da sessão 13 do workspace de origem: P25
+  feito, com push na `main` do `orca-dev` (`952a232c8ba..5ded04d6bd1`); o olho é o padrão da aba do arquivo Markdown.
+  Executado 0,3 h.
+- 2026-10-26 — sessão do `orca-dev` em `feat/build-win-local`, a pedido da sessão 26 do workspace de origem: P26 feito,
+  com push na `main` do `orca-dev` (`5ded04d6bd1..342d85f66c9`); o `build:win` sai num instalador x64 sem assinatura e
+  com o atualizador desligado, e compila os executáveis Rust do Windows (X1). Executado 0,4 h. Segue o P27, com
+  Anderson.
+- 2026-10-26 — sessão do `orca-dev` em `feat/native-chat-new-chat`, a pedido da sessão 26 do workspace de origem: P34
+  feito, com push na `main` do `orca-dev` (`342d85f66c9..273d2cc6420`); a barra da mensagem do agente recebe o id, e o
+  Novo Chat abre uma aba de chat com a mensagem como rascunho, sem enviar (X2). Executado 0,3 h. O P33 e o P35 podem
+  abrir.
 - 2026-10-26 — sessão do `orca-dev` em `feat/native-chat-edit-user-message`, a pedido da sessão `orca-dev` da raiz:
   P39 feito, com push na `main` do `orca-dev` (`273d2cc6420..5f7fdaf68bf`); a mensagem enviada tem o Editar, que a
   leva à caixa, abaixo do rascunho se houver, e dá foco (X3). Executado 0,4 h.
 - 2026-10-26 — sessão do `orca-dev` em `feat/native-chat-account-switch`, a pedido da sessão `orca-dev` da raiz e
-  retomada a pedido da `fixfy-22`: P36 feito, com push na `main` do `orca-dev` (`5f7fdaf68bf..65a2506c3c2`); o seletor
-  de conta troca a conta no mesmo chat, com o transcript levado à conta nova, o `resume` nela e o divisor "Conta
-  trocada - <conta>". Executado 1,2 h. O P40 pode abrir.
-- 2026-10-26 — sessão do `orca-dev` em `feat/native-chat-pin-chapter`, a pedido da sessão `orca-dev` da raiz e
-  retomada a pedido da `fixfy-22`: P35 feito, com push na `main` do `orca-dev` (`65a2506c3c2..b0a7ade5ba7`); a barra
-  da resposta tem o Fixar Capítulo, marcado por padrão, e a régua recua os desafixados e diz "Capítulo fixado" na
-  prévia. Executado 0,6 h.
-- 2026-10-26 — sessão do `orca-dev` em `feat/native-chat-auto-resume`, a pedido da sessão `orca-dev` da raiz e
-  retomada a pedido da `fixfy-22`: P41 feito, com push na `main` do `orca-dev` (`b0a7ade5ba7..a0110f3a431`); o aviso de
-  limite com `resetsAt` tem o "Retomar automaticamente", que agenda no host do main o mesmo Continuar para o reset + 1
-  min, com a linha "Retomada às HH:MM · Cancelar" e o disparo ao abrir (X4). Executado 1,1 h.
+  retomada a pedido da sessão 22 do workspace de origem: P36 feito, com push na `main` do `orca-dev`
+  (`5f7fdaf68bf..65a2506c3c2`); o seletor de conta troca a conta no mesmo chat, com o transcript levado à conta nova, o
+  `resume` nela e o divisor "Conta trocada - <conta>". Executado 1,2 h. O P40 pode abrir.
+- 2026-10-26 — sessão do `orca-dev` em `feat/native-chat-pin-chapter`, a pedido da sessão `orca-dev` da raiz e retomada
+  a pedido da sessão 22 do workspace de origem: P35 feito, com push na `main` do `orca-dev`
+  (`65a2506c3c2..b0a7ade5ba7`); a barra da resposta tem o Fixar Capítulo, marcado por padrão, e a régua recua os
+  desafixados e diz "Capítulo fixado" na prévia. Executado 0,6 h.
+- 2026-10-26 — sessão do `orca-dev` em `feat/native-chat-auto-resume`, a pedido da sessão `orca-dev` da raiz e retomada
+  a pedido da sessão 22 do workspace de origem: P41 feito, com push na `main` do `orca-dev`
+  (`b0a7ade5ba7..a0110f3a431`); o aviso de limite com `resetsAt` tem o "Retomar automaticamente", que agenda no host do
+  main o mesmo Continuar para o reset + 1 min, com a linha "Retomada às HH:MM · Cancelar" e o disparo ao abrir (X4).
+  Executado 1,1 h.
 - 2026-10-26 — sessão do `orca-dev` em `feat/native-chat-fork`, a pedido da sessão `orca-dev` da raiz e retomada a
-  pedido da `fixfy-22`: P33 feito, com push na `main` do `orca-dev` (`a0110f3a431..8eff03d0bb8`); o Bifurcar da
-  mensagem do agente corta a conversa nela pelo `forkSession` e abre a sessão nova numa aba de chat ao lado, sem mudar
-  a de origem (X5). Executado 0,9 h.
+  pedido da sessão 22 do workspace de origem: P33 feito, com push na `main` do `orca-dev` (`a0110f3a431..8eff03d0bb8`);
+  o Bifurcar da mensagem do agente corta a conversa nela pelo `forkSession` e abre a sessão nova numa aba de chat ao
+  lado, sem mudar a de origem (X5). Executado 0,9 h.
 - 2026-10-26 — sessão do `orca-dev` em `feat/native-chat-markdown-composer`, a pedido da sessão `orca-dev` da raiz e
-  retomada a pedido da `fixfy-22`: P38 feito, com push na `main` do `orca-dev` (`8eff03d0bb8..6285db81bbc`); o switch
-  "Modo de visualização Markdown", desligado por padrão, põe na caixa do chat as extensões do visualizador, com o texto
-  formatado e o envio em Markdown, pílulas incluídas (X6). Executado 1,0 h.
-- 2026-10-26 — sessão do `orca-dev` em `build/win-docker`, a pedido da `fixfy-22`: P27.1 feito num runner Windows do
-  GitHub (X7), com o `build-win-local.yml` em push na `main` do `orca-dev` (`6285db81bbc..68ffa0a223d`); o run
-  `40425512083` gerou o instalador `1.4.239-local.1793060470212.68ffa0a223d8`, 178 MiB, em 8 min 32 s, e ele está em
-  `~/Downloads/orca-dev-windows-1.4.239-local.1793060470212.68ffa0a223d8/`. O Docker não fecha o build (X7). Executado
-  0,7 h. Seguem o P27.2 e o P27.3, com Anderson, no Windows.
-  Worklog `work/worklogs/2026-10-26-instalador-windows-do-orca-dev-no-runner.md` do workspace da Fixfy.
-- 2026-10-26 — sessão do `orca-dev` em `build/mac-local-timestamp`, a pedido da `fixfy-orca`: P1.4 feito, com push na
-  `main` do `orca-dev` (`68ffa0a223d..b7c21f26f11`); o build local de Mac assina com `mac.timestamp: 'none'`, e o
-  release segue com o carimbo, depois da falha do build assinado do PLN-028/P5.1 no carimbo. Executado 0,3 h.
-- 2026-10-26 — sessão do `orca-dev` em `sync/v1.4.242`, a pedido da `fixfy-orca`: o merge da `v1.4.242` (PLN-025/P4,
-  `f57841688f5`, push `b7c21f26f11..c552e92da92`) muda três passos, pela rodada gravada em cada um:
+  retomada a pedido da sessão 22 do workspace de origem: P38 feito, com push na `main` do `orca-dev`
+  (`8eff03d0bb8..6285db81bbc`); o switch "Modo de visualização Markdown", desligado por padrão, põe na caixa do chat as
+  extensões do visualizador, com o texto formatado e o envio em Markdown, pílulas incluídas (X6). Executado 1,0 h.
+- 2026-10-26 — sessão do `orca-dev` em `build/win-docker`, a pedido da sessão 22 do workspace de origem: P27.1 feito
+  num runner Windows do GitHub (X7), com o `build-win-local.yml` em push na `main` do `orca-dev`
+  (`6285db81bbc..68ffa0a223d`); o run `40425512083` gerou o instalador `1.4.239-local.1793060470212.68ffa0a223d8`, 178
+  MiB, em 8 min 32 s, e ele está em `~/Downloads/orca-dev-windows-1.4.239-local.1793060470212.68ffa0a223d8/`. O Docker
+  não fecha o build (X7). Executado 0,7 h. Seguem o P27.2 e o P27.3, com Anderson, no Windows. O worklog do instalador
+  de Windows no runner está no workspace de origem.
+- 2026-10-26 — sessão do `orca-dev` em `build/mac-local-timestamp`, a pedido da sessão do fork de origem: P1.4 feito,
+  com push na `main` do `orca-dev` (`68ffa0a223d..b7c21f26f11`); o build local de Mac assina com `mac.timestamp:
+  'none'`, e o release segue com o carimbo, depois da falha do build assinado do fork de origem (P5.1 do plano dele) no
+  carimbo. Executado 0,3 h.
+- 2026-10-26 — sessão do `orca-dev` em `sync/v1.4.242`, a pedido da sessão do fork de origem: o merge da `v1.4.242` (P4
+  do plano de origem, `f57841688f5`, push `b7c21f26f11..c552e92da92`) muda três passos, pela rodada gravada em cada um:
   - P41: o "Retomar automaticamente" fica sozinho na linha do limite, porque a v1.4.242 tirou o Continue (#33392);
   - P40: o item 2 vira um botão próprio na linha;
   - P1: o helper Swift passa a ser o do upstream (`--build-system native`).
@@ -3723,12 +3732,12 @@ da linha quando o teste entra.
   O P33 e o P36 mudam de lugar, sem mudar de comportamento: o registro do `agentSession.forkThroughMessage` vai à lista
   do switch-account, e o preparo do perfil vai a `claude-profile-launch-readiness.ts`, pelo `max-lines`.
 
-- 2026-10-26 — sessão do `orca-dev` em `ci/build-mac-local`, a pedido da `fixfy-35`: o instalador de Mac num runner
-  do GitHub (X8), com o `build-mac-local.yml` em push na `main` do `orca-dev` (`c552e92da92..ee06556cb8f`); o run
-  `40432265386` gerou o DMG arm64 `1.4.242-local.1793064322587.ee06556cb8fe`, 239 MiB, assinado ad hoc, em 12 min 3 s.
-  O app baixado pede o "Abrir Mesmo Assim" ou o `xattr -dr com.apple.quarantine`. Executado 0,6 h. O release de Windows
-  e Mac segue com a `fixfy-35`.
-- 2026-10-26 — sessão `fixfy-35`, no checkout da raiz do workspace: o pre-release
+- 2026-10-26 — sessão do `orca-dev` em `ci/build-mac-local`, a pedido da sessão 35 do workspace de origem: o instalador
+  de Mac num runner do GitHub (X8), com o `build-mac-local.yml` em push na `main` do `orca-dev`
+  (`c552e92da92..ee06556cb8f`); o run `40432265386` gerou o DMG arm64 `1.4.242-local.1793064322587.ee06556cb8fe`, 239
+  MiB, assinado ad hoc, em 12 min 3 s. O app baixado pede o "Abrir Mesmo Assim" ou o `xattr -dr com.apple.quarantine`.
+  Executado 0,6 h. O release de Windows e Mac segue com a sessão 35 do workspace de origem.
+- 2026-10-26 — sessão 35, no checkout da raiz do workspace de origem: o pre-release
   [`v1.4.242-local.1793065827033.ee06556cb8fe`](https://github.com/brz-anderson/orca-dev/releases/tag/v1.4.242-local.1793065827033.ee06556cb8fe)
   do `orca-dev`, com a tag anotada em `ee06556cb8f`, como `brz-anderson`. Anderson pediu "assim que o sync da v1.4.242
   da orca-dev terminar, crie uma tag e um release para Windows no GitHub" e, na rodada, escolheu "A versão carimbada
@@ -3736,10 +3745,9 @@ da linha quando o teste entra.
   `orca-windows-setup.exe` vem do run `40434569141` (9 min 22 s, `1.4.242-local.1793065827033.ee06556cb8fe`, sha256
   `f377232f…`), e o `orca-macos-arm64.dmg`, do run `40432265386` do X8 (sha256 `ed412bcd…`). O digest dos dois no
   GitHub bate com o local. O P27.2 e o P27.3 podem instalar pelo release.
-- 2026-10-26 — worklog `work/worklogs/2026-10-26-p26-e-p34-do-pln-029-repassados.md` do workspace da Fixfy.
-- 2026-10-26 — worklog `work/worklogs/2026-10-26-primeiro-build-assinado-do-orca-fixfy.md` do workspace da Fixfy.
-- 2026-10-26 — worklog `work/worklogs/2026-10-26-rota-da-fixfy-no-orca-fica-no-fork.md` do workspace da Fixfy.
-- 2026-10-27 — plano movido do PLN-029 da Fixfy (rodada D), na montagem do brza-workspace:
+- 2026-10-26 — três worklogs no workspace de origem: o P26 e o P34 repassados, o primeiro build assinado do fork de
+  origem e a rota de lá no Orca, que fica no fork.
+- 2026-10-27 — plano movido do workspace de origem (rodada D), na montagem do brza-workspace:
   [O brza-workspace nasce com a norma, o PLN-001, a medição e as skills de notas e de plano](../../work/worklogs/2026-10-27-o-brza-workspace-nasce.md)
 - 2026-10-27 — [Os blocos de 120 colunas na largura "Total" e os links em azul claro no chat](../../work/worklogs/2026-10-27-chat-blocos-120-colunas-e-links.md):
   o P52 e o P53, com os commits `f130a85e578`, `9d289d2b631` e `52f7051a45d` do `brza-studio`.
@@ -3748,7 +3756,7 @@ da linha quando o teste entra.
   X9 e X10. Esperam a conferência com Anderson.
 - 2026-10-28 — [O pedido 30, a prévia de imagem no chat, desenhado](../../work/worklogs/2026-10-28-pedido-30-previa-de-imagem-desenhada.md):
   as R36, R39 e R42, o D42 ao D44 e o P54 ao P57, sem código; o corte aceito na R42.3.
-- 2026-10-28 — [O PLN-001 conferido contra a norma de planos da Fixfy e levado ao molde](../../work/worklogs/2026-10-28-pln-001-no-molde-da-fixfy.md):
+- 2026-10-28 — [O PLN-001 conferido contra a norma de planos do workspace de origem e levado ao molde](../../work/worklogs/2026-10-28-pln-001-no-molde-do-workspace-de-origem.md):
   o desenho, a Cobertura, a Restrições, a Regressão, os Casos manuais, as Decisões e o Fechamento no molde; os Passos e
   os Desvios esperam a Run, na issue das Pendências.
 - 2026-10-28 — [O P44 ao P48 e o P50 por workers do Orca em paralelo](../../work/worklogs/2026-10-28-p44-a-p48-e-p50-por-workers-do-orca.md):
@@ -3814,12 +3822,12 @@ da linha quando o teste entra.
 
 ## Decisões
 
-Notas de decisão do workspace da Fixfy, ao lado deste clone:
+Notas de decisão do workspace de origem, citadas pelo assunto:
 
-- O Orca da Fixfy substitui o original, sem atualizador, sincroniza por tag e guarda o código da Fixfy em pasta própria, no workspace da Fixfy: `work/decisions/orca-da-fixfy-substitui-o-original-e-sincroniza-por-tag.md`
-  — PLN-025/R10 da Fixfy, `done`.
-- O orca-dev commita com o noreply do brz-anderson, pela chave personal, com push direto na main, no workspace da Fixfy: `work/decisions/orca-dev-commita-como-brz-anderson-com-push-na-main.md`
-  — PLN-025/R14 da Fixfy, `done`.
+- O fork de origem substitui o Orca original, sem atualizador, sincroniza por tag e guarda o código de lá em pasta
+  própria — R10 do plano de origem, `done`.
+- O orca-dev commita com o noreply do brz-anderson, pela chave personal, com push direto na main — R14 do plano de
+  origem, `done`.
 
 ## Pendências conhecidas
 
@@ -3827,7 +3835,7 @@ Notas de decisão do workspace da Fixfy, ao lado deste clone:
   — achada pelo P74 em 2026-11-02; o import de chat do CLI cai no mesmo caminho silencioso do fork, e a saída é decisão de
   Anderson; `open`.
 - [Os Passos e os Desvios do PLN-001 no molde, depois da Run do P44 ao P50](../../work/issues/pln-001-passos-e-desvios-no-molde-depois-da-run.md)
-  — da rodada de 2026-10-28 na sessão `pln-001-norma-fixfy`; resolvida em 2026-10-28, `done`.
+  — da rodada de 2026-10-28 na sessão que levou o PLN-001 ao molde; resolvida em 2026-10-28, `done`.
 - [O check de import boundaries está vermelho na master pelo `external-subcommand.ts` do `brza X`](../../work/issues/import-boundaries-vermelho-pelo-external-subcommand.md)
   — achado pelos workers do P53.4 e do P40, em 2026-10-28; o conserto é do PLN-002.
 

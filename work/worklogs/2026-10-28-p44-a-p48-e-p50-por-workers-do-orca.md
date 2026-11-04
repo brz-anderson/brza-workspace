@@ -61,8 +61,8 @@ worker.
   segundo plano uma vez.
 - **O `filesModified` do `worker_done` pode trazer arquivos de outros commits** que entraram pelo rebase; o `git show
   --stat` de cada commit é a conferência.
-- **A sessão `pln-001-norma-fixfy` pediu pela Run a ordem das edições no plano**; a resposta ("depois-da-run") foi pela
-  Run e pelo correio, e ela levou o resto à issue dos Passos e Desvios.
+- **A sessão que levava o PLN-001 ao molde pediu pela Run a ordem das edições no plano**; a resposta ("depois-da-run")
+  foi pela Run e pelo correio, e ela levou o resto à issue dos Passos e Desvios.
 
 ## O que ficou aberto
 

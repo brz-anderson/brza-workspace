@@ -84,8 +84,8 @@ do `brza-studio`, sobre `fbff699fa58`.
 
 A pedido de Anderson ("abra as sessões que precisar, utilizando o orca cli"), esta sessão abriu duas sessões em
 terminais do BrzA Studio no `brza-workspace`, com `brza terminal create --command 'claude --name … '`. O comando é
-digitado no zsh de login, e a função `claude` do `~/.zshrc` passa o `--settings` do workspace, como o `orca-sessions`
-da Fixfy faz lá. O hook de medição registrou as duas.
+digitado no zsh de login, e a função `claude` do `~/.zshrc` passa o `--settings` do workspace, como o script de sessões
+do workspace de origem faz lá. O hook de medição registrou as duas.
 
 - **`pln-001-p44-p50`:** faz as rodadas das pendências do P44 ao P48 e do P50 e depois os executa com
   `/orchestration`.
@@ -94,8 +94,8 @@ da Fixfy faz lá. O hook de medição registrou as duas.
 ## As sessões em modo chat
 
 Anderson pediu que as sessões abrissem em modo chat e que esta sessão coordenasse com a `brza-workspace-80`, que
-adaptava os scripts da Fixfy para o brza. A coordenação foi por `/orchestration`, com mensagens diretas entre as duas
-sessões, sem Run.
+adaptava os scripts do workspace de origem para o brza. A coordenação foi por `/orchestration`, com mensagens diretas
+entre as duas sessões, sem Run.
 
 - **A divisão**, decidida por Anderson numa rodada da `brza-workspace-80`: o abridor de sessões fica com esta sessão.
   O `claude-brza`, o `brza-run`, o `brza-install` e o módulo comum `brza_runtime.py` ficam com a outra (`54aefe3`).

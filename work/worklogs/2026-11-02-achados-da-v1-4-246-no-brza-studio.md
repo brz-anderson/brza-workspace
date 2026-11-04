@@ -135,7 +135,7 @@ a sessão que o executa, num worktree do `brza-studio`:
   "Retomar automaticamente" agenda sozinho ao bater o limite. Sessão `pln-001-pedido-41`; o C32 espera o build.
 - **A limpeza de branches** (só local, a pedido): saíram os worktrees e as branches dos pedidos 37, 38, 39 (as quatro) e
   40, e as quatro pastas órfãs de `.worktrees/`. Ficam `master`, `sync/v1.4.246` e, no origin,
-  `rebrand/brza-studio` e `chore/sync-orca-fixfy-v1.4.239`.
+  `rebrand/brza-studio` e a branch de sync da v1.4.239 do fork de origem.
 - **O worker de plugin sem sandbox** fica na issue, com a decisão dos plugins, de Anderson.
 - **Os casos que só o build prova**, com Anderson, num build só a partir da `master` depois dos pushes: o C25 e o C26, e
   o C27 ao C30 do pedido 39 (o `brza foo` pelo app empacotado é o C30).
@@ -156,15 +156,15 @@ a sessão que o executa, num worktree do `brza-studio`:
   -readonly` em cópias no scratch, apagadas. **Risco:** nenhum; nenhum segredo foi lido, e um comando que imprimiria o
   `ORCA_PAIRING_CODE` foi barrado e não repetido.
 - **Vigia do limite de 5h, `/private/tmp/studio-246/limite-conta.py`, em segundo plano na sessão `studio-achados-246`**
-  (pedido de Anderson às 20h27: uso da `anderson@fixfy.com.br` em 95%, reset às 21h30). Lê o uso pelo RPC
-  `accounts.list` a cada 60 s e, ao bater 100%, troca a conta ativa global do Claude para a `admin@fixfy.com.br`
+  (pedido de Anderson às 20h27: uso da conta `anderson@` em 95%, reset às 21h30). Lê o uso pelo RPC
+  `accounts.list` a cada 60 s e, ao bater 100%, troca a conta ativa global do Claude para a conta `admin@`
   (`accounts.selectClaude`); às 21h31 (reset + 1 min) volta à conta de antes, o padrão do sistema, que é a
-  `anderson@fixfy.com.br`. Não move sessão em andamento nem mexe em chat fixado (P36). Para sem trocar se o reset chegar
+  conta `anderson@`. Não move sessão em andamento nem mexe em chat fixado (P36). Para sem trocar se o reset chegar
   antes do limite, ou se Anderson trocar a conta pela interface. **Risco:** durante a janela, o seletor global do app
   fica na `admin`. **Estado:** ativo até ~21h40. **Como desfazer:** `kill` do processo e, se preciso, escolher a conta
   no seletor do app; o log está em `/private/tmp/studio-246/limite-conta.log`.
 - **A troca da conta global às 21h02 e o processo da volta** (atualiza o item do vigia acima): o `limite-conta.py` trocou
-  para a `admin@fixfy.com.br` às 21h02, quando o uso da `anderson@` bateu 100%, e **morreu com a sessão** que o rodava. A
+  para a conta `admin@` às 21h02, quando o uso da `anderson@` bateu 100%, e **morreu com a sessão** que o rodava. A
   volta das 21h31 passou ao `/private/tmp/studio-246/voltar-conta.py`, desligado da sessão (duplo fork, pid 70493 às
   21h11), que seleciona o padrão do sistema (a `anderson@`) só se a conta ativa ainda for a `admin`. **Como desfazer:**
   `kill 70493` e escolher a conta no seletor do app; o log é `/private/tmp/studio-246/limite-conta.log`.

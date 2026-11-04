@@ -1,15 +1,13 @@
 # PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho
 
 O desenho do [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](PLN-001-plan.md). O
-que este desenho assume e o Terreno medido em 2026-10-24 estão no desenho do PLN-025 do workspace da Fixfy
-(`plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-design.md`); os itens D1 a D35 vieram de lá, pelo PLN-029 da Fixfy,
-com os IDs de antes (PLN-025/R28.2), e os D36 a D52 são daqui, de 2026-10-27 a 2026-10-31. Nos itens D1 a D35, o nome do
+que este desenho assume e o Terreno medido em 2026-10-24 estão no desenho do plano de origem, no workspace de
+origem; os itens D1 a D35 vieram de lá, pelo plano que se mudou para cá, com os IDs de antes (R28.2 de lá), e os D36 a D52 são daqui, de 2026-10-27 a 2026-10-31. Nos itens D1 a D35, o nome do
 repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do rebrand.
 
 ### O que este desenho assume
 
-- **D1 a D35:** o que assumem está no desenho do PLN-025 da Fixfy
-  (`~/Projects/fixfy/plans/PLN-025-orca-desktop-cli-app-e-web/PLN-025-design.md`), como a introdução diz.
+- **D1 a D35:** o que assumem está no desenho do plano de origem, no workspace de origem, como a introdução diz.
 - **R29.1:** o texto da pergunta no "Perguntou:" ganha a cor de destaque do tema (`primary`, a do ✓).
 - **R29.2:** git, gh (PR e issue), testes e pacotes e build ganham ícone e título próprios.
 - **R29.3:** Jira e Confluence, Skill, Figma e Firebase e Context7 ganham ícone e título próprios.
@@ -65,30 +63,31 @@ repositório nos caminhos é o de hoje, `brza-studio/…`, e não o de antes do 
 - **R52.1:** a linha do raciocínio fechada mostra "Pensou por 3s:" e o começo do texto.
 - **R52.2:** o texto do raciocínio fica no tom apagado.
 
-### D1 — O build local, assinado — `brza-studio/config/scripts/build-mac-local.mjs` (P1, PLN-028/P5)
+### D1 — O build local, assinado — `brza-studio/config/scripts/build-mac-local.mjs` (P1; P5 do plano do fork de origem)
 
 - **Origem:** R6.1, R7.2, R8
 - **Contexto:** o build da medição tinha três contornos e deixava o `.app` sem assinatura válida, e o pedido do Keychain
-  parou a medição (R6, R8 da Fixfy); pela R7.2, o que serve a projeto fora da Fixfy mora aqui (pedido 1).
+  parou a medição (R6, R8 de lá); pela R7.2, o que serve a projeto fora do workspace de origem mora aqui (pedido 1).
 
 #### Como fica
 
 `pnpm run build:mac` sai do clone limpo ao `.app` sem passo à mão: instala as dependências de `mobile/`, chama o `swift`
 com `--build-system native` e empacota só arm64. A identidade de assinatura vem de variável (`CSC_NAME`); sem ela, o
-build sai ad hoc com `codesign --force --deep -s -`, para servir a projetos fora da Fixfy. Com a `CSC_NAME` posta, o
-build sai assinado com a identidade dela, com o hardened runtime.
+build sai ad hoc com `codesign --force --deep -s -`, para servir a projetos fora do workspace de origem. Com a
+`CSC_NAME` posta, o build sai assinado com a identidade dela, com o hardened runtime.
 
 ### D2 — O atualizador desligado — `brza-studio/src/main/updater/` (P2)
 
 - **Origem:** R10.2
-- **Contexto:** o atualizador aponta para as releases do upstream, sem opção que o desligue (R6 da Fixfy); o build local
+- **Contexto:** o atualizador aponta para as releases do upstream, sem opção que o desligue (R6 de lá); o build local
   adotado de vez fica sem check antes do primeiro que traria o upstream de volta (R10.2).
 
 #### Como fica
 
 Um predicado único, `isUpdaterEnabled()`, falso no build local, no lugar das 6 guardas `!app.isPackaged`
 (`updater-setup.ts:139`, `updater-scheduling.ts:67`, `updater-menu-checks.ts:17`, `updater-build-selection.ts:92`,
-`updater-remote-status.ts:20`, `updater-nudge.ts:9`). A versão nova chega por sincronização e build (PLN-025/D4).
+`updater-remote-status.ts:20`, `updater-nudge.ts:9`). A versão nova chega por sincronização e build (D4 do plano de
+origem).
 
 ### D6 — O tema Islands Dark no Monaco e no Shiki — `brza-studio/src/renderer/src/lib/` (P6)
 
@@ -127,7 +126,7 @@ escolhido por arquivo continua guardado e vence o padrão. A aba de diff segue c
 `build:desktop` e o `ensure:electron-runtime` e chama o `electron-builder --win --x64` com a `ORCA_LOCAL_BUILD_VERSION`
 carimbada pelo mesmo `createLocalBuildVersion` do D1, o que desliga o atualizador (D2). O instalador sai sem assinatura,
 com o aviso do SmartScreen; os canais oficiais do upstream (`ORCA_WIN_*`) não mudam. No Windows se instala só o
-`brza-studio`, sem o código da Fixfy.
+`brza-studio`, sem o código do workspace de origem.
 
 ### D27 — A barra da mensagem do agente e o Bifurcar — `brza-studio/src/main/claude/` e `…/native-chat/` (P33, P34)
 

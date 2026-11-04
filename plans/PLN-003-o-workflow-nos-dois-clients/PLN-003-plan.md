@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: sim — P0 e P1 concluídos; próximo passo: P2
+ready: sim — P0, P1 e P2 concluídos; próximo passo: P3
 estimate_h: 37.5
-executed_h: 0.7
-remaining_h: 33.0
+executed_h: 1.9
+remaining_h: 28.0
 scope:
   - workspace
   - brza-studio
@@ -18,7 +18,7 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** P0 e P1 concluídos em 2026-11-03; os passos de MCP (P6–P9) passaram ao [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md); próximo passo: **P2** (a CLI `brza` unificada e o despacho nos dois clients).
+- **Retomar:** P0, P1 e P2 concluídos em 2026-11-03; os passos de MCP (P6–P9) passaram ao [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md); próximo passo: **P3** (o repositório público `brz-anderson/brza` e empacotamento `pipx` e `brew`).
 - **A fila do orquestrador (2026-11-03):** a R9, respondida na sessão `bb0fd632` do `workspace`, fez do coordenador o
   orquestrador e deu a ordem da fila e os três tetos de workers; o Desenho mudou nas premissas, no M8, no M17, na
   regra da fila e no M24 novo (o índice da `master` grava `priority`, `blocks` e `deadline`). Os itens `D` partem daí.
@@ -119,14 +119,14 @@ Estimado: 1.0 h · Executado: 0.3 h
 
 Executa D1 (B1, B2, B3, B5, M23) · executor: sessão do `tools-kit`
 
-Estimado: 5.0 h · Executado: — h
+Estimado: 5.0 h · Executado: 1.2 h
 
-- [ ] **1. Testes que falham:** detecção de client (`BRZA_CLIENT`, env herdado, processo vivo), despacho hierárquico `brza <sub>`, generalização de `tree`/`test` e flags de `app install`.
-- [ ] **2. Implementar:** binário unificador `brza` em Python stdlib, preservando `SHELL_SESSIONS_DISABLE=1` no `brza-run`.
-- [ ] **3. Rodar e ver passar:** testes de unidade em `test_brza_cli.py`, `test_brza_tree.py` e `test_brza_app.py`.
-- [ ] **4. Commit:** commit na branch `workstream/tools-kit`.
+- [x] **1. Testes que falham:** detecção de client (`BRZA_CLIENT`, env herdado, processo vivo), despacho hierárquico `brza <sub>`, generalização de `tree`/`test` e flags de `app install`.
+- [x] **2. Implementar:** binário unificador `brza` em Python stdlib, preservando `SHELL_SESSIONS_DISABLE=1` no `brza-run`.
+- [x] **3. Rodar e ver passar:** testes de unidade em `test_brza_cli.py` (9 testes), `test_brza_tree.py` (31 testes), `test_brza_test.py` (17 testes) e `test_brza_app.py` (18 testes) — 113 testes 100% OK.
+- [x] **4. Commit:** commit na branch `workstream/tools-kit` e `brza-workflow`.
 
-**Evidência:** —
+**Evidência:** commit `26b95fc` em `brza-workflow`, [O PLN-003 P2: a CLI brza unificada e o despacho nos dois clients](../../work/worklogs/2026-11-03-pln-003-p2-cli-unificada-e-despacho.md) e suíte com 113 testes em `scripts/brza/tests/`.
 
 ### P3 — O repositório público `brz-anderson/brza` e empacotamento (`pipx`, `brew`)
 
@@ -299,3 +299,5 @@ Estimado: 3.0 h · Executado: — h
   [O PLN-003: a medição das hipóteses da fase 0 (P0)](../../work/worklogs/2026-11-03-pln-003-medicao-das-hipoteses-p0.md)
 - 2026-11-03 — o P1 implementou e validou por TDD a extração de `priority`, `blocks` e `deadline` no `brza-note` para o índice da master.
   [O PLN-003 P1: o índice da master com priority, blocks e deadline](../../work/worklogs/2026-11-03-pln-003-p1-indice-master-ordering-properties.md)
+- 2026-11-03 — o P2 unificou a CLI `brza`, generalizou `tree` e `test`, adicionou install release no `app` e testou despacho nos dois clients.
+  [O PLN-003 P2: a CLI brza unificada e o despacho nos dois clients](../../work/worklogs/2026-11-03-pln-003-p2-cli-unificada-e-despacho.md)

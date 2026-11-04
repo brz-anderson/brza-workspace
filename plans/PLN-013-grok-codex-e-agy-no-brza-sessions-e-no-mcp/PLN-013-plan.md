@@ -5,8 +5,8 @@ origin: request
 description: O brza sessions abre o Grok com nome e espera, e o MCP despacha ao Grok, ao Codex e ao Antigravity com conta e cota por runtime
 ready: sim
 estimate_h: 16
-executed_h: 6.75
-remaining_h: 5.75
+executed_h: 7.25
+remaining_h: 5.25
 scope:
   - brza-workflow
 opened: 2026-11-03
@@ -18,7 +18,7 @@ tags:
 
 # PLN-013: O Grok, o Codex e o Antigravity abrem pelo `brza sessions` e recebem tarefas do MCP
 
-- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. A E1 está mesclada em `brza-workflow@975fe88`; a E2 está mesclada em `7c1684f`; próximo: a E3, a partir da sonda do P8.
+- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. A E1 está mesclada em `brza-workflow@975fe88`; a E2 está mesclada em `7c1684f`; o P8 (a sonda) fechou; o P9 roda.
 - **Dividido:** [PLN-013 — Entrevista](PLN-013-interview.md) · [PLN-013 — Desenho](PLN-013-design.md)
 
 ## Pedido
@@ -246,13 +246,25 @@ passou a ter cota lida, o que foi para a issue da R4.2.
 
 Executa D6 · executor: a sessão do `tools-kit`, com Anderson conferindo na tela o que cada chat mostra
 
-Estimado: 0.5 h · Executado: — h
+Estimado: 0.5 h · Executado: 0.5 h
 
-- [ ] **1. A sonda da D6** nos três runtimes, com o `brza sessions` da `master`.
-- [ ] **2. Gravar no plano** o resultado por runtime, com o `providerSession.id` e o id do runtime lado a lado.
-- [ ] **3. A issue** de cada runtime com sonda negativa (R4.4/P6).
+- [x] **1. A sonda da D6** nos três runtimes, com o `brza sessions` da `master`.
+- [x] **2. Gravar no plano** o resultado por runtime, com o `providerSession.id` e o id do runtime lado a lado.
+- [x] **3. A issue** de cada runtime com sonda negativa (R4.4/P6).
 
-**Evidência:** —
+**Evidência:** 2026-11-04, com o `brza sessions` da `master` (`7c1684f`): `brza sessions pln-013-sonda8-<rt> --agent
+<rt> --prompt "diga oi"` e `send … "/rename pln-013-sonda8-<rt>-nome"`, lidos pelo `agentSession.history` (X2).
+
+| Runtime | O `/rename` | O nome em disco | `providerSession.id` |
+| :-- | :-- | :-- | :-- |
+| Grok | ao modelo, como texto | `generated_title` = auto-título, sem `title_is_manual` | `01a1a534-c741…` = a pasta do `summary.json` |
+| Codex | ao modelo, como texto | o `thread_name` do `session_index.jsonl` é o título da aba ("PLN-013 P8: sonda codex") | `01a1a534-c909…` = o rollout |
+| Antigravity | ao modelo, que rodou `sqlite3` sozinho | o `.meta` sem título; `mode_id: "yolo"` | `86b3cf9a…` = a conversa |
+
+O `providerSession.id` é o id do runtime nos três, e vem no topo do `agentSession.history`, não na `page`. Issues:
+[O `/rename` pelo chat não chega ao Grok](../../work/issues/o-rename-pelo-chat-nao-chega-ao-grok.md) e
+[O `/rename` pelo chat não chega ao Antigravity](../../work/issues/o-rename-pelo-chat-nao-chega-ao-antigravity.md). O Codex
+segue o X3.
 
 ### P9 — E3: o `--wait` nos quatro e o `provider_session`
 
@@ -318,6 +330,9 @@ Estimado: 1 h · Executado: — h
   no caminho vai a issue e ao worklog, e o plano segue; só pula o passo que pede Anderson. Afeta P2 a P11. O `agy`
   roda com `--mode accept-edits`, sem comandos: o classificador da sessão barrou o `--dangerously-skip-permissions`, e
   a sessão roda o gate e commita.
+- **X3 — O nome do Codex vem do título da aba, e não do `/rename`.** A sonda do P8 mostrou que o `agentSession.rename`
+  grava o `thread_name` do Codex. No P10, o `--rename` do Codex dá o título com o nome e espera o `thread_name` igual,
+  sem mandar o slash. O Grok e o Antigravity seguem o P6 da R4.4. Afeta P10 e D7.
 - **X2 — A conferência na tela vira leitura do histórico.** Onde o passo pede Anderson conferindo a aba ou a mensagem
   (P3, P8, P11), a sessão lê o `agentSession.history` do chat. Afeta P3, P8 e P11.
 
@@ -338,3 +353,5 @@ Estimado: 1 h · Executado: — h
 - [O app não lê a cota do Grok](../../work/issues/o-app-nao-le-a-cota-do-grok.md) — da R4.2; o Grok fica em
   `quota_unknown` até o app ler a cota.
 - [O `status` do MCP não diz o runtime do pedido](../../work/issues/o-status-do-mcp-nao-diz-o-runtime-do-pedido.md) — do P4.
+- [O `/rename` pelo chat não chega ao Grok](../../work/issues/o-rename-pelo-chat-nao-chega-ao-grok.md) — do P8.
+- [O `/rename` pelo chat não chega ao Antigravity](../../work/issues/o-rename-pelo-chat-nao-chega-ao-antigravity.md) — do P8, com o `yolo`.

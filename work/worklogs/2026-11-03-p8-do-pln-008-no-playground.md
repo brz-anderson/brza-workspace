@@ -19,7 +19,7 @@ MIG-001 com o extrator novo do `refs`. Rodou na sessão `d11-playground`.
 ## O que foi feito
 
 1. **Worktree limpo:** `git status --short` vazio, com a branch em `1ab5cb2`.
-2. **Nada a neutralizar:** `git grep -il fixfy -- . ':!.brza/index.jsonl'` não achou arquivo. Nenhuma nota deste
+2. **Nada a neutralizar:** o `git grep -il` pelo nome do workspace de origem, fora do `.brza/index.jsonl`, não achou arquivo. Nenhuma nota deste
    workstream cita o workspace de origem nem tem o nome dele no caminho; nenhum arquivo do mapa de nomes é deste
    workstream, e nenhuma nota daqui aponta para os de outros workstreams.
 3. **Worklog da MIG-001 recomitado** pelo `brza note commit`, em `e271921`: o `refs` de

@@ -6,8 +6,8 @@ origin_ref: brza-chat-list-read-send-no-studio
 description: O brza-studio ganha brza chat list/read/send com cursor, fila e recibos, a navegação de chats pela CLI, pela barra lateral e pela Jump Palette, o Native Chat na API de plugins e o account usage, em fases por prioridade.
 ready: sim
 estimate_h: 31
-executed_h: 0.9
-remaining_h: 25.0
+executed_h: 1.6
+remaining_h: 21.0
 priority: high
 scope:
   - brza-studio
@@ -20,12 +20,9 @@ tags:
 
 # PLN-011: Os chats do BrzA Studio se coordenam pela CLI, aparecem na navegação e chegam aos plugins
 
-- **Retomar:** em 2026-11-04, o P4 tem os commits `brza-studio@55225f8cb878` e `brza-studio@ed5bf0283e1` no
-  worktree `pln-011-chat-cli`, branch `feat/pln-011-chat-cli`. O complemento cobre os casos obrigatórios e corrige
-  `held_by` na pausa; passaram 60 testes do alvo, 62 de regressão e os 22 gates. A revisão independente foi enviada
-  ao Grok por `msg_3c493c16db32`; A1/A2 foram corrigidos em `a243520d41f` e confirmados pelo revisor. A R20 fechou
-  a lacuna de transporte nas releituras; o worker `ctx_c72808414a56` implementa o complemento D4/D6 (X5).
-  Próximo ato: receber o complemento, revisá-lo com Grok, reservar o parecer, fechar P4 e seguir P5. P3 está fechado com REV-009.
+- **Retomar:** o P4 está fechado em `brza-studio@0de38e7d082`, com REV-011 aprovada pelo Grok, A1/A2 corrigidos
+  em `a243520d41f` e R20 implementada e revisada (X5). Próximo passo: P5, `chat send --operation`, no worktree
+  `pln-011-chat-cli`, branch `feat/pln-011-chat-cli`, a partir de `0de38e7d0828d5ff77b688d1f3d20373d160522f`.
 - **Dividido:** [PLN-011 — Entrevista](PLN-011-interview.md) · [PLN-011 — Desenho](PLN-011-design.md)
 
 ## Pedido
@@ -218,9 +215,9 @@ commit estão resolvidos no segundo.
 
 Executa D4, D6 · executor: worker `implementer` em Codex (R18.1), no worktree do `brza-studio`
 
-Estimado: 4 h · Executado: — h, com a revisão
+Estimado: 4 h · Executado: 0,7 h, com a revisão
 
-- [ ] **1. Testes que falham** — `src/cli/brza/chat-send-outcome.test.ts`, uma linha da tabela do D4 por caso; e em
+- [x] **1. Testes que falham** — `src/cli/brza/chat-send-outcome.test.ts`, uma linha da tabela do D4 por caso; e em
       `src/cli/handlers/chat.test.ts`:
       - `queued` com página seguinte de `actionablePromptIds: ['p1']` → `held_by: 'question'`, `queuePosition`,
         `nextQueuedMessageId`, saída 0;
@@ -235,17 +232,19 @@ Estimado: 4 h · Executado: — h, com a revisão
         `operation` no resultado;
       - a origem: com `ORCA_AGENT_SESSION_ID` no ambiente, a chamada do `send` sai pelo `client.call` sem mudar os
         parâmetros (a evidência é do D2, conferida no P2); o `envelope.expectedRuntimeFence` é o `fence` do `tail`.
-- [ ] **2. Implementar** — `src/cli/brza/chat-send-outcome.ts`, `src/cli/brza/chat-queue-hold.ts`, o `history tail`
+- [x] **2. Implementar** — `src/cli/brza/chat-send-outcome.ts`, `src/cli/brza/chat-queue-hold.ts`, o `history tail`
       depois de `queued`, o `process.exitCode` depois do `printResult`, o spec e as linhas do guia (D6).
-- [ ] **3. Rodar e ver passar** —
+- [x] **3. Rodar e ver passar** —
       `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-send-outcome.test.ts src/cli/brza/chat-queue-hold.test.ts --maxWorkers=2`;
       `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
-- [ ] **4. Commit** — `feat(cli): chat send diz o estado da entrega, o motivo da fila e sai pelo código do estado`.
-- [ ] **5. Revisão independente** — a sessão Grok, `reviewer` (R19.2), com `ref: PLN-011/P4`, revisa o commit
+- [x] **4. Commit** — `feat(cli): chat send diz o estado da entrega, o motivo da fila e sai pelo código do estado`.
+- [x] **5. Revisão independente** — a sessão Grok, `reviewer` (R19.2), com `ref: PLN-011/P4`, revisa o commit
       contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
       antes do passo seguinte.
 
-**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
+**Evidência:** `brza-studio@55225f8cb878`, `ed5bf0283e1`, `a243520d41f` e `0de38e7d082` · 79 testes do alvo,
+62 de regressão terminal; guias, tc:cli, lint e hooks aprovados; `pnpm check:changed --base=origin/master
+--maxWorkers=2 --force` → 22/22 · REV-011 aprovada. Inclui os dois achados corrigidos e o complemento R20 (X5).
 
 #### P5 — `chat send --operation`
 
@@ -505,6 +504,9 @@ Estimado: 1 h · Executado: — h
 - 2026-11-04 — P4 com cobertura complementar em `ed5bf0283e1`, corrigindo a pausa da fila; revisão pedida ao Grok.
   [PLN-011: cobertura e revisão do P4](../../work/worklogs/2026-11-04-pln-011-execucao.md)
 
+- 2026-11-04 — P4 fechado em `0de38e7d082` com REV-011, incluindo R20; próximo P5.
+  [PLN-011: cobertura e revisão do P4](../../work/worklogs/2026-11-04-pln-011-execucao.md)
+
 ## Revisões
 
 - [REV-007: o P1 do PLN-011, o porte do `#33115`](../../work/reviews/REV-007-pln-011-p1-porte-33115.md) — aprova; A1
@@ -513,6 +515,9 @@ Estimado: 1 h · Executado: — h
   — aprova; A1 (a cobertura do WSL e do pareado) corrigido em `brza-studio@594c4a7e13c`; A2 vai à issue, pela R17.1.
 - [REV-009: P3 do PLN-011, `chat read` com cursor, ids e reset](../../work/reviews/REV-009-pln-011-p3-chat-read-cursor.md)
   — aprova; A1–A3 da revisão inicial corrigidos em `brza-studio@a7099022850`.
+
+- [REV-011: P4 do PLN-011, estados e fila do `chat send`](../../work/reviews/REV-011-pln-011-p4-chat-send.md)
+  — aprova; A1/A2 corrigidos em `a243520d41f`, lacuna de transporte resolvida na R20 e em `0de38e7d082`.
 
 ## Pendências conhecidas
 

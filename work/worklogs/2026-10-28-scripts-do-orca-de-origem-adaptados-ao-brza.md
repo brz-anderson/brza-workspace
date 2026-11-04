@@ -4,7 +4,7 @@ scope:
   - brza-studio
 refs:
   - PLN-001
-  - issue:scripts-do-workspace-de-origem-fora-do-port-para-o-brza
+  - issue:scripts-da-fixfy-fora-do-port-para-o-brza
 ---
 
 # Os scripts do Orca do workspace de origem adaptados ao BrzA Studio

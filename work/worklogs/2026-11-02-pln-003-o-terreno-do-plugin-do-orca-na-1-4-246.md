@@ -4,7 +4,7 @@ scope:
   - brza-studio
 refs:
   - PLN-003
-  - issue:skills-de-documento-do-workspace-de-origem-num-plugin
+  - issue:skills-de-documento-da-fixfy-num-plugin
 ---
 
 # O PLN-003: o Terreno do plugin do Orca na 1.4.246

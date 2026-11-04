@@ -42,7 +42,7 @@ e seguir para a entrevista. Nenhum código.
   [O `brza quota` lê o uso por conta pelo `account usage` do app](../issues/o-brza-quota-le-o-account-usage-do-app.md).
 
 - **A Rodada 2**, respondida nesta sessão: o código de saída por estado (0, 1, 75), o retry por `--operation`, o
-  cursor inválido com código 65, e os requisitos do contrato por correio à sessão `studio-chats-cli`. Os Pré-requisitos
+  cursor inválido com código 65, e os requisitos do contrato por correio à sessão "Plano: chats pela CLI e plugins (studio)". Os Pré-requisitos
   do plano listam o que se pede ao `PLN-011`.
 
 ## O que ficou aberto

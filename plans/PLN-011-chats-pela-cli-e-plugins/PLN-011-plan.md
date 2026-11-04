@@ -93,6 +93,8 @@ e a numeração das outras fica.
   de troca de conta ou de outro papel para e vai a Anderson.
 - **Do P3 em diante, os workers saem do `brza-mcp`** (R18.1): ele só aceita o runtime `claude`, e a cota da Claude
   segurava o P3. O `brza-mcp` fica de pé, sem pedidos deste plano.
+- **O `reviewer` em Antigravity roda com `--model gemini-3.8-flash-high`.** Anderson, em 2026-11-03: "revisão no `agy`
+  terá que ser com o `Gemini Flash 3.8 High` a cota do `Argon 4` acabou".
 - **O `brza-mcp` roda o código da `feat/pln-009-mcp`, sem merge** (R7.1): defeito do orquestrador vai ao PLN-009, numa
   issue do `tools-kit`, e não se corrige daqui.
 

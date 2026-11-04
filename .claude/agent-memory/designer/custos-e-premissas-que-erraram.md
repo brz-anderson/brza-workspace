@@ -1,6 +1,6 @@
 ---
 name: custos-e-premissas-que-erraram
-description: Premissas e custos de rodada que a medição desmentiu no PLN-012 — ps -S no macOS e a linha do worklog sem o turno do commit
+description: Premissas de rodada que a medição desmentiu no PLN-012 (ps -S, turno do commit) e no PLN-013 (catálogo de modelos do app, cota do Grok)
 metadata:
   type: project
 ---
@@ -13,6 +13,14 @@ Duas premissas que foram à rodada do PLN-012 (R1.2, R1.4) com preço apresentad
   `getrusage(RUSAGE_CHILDREN)`, com `ru_maxrss` em bytes.
 - **"A linha não traz o turno do próprio commit" parecia barato e não é**: a mediana da tarefa tem ~77% do custo e ~88%
   da duração no turno que commita, e ~44% das tarefas são de um turno só, porque a rodada segura o turno aberto.
+
+No PLN-013 (mesmo dia), duas premissas do Terreno e das rodadas caíram quando conferidas no Desenho:
+
+- **O catálogo de modelos do app fica atrás do runtime.** O seed do Codex no `brza-studio` lista `gpt-5.6-*`; o
+  `~/.codex/models_cache.json` e o `~/.codex/config.toml` de Anderson já estão em `gpt-6.1-sol`. Para valores de
+  modelo, a fonte é a lista do próprio runtime: `~/.codex/models_cache.json`, `grok models`, `agy models`.
+- **Login não dá cota.** A R1.2 e a R2.1 contavam com a cota do Grok "depois do `grok login`"; com o login feito, o
+  `rateLimits.grok` sai `status: unavailable`, sem janela, e o Grok fica em `quota_unknown`.
 
 **Why:** as duas entraram na rodada como fato do Terreno, sem teste; o custo de "deixar de fora" foi dito sem medir.
 

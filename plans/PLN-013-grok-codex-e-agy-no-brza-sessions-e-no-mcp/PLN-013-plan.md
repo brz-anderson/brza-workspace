@@ -3,7 +3,10 @@ status: open
 phase: design
 origin: request
 description: O brza sessions abre o Grok com nome e espera, e o MCP despacha ao Grok, ao Codex e ao Antigravity com conta e cota por runtime
-ready: "não — faltam os itens D das três entregas; isso trava os Passos"
+ready: "não — falta o aceite do corte em passos (R5)"
+estimate_h: 16
+executed_h: 0
+remaining_h: 16
 scope:
   - brza-workflow
 opened: 2026-11-03
@@ -15,8 +18,9 @@ tags:
 
 # PLN-013: O Grok, o Codex e o Antigravity abrem pelo `brza sessions` e recebem tarefas do MCP
 
-- **Retomar:** R1 a R3 respondidas e o Terreno gravado em 2026-11-03. Próximo: os itens `D` das três entregas da R2.3,
-  por um `designer`, com os valores da tabela de modelo por runtime da R3.1 como ponto de rodada.
+- **Retomar:** a entrevista (R1 a R4), o Desenho e os Passos estão gravados (2026-11-03). Próximo: a R5, o aceite do
+  corte em passos; depois, o P1 (a sonda do `worker-start`), só a pedido de Anderson.
+- **Dividido:** [PLN-013 — Entrevista](PLN-013-interview.md) · [PLN-013 — Desenho](PLN-013-design.md)
 
 ## Pedido
 
@@ -39,20 +43,19 @@ Os itens do pedido, numerados para a Cobertura, com o corte da R1.2, da R1.3 e d
 
 ### Cobertura
 
-Rascunho da abertura: o critério de cada linha é proposta até a rodada que o confirma.
-
 | Origem     | Critério de aceite | Passo | Teste (nível) |
 | :--------- | :----------------- | :---- | :------------ |
-| `Pedido 1` | `brza sessions <nome> --agent grok --title … --prompt …` abre o chat do Grok no app, grava o `open` no mapa, e `send <nome>` chega a ele | — | `test_brza_sessions` (unidade); abertura no app (manual) |
-| `Pedido 2` | com `--agent grok`, `codex` ou `agy`, o `--rename` dá o nome à sessão do runtime, e o `--wait` só anuncia com ela no ar; agente fora dos quatro segue recusado | — | `test_brza_sessions` (unidade); uma abertura de cada no app (manual) |
-| `Pedido 3` | o `dispatch` aceita `runtime` `grok`, `codex` e `antigravity`, e o worker abre pelo `worker-start --agent` do runtime | — | `tests/mcp/test_mcp_dispatch.py`, `test_mcp_cycle.py` (unidade); um worker de cada (manual) |
-| `Pedido 4` | o worker de cada runtime espera quando a janela do `rateLimits.<runtime>` do app passa do teto, e o `status` diz qual | — | `tests/mcp/test_mcp_limits.py`, `test_mcp_accounts.py` (unidade) |
-| `R2.1`     | o worker Codex pode sair numa conta inativa (`inactiveCodexAccounts`) quando a ativa está no teto; o Grok e o Antigravity ficam na conta única | — | `tests/mcp/test_mcp_accounts.py` (unidade) |
-| `R2.3`     | cada uma das três entregas sai num commit e serve sozinha: E1 abrir e despachar, E2 a cota e a conta, E3 o `--rename` e o `--wait` | — | o gate de cada entrega |
-| `R3.1`     | o papel do pedido escolhe o modelo e o esforço pela tabela do runtime no `brza.toml`; um worker Codex ou Grok nunca sai com `--model sonnet` | — | `tests/mcp/test_mcp_policy.py` (unidade) |
-| `R3.3`     | com a cota do Codex no teto, o worker espera e o `dispatch` devolve a proposta de troca pelo gate; o `accounts.selectCodex` só roda com a aprovação | — | `tests/mcp/test_mcp_gates.py`, `test_mcp_accounts.py` (unidade) |
-| `R3.4`     | a sonda diz, para cada runtime, se o `/rename` mandado pelo chat do app chega ao runtime e onde o nome fica em disco | — | a sonda, gravada no plano (manual) |
-| `Pedido 5` | a issue irmã existe, no formato da do Codex e do Antigravity | — | o checador de notas |
+| `Pedido 1` | `brza sessions <nome> --agent grok --title … --prompt …` abre o chat do Grok no app, grava o `open` no mapa, e `send <nome>` chega a ele | P3 | `test_brza_sessions` (unidade); abertura no app (manual) |
+| `Pedido 2` | com `--agent grok`, `codex` ou `agy`, o `--wait` só anuncia com o `providerSession.id` no ar; o `--rename` dá o nome à sessão do runtime onde a sonda viu o `/rename` chegar, e só a aba e o mapa, com uma linha `CHECK`, onde não viu (R4.4/P6); agente fora dos quatro é recusado antes de abrir | P3, P8, P9, P10 | `test_brza_sessions` (unidade); a sonda e uma abertura de cada no app (manual) |
+| `Pedido 3` | o `dispatch` aceita `runtime` `grok`, `codex`, `antigravity` e `agy`, este normalizado para `antigravity` antes da fila, e o worker abre pelo `worker-start --agent` do runtime | P1, P2 | `test_mcp_dispatch.py`, `test_mcp_cycle.py` (unidade); um worker de cada (manual, P1) |
+| `Pedido 4` | o worker de cada runtime espera quando uma janela de topo do `rateLimits.<runtime>` passa do teto, e o `status` diz qual; o Grok, sem janela, fica em `quota_unknown` dentro do teto de sessões, e o `status` cita o `error` do `rateLimits.grok` (R4.2) | P5 | `test_mcp_limits.py`, `test_mcp_accounts.py`, `test_brza_quota.py` (unidade) |
+| `R2.1`     | o worker Codex pode sair numa conta inativa (`inactiveCodexAccounts`) quando a ativa está no teto; o Grok e o Antigravity ficam na conta única `systemDefault` | P5, P6 | `test_mcp_accounts.py`, `test_mcp_gates.py` (unidade) |
+| `R2.3`     | cada uma das três entregas sai num commit, mesclado na `master` do `brza-workflow`, e serve sozinha: E1 abrir e despachar, E2 a cota e a conta, E3 o `--rename` e o `--wait` | P4, P7, P11 | o gate de cada entrega e as duas revisões |
+| `R3.1`, `R4.1` | o papel do pedido escolhe o modelo e o esforço pela linha do runtime no `brza.toml`, com a tabela da R4.1; um worker fora do Claude nunca sai com modelo do Claude nem chama o desempatador Haiku | P2 | `test_mcp_policy.py`, `test_mcp_cycle.py` (unidade); o P1 confere os quatro pares no `worker-start` real |
+| `R3.3`, `R4.4` | com a cota do Codex no teto e uma conta inativa abaixo dele, o `dispatch` devolve a proposta de troca pelo gate; o `accounts.selectCodex` só roda na aprovação; o pedido que já espera não abre gate, e o `held_reason` diz que a troca só se propõe num `dispatch` novo | P6 | `test_mcp_gates.py`, `test_mcp_accounts.py` (unidade) |
+| `R3.4`     | a sonda diz, para cada runtime, se o `/rename` mandado pelo chat do app roda como comando, onde o nome fica em disco, e o `providerSession.id` ao lado do id do runtime | P8 | a sonda, gravada no plano (manual) |
+| `R4.2`     | a issue "o app não lê a cota do Grok" existe | P5 | o checador de notas |
+| `Pedido 5` | a issue irmã existe, no formato da do Codex e do Antigravity | — (já aberta na abertura) | o checador de notas |
 
 ### Fora de escopo
 
@@ -77,242 +80,215 @@ Rascunho da abertura: o critério de cada linha é proposta até a rodada que o 
   Grok — run grok login". Sem ele, nenhuma abertura real nem cota do Grok. Quem faz é Anderson, com `grok login`.
 - **O MCP do PLN-009 na `master` do `brza-workflow`**, mesclado em `23d812d`.
 
-## Entrevista
 
-### Rodada 1 — o destino, o corte, os outros runtimes e a medição (enviada 2026-11-03)
+## Passos
 
-> **Apresentado antes:** o PLN-003/P12 é o roteador multiruntime do `brza sessions` (`--agent claude|codex|agy`) e não
-> começou (`PLN-003-plan.md:217-228`); o PLN-009, em `review` e já mesclado, deixou "Outros runtimes (Codex, `agy`), o
-> M4" fora de escopo, apontando para o P12. O `brza sessions` passa o `--agent` ao app sem lista e recusa o `--rename` e o
-> `--wait` fora do Claude (`brza-workflow/packages/client/bin/brza-sessions:363-367`). O MCP fixa o Claude em
-> `tools.py:25`, `accounts.py:24`, `cycle.py:22` e `limits.py:225`. O app conhece o Grok: o `worker-start` aceita o
-> `--model` dele (`orca orchestration worker-start --help`), e ele tem contas (`GrokAccountsSection.tsx`) e cota
-> (`src/main/rate-limits/grok-fetcher.ts`). A CLI do Grok tem `-p`, `--output-format`, `-s` e `-r` (`grok help`). O
-> `grok login` não foi feito.
+Os passos executam a pedido de Anderson. O código vai ao `brza-workflow`, pelo `implementer`, conduzido pela sessão do
+> `tools-kit`, numa branch por entrega, cada uma num worktree em `~/Projects/brza-workflow/.worktrees/`, nascida da
+> `master` depois do merge da entrega anterior. A revisão de cada entrega vai pelo `reviewer` e por uma sessão Grok como
+> segunda revisora, aberta pelo `brza sessions <nome> --agent grok --prompt-file <pedido>`. O merge na `master` do
+> `brza-workflow` é com a confirmação de Anderson.
+>
+> **O gate de cada passo**, no worktree da entrega:
+>
+> ```bash
+> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/mcp
+> ```
+>
+> ```bash
+> env -u BRZA_WORKSPACE -u CLAUDE_PROJECT_DIR PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.cli.test_brza_sessions
+> ```
+>
+> e, no passo de revisão, a suíte do `cli` inteira num ambiente limpo, como no PLN-009:
+> `env -i HOME="$HOME" PATH="<dir do python3 3.10+>:/usr/bin:/bin" python3 -m unittest discover -s tests/cli`.
+> A base, em 2026-11-03 no `ebb4e7d`: `tests/mcp` → 358 OK; `test_brza_sessions` → 39 OK.
 
-Respondida em 2026-11-03, nesta sessão.
+### P1 — E1: a sonda do `worker-start` nos três runtimes
 
-1. **Onde mora o trabalho.** Opções:
-   - um PLN novo, `high`, que absorve o PLN-003/P12 e o M4 do PLN-009, com o P12 virando `[-]` (recomendada) — custo:
-     ~15 min; se paga: agora, porque o urgente não espera o P4 do PLN-003, e o PLN-009 fecha sem reabrir;
-   - um passo no PLN-003/P12 — custo: ~5 min, com o urgente furando a ordem de um plano de 24 h restantes; se paga: só
-     se o Grok for pequeno;
-   - reabrir o PLN-009 — custo: adia o fechamento dele; se paga: nunca, além do que o PLN novo dá;
-   - uma issue — custo: ~10 min, sem rodada para as lacunas; se paga: agora, se o corte for só o `brza sessions`.
+Executa D1, D2 · executor: a sessão do `tools-kit`, pelo `orca orchestration` do Studio
 
-   **Decidido — "PLN novo (Recomendado)".** O pedido de marcar o P12 vai ao `Retomar` do PLN-003.
+Estimado: 0.75 h · Executado: — h
 
-2. **O que entra no corte urgente**, com seleção múltipla. Opções:
-   - o `brza sessions` abre o Grok (recomendada) — custo: ~0,5 h, depois do `grok login`; se paga: na primeira sessão
-     Grok aberta pelo `brza sessions`;
-   - o MCP despacha ao Grok, na conta padrão e sem cota, como a PLN-009/R2.5 (recomendada) — custo: ~2,5 h; se paga: na
-     primeira tarefa que a fila manda ao Grok;
-   - a conta e a cota do Grok no MCP, pelo `GROK_HOME` e pela cota do app — custo: ~4 h; se paga: quando houver mais de
-     uma conta Grok ou ele bater limite;
-   - o `--rename` e o `--wait` no Grok — custo: ~2 a 3 h, com levantamento antes; se paga: quando a sessão Grok precisar
-     ser achada pelo nome fora do mapa.
+- [ ] **1. Um worker real de cada runtime**, com o par da R4.1 que mais arrisca: `--agent codex --model gpt-6.1-sol
+  --effort low` (modelo fora do catálogo semeado do app), `--agent codex --model gpt-6-astra --effort high`, `--agent
+  grok --model grok-4.7 --effort xhigh`, `--agent antigravity --model gemini-4-argon-high` sem `--effort`.
+- [ ] **2. Anotar no plano**, por worker: abriu em chat ou em terminal; o `--model` e o `--effort` foram aceitos ou
+  recusados, com o código do erro.
+- [ ] **3. Aplicar o resultado:** com o `xhigh` recusado, a linha `architect.grok` cai para `high` (R4.1); outra
+  recusa vira ponto de rodada antes do P2.
 
-   **Decidido — as quatro:** "Sessions abre o grok (Recomendado), MCP despacha ao grok (Recomendado), Conta e cota do
-   grok no MCP, --rename e --wait no grok". Somadas, ~9,5 h.
+**Evidência:** —
 
-3. **O Codex e o Antigravity no MCP.** Opções:
-   - uma tabela de runtimes com o Claude e o Grok, e os outros depois, com uma linha e um teste (recomendada) — custo:
-     +~0,5 h; se paga: no segundo runtime além do Grok;
-   - os três juntos, com teste e abertura real de cada um — custo: +~2 h; se paga: já, se houver despacho ao Codex ou ao
-     `agy` pelo MCP nesta semana;
-   - só o Grok, numa tupla fixa — custo: ~0 agora e uma refatoração no próximo runtime; se paga: nunca, se outro runtime
-     vier.
+### P2 — E1: os runtimes no `dispatch` e a política por runtime
 
-   **Decidido — "Os três juntos".** Se isso vale também para a conta, a cota, o `--rename` e o `--wait`, vai à R2.
+Executa D1, D2 · executor: `implementer`, pela sessão do `tools-kit`, em `~/Projects/brza-workflow/.worktrees/pln-013-e1`,
+branch `feat/pln-013-e1-abrir-e-despachar`
 
-4. **A lacuna de medição do Grok.** Opções:
-   - uma issue irmã, no formato da do Codex e do Antigravity (recomendada) — custo: ~10 min; se paga: agora, porque a
-     issue antiga não muda de nome e o `move_note` não reescreve link no PLN-012;
-   - na issue existente, renomeada pelo `move_note` — custo: ~10 min, com o link reescrito dentro do PLN-012, que outra
-     sessão edita; se paga: quando as três lacunas forem resolvidas juntas.
+Estimado: 4.5 h · Executado: — h
 
-   **Decidido — "Issue irmã (Recomendado)".**
+- [ ] **1. Testes que falham:** os da D1 (`test_mcp_dispatch.py`, `test_mcp_limits.py`, `test_mcp_cycle.py`) e os da
+  D2 (`test_mcp_policy.py`, `test_mcp_cycle.py`), com a migração da chave plana nos testes existentes.
+- [ ] **2. Implementar** `runtimes.py`, as mudanças em `tools.py`, `cycle.py`, `limits.py`, `accounts.active_id` e
+  `policy.py`.
+- [ ] **3. Rodar e ver passar:** o gate.
+- [ ] **4. Commit** na `feat/pln-013-e1-abrir-e-despachar`.
 
-### Rodada 2 — o alcance da conta, do `--rename` e a ordem das entregas (enviada 2026-11-03)
+**Evidência:** —
 
-> **Apresentado antes:** a cota dos três runtimes já sai do app no formato das janelas do Claude — `orca account list
-> --json` traz `rateLimits.grok`, `.codex` e `.antigravity`, com `session` e `weekly` (`usedPercent`, `windowMinutes`,
-> `resetsAt`), e o Codex estava com a `session` em 97%. O app só lista contas do Claude e do Codex (chaves de topo
-> `claude`, `codex`, `opencode`, `devin`; `inactiveCodexAccounts`); o Grok tem o `GROK_HOME` por conta no launch
-> (`brza-studio/src/main/acp/acp-launch-specs.ts:163`), mas nenhuma lista. A "conta do Grok" da R1.2 é, hoje, a única.
+### P3 — E1: o `brza sessions` abre o Grok
 
-Respondida em 2026-11-03, nesta sessão.
+Executa D3 · executor: `implementer`, pela sessão do `tools-kit`, no mesmo worktree; a abertura real, a sessão, com
+Anderson conferindo a aba no app
 
-1. **Conta e cota no MCP para os três.** Opções:
-   - a cota dos três pelo `rateLimits`, com troca de conta só no Claude e no Codex, os que o app lista; o Grok e o
-     Antigravity na conta única (recomendada) — custo: ~3 h; se paga: hoje, porque o Codex a 97% faria o worker falhar
-     sem freio;
-   - a cota só do Grok, como a R1.2 literal, e o Codex e o `agy` como `quota_unknown` dentro do teto de sessões — custo:
-     ~1,5 h; se paga: agora, com o Codex sem freio;
-   - a recomendada mais várias contas Grok pelo `GROK_HOME`, com um passo no `brza-studio` para o `account list` as
-     expor — custo: +~3 h e uma sessão no studio; se paga: quando houver uma segunda conta Grok, hoje nunca.
+Estimado: 0.5 h · Executado: — h
 
-   **Decidido — "Cota dos 3, troca só Codex (Recomendado)".** Precisa a R1.2 no ponto da conta do Grok.
+- [ ] **1. Teste que falha:** `test_unknown_agent_is_refused_before_any_side_effect`; o `grok` nos `subTest` de
+  regressão.
+- [ ] **2. Implementar** o `AGENTS`, o docstring e o `--help`.
+- [ ] **3. Rodar e ver passar:** o gate.
+- [ ] **4. Abertura real:** `brza sessions pln-013-sonda-grok --agent grok --title "PLN-013 E1: Grok" --prompt "diga
+  oi"`, e `brza sessions send pln-013-sonda-grok "oi de novo"`; Anderson confere que as duas mensagens chegaram.
+- [ ] **5. Commit.**
 
-2. **O `--rename` e o `--wait` fora do Grok.** Opções:
-   - só no Grok, como a R1.2, com o Codex e o `agy` recusados e uma issue para eles (recomendada) — custo: ~2,5 h; se
-     paga: na primeira sessão Grok que outra sessão precisa achar pelo nome;
-   - nos três, levantando onde o Codex e o `agy` gravam a sessão e o título — custo: +~3 h; se paga: quando forem
-     abertos pelo nome com frequência; hoje, 1 abertura de cada desde 2026-10-29.
+**Evidência:** —
 
-   **Decidido — "Nos três".** A E3 passa a ~5,5 h.
+### P4 — E1: a revisão e o merge
 
-3. **A ordem das entregas.** Opções:
-   - três entregas, cada uma com commit e usável — E1, o `brza sessions` abre o Grok e o MCP despacha aos três na conta
-     padrão (~4,5 h); E2, a cota e a conta (~3 h); E3, o `--rename` e o `--wait` (~2,5 h) (recomendada) — custo: ~0,5 h a
-     mais de testes de borda; se paga: a E1 serve no mesmo dia;
-   - só o `brza sessions` primeiro (~0,5 h) e o MCP numa entrega única (~9,5 h) — custo: o despacho ao Grok espera ~1
-     dia; se paga: hoje, se o urgente for abrir o Grok à mão;
-   - uma entrega só, num merge (~10 h) — custo: nada usável antes do fim; se paga: só se as partes não servirem sozinhas.
+Executa D1, D2, D3 · executor: `reviewer` e uma sessão Grok, pela sessão do `tools-kit`; o merge, a pedido de Anderson
 
-   **Decidido — "Três entregas (Recomendado)".** Com a R2.2, a soma vai a ~13 h.
+Estimado: 0.75 h · Executado: — h
 
-### Em aberto para o Desenho
+- [ ] **1. Revisão pelo `reviewer`** e **pela sessão Grok**, sobre o diff da `feat/pln-013-e1-abrir-e-despachar`,
+  com a suíte do `cli` limpa; os achados se corrigem pelo `implementer`, com commit.
+- [ ] **2. Merge na `master` do `brza-workflow`**, com a confirmação de Anderson, e o `brza mcp stop` e `brza mcp
+  start` do checkout principal, para o servidor carregar o código novo.
+- [ ] **3. Um `dispatch` real** de consultant a cada runtime, pela sessão, e o `status` mostrando os três.
 
-Estrutura, para o Terreno responder com fonte; nenhum vai a Anderson antes de o código dizer. **→ respondidos no
-Terreno**, e o que o código não resolveu foi à R3:
+**Evidência:** —
 
-1. o `worker-start --agent` aceita `grok` — a ajuda lista `claude, codex, cursor, antigravity, muse, zcode, opencode`
-   como exemplo, e o `--model` cita o Grok;
-2. o que o `--rename` quer dizer em cada runtime: o título da sessão que o Grok acha com `-r`, e o equivalente no Codex
-   e no Antigravity;
-3. onde cada runtime grava a sessão, para o `--wait` saber que ela está no ar;
-4. por onde o MCP troca a conta do Codex: o `accounts.switch_chat_account` usa o RPC do H3, medido só no Claude.
+### P5 — E2: a conta e o uso por runtime
 
-### Rodada 3 — o modelo, a cota por runtime, a troca do Codex e o `--rename` (enviada 2026-11-03)
+Executa D4 · executor: `implementer`, pela sessão do `tools-kit`, em `~/Projects/brza-workflow/.worktrees/pln-013-e2`,
+branch `feat/pln-013-e2-cota-e-conta`; a issue, a sessão
 
-> **Apresentado antes:** o Terreno, abaixo. O que mudou desde a R2: o Codex voltou a `session` 1% e não tem segunda
-> conta no app (`inactiveCodexAccounts: []`), e o Antigravity está a `weekly` 99%. A sessão conferiu
-> `worker-start-validation.ts:146-157`, `policy.py:210-215` e `limits.py:156`; a configuração de chat ou terminal por
-> agente não está nos JSON do app, e a sonda dela vai ao primeiro subpasso da E1, sem rodada.
+Estimado: 2.5 h · Executado: — h
 
-Respondida em 2026-11-03, nesta sessão.
+- [ ] **1. Testes que falham:** os da D4 (`test_mcp_accounts.py`, `test_mcp_limits.py`, `test_mcp_dispatch.py`,
+  `test_brza_quota.py`), com a fixture `orca-account-list.json` trazendo `codex`, `grok` e `antigravity`.
+- [ ] **2. Implementar** o `parse` por runtime, o `Accounts` e o `Limits` com runtime, a `normalize_account`, o
+  `quota_unknown` do `status` e o `quota_report`.
+- [ ] **3. Rodar e ver passar:** o gate.
+- [ ] **4. Commit** na `feat/pln-013-e2-cota-e-conta`.
+- [x] **5. A issue da R4.2**, aberta na abertura do Desenho: [O app não lê a cota do Grok](../../work/issues/o-app-nao-le-a-cota-do-grok.md).
 
-1. **O modelo e o esforço dos workers fora do Claude.** Opções:
-   - a política de papéis só no `claude`, e nos outros o `model` e o `effort` do pedido ou o padrão do runtime
-     (recomendada) — custo: ~1 h na E1; se paga: no primeiro worker fora do Claude, que sem isso sai com `--model
-     sonnet` e falha;
-   - uma tabela `policy.roles.<papel>.<runtime>` no `brza.toml` — custo: ~2,5 h e a mudança no `brza.toml`; se paga:
-     quando houver modelo por papel no Codex ou no Grok;
-   - exigir `model` no pedido fora do Claude — custo: ~0,5 h; se paga: só se o padrão do runtime for ruim.
+**Evidência:** —
 
-   **Decidido — "Tabela por runtime".** Os valores de cada papel em cada runtime vão a uma rodada do Desenho.
+### P6 — E2: a troca do Codex pelo gate
 
-2. **A conta ativa e a cota por runtime.** Opções:
-   - a conta ativa e o uso lidos por runtime, com o Grok e o Antigravity na conta única e a cota pelas janelas
-     `session` e `weekly` de topo (recomendada) — custo: ~1,5 h na E2; se paga: já na E2, com o Antigravity a 99%
-     retido até a cota renovar;
-   - o mesmo, com o Antigravity pelos `buckets` do grupo do modelo — custo: +~1,5 h e um mapa de modelo para grupo; se
-     paga: quando os grupos divergirem e o worker parado custar trabalho;
-   - só a chave por runtime, sem ler a conta ativa fora do Claude — custo: ~0,5 h; se paga: se o Codex nunca tiver
-     segunda conta, e a troca da R2.1 sai.
+Executa D5 · executor: `implementer`, pela sessão do `tools-kit`, no mesmo worktree
 
-   **Decidido — "Por runtime, janelas de topo (Recomendado)".**
+Estimado: 1.5 h · Executado: — h
 
-3. **A troca de conta do Codex.** Opções:
-   - segurar o worker e devolver a proposta de troca pelo gate da sessão principal (PLN-003/R5.2), com o
-     `accounts.selectCodex` só depois da aprovação, em código e teste, sem prova real (recomendada) — custo: ~1,5 h na E2;
-     se paga: quando houver uma segunda conta Codex;
-   - só segurar, sem trocar — custo: ~0 h; se paga: se a troca global for risco demais; desfaz a troca da R2.1;
-   - trocar sem gate — custo: ~1 h; se paga: nunca, porque a troca global afeta os outros workers e os chats abertos.
+- [ ] **1. Testes que falham:** os da D5 (`test_mcp_gates.py`, `test_mcp_accounts.py`).
+- [ ] **2. Implementar** o `codex_switch`, os dois motivos no gate, a ordem do `approve`, o `select_codex` e o
+  `held_reason` do Codex.
+- [ ] **3. Rodar e ver passar:** o gate.
+- [ ] **4. Commit.**
 
-   **Decidido — "Segura e propõe pelo gate (Recomendado)".**
+**Evidência:** —
 
-4. **O que o `--rename` quer dizer fora do Claude.** Opções:
-   - uma sonda de ~0,5 h antes da E3, mandando o `/rename` pelo `agentSession.send` nos três, com a E3 seguindo o que
-     ela mostrar e o `--wait` pelo `providerSession.id` (recomendada) — custo: ~0,5 h e o `grok login`; se paga: na E3;
-   - só o título da aba, pelo `agentSession.rename`, e o mapa — custo: ~0 h além do `--wait`; se paga: se o correio do
-     Claude for o único consumidor do nome do runtime;
-   - o Grok fora do `--rename` até o login — custo: parte da R2.2 espera; se paga: se o login demorar.
+### P7 — E2: a revisão e o merge
 
-   **Decidido — "Sonda antes da E3 (Recomendado)".**
+Executa D4, D5 · executor: `reviewer` e uma sessão Grok, pela sessão do `tools-kit`; o merge, a pedido de Anderson
 
-## Desenho
+Estimado: 0.5 h · Executado: — h
 
-### O que este desenho assume
+- [ ] **1. Revisão pelo `reviewer`** e **pela sessão Grok**; os achados se corrigem pelo `implementer`, com commit.
+- [ ] **2. Merge na `master` do `brza-workflow`**, com a confirmação de Anderson, e o `brza mcp stop` e `brza mcp
+  start`.
+- [ ] **3. O `brza quota`** real mostra o Codex, o Antigravity e o Grok sem janela, com o `error`.
 
-- **R1.3, R2.1, R3.2:** os três runtimes no `dispatch`; a conta ativa e a cota lidas por runtime, pelas janelas de topo
-  do `rateLimits`; o Grok e o Antigravity na conta única.
-- **R3.1:** o modelo e o esforço por papel e por runtime, numa tabela do `brza.toml`.
-- **R3.3:** a troca de conta do Codex passa pelo gate, e o `accounts.selectCodex` só roda aprovado.
-- **R2.2, R3.4:** o `--rename` e o `--wait` nos quatro runtimes; o `--wait` pelo `providerSession.id`, o `--rename` pelo
-  que a sonda mostrar.
-- **R2.3:** três entregas, cada uma com commit e usável: E1 abrir e despachar, E2 a cota e a conta, E3 o `--rename` e o
-  `--wait`.
+**Evidência:** —
 
-### Terreno
+### P8 — E3: a sonda do `/rename`
 
-Levantado em 2026-11-03 por um `collector`, só leitura; a sessão conferiu os três primeiros fatos do MCP e o do
-`worker-start`.
+Executa D6 · executor: a sessão do `tools-kit`, com Anderson conferindo na tela o que cada chat mostra
 
-#### O `worker-start` do app
+Estimado: 0.5 h · Executado: — h
 
-- **Aceita `grok`, `codex` e `antigravity`.** `brza-studio/src/main/runtime/rpc/methods/orchestration/worker/worker-start-validation.ts:146-157`
-  — o `--agent` passa por `isTuiAgent` e pelo `validateOrchestrationAgentLauncher`; o `settings.getAgentLaunch` deu
-  `disabledTuiAgents: []`. A lista do `--help` é exemplo.
-- **O `--model` e o `--effort` valem nos três.** `orchestration-worker-specs.ts:43-44`; o catálogo do app dá ao Grok os
-  modelos 4.7, 4.6 e 4.5, com esforço de `low` a `xhigh`, ao Codex esforço até `ultra`, e ao Antigravity `models: []` e
-  esforço `low` a `high`.
-- **Chat ou terminal segue a configuração do usuário, sem flag.** `src/main/agent-launch/agent-launch-mode.ts:98-160`.
-  No chat, o Grok e o Antigravity vão por ACP (`src/main/acp/acp-launch-specs.ts:297-303`); o Claude e o Codex, por
-  adaptador de CLI. O valor atual por agente não sai em RPC de leitura nem nos JSON do app.
+- [ ] **1. A sonda da D6** nos três runtimes, com o `brza sessions` da `master`.
+- [ ] **2. Gravar no plano** o resultado por runtime, com o `providerSession.id` e o id do runtime lado a lado.
+- [ ] **3. A issue** de cada runtime com sonda negativa (R4.4/P6).
 
-#### O MCP
+**Evidência:** —
 
-- **Quatro pontos fixos no Claude.** `brza_mcp/tools.py:25` (o enum em `:32`, a recusa em `:192-193`, o padrão em
-  `:217`), `cycle.py:22` (usado em `:152`), `accounts.py:24` e `limits.py:225`.
-- **A conta ativa é a do Claude para qualquer runtime.** `limits.py:156` (`_active`), `:166-210` (`_account`,
-  `_sessions`, `_quota`, `_account_matches`) e `tools.py:140-156` (`normalize_account`).
-- **O `accounts.parse` lê só o Claude.** `accounts.py:56-76` lê `claude`, `rateLimits.claude` e
-  `rateLimits.inactiveClaudeAccounts`; `usage()` (`:151`) devolve `None` aos outros, o que vira `quota_unknown`.
-- **O `_windows` já lê os blocos dos outros.** Rodado contra o `account list --json` real: Codex `session` 1% e `weekly`
-  0%; Antigravity `session` 37% e `weekly` 99%, com `buckets` por grupo que ele ignora; Grok `[]`, sem login.
-- **A política é toda Claude.** `policy.py:28-30` dá `sonnet` e `opus` aos papéis, e `policy.py:210-215` os põe por cima
-  do pedido.
-- **O `pick_account` e o `switch_chat_account` não têm chamador** fora dos testes.
+### P9 — E3: o `--wait` nos quatro e o `provider_session`
 
-#### A conta do Codex
+Executa D6 · executor: `implementer`, pela sessão do `tools-kit`, em `~/Projects/brza-workflow/.worktrees/pln-013-e3`,
+branch `feat/pln-013-e3-rename-e-wait`
 
-- **Hoje só há a `systemDefault`.** `account list --json`: `codex.accounts = []`, `inactiveCodexAccounts = []`.
-- **A troca é global, do app.** `brza-studio/src/main/runtime/rpc/methods/accounts.ts:153-165` — `accounts.selectCodex` e
-  `selectCodexForTarget`, com a permissão `accounts-admin`; não há flag de conta no `worker-start`.
-- **O `switch_chat_account` não serve ao Codex.** O `prepareAccountSwitch` só existe no adaptador do Claude
-  (`claude-structured-session-adapter.ts:153`), e o roteador devolve `unknown-account` aos outros
-  (`brza-router-record-methods.ts:10-13`).
-- **A conta do Codex vai no `CODEX_HOME`**, que o app aplica pela conta ativa; o resumo da conta Codex não traz `home`.
+Estimado: 1.5 h · Executado: — h
 
-#### O `--rename` e o `--wait`
+- [ ] **1. Testes que falham:** os da D6 em `test_brza_sessions.py`.
+- [ ] **2. Implementar** o `provider_session` nos quatro, o `session_map`, o `list --json` e a leitura do agente da
+  aba.
+- [ ] **3. Rodar e ver passar:** o gate.
+- [ ] **4. Commit** na `feat/pln-013-e3-rename-e-wait`.
 
-- **O caminho do Claude.** `brza-workflow/packages/client/bin/brza-sessions` — o `/rename` como primeiro prompt
-  (`:387`), o título da aba pelo `agentSession.rename` (`:401`), o `open` no mapa (`:404`), o `--wait` pelo
-  `providerSession.id` (`:193-212`) e pelo `<config>/sessions/<pid>.json` (`:127-151`, `:184-190`), o evento `session`
-  (`:417`).
-- **Há um id de sessão nos quatro.** O `agentSession.history` devolve `providerSession{key: 'session_id', id}`, rodado
-  nos chats reais do Claude, do Codex e do Antigravity; o do Grok, sem login, não traz.
-- **O `agentSession.rename` só dá o nome no app**, não no runtime.
-- **O nome no runtime, por evidência fraca** (binários e ajuda, nada exercitado pelo chat): o Grok tem `/rename` e acha
-  pelo título com `grok -r`; o Codex tem o slash "rename the current thread", com o nome em `~/.codex/session_index.jsonl`
-  (`thread_name`); o Antigravity tem `/rename` no `strings` do `agy`.
-- **Onde cada um grava a sessão:** o Grok em `~/.grok/sessions/<cwd>/<id>/summary.json`; o Codex em
-  `~/.codex/sessions/AAAA/MM/DD/rollout-*.jsonl`; o Antigravity do chat em
-  `<dados do app>/antigravity-chat/antigravity-acp/conversations/<uuid>.db`.
-- **Bug latente no `list`.** `brza-sessions:244` lê `tab.get('agentSessionAgent')`, e as abas reais trazem `agent`.
+**Evidência:** —
 
-#### Os testes
+### P10 — E3: o `--rename` por runtime
 
-- **O `brza sessions`:** `tests/cli/test_brza_sessions.py`, com os casos fora do Claude em `:364-450`, que hoje asserem
-  a recusa do `--rename` e do `--wait`. 4 dos 39 falham com o `BRZA_WORKSPACE` herdado do worktree; a base sai com o
-  env limpo.
-- **O MCP:** `tests/mcp/test_mcp_dispatch.py:85` (a recusa do `codex`, que a E1 inverte), `test_mcp_cycle.py:78`,
-  `test_mcp_limits.py`, `test_mcp_accounts.py:391-406`, `test_brza_quota.py` e a fixture
-  `fixtures/orca-account-list.json`. `python3 -m unittest discover -s tests/mcp` → 358 OK.
+Executa D7 · executor: `implementer`, pela sessão do `tools-kit`, no mesmo worktree
+
+Estimado: 2 h · Executado: — h
+
+> A faixa é de 1,5 h, com a sonda negativa nos três, a 3 h, com ela positiva nos três.
+
+- [ ] **1. Testes que falham:** os da D7, só das linhas de `NAMED` que a sonda confirmou, e o da saída do P6.
+- [ ] **2. Implementar** o `NAMED`, o `wait_for_name` por runtime e a linha `CHECK`.
+- [ ] **3. Rodar e ver passar:** o gate.
+- [ ] **4. Commit.**
+
+**Evidência:** —
+
+### P11 — E3: a revisão, o merge e uma abertura de cada
+
+Executa D6, D7 · executor: `reviewer` e uma sessão Grok, pela sessão do `tools-kit`; o merge, a pedido de Anderson;
+as aberturas, a sessão, com Anderson conferindo as abas
+
+Estimado: 1 h · Executado: — h
+
+- [ ] **1. Revisão pelo `reviewer`** e **pela sessão Grok**; os achados se corrigem pelo `implementer`, com commit.
+- [ ] **2. Merge na `master` do `brza-workflow`**, com a confirmação de Anderson.
+- [ ] **3. Uma abertura de cada:** `brza sessions pln-013-<rt> --agent <rt> --rename --wait --prompt "diga oi"` nos
+  três, com o `open:` só depois do `providerSession.id`.
+
+**Evidência:** —
+
+### As horas
+
+| Entrega | Passos       | Estimado |
+| :------ | :----------- | :------- |
+| E1      | P1 a P4      | 6,5 h    |
+| E2      | P5 a P7      | 4,5 h    |
+| E3      | P8 a P11     | 5 h      |
+| Total   |              | 16 h     |
+
+> A E1 sobe de ~4,5 h (R2.3) porque a R3.1 trocou a opção de ~1 h pela tabela de ~2,5 h; a E3 fica na faixa de 4 a
+> 5,5 h, com o meio, até a sonda dizer (REV-010/A11).
 
 ## Worklogs
 
 - 2026-11-03 — Passos 0 a 2, a R1, a R2, o Terreno e a R3; o plano abriu e a issue irmã nasceu. Parou nos itens `D`.
   [Abertura e entrevista do PLN-013, o Grok no `brza sessions` e no MCP](../../work/worklogs/2026-11-03-pln-013-abertura-e-entrevista.md)
+
+## Revisões
+
+- [REV-010: O Desenho do PLN-013, revisado pela sessão Grok](../../work/reviews/REV-010-pln-013-o-desenho-pelo-grok.md)
+  — 2026-11-03, 16 achados: 15 corrigidos no Desenho e o A15 falso.
+
+## Pendências conhecidas
+
+- [O app não lê a cota do Grok](../../work/issues/o-app-nao-le-a-cota-do-grok.md) — da R4.2; o Grok fica em
+  `quota_unknown` até o app ler a cota.

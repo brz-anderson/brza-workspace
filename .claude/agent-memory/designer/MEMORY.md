@@ -1,2 +1,3 @@
 - [Critérios de Anderson na medida por tarefa](anderson-criterios-medicao.md) — tempo parado fora da tarefa, lacuna vira issue, forma só com objetivo; reabrir com número medido passa
-- [Premissas e custos que erraram](custos-e-premissas-que-erraram.md) — ps -S no macOS não soma filhos; o turno do commit é a maior parte da tarefa
+- [Premissas e custos que erraram](custos-e-premissas-que-erraram.md) — ps -S no macOS; turno do commit; catálogo do app atrás do runtime; login sem cota
+- [Anderson prefere cobertura uniforme](anderson-prefere-cobertura-uniforme.md) — recusou cortar runtime por uso baixo nas R1.3, R2.2, R3.1 do PLN-013

@@ -6,7 +6,11 @@ tags:
 refs:
   - PLN-003
   - PLN-009
+  - PLN-010
+  - PLN-011
   - PLN-013
+  - REV-010
+  - issue:o-app-nao-le-a-cota-do-grok
   - issue:o-grok-fica-sem-medida-por-tarefa
 ---
 
@@ -46,7 +50,20 @@ fluxo do `brza sessions` e do `MCP`". Esta sessão rodou os Passos 0 a 2 da `pla
 - **A R3.** O modelo e o esforço saem de uma tabela por runtime. A cota é por runtime, pelas janelas de topo. O Codex
   troca de conta pelo gate. Uma sonda vem antes da E3.
 
+- **A revisão do rascunho por duas sessões Grok.** A pedido de Anderson, uma sessão Grok revisou o Desenho. A que ele
+  indicou, a `grok_18ca2288…`, estava presa numa aprovação do P3 do PLN-011, e a sessão abriu a
+  `pln-013-grok-revisor` pelo `brza sessions --agent grok`, a primeira abertura real do Grok. O pedido que ficou na
+  fila da antiga rodou mesmo assim, e o parecer dela sobrescreveu o da nova no scratch, porque o aviso de desconsiderar
+  entrou na fila atrás dele. Os dois pareceres foram ao
+  [REV-010: O Desenho do PLN-013, revisado pela sessão Grok](../reviews/REV-010-pln-013-o-desenho-pelo-grok.md), com 16
+  achados, um deles falso. O `send_to_chat` não deu recibo do envio: é a lacuna do
+  [PLN-010](../../plans/PLN-010-brza-sessions-sobre-o-brza-chat/PLN-010-plan.md).
+- **A R4** fechou a tabela de modelo e esforço por runtime, a cota do Grok em `quota_unknown`, o `provider_session` nos
+  quatro e as convergências. A issue [O app não lê a cota do Grok](../issues/o-app-nao-le-a-cota-do-grok.md) nasceu dela.
+- **O Desenho e os Passos.** O `designer` reescreveu os itens D1 a D7 com a R4 e os achados, e derivou 11 passos em três
+  entregas: E1 6,5 h, E2 4,5 h e E3 5 h, 16 h ao todo. O plano foi dividido em `-interview` e `-design`.
+
 ## Em aberto
 
-- Os itens `D` das três entregas, com os valores da tabela de modelo por runtime como rodada.
-- O `grok login`, que é de Anderson e é pré-requisito da sonda da E3 e de toda abertura real.
+- A R5, o aceite do corte em passos.
+- O pedido de marcar o PLN-003/P12 como `[-]` segue no `Retomar` do PLN-003.

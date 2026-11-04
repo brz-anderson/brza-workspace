@@ -200,7 +200,7 @@ Respondida em 2026-11-03, por Anderson.
      PLN-009.
 
    **Decidido — "Reabre com --mcp-config"**: a sessão que abriu o plano grava o `Retomar` e abre a coordenadora pelo
-   `brza sessions`, com o servidor na configuração.
+   `brza sessions`, com o servidor na configuração. **→ reaberta em R12.1.**
 
 **Por delegação de Anderson (R7, "Apresentado antes"), as rodadas R8 a R11 foram respondidas pelo `agy` com o modelo
 `gemini-3.8-flash-high`**, em modo `plan`, com leitura do plano, dos levantamentos e do código. Cada uma leva o porquê
@@ -353,3 +353,25 @@ Respondida em 2026-11-03, pelo `agy`.
    **Decidido — "Fase 3 vira issue fora de escopo e o plano fecha (Recomendado)"**. "Mantém a decisão da R4.3 de não
    absorver 459 arquivos de um PR instável no upstream e permite encerrar o plano ao concluir a fase 5 sem bloqueios
    indefinidos."
+
+### Rodada 12 — a sessão coordenadora, refeita (enviada 2026-11-03)
+
+> **Apresentado antes:** o `dispatch` exige um chamador que seja sessão do chat do Studio: no teste do PLN-009, a
+> sessão de terminal com `--mcp-config` caiu em `session_caller_unknown` (issue "O dispatch aceita chamador fora do
+> Studio", no `tools-kit`), e o C4 só passou de um chat do Studio, por HTTP, com o `X-Brza-Session` e o
+> `X-Brza-Client` dele. O `brza sessions` abre chat do Studio, mas não aceita `--mcp-config`, e o `claude-brza`
+> instalado, da `master`, não exporta o `BRZA_MCP_TOKEN`.
+
+Respondida em 2026-11-03, por Anderson.
+
+1. **A sessão coordenadora.** Opções:
+   - chat novo no Studio, MCP por HTTP (recomendada) — custo: o arranque de uma sessão nova e nenhuma linha `mcp` na
+     medição; se paga: já, é o caminho provado no C4 e dá contexto limpo para as 31 h;
+   - chat novo com `.mcp.json` local — custo: uma sessão de teste (~5 min) e uma emenda na `workspace.md`; se paga:
+     quando a linha `mcp` da medição importar ao PLN-009;
+   - esta sessão coordena, por HTTP — custo: o contexto desta sessão encosta nos ~200 mil tokens no meio do plano; se
+     paga: já, mas só até a fase 1.
+
+   **Decidido — "Chat novo no Studio, MCP por HTTP (Recomendado)"**. Conferido antes de abrir: do chat da abertura,
+   `initialize` e `tools/call status` responderam pelo `/mcp`, com a fila vazia e `orchestrator.max_workers: 6`.
+

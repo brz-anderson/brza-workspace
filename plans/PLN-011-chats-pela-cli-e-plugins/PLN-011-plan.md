@@ -20,9 +20,9 @@ tags:
 
 # PLN-011: Os chats do BrzA Studio se coordenam pela CLI, aparecem na navegação e chegam aos plugins
 
-- **Retomar:** em 2026-11-03, o plano fechou o Desenho e os Passos (R7 a R11) e entra em execução, a pedido de Anderson
-  ("siga com os passos até encerrar o plano"); o `brza-mcp` está de pé (R7.1), e o próximo passo é o P1, pelo
-  `dispatch` de um `implementer`, na sessão coordenadora aberta com `--mcp-config` (R7.3).
+- **Retomar:** em 2026-11-03, o plano entrou em execução, a pedido de Anderson ("siga com os passos até encerrar o
+  plano"); o `brza-mcp` está de pé (R7.1), e a sessão coordenadora "PLN-011: coordenação" abre no chat do Studio,
+  falando com o MCP por HTTP (R12.1); o próximo passo é o P1, pelo `dispatch` de um `implementer`.
 - **Dividido:** [PLN-011 — Entrevista](PLN-011-interview.md) · [PLN-011 — Desenho](PLN-011-design.md)
 
 ## Pedido
@@ -97,8 +97,9 @@ e a numeração das outras fica.
 ## Pré-requisitos
 
 - **O `brza-mcp` de pé:** `brza-mcp status` → "carregado: sim" e "health: responde". Parado, `brza-mcp start`.
-- **A sessão coordenadora com o servidor:** aberta com `claude --mcp-config <arquivo fora do git>`, com a URL de
-  `brza-mcp url` e o token por `headersHelper` (`brza-workflow@3826f63`).
+- **A sessão coordenadora é um chat do Studio** (R12.1), com `ORCA_AGENT_SESSION_ID` e `ORCA_USER_DATA_PATH` no
+  ambiente, que chama o `/mcp` por HTTP com o Bearer de `~/.brza/runtime/mcp.token` e os headers `X-Brza-Session` e
+  `X-Brza-Client`.
 
 ## Passos
 
@@ -453,7 +454,7 @@ Estimado: 1 h · Executado: — h
 
 - 2026-11-03 — abertura: as cinco issues das frentes, o PLN-011 com as fases e as R1 a R4 do `playground`; R5 e
   R6 fecham a entrevista da fase 1, e o `#37774` sai dela; R7 com Anderson e R8 a R11 pelo `agy`; Desenho e P1 a P17
-  gravados, e o `brza-mcp` de pé. Parou antes do P1.
+  gravados, o `brza-mcp` de pé e a R12 refaz a R7.3. Parou antes do P1, com a coordenadora aberta.
   [PLN-011: abertura do plano dos chats pela CLI e pelos plugins](../../work/worklogs/2026-11-03-pln-011-abertura-chats-pela-cli-e-plugins.md)
 
 ## Fechamento

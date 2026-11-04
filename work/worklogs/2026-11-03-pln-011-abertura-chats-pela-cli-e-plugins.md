@@ -77,7 +77,13 @@ abrir o plano e seguir para a entrevista. Nenhum código.
   - **Estado:** ativo.
   - **Como desfazer:** `brza-mcp stop`, que descarrega o agente e apaga o plist.
 
+- **R12, com Anderson:** a R7.3 não se cumpre como respondida, porque o `dispatch` exige chamador do chat do Studio e
+  o `brza sessions` não passa `--mcp-config`. Escolha: "Chat novo no Studio, MCP por HTTP (Recomendado)". Antes de abrir,
+  o `initialize` e o `status` pelo `/mcp` responderam deste chat.
+- **A coordenadora** abre pelo `brza sessions`, com o nome `pln-011-coord`, o título "PLN-011: coordenação" e o pedido
+  com as palavras de Anderson, a função `mcp` testada e a regra dos gates.
+
 ## O que ficou aberto
 
-- O P1, pela sessão coordenadora com o `brza-mcp`.
+- A execução do P1 ao P17, na sessão "PLN-011: coordenação".
 - A issue de origem passa a `done` pelo `playground`, que lê estas pelo git.

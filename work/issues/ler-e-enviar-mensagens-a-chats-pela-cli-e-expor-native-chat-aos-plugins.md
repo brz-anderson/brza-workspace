@@ -94,3 +94,34 @@ A resposta orienta a proposta técnica; não autoriza iniciar a implementação.
 - **Envio durante atividade:** Anderson escolheu preservar `queue-if-active` e expor que a mensagem está enfileirada, inclusive quando uma pergunta pendente retém a fila.
 
 Com essas respostas, a proposta da primeira versão fica delimitada a coordenação por cursor e fila existente, integrada aos aliases de `brza sessions`, com recibos e retry seguros. A implementação ainda não foi iniciada.
+
+### Rodada de abertura do plano (2026-11-03)
+
+Apresentado antes: o recorte já respondido (coordenação por cursor e fila, aliases de `brza sessions`, recibos e retry)
+e as frentes fora dele (focus e barra lateral, Jump Palette, robustez do journal, plugins, `account usage`).
+
+- **Destino** — opções: `PLN` em `plans/` (recomendado); seção num worklog. **Resposta:** "um plano pra cada
+  `workstream` e elas se coordenam na execução".
+- **Recorte** — opções: só a coordenação (recomendado); coordenação + `chat focus`; a issue inteira, por fases.
+  **Resposta:** "A issue inteira, por fases".
+- **Restante** — opções: fica na issue de origem (recomendado); vira issues próprias. **Resposta:** "issues próprias,
+  repriorize individualmente".
+
+As respostas em texto livre voltam em rodada de esclarecimento: que workstreams recebem plano e como as fases se
+combinam com as issues próprias.
+
+### Rodada de esclarecimento do plano (2026-11-03)
+
+Apresentado antes: a leitura das respostas em texto livre — `studio` para o código do `brza-studio` e `tools-kit` para o
+`brza sessions` (`README.md:12-14`), abertos por sessões novas, como manda o `AGENTS.md`; e o estado no upstream:
+`#37774` integrado em 2026-11-03 18:28 UTC e ausente do checkout local `8f41dd56a33`, `#37802` e `#37467` abertos.
+
+- **Workstreams:** "studio + tools-kit (Recomendado)". Um `PLN` no `studio` e outro no `tools-kit`, este com
+  `depends_on` no do `studio`, cada um aberto por sessão nova no worktree dele.
+- **Fases:** "Todas as frentes, por prioridade (Recomendado)". Cada frente vira issue com prioridade própria; os planos
+  cobrem todas, em fases na ordem da prioridade, cada fase citando a issue dela.
+- **Prioridades:** "Proposta abaixo (Recomendado)". `high`: coordenação (`list/read/send`) e o porte do `#37774` antes
+  do `send`. `medium`: navegação (`focus`, barra lateral, Jump Palette) e o journal do `#37802`, que espera a integração
+  no upstream. `low`: plugins e `account usage` (`#37467`).
+- **Issues:** "No workstream da frente (Recomendado)". A sessão que abre cada plano cria as issues dele. Esta issue
+  passa a `done`, com os links para as novas, quando elas existirem.

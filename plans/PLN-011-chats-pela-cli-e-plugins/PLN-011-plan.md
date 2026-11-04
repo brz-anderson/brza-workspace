@@ -20,10 +20,11 @@ tags:
 
 # PLN-011: Os chats do BrzA Studio se coordenam pela CLI, aparecem na navegação e chegam aos plugins
 
-- **Retomar:** o P3 foi fechado em 2026-11-03 em `brza-studio@a7099022850`, com os achados A1–A3 da revisão do
-  `77a1cca1af2` corrigidos, e o parecer REV-009 aprovado pelo Grok. O próximo passo é o P4 no worktree
-  `feat/pln-011-chat-cli`, a partir do HEAD `a7099022850c003f340a0a8cacec0d13b256c15c`; o pedido está no scratch da
-  sessão coordenadora. A nota antiga de passagem está no worklog de 2026-11-03.
+- **Retomar:** em 2026-11-04, o P4 tem os commits `brza-studio@55225f8cb878` e `brza-studio@ed5bf0283e1` no
+  worktree `pln-011-chat-cli`, branch `feat/pln-011-chat-cli`. O complemento cobre os casos obrigatórios e corrige
+  `held_by` na pausa; passaram 60 testes do alvo, 62 de regressão e os 22 gates. A revisão independente foi enviada
+  ao Grok por `msg_3c493c16db32`; o parecer vai ao scratch da coordenadora, `p4-rev-grok.md`. Próximo ato: receber a
+  revisão, tratar os achados, reservar o parecer, fechar P4 e seguir P5. P3 está fechado com REV-009.
 - **Dividido:** [PLN-011 — Entrevista](PLN-011-interview.md) · [PLN-011 — Desenho](PLN-011-design.md)
 
 ## Pedido
@@ -495,6 +496,9 @@ Estimado: 1 h · Executado: — h
   [PLN-011: execução dos passos pela sessão coordenadora](../../work/worklogs/2026-11-03-pln-011-execucao.md)
 - 2026-11-03 — coordenação em Codex: P3 corrigido e fechado em `a7099022850`, com REV-009 aprovada; próximo P4.
   [PLN-011: execução dos passos pela sessão coordenadora](../../work/worklogs/2026-11-03-pln-011-execucao.md)
+
+- 2026-11-04 — P4 com cobertura complementar em `ed5bf0283e1`, corrigindo a pausa da fila; revisão pedida ao Grok.
+  [PLN-011: cobertura e revisão do P4](../../work/worklogs/2026-11-04-pln-011-execucao.md)
 
 ## Revisões
 

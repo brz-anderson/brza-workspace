@@ -93,8 +93,9 @@ e a numeração das outras fica.
   de troca de conta ou de outro papel para e vai a Anderson.
 - **Do P3 em diante, os workers saem do `brza-mcp`** (R18.1): ele só aceita o runtime `claude`, e a cota da Claude
   segurava o P3. O `brza-mcp` fica de pé, sem pedidos deste plano.
-- **O `reviewer` em Antigravity roda com `--model gemini-3.8-flash-high`.** Anderson, em 2026-11-03: "revisão no `agy`
-  terá que ser com o `Gemini Flash 3.8 High` a cota do `Argon 4` acabou".
+- **O `reviewer` e o `designer` são a sessão Grok 4.7** (R19.2), `grok_18ca2288_cf47_4da8_abf1_781cef5885a6`, com o
+  pedido pelo `orchestration send --to orca_session_id:…` e o parecer num arquivo do scratch. O `agy` fica nas rodadas,
+  com `gemini-3.8-flash-high`: "a cota do `Argon 4` acabou", nas palavras de Anderson em 2026-11-03.
 - **O `brza-mcp` roda o código da `feat/pln-009-mcp`, sem merge** (R7.1): defeito do orquestrador vai ao PLN-009, numa
   issue do `tools-kit`, e não se corrige daqui.
 
@@ -109,7 +110,8 @@ e a numeração das outras fica.
 
 Cada passo de código roda num worker `implementer` e é revisado por um worker `reviewer` antes do passo seguinte (R7).
 O P1 e o P2 rodaram pelo `dispatch` do `brza-mcp`; do P3 em diante, pela R18.1, o `implementer` roda em Codex e o
-`reviewer` em Antigravity, pelo `orchestration worker-start` do Studio, no worktree da fase. Os gates dos dois, com `ref: PLN-011`, estão pré-aprovados (R7.2). Cada passo é
+`reviewer` é a sessão Grok 4.7 (R19.2), pelo `orchestration worker-start` e pelo `orchestration send` do Studio, no
+worktree da fase. Os gates dos dois, com `ref: PLN-011`, estão pré-aprovados (R7.2). Cada passo é
 um commit verde; o worker roda só o alvo, e a suíte inteira roda uma vez, no merge de cada fase, pela coordenação.
 
 ### Fase 1 — coordenação
@@ -199,7 +201,7 @@ Estimado: 3,5 h · Executado: — h, com a revisão
       `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-cursor.test.ts --maxWorkers=2`;
       `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `feat(cli): chat read --cursor lê só o que mudou e avisa o cursor_reset`.
-- [ ] **5. Revisão independente** — um worker `reviewer` em Antigravity (R18.1), com `ref: PLN-011/P3`, revisa o commit
+- [ ] **5. Revisão independente** — a sessão Grok, `reviewer` (R19.2), com `ref: PLN-011/P3`, revisa o commit
       contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
       antes do passo seguinte.
 
@@ -232,7 +234,7 @@ Estimado: 4 h · Executado: — h, com a revisão
       `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-send-outcome.test.ts src/cli/brza/chat-queue-hold.test.ts --maxWorkers=2`;
       `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `feat(cli): chat send diz o estado da entrega, o motivo da fila e sai pelo código do estado`.
-- [ ] **5. Revisão independente** — um worker `reviewer` em Antigravity (R18.1), com `ref: PLN-011/P4`, revisa o commit
+- [ ] **5. Revisão independente** — a sessão Grok, `reviewer` (R19.2), com `ref: PLN-011/P4`, revisa o commit
       contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
       antes do passo seguinte.
 
@@ -259,7 +261,7 @@ Estimado: 2 h · Executado: — h, com a revisão
       `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-operation-id.test.ts --maxWorkers=2`;
       `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `feat(cli): chat send --operation repete o envio sem reenviar`.
-- [ ] **5. Revisão independente** — um worker `reviewer` em Antigravity (R18.1), com `ref: PLN-011/P5`, revisa o commit
+- [ ] **5. Revisão independente** — a sessão Grok, `reviewer` (R19.2), com `ref: PLN-011/P5`, revisa o commit
       contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
       antes do passo seguinte.
 
@@ -310,7 +312,7 @@ Estimado: 2,5 h · Executado: — h, com a revisão
       config/vitest.config.ts <arquivos> --maxWorkers=2`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master
       --maxWorkers=2`.
 - [ ] **4. Commit** — `feat(chat): brza chat focus abre o chat pelo terminal.reveal`.
-- [ ] **5. Revisão independente** — worker `reviewer` em Antigravity, `ref: PLN-011/P8`, parecer em `work/reviews/`.
+- [ ] **5. Revisão independente** — a sessão Grok, `reviewer` (R19.2), `ref: PLN-011/P8`, parecer em `work/reviews/`.
 
 **Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
@@ -326,7 +328,7 @@ Estimado: 2,5 h · Executado: — h, com a revisão
       `agent-session`.
 - [ ] **3. Rodar e ver passar** — os testes tocados e `pnpm check:changed --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `fix(sidebar): a seleção de agentes segue o chat ativo`.
-- [ ] **5. Revisão independente** — worker `reviewer` em Antigravity, `ref: PLN-011/P9`, parecer em `work/reviews/`.
+- [ ] **5. Revisão independente** — a sessão Grok, `reviewer` (R19.2), `ref: PLN-011/P9`, parecer em `work/reviews/`.
 
 **Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
@@ -341,7 +343,7 @@ Estimado: 3 h · Executado: — h, com a revisão
 - [ ] **2. Implementar** — o D9.
 - [ ] **3. Rodar e ver passar** — os testes tocados e `pnpm check:changed --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `fix(palette): a Jump Palette lista e acha os Native Chats`.
-- [ ] **5. Revisão independente** — worker `reviewer` em Antigravity, `ref: PLN-011/P10`, parecer em `work/reviews/`.
+- [ ] **5. Revisão independente** — a sessão Grok, `reviewer` (R19.2), `ref: PLN-011/P10`, parecer em `work/reviews/`.
 
 **Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
@@ -396,7 +398,7 @@ Estimado: 3,5 h · Executado: — h, com a revisão
 - [ ] **3. Rodar e ver passar** — os testes de `src/main/plugins` e `src/shared/plugins` tocados, e `pnpm check:changed
       --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `feat(plugins): os chats nativos em agents.list e agent.status.changed`.
-- [ ] **5. Revisão independente** — worker `reviewer` em Antigravity, `ref: PLN-011/P14`, parecer em `work/reviews/`.
+- [ ] **5. Revisão independente** — a sessão Grok, `reviewer` (R19.2), `ref: PLN-011/P14`, parecer em `work/reviews/`.
 
 **Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
@@ -426,7 +428,7 @@ Estimado: 1,5 h · Executado: — h, com a revisão
 - [ ] **2. Rodar e ver passar** — `src/cli/handlers/account-usage-command.test.ts` e
       `src/cli/handlers/account-usage-format.test.ts`, com as expectativas de texto acertadas ao rebrand; `pnpm tc:cli`.
 - [ ] **3. Commit** — `feat(cli): porta account usage do stablyai/orca#37467`, com o trailer `Upstream:`.
-- [ ] **4. Revisão independente** — worker `reviewer` em Antigravity, `ref: PLN-011/P16`, parecer em `work/reviews/`.
+- [ ] **4. Revisão independente** — a sessão Grok, `reviewer` (R19.2), `ref: PLN-011/P16`, parecer em `work/reviews/`.
 
 **Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 

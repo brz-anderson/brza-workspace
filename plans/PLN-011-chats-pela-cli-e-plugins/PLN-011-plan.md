@@ -6,8 +6,8 @@ origin_ref: brza-chat-list-read-send-no-studio
 description: O brza-studio ganha brza chat list/read/send com cursor, fila e recibos, a navegação de chats pela CLI, pela barra lateral e pela Jump Palette, o Native Chat na API de plugins e o account usage, em fases por prioridade.
 ready: sim
 estimate_h: 31
-executed_h: 0
-remaining_h: 31
+executed_h: 0.3
+remaining_h: 29.5
 priority: high
 scope:
   - brza-studio
@@ -20,9 +20,9 @@ tags:
 
 # PLN-011: Os chats do BrzA Studio se coordenam pela CLI, aparecem na navegação e chegam aos plugins
 
-- **Retomar:** em 2026-11-03, o plano entrou em execução, a pedido de Anderson ("siga com os passos até encerrar o
-  plano"); o `brza-mcp` está de pé (R7.1), e a sessão coordenadora "PLN-011: coordenação" abre no chat do Studio,
-  falando com o MCP por HTTP (R12.1); o próximo passo é o P1, pelo `dispatch` de um `implementer`.
+- **Retomar:** em 2026-11-03, o P1 fechou (`brza-studio@df8adc29574`, REV-007), e as R13 a R16 refizeram às cegas
+  as R8 a R11, com o cursor como `--cursor` (X3); o próximo passo é o P2, pelo `dispatch` de um `implementer` no
+  worktree `pln-011-chat-cli`, na sessão coordenadora "pln-011-coord".
 - **Dividido:** [PLN-011 — Entrevista](PLN-011-interview.md) · [PLN-011 — Desenho](PLN-011-design.md)
 
 ## Pedido
@@ -62,12 +62,12 @@ e a numeração das outras fica.
 
 | Origem | Critério de aceite | Passo | Teste (nível) |
 | :----- | :----------------- | :---- | :------------ |
-| Fase 1, R5.2, R8.4 | `brza chat list --json` lista os chats abertos com `session`, `handle`, `worktree` e `title`, e o id que `read` e `send` aceitam | P1 | `chat.test.ts` (unidade) |
-| Fase 1, R2.1, R6.3, R8.3, R8.4 | `brza chat read --since <epoch:sequence>` lê uma página `after` e devolve só o que mudou, com `itemId`, `revision`, `sequence`, `removedItemIds`, `nextCursor` e `hasNewer`; recusa `--limit` junto | P3 | `chat.test.ts`, `chat-cursor.test.ts` (unidade); C1 (manual) |
+| Fase 1, R5.2, R13.4 | `brza chat list --json` lista os chats abertos com `session`, `handle`, `worktree` e `title`, e o id que `read` e `send` aceitam | P1 | `chat.test.ts` (unidade) |
+| Fase 1, R2.1, R6.3, R8.3, R13.4 | `brza chat read --cursor <epoch:sequence>` lê uma página `after` e devolve só o que mudou, com `itemId`, `revision`, `sequence`, `removedItemIds`, `nextCursor` e `hasNewer`; recusa `--limit` junto | P3 | `chat.test.ts`, `chat-cursor.test.ts` (unidade); C1 (manual) |
 | Fase 1, R5.3, R8.1, R8.2 | o cursor inválido sai 2 com `cursor_reset: <motivo>`, a página `tail` e o `nextCursor` novos, também no reset repetido | P3 | `chat.test.ts`, um caso por motivo (unidade) |
 | Fase 1, R2.2, R5.4, R9.2 | o `send` enfileirado diz a posição, o `nextQueuedMessageId` e `held_by: question\|working\|null`, com `queuePaused` no Stop | P4 | `chat.test.ts`, `chat-queue-hold.test.ts` (unidade); C1 (manual) |
 | Fase 1, R6.1, R9.1, R9.3 | o `send` sai 0 em `accepted` e `queued`, 1 em recusa, `rejected`, `returned` e `withdrawn`, 3 em `unknown` e no `pending` que não resolve em 30 s | P4 | `chat-send-outcome.test.ts`, `chat.test.ts` (unidade) |
-| Fase 1, R6.2, R8.4 | `send --operation <id>` com o mesmo texto devolve o gravado sem reenviar, e o `unknown` continua `unknown` | P5 | `chat.test.ts` (unidade); C1 (manual) |
+| Fase 1, R6.2, R13.4 | `send --operation <id>` com o mesmo texto devolve o gravado sem reenviar, e o `unknown` continua `unknown` | P5 | `chat.test.ts` (unidade); C1 (manual) |
 | Fase 1, R6.3 | o `send` leva o `ORCA_AGENT_SESSION_ID` como origem do coordenador e o `expectedRuntimeFence` lido do histórico | P2, P4 | `client-execution-host.test.ts`, `chat.test.ts` (unidade); C1 (manual) |
 | Fase 2, R10.1 | `brza chat focus --session <id>` traz o app à frente com o chat ativo | P8 | teste do roteamento do reveal (unidade); C2 (manual) |
 | Fase 2, R10.2 | a barra lateral destaca o chat ativo, qualquer que seja a origem da troca | P9 | testes da barra lateral (unidade); C2 (manual) |
@@ -126,22 +126,26 @@ cd "$HOME/Projects/brza-studio/.worktrees/pln-011-chat-cli" && pnpm install --of
 
 Executa D1 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
 
-Estimado: 1,5 h · Executado: — h, com a revisão
+Estimado: 1,5 h · Executado: 0,3 h, com a revisão
 
-- [ ] **1. Teste que falha** — antes do porte, `src/cli/handlers/chat.test.ts` não existe; o teste chega com o diff e
+- [x] **1. Teste que falha** — antes do porte, `src/cli/handlers/chat.test.ts` não existe; o teste chega com o diff e
       falha só se o porte quebrar.
-- [ ] **2. Aplicar** — `gh pr diff 33115 -R stablyai/orca | git apply --3way`, conferindo que a cabeça ainda é
+- [x] **2. Aplicar** — `gh pr diff 33115 -R stablyai/orca | git apply --3way`, conferindo que a cabeça ainda é
       `a007c29e248` (`gh pr view 33115 -R stablyai/orca --json headRefOid`).
-- [ ] **3. Rodar e ver passar** —
+- [x] **3. Rodar e ver passar** —
       `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/handler-group-manifest.test.ts --maxWorkers=2`;
       `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
-- [ ] **4. Commit** — `feat(cli): porta chat list/read/send do stablyai/orca#33115`, com o trailer
+- [x] **4. Commit** — `feat(cli): porta chat list/read/send do stablyai/orca#33115`, com o trailer
       `Upstream: stablyai/orca#33115 @ a007c29e248`. Nenhuma linha nossa no commit.
-- [ ] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P1`, revisa o commit
+- [x] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P1`, revisa o commit
       contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
       antes do passo seguinte.
 
-**Evidência:** `brza-studio@<sha>` · os comandos acima → `chat.test.ts` 10 passed · REV-NNN
+**Evidência:** `brza-studio@f633ec3e307` (o porte, cabeça `a007c29e248` conferida) e `brza-studio@df8adc29574` (X2) ·
+o vitest de `chat.test.ts` e `handler-group-manifest.test.ts` → 17 passed (11 + 6); `worktree-ps-*` → 9 passed;
+`pnpm verify:bundled-skill-guides`, `pnpm tc:cli` → exit 0; `pnpm check:changed` → 22/22 depois do X2 ·
+[REV-007: o P1 do PLN-011, o porte do `#33115`](../../work/reviews/REV-007-pln-011-p1-porte-33115.md), aprova com o A1
+corrigido no D1
 
 #### P2 — A origem do coordenador no `agentSession.send`
 
@@ -169,24 +173,24 @@ Executa D3, D6 · executor: worker `implementer` do `brza-mcp`, no worktree do `
 Estimado: 3,5 h · Executado: — h, com a revisão
 
 - [ ] **1. Testes que falham** — em `src/cli/handlers/chat.test.ts`, com o `fakeClient` do `#33115`:
-      - sem `--since`: `entries` com `itemId`, `revision`, `sequence`; `nextCursor` = `liveCursor` formatado; `hasNewer: false`;
-      - `--since e:9`: uma chamada `after` com `cursor: { epoch: 'e', sequence: 9 }` e `limit: 200`; `nextCursor` =
+      - sem `--cursor`: `entries` com `itemId`, `revision`, `sequence`; `nextCursor` = `liveCursor` formatado; `hasNewer: false`;
+      - `--cursor e:9`: uma chamada `after` com `cursor: { epoch: 'e', sequence: 9 }` e `limit: 200`; `nextCursor` =
         `window.nextCursor`; `hasNewer` da página; `removedItemIds` passa;
       - um caso por motivo de reset (`epoch_changed`, `cursor_ahead`, `cursor_compacted`, `journal_gap`,
         `schema_unreadable`): `cursor_reset` no JSON, `entries` da página `tail`, `nextCursor` = `liveCursor`, e
         `process.exitCode` igual a 2, pela R8.1;
       - cursor malformado (`abc`, `e:-1`, `:3`): `invalid_argument`, sem chamada ao host;
       - epoch com `:` (`a:b:7`) vira `{ epoch: 'a:b', sequence: 7 }`;
-      - reset `cursor_compacted` duas vezes seguidas → as duas saem 2, com a página `tail`, e o guia diz "leia sem `--since`" (R8.2);
-      - `--since` com `--limit`: recusado com `invalid_argument`, pela R8.3.
+      - reset `cursor_compacted` duas vezes seguidas → as duas saem 2, com a página `tail`, e o guia diz "leia sem `--cursor`" (R8.2);
+      - `--cursor` com `--limit`: recusado com `invalid_argument`, pela R8.3.
       E `src/cli/brza/chat-cursor.test.ts` para o parse e o formato.
-- [ ] **2. Implementar** — `src/cli/brza/chat-cursor.ts`; o ramo `--since` no `chat read`; os ids no
+- [ ] **2. Implementar** — `src/cli/brza/chat-cursor.ts`; o ramo `--cursor` no `chat read`; os ids no
       `chatTranscript` (o tipo de entrada ganha `itemId`, `revision`, `sequence`); o `nextCursor` e o `hasNewer` no
       resultado; o spec e a linha do guia (D6), e `pnpm generate:bundled-skill-guides`.
 - [ ] **3. Rodar e ver passar** —
       `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-cursor.test.ts --maxWorkers=2`;
       `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
-- [ ] **4. Commit** — `feat(cli): chat read --since lê só o que mudou e avisa o cursor_reset`.
+- [ ] **4. Commit** — `feat(cli): chat read --cursor lê só o que mudou e avisa o cursor_reset`.
 - [ ] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P3`, revisa o commit
       contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
       antes do passo seguinte.
@@ -433,7 +437,7 @@ Estimado: 1 h · Executado: — h
 
 | ID  | Critério | Passos | Esperado | Observado | Veredito |
 | :-- | :------- | :----- | :------- | :-------- | :------- |
-| C1  | R2.1, R2.2, R5.4, R6.1, R6.2, R6.3: o coordenador lê por cursor, envia, vê a fila retida e a origem | No app de dev, dois chats Claude: A (coordenador) e B (alvo). 1) `pnpm orca-dev chat list --json` e anote o `session` dos dois. 2) Em B, peça uma tarefa longa (ex.: "liste os arquivos de src/cli um a um, devagar"). 3) `ORCA_AGENT_SESSION_ID=<A> pnpm orca-dev chat send --session <B> --text "pare e resuma" --json; echo "saída $?"`. 4) Em B, peça uma pergunta com opções e deixe sem responder; repita o passo 3. 5) `pnpm orca-dev chat read --session <B> --json`, anote o `nextCursor`; responda a pergunta em B; `pnpm orca-dev chat read --session <B> --since <nextCursor> --json`. 6) Repita o passo 3 com `--operation <operation do passo 4>`. | 3) `delivery: queued`, `held_by: working`, saída 0. 4) `held_by: question`, saída 0. Em B, a mensagem aparece como tarefa de A, não como de pessoa. 5) só as entradas depois do cursor, com a resposta e a nova revisão da pergunta (`pending: false`), `hasNewer` e `nextCursor`. 6) `replayed: true`, saída 0, e nenhuma mensagem nova em B. | | |
+| C1  | R2.1, R2.2, R5.4, R6.1, R6.2, R6.3: o coordenador lê por cursor, envia, vê a fila retida e a origem | No app de dev, dois chats Claude: A (coordenador) e B (alvo). 1) `pnpm orca-dev chat list --json` e anote o `session` dos dois. 2) Em B, peça uma tarefa longa (ex.: "liste os arquivos de src/cli um a um, devagar"). 3) `ORCA_AGENT_SESSION_ID=<A> pnpm orca-dev chat send --session <B> --text "pare e resuma" --json; echo "saída $?"`. 4) Em B, peça uma pergunta com opções e deixe sem responder; repita o passo 3. 5) `pnpm orca-dev chat read --session <B> --json`, anote o `nextCursor`; responda a pergunta em B; `pnpm orca-dev chat read --session <B> --cursor <nextCursor> --json`. 6) Repita o passo 3 com `--operation <operation do passo 4>`. | 3) `delivery: queued`, `held_by: working`, saída 0. 4) `held_by: question`, saída 0. Em B, a mensagem aparece como tarefa de A, não como de pessoa. 5) só as entradas depois do cursor, com a resposta e a nova revisão da pergunta (`pending: false`), `hasNewer` e `nextCursor`. 6) `replayed: true`, saída 0, e nenhuma mensagem nova em B. | | |
 | C2  | R10.2, R10.3, R10.4: o `focus`, a barra lateral e a Jump Palette seguem o chat | No app de dev, dois chats e um terminal. 1) Com outra janela na frente, `pnpm orca-dev chat focus --session <B>`. 2) Troque para o chat A pelo atalho de aba e depois pela notificação de B. 3) Na Jump Palette, busque o título de B e abra. | 1) o app vem à frente com B ativo. 2) a barra lateral destaca o chat da tela a cada troca. 3) B aparece nas recentes e na busca, e abre como chat. | | |
 
 ## Regressão
@@ -450,12 +454,30 @@ Estimado: 1 h · Executado: — h
 - **O envio do próprio chat segue como de pessoa** (`userSend`) (F8): um teste do P4 com
   `ORCA_AGENT_SESSION_ID` igual ao `--session` não muda os parâmetros; a regra é do host e não muda.
 
+## Desvios
+
+- **X1 — A fase 1 nasce da `origin/master` `50333c6ffd5`, e não da `8f41dd56a33`.** A `master` local estava um commit
+  atrás (o tema BrzA Dark, PLN-007), sem relação com a CLI; afeta P1.
+- **X2 — O lint do porte num commit nosso.** O `check:changed` falha no `src/cli/handlers/chat.test.ts:78` do próprio
+  `#33115` (`consistent-type-assertions`); o porte fica intacto em `brza-studio@f633ec3e307`, e o guard vai em
+  `brza-studio@df8adc29574`; afeta P1 e D1.
+- **X3 — O cursor é `--cursor`, e não `--since`.** A R13.4, às cegas, reabriu a R8.4 só no nome do cursor; o D3, o D6, o
+  P3, a Cobertura e o C1 foram reescritos. O PLN-010 do `tools-kit` chama `brza chat read --cursor`.
+
 ## Worklogs
 
 - 2026-11-03 — abertura: as cinco issues das frentes, o PLN-011 com as fases e as R1 a R4 do `playground`; R5 e
   R6 fecham a entrevista da fase 1, e o `#37774` sai dela; R7 com Anderson e R8 a R11 pelo `agy`; Desenho e P1 a P17
   gravados, o `brza-mcp` de pé e a R12 refaz a R7.3. Parou antes do P1, com a coordenadora aberta.
   [PLN-011: abertura do plano dos chats pela CLI e pelos plugins](../../work/worklogs/2026-11-03-pln-011-abertura-chats-pela-cli-e-plugins.md)
+- 2026-11-03 — execução: o P1 fecha pelo `brza-mcp` (X1, X2, REV-007); as R13 a R16 às cegas, com a R13.4 em acordo
+  na volta 1 (X3).
+  [PLN-011: execução dos passos pela sessão coordenadora](../../work/worklogs/2026-11-03-pln-011-execucao.md)
+
+## Revisões
+
+- [REV-007: o P1 do PLN-011, o porte do `#33115`](../../work/reviews/REV-007-pln-011-p1-porte-33115.md) — aprova; A1
+  (a contagem de testes do D1) corrigido aqui.
 
 ## Fechamento
 

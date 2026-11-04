@@ -222,28 +222,28 @@ Respondida em 2026-11-03, pelo `agy`.
    `tools-kit`, quando o wrapper separa recomeçar de falhar · 1 — custo: nenhum; se paga: nunca · 4 — custo: o da 2; se
    paga: só com tabela única de códigos.
 
-   **Decidido — "2 (Recomendado)"**. "Permite ao coordenador e ao wrapper distinguir recomeço por reset de falha real
+   **Decidido — "2 (Recomendado)"** → refeita às cegas em R13.1.. "Permite ao coordenador e ao wrapper distinguir recomeço por reset de falha real
    diretamente pelo código de saída, sem precisar inspecionar o payload do erro."
 
 2. **O reset repetido.** Opções: aceitar e documentar (recomendada) — custo: uma linha no guia e um teste; até 200
    itens relidos por leitura; se paga: agora · contorno no cliente — custo: ~1 h, revisões antigas perdidas sem aviso;
    se paga: só com medição · mudar o host — custo: contrato `strict` e conflito no sync; se paga: nunca na fase 1.
 
-   **Decidido — "Aceitar e documentar (Recomendado)"**. "Preserva a fidelidade ao contrato do host sem introduzir
+   **Decidido — "Aceitar e documentar (Recomendado)"** → refeita às cegas em R13.2.. "Preserva a fidelidade ao contrato do host sem introduzir
    divergências no sync com o upstream, evitando perda silenciosa de revisões no cliente."
 
 3. **Quanto o cursor lê.** Opções: uma página `after` de 200 linhas (recomendada) — custo: recusar o `--limit` e um
    campo; se paga: agora · `--limit` conta linhas — custo: a flag muda de sentido; se paga: só se 200 linhas pesarem ·
    lê até `hasNewer` falso — custo: saída sem teto; se paga: nunca.
 
-   **Decidido — "Uma página after de 200 linhas (Recomendado)"**. "Garante paginação exata por construção e
+   **Decidido — "Uma página after de 200 linhas (Recomendado)"** → refeita às cegas em R13.3.. "Garante paginação exata por construção e
    previsibilidade de consumo, evitando saída sem teto ou ambiguidade semântica na flag de limite."
 
 4. **Os nomes das flags.** Opções: adotar os do PLN-010 (recomendada) — custo: reescrever a R6.2 e a R6.3 só no nome;
    se paga: já · manter os da R6 — custo: o PLN-010 muda o Desenho; se paga: nunca · os dois, como alias — custo:
    superfície dupla; se paga: nunca.
 
-   **Decidido — "Adotar os do PLN-010 (Recomendado)"**: `--since`, `--operation` e o campo `operation` no recibo, com a
+   **Decidido — "Adotar os do PLN-010 (Recomendado)"** → reaberta em R13.4.: `--since`, `--operation` e o campo `operation` no recibo, com a
    semântica da R6. "Atende de imediato ao consumidor dependente no tools-kit sem impor adaptações e dispensa aliases
    redundantes em uma interface nova sem legado."
 
@@ -260,7 +260,7 @@ Respondida em 2026-11-03, pelo `agy`.
    paga: na fase 1 · manter a R6.1 — custo: o wrapper perde o sinal de incerteza; se paga: se o C1 mostrar `pending`
    raro · `pending` sai 0 — custo: sucesso falso; se paga: nunca.
 
-   **Decidido — "Esperar o pending resolver, teto 30 s (Recomendado)"**. "Preserva a semântica do código 0 para
+   **Decidido — "Esperar o pending resolver, teto 30 s (Recomendado)"** → refeita às cegas em R14.1.. "Preserva a semântica do código 0 para
    confirmação real e 3 para incerteza na coordenação entre sessões, sem nunca reportar sucesso falso antes da entrega
    resolver."
 
@@ -268,19 +268,19 @@ Respondida em 2026-11-03, pelo `agy`.
    paga: na fase 1 · com `paused` e `blocked` — custo: o `blocked` não aparece na página; se paga: só se o wrapper agir
    diferente · só `question | working` — custo: valor falso; se paga: nunca.
 
-   **Decidido — "question | working | null (Recomendado)"**, com `queuePaused: true` na pausa. "Evita reportar working
+   **Decidido — "question | working | null (Recomendado)"** → refeita às cegas em R14.2., com `queuePaused: true` na pausa. "Evita reportar working
    falso quando a fila já escoou ou está pausada, mantendo o held_by fiel aos dados reais expostos pelo histórico."
 
 3. **O replay `returned` ou `withdrawn`.** Opções: sair 1, `rejected` (recomendada) — custo: duas linhas e dois testes;
    se paga: no primeiro retry depois de um Stop · sair 0 — custo: diz "na fila" para o que não sai; se paga: nunca.
 
-   **Decidido — "Sair 1, com submission.state rejected (Recomendado)"**. "Cumpre o princípio de nunca reportar sucesso
+   **Decidido — "Sair 1, com submission.state rejected (Recomendado)"** → refeita às cegas em R14.3.. "Cumpre o princípio de nunca reportar sucesso
    falso em replays de mensagens retiradas ou com falha definitiva que não serão entregues."
 
 4. **Onde mora a extensão.** Opções: `src/cli/brza/` (recomendada) — custo: quatro arquivos pequenos; se paga: no sync
    do `#33115` fundido · tudo no `chat.ts` — custo: conflito em cada função; se paga: no sync, nunca.
 
-   **Decidido — "Em src/cli/brza/, com o chat.ts só chamando (Recomendado)"**. "Isola as extensões do fork no padrão
+   **Decidido — "Em src/cli/brza/, com o chat.ts só chamando (Recomendado)"** → refeita às cegas em R14.4.. "Isola as extensões do fork no padrão
    das outras pastas brza/, minimizando divergências e conflitos no rebase com o upstream após o merge do #33115."
 
 ### Rodada 10 — a navegação (enviada 2026-11-03, ao `agy`)
@@ -293,7 +293,7 @@ Respondida em 2026-11-03, pelo `agy`.
    enganoso e 1 teste; se paga: na fase 2 · RPC novo `agentSession.focus` — custo: schema, catálogo e IPC novos; se
    paga: se o upstream aceitar · só `agentSession.reveal` — custo: não traz a janela; se paga: nunca.
 
-   **Decidido — "Ramo de chat no terminal.reveal, no renderer (Recomendado)"**. "Evita criar RPCs e schemas novos que
+   **Decidido — "Ramo de chat no terminal.reveal, no renderer (Recomendado)"** → refeita às cegas em R15.1.. "Evita criar RPCs e schemas novos que
    gerem conflitos no sync com o upstream, reusando o relay existente para trazer a janela ao primeiro plano e
    resolvendo a aba no renderer."
 
@@ -301,19 +301,19 @@ Respondida em 2026-11-03, pelo `agy`.
    arquivos, com testes; se paga: na fase 2 · só em mudança externa — custo: dois estados; se paga: nunca · só pelo
    `focus` — custo: atalho e notificação divergem; se paga: nunca.
 
-   **Decidido — "Sempre, derivada da aba ativa (Recomendado)"**. "Elimina o estado duplicado que causa a divergência
+   **Decidido — "Sempre, derivada da aba ativa (Recomendado)"** → refeita às cegas em R15.2.. "Elimina o estado duplicado que causa a divergência
    visual relatada, mantendo a barra lateral sempre sincronizada com a aba ativa independente da origem da navegação."
 
 3. **O que a Jump Palette ganha.** Opções: só título e recentes (recomendada) — custo: ramo novo no builder e na
    ativação; se paga: na fase 2 · título e conteúdo — custo: indexar transcript; se paga: só com busca de conteúdo.
 
-   **Decidido — "Só título e recentes (Recomendado)"**. "Atende à navegação de chats na Jump Palette com menor
+   **Decidido — "Só título e recentes (Recomendado)"** → refeita às cegas em R15.3.. "Atende à navegação de chats na Jump Palette com menor
    divergência e sem a sobrecarga ou complexidade de indexar o texto dos transcripts."
 
 4. **A prova da fase 2.** Opções: unidade e caso manual (recomendada) — custo: ~20 min de Anderson no app; se paga: no
    fim da fase 2 · só unidade — custo: nenhum de Anderson; se paga: agora, sem prova do foco da janela.
 
-   **Decidido — "Unidade + caso manual (Recomendado)"**. "Cumpre a diretriz de comprovar a lógica com testes de
+   **Decidido — "Unidade + caso manual (Recomendado)"** → refeita às cegas em R15.4.. "Cumpre a diretriz de comprovar a lógica com testes de
    unidade e verificar manualmente no app o foco de janela e a experiência visual real."
 
 ### Rodada 11 — plugins, `account usage` e o journal (enviada 2026-11-03, ao `agy`)
@@ -327,7 +327,7 @@ Respondida em 2026-11-03, pelo `agy`.
    não sobe; se paga: na fase 4 · método novo `agents.listChats` — custo: superfície nova; se paga: se o plugin precisar
    detectar · mudar a forma — custo: quebra o contrato; se paga: nunca.
 
-   **Decidido — "Campos opcionais novos, conferindo antes no app (Recomendado)"**. "Respeita a regra frozen da Host API
+   **Decidido — "Campos opcionais novos, conferindo antes no app (Recomendado)"** → refeita às cegas em R16.1.. "Respeita a regra frozen da Host API
    1 de que resultados apenas crescem sem quebrar plugins existentes, além de validar antes no app o comportamento real
    das sessões."
 
@@ -335,13 +335,13 @@ Respondida em 2026-11-03, pelo `agy`.
    `cwd`; se paga: até a sandbox do worker · por capacidade nova — custo: manifest e diálogo; se paga: com plugin de
    status line · sim para todos — custo: `cwd` e `transcriptPath` em frames isolados; se paga: nunca.
 
-   **Decidido — "Não agora (Recomendado)"**. "Mantém a restrição intencional contra o vazamento de caminhos locais e
+   **Decidido — "Não agora (Recomendado)"** → refeita às cegas em R16.2.. "Mantém a restrição intencional contra o vazamento de caminhos locais e
    transcrições para frames isolados antes da introdução de sandboxing ou modelo de permissões."
 
 3. **Quando portar o `#37467`.** Opções: agora (recomendada) — custo: 1 conflito trivial e o rebrand das strings; se
    paga: na fase 5 · esperar o upstream — custo: a CLI só no sync; se paga: no próximo sync.
 
-   **Decidido — "Agora, aplicando o diff com o conflito à mão (Recomendado)"**. "O diff é restrito à CLI, tem
+   **Decidido — "Agora, aplicando o diff com o conflito à mão (Recomendado)"** → refeita às cegas em R16.3.. "O diff é restrito à CLI, tem
    dependências prontas no fork e traz apenas um conflito trivial de rebrand, liberando o avanço da fase 5 e o consumo
    pelo PLN-010."
 
@@ -350,7 +350,7 @@ Respondida em 2026-11-03, pelo `agy`.
    tempo indefinido; se paga: quando o upstream integrar · portar o PR aberto — custo: 459 arquivos instáveis; se paga:
    nunca, enquanto aberto.
 
-   **Decidido — "Fase 3 vira issue fora de escopo e o plano fecha (Recomendado)"**. "Mantém a decisão da R4.3 de não
+   **Decidido — "Fase 3 vira issue fora de escopo e o plano fecha (Recomendado)"** → refeita às cegas em R16.4.. "Mantém a decisão da R4.3 de não
    absorver 459 arquivos de um PR instável no upstream e permite encerrar o plano ao concluir a fase 5 sem bloqueios
    indefinidos."
 
@@ -374,4 +374,167 @@ Respondida em 2026-11-03, por Anderson.
 
    **Decidido — "Chat novo no Studio, MCP por HTTP (Recomendado)"**. Conferido antes de abrir: do chat da abertura,
    `initialize` e `tools/call status` responderam pelo `/mcp`, com a fila vazia e `orchestrator.max_workers: 6`.
+
+**Refeitas às cegas, pela regra nova de Anderson.** Em 2026-11-03, trazida pela sessão "Plano: chats pela CLI e
+plugins (studio)", nas palavras dele: "se o `agy` discordar de você, discutam em rodadas até chegarem a um acordo, não
+indique ao agente do `agy` qual a sua escolha recomendada, deixe que ele decida por si". As R8 a R11 tinham a
+recomendada marcada, e o `agy` escolheu essa nas 16 perguntas; as R13 a R16 repetem as mesmas perguntas, com o mesmo
+"Apresentado antes", sem "(Recomendado)" e com as opções embaralhadas. A recomendação da sessão coordenadora foi
+gravada antes de enviar, em `/private/tmp/pln011coord/agy/minhas-recomendacoes.md`; o `agy` não leu o plano nem o
+rascunho com a seção de pontos (`pln011-fase1-desenho-cego.md`). Os prompts e as respostas estão em
+`/private/tmp/pln011coord/agy/`. Nenhuma nota de `work/decisions/` nasce delas.
+
+### Rodada 13 — o contrato da leitura da fase 1, às cegas (enviada 2026-11-03, ao `agy`)
+
+> **Apresentado antes:** o mesmo da R8, e as opções com o custo e o "se paga" da R8, reescritos sem
+> adjetivo que puxe a escolha. Conversa do `agy`: `6bc36873-9dfe-420c-8fe4-45ca9d4bd1ff`.
+
+Respondida em 2026-11-03, pelo `agy`, às cegas.
+
+1. **O código do `cursor_reset`.** Opções, na ordem enviada: 1 · 4 · 2.
+
+   Escolha cega do `agy`: "2" — "O código 2 distingue imediatamente o reset de cursor de falhas gerais (1) ou incertezas (3), viabilizando que o tools-kit e o coordenador reajam de forma limpa pelo código de saída." Recomendação da coordenadora, gravada antes: "2".
+
+   **Decidido — "2"**, por acordo na primeira volta. Confirma a R8.1.
+
+2. **O reset repetido.** Opções, na ordem enviada: Mudar o host · Aceitar e documentar · Contorno no cliente.
+
+   Escolha cega do `agy`: "Aceitar e documentar" — "Preserva a menor divergência com o upstream sem alterar o host e evita contornos no cliente que descartariam revisões antigas, respeitando o princípio de nunca reportar falso sucesso." Recomendação da coordenadora, gravada antes: "Aceitar e documentar".
+
+   **Decidido — "Aceitar e documentar"**, por acordo na primeira volta. Confirma a R8.2.
+
+3. **Quanto o cursor lê.** Opções, na ordem enviada: --limit conta linhas · Lê até hasNewer false · Uma página after de 200 linhas.
+
+   Escolha cega do `agy`: "Uma página after de 200 linhas" — "Mantém o consumo de contexto previsível e limitado por chamada paginada com hasNewer, evitando saídas sem teto e sem conflitar com a semântica do --limit existente." Recomendação da coordenadora, gravada antes: "Uma página after de 200 linhas".
+
+   **Decidido — "Uma página after de 200 linhas"**, por acordo na primeira volta. Confirma a R8.3.
+
+4. **Os nomes das flags.** Opções, na ordem enviada: Aceitar os dois, como alias · Manter os da R6 · Adotar os do PLN-010.
+
+   Escolha cega do `agy`: "Manter os da R6" — "Mantém a consistência com a convenção canônica de --cursor já presente na CLI do Orca e preserva as decisões da R6, cabendo ao plano dependente (PLN-010) alinhar seu desenho." Recomendação da coordenadora, gravada antes: "Adotar os do PLN-010".
+
+   **Discussão, volta 1.** A coordenadora defendeu "Adotar os do PLN-010": o PLN-010 é o único consumidor e já decidiu `--since` e
+   `--operation` (`PLN-010-plan.md:69`, `:72`, `:94`, `:99`), e os nomes da R6 nunca foram implementados. E levou os fatos
+   a favor dele, conferidos no `brza-studio`: `--cursor <cursor>` é a paginação opaca em seis specs
+   (`src/cli/specs/search.ts:9`, `linear-mcp.ts:46`, `automations.ts:128`, `artifacts.ts:33`,
+   `orchestration-worker-specs.ts:74` e `:147`); o único `--since` da CLI (`search.ts:9`, `:33`) recebe data ISO; não
+   há convenção para a flag de operação. O `agy` contrapropôs "--cursor para o cursor, --operation para a operação e operation no recibo": "Para a leitura, manter --cursor respeita a convenção consolidada em seis specs da CLI do Orca e previne conflito semântico com --since, que já representa data ISO em search. Para o envio, como não existe convenção prévia na CLI, adotar a flag --operation combinada ao campo operation no recibo atende ao PLN-010 e oferece simetria direta entre o JSON e o replay. Essa divisão harmoniza a consistência da CLI com a melhor ergonomia para a coordenação entre sessões." A coordenadora mudou
+   para a contraproposta, pelo argumento da convenção e do sentido único do `--since`.
+
+   **Decidido — `--cursor <epoch:sequence>` para o cursor, `--operation <id>` para a operação e `operation` no
+   recibo**, por acordo na volta 1. Reabre a R8.4 só no nome do cursor; o PLN-010 lê o plano pelo git e troca `--since`
+   por `--cursor` no `brza chat read` que o wrapper chama.
+
+### Rodada 14 — o contrato do envio e o código da fase 1, às cegas (enviada 2026-11-03, ao `agy`)
+
+> **Apresentado antes:** o mesmo da R9, e as opções com o custo e o "se paga" da R9, reescritos sem
+> adjetivo que puxe a escolha. Conversa do `agy`: `2d3fca3a-ea81-4116-8fd7-b421fa2cfd13`.
+
+Respondida em 2026-11-03, pelo `agy`, às cegas.
+
+1. **O `pending`.** Opções, na ordem enviada: Manter a R6.1 como está · pending sai 0 · Esperar o pending resolver, teto 30 s.
+
+   Escolha cega do `agy`: "Esperar o pending resolver, teto 30 s" — "Como a CLI local recebe pending logo na admissão, sair 3 inviabilizaria o fluxo comum e sair 0 violaria o critério de nunca reportar falso sucesso se o provedor rejeitar a mensagem logo em seguida. A espera de até 30 s garante a leitura do estado definitivo da entrega e viabiliza a coordenação confiável entre sessões." Recomendação da coordenadora, gravada antes: "Esperar o pending resolver, teto 30 s".
+
+   **Decidido — "Esperar o pending resolver, teto 30 s"**, por acordo na primeira volta. Confirma a R9.1.
+
+2. **Os valores do `held_by`.** Opções, na ordem enviada: Só question | working · question | working | paused | blocked | null · question | working | null.
+
+   Escolha cega do `agy`: "question | working | null" — "Evita mascarar pausa ou escoamento da fila como working e não tenta deduzir blocked, que não é exposto na página do wire. O indicador queuePaused: true cobre a pausa com clareza sem poluir o enum de retenção da fila." Recomendação da coordenadora, gravada antes: "question | working | null".
+
+   **Decidido — "question | working | null"**, por acordo na primeira volta. Confirma a R9.2.
+
+3. **O replay `returned` ou `withdrawn`.** Opções, na ordem enviada: Sair 0, como queued · Sair 1, com submission.state rejected.
+
+   Escolha cega do `agy`: "Sair 1, com submission.state rejected" — "Um envio retornado ou retirado não seguirá adiante sozinho, de modo que responder 0 (queued) configuraria falso sucesso e deixaria o coordenador esperando indefinidamente. Sair 1 com submission.state rejected informa de imediato que a entrega foi frustrada após o cancelamento ou erro." Recomendação da coordenadora, gravada antes: "Sair 1, com submission.state rejected".
+
+   **Decidido — "Sair 1, com submission.state rejected"**, por acordo na primeira volta. Confirma a R9.3.
+
+4. **Onde mora a extensão.** Opções, na ordem enviada: Tudo em chat-sessions.ts e chat.ts · Em src/cli/brza/, com o chat.ts só chamando.
+
+   Escolha cega do `agy`: "Em src/cli/brza/, com o chat.ts só chamando" — "Segue o padrão arquitetural do repositório de manter adições exclusivas do fork em pastas brza/ e atende ao critério de menor divergência com o stablyai/orca. Essa separação previne conflitos de código durante a sincronização que trouxer o PR #33115 fundido do upstream." Recomendação da coordenadora, gravada antes: "Em src/cli/brza/".
+
+   **Discussão, volta 1.** A coordenadora defendeu "Em src/cli/brza/": o PLN-010 é o único consumidor e já decidiu `--since` e
+   `--operation` (`PLN-010-plan.md:69`, `:72`, `:94`, `:99`), e os nomes da R6 nunca foram implementados. E levou os fatos
+   a favor dele, conferidos no `brza-studio`: `--cursor <cursor>` é a paginação opaca em seis specs
+   (`src/cli/specs/search.ts:9`, `linear-mcp.ts:46`, `automations.ts:128`, `artifacts.ts:33`,
+   `orchestration-worker-specs.ts:74` e `:147`); o único `--since` da CLI (`search.ts:9`, `:33`) recebe data ISO; não
+   há convenção para a flag de operação. O `agy` contrapropôs "--cursor para o cursor, --operation para a operação e operation no recibo": "Para a leitura, manter --cursor respeita a convenção consolidada em seis specs da CLI do Orca e previne conflito semântico com --since, que já representa data ISO em search. Para o envio, como não existe convenção prévia na CLI, adotar a flag --operation combinada ao campo operation no recibo atende ao PLN-010 e oferece simetria direta entre o JSON e o replay. Essa divisão harmoniza a consistência da CLI com a melhor ergonomia para a coordenação entre sessões." A coordenadora mudou
+   para a contraproposta, pelo argumento da convenção e do sentido único do `--since`.
+
+   **Decidido — `--cursor <epoch:sequence>` para o cursor, `--operation <id>` para a operação e `operation` no
+   recibo**, por acordo na volta 1. Reabre a R8.4 só no nome do cursor; o PLN-010 lê o plano pelo git e troca `--since`
+   por `--cursor` no `brza chat read` que o wrapper chama.
+
+### Rodada 15 — a navegação, às cegas (enviada 2026-11-03, ao `agy`)
+
+> **Apresentado antes:** o mesmo da R10, e as opções com o custo e o "se paga" da R10, reescritos sem
+> adjetivo que puxe a escolha. Conversa do `agy`: `831f2d80-b570-4e96-89a4-a7dbd1653653`.
+
+Respondida em 2026-11-03, pelo `agy`, às cegas.
+
+1. **Como o `focus` navega.** Opções, na ordem enviada: RPC novo agentSession.focus · Só agentSession.reveal pela CLI · Ramo de chat no terminal.reveal, no renderer.
+
+   Escolha cega do `agy`: "Ramo de chat no terminal.reveal, no renderer" — "Evita criar novo RPC/IPC e mantém divergência zero com o protocolo do upstream, reaproveitando o relay existente para trazer a janela ao primeiro plano e delegando a navegação ao revealDashboardAgent." Recomendação da coordenadora, gravada antes: "Ramo de chat no terminal.reveal".
+
+   **Discussão, volta 1.** A coordenadora defendeu "Ramo de chat no terminal.reveal": o PLN-010 é o único consumidor e já decidiu `--since` e
+   `--operation` (`PLN-010-plan.md:69`, `:72`, `:94`, `:99`), e os nomes da R6 nunca foram implementados. E levou os fatos
+   a favor dele, conferidos no `brza-studio`: `--cursor <cursor>` é a paginação opaca em seis specs
+   (`src/cli/specs/search.ts:9`, `linear-mcp.ts:46`, `automations.ts:128`, `artifacts.ts:33`,
+   `orchestration-worker-specs.ts:74` e `:147`); o único `--since` da CLI (`search.ts:9`, `:33`) recebe data ISO; não
+   há convenção para a flag de operação. O `agy` contrapropôs "--cursor para o cursor, --operation para a operação e operation no recibo": "Para a leitura, manter --cursor respeita a convenção consolidada em seis specs da CLI do Orca e previne conflito semântico com --since, que já representa data ISO em search. Para o envio, como não existe convenção prévia na CLI, adotar a flag --operation combinada ao campo operation no recibo atende ao PLN-010 e oferece simetria direta entre o JSON e o replay. Essa divisão harmoniza a consistência da CLI com a melhor ergonomia para a coordenação entre sessões." A coordenadora mudou
+   para a contraproposta, pelo argumento da convenção e do sentido único do `--since`.
+
+   **Decidido — `--cursor <epoch:sequence>` para o cursor, `--operation <id>` para a operação e `operation` no
+   recibo**, por acordo na volta 1. Reabre a R8.4 só no nome do cursor; o PLN-010 lê o plano pelo git e troca `--since`
+   por `--cursor` no `brza chat read` que o wrapper chama.
+
+2. **Quando a barra lateral segue o chat.** Opções, na ordem enviada: Só pelo focus novo · Sempre, derivada da aba ativa · Só em mudança externa.
+
+   Escolha cega do `agy`: "Sempre, derivada da aba ativa" — "Garante fonte única de verdade eliminando estados paralelos no clique, permitindo que a barra lateral acompanhe trocas por atalho, notificação ou CLI de forma consistente." Recomendação da coordenadora, gravada antes: "Sempre, derivada da aba ativa".
+
+   **Decidido — "Sempre, derivada da aba ativa"**, por acordo na primeira volta. Confirma a R10.2.
+
+3. **O que a Jump Palette ganha.** Opções, na ordem enviada: Título e conteúdo · Só título e recentes.
+
+   Escolha cega do `agy`: "Só título e recentes" — "Resolve a ausência de chats na paleta sem o alto custo de indexar transcripts completos, integrando os chats recentes e busca por título com baixo impacto no código." Recomendação da coordenadora, gravada antes: "Só título e recentes".
+
+   **Decidido — "Só título e recentes"**, por acordo na primeira volta. Confirma a R10.3.
+
+4. **A prova da fase 2.** Opções, na ordem enviada: Só unidade · Unidade + caso manual.
+
+   Escolha cega do `agy`: "Unidade + caso manual" — "Segue o critério de nunca reportar sucesso falso, garantindo cobertura de unidade na lógica e validação manual do comportamento de foco de janela e sincronização visual no app." Recomendação da coordenadora, gravada antes: "Unidade + caso manual".
+
+   **Decidido — "Unidade + caso manual"**, por acordo na primeira volta. Confirma a R10.4.
+
+### Rodada 16 — plugins, `account usage` e o journal, às cegas (enviada 2026-11-03, ao `agy`)
+
+> **Apresentado antes:** o mesmo da R11, e as opções com o custo e o "se paga" da R11, reescritos sem
+> adjetivo que puxe a escolha. Conversa do `agy`: `a134784e-8c43-420f-a356-e6156e2df468`.
+
+Respondida em 2026-11-03, pelo `agy`, às cegas.
+
+1. **`agents.list` e `agent.status.changed`.** Opções, na ordem enviada: Mudar a forma (terminalId opcional) · Método novo agents.listChats (since 3) · Campos opcionais novos, conferindo antes no app.
+
+   Escolha cega do `agy`: "Campos opcionais novos, conferindo antes no app" — "Preserva a regra do Host API 1 de que o contrato congelado só cresce sem quebrar clientes existentes, validando o comportamento real no app antes de estender os metadados." Recomendação da coordenadora, gravada antes: "Campos opcionais novos, conferindo antes no app".
+
+   **Decidido — "Campos opcionais novos, conferindo antes no app"**, por acordo na primeira volta. Confirma a R11.1.
+
+2. **O caminho em `workspace.readContext`.** Opções, na ordem enviada: Por capacidade nova workspace:path · Sim para todos · Não agora.
+
+   Escolha cega do `agy`: "Não agora" — "Respeita a diretriz de segurança do upstream de omitir caminhos em projeções públicas para iframes isolados, evitando divergências prematuras antes de haver sandbox ou modelo formal de permissões." Recomendação da coordenadora, gravada antes: "Não agora".
+
+   **Decidido — "Não agora"**, por acordo na primeira volta. Confirma a R11.2.
+
+3. **Quando portar o `#37467`.** Opções, na ordem enviada: Esperar o merge no upstream · Agora, aplicando o diff com o conflito à mão.
+
+   Escolha cega do `agy`: "Agora, aplicando o diff com o conflito à mão" — "O diff é pontual, tem apenas um conflito trivial de texto/rebrand e as dependências de runtime já existem no fork, destravando a fase 5 e o PLN-010 de imediato no mesmo padrão adotado com o #33115." Recomendação da coordenadora, gravada antes: "Agora, aplicando o diff com o conflito à mão".
+
+   **Decidido — "Agora, aplicando o diff com o conflito à mão"**, por acordo na primeira volta. Confirma a R11.3.
+
+4. **Como o plano fecha sem o `#37802`.** Opções, na ordem enviada: O plano fica em blocked até o #37802 · Portar o #37802 aberto · Fase 3 vira issue fora de escopo e o plano fecha.
+
+   Escolha cega do `agy`: "Fase 3 vira issue fora de escopo e o plano fecha" — "Evita portar um PR aberto instável de 459 arquivos em revisão no upstream, permitindo encerrar o PLN-011 ao término da fase 5 e deixando a retomada da fase 3 rastreada por issue com gatilho claro." Recomendação da coordenadora, gravada antes: "Fase 3 vira issue fora de escopo e o plano fecha".
+
+   **Decidido — "Fase 3 vira issue fora de escopo e o plano fecha"**, por acordo na primeira volta. Confirma a R11.4.
 

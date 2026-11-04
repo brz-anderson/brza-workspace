@@ -5,8 +5,8 @@ origin: request
 description: O brza sessions abre o Grok com nome e espera, e o MCP despacha ao Grok, ao Codex e ao Antigravity com conta e cota por runtime
 ready: sim
 estimate_h: 16
-executed_h: 3.75
-remaining_h: 10.25
+executed_h: 6.75
+remaining_h: 5.75
 scope:
   - brza-workflow
 opened: 2026-11-03
@@ -18,7 +18,7 @@ tags:
 
 # PLN-013: O Grok, o Codex e o Antigravity abrem pelo `brza sessions` e recebem tarefas do MCP
 
-- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. A E1 (P1 a P4) fechou e foi mesclada em `brza-workflow@975fe88`; próximo: o P5.
+- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. A E1 está mesclada em `brza-workflow@975fe88`; a E2 está mesclada em `7c1684f`; próximo: a E3, a partir da sonda do P8.
 - **Dividido:** [PLN-013 — Entrevista](PLN-013-interview.md) · [PLN-013 — Desenho](PLN-013-design.md)
 
 ## Pedido
@@ -195,44 +195,52 @@ Estimado: 0.75 h · Executado: 1 h
 Executa D4 · executor: `implementer`, pela sessão do `tools-kit`, em `~/Projects/brza-workflow/.worktrees/pln-013-e2`,
 branch `feat/pln-013-e2-cota-e-conta`; a issue, a sessão
 
-Estimado: 2.5 h · Executado: — h
+Estimado: 2.5 h · Executado: 1.5 h
 
-- [ ] **1. Testes que falham:** os da D4 (`test_mcp_accounts.py`, `test_mcp_limits.py`, `test_mcp_dispatch.py`,
+- [x] **1. Testes que falham:** os da D4 (`test_mcp_accounts.py`, `test_mcp_limits.py`, `test_mcp_dispatch.py`,
   `test_brza_quota.py`), com a fixture `orca-account-list.json` trazendo `codex`, `grok` e `antigravity`.
-- [ ] **2. Implementar** o `parse` por runtime, o `Accounts` e o `Limits` com runtime, a `normalize_account`, o
+- [x] **2. Implementar** o `parse` por runtime, o `Accounts` e o `Limits` com runtime, a `normalize_account`, o
   `quota_unknown` do `status` e o `quota_report`.
-- [ ] **3. Rodar e ver passar:** o gate.
-- [ ] **4. Commit** na `feat/pln-013-e2-cota-e-conta`.
+- [x] **3. Rodar e ver passar:** o gate.
+- [x] **4. Commit** na `feat/pln-013-e2-cota-e-conta`.
 - [x] **5. A issue da R4.2**, aberta na abertura do Desenho: [O app não lê a cota do Grok](../../work/issues/o-app-nao-le-a-cota-do-grok.md).
 
-**Evidência:** —
+**Evidência:** `brza-workflow@38b8920`, pelo `agy` (X1), em duas rodadas, porque a primeira deixou
+5 falhas e 2 erros: `tests/mcp` → 378 OK; com o `packages/mcp` da `master`, 7 falhas e 5 erros. Revisão do Grok
+(`rev-P5`): "aprova com correções", A1 a A3, corrigidos em `82793d3` (389 OK).
 
 ### P6 — E2: a troca do Codex pelo gate
 
 Executa D5 · executor: `implementer`, pela sessão do `tools-kit`, no mesmo worktree
 
-Estimado: 1.5 h · Executado: — h
+Estimado: 1.5 h · Executado: 1 h
 
-- [ ] **1. Testes que falham:** os da D5 (`test_mcp_gates.py`, `test_mcp_accounts.py`).
-- [ ] **2. Implementar** o `codex_switch`, os dois motivos no gate, a ordem do `approve`, o `select_codex` e o
+- [x] **1. Testes que falham:** os da D5 (`test_mcp_gates.py`, `test_mcp_accounts.py`).
+- [x] **2. Implementar** o `codex_switch`, os dois motivos no gate, a ordem do `approve`, o `select_codex` e o
   `held_reason` do Codex.
-- [ ] **3. Rodar e ver passar:** o gate.
-- [ ] **4. Commit.**
+- [x] **3. Rodar e ver passar:** o gate.
+- [x] **4. Commit.**
 
-**Evidência:** —
+**Evidência:** `brza-workflow@ac4933e`, pelo `agy` (X1); a primeira rodada esqueceu um import
+(`NameError: lim`), corrigido na segunda: `tests/mcp` → 386 OK. Revisão do Grok (`rev-P6`): "aprova com correções", A1
+(o `select_codex` no cliente do pedido) e A2 (o `held_reason` só no "já em"), corrigidos em `82793d3`.
 
 ### P7 — E2: a revisão e o merge
 
 Executa D4, D5 · executor: `reviewer` e uma sessão Grok, pela sessão do `tools-kit`; o merge, a pedido de Anderson
 
-Estimado: 0.5 h · Executado: — h
+Estimado: 0.5 h · Executado: 0.5 h
 
-- [ ] **1. Revisão pelo `reviewer`** e **pela sessão Grok**; os achados se corrigem pelo `implementer`, com commit.
-- [ ] **2. Merge na `master` do `brza-workflow`**, com a confirmação de Anderson, e o `brza mcp stop` e `brza mcp
+- [x] **1. Revisão pelo `reviewer`** e **pela sessão Grok**; os achados se corrigem pelo `implementer`, com commit.
+- [x] **2. Merge na `master` do `brza-workflow`**, com a confirmação de Anderson, e o `brza mcp stop` e `brza mcp
   start`.
-- [ ] **3. O `brza quota`** real mostra o Codex, o Antigravity e o Grok sem janela, com o `error`.
+- [x] **3. O `brza quota`** real mostra o Codex, o Antigravity e o Grok sem janela, com o `error`.
 
-**Evidência:** —
+**Evidência:** revisão da E2 pelo Grok (`rev-P7-E2`, de `975fe88` a `82793d3`): "VEREDITO: aprova", com os
+achados do P5 e do P6 conferidos; a suíte do `cli` em `env -i` → 484 OK; merge `brza-workflow@7c1684f`, com push, e o
+`tests/mcp` → 389 OK na `master`. O `brza quota` real, com o MCP reiniciado, traz `[claude]`, `[codex] … [ativa]`,
+`[grok] grok (systemDefault) [ativa] … weekly usado 17%` e `[antigravity] … weekly usado 99% … ACIMA DO TETO`. O Grok
+passou a ter cota lida, o que foi para a issue da R4.2.
 
 ### P8 — E3: a sonda do `/rename`
 

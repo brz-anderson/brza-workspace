@@ -26,8 +26,12 @@ pediu a cota dos três runtimes no MCP. Para o Grok, o app não dá a cota. Na R
   `error: "Grok did not report a usage percentage for this account"`.
 - **O app tenta.** A leitura é do `brza-studio/src/main/rate-limits/grok-fetcher.ts`.
 
+- **Em 2026-11-04 a cota veio.** O `brza quota`, no `brza-workflow@7c1684f`, mostra `[grok] … weekly usado 17%, reset
+  2026-11-10 22:28`. A ausência de ontem pode ter sido só a falta de uso da conta logo depois do login. Ainda não se
+  sabe se a janela `session` também vem.
+
 ## O que falta
 
-1. Saber por que o Grok não reporta o percentual: o plano da conta, a API que o fetcher consulta, ou o fetcher.
+1. Confirmar, por mais uns dias, se a leitura se mantém; se sim, fechar a issue. Se não, saber por que o Grok não reporta o percentual: o plano da conta, a API que o fetcher consulta, ou o fetcher.
 2. Com a cota lida, o MCP passa a segurar o worker Grok pelas janelas de topo, como os outros (PLN-013/R3.2), sem
    mudança no desenho.

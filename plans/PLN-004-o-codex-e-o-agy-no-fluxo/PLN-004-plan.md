@@ -24,9 +24,9 @@ tags:
   o Desenho reescrito com o `.brzAgents` (D1, D4, D7, D11 e D15) no `pln-004-design-v2.md`, no scratch, e a
   aprovação, na mensagem, antes de gravá-lo em `PLN-004-design.md`. O código passa ao `brza-workflow`, com o pacote
   `packages/runtimes`, executado pela sessão `workspace`. **Pedido novo de Anderson, 2026-11-03, no meio da R17: "agora
-  temos que inserir também o `Grok`"** (o Grok Build CLI 1.0.70, já instalado, com o dialeto dele no app). Um `collector`
-  levanta o `grok` eixo a eixo; o escopo do plano (título, Pedido, Cobertura) e a R17 aguardam a rodada que vem desse
-  levantamento.
+  temos que inserir também o `Grok`"** (o Grok Build CLI 1.0.70, já instalado, com o dialeto dele no app). O `collector`
+  levantou o `grok` eixo a eixo (`/private/tmp/pln004/grok/levantamento.md`); o escopo do plano (título, Pedido,
+  Cobertura) e a R17 aguardam a R18, que vem dele.
 - **Dividido:** [PLN-004 — Entrevista](PLN-004-interview.md)
 
 ## Pedido

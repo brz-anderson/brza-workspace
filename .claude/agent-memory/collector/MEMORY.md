@@ -4,3 +4,4 @@
 - [Acoplamentos da norma do brza-workspace (genérico/local)](reference_brza-norma-acoplamento-atalhos.md) — focos de código, greps, órfãos, doc de @import
 - [Sondar symlink de agents/skills/memória (Claude, Codex, agy)](reference_symlink-claude-codex-agy-sondas-sem-modelo.md) — sondas a US$ 0,002, memória do subagente por link negada, sync e link
 - [Onde mora cada peça depois do PLN-006 (brza-workflow)](reference_brza-workflow-depois-da-migracao.md) — mapa BW/BZ, o que o sync toca, citações velhas e atalhos
+- [Sondar o Grok Build CLI 1.0.70 (PLN-004)](reference_grok-build-cli-sondas-atalhos.md) — docs locais, `grok inspect`, env limpo, custo por turno, hooks de ~/.claude que entram

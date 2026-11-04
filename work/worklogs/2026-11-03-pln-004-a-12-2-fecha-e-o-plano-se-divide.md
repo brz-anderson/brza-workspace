@@ -41,6 +41,12 @@ o dia anterior está em
   como silenciar na sessão (US$ 0,041). Anderson escolheu a memória real em `.claude/agent-memory/`, com
   `.brzAgents/memory` como link para ela, e a 16.1.3 ficou substituída.
 
+- **O levantamento do Grok** (a pedido de Anderson, "agora temos que inserir também o `Grok`"): um `collector` mediu o
+  Grok Build CLI 1.0.70 eixo a eixo, em `/private/tmp/pln004/grok/levantamento.md` (103 fatos). O Grok lê `AGENTS.md` e
+  `CLAUDE.md` juntos (sem `@import`), `.claude/rules`, `.claude/skills` e `.agents/skills` (link de diretório vale),
+  `.claude/agents/*.md` e roda os hooks do `.claude/settings.json`; mas **sem confiança de pasta não carrega nada de
+  projeto**, e o app não pré-confia o Grok. Gasto das sondas: US$ 0,509 em 6 turnos, mais os de `grok inspect` sem modelo.
+
 ## O que ficou
 
 - **A R17**, a medição e a máquina (P8 a P11), e o **Desenho reescrito com o `.brzAgents`**, que vai à aprovação na
@@ -50,3 +56,19 @@ o dia anterior está em
 - **O `high` do Codex não foi medido:** a R12.2 mediu só `xhigh`.
 - **A migração para o `.brzAgents`** muda o `core/` do `brza-workflow` (16 `git mv`, 14 fixtures do ouro, o sync) e,
   com a memória literal, `git mv` de 55 arquivos de memória em 4 branches; tudo a executar só a pedido de Anderson.
+
+## Fora do workspace
+
+- **O `~/.grok` mexido pelas sondas do Grok** (23:23 em diante, 2026-11-03): 16 sessões novas em `~/.grok/sessions` (dos
+  diretórios de sonda em `chat-scratch/…/grok/p1`, `p4` e `p5`), mais `sessions/sandbox-events.jsonl` e cinco arquivos
+  vazios, `bundles/`, `hooks/`, `hooks-paths`, `sandbox.toml` e `trusted_folders.toml`, que a primeira corrida sob
+  `--sandbox` criou.
+  - **Risco:** o `sandbox.toml` e o `trusted_folders.toml` vazios podem ser lidos pelo Grok do app como configuração;
+    as sessões somam histórico fora do git. `auth.json` não foi aberto, e a `memory-v2` não foi tocada (`GROK_MEMORY=0`).
+  - **Estado:** ativos, parados.
+  - **Desfazer:** apagar os cinco arquivos vazios e as 16 sessões das sondas, que o fim do `levantamento.md` lista.
+- **Os transcripts do `agy` das sondas da R16**, em `~/.gemini/antigravity-cli/brain` (ids `0ba003d1-5b11-47da-ae9c-c7f552d3d7d4`
+  e `542ce7a2-3b6b-44b1-82f1-61d2643b6b9e`).
+  - **Risco:** guardam os prompts das sondas, fora do git.
+  - **Estado:** ativos, parados.
+  - **Desfazer:** apagar os dois diretórios.

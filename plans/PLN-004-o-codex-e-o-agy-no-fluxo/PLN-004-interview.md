@@ -711,3 +711,62 @@ dentro de `.brzAgents`, não mais dentro de `.claude`; restante recomendado".
    maior que o ponto: toca onde moram os papéis, as skills e a memória dos subagentes em todo workspace, o `brza sync`,
    o `brza init` e o Desenho inteiro (D1, D4, D7, D11). A sessão mede o custo antes de voltar com opções, e o D11 fica
    em aberto até lá. Não há menção ao `.brzAgents` em nenhum repositório nem nota hoje.
+
+### Rodada 16 — o `.brzAgents` (enviada 2026-11-03, no chat)
+
+**Apresentado antes:** o levantamento do `collector` (`/private/tmp/pln004/brz-agents/levantamento.md`, 36 fatos, gasto
+de US$ 0,026 nas sondas). O `brza-studio` não lê nenhum dos três caminhos; hooks, `settings.json` e `rules/` não os
+citam. O Claude Code 2.1.318 carrega `agents` e `skills` por link de diretório e por link de arquivo (`system/init`), e
+o Codex 0.166 e o `agy` 1.4.12 acharam a skill por `.agents/skills` como link para `.brzAgents/skills`. Mover `agents`
+e `skills` toca 36 arquivos e 104 linhas de referência no `brza-workflow`, 5 arquivos locais no workspace e nenhum no
+`brza-studio`. O D15 como escrito falha na transição de diretório real para link (o sync escreve antes de apagar, e o
+`commit_and_push` falha em `git add` através do link novo). Com `.claude/agent-memory` como link, o `Write` e o `Edit`
+do subagente foram negados ("sensitive file") em 3 de 3 execuções de `claude -p`, contra o controle com diretório real,
+que gravou; a doc diz que o diretório da memória do subagente não é configurável. Conferi o `c3.jsonl` e o `c4.jsonl`.
+O que a sonda não mediu: a sessão interativa e a regra de permissão com caminho absoluto. Esta rodada passa a R16, e a
+medição, o `~/.zshrc` e as sessões, que eram R16, passam a R17.
+
+Respondida em 2026-11-03, na sessão `workspace`: "16.1.3 / restante recomendado".
+
+1. **Onde mora a memória dos subagentes?** Opções:
+   - real em `.claude/agent-memory/`, sem link neutro (recomendada) — custo: zero código, e a memória não vive em
+     `.brzAgents`; se paga: agora, a única opção medida sem regressão;
+   - real em `.claude/agent-memory/`, com `.brzAgents/memory` como link para ele — custo: um link e uma linha na norma;
+     se paga: só se o Codex ou o `agy` precisarem do caminho neutro;
+   - literal: real em `.brzAgents/memory`, e `.claude/agent-memory` como link — custo: ~21 linhas no `brza-workflow` e
+     ~17 no workspace, `git mv` de 55 arquivos em 4 branches antes de receberem a norma (conflito de arquivo contra
+     diretório), e a gravação do Claude negada até uma sonda interativa provar o contrário; se paga: nunca, enquanto a
+     negação não se resolver.
+
+   **Decidido — a opção 3, a literal, não a recomendada.** Anderson não deu o porquê. A própria opção declarava a
+   condição: a gravação do Claude pelo link está negada. A sessão mede a saída antes do Desenho (regra de permissão com
+   caminho absoluto, `--add-dir`); se não houver saída, a 16.1 volta a Anderson antes de o texto ir à aprovação.
+
+2. **As skills: um link de diretório ou 4 links por skill?** (D4) Opções:
+   - `.agents/skills` como link de diretório para `.brzAgents/skills` (recomendada) — custo: o D15 passa a suportar link
+     de diretório; se paga: na fase do D15, e elimina o gerador e o `--check` dos links;
+   - `.agents/skills` real, e `.claude/skills` como link para ele — custo: a mesma emenda do sync, e contraria a
+     proposta da 15.3; se paga: na fase do D15;
+   - manter o D4, com 4 links por skill gerados — custo: o gerador, o `--check` e a skill local sem link; se paga:
+     nunca, se o link de diretório vale.
+
+   **Decidido — a recomendada.**
+
+3. **O que sai de `.claude/` para `.brzAgents/`?** Opções:
+   - `skills` e `agents`, as duas (recomendada) — custo: 16 `git mv` no `core/`, 14 fixtures do ouro e ~21 linhas de
+     golden, que mudam de caminho de qualquer forma; se paga: agora;
+   - só `skills` — custo: 4 `git mv` a menos, e `agents` fica fora da pasta neutra; se paga: se `agents` puder ficar
+     em `.claude/`;
+   - nada: o D4 e o D7 como estão — custo: os 4 links por skill ficam; se paga: nunca, se a opção 2.1 vale.
+
+   **Decidido — a recomendada, `skills` e `agents`.** Com a 16.1.3, o ferramental `agents`, `skills` e `memory` vive em
+   `.brzAgents/`, e `.claude/agents`, `.claude/skills` e `.claude/agent-memory` passam a links para ele.
+
+4. **O sync precisa tratar a transição de diretório real para link?** (D15) Opções:
+   - emendar o D15: remoção antes da escrita, `git add` do próprio link, e abortar sem estado parcial (recomendada) —
+     custo: ~30 linhas e 3 testes além do D15; se paga: no primeiro sync depois do `git mv`;
+   - uma migração única à parte, no molde da MIG-001, que apaga os diretórios reais antes do primeiro sync — custo: um
+     script, uma nota e a transição manual em cada worktree; se paga: só se o sync não deve conhecer transição de
+     diretório para link.
+
+   **Decidido — a recomendada, emendar o D15.**

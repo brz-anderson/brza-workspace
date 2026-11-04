@@ -2,4 +2,5 @@
 - [Sondar Codex/agy: armadilhas e atalhos](reference_codex-agy-sondas-armadilhas.md) — `command codex`, `codex sandbox`, `.git` protegido, guardian, nega do classificador
 - [Triar skills da Fixfy contra as do brza-workspace](reference_fixfy-skills-triagem-atalhos.md) — onde moram skills/papéis, greps que poupam leitura, linha citada de cabeça erra
 - [Acoplamentos da norma do brza-workspace (genérico/local)](reference_brza-norma-acoplamento-atalhos.md) — focos de código, greps, órfãos, doc de @import
+- [Sondar symlink de agents/skills/memória (Claude, Codex, agy)](reference_symlink-claude-codex-agy-sondas-sem-modelo.md) — sondas a US$ 0,002, memória do subagente por link negada, sync e link
 - [Onde mora cada peça depois do PLN-006 (brza-workflow)](reference_brza-workflow-depois-da-migracao.md) — mapa BW/BZ, o que o sync toca, citações velhas e atalhos

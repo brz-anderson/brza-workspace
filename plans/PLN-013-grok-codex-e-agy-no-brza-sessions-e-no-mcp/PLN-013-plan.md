@@ -1,9 +1,9 @@
 ---
-status: open
-phase: design
+status: in_progress
+phase: execution
 origin: request
 description: O brza sessions abre o Grok com nome e espera, e o MCP despacha ao Grok, ao Codex e ao Antigravity com conta e cota por runtime
-ready: "não — falta o aceite do corte em passos (R5)"
+ready: sim
 estimate_h: 16
 executed_h: 0
 remaining_h: 16
@@ -18,8 +18,8 @@ tags:
 
 # PLN-013: O Grok, o Codex e o Antigravity abrem pelo `brza sessions` e recebem tarefas do MCP
 
-- **Retomar:** a entrevista (R1 a R4), o Desenho e os Passos estão gravados (2026-11-03). Próximo: a R5, o aceite do
-  corte em passos; depois, o P1 (a sonda do `worker-start`), só a pedido de Anderson.
+- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. Próximo: o P1, a sonda do
+  `worker-start`.
 - **Dividido:** [PLN-013 — Entrevista](PLN-013-interview.md) · [PLN-013 — Desenho](PLN-013-design.md)
 
 ## Pedido
@@ -278,10 +278,19 @@ Estimado: 1 h · Executado: — h
 > A E1 sobe de ~4,5 h (R2.3) porque a R3.1 trocou a opção de ~1 h pela tabela de ~2,5 h; a E3 fica na faixa de 4 a
 > 5,5 h, com o meio, até a sonda dizer (REV-010/A11).
 
+## Desvios
+
+- **X1 — O executor e as revisoras trocados pela R5.** O código vai ao `agy -p --model gemini-3.8-flash-medium`, rodado
+  pela sessão no worktree da entrega, no lugar do `implementer`. Cada passo e o plano inteiro são revisados pelo
+  `grok -p -m grok-4.7 --reasoning-effort high`, só leitura, no lugar do `reviewer` e da sessão Grok. Problema ou desvio
+  no caminho vai a issue e ao worklog, e o plano segue; só pula o passo que pede Anderson. Afeta P2 a P11.
+
 ## Worklogs
 
 - 2026-11-03 — Passos 0 a 2, a R1, a R2, o Terreno e a R3; o plano abriu e a issue irmã nasceu. Parou nos itens `D`.
   [Abertura e entrevista do PLN-013, o Grok no `brza sessions` e no MCP](../../work/worklogs/2026-11-03-pln-013-abertura-e-entrevista.md)
+- 2026-11-04 — R5: o plano aceito e a execução, de ponta a ponta.
+  [A execução do PLN-013, o Grok, o Codex e o Antigravity no `brza sessions` e no MCP](../../work/worklogs/2026-11-04-pln-013-execucao.md)
 
 ## Revisões
 

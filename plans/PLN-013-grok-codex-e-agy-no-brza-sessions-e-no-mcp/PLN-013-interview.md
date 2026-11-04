@@ -211,3 +211,24 @@ Respondida em 2026-11-03, nesta sessão: "todos recomendados, siga".
      quando um chamador do MCP escrever `agy`.
 
    **Decidido — as quatro.**
+
+### Rodada 5 — o corte em passos (enviada 2026-11-03, na mensagem)
+
+> **Apresentado antes:** os Passos P1 a P11 inteiros, em três entregas, 16 h, e o Desenho, D1 a D7.
+
+Respondida em 2026-11-04, na mesma sessão: "aceito o plano, execute o plano, do inicio ao fim, utilizando o `brza
+sessions` ou qualquer meio que estiver disponível, para coordenar os passos, para o `implementer` que executa os passos,
+chame o `agy` com o modelo `Gemini Flash 3.8` no Medio, para as revisões - uma a cada passo e uma no final do plano
+completo - utilize o `Grok 4.7` no Alto, não pare o plano ao encontrar problemas ou desvios no meio do caminho,
+registre em issue e no worklog e siga, pule apenas os passos que não puder executar sem mim".
+
+1. **O corte em passos.** Opções:
+   - aceitar o corte como está, 11 passos em três entregas, 16 h (recomendada) — custo: 0 agora; o P1 abre quatro
+     workers reais; se paga: agora;
+   - juntar a sonda do P1 ao P2 — custo: −0,25 h, e a recusa de modelo só aparece depois do código; se paga: se o
+     `worker-start` aceitar os quatro pares de primeira;
+   - separar o P3 numa entrega antes — custo: +~0,5 h; se paga: nunca hoje;
+   - uma revisão só por entrega — custo: −~1,5 h; se paga: se as revisões repetirem os achados.
+
+   **Decidido — "aceito o plano"**, com a execução de ponta a ponta e o executor e as revisoras trocados (X1). A frase
+   autoriza os merges da `master` do `brza-workflow` que os passos pediam com a confirmação de Anderson.

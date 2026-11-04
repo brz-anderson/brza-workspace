@@ -6,8 +6,8 @@ origin_ref: brza-chat-list-read-send-no-studio
 description: O brza-studio ganha brza chat list/read/send com cursor, fila e recibos, a navegação de chats pela CLI, pela barra lateral e pela Jump Palette, o Native Chat na API de plugins e o account usage, em fases por prioridade.
 ready: sim
 estimate_h: 31
-executed_h: 0.6
-remaining_h: 28.5
+executed_h: 0.9
+remaining_h: 25.0
 priority: high
 scope:
   - brza-studio
@@ -20,10 +20,10 @@ tags:
 
 # PLN-011: Os chats do BrzA Studio se coordenam pela CLI, aparecem na navegação e chegam aos plugins
 
-- **Retomar:** em 2026-11-03, a coordenação passou a uma sessão Codex no chat do Studio, a pedido de Anderson; o P3
-  tem o commit `brza-studio@77a1cca1af2` e duas revisões (Antigravity, sem achados; Grok, A1 a A3 "corrigido aqui",
-  em `/private/tmp/pln011coord/rev/`), e o próximo ato é o conserto deles pelo worker Codex `ctx_24dec7223f04`, o
-  parecer REV-009 e o P4. O prompt da passagem está em `/private/tmp/pln011coord/handoff-codex.md`.
+- **Retomar:** o P3 foi fechado em 2026-11-03 em `brza-studio@a7099022850`, com os achados A1–A3 da revisão do
+  `77a1cca1af2` corrigidos, e o parecer REV-009 aprovado pelo Grok. O próximo passo é o P4 no worktree
+  `feat/pln-011-chat-cli`, a partir do HEAD `a7099022850c003f340a0a8cacec0d13b256c15c`; o pedido está no scratch da
+  sessão coordenadora. A nota antiga de passagem está no worklog de 2026-11-03.
 - **Dividido:** [PLN-011 — Entrevista](PLN-011-interview.md) · [PLN-011 — Desenho](PLN-011-design.md)
 
 ## Pedido
@@ -181,9 +181,9 @@ chat → 73 passed; `pnpm tc:cli` → exit 0; `pnpm check:changed --force` → 2
 
 Executa D3, D6 · executor: worker `implementer` em Codex (R18.1), no worktree do `brza-studio`
 
-Estimado: 3,5 h · Executado: — h, com a revisão
+Estimado: 3,5 h · Executado: 0,3 h, com a revisão
 
-- [ ] **1. Testes que falham** — em `src/cli/handlers/chat.test.ts`, com o `fakeClient` do `#33115`:
+- [x] **1. Testes que falham** — em `src/cli/handlers/chat.test.ts`, com o `fakeClient` do `#33115`:
       - sem `--cursor`: `entries` com `itemId`, `revision`, `sequence`; `nextCursor` = `liveCursor` formatado; `hasNewer: false`;
       - `--cursor e:9`: uma chamada `after` com `cursor: { epoch: 'e', sequence: 9 }` e `limit: 200`; `nextCursor` =
         `window.nextCursor`; `hasNewer` da página; `removedItemIds` passa;
@@ -195,18 +195,22 @@ Estimado: 3,5 h · Executado: — h, com a revisão
       - reset `cursor_compacted` duas vezes seguidas → as duas saem 2, com a página `tail`, e o guia diz "leia sem `--cursor`" (R8.2);
       - `--cursor` com `--limit`: recusado com `invalid_argument`, pela R8.3.
       E `src/cli/brza/chat-cursor.test.ts` para o parse e o formato.
-- [ ] **2. Implementar** — `src/cli/brza/chat-cursor.ts`; o ramo `--cursor` no `chat read`; os ids no
+- [x] **2. Implementar** — `src/cli/brza/chat-cursor.ts`; o ramo `--cursor` no `chat read`; os ids no
       `chatTranscript` (o tipo de entrada ganha `itemId`, `revision`, `sequence`); o `nextCursor` e o `hasNewer` no
       resultado; o spec e a linha do guia (D6), e `pnpm generate:bundled-skill-guides`.
-- [ ] **3. Rodar e ver passar** —
+- [x] **3. Rodar e ver passar** —
       `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-cursor.test.ts --maxWorkers=2`;
       `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
-- [ ] **4. Commit** — `feat(cli): chat read --cursor lê só o que mudou e avisa o cursor_reset`.
-- [ ] **5. Revisão independente** — a sessão Grok, `reviewer` (R19.2), com `ref: PLN-011/P3`, revisa o commit
+- [x] **4. Commit** — `brza-studio@77a1cca1af2` (`feat(cli): chat read --cursor lê só o que mudou e avisa o cursor_reset`);
+      correções dos achados em commit separado `brza-studio@a7099022850`.
+- [x] **5. Revisão independente** — a sessão Grok 4.7, `reviewer` (R19.2), com `ref: PLN-011/P3`, revisa os dois commits
       contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
-      antes do passo seguinte.
+      antes do passo seguinte. Antigravity também revisou o commit inicial e aprovou sem achados.
 
-**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
+**Evidência:** `brza-studio@77a1cca1af2` + `brza-studio@a7099022850` · teste alvo → 31/31 passed;
+`pnpm verify:bundled-skill-guides`, `pnpm tc:cli`, `pnpm check:changed --base=origin/master --maxWorkers=2 --force`
+→ 22/22; `oxlint` e `oxfmt --check` passaram · REV-009 aprovada. Os três achados A1–A3 do Grok sobre o primeiro
+commit estão resolvidos no segundo.
 
 #### P4 — `chat send` com estado, códigos de saída e fila
 
@@ -489,6 +493,8 @@ Estimado: 1 h · Executado: — h
   e a revisão à sessão Grok (X4); o P3 commitado e revisado, com os achados do Grok por corrigir; a coordenação passa
   a uma sessão Codex.
   [PLN-011: execução dos passos pela sessão coordenadora](../../work/worklogs/2026-11-03-pln-011-execucao.md)
+- 2026-11-03 — coordenação em Codex: P3 corrigido e fechado em `a7099022850`, com REV-009 aprovada; próximo P4.
+  [PLN-011: execução dos passos pela sessão coordenadora](../../work/worklogs/2026-11-03-pln-011-execucao.md)
 
 ## Revisões
 
@@ -496,6 +502,8 @@ Estimado: 1 h · Executado: — h
   (a contagem de testes do D1) corrigido aqui.
 - [REV-008: o P2 do PLN-011, a origem do coordenador no `agentSession.send`](../../work/reviews/REV-008-pln-011-p2-origem-do-coordenador.md)
   — aprova; A1 (a cobertura do WSL e do pareado) corrigido em `brza-studio@594c4a7e13c`; A2 vai à issue, pela R17.1.
+- [REV-009: P3 do PLN-011, `chat read` com cursor, ids e reset](../../work/reviews/REV-009-pln-011-p3-chat-read-cursor.md)
+  — aprova; A1–A3 da revisão inicial corrigidos em `brza-studio@a7099022850`.
 
 ## Pendências conhecidas
 

@@ -182,7 +182,7 @@ Respondida em 2026-11-03, por Anderson.
    - fecha o PLN-009 antes — custo: o PLN-011 espera; se paga: quando roda sobre código aceito;
    - sem o MCP — custo: perde o teste real do orquestrador; se paga: agora, para o PLN-009 nunca.
 
-   **Decidido — "Liga da feat, via launchd (Recomendado)"**. Ligado em 2026-11-03: `brza-mcp start` → "de pé", o
+   **Decidido — "Liga da feat, via launchd (Recomendado)"**. → reaberta em R18.1, no caminho dos workers. Ligado em 2026-11-03: `brza-mcp start` → "de pé", o
    agente `com.brza.orchestrator` do launchd, em `http://127.0.0.1:4242/mcp`.
 
 2. **Os gates do `dispatch`.** Opções:
@@ -560,4 +560,23 @@ Respondida em 2026-11-03, pelo `agy`, às cegas.
 
    **Decidido — "Issue no workstream studio, com gatilho"**, por acordo na volta 1:
    [O `--session` do `brza chat` recusa o endereço `orca_session_id:<id>`](../../work/issues/chat-session-recusa-o-endereco-orca-session-id.md).
+
+### Rodada 18 — quem roda os workers, com a cota da Claude esgotada (enviada 2026-11-03)
+
+> **Apresentado antes:** o P3 (pedido 7) ficou retido no `brza-mcp` por `account_quota`: a janela de sessão da conta
+> projetava 171% e depois 210% no reset, com teto de 90%. Anderson informou: "`Codex` está em 0% e `Antigravity` em
+> 37%". O `brza-mcp` só aceita o runtime `claude` (`tools.py:192-193`), e o `orchestration worker-start` do Studio
+> aceita `--agent codex` e `antigravity`, com `--worktree path:<caminho>`.
+
+Respondida em 2026-11-03, por Anderson.
+
+1. **Quem roda os passos de código e as revisões.** Opções: Codex implementa, agy revisa (recomendada) — custo: os
+   passos saem da fila, dos tetos e da telemetria do `brza-mcp`; se paga: já · Codex nos dois papéis — custo: o mesmo e
+   menos independência na revisão; se paga: já, poupando o Antigravity para as rodadas · esperar a janela da Claude —
+   custo: o plano para por tempo desconhecido; se paga: quando a janela virar, tudo pelo `brza-mcp`.
+
+   **Decidido — "Codex implementa, agy revisa (Recomendado)"**. Reabre a R7.1 e a R12.1 só no caminho dos workers: a
+   sessão coordenadora abre o `implementer` em Codex e o `reviewer` em Antigravity pelo `orchestration worker-start`,
+   com `--worktree path:` no worktree da fase, e o `brza-mcp` fica de pé, sem pedidos deste plano. As rodadas de
+   conteúdo seguem no `agy` (a regra das rodadas cegas).
 

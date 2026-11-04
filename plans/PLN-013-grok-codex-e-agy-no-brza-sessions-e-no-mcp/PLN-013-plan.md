@@ -131,31 +131,39 @@ branch `feat/pln-013-e1-abrir-e-despachar`
 
 Estimado: 4.5 h · Executado: — h
 
-- [ ] **1. Testes que falham:** os da D1 (`test_mcp_dispatch.py`, `test_mcp_limits.py`, `test_mcp_cycle.py`) e os da
+- [x] **1. Testes que falham:** os da D1 (`test_mcp_dispatch.py`, `test_mcp_limits.py`, `test_mcp_cycle.py`) e os da
   D2 (`test_mcp_policy.py`, `test_mcp_cycle.py`), com a migração da chave plana nos testes existentes.
-- [ ] **2. Implementar** `runtimes.py`, as mudanças em `tools.py`, `cycle.py`, `limits.py`, `accounts.active_id` e
+- [x] **2. Implementar** `runtimes.py`, as mudanças em `tools.py`, `cycle.py`, `limits.py`, `accounts.active_id` e
   `policy.py`.
-- [ ] **3. Rodar e ver passar:** o gate.
-- [ ] **4. Commit** na `feat/pln-013-e1-abrir-e-despachar`.
+- [x] **3. Rodar e ver passar:** o gate.
+- [x] **4. Commit** na `feat/pln-013-e1-abrir-e-despachar`.
 
-**Evidência:** —
+**Evidência:** `brza-workflow@6eda393`, pelo `agy` (X1): `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s
+tests/mcp` → 370 OK (base 358; o `agy` relata 12 falhas e 9 erros antes da implementação). Revisão do Grok (`rev-P2`):
+"aprova com correções", A1 a A5, em correção pelo `agy`.
 
 ### P3 — E1: o `brza sessions` abre o Grok
 
 Executa D3 · executor: `implementer`, pela sessão do `tools-kit`, no mesmo worktree; a abertura real, a sessão, com
 Anderson conferindo a aba no app
 
-Estimado: 0.5 h · Executado: — h
+Estimado: 0.5 h · Executado: 0.5 h
 
-- [ ] **1. Teste que falha:** `test_unknown_agent_is_refused_before_any_side_effect`; o `grok` nos `subTest` de
+- [x] **1. Teste que falha:** `test_unknown_agent_is_refused_before_any_side_effect`; o `grok` nos `subTest` de
   regressão.
-- [ ] **2. Implementar** o `AGENTS`, o docstring e o `--help`.
-- [ ] **3. Rodar e ver passar:** o gate.
-- [ ] **4. Abertura real:** `brza sessions pln-013-sonda-grok --agent grok --title "PLN-013 E1: Grok" --prompt "diga
+- [x] **2. Implementar** o `AGENTS`, o docstring e o `--help`.
+- [x] **3. Rodar e ver passar:** o gate.
+- [x] **4. Abertura real:** `brza sessions pln-013-sonda-grok --agent grok --title "PLN-013 E1: Grok" --prompt "diga
   oi"`, e `brza sessions send pln-013-sonda-grok "oi de novo"`; Anderson confere que as duas mensagens chegaram.
-- [ ] **5. Commit.**
+- [x] **5. Commit.**
 
-**Evidência:** —
+**Evidência:** `brza-workflow@c91847c` (branch `feat/pln-013-e1-abrir-e-despachar`), pelo `agy` (X1).
+`env -u BRZA_WORKSPACE -u CLAUDE_PROJECT_DIR PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.cli.test_brza_sessions`
+→ 40 OK; com o `brza-sessions` do pai, `FAIL: test_unknown_agent_is_refused_before_any_side_effect`. Abertura real:
+`brza-sessions pln-013-sonda-grok --agent grok --title "PLN-013 E1: Grok" --prompt "diga oi"` → `open: …
+grok_94e6baa2_6dcb_435f_9b3d_04e946504b63`, e o `send … "oi de novo"` → `sent:`; o `agentSession.history` mostra as duas
+mensagens do usuário, conferidas pela sessão no lugar da tela (X2). `--agent cursor --dry-run` → a linha `CHECK` e
+exit 1. Revisão do Grok (`rev-P3`): "VEREDITO: aprova", sem achado.
 
 ### P4 — E1: a revisão e o merge
 
@@ -288,7 +296,11 @@ Estimado: 1 h · Executado: — h
 - **X1 — O executor e as revisoras trocados pela R5.** O código vai ao `agy -p --model gemini-3.8-flash-medium`, rodado
   pela sessão no worktree da entrega, no lugar do `implementer`. Cada passo e o plano inteiro são revisados pelo
   `grok -p -m grok-4.7 --reasoning-effort high`, só leitura, no lugar do `reviewer` e da sessão Grok. Problema ou desvio
-  no caminho vai a issue e ao worklog, e o plano segue; só pula o passo que pede Anderson. Afeta P2 a P11.
+  no caminho vai a issue e ao worklog, e o plano segue; só pula o passo que pede Anderson. Afeta P2 a P11. O `agy`
+  roda com `--mode accept-edits`, sem comandos: o classificador da sessão barrou o `--dangerously-skip-permissions`, e
+  a sessão roda o gate e commita.
+- **X2 — A conferência na tela vira leitura do histórico.** Onde o passo pede Anderson conferindo a aba ou a mensagem
+  (P3, P8, P11), a sessão lê o `agentSession.history` do chat. Afeta P3, P8 e P11.
 
 ## Worklogs
 

@@ -32,7 +32,12 @@ fluxo do `brza sessions` e do `MCP`". Esta sessão rodou os Passos 0 a 2 da `pla
     e há `inactiveCodexAccounts`.
   - **O Grok está sem login:** `grokAuthConfigured: false`.
 
+- **A R2.** Fica a cota dos três runtimes, com a troca de conta só no Codex. O `--rename` e o `--wait` valem no Grok, no
+  Codex e no Antigravity. A entrega sai em três partes: E1, abrir e despachar; E2, a cota e a conta; E3, o `--rename` e
+  o `--wait`. A soma vai a ~13 h.
+
 ## Em aberto
 
-- A R2 — a conta e a cota por runtime, o `--rename` e o `--wait` fora do Grok, e a ordem das entregas —, que trava o
-  Desenho.
+- O Terreno, com os quatro pontos de "Em aberto para o Desenho" do PLN-013. O primeiro é se o `worker-start` aceita
+  `--agent grok`.
+- O `grok login`, que é de Anderson e é pré-requisito de toda abertura real.

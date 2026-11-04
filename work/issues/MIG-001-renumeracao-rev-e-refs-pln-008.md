@@ -72,7 +72,7 @@ a ordem acima aplicou com saída 0 nas seis passagens (1 + 3 pareceres renomeado
   `6e10fd0` na master; checador com 73 arquivos, 0 erros e 0 avisos; worklog do `tools-kit` em `8600fa1`.
 - **`workspace`, item 2**, pela sessão `workspace-a6`, em 2026-11-03: prévia igual ao ensaio (REV-002 a REV-004, 5
   notas com links, 22 worklogs); `--apply` com saída 0; commit `361d0d4`, com push; checador com 59 arquivos, 0
-  erros e 4 avisos `unknown-ref-mention` (PLN-029 e PLN-011, menções históricas que o D3 só avisa). O bloco de
+  erros e 4 avisos `unknown-ref-mention` (menções históricas a planos de outro workspace, que o D3 só avisa). O bloco de
   preservação, restrito às duas árvores, conferiu 60 notas, 51 delas worklogs.
 - **`tools-kit`, item 3**, pela sessão `tools-kit-mig001`: prévia e `--apply` zerados, sem commit da migração, como
   no ensaio; checador com 74 arquivos, 0 erros e 0 avisos; worklog do `tools-kit` em `57c29b5`.

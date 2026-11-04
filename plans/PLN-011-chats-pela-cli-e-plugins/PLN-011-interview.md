@@ -575,8 +575,31 @@ Respondida em 2026-11-03, por Anderson.
    menos independência na revisão; se paga: já, poupando o Antigravity para as rodadas · esperar a janela da Claude —
    custo: o plano para por tempo desconhecido; se paga: quando a janela virar, tudo pelo `brza-mcp`.
 
-   **Decidido — "Codex implementa, agy revisa (Recomendado)"**. Reabre a R7.1 e a R12.1 só no caminho dos workers: a
+   **Decidido — "Codex implementa, agy revisa (Recomendado)"**. → reaberta em R19.2, na revisora. Reabre a R7.1 e a R12.1 só no caminho dos workers: a
    sessão coordenadora abre o `implementer` em Codex e o `reviewer` em Antigravity pelo `orchestration worker-start`,
    com `--worktree path:` no worktree da fase, e o `brza-mcp` fica de pé, sem pedidos deste plano. As rodadas de
    conteúdo seguem no `agy` (a regra das rodadas cegas).
+
+### Rodada 19 — a revisora, com o `agy` parado em aprovação (enviada 2026-11-03)
+
+> **Apresentado antes:** a revisão do P3 em Antigravity (`ctx_206b0db33e60`) parou no primeiro comando de shell, à
+> espera de aprovação de uma pessoa, e a CLI não tem como aprovar.
+
+Respondida em 2026-11-03, por Anderson.
+
+1. **Como a revisão em `agy` roda.** Opções: você aprova no chat do worker (recomendada) · `agy` headless, `auto` e
+   `sandbox` · `agy` headless, sem permissões · revisão em Codex.
+
+   Resposta em texto livre: "`orcaTabId: structured-agent-session-grok_18ca2288_cf47_4da8_abf1_781cef5885a6` está
+   sessão está rodando o `Grok 4.7` no Alto, utilize ela como segunda revisora e para desenhar sugestões, basicamente
+   sendo o `reviewer` e o `designer`". Registrada como contraproposta, e o ponto em aberto voltou com opções na R19.2.
+
+2. **As revisoras do P3 ao P16.** Opções: só o Grok, e o `agy` parado (recomendada) — custo: uma revisão por passo, sem
+   a do Gemini; se paga: já · Grok e `agy`, duas revisões — custo: o dobro e as aprovações de Anderson; se paga: quando
+   as duas discordarem · Grok só nesta revisão — custo: o da anterior, a partir do P4; se paga: quando o Grok sair.
+
+   **Decidido — "Só o Grok; paro o agy (Recomendado)"**. A sessão Grok 4.7 (`grok_18ca2288_cf47_4da8_abf1_781cef5885a6`,
+   esforço Alto) é o `reviewer` e o `designer` do PLN-011 do P3 em diante, e recebe os pedidos pelo `orchestration send
+   --to orca_session_id:…`. O `agy` fica nas rodadas cegas. A revisão do P3 em Antigravity, que terminou antes da
+   resposta, entra no parecer do P3 junto com a do Grok. Reabre a R18.1 só na revisora.
 

@@ -291,7 +291,7 @@ runtime sem fonte disponível volta à rodada com evidência, sem expansão sile
 
 ## D11 — A Fixfy sai dos arquivos atuais dos repositórios `brza-*` — notas, norma local, `brza-workflow` e `brza-studio`
 
-- **Origem:** Pedido 6; R15.1 a R15.3; R16.1 a R16.4.
+- **Origem:** Pedido 6; R15.1 a R15.3; R16.1 a R16.4; R17.1.
 - **Contexto:** o PLN-011 do `studio` colidiu com o PLN-011 da Fixfy, citado em crase em dois worklogs do `workspace`;
   o D3 conta a crase, e o próximo commit desses worklogs ligaria o plano errado.
 
@@ -304,6 +304,8 @@ runtime sem fonte disponível volta à rodada com evidência, sem expansão sile
 | `brza-workflow` | O `FOREIGN` do `bin/brza-init` lê os nomes proibidos de um arquivo da máquina, fora do git. O `golden_differences.py` troca a chave "fixfy" por "origem", com textos neutros. Os testes e o golden seguem. |
 | `brza-studio` | Os 3 testes trocam os dados de exemplo (`fixfy-cc`, `fixfy.atlassian.net`) por nomes neutros. |
 | Histórico do git, e-mail de autor dos commits antigos, `.brza/index.jsonl` | Ficam como estão: o histórico não se reescreve, e o índice só recebe linhas novas. |
+| Identidade `issue:<slug>` das duas issues do `tools-kit` com "fixfy" no slug | Fica, no índice e no `refs`; o arquivo e o H1 mudam (R17.1). |
 
 A prova é um `git grep -il fixfy` sem resultado nos arquivos atuais das cinco branches, da master, do `brza-workflow` e
-do `brza-studio`, salvo o `.brza/index.jsonl`.
+do `brza-studio`, salvo o `.brza/index.jsonl` e as citações `issue:scripts-da-fixfy-fora-do-port-para-o-brza` e
+`issue:skills-de-documento-da-fixfy-num-plugin` no `refs` e no `depends_on`.

@@ -434,3 +434,15 @@ Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
 4. **O histórico do git e as linhas do índice?** Opções: ficam como estão (recomendada); reescrever o histórico.
 
    **Decidido — "Ficam como estão (Recomendado)".** → D11.
+
+### Rodada 17 — a identidade das issues com a Fixfy no slug (enviada 2026-11-03)
+
+**Apresentado antes:** o rename preserva a identidade `issue:<slug da criação>` (`check_notes.py:269`; Regressão do
+PLN-008). As duas issues do `tools-kit` com "fixfy" no slug manteriam esse ID no índice e no `refs`.
+
+Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
+
+1. **Como tratar?** Opções: exceção, o ID da issue fica (recomendada) — custo zero; identidade nova com alias — ~2 h,
+   reabrindo o contrato do P1 e o D3.
+
+   **Decidido — "Exceção: ID de issue fica (Recomendado)".** → D11.

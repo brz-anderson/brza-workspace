@@ -36,11 +36,13 @@ o dia anterior está em
   R16: `agents`, `skills` e `memory` em `.brzAgents/`, a memória literal (16.1.3, não a recomendada), o link de
   diretório para as skills e o D15 emendado.
 
+- **A sonda de saída da memória e a sessão interativa** (R16.5): em `claude -p` nenhuma de seis variantes gravou atrás
+  de link (US$ 0,095); com um host de permissão respondendo, o link gravou nas 3 gravações, mas **perguntou 3 vezes**, sem
+  como silenciar na sessão (US$ 0,041). Anderson escolheu a memória real em `.claude/agent-memory/`, com
+  `.brzAgents/memory` como link para ela, e a 16.1.3 ficou substituída.
+
 ## O que ficou
 
-- **A sonda de saída da memória** (regra de permissão com caminho absoluto, `--add-dir`, link só no nível do papel,
-  hook): com o `collector`, em `/private/tmp/pln004/brz-agents/levantamento-memoria.md`. Sem saída, a 16.1 volta a
-  Anderson antes do Desenho.
 - **A R17**, a medição e a máquina (P8 a P11), e o **Desenho reescrito com o `.brzAgents`**, que vai à aprovação na
   mensagem, em 3 partes, antes de virar `PLN-004-design.md`; na gravação, corrigir no `-plan` o "Fora de escopo" (ainda
   manda o código ao `tools-kit`) e a Cobertura (ainda diz "um foco por runtime"), e a revisão do Codex no D11 para `high`.

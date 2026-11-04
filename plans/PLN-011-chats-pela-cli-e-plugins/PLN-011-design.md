@@ -15,13 +15,14 @@ marcas `[F… · lido · …]` são a evidência do levantamento de cada fato. A
 - **R5.4:** depois de `queued`, um `history tail`; o JSON traz a posição, o `nextQueuedMessageId` e `held_by: question|working`.
 - **R6.1:** `send` sai 0 em `accepted` e `queued`, 1 em recusa e `rejected`, 3 em `pending` e `unknown`; o JSON traz sempre
   `delivery` e `submission.state`.
-- **R6.2:** o id da operação faz replay sem reenvio, e o `send` o imprime; o nome da flag e do campo vem da R8.4.
+- **R6.2:** o id da operação faz replay sem reenvio, e o `send` o imprime; o nome da flag e do campo vem da R13.4.
 - **R6.3:** cursor opaco `epoch:sequence`; `--json` com `itemId`, `revision`, `sequence`, `nextCursor`, `hasNewer`; origem do
   coordenador pelo `ORCA_AGENT_SESSION_ID`; `expectedRuntimeFence` lido do histórico antes do envio.
 - **R6.4:** prova por `chat.test.ts`, teste do `client.ts` e o caso manual C1.
-- **R8.1:** `cursor_reset` sai 2. **R8.2:** o reset repetido se aceita e se documenta. **R8.3:** `--since` lê uma
-  página `after` de 200 linhas, recusa `--limit` e traz `removedItemIds`. **R8.4:** as flags são `--since` e
-  `--operation`, e o recibo traz `operation`, como pede o PLN-010.
+- **R8.1:** `cursor_reset` sai 2. **R8.2:** o reset repetido se aceita e se documenta. **R8.3:** `--cursor` lê uma
+  página `after` de 200 linhas, recusa `--limit` e traz `removedItemIds`. **R13.4**, que reabre a R8.4 só no nome
+  do cursor: as flags são `--cursor` e `--operation`, e o recibo traz `operation`.
+- **R13 a R16** refazem as R8 a R11 às cegas e confirmam todas as outras escolhas.
 - **R9.1:** o `pending` se espera até 30 s, relendo o `tail` a cada 500 ms. **R9.2:** `held_by: question | working |
   null`, com `queuePaused: true` na pausa. **R9.3:** o replay `returned` ou `withdrawn` sai 1, `rejected`. **R9.4:** a
   extensão mora em `src/cli/brza/`.
@@ -112,7 +113,7 @@ marcas `[F… · lido · …]` são a evidência do levantamento de cada fato. A
   (`src/main/native-chat/agent-session-journal/journal-public-read.ts:54-62`; `journal-submission-fold.ts:78-82`). [F30 · lido · 90]
 - O `HistoryParams` é `strict` e aceita `limit` até 200 (`src/shared/rpc-contract/structured-agent-session-params.ts:319-326`;
   `agent-session-wire.ts:51`). [F39 · lido · 95]
-- Daí, na sessão que teve um hand-off da fila em dúvida, todo `chat read --since` volta `cursor_compacted` até o
+- Daí, na sessão que teve um hand-off da fila em dúvida, todo `chat read --cursor` volta `cursor_compacted` até o
   epoch mudar; não medi quantas sessões têm isso. [F31 · inferido · 75]
 
 #### A fila
@@ -149,7 +150,7 @@ Os 11 arquivos do diff, sem mudar uma linha: (F2)
 | :------ | :---- |
 | `src/cli/chat-sessions.ts` (novo) | `parseChatSessionSelector`, `listChatSessions`, `chatTranscript`, `formatChatList`, `formatChatRead` |
 | `src/cli/handlers/chat.ts` (novo) | `CHAT_HANDLERS`: `chat list`, `chat read`, `chat send` |
-| `src/cli/handlers/chat.test.ts` (novo) | 10 testes |
+| `src/cli/handlers/chat.test.ts` (novo) | 11 testes (A1 da REV-007) |
 | `src/cli/specs/chat.ts` (novo) | `CHAT_COMMAND_SPECS` |
 | `src/cli/specs/index.ts` | registra os specs |
 | `src/cli/handler-group-manifest.ts` | grupo `chat` |
@@ -197,7 +198,7 @@ O commit leva o trailer `Upstream: stablyai/orca#33115 @ a007c29e248`. O gerado 
 
 ### D3 — `chat read` com cursor — `src/cli/handlers/chat.ts`, `src/cli/brza/chat-cursor.ts` (P3)
 
-- **Origem:** R2.1, R5.3, R6.3
+- **Origem:** R2.1, R5.3, R6.3, R8.1 a R8.3, R13.4
 - **Contexto:** o `#33115` só lê `tail` e `before`, e o `--json` dele não traz ids, cursor nem `hasNewer`.
 
 #### Como fica
@@ -205,13 +206,13 @@ O commit leva o trailer `Upstream: stablyai/orca#33115 @ a007c29e248`. O gerado 
 **Uso** (spec em `src/cli/specs/chat.ts`):
 
 ```text
-orca chat read --session <id-or-handle> [--limit <n>] [--since <epoch:sequence>] [--json]
+orca chat read --session <id-or-handle> [--limit <n>] [--cursor <epoch:sequence>] [--json]
 
-  --since   Reads only what changed after this cursor: new entries and new revisions of
+  --cursor   Reads only what changed after this cursor: new entries and new revisions of
              older ones. Pass the nextCursor of the previous read. Without it, the read
              shows the newest entries and returns the cursor to continue from.
-  --limit    Without --since: the number of entries shown (default 20, max 100).
-             Refused together with --since.
+  --limit    Without --cursor: the number of entries shown (default 20, max 100).
+             Refused together with --cursor.
 Exit codes: 0 read; 2 cursor_reset, the cursor no longer applies and the newest
 entries are shown instead; 1 any other failure.
 ```
@@ -241,7 +242,7 @@ type ChatReadEntry = ChatTranscriptEntry & {
 type ChatReadResult = {
   session: string
   entries: ChatReadEntry[]
-  /** Só no modo --since: itens que o host apagou depois do cursor (R8.3). */
+  /** Só no modo --cursor: itens que o host apagou depois do cursor (R8.3). */
   removedItemIds: string[]
   /** O cursor para a próxima leitura: "epoch:sequence". */
   nextCursor: string
@@ -269,17 +270,17 @@ type ChatReadResult = {
 
 | Modo | Chamada | `entries` | `nextCursor` | `hasNewer` |
 | :--- | :------ | :-------- | :----------- | :--------- |
-| sem `--since` | `tail` e o laço `before` do `#33115` | as `limit` mais novas | `page.liveCursor` da primeira página `tail` (F25) | `false` |
-| `--since` | um `after` com `limit: 200`, o teto do `HistoryParams` (F39), pela R8.3 | todas as legíveis da página, sem corte | `page.window.nextCursor` (F26) | `page.hasNewer` |
+| sem `--cursor` | `tail` e o laço `before` do `#33115` | as `limit` mais novas | `page.liveCursor` da primeira página `tail` (F25) | `false` |
+| `--cursor` | um `after` com `limit: 200`, o teto do `HistoryParams` (F39), pela R8.3 | todas as legíveis da página, sem corte | `page.window.nextCursor` (F26) | `page.hasNewer` |
 | reset | a página `tail` que o reset traz | as legíveis da página | `page.liveCursor` (F25) | `false` |
 
 - Sem `liveCursor` (host mais velho), o `nextCursor` cai para o `window.newest`, ou `epoch:0` na página vazia, pela
   compatibilidade entre versões que a norma do `brza-studio` exige (`AGENTS.md:61`).
-- **O reset repetido** (F28–F31) se aceita, pela R8.2: o guia diz "reset repetido: leia sem `--since`", e um teste
+- **O reset repetido** (F28–F31) se aceita, pela R8.2: o guia diz "reset repetido: leia sem `--cursor`", e um teste
   cobre o reset `cursor_compacted` duas vezes seguidas.
 - O laço do `#33115` que troca a janela pelo reset no `before` fica como está: ali o reset não é do cursor de quem chamou.
 - **Texto:** as linhas do `formatChatRead`, e no fim `next cursor: <epoch:sequence>`, mais
-  `more after this page: run again with --since <next>` quando `hasNewer`. No reset, a primeira linha vai ao stderr:
+  `more after this page: run again with --cursor <next>` quando `hasNewer`. No reset, a primeira linha vai ao stderr:
   `cursor_reset: <motivo>: the cursor no longer applies; showing the newest entries`.
 - **Saída:** o handler imprime o resultado e põe o `process.exitCode`, como o `terminal send` (F37).
 
@@ -321,7 +322,7 @@ Exit codes: 0 accepted or queued; 1 refused or rejected, nothing was delivered;
 ```ts
 type ChatSendResult = {
   session: string
-  /** O clientOperationId do envio, que `--operation` repete (R8.4). */
+  /** O clientOperationId do envio, que `--operation` repete (R13.4). */
   operation: string
   /** O host devolveu o desfecho gravado, sem novo envio. */
   replayed: boolean
@@ -438,7 +439,7 @@ Acréscimo à seção "Chats" do `skill-guides/orca-cli.md`, em inglês como o r
 regravado pelo gerador (F4); cada passo leva a sua linha:
 
 ```text
-- `chat read --since <nextCursor>` returns only what changed since the last read; keep the
+- `chat read --cursor <nextCursor>` returns only what changed since the last read; keep the
   `nextCursor` it returns and read again while `hasNewer` is true. Exit 2 with `cursor_reset`
   means the cursor no longer applies: start over from the entries and `nextCursor` it returns.   (P3)
 - `chat send` exits 0 when the message was accepted or queued, 1 when nothing was delivered,
@@ -447,7 +448,7 @@ regravado pelo gerador (F4); cada passo leva a sua linha:
 - A queued message reports `held_by`: `question` (an approval or question is waiting) or
   `working` (the current turn has not ended) or null (the queue drained or was stopped,
   with `queuePaused: true`).                                                                     (P4)
-- Repeated `cursor_reset` in the same chat: read without `--since` and start over.               (P3)
+- Repeated `cursor_reset` in the same chat: read without `--cursor` and start over.               (P3)
 ```
 
 ---

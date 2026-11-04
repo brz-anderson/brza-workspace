@@ -8,8 +8,6 @@ completed: 2026-11-03
 refs:
   - MIG-001
   - PLN-008
-  - REV-001
-  - REV-004
 ---
 
 # P8 do PLN-008 no playground
@@ -25,7 +23,7 @@ MIG-001 com o extrator novo do `refs`. Rodou na sessão `d11-playground`.
    workstream cita o workspace de origem nem tem o nome dele no caminho; nenhum arquivo do mapa de nomes é deste
    workstream, e nenhuma nota daqui aponta para os de outros workstreams.
 3. **Worklog da MIG-001 recomitado** pelo `brza note commit`, em `e271921`: o `refs` de
-   [Aplicação da MIG-001 no playground](2026-11-03-aplicacao-da-mig-001-no-playground.md) perdeu REV-001 e REV-004, que
+   [Aplicação da MIG-001 no playground](2026-11-03-aplicacao-da-mig-001-no-playground.md) perdeu os dois pareceres que
    só vinham do texto do link para a MIG-001.
 4. **Checador**, `python3 .claude/skills/notes-checker/scripts/check_notes.py`, com saída 0: 25 arquivos, 0 links não
    resolvidos, 0 erros e 0 avisos.

@@ -9,7 +9,7 @@ refs:
 
 # O brza-workspace nasce com a norma, o PLN-001, a medição e as skills de notas e de plano
 
-Sessão `fixfy-9b`, aberta no workspace da Fixfy, em 2026-10-27. Anderson pediu duas coisas:
+Sessão aberta em outro workspace, em 2026-10-27. Anderson pediu duas coisas:
 
 - "criei um repo pra servir de workspace do brza-studio, git: git@github.com:brz-anderson/brza-workspace.git - clone em
   Projects/ ao lado de brza-studio e envie o plano de melhorias do BrzA Studio para lá (brza-workspace)";
@@ -22,12 +22,12 @@ que o projeto exista no disco, com git, pra mim abrir no BrzA Studio".
 ## O que foi feito
 
 - **O clone**, em `~/Projects/brza-workspace`, pelo alias `personal`.
-- **O plano.** O PLN-029 da Fixfy virou o
+- **O plano.** O plano de lá virou o
   [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](../../plans/PLN-001-o-brza-studio-generico/PLN-001-plan.md).
-  Os pedidos de 2026-10-27 entraram como P42 a P53, e as rodadas como R29 a R32. Na Fixfy, o PLN-029 ficou como aviso de
+  Os pedidos de 2026-10-27 entraram como P42 a P53, e as rodadas como R29 a R32. Lá, o plano ficou como aviso de
   mudança.
 - **A norma.** Feitos por subagentes:
-  - o `work/README.md` e o `plans/README.md`, adaptados da Fixfy;
+  - o `work/README.md` e o `plans/README.md`, adaptados do workspace de origem;
   - o `notes-checker` e a `plan-runner`, como skills de projeto.
 
   Os comandos estão no `README.md`.
@@ -42,15 +42,15 @@ que o projeto exista no disco, com git, pra mim abrir no BrzA Studio".
 
 ## Rodadas
 
-As rodadas de 2026-10-27, sessão `fixfy-9b`. A escolhida está marcada com ✅. A rodada D, do plano, está na R32 do
+As rodadas de 2026-10-27, na sessão de lá. A escolhida está marcada com ✅. A rodada D, do plano, está na R32 do
 PLN-001.
 
 ### Rodada E — telemetria e configuração
 
 Apresentado antes:
-- o `measure.py` só depende da Fixfy pela raiz (`FIXFY_WORKSPACE`);
-- o `settings.json` não passa de um diretório para outro, e quem o injeta é a função `fixfy_claude`, só dentro de
-  `~/Projects/fixfy`;
+- o `measure.py` só depende do workspace de origem pela raiz, pela variável de ambiente dele;
+- o `settings.json` não passa de um diretório para outro, e quem o injeta é a função `claude` de lá, só dentro do
+  repositório dele;
 - por isso o `brza-studio` precisava do `env -u` das cinco variáveis em cada commit.
 
 **E1. Quais medições e hooks vão?** (múltipla)
@@ -73,11 +73,11 @@ Apresentado antes:
 **E4. Quais skills de projeto?**
 - ✅ notes-checker + plan-runner adaptados (Recomendado). Custo: ~1,5 h. Se paga: no próximo plano ou nota.
 - Só o notes-checker. Custo: ~0,7 h. Se paga: agora, mas sem a entrevista e o molde.
-- Habilitar o plugin fixfy. Custo: ~0,1 h, mas mistura a norma da Fixfy. Se paga: nunca.
+- Habilitar o plugin do workspace de origem. Custo: ~0,1 h, mas mistura a norma dele. Se paga: nunca.
 
 ### Rodada F — o AGENTS.md e o ferramental
 
-Apresentado antes: quais seções do `AGENTS.md` da Fixfy são genéricas e quais são só da Fixfy.
+Apresentado antes: quais seções do `AGENTS.md` do workspace de origem são genéricas e quais são só dele.
 
 **F1. Quais seções genéricas vão?** (múltipla)
 - ✅ Rodadas e decisão explícita (Recomendado). Custo: ~0,2 h. Se paga: na primeira decisão.
@@ -112,7 +112,7 @@ Apresentado antes:
 - Entra. Custo: ruído em quase todo worklog. Se paga: nunca, provavelmente.
 
 **G3. Os conectores do claude.ai sobem?**
-- ✅ Desligar, como na Fixfy (Recomendado). Custo: os conectores somem dessas sessões. Se paga: em toda sessão.
+- ✅ Desligar, como no workspace de origem (Recomendado). Custo: os conectores somem dessas sessões. Se paga: em toda sessão.
 - Deixar ligados. Custo: contexto em toda sessão. Se paga: só se você usar algum deles aqui.
 
 **G4. Sem a `BRZA_WORKSPACE`, onde a medição grava?**
@@ -131,8 +131,8 @@ Apresentado antes:
 
 - **`~/.zshrc`, o bloco "Workspace BrzA"**:
   - **O quê e onde:** `BRZA_WORKSPACE`, `BRZA_STUDIO`, `brza_where` e `brza_claude`. A `claude()` escolhe entre
-    `brza_claude` e `fixfy_claude`, e a `adm-claude()` passou a chamar `claude`. É o bloco de "Funções do shell" do
+    `brza_claude` e a função de lá, e a `adm-claude()` passou a chamar `claude`. É o bloco de "Funções do shell" do
     `README.md`.
-  - **O risco:** uma sessão aberta no brza-studio deixa de herdar a configuração da Fixfy.
+  - **O risco:** uma sessão aberta no brza-studio deixa de herdar a configuração do workspace de origem.
   - **Estado:** ativo.
-  - **Como desfazer:** apagar o bloco e voltar `claude()` e `adm-claude()` a chamar `fixfy_claude`.
+  - **Como desfazer:** apagar o bloco e voltar `claude()` e `adm-claude()` a chamar a função `claude` de lá.

@@ -47,7 +47,7 @@ Toda aplicação de migração ocorreu em repositórios temporários com remote 
 
 P5 concluído. Executado em horas: não aferido. O plano tinha `executed_h: 0`, `remaining_h: 18` e nenhum passo marcado,
 apesar dos commits `b7fb3d2`, `b7e8727`, `3fc3935` e `a168f73`; essa divergência foi registrada no plano, sem atestar
-P1–P4 nem inventar horas. Os quatro usam `anderson@fixfy.com.br`, divergindo da identidade exigida
+P1–P4 nem inventar horas. Os quatro usam o e-mail corporativo do `~/.gitconfig`, divergindo da identidade exigida
 `240569289+brz-anderson@users.noreply.github.com`. Não foram reescritos; preparar o tratamento em P6.
 
 Outra sessão, `Correção de agentes no brza sessions`, alterou e publicou `README.md`, `packages/client/bin/brza-sessions`

@@ -29,8 +29,8 @@ decisão está em
   `f7273e4`); a `master` perdeu as notas em `4f0838f`, que entrou nos workstreams por `git merge -s ours`, para que o
   `brza note sync` de depois não apague nada. O `studio` ficou com 26 notas, o `tools-kit` com 33 e o `workspace` com 4,
   mais esta e a decisão.
-- **O checador em cada worktree:** 0 erros. No `studio`, dois links do PLN-001 para o workspace da Fixfy
-  (`../../../fixfy/…`) só resolviam do checkout principal; viraram citação em crase, como manda o `work/README.md`
+- **O checador em cada worktree:** 0 erros. No `studio`, dois links do PLN-001 para o workspace de origem
+  (`../../../<repositório de origem>/…`) só resolviam do checkout principal; viraram citação em crase, como manda o `work/README.md`
   (`191ad6e`).
 - **O PLN-003:** uma linha no `Retomar`, porque o Desenho pode contar com as notas na `master` e com o `brza note` de
   antes.

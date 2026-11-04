@@ -53,7 +53,7 @@ tags:
   (`.claude/agent-memory/designer/feedback_medir-antes-de-desenhar.md`). Ninguém confere depois se o fato se
   sustentou.
 - O melhor argumento contra a confiança do `reviewer` foi o número dado pelo mesmo modelo que escreve o achado
-  (`work/worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md:49`): medir o acerto responde a ele.
+  (`work/worklogs/2026-10-31-o-porte-das-skills-do-workspace-de-origem.md:49`): medir o acerto responde a ele.
 - O único fato errado registrado do `designer` foi uma estimativa de custo: o symlink do `hooks.json` saiu "barato" e
   não rodou (`.claude/agent-memory/designer/feedback_custo-de-symlink-com-confianca.md`).
 - O evento `subagent` não guarda o conteúdo da devolução (`.claude/hooks/measure.py:434-476`), mas já lê o transcript

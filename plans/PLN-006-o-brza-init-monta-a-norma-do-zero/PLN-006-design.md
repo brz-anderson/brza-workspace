@@ -43,7 +43,7 @@ auditoria do PLN-005; a escolha que uma rodada fixou cita a rodada.
   de plano, issue e decisão, obrigatório na nota nova. **R7.4:** a linha do índice chega à `master` por commit sem
   checkout, com 3 tentativas.
 - **R8.1:** o id de issue e decisão é `issue:<slug>` ou `decision:<slug>`, com o slug da criação. **R8.2:** as menções
-  à Fixfy saem do núcleo. **R8.3:** a medição datada fica no núcleo, como o porquê da regra. **R8.4:** a exceção ao
+  ao workspace de origem saem do núcleo. **R8.3:** a medição datada fica no núcleo, como o porquê da regra. **R8.4:** a exceção ao
   índice vai numa decisão nova, sem `superseded_by`.
 
 ### Terreno
@@ -244,7 +244,7 @@ synced = "2026-11-03"
 | `AGENTS.md:60-65` ("Quem commita") | núcleo, com placeholders; a chave `personal` ao `README.md` | render |
 | `plans/README.md:9` (o contador) | sai (R5.3); o número vem do índice (D11) | — |
 | `.brza/index.jsonl` (novo) | local: nasce vazio no init; só o `brza note` acrescenta | — |
-| As 7 menções à Fixfy | saem do núcleo (R8.2) | — |
+| As 7 menções ao workspace de origem | saem do núcleo (R8.2) | — |
 | A medição datada (`AGENTS.md:92-93`, `CLAUDE.md:158+`) | fica no núcleo, como o porquê da regra (R8.3) | render |
 
 ### D4 — Os placeholders e o motor de render — `brza_root.render` (P3)
@@ -445,7 +445,7 @@ brza_claude() {
   BRZA_WORKSPACE="$ws" command claude --settings "$ws/.claude/settings.json" "${agents[@]}" "$@"
 }
 
-claude() { local w; w=$(brza-where 2>/dev/null); if [ -n "$w" ]; then brza_claude ${=w} "$@"; else fixfy_claude "$@"; fi; }
+claude() { local w; w=$(brza-where 2>/dev/null); if [ -n "$w" ]; then brza_claude ${=w} "$@"; else <função claude do workspace de origem> "$@"; fi; }
 ```
 
 - **Saem** `BRZA_WORKSPACE=…`, `BRZA_STUDIO=…` e o `brza_where` de `~/.zshrc:51-65`; a troca vai ao worklog. O

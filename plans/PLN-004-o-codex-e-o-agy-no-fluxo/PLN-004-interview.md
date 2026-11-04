@@ -5,15 +5,15 @@ Do [PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude](PL
 ### Rodada 1 — destino, escopo, partida e identidade (enviada 2026-10-30)
 
 **Apresentado antes**, na sessão `brza-workspace-80`:
-- **Os binários:** `codex-cli 0.164.0` e `agy 1.4.8` instalados. As funções `codex` e `agy` do `~/.zshrc` só tratam a
-  Fixfy (`fixfy_where`); fora dela, chamam o binário puro, sem a identidade e sem a medição.
+- **Os binários:** `codex-cli 0.164.0` e `agy 1.4.8` instalados. As funções `codex` e `agy` do `~/.zshrc` só tratam o
+  workspace de origem (pela função de localização dele); fora dela, chamam o binário puro, sem a identidade e sem a medição.
 - **A norma:** neutra — o `AGENTS.md` mais um adaptador por runtime —, mas só existe o adaptador do Claude, o
   `CLAUDE.md`.
 - **O que já toca o assunto:** o PLN-001 marca os passos para outro runtime
   (`workstream/studio:plans/PLN-001-o-brza-studio-generico/PLN-001-plan.md:933`), e a issue
   `workstream/studio:work/issues/codex-como-subagente-no-chat-do-claude.md` trata o Codex chamado pela sessão Claude.
-- **O precedente:** o PLN-011 da Fixfy, com as peças em `~/Projects/fixfy/.codex/` (`config.toml` com
-  `developer_instructions`, `agents/*.toml`, `hooks.json`) e em `~/Projects/fixfy/.agents/` (`rules/runtime.md`,
+- **O precedente:** o plano de chats do workspace de origem, com as peças em `.codex/` de lá (`config.toml` com
+  `developer_instructions`, `agents/*.toml`, `hooks.json`) e em `.agents/` de lá (`rules/runtime.md`,
   `agents/*.md`, `hooks.json`, `mcp_config.json`, `plugins.json`). Lá, o P4, o P5, o P8.5 e o P9 foram reabertos (R27),
   e o P13, o guia de custo por peça, não foi feito.
 
@@ -38,11 +38,11 @@ Respondida em 2026-10-30, na sessão `brza-workspace-80`, e trazida a este plano
    ligada ao plano.
 
 3. **Partida.** Opções:
-   - portar o PLN-011 (recomendada);
+   - portar o plano de chats de origem (recomendada);
    - desenhar do zero.
 
-   **Decidido — "Portar o PLN-011 (Recomendado)".** Um `collector` levanta as peças da Fixfy, os desvios X1–X8 e os
-   passos reabertos; o desenho tira o que é só de lá (as contas `fixfy-*`, o `fixfy-plugin`, a guarda).
+   **Decidido — "Portar o plano de chats de origem (Recomendado)".** Um `collector` levanta as peças do workspace de origem, os desvios X1–X8 e os
+   passos reabertos; o desenho tira o que é só de lá (as contas de lá, o plugin de lá, a guarda).
 
 4. **Identidade.** Opções:
    - brz-anderson, igual ao Claude (recomendada);
@@ -53,17 +53,17 @@ Respondida em 2026-10-30, na sessão `brza-workspace-80`, e trazida a este plano
 
 ### Rodada 2 — a base e a identidade (enviada 2026-10-30)
 
-**Apresentado antes:** o levantamento do PLN-011 da Fixfy, pelo `collector`, com o agregado no scratch da sessão
-(`pln-004-levantamento-pln-011.md`). As fontes abaixo são de lá; `FX` é `~/Projects/fixfy`.
+**Apresentado antes:** o levantamento do plano de chats do workspace de origem, pelo `collector`, com o agregado no scratch da sessão
+(`pln-004-levantamento-do-plano-de-origem.md`). As fontes abaixo são de lá; `FX` é o repositório do workspace de origem.
 - **O Codex 0.164 lê o `AGENTS.md` do worktree e não o `CLAUDE.md` nem as `.claude/skills`** — `codex debug
   prompt-input`, com `CODEX_HOME` vazio.
-- **Na Fixfy, o adaptador do Codex** é o `developer_instructions` do `FX/.codex/config.toml:9-19`, e o do `agy`, o
+- **No workspace de origem, o adaptador do Codex** é o `developer_instructions` do `FX/.codex/config.toml:9-19`, e o do `agy`, o
   `FX/.agents/rules/runtime.md:1-18`, com `trigger: always_on`. As funções `codex` e `agy` do `~/.zshrc:79-98` só tratam
-  a Fixfy.
+  o workspace de origem.
 - **As sessões Codex que o app abriu em worktree do brza-studio** (3 rollouts de 2026-10-28, `originator:
   orca_desktop`) rodaram sem a norma do workspace, sem a identidade e sem a medição.
 - **Os hooks do Codex só rodam depois de confiados**, por hash e por caminho (`~/.codex/config.toml:161-210`): cada
-  worktree novo pede revisão (X3 da Fixfy, `PLN-011-plan.md:783`).
+  worktree novo pede revisão (X3 do workspace de origem, `plan.md:783` de lá).
 - **A doc do Codex não diz qual `shell_environment_policy` vale por padrão**, nem se o `.git` do worktree é gravável em
   `workspace-write`; a página `config-reference` deu 404.
 
@@ -74,23 +74,23 @@ Respondida em 2026-10-30, na sessão `workspace`.
      adaptador (`-c developer_instructions`, `--add-dir`), mais `.codex/config.toml` e `.agents/rules/` no workspace —
      custo: o código do wrapper, como pedido ao `tools-kit`, e a cópia do bloco ao `~/.zshrc`; se paga: na primeira
      sessão Codex no brza-studio, onde hoje a norma não chega;
-   - só os arquivos no workspace, como a Fixfy — custo: poucos arquivos; se paga: nunca no brza-studio, que fica sem a
+   - só os arquivos no workspace, como o workspace de origem — custo: poucos arquivos; se paga: nunca no brza-studio, que fica sem a
      norma.
 
    **Decidido — "Função e wrapper (Recomendado)".** **→ reaberta em R10.1**: o `.codex/config.toml` e o
    `.agents/rules/` deixam de ser arquivos locais e vão ao pacote `runtimes` do `brza-workflow`.
 
 2. **Como o "acionar uma skill" funciona no Codex e no `agy`.** Opções:
-   - uma linha no adaptador manda ler `.claude/skills/<nome>/SKILL.md`, como a Fixfy no Codex
+   - uma linha no adaptador manda ler `.claude/skills/<nome>/SKILL.md`, como o workspace de origem no Codex
      (`FX/.codex/config.toml:16`) (recomendada) — custo: nenhum arquivo novo; se paga: agora, nas duas skills;
-   - espelhar em `.agents/skills/` — custo: a duplicação, que a Fixfy deixou em issue aberta (`PLN-011-plan.md:363-365`);
+   - espelhar em `.agents/skills/` — custo: a duplicação, que o workspace de origem deixou em issue aberta (`plan.md:363-365` de lá);
      se paga: só com muitas skills.
 
    **Decidido — "Espelhar em `.agents/skills/`".** Como o espelho evita divergir do `.claude/skills/` vai ao Desenho.
 
 3. **Medir antes se `GIT_AUTHOR_*` e `GIT_SSH_COMMAND` chegam ao `git commit` no Codex e no `agy`.** Opções:
    - sondar antes (recomendada): um commit num repositório descartável do scratch, um turno por runtime — custo: dois
-     turnos curtos, ~US$ 0,20 cada no Codex (`PLN-011-plan.md:696`); se paga: antes de a R1.4 virar função do shell;
+     turnos curtos, ~US$ 0,20 cada no Codex (`plan.md:696` de lá); se paga: antes de a R1.4 virar função do shell;
    - confiar no `env` exportado — custo: nada agora; se paga: talvez nunca, e o commit com outra identidade só se
      descobre depois.
 
@@ -109,17 +109,17 @@ Respondida em 2026-10-30, na sessão `workspace`.
 ### Rodada 3 — os papéis, a memória, a medição e a delegação (enviada 2026-10-30)
 
 **Apresentado antes:** do mesmo levantamento.
-- **Os geradores da Fixfy** — `generate_codex_agents.py` e `generate_agy_agents.py`, sobre `agent_frontmatter.py` —
-  têm `--check`, que acusa divergência (`FX/fixfy-plugin/scripts/generate_codex_agents.py:93-108`). O Codex não traduz
+- **Os geradores do workspace de origem** — `generate_codex_agents.py` e `generate_agy_agents.py`, sobre `agent_frontmatter.py` —
+  têm `--check`, que acusa divergência (`FX/<plugin>/scripts/generate_codex_agents.py:93-108`). O Codex não traduz
   `tools` nem `memory` (`:13-15`).
 - **Nem o Codex nem o `agy` têm campo de memória por agente**; aqui, os papéis usam `memory: project`
   (`.claude/agents/collector.md:6`).
 - **O `agy` trocou os nomes das ferramentas** em 2026-10-20 (`view_file` → `read_file`, `write_to_file` →
-  `write_file`, `replace_file_content` → `edit_file`); a tabela da Fixfy (`generate_agy_agents.py:34-43`) e os matchers
+  `write_file`, `replace_file_content` → `edit_file`); a tabela do workspace de origem (`generate_agy_agents.py:34-43`) e os matchers
   do `FX/.agents/hooks.json:14-40` têm os nomes antigos.
-- **O `measure.py` daqui** não tem `runtime` nem os modos `codex` e `agy`; o da Fixfy tem os dois
+- **O `measure.py` daqui** não tem `runtime` nem os modos `codex` e `agy`; o do workspace de origem tem os dois
   (`FX/.claude/hooks/measure.py:468-701`). O Codex 0.164 grava também rollouts `guardian_review`.
-- **A delegação da Fixfy** é o `FX/scripts/delegate.py`, do PLN-022, com o destino pelo `quota.py` e a conta `adm`; a
+- **A delegação do workspace de origem** é o `FX/scripts/delegate.py`, de outro plano de lá, com o destino pelo `quota.py` e a conta `adm`; a
   medição dela fecha hoje, sem veredito gravado.
 
 Respondida em 2026-10-30, na sessão `workspace`.
@@ -140,26 +140,26 @@ Respondida em 2026-10-30, na sessão `workspace`.
      custo: a restrição só vale quando o papel vem pela delegação; se paga: agora, sem portar a tabela de nomes ainda
      não provados;
    - traduzir `tools` no `agy`, depois de uma sonda de um turno (`agy -p`) que lê os nomes atuais — custo: um turno
-     medido (~US$ 0,35 em seis turnos no P11 da Fixfy, `PLN-011-plan.md:696`), a tabela e os testes; se paga: se um
+     medido (~US$ 0,35 em seis turnos no P11 do workspace de origem, `plan.md:696` de lá), a tabela e os testes; se paga: se um
      papel do `agy` rodar como sessão interativa.
 
    **Decidido — "Traduzir tools no agy"**, com a sonda dos nomes antes.
 
 3. **Como a medição do Codex e do `agy` entra no `measure.py` daqui.** Opções:
-   - portar o `codex()`/`agy()` da Fixfy, com `runtime`, `workstream` e `memory()` em todo modo, o `API_PRICES`
+   - portar o `codex()`/`agy()` do workspace de origem, com `runtime`, `workstream` e `memory()` em todo modo, o `API_PRICES`
      conferido com os modelos de hoje e a tabela "Por runtime" no resumo, depois de uma sonda que vê se o
      `guardian_review` dispara `SubagentStop` (recomendada) — custo: ~260 linhas e testes com três fixtures; se paga: no
-     primeiro resumo com linha real de cada runtime, o que o P9 da Fixfy reabriu;
+     primeiro resumo com linha real de cada runtime, o que o P9 do workspace de origem reabriu;
    - só tokens e cota, sem US$ — custo: menor, sem comparar com o Claude; se paga: nunca, se o custo por turno for
      métrica.
 
    **Decidido — "Portar com US$ (Recomendado)".**
 
-4. **Se a delegação porta o `delegate.py` da Fixfy.** Opções:
+4. **Se a delegação porta o `delegate.py` do workspace de origem.** Opções:
    - versão reduzida: `--type review|reading`, `--to codex|agy` explícito, sem `quota.py` nem a conta `adm`, só leitura,
      com a linha `delegation` na medição (recomendada) — custo: ~150 linhas a menos que o original e um pedido ao
      `tools-kit`; se paga: na primeira revisão feita pelo Codex ou pelo `agy`;
-   - esperar o veredito da Fixfy — custo: o PLN-004 para na frente 4; se paga: se o veredito for encerrar a delegação.
+   - esperar o veredito do workspace de origem — custo: o PLN-004 para na frente 4; se paga: se o veredito for encerrar a delegação.
 
    **Decidido — "Versão reduzida (Recomendado)".**
 
@@ -202,14 +202,14 @@ o detalhe está em `pln-004-sondas.md`, no scratch da sessão `workspace`.
 - **Codex, o `guardian_review`:** dispara com `approval_policy=on-request` e `approvals_reviewer=auto_review`; liberou o
   commit fora do sandbox (`682e434`). O rollout filho tem `thread_source: guardian_review` e o `parent_thread_id` do
   pai; **os tokens do filho não entram no pai** — nos dois casos de 2026-10-28 e na reprodução, a soma do pai bate com
-  o total dele, e o filho fica à parte (~3% da entrada em 2026-10-28). Na Fixfy, 0 de 14 filhos têm linha na medição.
+  o total dele, e o filho fica à parte (~3% da entrada em 2026-10-28). No workspace de origem, 0 de 14 filhos têm linha na medição.
   O evento de hook não foi observado: hook sem confiança é pulado em silêncio.
 - **`agy`, a identidade:** o `env` chega; o commit não passa — sem `--add-dir`, `not a git repository`; com ele,
   `index.lock: Operation not permitted`. A candidata, `--settings '{"enableTerminalSandbox":false}'`, ficou sem teste.
 - **`agy`, as ferramentas:** o agente principal usa `read_file`, `write_file`, `edit_file` e `run_command`; o `tools:`
   aceita a família antiga e a nova, e o subagente recebe a que o frontmatter nomeia; o `agy agents` não valida nomes.
-- **O `fixfy_where`** responde `root` em qualquer cwd quando a `FIXFY_WORKSPACE` está vazia (`~/.zshrc:17`, o
-  `cd ""` não falha): a função da Fixfy pega o `codex` fora dela.
+- **A função de localização do workspace de origem** responde `root` em qualquer cwd quando a variável de workspace dele está vazia (`~/.zshrc:17`, o
+  `cd ""` não falha): a função do workspace de origem pega o `codex` fora dela.
 
 Respondida em 2026-10-30, na sessão `workspace`.
 
@@ -286,7 +286,7 @@ Respondida em 2026-10-30, na sessão `workspace`: "6.1.1 / 6.2.1 / 6.3.1 / 6.4.1
      ~10 testes pelo `tools-kit`, e a frente 2 na fila dele; se paga: agora, com um parser só;
    - um script novo na `master`, pela sessão que conduz — custo: as mesmas linhas, mais um `import` cruzado ou um
      parser repetido, e pode reabrir a R1.1; se paga: se o `tools-kit` não tiver sessão livre antes do D9;
-   - portar os geradores da Fixfy — custo: 282 linhas e um parser que já divergiu (G13); se paga: nunca.
+   - portar os geradores do workspace de origem — custo: 282 linhas e um parser que já divergiu (G13); se paga: nunca.
 
    **Decidido — no `brza agents --write|--check`.**
 
@@ -304,7 +304,7 @@ Respondida em 2026-10-31, na sessão `workspace`: "7.1.1 / 7.2.1 / 7.3.1 / 7.4.1
    automático e não a Anderson, contra a R5.3. Opções:
    - o `codex-brza` tira a flag nos checkouts brza (recomendada) — custo: ~5 linhas e um teste, no pedido ao
      `tools-kit`; se paga: no primeiro push numa sessão Codex do app;
-   - Anderson esvazia o `agentDefaultArgs.codex` no app — custo: vale também para a Fixfy; se paga: agora;
+   - Anderson esvazia o `agentDefaultArgs.codex` no app — custo: vale também para o workspace de origem; se paga: agora;
    - aceitar o revisor automático no app — custo: reabre a R5.3; se paga: só com muitos pushes por sessão.
 
    **Decidido — o `codex-brza` tira a flag nos checkouts brza.**
@@ -317,10 +317,10 @@ Respondida em 2026-10-31, na sessão `workspace`: "7.1.1 / 7.2.1 / 7.3.1 / 7.4.1
 
    **Decidido — caminho relativo à raiz do worktree.**
 
-3. **Como a função nova `codex`/`agy` convive com a da Fixfy no `~/.zshrc`** (D6). Opções:
-   - o bloco BrzA copia a função da Fixfy para `fixfy_codex`/`fixfy_agy` com `functions -c` e a redefine (recomendada)
-     — custo: 2 linhas, e o bloco vem depois do da Fixfy; se paga: agora, sem mexer na Fixfy;
-   - renomear as funções no README da Fixfy — custo: mexe em outro workspace, contra a R1.3; se paga: só se a Fixfy já
+3. **Como a função nova `codex`/`agy` convive com a do workspace de origem no `~/.zshrc`** (D6). Opções:
+   - o bloco BrzA copia a função do workspace de origem para `<origem>_codex`/`<origem>_agy` com `functions -c` e a redefine (recomendada)
+     — custo: 2 linhas, e o bloco vem depois do do workspace de origem; se paga: agora, sem mexer no workspace de origem;
+   - renomear as funções no README do workspace de origem — custo: mexe em outro workspace, contra a R1.3; se paga: só se o workspace de origem já
      for mexer nesse bloco.
 
    **Decidido — `functions -c` no bloco BrzA.**
@@ -338,7 +338,7 @@ Respondida em 2026-10-31, na sessão `workspace`: "7.1.1 / 7.2.1 / 7.3.1 / 7.4.1
 `.codex/agents` em symlink, mas o espião do hook não gravou nada, e o `~/.codex/config.toml` não ganhou `hooks.state`
 para o `sondas2`. A captura de Anderson mostrou a tela "PreToolUse hooks" só com o hook do Orca (`Source: User config -
 ~/.codex/hooks.json`), que não decide, porque o hook da sonda é só `Stop` e `SubagentStop`. A única confiança de
-`hooks.json` por link na máquina, a da Fixfy, foi gravada pelo caminho resolvido (`~/.codex/config.toml:209`).
+`hooks.json` por link na máquina, a do workspace de origem, foi gravada pelo caminho resolvido (`~/.codex/config.toml:209`).
 
 Respondida em 2026-10-31, na sessão `workspace`: "8.1.1 / 8.2.1".
 
@@ -371,7 +371,7 @@ Respondida em 2026-10-31, na sessão `workspace`: "todos recomendados".
    Opções:
    - `${BRZA_WORKSPACE:-$HOME/Projects/brza-workspace}` nos dois hooks (recomendada) — custo: nada além do texto; se
      paga: na primeira sessão aberta sem o wrapper;
-   - `..` no `agy` e `.` no Codex, como na Fixfy — custo: sem o wrapper, a medição vai ao worktree e, no brza-studio,
+   - `..` no `agy` e `.` no Codex, como no workspace de origem — custo: sem o wrapper, a medição vai ao worktree e, no brza-studio,
      se perde; se paga: nunca.
 
    **Decidido — `${BRZA_WORKSPACE:-$HOME/Projects/brza-workspace}`.** **→ reaberta em R10.3**: o `measure.py` e o
@@ -466,7 +466,7 @@ só roda para o Claude.
 
 **Apresentado antes:** o `brza-sync` só conhece os modos `100644` e `100755` e gravaria um symlink do pacote como arquivo
 de texto (`brza-workflow/bin/brza-sync:115`, `:323-331`, lido, não rodado); o `~/.zshrc` faz `source` do `brza.zsh`, tem
-a `brza_claude_fallback`, e o `codex()` e o `agy()` dele são da Fixfy; o `fact_audit.py` lê o transcript no formato do
+a `brza_claude_fallback`, e o `codex()` e o `agy()` dele são do workspace de origem; o `fact_audit.py` lê o transcript no formato do
 Claude (`blocks_of`, `sources_of`, `runs_of`), só para `designer` e `collector`, e solta o `claude -p --model haiku`, cuja
 metade `run` não depende do runtime.
 
@@ -483,7 +483,7 @@ Respondida em 2026-11-02, na sessão `workspace`: "11.3 meça a opção 2, resta
    **Decidido — "Tudo pelo sync (Recomendado)".**
 
 2. **Onde entram o `codex()` e o `agy()` no shell** (D6). Opções:
-   - um arquivo do pacote `runtimes` (`shell/runtimes.zsh`), com o `~/.zshrc` renomeando os da Fixfy para
+   - um arquivo do pacote `runtimes` (`shell/runtimes.zsh`), com o `~/.zshrc` renomeando os do workspace de origem para
      `brza_codex_fallback` e `brza_agy_fallback` (recomendada) — custo: Anderson edita o `~/.zshrc` (~6 linhas), e vai ao
      worklog em "Fora do workspace"; se paga: agora;
    - dentro do `packages/client/shell/brza.zsh` — custo: o `client` passa a conhecer o `codex-brza`, de outro pacote;
@@ -508,25 +508,25 @@ Respondida em 2026-11-02, na sessão `workspace`: "11.3 meça a opção 2, resta
    - **O custo da auditoria:** US$ 1,03 em 8 auditorias para 238 fatos, ou **US$ 0,0043 por fato**, com mediana de 134 s
      em segundo plano (`.measurements/measurements.jsonl`, eventos `fact_audit`); com ~24 fatos auditáveis por devolução
      (240 em 10 capturas), **~US$ 0,10 por devolução**. O auditor é o Haiku do `claude -p`: não muda com o runtime.
-   - **O Codex dá o que o `stop` precisa:** o `SubagentStop` traz `agent_type` e `agent_transcript_path`; na Fixfy há 11
-     linhas `subagent` de `reviewer` do Codex (`~/Projects/fixfy/.measurements/measurements.jsonl`;
+   - **O Codex dá o que o `stop` precisa:** o `SubagentStop` traz `agent_type` e `agent_transcript_path`; no workspace de origem há 11
+     linhas `subagent` de `reviewer` do Codex (`.measurements/measurements.jsonl` de lá;
      `FX/.claude/hooks/measure.py:326-329,558`). Aqui o hook só roda depois do `/hooks`, por worktree.
    - **O `agy` não dá:** o `Stop` traz `conversationId`, `transcriptPath` e `lastUserInput`, sem nome de agente, e não há
      `SubagentStop` (`pln-004-sondas-r6.md`, eventos do espião); só dá para filtrar pela marca na última resposta.
    - **O `rodado` pesa menos do que parece:** dos 240 fatos auditáveis, 82 são `rodado` (34%), e mesmo no Claude 49 de 80
      saíram `unknown` (61%); o `lido` segurou 105 de 150 (70%).
    - **Estimativa, não medida:** ~140 linhas e ~8 testes para os dois adaptadores de captura (o `stop` tem 40 linhas; o
-     `codex()` e o `agy()` do `measure.py` da Fixfy, 48 e 33).
+     `codex()` e o `agy()` do `measure.py` do workspace de origem, 48 e 33).
 
 ### Rodada 12 — o foco da revisão (enviada 2026-11-02, no chat)
 
-**Apresentado antes:** a Fixfy parte o diff de uma entrega em três revisores isolados, com o mesmo escopo e a mesma
+**Apresentado antes:** o workspace de origem parte o diff de uma entrega em três revisores isolados, com o mesmo escopo e a mesma
 régua, cada um só relatando o que cai no foco dele — simplicidade, defeito ou convenção
-(`~/Projects/fixfy/fixfy-plugin/skills/review-writer/references/review-orders.md:13-30`) —, e Anderson mandou os três para
+(`<repositório de origem>/<plugin>/skills/review-writer/references/review-orders.md:13-30`) —, e Anderson mandou os três para
 a frente 4, "um por runtime". O custo de uma revisão, medido: **Codex** US$ 1,98 de mediana (`gpt-6-astra` em `xhigh`,
-122 s, 11 revisões da Fixfy); **Claude** US$ 4,22 (`opus-5-5`, 1.079 s, 4 revisões daqui); **`agy`** estimado em US$ 0,1
-a 0,4 pelos tokens das sondas, no preço da tabela da Fixfy. As tarefas diferem: é a forma do custo, não a qualidade. A
-Fixfy não gravou o veredito da delegação, que fechava em 2026-10-30.
+122 s, 11 revisões do workspace de origem); **Claude** US$ 4,22 (`opus-5-5`, 1.079 s, 4 revisões daqui); **`agy`** estimado em US$ 0,1
+a 0,4 pelos tokens das sondas, no preço da tabela do workspace de origem. As tarefas diferem: é a forma do custo, não a qualidade.
+O workspace de origem não gravou o veredito da delegação, que fechava em 2026-10-30.
 
 Respondida em 2026-11-02, na sessão `workspace`: "11.3.2 / 12.1.1 / 12.2.2".
 
@@ -699,11 +699,11 @@ dentro de `.brzAgents`, não mais dentro de `.claude`; restante recomendado".
 
 3. **Onde mora o texto dos três focos, e quem manda usá-lo** (D11). Opções:
    - `core/.claude/review-focus.md` com os três textos, apontado pela linha do `reviewer` em `core/AGENTS.md:139`, sem a
-     junção da Fixfy (recomendada) — custo: um arquivo de ~30 linhas, uma linha no núcleo e uma entrada no
+     junção do workspace de origem (recomendada) — custo: um arquivo de ~30 linhas, uma linha no núcleo e uma entrada no
      `golden_differences.py`; se paga: na próxima revisão de entrega, também nos workspaces sem o pacote;
    - o mesmo arquivo no pacote `runtimes` — custo: o foco só existe onde o pacote está; se paga: nunca, se o foco vale
      no Claude;
-   - o arquivo mais a regra de junção da Fixfy — custo: régua que o experimento não testou; se paga: quando a sessão
+   - o arquivo mais a regra de junção do workspace de origem — custo: régua que o experimento não testou; se paga: quando a sessão
      juntar três devoluções com sobreposição.
 
    **Contraproposta de Anderson, em texto livre, sem decidir:** "o ferramental de `agents` | `skills` | `memory`

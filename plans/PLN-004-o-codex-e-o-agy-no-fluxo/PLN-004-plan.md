@@ -29,8 +29,7 @@ tags:
 ## Pedido
 
 - **Origem:** pedido livre, no chat do BrzA Studio, na sessão `brza-workspace-80` ("Integrar codex e agy ao fluxo"),
-  aberta na `master`, de 2026-10-30. A partida é o PLN-011 da Fixfy (R1.3),
-  `~/Projects/fixfy/plans/PLN-011-claude-codex-e-antigravity-no-mesmo-ecossistema/`. Toca o
+  aberta na `master`, de 2026-10-30. A partida é o plano de chats do workspace de origem (R1.3). Toca o
   [PLN-001](../PLN-001-o-brza-studio-generico/PLN-001-plan.md), que já marca os passos que outro runtime pode executar,
   e a issue
   [O Codex chamado pela sessão Claude aparece como subagente no chat do BrzA Studio](../../work/issues/codex-como-subagente-no-chat-do-claude.md),
@@ -47,8 +46,8 @@ As frentes do pedido, pela R1.2, numeradas para a Cobertura:
 3. **Medição:** o `measure.py` lendo o rollout do Codex e o transcript do `agy`, com o runtime em cada linha;
 4. **Delegação e sessões:** a sessão Claude manda revisão e levantamento ao Codex e ao `agy`, só leitura, e o
    `brza sessions` abre sessão Codex ou `agy` no worktree. Esta frente leva também os três focos de revisão —
-   simplicidade, defeito e convenção —, um por runtime, que Anderson mandou para cá na triagem do porte das skills da
-   Fixfy, em 2026-10-31 ("Com a frente 4", no [O porte das skills da Fixfy para o workspace](../../work/worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md)).
+   simplicidade, defeito e convenção —, um por runtime, que Anderson mandou para cá na triagem do porte das skills do
+   workspace de origem, em 2026-10-31 ("Com a frente 4", no [O porte das skills do workspace de origem para o workspace](../../work/worklogs/2026-10-31-o-porte-das-skills-do-workspace-de-origem.md)).
 
 ### Cobertura
 
@@ -69,7 +68,7 @@ As frentes do pedido, pela R1.2, numeradas para a Cobertura:
 
 ### Fora de escopo
 
-- **O que é só da Fixfy** — as contas `fixfy-*`, o `fixfy-plugin`, a guarda —, pela R1.3. Fica no PLN-011 de lá.
+- **O que é só do workspace de origem** — as contas de lá, o plugin de lá, a guarda —, pela R1.3. Fica no plano de chats de lá.
 - **O código do `brza`** — o `brza sessions`, o `claude-brza` —, pela R1.1. Vai como pedido ao `tools-kit`, que o
   executa numa sessão dele.
 - **O chat Antigravity do BrzA Studio.** É um servidor ACP gerenciado pelo app, que não é o `agy` e ignora o
@@ -83,14 +82,14 @@ As rodadas R1–R12 estão em [PLN-004 — Entrevista](PLN-004-interview.md), po
 
 ## Worklogs
 
-- 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do PLN-011; R2 a R4; as sondas; R5; o rascunho
+- 2026-10-30 — aberto; R1 trazida da sessão `brza-workspace-80`; o levantamento do plano de chats de origem; R2 a R4; as sondas; R5; o rascunho
   do Desenho, pelo `designer`; R6. Parou nas sondas da R6.1.
   [O PLN-004: a abertura do Codex e do agy no fluxo](../../work/worklogs/2026-10-30-pln-004-a-abertura-do-codex-e-do-agy-no-fluxo.md)
 - 2026-10-31 — as sondas da R6.1; o `/hooks` de Anderson, sem o hook rodar; R7 e R8. Parou na
   aprovação do Desenho.
   [O PLN-004: as sondas da R6 e o Desenho do Codex e do agy](../../work/worklogs/2026-10-31-pln-004-as-sondas-e-o-desenho.md)
-- 2026-10-31 — fora do plano, a triagem do porte da Fixfy mandou à frente 4 os três focos de revisão.
-  [O porte das skills da Fixfy para o workspace](../../work/worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md)
+- 2026-10-31 — fora do plano, a triagem do porte do workspace de origem mandou à frente 4 os três focos de revisão.
+  [O porte das skills do workspace de origem para o workspace](../../work/worklogs/2026-10-31-o-porte-das-skills-do-workspace-de-origem.md)
 - 2026-11-02 — a revisão do plano contra a migração ao `brza-workflow` (PLN-006), o `Retomar` e a frente 4 com os três
   focos; R10 a R12, e as medições da auditoria de fatos e da revisão por runtime. Parou no desenho do experimento da
   12.2.

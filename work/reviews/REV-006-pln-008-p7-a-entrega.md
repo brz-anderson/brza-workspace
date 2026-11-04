@@ -79,11 +79,11 @@ correção da segunda está em `b7fb3d2` (`tests/cli/test_brza_note.py:811-831`)
 (`--bootstrap-pln008`), sem uso depois da MIG-001 `done`. Premissa: o `brza-workflow` serve outros workspaces pelo
 `brza init`. D7.
 
-### A8 — P1–P4 saíram com o e-mail da Fixfy, e `7a18392` repete
+### A8 — P1–P4 saíram com o e-mail corporativo, e `7a18392` repete
 
 > desvio · sugestão · confiança 99 · → descartado: já registrado nos worklogs de P5 e P6, e a Restrição proíbe reescrever histórico
 
-**Evidência:** `git log --format='%h %ae'` dá `anderson@fixfy.com.br` em `b7fb3d2`, `b7e8727`, `3fc3935`, `a168f73`,
+**Evidência:** `git log --format='%h %ae'` dá o e-mail corporativo do `~/.gitconfig` em `b7fb3d2`, `b7e8727`, `3fc3935`, `a168f73`,
 `9f51cda` e `7a18392`; `git config --show-origin user.email` aponta o `~/.gitconfig`, herdado pela sessão sem o `env`.
 
 ### A9 — A suíte CLI falha em 20 testes

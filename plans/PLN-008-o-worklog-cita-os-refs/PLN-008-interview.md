@@ -42,7 +42,7 @@ Respondida em 2026-11-03, na sessão `workspace`.
    ~3 h; se paga: na primeira migração; pasta `work/migrations/` — custo: ~3–4 h; se paga: só com migrações curtas;
    só rótulo — custo: ~1 h; se paga: agora, mas o `refs` aponta para ID sem arquivo.
 
-   **Resposta:** "Verifique como funciona migrations/ de fixfy_flutter e flutter-template e abra dois subagentes em
+   **Resposta:** "Verifique como funciona migrations/ de [o workspace de origem]_flutter e flutter-template e abra dois subagentes em
    paralelo, um que defenda sua recomendação e um que rebata sua recomendação". Leitura: o lugar volta à rodada depois
    do levantamento e dos dois consultores — vai à R3.
 
@@ -59,10 +59,10 @@ Respondida em 2026-11-03, na sessão `workspace`.
 
 ### Rodada 3 — o MIG (enviada 2026-11-03)
 
-**Apresentado antes:** no `flutter-template` e no `fixfy_flutter`, a migração é a "divergência entre o código em disco
+**Apresentado antes:** no `flutter-template` e no projeto Flutter do workspace de origem, a migração é a "divergência entre o código em disco
 e a norma em vigor", numa pasta permanente, um arquivo numerado por migração, com tabela de origem, urgência,
 dependência e status; tem o tamanho de um commit ou PR, aponta um plano pelo campo `Plano:` e **sai do diretório** ao
-concluir (`flutter-template/docs/migrations/README.md`; `fixfy_flutter/docs/migration/README.md`). Dois consultores
+concluir (`flutter-template/docs/migrations/README.md`; `docs/migration/README.md` do projeto de origem). Dois consultores
 `designer` em paralelo:
 - **a defesa** do MIG como plano: a migração real do brza foi trabalho de plano (o D12 do PLN-006, com a volta
   escrita); o molde do PLN já tem Terreno, Cobertura e Regressão; a fila são as issues; `kind: plan` com id `MIG-NNN`
@@ -72,7 +72,7 @@ concluir (`flutter-template/docs/migrations/README.md`; `fixfy_flutter/docs/migr
   a contraproposta é a fila `work/migrations/`, e a MIG-001 a renumeração das revisões.
 
 Os dois concordaram: a migração concluída fica, com `status: done` (`work/README.md:80`, `plans/README.md:34`), e a
-`migration-writer` da Fixfy não serve aqui (`work/worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md:24`). A síntese
+`migration-writer` do workspace de origem não serve aqui (`work/worklogs/2026-10-31-o-porte-das-skills-do-workspace-de-origem.md:24`). A síntese
 apresentada: a definição do ataque, no lugar da fila que a defesa apontou, a issue.
 
 Respondida em 2026-11-03, na sessão `workspace`.
@@ -389,21 +389,21 @@ Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
    **Decidido — as três: "A5, A7: issues no workspace", "A6: fechar 2 issues", "A3, A8: descartados".**
 
 
-### Rodada 15 — as citações da Fixfy (enviada 2026-11-03)
+### Rodada 15 — as citações do workspace de origem (enviada 2026-11-03)
 
 **Apresentado antes:** a lista de worklogs cujo `refs` muda com o extrator do P8 (`brza-workflow@30b3666`): os 4
-previstos e mais dois do `workspace`, que ganhariam o PLN-011 porque citam em crase o PLN-011 da Fixfy, enquanto o
+previstos e mais dois do `workspace`, que ganhariam o PLN-011 porque citam em crase o ID de um plano do workspace de origem que coincide com ele, enquanto o
 `studio` tem agora um PLN-011 próprio (`plans/PLN-011-chats-pela-cli-e-plugins`). O lookbehind de `bin/brza-note:185`
-ignora `fixfy:PLN-011`.
+ignora a citação com o prefixo do workspace de origem.
 
 Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
 
-1. **Como tratar a colisão de IDs da Fixfy?** Opções: prefixo `fixfy:` na regra local (recomendada); issue, sem mexer
+1. **Como tratar a colisão de IDs do workspace de origem?** Opções: prefixo do nome dele na regra local (recomendada); issue, sem mexer
    agora; aceitar o PLN-011 no `refs`.
 
-   **Resposta em texto livre:** "remover citações a fixfy de todos os repos brza-*". É uma contraproposta.
-2. **O alcance** (pergunta de volta, com a medida: 80 arquivos de notas, cerca de 41 linhas com ID da Fixfy, 16 arquivos
-   no `brza-workflow` e 3 testes no `brza-studio`). Opções: IDs da Fixfy nas notas (recomendada); toda menção nas
+   **Resposta em texto livre:** "remover citações a [o workspace de origem] de todos os repos brza-*". É uma contraproposta.
+2. **O alcance** (pergunta de volta, com a medida: 80 arquivos de notas, cerca de 41 linhas com ID do workspace de origem, 16 arquivos
+   no `brza-workflow` e 3 testes no `brza-studio`). Opções: IDs do workspace de origem nas notas (recomendada); toda menção nas
    notas; tudo, inclusive código.
 
    **Resposta: "Tudo, inclusive código".**
@@ -412,9 +412,9 @@ Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
 
    **Resposta: "Dentro do P8 (Recomendado)".** Ela cruza com a resposta 2 e volta à Rodada 16.
 
-### Rodada 16 — o alcance da remoção da Fixfy (enviada 2026-11-03)
+### Rodada 16 — o alcance da remoção do workspace de origem (enviada 2026-11-03)
 
-**Apresentado antes:** a resposta 3 da R15 cruzava com a 2. No `brza-workflow`, "Fixfy" é guarda: o `FOREIGN`
+**Apresentado antes:** a resposta 3 da R15 cruzava com a 2. No `brza-workflow`, o nome do workspace de origem é guarda: o `FOREIGN`
 (`bin/brza-init:60`) e o `tests/hooks/golden_differences.py:19`. No `brza-studio`, são dados de 3 testes.
 
 Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
@@ -423,7 +423,7 @@ Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
 
    **Decidido — "P8 ampliado (Recomendado)".**
 2. **O que fica no lugar das guardas?** Opções: o nome fora do repositório (recomendada) — `FOREIGN` lê os nomes
-   proibidos de um arquivo da máquina, fora do git, e o golden troca a chave "fixfy" por "origem", ~1 h; tirar sem
+   proibidos de um arquivo da máquina, fora do git, e o golden troca a chave do nome por "origem", ~1 h; tirar sem
    substituto, ~20 min, perdendo a guarda.
 
    **Decidido — "Nome fora do repositório (Recomendado)".**
@@ -435,10 +435,10 @@ Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
 
    **Decidido — "Ficam como estão (Recomendado)".** → D11.
 
-### Rodada 17 — a identidade das issues com a Fixfy no slug (enviada 2026-11-03)
+### Rodada 17 — a identidade das issues com o workspace de origem no slug (enviada 2026-11-03)
 
 **Apresentado antes:** o rename preserva a identidade `issue:<slug da criação>` (`check_notes.py:269`; Regressão do
-PLN-008). As duas issues do `tools-kit` com "fixfy" no slug manteriam esse ID no índice e no `refs`.
+PLN-008). As duas issues do `tools-kit` com o nome do workspace de origem no slug manteriam esse ID no índice e no `refs`.
 
 Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
 

@@ -8,7 +8,7 @@ metadata:
 Fato que pesa numa bifurcação se mede antes de virar opção: Anderson escolheu "sondar antes" nas duas vezes em que a
 opção apareceu (PLN-004, R2.3 e R4.2, 2026-10-30), com o critério "no Desenho, com fato no lugar de hipótese".
 
-**Why:** a sonda desmentiu duas hipóteses do desenho da Fixfy (o `.git` do worktree no sandbox do Codex, o commit do
+**Why:** a sonda desmentiu duas hipóteses do desenho do workspace de origem (o `.git` do worktree no sandbox do Codex, o commit do
 `agy`), e um `D` escrito sobre hipótese teria de ser reescrito.
 
 **How to apply:** antes de pôr uma alternativa na rodada, procure a sonda de custo zero — `codex debug prompt-input` com

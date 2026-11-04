@@ -62,7 +62,7 @@ migração em estágios.
 A revisão do `designer` com a R4–R6 abriu cinco pontos de detalhe do registro e do índice, e o rascunho trazia três
 escolhas marcadas "sem lastro" que não tinham ido à rodada. A R7 e a R8 fecharam os oito, todos na recomendada: o
 registro guarda o par raiz + código, pelo `brza register`; o índice é `.brza/index.jsonl`, com um campo `description`
-no frontmatter e a linha levada à `master` por commit sem checkout; o id de issue e decisão é `kind:slug`; a Fixfy sai
+no frontmatter e a linha levada à `master` por commit sem checkout; o id de issue e decisão é `kind:slug`; o workspace de origem sai
 do núcleo; a medição datada fica como o porquê; a exceção ao índice vai numa decisão nova.
 
 O Desenho foi ao `PLN-006-design.md` (D1–D12, 580 linhas), e os Passos, P1–P9, somam 27 h. Na R9, Anderson aceitou o

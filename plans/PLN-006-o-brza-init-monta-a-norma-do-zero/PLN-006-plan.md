@@ -113,8 +113,8 @@ Estimado: 3,5 h · Executado: 0,4 h
 
 - [x] **1. Teste de ouro que falha**: o render do núcleo com o manifesto do `brza-workspace` sai igual à `master`
   daqui, menos a lista fechada do D12
-- [x] **2. Implementar** o parser TOML, o render `{{tabela.chave}}`, o lock; pôr os placeholders nos `.md`, tirar a
-  Fixfy (R8.2), o `@AGENTS.md` e as `.claude/rules/`
+- [x] **2. Implementar** o parser TOML, o render `{{tabela.chave}}`, o lock; pôr os placeholders nos `.md`, tirar o
+  workspace de origem (R8.2), o `@AGENTS.md` e as `.claude/rules/`
 - [x] **3. Rodar e ver passar**
 - [x] **4. Commit**
 
@@ -228,8 +228,8 @@ Estimado: 3 h · Executado: 1,2 h
   `scripts/brza/` o que foi ao núcleo e os testes antigos, e troca o cabeçalho dos cinco scripts locais (A3) →
   `python3 -m unittest discover -s scripts/brza/tests` → 94 OK, e os cinco `--help` sobem; o `--local` → nada a trocar.
 - **7:** `brza note sync` → `brand`, `studio`, `tools-kit` e `workspace` mesclados e enviados.
-- **8:** o `~/.zshrc` passa a `source` do `packages/client/shell/brza.zsh` e a `brza_claude_fallback` à Fixfy;
-  `zsh -n` ok, e a `claude` roteia: `--agents` no `brza-studio`, `--settings` no worktree, a Fixfy fora.
+- **8:** o `~/.zshrc` passa a `source` do `packages/client/shell/brza.zsh` e a `brza_claude_fallback` ao workspace de origem;
+  `zsh -n` ok, e a `claude` roteia: `--agents` no `brza-studio`, `--settings` no worktree, o workspace de origem fora.
 - **9:** a trava do `/compact` com a memória suja → `decision: block` e a linha `guard` com `workstream: workspace`;
   os turnos novos gravam o `workstream`; a linha `changed` do índice sai deste commit do plano.
 
@@ -295,12 +295,12 @@ com a `BRZA_WORKSPACE`, o `brza sync` recusa e diz os dois caminhos · o README 
   P8, o manifesto e o `brza register` vêm antes de qualquer relink.
 - **X17 — O P6 vem antes do P5**, e não junto: o passo 6 do D8 roda a camada 1 do sync no diretório novo. Escolha da
   sessão, pela regra da recomendada.
-- **X18 — O bloco do shell tem duas cópias e uma chamada à Fixfy**: o `packages/client/shell/brza.zsh` do P7 cai na
-  `fixfy_claude`, contra a R8.2, e o `templates/README.md` do P3 traz outra cópia do bloco. O P5, dono do molde do
+- **X18 — O bloco do shell tem duas cópias e uma chamada ao workspace de origem**: o `packages/client/shell/brza.zsh` do P7 cai na
+  função `claude` do workspace de origem, contra a R8.2, e o `templates/README.md` do P3 traz outra cópia do bloco. O P5, dono do molde do
   README, os reconcilia.
 - **X19 — O `render` ganhou o parâmetro `escape`**, e o `render_settings` escapa o valor para JSON; o
   `templates/.brza/workspace.toml` é a saída exata do `dump_manifest`, para o P5 ter uma fonte só.
-- **X20 — Ficaram no núcleo**, só com placeholders, o exemplo `fixfy:architect` do docstring do `measure.py:135` e o
+- **X20 — Ficaram no núcleo**, só com placeholders, o exemplo de agente com o prefixo do workspace de origem no docstring do `measure.py:135` e o
   parágrafo do `CLAUDE.md` sobre o `--agents` do `claude-brza`, que é do cliente. O primeiro sai no P5, com o X18.
 - **X21 — O `brza sync` sem `--core-only` roda também a camada 2**, o `brza-note sync`, por subprocesso; o
   `--dry-run` e o `--core-only` não a rodam. O D9 não dizia o que o `--core-only` excluía.
@@ -310,7 +310,7 @@ com a `BRZA_WORKSPACE`, o `brza sync` recusa e diz os dois caminhos · o README 
   `.claude/hooks/tests/*` e o `notes-checker/tests/run.py` do `brza-workspace` saem por `git rm` no P8 (R15.3).
 - **X24 — O `brza init` registra por último**: confere (8), commita (9) e só então grava o registro (7), para a falha da
   conferência não deixar entrada no único arquivo fora do diretório. A conferência varre os cinco termos —
-  `brza-workspace`, `brza-studio`, `Anderson`, `brz-anderson`, `Fixfy` —, salvo o que o manifesto traz.
+  `brza-workspace`, `brza-studio`, `Anderson`, `brz-anderson` e o nome do workspace de origem —, salvo o que o manifesto traz.
 - **X25 — O `brza init` ganhou `--code-github`**, e grava o checkout principal quando o `--code` é um worktree; com o
   `brza-workflow` em detached, o `core.ref` cai no `master`.
 - **X27 — O `--local` vem depois do estágio 6, e não no 5**: antes de o 6 tirar de `scripts/brza/` o que foi ao

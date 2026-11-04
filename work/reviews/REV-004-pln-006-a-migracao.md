@@ -65,8 +65,8 @@ escrito`, e o real gera um commit só do lock (`bin/brza-sync:363-380`). O lock 
 
 > lacuna · sugestão · confiança 90 · → corrigido aqui
 
-**Evidência:** o gate de testes do `reviewer.md:36` e as linhas do `work/README.md` sobre as notas do workspace da
-Fixfy (`:177`) não chegaram à `.claude/rules/workspace.md` nem ao README. Corrigido em `brza-workspace@f12fdd4`.
+**Evidência:** o gate de testes do `reviewer.md:36` e as linhas do `work/README.md` sobre as notas de outro
+workspace (`:177`) não chegaram à `.claude/rules/workspace.md` nem ao README. Corrigido em `brza-workspace@f12fdd4`.
 
 ### A7 — A volta dos links depende do `/private/tmp`
 

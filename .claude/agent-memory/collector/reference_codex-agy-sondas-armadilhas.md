@@ -8,7 +8,7 @@ metadata:
 Aprendido nas sondas do PLN-004 (2026-10-30); confira com `codex --version` e `agy --version` antes de confiar.
 
 **Armadilhas de execução**
-- No shell da ferramenta `codex` e `agy` são as funções da Fixfy; `fixfy_where` devolve `root` para qualquer cwd quando `FIXFY_WORKSPACE` está vazio (`cd ""` não sai do lugar). Use sempre `command codex …` e `command agy …`, senão entram `-c project_root_markers`, o MCP `firebase` e um `codex plugin marketplace upgrade`.
+- No shell da ferramenta `codex` e `agy` são as funções de outro workspace; a função de localização dele devolve `root` para qualquer cwd quando a variável de workspace dele está vazia (`cd ""` não sai do lugar). Use sempre `command codex …` e `command agy …`, senão entram `-c project_root_markers`, o MCP `firebase` e um `codex plugin marketplace upgrade`.
 - `codex exec "prompt"` sem `< /dev/null` espera stdin e pendura a ferramenta Bash (vai a segundo plano em 300 s). Com `</dev/null` ainda imprime "Reading additional input from stdin..." e segue.
 - O `codex exec` grava `[projects."<raiz git>"] trust_level = "trusted"` no `~/.codex/config.toml` sozinho (raiz do repositório, não do worktree). Conte isso como estado fora do workspace.
 - `agy -p` com `--add-dir`: o cwd do `run_command` vira o primeiro `--add-dir` em ordem alfabética, não o cwd do processo. Sem `--add-dir` o git do worktree dá `not a git repository: (null)`.
@@ -32,4 +32,4 @@ Aprendido nas sondas do PLN-004 (2026-10-30); confira com `codex --version` e `a
 - App (`~/Projects/brza-studio`): override de chat do Codex é um executável literal sem argumentos e roda `<override> app-server`; o chat do `antigravity` é ACP gerenciado e ignora o override (`src/main/acp/acp-launch-specs.ts:265`); o app pré-confia worktree (`src/main/agent-trust-presets.ts:67-142`). A configuração do app mora em `profiles/local-default/profile-state.db` (sqlite), não em JSON.
 - Skill no `agy` = ler o `SKILL.md` (não há ferramenta de skill); `${CLAUDE_SKILL_DIR}` não existe lá.
 
-Ver também [[reference-fixfy-pln-011-onde-mora]].
+Ver também [[reference-workspace-de-origem-chats-onde-mora]].

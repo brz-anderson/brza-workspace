@@ -8,26 +8,26 @@ refs:
   - issue:skills-de-documento-da-fixfy-num-plugin
 ---
 
-# O porte das skills da Fixfy para o workspace
+# O porte das skills do workspace de origem para o workspace
 
-Anderson pediu, na sessão `workspace`: "vamos avaliar o porte das skills da `Fixfy` usando a
+Anderson pediu, na sessão `workspace`: "vamos avaliar o porte das skills de [o workspace de origem] usando a
 /skill-creator:skill-creator". A `skill-creator` tinha acabado de entrar no escopo local do worktree, como registra o
 [O PLN-004: as sondas da R6 e o Desenho do Codex e do agy](2026-10-31-pln-004-as-sondas-e-o-desenho.md).
 
 ## A triagem
 
-O `collector` leu as 16 skills de `~/Projects/fixfy/fixfy-plugin/skills/` contra a norma e as skills daqui. Tamanho é o
+O `collector` leu as 16 skills do workspace de origem contra a norma e as skills daqui. Tamanho é o
 `SKILL.md` mais as referências, em linhas.
 
 | Skill | Classe | Argumento | Tamanho |
 | :---- | :----- | :-------- | :------ |
-| `plan-runner` | já portada | O `diff` não acha resíduo da Fixfy; mudaram as pastas, o `brza note commit`, o critério de plano e a delegação por papel | 229 + 461 |
+| `plan-runner` | já portada | O `diff` não acha resíduo do workspace de origem; mudaram as pastas, o `brza note commit`, o critério de plano e a delegação por papel | 229 + 461 |
 | `agent-instructions-writer` | adaptar | Este workstream edita a norma o tempo todo, e nenhuma skill guia isso; as invariantes servem, o roteamento por constituição e `docs/` não | 91 + 146 |
 | `review-writer` | adaptar em parte | A forma do achado já está no `plan-runner` (`references/conduct.md`); sobram a confiança, o achado falso e a ordem de revisão | 159 + 471 |
 | `end-day-runner` | não serve | O `close-task` cobre o principal; sobram dois furos | 166 |
 | `git-runner` | não serve | PR, Jira e submódulo; aqui o push é direto e o `brza note commit` faz a mecânica | 161 + 318 |
 | `adr-writer`, `constitution-writer`, `manual-writer`, `migration-writer`, `spec-writer`, `readme-writer` | não serve aqui | Pressupõem o `docs/` de um repositório de código; a decisão daqui é `work/decisions/` e a norma de topo, o `AGENTS.md` | ~6.000 no total |
-| `fixfy-context`, `atlassian-runner`, `sprint-runner`, `prototype-creator`, `token-drift-checker` | não serve | Presas ao Jira, ao Figma, ao design system ou ao mapa de repositórios da Fixfy | — |
+| a de contexto do workspace de origem, `atlassian-runner`, `sprint-runner`, `prototype-creator`, `token-drift-checker` | não serve | Presas ao Jira, ao Figma, ao design system ou ao mapa de repositórios de lá | — |
 
 A norma não diz o formato da mensagem de commit, embora a prática seja `docs:`, `fix(brza):` e afins; ficou fora da
 rodada.
@@ -41,7 +41,7 @@ rodada.
 - **Como medir:** "3 tarefas, com e sem" — a mesma tarefa com a skill adaptada e sem ela, pela `skill-creator`; e as
   três tarefas propostas, "Servem".
 - **As skills de documento:** "essas vão ao `tools-kit` para um possível plugin", registrado como "Issue no tools-kit"
-  em [As skills de documento da Fixfy num possível plugin do BrzA](../issues/skills-de-documento-da-fixfy-num-plugin.md).
+  em [As skills de documento do workspace de origem num possível plugin do BrzA](../issues/skills-de-documento-do-workspace-de-origem-num-plugin.md).
 - **Os furos do `end-day-runner`:** "Issue", em
   [O close-task não varre o work/notes/ do dia nem relata os worktrees sujos](../issues/close-task-sem-varredura-de-notes-nem-worktrees-sujos.md).
 
@@ -55,7 +55,7 @@ papel `reviewer` nunca rodou, e houve um parecer só, o do PLN-002, sem achado f
   do próprio defensor, era o número dito pelo mesmo modelo que escreve o achado.
 - **Achado falso:** "Só no texto" — destino `→ falso`, separado de `descartado`, e a sessão refaz a evidência antes da
   rodada.
-- **Ordem de revisão:** "No reviewer.md", sem o "estado presente" da Fixfy, porque a norma daqui guarda medição datada
+- **Ordem de revisão:** "No reviewer.md", sem o "estado presente" do workspace de origem, porque a norma daqui guarda medição datada
   de propósito.
 - **Três revisores com foco:** "Com a frente 4", numa linha no `Retomar` do
   [PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude](../../plans/PLN-004-o-codex-e-o-agy-no-fluxo/PLN-004-plan.md).
@@ -88,7 +88,7 @@ seguiu a régua como roteiro e parou em "não conferi".
 **A versão 2** mandou ler o arquivo inteiro como quem vai segui-lo, com a régua como mínimo; seguir o ponteiro para fora
 do repositório, só lendo; dizer o que quebra; responder às perguntas do pedido em lista; e citar a escolha anterior
 que o pedido contraria. A iteração 2 deu 100% contra 87%, com ~+12 mil tokens e ~+16 s por execução. Na revisão, 8/8
-contra 5/8: só a versão com a skill achou o `~/.zshrc` sem o `--agents` e o `gh` na conta `anderson-fixfy`, os dois
+contra 5/8: só a versão com a skill achou o `~/.zshrc` sem o `--agents` e o `gh` na conta corporativa, os dois
 conferidos; a sem a skill afirmou que o `~/.zshrc` batia com o `README.md`. As outras duas tarefas empataram.
 
 Anderson: "tudo aprovado, segue". A skill entrou na `master` em `3f55576`, em `.claude/skills/agent-instructions-writer/`.
@@ -99,24 +99,24 @@ A otimização da `description` pela `skill-creator` não rodou.
 a dizer onde ele fica no chat do BrzA Studio, que o `/private/tmp/claude-501/…` não cobria (`81a3d1b`). A memória que o
 guardava saiu.
 
-## A sessão paralela na Fixfy
+## A sessão paralela no workspace de origem
 
-Anderson pediu: "em pararelo, abra uma sessão no `fixfy-workspace`, em workstream, para fazer as medições e planejar
-possíveis melhorias", e depois "abra no `BrzA Studio`". A sessão `fixfy-skills` abriu pelo `brza sessions`, em
-`~/Projects/fixfy`, com o título "Fixfy: medir e melhorar as skills". A Fixfy não tem workstream; ela abriu na raiz, onde
+Anderson pediu: "em pararelo, abra uma sessão no [o workspace de origem], em workstream, para fazer as medições e planejar
+possíveis melhorias", e depois "abra no `BrzA Studio`". A sessão de skills de lá abriu pelo `brza sessions`, no
+repositório do workspace de origem, com o título "Medir e melhorar as skills". Ele não tem workstream; ela abriu na raiz, onde
 a norma de lá grava as notas, com a ordem de abrir worktree para mudar skill e de trazer a rodada do que medir antes de
-rodar. No chat do app, o `claude-brza` roda ali o `claude` puro, sem a função `fixfy_claude`: a conta é a padrão.
+rodar. No chat do app, o `claude-brza` roda ali o `claude` puro, sem a função `claude` dele: a conta é a padrão.
 
 ## Fora do workspace
 
-- **A conta ativa do `gh` no perfil padrão**, trocada de `anderson-fixfy` para `brz-anderson` com
+- **A conta ativa do `gh` no perfil padrão**, trocada da conta corporativa para `brz-anderson` com
   `gh auth switch --hostname github.com --user brz-anderson`, como o `CLAUDE.md` promete ("O `gh` usa o perfil padrão,
   com a conta `brz-anderson` ativa"). Quem achou foi a revisão da `agent-instructions-writer`, na iteração 2 da medição;
   Anderson: "conserte".
-  - Risco: a sessão aberta sem a `fixfy_claude`, como a `fixfy-skills` no BrzA Studio, usa o perfil padrão e passa a
-    falar com o GitHub como `brz-anderson`; a `fixfy_claude` usa o próprio `GH_CONFIG_DIR` e não muda.
+  - Risco: a sessão aberta sem a função `claude` do workspace de origem, como a de skills de lá no BrzA Studio, usa o perfil padrão e passa a
+    falar com o GitHub como `brz-anderson`; essa função usa o próprio `GH_CONFIG_DIR` e não muda.
   - Estado: ativo.
-  - Como desfazer: `gh auth switch --hostname github.com --user anderson-fixfy`.
+  - Como desfazer: `gh auth switch --hostname github.com --user <conta corporativa>`.
 - **O bloco do BrzA no `~/.zshrc` está atrás do `README.md`**: a `brza_claude` de lá não passa o `--agents`, e a
   sessão aberta pelo terminal no `brza-studio` sobe sem os subagentes por papel. A cópia foi barrada pelo classificador
   de permissões da sessão e ficou com Anderson.
@@ -125,8 +125,8 @@ rodar. No chat do app, o `claude-brza` roda ali o `claude` puro, sem a função 
   - Estado: pendente.
   - Como desfazer: depois da cópia, o `~/.zshrc.bak-2026-10-31-brza` que o comando grava.
 
-- **A sessão `fixfy-skills` no BrzA Studio**, em `~/Projects/fixfy`, que vai instalar a `skill-creator` no escopo local
-  do checkout da Fixfy.
-  - Risco: a sessão grava notas e worktrees na Fixfy, pela norma de lá.
+- **A sessão de skills do workspace de origem no BrzA Studio**, no repositório dele, que vai instalar a `skill-creator` no escopo local
+  do checkout dele.
+  - Risco: a sessão grava notas e worktrees no workspace de origem, pela norma de lá.
   - Estado: ativa.
-  - Como desfazer: `brza sessions close fixfy-skills`; o que ela gravar se desfaz pela norma da Fixfy.
+  - Como desfazer: `brza sessions close` na sessão de skills de lá; o que ela gravar se desfaz pela norma do workspace de origem.

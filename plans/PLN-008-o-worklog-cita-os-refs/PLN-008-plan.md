@@ -18,7 +18,7 @@ tags:
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
 - **Retomar:** P8 em curso. A parte da R14 está publicada (`brza-workflow@30b3666`, sync `2130026`). As R15 e R16
-  ampliaram o P8 com o D11, a saída da Fixfy dos repositórios `brza-*`. Próximo: abrir as sessões do D11, depois do
+  ampliaram o P8 com o D11, a saída do workspace de origem dos repositórios `brza-*`. Próximo: abrir as sessões do D11, depois do
   pedido de Anderson: `brza-workflow`, `brza-studio`, a master por esta sessão e as sessões donas dos cinco
   workstreams, que também recomitam os worklogs do `refs`. Depois, a regressão final e o Fechamento, com a rodada das
   horas.
@@ -57,10 +57,10 @@ Os itens, numerados para a Cobertura:
 frontmatter das notas pode melhorar visando um nelhor desempenhi no fluxo do coordenador" — Anderson, em 2026-11-03, na
 mesma sessão.
 
-"remover citações a fixfy de todos os repos brza-*" — Anderson, em 2026-11-03, na sessão `workspace-a6`, na R15.1,
+"remover citações a [o workspace de origem] de todos os repos brza-*" — Anderson, em 2026-11-03, na sessão `workspace-a6`, na R15.1,
 com o alcance "Tudo, inclusive código" (R15.2).
 
-6. os arquivos atuais dos repositórios `brza-*` não citam a Fixfy (D11).
+6. os arquivos atuais dos repositórios `brza-*` não citam o workspace de origem (D11).
 
 ### Cobertura
 
@@ -91,7 +91,7 @@ Os cenários abaixo são provas a implementar ou executar nos passos; não afirm
 | `R14.1` | checador avisa parecer fora de REV-NNN e MIG incoerente com type, sem barrar | P8 | três casos de aviso e um de nota correta (notes-checker) |
 | `R14.2` | norma lista só PLN, MIG e issue em depends_on | P8 | conferir `core/work/README.md` e `plan-template.md` contra o checador (revisão documental) |
 | `R14.3` | ID só no texto do link não entra no refs, nas duas cópias do extrator | P8 | caso da tabela do D3 em `run.py` e na CLI; bloco 2 da MIG-001 com 0 nas cinco árvores (unidade e integração) |
-| `Pedido 6` | nenhum arquivo atual dos repositórios `brza-*` cita a Fixfy, salvo o índice; a guarda do `brza init` continua | P8 | `git grep -il fixfy` vazio nas cinco branches, na master, no `brza-workflow` e no `brza-studio`; teste do `FOREIGN` com o arquivo da máquina (unidade e integração) |
+| `Pedido 6` | nenhum arquivo atual dos repositórios `brza-*` cita o workspace de origem, salvo o índice; a guarda do `brza init` continua | P8 | um grep sem diferenciar caixa pelo nome do workspace de origem, lido do arquivo da máquina da guarda do `brza init`, vazio nas cinco branches, na master, no `brza-workflow` e no `brza-studio`; teste do `FOREIGN` com o arquivo da máquina (unidade e integração) |
 
 ### Fora de escopo
 
@@ -288,7 +288,7 @@ A3 e A6. R14 deu os destinos: A1, A2 e A4 corrigidos no P8; A5 e A7 em issues; A
 - [ ] Fechar o worklog e o plano quando os itens de Fechamento forem verdadeiros; nenhum achado aberto é ocultado.
   Depende do P8.
 
-### P8 — O checador avisa a nota fora de número, a norma volta ao D2, o refs ignora o texto do link e a Fixfy sai
+### P8 — O checador avisa a nota fora de número, a norma volta ao D2, o refs ignora o texto do link e o workspace de origem sai
 
 Executa D7, D2 e D3, pela R14, e D11, pelas R15 e R16 · executores: sessões de implementação no `brza-workflow` e no
 `brza-studio`; a sessão principal na master; as sessões donas dos cinco workstreams nas notas · depende do P7.
@@ -310,14 +310,14 @@ em dois do `workspace`, que ganhariam o PLN-011 do `studio` (R15).
   `plan-template.md`, e acrescentar o texto do link e os avisos à norma.
 - [x] Rodar as três suítes da Regressão sem a `BRZA_WORKSPACE`, commitar, publicar e levar pelo `brza sync` e
   `brza note sync`.
-- [ ] D11 no `brza-workflow`: `FOREIGN` lendo arquivo da máquina, golden com a chave "origem", testes sem a Fixfy;
+- [ ] D11 no `brza-workflow`: `FOREIGN` lendo arquivo da máquina, golden com a chave "origem", testes sem o nome do workspace de origem;
   suítes, commit, publicação e sync.
 - [ ] D11 no `brza-studio`: os 3 testes com dados neutros, pela norma de lá.
 - [ ] D11 na master: `README.md` e `.claude/rules/workspace.md` neutros.
-- [ ] D11 nas notas: cada sessão dona troca as citações à Fixfy por termo neutro no próprio workstream.
+- [ ] D11 nas notas: cada sessão dona troca as citações ao workspace de origem por termo neutro no próprio workstream.
 - [ ] No mesmo commit, recomitar os worklogs cujo `refs` muda: o da MIG-001 em `brand`, `studio` e `playground`, o do
-  `tools-kit` com PLN-001 e os dois do `workspace` já sem o PLN-011 da Fixfy. Depois, o bloco 2 do critério da MIG-001
-  sai com 0 nas cinco árvores, e o `git grep -il fixfy` do D11 sai vazio.
+  `tools-kit` com PLN-001 e os dois do `workspace` já sem o ID do plano do workspace de origem. Depois, o bloco 2 do critério da MIG-001
+  sai com 0 nas cinco árvores, e a prova do D11, o grep pelo nome do workspace de origem, sai vazia.
 - [ ] Registrar commits, comandos, resultados e Executado neste plano.
 
 ## Regressão

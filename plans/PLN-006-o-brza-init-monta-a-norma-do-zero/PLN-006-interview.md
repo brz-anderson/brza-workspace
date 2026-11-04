@@ -12,7 +12,7 @@ recomendada, que só crescem. Saíram do `-plan` em 2026-11-02, quando ele passo
   Support/brza-studio`); a função `claude` do `~/.zshrc` e o `claude-brza` só reconhecem os dois repositórios.
 - O `measure.py` e o `compact_guard.py` gravam no `.measurements/` do `BRZA_WORKSPACE`.
 - A `master` tem ~14 mil linhas versionadas, metade teste. Umas 250 linhas, em ~40 arquivos, citam o que é local
-  (BrzA Studio, `brza-studio`, Anderson, `brz-anderson`, Fixfy, Orca, `~/Projects`); as que mais citam são o
+  (BrzA Studio, `brza-studio`, Anderson, `brz-anderson`, o nome do workspace de origem, Orca, `~/Projects`); as que mais citam são o
   `CLAUDE.md` (22), o `work/README.md` (16), o `brza-shot` (14), a `plan-runner/SKILL.md` (13), o `AGENTS.md` (12) e o
   molde de plano (12).
 - A separação genérico/local custa ~4–6 h em qualquer caminho, e o mecanismo vem em cima.
@@ -350,7 +350,7 @@ Respondida em 2026-10-31.
 
    **Decidido — "Commit sem checkout (Recomendado)".**
 
-### Rodada 8 — o id, a Fixfy, a medição datada e a decisão (enviada 2026-10-31)
+### Rodada 8 — o id, o workspace de origem, a medição datada e a decisão (enviada 2026-10-31)
 
 **Apresentado antes:** o quinto ponto da revisão do `designer` e três escolhas que o rascunho marcou "sem lastro" sem
 levar à rodada (`PLN-006-design.md`, D3 e D11).
@@ -364,7 +364,7 @@ Respondida em 2026-10-31.
 
    **Decidido — "kind:slug da criação (Recomendado)".**
 
-2. **As 7 menções à Fixfy.** Opções:
+2. **As 7 menções ao workspace de origem.** Opções:
    - saem do núcleo (recomendada) — custo: ~0,2 h no P3; se paga: já, com o núcleo público;
    - vão à parte local — custo: ~0,3 h; se paga: se a procedência servir a quem lê este workspace;
    - ficam no núcleo — custo: 0 h; se paga: só se a referência for desejada em todo workspace.

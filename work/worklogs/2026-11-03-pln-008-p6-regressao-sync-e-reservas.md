@@ -43,7 +43,7 @@ P7 permanece fora desta execução; cada workstream aplica suas notas pela sess�
 O collector conferiu os commits `b7fb3d2`, `b7e8727`, `3fc3935` e `a168f73`: há implementação e testes correspondentes,
 mas isso não certifica todo o aceite. P2 não demonstra alteração/remoção de cada campo isoladamente; P4 tem fixtures,
 sem artefato de sonda real atual no commit. A sonda complementar em `/tmp/pln008-p6-index-probe.py` comprovou 68/68 cenários de alteração/remoção e 68/68 rebuilds subsequentes idempotentes. O checador da fixture é stub: a prova é do índice, não da validação semântica. Os helpers nas fontes atuais resolveram workspace como `workspace` e código na master sem workstream; conta `.claude` e identidade noreply corretas. Não há worktree atual de código em branch de plano, cujo caso segue somente em fixture. Nenhuma medição histórica foi reescrita. O fechamento da reconciliação segue em P6.
-Os quatro commits usam `anderson@fixfy.com.br`, divergente da identidade exigida quando esta tarefa foi aberta;
+Os quatro commits usam o e-mail corporativo do `~/.gitconfig`, divergente da identidade exigida quando esta tarefa foi aberta;
 histórico preservado, sem reescrita. Horas históricas não aferidas; timestamps não foram convertidos em duração.
 
 ## Ponto de parada desta etapa

@@ -12,12 +12,12 @@ preenchido pelo `brza note commit`, deram `REV-NNN` às revisões e `MIG-NNN` à
 [PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca](../../plans/PLN-008-o-worklog-cita-os-refs/PLN-008-plan.md),
 parado antes do Desenho.
 
-- **O MIG veio do modelo da Fixfy, com dois ajustes.** Lidos o `docs/migrations/README.md` do `flutter-template` e o
-  `docs/migration/README.md` do `fixfy_flutter`: a migração é divergência entre o disco e a norma, e sai do diretório ao
+- **O MIG veio do modelo do workspace de origem, com dois ajustes.** Lidos o `docs/migrations/README.md` do `flutter-template` e o
+  `docs/migration/README.md` do projeto Flutter de lá: a migração é divergência entre o disco e a norma, e sai do diretório ao
   concluir. Aqui ela é issue `type: migration` e fica com `status: done`, porque o `refs:` confere a existência.
 - **Dois `designer` em paralelo**, um defendendo o MIG como plano e outro atacando, a pedido de Anderson. A síntese mudou
   a recomendação: a definição do ataque, no lugar que a defesa apontou para a fila. Os dois gravaram o aprendizado em
-  `.claude/agent-memory/designer/project_porte-da-fixfy-regua-sem-lastro.md`.
+  `.claude/agent-memory/designer/project_porte-do-workspace-de-origem-regua-sem-lastro.md`.
 - **As skills entraram no pedido.** Depois da R3, Anderson pediu: "Temos também que criar/adaptar skills para a
   criação, revisão e execução dessas novas notas". É o item 4 do Pedido; criar ou adaptar vai ao Desenho.
 - **O frontmatter para o coordenador entrou como item 5.** Anderson pediu um levantamento de "como o frontmatter das

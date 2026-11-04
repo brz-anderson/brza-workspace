@@ -34,7 +34,7 @@ o dia anterior está em
     `brza-tree` segue local.
   - **O bloco do shell é do pacote do cliente** (`packages/client/shell/brza.zsh`, com o `brza-where`): o defeito do
     `cd ""` deixou de existir, o `~/.zshrc` só faz `source` dele, e o `codex()` e o `agy()` do `~/.zshrc` continuam
-    sendo só da Fixfy.
+    sendo só do workspace de origem.
   - **O `fact_audit.py` e o `measure.py` são só do Claude:** o primeiro chama `claude -p --model haiku` e roda só no
     `SubagentStop` do `settings.json`; o segundo não tem modo `codex` nem `agy`.
   - **O `tools-kit`** não tem item do PLN-004, e o PLN-006 foi executado pela sessão `workspace` nos dois repositórios.
@@ -53,17 +53,17 @@ o dia anterior está em
   tem `packages/client/bin` fixo (`bin/brza-install:61`) e só liga `brza-*` e o `claude-brza`.
 
 - **A rodada 11**, no chat: os papéis gerados e os links de skill vão tudo pelo sync (o `brza-sync` aprende o modo
-  `120000`); o `codex()` e o `agy()` vão num `shell/runtimes.zsh` do pacote `runtimes`, e o `~/.zshrc` renomeia os da
-  Fixfy. Na auditoria de fatos, Anderson pediu a medição da opção 2 antes de decidir.
-- **As medições da R11.3 e da R12**, só leitura, a pedido de Anderson, em `.measurements/` daqui e da Fixfy:
+  `120000`); o `codex()` e o `agy()` vão num `shell/runtimes.zsh` do pacote `runtimes`, e o `~/.zshrc` renomeia os do
+  workspace de origem. Na auditoria de fatos, Anderson pediu a medição da opção 2 antes de decidir.
+- **As medições da R11.3 e da R12**, só leitura, a pedido de Anderson, em `.measurements/` daqui e do workspace de origem:
   - **A auditoria custa US$ 0,0043 por fato** (US$ 1,03 por 238 fatos), ~US$ 0,10 por devolução; o `SubagentStop` do
     Codex traz `agent_type` e o caminho do transcript; o `Stop` do `agy` não traz nome de agente; o `rodado` é 34% dos
     fatos auditáveis e 61% dele sai `unknown` mesmo no Claude.
-  - **Uma revisão custa** US$ 1,98 de mediana no Codex (`gpt-6-astra` em `xhigh`, 122 s, 11 revisões da Fixfy) e US$ 4,22
+  - **Uma revisão custa** US$ 1,98 de mediana no Codex (`gpt-6-astra` em `xhigh`, 122 s, 11 revisões do workspace de origem) e US$ 4,22
     no Claude (`opus-5-5`, 1.079 s, 4 revisões daqui); a do `agy` não tem linha de `reviewer` e fica estimada em US$ 0,1
-    a 0,4 pelos tokens das sondas, no preço da tabela da Fixfy. As tarefas diferem, então é a forma do custo, e não a
+    a 0,4 pelos tokens das sondas, no preço da tabela do workspace de origem. As tarefas diferem, então é a forma do custo, e não a
     qualidade.
-  - **A Fixfy não gravou o veredito da delegação**, que fechava em 2026-10-30: a decisão segue com o título "em medição
+  - **O workspace de origem não gravou o veredito da delegação**, que fechava em 2026-10-30: a decisão segue com o título "em medição
     até 2026-10-30" e sem nota do resultado.
 
 - **A 11.3 e a R12**, respondidas "11.3.2 / 12.1.1 / 12.2.2": a auditoria de fatos ganha hooks nos dois runtimes
@@ -161,8 +161,8 @@ o dia anterior está em
   - **Como pontuar:** casar cada achado de cada braço com A1 a A15 do `gabarito.md` (real, parcial, falso positivo ou
     novo), com recall sobre A1, A2, A3, A4, A6, A7 e A8; e contar os novos que mais de um braço aponta. Um `collector`
     com o gabarito faz o casamento mecânico, e a sessão confere os ambíguos.
-  - **O custo, por onde sai:** o Codex, do `turn.completed` do `codex-*.jsonl` (preço da `gpt-6-astra` na tabela da
-    Fixfy: US$ 10, 1 e 50 por milhão de entrada, cache e saída) e dos pontos de `rate_limits` dos rollouts em
+  - **O custo, por onde sai:** o Codex, do `turn.completed` do `codex-*.jsonl` (preço da `gpt-6-astra` na tabela do
+    workspace de origem: US$ 10, 1 e 50 por milhão de entrada, cache e saída) e dos pontos de `rate_limits` dos rollouts em
     `~/.codex/sessions/2026/11/02/` (18-13-24, 18-19-58 e 18-24-59); o `agy`, dos passos `PLANNER_RESPONSE` do
     transcript em `~/.gemini/antigravity-cli/brain/` (o de defeito é `86119f93…`; os de convenção e simplicidade são
     os dois diretórios novos de 18:31 e 18:37), com o preço da `gemini-4-argon` (US$ 4, 0,20 e 20 por milhão); o
@@ -174,13 +174,13 @@ o dia anterior está em
 - **Os nomes de modelo do `agy` no rascunho**, a corrigir no Desenho: o `agy models` (1.4.12) lista
   `gemini-4-argon-{low,medium,high}`, `gemini-3.8-flash-{low,medium,high}`, `claude-opus-5-5-*`, `claude-sonnet-5-5-*` e
   `gpt-oss-120b-medium`, e nenhum `pro` nem `flash`; o mapa `opus`/`sonnet` para `pro` e `haiku` para `flash`, que veio
-  da Fixfy, fica sem base até se provar que o `--model pro` é alias. Os do Codex (`gpt-6-astra`, `gpt-6.1-sol`,
+  do workspace de origem, fica sem base até se provar que o `--model pro` é alias. Os do Codex (`gpt-6-astra`, `gpt-6.1-sol`,
   `gpt-6-luna`) existem no `codex debug models`.
 - **O plano passa de 400 linhas** (548 hoje), e o `plans/README.md` manda a Entrevista ao `-interview.md`; a divisão vai
   depois da R11, junto com a gravação do Desenho, para fazer uma vez.
 - **O rascunho do Desenho** (556 linhas, no scratch) é reescrito depois da R10, e só então vai à aprovação.
 - **As 19 citações que não batem** estão na tabela do agregado; três nunca sustentaram o fato (a linha do app para o
-  `app-server` e a `permissionPolicy`, a do `agentCmdOverrides` no terminal e a do X3 do PLN-011).
+  `app-server` e a `permissionPolicy`, a do `agentCmdOverrides` no terminal e a do desvio X3 do plano de chats do workspace de origem).
 
 ## Fora do workspace
 

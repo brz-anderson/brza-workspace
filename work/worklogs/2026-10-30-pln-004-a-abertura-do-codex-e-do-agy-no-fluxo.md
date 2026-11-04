@@ -18,7 +18,7 @@ reservado na `master` (`233ea9a`). O plano é o
 - **A abertura do plano**, na sessão `workspace`: o frontmatter em `phase: interview`, o `Retomar`, o Pedido com as
   quatro frentes da R1.2, a Cobertura em rascunho, o Fora de escopo e a R1, gravada como foi respondida na sessão de
   origem, sem perguntar de novo.
-- **O levantamento do PLN-011 da Fixfy**, pelo `collector`, por peça, com o agregado no scratch da sessão; deu oito
+- **O levantamento do plano de chats do workspace de origem**, pelo `collector`, por peça, com o agregado no scratch da sessão; deu oito
   pontos sem lastro.
 - **A rodada 2**, da base e da identidade: função e wrapper; as skills espelhadas em `.agents/skills/`; a sonda da
   identidade antes do desenho; o `.codex/hooks.json` versionado, com revisão por worktree.
@@ -32,8 +32,8 @@ reservado na `master` (`233ea9a`). O plano é o
   repositório descartável, foi barrada pelo classificador e saiu sem a flag.
 - **A rodada 5**: o `agy` não comita; o `guardian_review` com linha própria ligada ao pai; o wrapper do Codex libera o
   `.git` do worktree, e o push pede aprovação.
-- **Um defeito do `~/.zshrc`**, achado nas sondas: o `fixfy_where` responde `root` em qualquer cwd quando a
-  `FIXFY_WORKSPACE` está vazia (`~/.zshrc:17`). Entra no desenho das funções novas.
+- **Um defeito do `~/.zshrc`**, achado nas sondas: a função de localização do workspace de origem responde `root` em qualquer cwd quando a
+  variável de workspace dele está vazia (`~/.zshrc:17`). Entra no desenho das funções novas.
 - **O rascunho do Desenho**, pelo `designer`, no scratch: D1 a D14 e a ordem de execução, com 8 pontos para rodada.
 - **A rodada 6**, no chat, a pedido de Anderson: as sondas que sobraram agora; as skills por symlink; o `brza tree`
   liga `.codex/` e `.agents/` no brza-studio; o gerador dos papéis no `brza agents --write|--check`.
@@ -65,11 +65,11 @@ reservado na `master` (`233ea9a`). O plano é o
   - Risco: aparecem no histórico do Codex e numa medição que varra os rollouts.
   - Estado: ativo.
   - Como desfazer: `codex delete <id>` em cada um.
-- **Um `codex plugin marketplace upgrade`**, rodado pela função `codex` da Fixfy na primeira chamada das sondas, por
-  causa do `fixfy_where` com a `FIXFY_WORKSPACE` vazia.
-  - Risco: o marketplace da Fixfy no `~/.codex/plugins` atualizado fora de hora; o efeito não foi conferido.
+- **Um `codex plugin marketplace upgrade`**, rodado pela função `codex` do workspace de origem na primeira chamada das sondas, por
+  causa da função de localização dele, com a variável de workspace vazia.
+  - Risco: o marketplace do workspace de origem no `~/.codex/plugins` atualizado fora de hora; o efeito não foi conferido.
   - Estado: ativo.
-  - Como desfazer: nada a desfazer, salvo se a Fixfy precisar da versão anterior.
+  - Como desfazer: nada a desfazer, salvo se o workspace de origem precisar da versão anterior.
 - **Os transcripts das sondas do `agy`**, em `~/.gemini/antigravity-cli/brain/` — `00feb094-…`, `9eacb174-…`,
   `93f949d7-…`, `cc301532-…`, `b821b81b-…`, `b1db9c6b-…`, `de28153a-…` e `d20b8a24-…` —, mais o `conversations/`, o
   `conversation_summaries.db` e os logs.

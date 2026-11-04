@@ -1,6 +1,6 @@
 # .brza/core.lock — gerado pelo brza sync; não edite
-commit = "30b3666e8330c60947eefd0255c9e4571f194554"
-ref = "30b3666"
+commit = "ebb4e7d5dfa42d125765d5e6d6d1c065f73ee1bd"
+ref = "ebb4e7d"
 synced = "2026-11-03"
 
 [files]
@@ -32,5 +32,5 @@ synced = "2026-11-03"
 "CLAUDE.md" = "sha256:5277f97319edda05703d2c234f836d4d1475ca0f99616e4fcaf319e9501f625a"
 "plans/README.md" = "sha256:b0e303605e158c5062274116faf5c09ee73b822d2687ce7cc4bb06a14fbc2f5c"
 "scripts/fact_outcome.py" = "sha256:ac87d22c1a849cb8965e36f9f1cc07d934c1da98c1963e0a8e80e62c547f740d"
-"scripts/summarize_measurements.py" = "sha256:2aadd8514de156d80582ff63178a7c2a68e1058a4a4f22332bda3c2353699372"
+"scripts/summarize_measurements.py" = "sha256:371510025fe2ca19583465558c4e146552730a9f2d22d40cecd0eefb3ece2eaf"
 "work/README.md" = "sha256:3249ef5dd2a7a536336f2b3f3d56dd66d2fe84488d28ba4c6d2505cd3e328f9d"

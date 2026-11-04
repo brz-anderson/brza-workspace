@@ -29,11 +29,22 @@ o dia anterior está em
   `gemini-4-argon-high` na revisão, e o Codex revisa em `gpt-6-astra` com `high` (variante de Anderson, sem o `high`
   medido).
 
+- **A R15 e a R16** foram respondidas e gravadas. R15: o `brza delegate` usa o papel e o `--runtime` é obrigatório. A
+  15.3 virou a contraproposta de Anderson, o `.brzAgents`, e um `collector` mediu o custo (36 arquivos e 104 linhas no
+  `brza-workflow`, nenhum no `brza-studio`; o Claude, o Codex e o `agy` leem `agents` e `skills` por link; o D15 falha
+  na transição de diretório para link; a gravação da memória do subagente pelo link foi negada em 3 de 3 `claude -p`).
+  R16: `agents`, `skills` e `memory` em `.brzAgents/`, a memória literal (16.1.3, não a recomendada), o link de
+  diretório para as skills e o D15 emendado.
+
 ## O que ficou
 
-- **A R15 e a R16**, paradas por pedido de Anderson ("sem mais rodadas, por ora"): a delegação (P5 a P7) e a medição
-  e a máquina (P8 a P11), no fim do `pln-004-design-v2.md`. Depois, o Desenho vai à aprovação na mensagem, em 3 partes,
-  antes de virar `PLN-004-design.md`; na gravação, corrigir no `-plan` o "Fora de escopo" (ainda manda o código ao
-  `tools-kit`) e a Cobertura (ainda diz "um foco por runtime").
+- **A sonda de saída da memória** (regra de permissão com caminho absoluto, `--add-dir`, link só no nível do papel,
+  hook): com o `collector`, em `/private/tmp/pln004/brz-agents/levantamento-memoria.md`. Sem saída, a 16.1 volta a
+  Anderson antes do Desenho.
+- **A R17**, a medição e a máquina (P8 a P11), e o **Desenho reescrito com o `.brzAgents`**, que vai à aprovação na
+  mensagem, em 3 partes, antes de virar `PLN-004-design.md`; na gravação, corrigir no `-plan` o "Fora de escopo" (ainda
+  manda o código ao `tools-kit`) e a Cobertura (ainda diz "um foco por runtime"), e a revisão do Codex no D11 para `high`.
 - **O turno do `agy` com `model: pro`**, que lê o `modelName` do `Stop`, fica para o D7 (R14.1).
 - **O `high` do Codex não foi medido:** a R12.2 mediu só `xhigh`.
+- **A migração para o `.brzAgents`** muda o `core/` do `brza-workflow` (16 `git mv`, 14 fixtures do ouro, o sync) e,
+  com a memória literal, `git mv` de 55 arquivos de memória em 4 branches; tudo a executar só a pedido de Anderson.

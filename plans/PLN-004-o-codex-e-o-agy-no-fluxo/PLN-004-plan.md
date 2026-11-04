@@ -14,13 +14,16 @@ tags:
 
 # PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** a Entrevista fechou até a R14; Anderson pediu "sem mais rodadas, por ora". A 12.2 saiu decidida pela
-  medição (o Claude padrão nos três focos; o `agy` e o Codex como segundo passe, por `--runtime`), e a R13 e a R14
-  fixaram a norma do pacote, o render do `.toml`, o `tomllib` e os modelos (`agy`: `pro`/`flash` no papel,
-  `gemini-4-argon-high` na revisão; Codex: `gpt-6-astra` em `high`, sem a medição do `high`). Faltam a R15 (a delegação)
-  e a R16 (a medição e a máquina), com os pontos P5 a P11 do `designer` no fim do `pln-004-design-v2.md`, no scratch, e
-  depois a aprovação do Desenho, na mensagem, antes de gravá-lo em `PLN-004-design.md`. O código passa ao
-  `brza-workflow`, com o pacote `packages/runtimes`, executado pela sessão `workspace`.
+- **Retomar:** a Entrevista fechou até a R16. A 12.2 saiu decidida pela medição (o Claude padrão nos três focos; o
+  `agy` e o Codex como segundo passe, por `--runtime`); a R13 e a R14 fixaram a norma do pacote, o render do `.toml`, o
+  `tomllib` e os modelos (Codex: `gpt-6-astra` em `high`, sem a medição do `high`); a R15 decidiu o papel no
+  `brza delegate` e o `--runtime` obrigatório; a R16 decidiu que `agents`, `skills` e `memory` passam a viver em
+  `.brzAgents/`, com `.claude/agents`, `.claude/skills` e `.claude/agent-memory` como links e o D15 emendado. **A
+  memória literal (16.1.3) depende de uma saída para a negação de gravação do Claude pelo link**, que um `collector`
+  está medindo; sem saída, a 16.1 volta a Anderson. Faltam a R17 (a medição, o `~/.zshrc` e as sessões, P8 a P11 do
+  `designer`), o Desenho reescrito com o `.brzAgents` (D1, D4, D7, D11 e D15) no `pln-004-design-v2.md`, no scratch, e
+  a aprovação, na mensagem, antes de gravá-lo em `PLN-004-design.md`. O código passa ao `brza-workflow`, com o pacote
+  `packages/runtimes`, executado pela sessão `workspace`.
 - **Dividido:** [PLN-004 — Entrevista](PLN-004-interview.md)
 
 ## Pedido

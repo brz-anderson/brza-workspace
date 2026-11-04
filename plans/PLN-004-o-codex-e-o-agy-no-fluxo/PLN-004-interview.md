@@ -738,7 +738,7 @@ Respondida em 2026-11-03, na sessão `workspace`: "16.1.3 / restante recomendado
      diretório), e a gravação do Claude negada até uma sonda interativa provar o contrário; se paga: nunca, enquanto a
      negação não se resolver.
 
-   **Decidido — a opção 3, a literal, não a recomendada.** Anderson não deu o porquê. A própria opção declarava a
+   **Decidido — a opção 3, a literal, não a recomendada → reaberta e substituída na 16.5.** Anderson não deu o porquê. A própria opção declarava a
    condição: a gravação do Claude pelo link está negada. A sessão mede a saída antes do Desenho (regra de permissão com
    caminho absoluto, `--add-dir`); se não houver saída, a 16.1 volta a Anderson antes de o texto ir à aprovação.
 
@@ -770,3 +770,34 @@ Respondida em 2026-11-03, na sessão `workspace`: "16.1.3 / restante recomendado
      diretório para link.
 
    **Decidido — a recomendada, emendar o D15.**
+
+#### 16.5 — a memória dos subagentes, reaberta (enviada 2026-11-03, no chat)
+
+**Apresentado antes:** a 16.1.3 vinha com a condição "se paga: nunca, enquanto a negação não se resolver". A sonda de
+saída do `collector` (`/private/tmp/pln004/brz-agents/levantamento-memoria.md`, US$ 0,095) não achou saída em
+`claude -p`: nenhuma de seis variantes gravou atrás de link. A doc diz que `.claude` é caminho protegido, com exceção
+para os Markdown de `.claude/agent-memory/`, e que a regra de `permissions.allow` não pré-aprova caminho protegido
+(`code.claude.com/docs/en/permission-modes#protected-paths`). A sessão interativa, a pedido de Anderson ("meça a sessão
+interativa"), foi medida por um host de permissão em `--permission-prompt-tool stdio` (sem `tmux`, então a lógica de
+permissão e não a TUI; US$ 0,041, em `sonda-mem/run-int.py`): com o diretório real, 0 perguntas e as 3 gravações; com o
+link (relativo ou absoluto, `default` ou `acceptEdits`), **3 perguntas, uma por gravação**, e as 3 passam se o host
+responde `allow`; a sugestão "nesta sessão" (`setMode acceptEdits`) não corta as perguntas, e em `acceptEdits` nem há
+sugestão; sem ninguém para responder (`-p`, `dontAsk`, workflow sem tela) a gravação é negada. Não medido: o texto da
+TUI, o link absoluto para fora do projeto (o do `brza tree` no `brza-studio`), a sessão principal gravando pelo link e
+Opus ou Sonnet no lugar do Haiku.
+
+Respondida em 2026-11-03, na sessão `workspace`: "recomendado".
+
+1. **A memória dos subagentes.** Opções:
+   - real em `.claude/agent-memory/`, e `.brzAgents/memory` como link para ela (recomendada) — custo: um link e uma
+     linha na norma, e a memória segue fisicamente em `.claude/`; se paga: agora, a única variante sem pergunta de
+     permissão;
+   - literal, aceitando o prompt — custo: uma pergunta por gravação de memória de subagente, sem como silenciá-las, as
+     gravações negadas em `-p`, `dontAsk` e workflows sem tela, ~38 linhas e `git mv` de 55 arquivos em 4 branches; se
+     paga: só se ter a memória em `.brzAgents` valer um clique por gravação;
+   - literal, com `bypass` ou um host para as gravações de memória — custo: abre mão da proteção do `.claude` para o
+     subagente, e não foi medido; se paga: nunca com a evidência atual.
+
+   **Decidido — a recomendada.** `agents` e `skills` vivem em `.brzAgents/` (R16.2 e R16.3), a memória real fica em
+   `.claude/agent-memory/` por causa da exceção de caminho protegido, e `.brzAgents/memory` é um link para ela, para
+   quem lê pelo caminho neutro. A 16.1.3 fica substituída.

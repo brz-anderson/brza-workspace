@@ -4,8 +4,6 @@ scope:
 refs:
   - MIG-001
   - PLN-008
-  - REV-001
-  - REV-004
   - issue:brza-shot-quebra-com-os-tokens-do-painel-movidos
   - issue:o-brza-sessions-abre-na-conta-ativa-do-app
 ---
@@ -32,8 +30,8 @@ não foi editado.
    - Arquivos: [O brza shot quebra com os tokens do painel movidos no brza-studio](../issues/brza-shot-quebra-com-os-tokens-do-painel-movidos.md),
      [O brza sessions abre a sessão na conta ativa do app, e não na da sessão de origem](../issues/o-brza-sessions-abre-na-conta-ativa-do-app.md),
      `2026-11-02-os-plugins-da-orca-1-4-246-e-os-planos.md` e `2026-11-02-pln-007-o-desenho-da-marca-brza.md`.
-4. **Recommit do worklog da MIG-001:** `2026-11-03-mig-001-a-aplicacao-no-brand.md` perdeu REV-001 e REV-004 do
-   `refs`, que só vinham do texto do link para a MIG-001; ficaram MIG-001 e PLN-008.
+4. **Recommit do worklog da MIG-001:** `2026-11-03-mig-001-a-aplicacao-no-brand.md` perdeu os dois pareceres do
+   `refs`, que só vinham do texto do link para a migração; ficaram a migração e o PLN-008.
 5. **Checador:** `check_notes.py` com 64 arquivos, 0 links não resolvidos, 0 erros e 0 avisos.
 6. **Commit** `2c18797` na `origin/workstream/brand`, pelo `brza note commit`, só os cinco caminhos.
 7. **Conferência final:** o `git grep -il` do nome, fora do `.brza/index.jsonl`, saiu vazio (código 1). Não sobrou

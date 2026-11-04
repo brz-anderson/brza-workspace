@@ -5,8 +5,8 @@ origin: request
 description: O brza sessions abre o Grok com nome e espera, e o MCP despacha ao Grok, ao Codex e ao Antigravity com conta e cota por runtime
 ready: sim
 estimate_h: 16
-executed_h: 0
-remaining_h: 16
+executed_h: 0.25
+remaining_h: 15.25
 scope:
   - brza-workflow
 opened: 2026-11-03
@@ -18,8 +18,7 @@ tags:
 
 # PLN-013: O Grok, o Codex e o Antigravity abrem pelo `brza sessions` e recebem tarefas do MCP
 
-- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. Próximo: o P1, a sonda do
-  `worker-start`.
+- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. O P1 fechou; o P2 roda pelo `agy`.
 - **Dividido:** [PLN-013 — Entrevista](PLN-013-interview.md) · [PLN-013 — Desenho](PLN-013-design.md)
 
 ## Pedido
@@ -107,17 +106,23 @@ A base, em 2026-11-03 no `ebb4e7d`: `tests/mcp` → 358 OK; `test_brza_sessions`
 
 Executa D1, D2 · executor: a sessão do `tools-kit`, pelo `orca orchestration` do Studio
 
-Estimado: 0.75 h · Executado: — h
+Estimado: 0.75 h · Executado: 0.25 h
 
-- [ ] **1. Um worker real de cada runtime**, com o par da R4.1 que mais arrisca: `--agent codex --model gpt-6.1-sol
+- [x] **1. Um worker real de cada runtime**, com o par da R4.1 que mais arrisca: `--agent codex --model gpt-6.1-sol
   --effort low` (modelo fora do catálogo semeado do app), `--agent codex --model gpt-6-astra --effort high`, `--agent
   grok --model grok-4.7 --effort xhigh`, `--agent antigravity --model gemini-4-argon-high` sem `--effort`.
-- [ ] **2. Anotar no plano**, por worker: abriu em chat ou em terminal; o `--model` e o `--effort` foram aceitos ou
+- [x] **2. Anotar no plano**, por worker: abriu em chat ou em terminal; o `--model` e o `--effort` foram aceitos ou
   recusados, com o código do erro.
-- [ ] **3. Aplicar o resultado:** com o `xhigh` recusado, a linha `architect.grok` cai para `high` (R4.1); outra
+- [x] **3. Aplicar o resultado:** com o `xhigh` recusado, a linha `architect.grok` cai para `high` (R4.1); outra
   recusa vira ponto de rodada antes do P2.
 
-**Evidência:** —
+**Evidência:** `orca orchestration worker-start --spec … --worktree path:<tools-kit> --agent <rt> --model <m> [--effort <e>] --json`,
+run `run_2e4086465e71`, 2026-11-04. Os quatro abriram em `mode: structured` (chat) e aceitaram o par:
+- `codex gpt-6.1-sol/low` (`ctx_32f5af1dc364`) e `codex gpt-6-astra/high` (`ctx_65c7f5035d48`) responderam "OK";
+- `grok grok-4.7/xhigh` (`ctx_d80c6cbc91d4`) abriu e raciocinou; o `xhigh` fica na linha `architect.grok`;
+- `antigravity gemini-4-argon-high`, sem `--effort` (`ctx_44b26f4e1dc7`), mandou o `worker_done` e bateu "Usage Limit
+  Reached … reset in 5 days, 23 hours" — o `weekly` a 99% do Terreno.
+Nenhuma recusa: a tabela da R4.1 fica como está.
 
 ### P2 — E1: os runtimes no `dispatch` e a política por runtime
 

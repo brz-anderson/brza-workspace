@@ -147,6 +147,9 @@ Executa D3 (B8, M3, M5, M12, M20) · executor: sessão do `tools-kit`
 
 Estimado: 4.5 h · Executado: — h
 
+> [!NOTE]
+> **Possível desvio (2026-11-03):** Possivelmente utilizaremos o `brza-workflow` para distribuir as skills e hooks via CLI (aproveitando `brza install` / `brza sync`) e o uso do servidor MCP residente (PLN-009) para expor as ferramentas nos dois clients, em vez de manter um plugin estático duplicado em `plugins/claude/`.
+
 - [ ] **1. Estrutura do plugin:** criar `plugins/claude/.claude-plugin/plugin.json` e `.mcp.json` (com `"type": "http"`, a URL de `brza mcp url`, `"Authorization": "Bearer ${BRZA_MCP_TOKEN}"` e headers `"X-Brza-Session": "${ORCA_AGENT_SESSION_ID}"` e `"X-Brza-Client": "${ORCA_USER_DATA_PATH}"`).
 - [ ] **2. Skills com namespace:** expor skills sob prefixo `brza:`.
 - [ ] **3. Agente Codex:** definir `agents/codex.json` invocando `codex exec` com `-s read-only`.
@@ -257,7 +260,8 @@ Estimado: 3.0 h · Executado: — h
 
 ## Desvios
 
-*(Nenhum desvio registrado até o momento).*
+- **2026-11-03 — Possível desvio no P4 (distribuição via `brza-workflow` e MCP):**
+  Em vez de criar e distribuir um plugin estático do Claude em `plugins/claude/` com redundância de arquivos, possivelmente utilizaremos o `brza-workflow` para distribuir as skills e hooks via CLI (aproveitando `brza install` / `brza sync`) e o uso do servidor MCP residente (PLN-009) para orquestração e ferramentas nos dois apps.
 
 ## Pendências conhecidas
 

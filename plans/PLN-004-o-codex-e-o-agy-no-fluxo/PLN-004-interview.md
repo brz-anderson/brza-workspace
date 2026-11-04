@@ -801,3 +801,14 @@ Respondida em 2026-11-03, na sessão `workspace`: "recomendado".
    **Decidido — a recomendada.** `agents` e `skills` vivem em `.brzAgents/` (R16.2 e R16.3), a memória real fica em
    `.claude/agent-memory/` por causa da exceção de caminho protegido, e `.brzAgents/memory` é um link para ela, para
    quem lê pelo caminho neutro. A 16.1.3 fica substituída.
+
+### Pedido novo — o Grok (2026-11-03, no meio da R17)
+
+**Texto de Anderson, na sessão `workspace`:** "agora temos que inserir também o `Grok`". Sem responder a R17, que fica
+aberta (17.1 a 17.4, a medição, o `~/.zshrc` e as sessões). Conferi no disco: o `grok` é o Grok Build CLI 1.0.70, em
+`/opt/homebrew/bin/grok` (brew `grok-build`), com `~/.grok`; o `--help` traz `--agent`, `--agents <JSON>`, `--allow`,
+`--deny`, `--always-approve`, `--continue` e `--cwd`, e o `brza-studio` tem o dialeto dele em
+`src/main/acp/acp-dialects/grok-*.ts`. Não há `Grok` no plano nem no Desenho. Um `collector` levanta o `grok` por eixo
+(norma, skills, subagentes, hooks, memória, modo headless, sessões e transcript, modelos, o app) e devolve a tabela
+Claude, Codex, `agy` e Grok; o escopo do plano (o título "O Codex e o `agy`…", o Pedido e a Cobertura) muda só depois da
+rodada que vem dele.

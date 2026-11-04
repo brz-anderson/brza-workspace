@@ -40,7 +40,7 @@ com 116 fatos marcados, estava em `/private/tmp/plugins-orca/levantamento.md` (s
 - **PLN-003 (`tools-kit`):** o Terreno do plugin do Orca envelheceu ("sem canal worker→painel", três métodos do host, "fork
   só manifest 1"); o painel TSX com worker pede o C5 reaberto, com um spike no app instalado. A orquestração segue no MCP e
   no `brza` até a base chegar a 1.4.248. O plugin do Claude com MCP (R4.3, R4.4) não muda.
-- **A issue das skills de documento da Fixfy:** o plugin do Orca não contribui skills, então o veículo é o plugin do Claude.
+- **A issue das skills de documento do workspace de origem:** o plugin do Orca não contribui skills, então o veículo é o plugin do Claude.
 - **PLN-007:** nada; tema de plugin não toca o chat nem a marca.
 - **Próximo sync:** só quando houver tag; os hooks e a API nova de plugins vêm junto, e plugin com `engines.orca >=1.4.248`
   não carrega no fork antes disso.

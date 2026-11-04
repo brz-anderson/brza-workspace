@@ -61,15 +61,15 @@ ao plano, que passou a `phase: execution`, sem passo executado. O próximo é o 
 ## O conserto do brza shot, em sessão própria
 
 Anderson pediu o conserto da
-[issue do brza shot](../issues/brza-shot-quebra-com-os-tokens-do-painel-movidos.md) "em sessão própria, na conta
-`admin@fixfy.com.br`". A primeira tentativa, pelo `brza sessions brza-shot-fix --checkout .worktrees/tools-kit`, subiu
-na conta padrão, `anderson@fixfy.com.br` (`~/.claude/sessions/77277.json`): o `brza sessions` abre com a conta ativa do
+[issue do brza shot](../issues/brza-shot-quebra-com-os-tokens-do-painel-movidos.md) "em sessão própria", na conta de
+administração (`~/.claude-adm`). A primeira tentativa, pelo `brza sessions brza-shot-fix --checkout .worktrees/tools-kit`, subiu
+na conta padrão (`~/.claude/sessions/77277.json`): o `brza sessions` abre com a conta ativa do
 app, e não com a desta sessão, que roda no perfil `8eee0e1b…` do app. A sessão foi fechada com `--force` antes de
 commitar e deixou um teste começado em `scripts/brza/tests/test_brza_shot.py`, na `master`, sem commit.
 
 Numa rodada, Anderson escolheu reabrir pelo terminal, com o `adm-claude` (`CLAUDE_CONFIG_DIR=~/.claude-adm`), e deixar o
-teste para a sessão nova. A `brza-shot-fix` roda numa aba de terminal do worktree do `tools-kit`, na conta
-`admin@fixfy.com.br` (`~/.claude-adm/sessions/99742.json`), com o pedido em `/private/tmp/pln-007/prompt-brza-shot.md`,
+teste para a sessão nova. A `brza-shot-fix` roda numa aba de terminal do worktree do `tools-kit`, na conta de
+administração (`~/.claude-adm/sessions/99742.json`), com o pedido em `/private/tmp/pln-007/prompt-brza-shot.md`,
 e avisa a `brand-24` pelo correio ao terminar. A issue fecha aqui, no `brand`.
 
 ## Fora do workspace

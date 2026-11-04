@@ -4,8 +4,6 @@ scope:
 refs:
   - MIG-001
   - PLN-008
-  - REV-001
-  - REV-004
 ---
 
 # MIG-001: a aplicação no `brand`

@@ -30,7 +30,7 @@ do `native-chat-visual-shell.ts` em vez do caminho fixo. Mora no `scripts/brza/`
 conforme o PLN-006 deixou o `brza shot`; não é do `brand`.
 
 **Resolvida em 2026-11-02**, pela sessão `brza-shot-fix`, aberta a pedido de Anderson no worktree do `tools-kit`, na
-conta `admin@fixfy.com.br`: `8d554e7` na `master` ("brza shot: acha a lista de tokens pelo import do shell dos
+conta de administração (`~/.claude-adm`): `8d554e7` na `master` ("brza shot: acha a lista de tokens pelo import do shell dos
 visuais"), que acha o arquivo da lista pelo import do `native-chat-visual-shell.ts`, com o teste novo que falhava antes
 e os 98 `unittest` de `scripts/brza/tests/` passando, segundo o relato de Anderson. A sessão do `brand` conferiu o
 commit na `origin/master` e rodou o `brza shot` oficial num artboard da R6 do PLN-007: o PNG saiu igual, pixel a pixel,

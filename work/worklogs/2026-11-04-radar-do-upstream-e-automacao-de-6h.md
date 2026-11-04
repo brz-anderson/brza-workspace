@@ -15,10 +15,11 @@ refs:
   - issue:repositorios-vinculados-no-source-control-e-escopo-de-worktree-na-cli
   - issue:seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes
   - issue:subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent
+  - issue:vazamento-de-memoria-gpu-webgl-no-terminal-e-performance-macos
   - issue:workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh
 ---
 
-# Radar de issues e PRs do upstream e automação de 6h (00h e 06h BRT)
+# Radar de issues e PRs do upstream e automação de 6h (00h, 06h e 12h BRT)
 
 ## O que foi feito
 
@@ -81,8 +82,41 @@ refs:
      projetos e ênfase em atividade), PR `#38092` (organização de boards e catálogos por owner), PR `#38078` (reapontamento de projetos
      de pastas movidas sem duplicações) e PR `#38049` (supressão de escape tails residuais ao trocar de workspace).
 
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-04)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisadas dezenas de PRs e issues abertos criados ou
+   atualizados entre `2026-11-04T09:00:00Z` e `2026-11-04T15:00:00Z`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Vazamento de memória GPU WebGL no terminal e performance no macOS](../issues/vazamento-de-memoria-gpu-webgl-no-terminal-e-performance-macos.md)
+     (PR `#38120`, issue `#38108` e issue `#38150`): correção de vazamento crítico de mais de 20 GB de memória gráfica
+     `IOAccelerator` no Apple Silicon causado por texturas de atlas de glifos não liberadas no `@xterm/addon-webgl`,
+     limitação do tamanho de página a 2.048 × 2.048 pixels e retração imediata de slots para 1 × 1 px, além de prevenção
+     de bloqueio da thread principal no macOS.
+3. **Atualização de 4 issues existentes em `work/issues/`:**
+   - [Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md):
+     adicionados PR `#38149` (suporte a `claudeConfigProfiles` permitindo lançar Claude a partir de perfis em pastas locais
+     como `~/.claude-a` e `~/.claude-b` com credenciais próprias sem depender do switcher global), issue `#38134` (dashboard
+     Home global para limites de uso e frota de agentes) e issue `#38116` (manter computador acordado contando agentes remotos SSH);
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     adicionados PR `#37757` (resolve `#37693`, gravando e fazendo replay da receita original de launch `launch_recipe` na
+     reabertura de workers para não perder permissões Full access), issue `#38111` (ajuste no preâmbulo fixo para permitir push
+     de branch e criação de PRs por workers sem bloqueio), issue `#38123` (correção de erro de rollback SQLite falso em `worker_done`
+     no orcad headless) e issue `#38131` (tratamento de timeout de dsh);
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados PR `#38118` (resolve `#8766`, adicionando comandos CLI `orca project-group create/rename/add/ungroup/list/rm`
+     com proteção contra desvinculação acidental), issue `#38112` (criação de folder workspaces via CLI) e issue `#38138` (ações
+     e atalhos de colapso/expansão de workspaces);
+   - [Segurança de hooks em worktrees e integridade de setup em automações](../issues/seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes.md):
+     adicionado PR `#38128` (resolve `#37902`, tratando negação de acesso no teardown de observadores durante a exclusão de
+     worktrees para evitar falhas espúrias quando o Git já removeu a pasta da lista de raízes autorizadas);
+   - [Melhorias de Native Chat, ACP do Gemini CLI, abas e diff no upstream](../issues/melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream.md):
+     adicionados PR `#38094` (resolve `#38090`, importando a continuação indexada mais recente em vez do arquivo canônico
+     defasado no Codex Chat), PR `#37640` (remoção de comandos exclusivos de terminal na superfície de chat do Codex), issue
+     `#38100` (recuperação de sessões do Antigravity ACP no Session History), issue `#38124` (suporte a blocos advisor `server_tool_use`)
+     e issue `#38115` (detalhes técnicos do modelo em hover no picker).
+
 ## Fora do workspace
 
 - **O quê e onde:** automação `Radar do upstream (stablyai/orca)` (`id: f75b8281-8ae3-4558-afe4-7ab5bbc35601`) ativa no
   runtime do BrzA Studio rodando a cada 6h (`0 */6 * * *`).
-- **Estado:** ciclo das 06:00 BRT processado com sucesso.
+- **Estado:** ciclo das 12:00 BRT processado com sucesso.

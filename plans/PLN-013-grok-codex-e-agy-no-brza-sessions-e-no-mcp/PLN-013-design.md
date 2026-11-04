@@ -403,7 +403,7 @@ def quota_report(data, queue, limits, now_ms=None) -> list   # uma linha por (ru
 
 - **O Antigravity:** com o `weekly` de topo em 99% em 2026-11-03, renovando em 2026-11-10 00:09 -03 (`orca account
   list --json`), todo worker dele espera em `account_quota` até lá.
-- **A issue da R4.2** ("o app não lê a cota do Grok") é da sessão, no P5.
+- **A issue da R4.2** já existe: [O app não lê a cota do Grok](../../work/issues/o-app-nao-le-a-cota-do-grok.md).
 
 #### O teste que falha antes
 

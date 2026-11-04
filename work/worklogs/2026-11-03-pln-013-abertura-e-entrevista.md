@@ -57,7 +57,7 @@ fluxo do `brza sessions` e do `MCP`". Esta sessão rodou os Passos 0 a 2 da `pla
   entrou na fila atrás dele. Os dois pareceres foram ao
   [REV-010: O Desenho do PLN-013, revisado pela sessão Grok](../reviews/REV-010-pln-013-o-desenho-pelo-grok.md), com 16
   achados, um deles falso. O `send_to_chat` não deu recibo do envio: é a lacuna do
-  [PLN-010](../../plans/PLN-010-brza-sessions-sobre-o-brza-chat/PLN-010-plan.md).
+  PLN-010, o recibo fiel do envio.
 - **A R4** fechou a tabela de modelo e esforço por runtime, a cota do Grok em `quota_unknown`, o `provider_session` nos
   quatro e as convergências. A issue [O app não lê a cota do Grok](../issues/o-app-nao-le-a-cota-do-grok.md) nasceu dela.
 - **O Desenho e os Passos.** O `designer` reescreveu os itens D1 a D7 com a R4 e os achados, e derivou 11 passos em três

@@ -2,14 +2,15 @@
 status: in_progress
 phase: execution
 origin: request
-ready: sim — P0 concluído (H1 a H6 medidas e D3–D7 ajustados); próximo passo: P1
+ready: sim — P0 e P1 concluídos; próximo passo: P2
 estimate_h: 37.5
-executed_h: 0.4
-remaining_h: 34.0
+executed_h: 0.7
+remaining_h: 33.0
 scope:
   - workspace
   - brza-studio
 opened: 2026-10-29
+priority: high
 owner: Anderson
 tags:
   - tooling
@@ -17,7 +18,7 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** P0 concluído em 2026-11-03 (H1 a H6 confirmadas e itens `D3` a `D7` ajustados no [Desenho](PLN-003-design.md)); os passos de MCP (P6–P9) passaram ao [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md); próximo passo: **P1** (o índice da `master` com `priority`, `blocks` e `deadline` em `brza-note`).
+- **Retomar:** P0 e P1 concluídos em 2026-11-03; os passos de MCP (P6–P9) passaram ao [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md); próximo passo: **P2** (a CLI `brza` unificada e o despacho nos dois clients).
 - **A fila do orquestrador (2026-11-03):** a R9, respondida na sessão `bb0fd632` do `workspace`, fez do coordenador o
   orquestrador e deu a ordem da fila e os três tetos de workers; o Desenho mudou nas premissas, no M8, no M17, na
   regra da fila e no M24 novo (o índice da `master` grava `priority`, `blocks` e `deadline`). Os itens `D` partem daí.
@@ -105,14 +106,14 @@ Estimado: 3.5 h · Executado: 0.4 h
 
 Executa D2 (M24) · executor: sessão do `tools-kit`
 
-Estimado: 1.0 h · Executado: — h
+Estimado: 1.0 h · Executado: 0.3 h
 
-- [ ] **1. Teste que falha:** `test_brza_note.py` validando extração de `priority`, `blocks` e `deadline` para o `.brza/index.jsonl`.
-- [ ] **2. Implementar:** atualizar `scripts/brza/brza-note` para extrair e gravar campos no índice unificado da master.
-- [ ] **3. Rodar e ver passar:** suíte de testes de `scripts/brza/tests/test_brza_note.py`.
-- [ ] **4. Commit:** commit na branch `workstream/tools-kit`.
+- [x] **1. Teste que falha:** `test_pln003_p1_master_index_ordering_properties_for_plans_and_notes` em `test_brza_note_index.py` validando extração de `priority`, `blocks` (escalar e lista) e `deadline` para o `.brza/index.jsonl`.
+- [x] **2. Implementar:** atualizar `note_state` em `bin/brza-note` para extrair e gravar campos `priority`, `blocks` e `deadline` no índice unificado da master.
+- [x] **3. Rodar e ver passar:** suíte de 131 testes de `tests/cli/test_brza_note*.py` passando 100%.
+- [x] **4. Commit:** commit `7a18392` no repositório `brza-workflow`.
 
-**Evidência:** —
+**Evidência:** commit `7a18392` em `brza-workflow` e [O PLN-003 P1: o índice da master com priority, blocks e deadline](../../work/worklogs/2026-11-03-pln-003-p1-indice-master-ordering-properties.md).
 
 ### P2 — A CLI `brza` unificada e o despacho nos dois clients
 
@@ -296,3 +297,5 @@ Estimado: 3.0 h · Executado: — h
   [O PLN-003: os itens D e os passos](../../work/worklogs/2026-11-03-pln-003-itens-d-e-passos-do-workflow-nos-dois-clients.md)
 - 2026-11-03 — o P0 mediu e confirmou as hipóteses H1 a H6 da fase 0; ajustes técnicos incorporados aos itens `D3` a `D7` do Desenho.
   [O PLN-003: a medição das hipóteses da fase 0 (P0)](../../work/worklogs/2026-11-03-pln-003-medicao-das-hipoteses-p0.md)
+- 2026-11-03 — o P1 implementou e validou por TDD a extração de `priority`, `blocks` e `deadline` no `brza-note` para o índice da master.
+  [O PLN-003 P1: o índice da master com priority, blocks e deadline](../../work/worklogs/2026-11-03-pln-003-p1-indice-master-ordering-properties.md)

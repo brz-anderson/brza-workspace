@@ -84,24 +84,24 @@ Os itens do pedido, numerados para a Cobertura, com o corte da R1.2, da R1.3 e d
 ## Passos
 
 Os passos executam a pedido de Anderson. O código vai ao `brza-workflow`, pelo `implementer`, conduzido pela sessão do
-> `tools-kit`, numa branch por entrega, cada uma num worktree em `~/Projects/brza-workflow/.worktrees/`, nascida da
-> `master` depois do merge da entrega anterior. A revisão de cada entrega vai pelo `reviewer` e por uma sessão Grok como
-> segunda revisora, aberta pelo `brza sessions <nome> --agent grok --prompt-file <pedido>`. O merge na `master` do
-> `brza-workflow` é com a confirmação de Anderson.
->
-> **O gate de cada passo**, no worktree da entrega:
->
-> ```bash
-> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/mcp
-> ```
->
-> ```bash
-> env -u BRZA_WORKSPACE -u CLAUDE_PROJECT_DIR PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.cli.test_brza_sessions
-> ```
->
-> e, no passo de revisão, a suíte do `cli` inteira num ambiente limpo, como no PLN-009:
-> `env -i HOME="$HOME" PATH="<dir do python3 3.10+>:/usr/bin:/bin" python3 -m unittest discover -s tests/cli`.
-> A base, em 2026-11-03 no `ebb4e7d`: `tests/mcp` → 358 OK; `test_brza_sessions` → 39 OK.
+`tools-kit`, numa branch por entrega, cada uma num worktree em `~/Projects/brza-workflow/.worktrees/`, nascida da
+`master` depois do merge da entrega anterior. A revisão de cada entrega vai pelo `reviewer` e por uma sessão Grok como
+segunda revisora, aberta pelo `brza sessions <nome> --agent grok --prompt-file <pedido>`. O merge na `master` do
+`brza-workflow` é com a confirmação de Anderson.
+
+**O gate de cada passo**, no worktree da entrega:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/mcp
+```
+
+```bash
+env -u BRZA_WORKSPACE -u CLAUDE_PROJECT_DIR PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.cli.test_brza_sessions
+```
+
+e, no passo de revisão, a suíte do `cli` inteira num ambiente limpo, como no PLN-009:
+`env -i HOME="$HOME" PATH="<dir do python3 3.10+>:/usr/bin:/bin" python3 -m unittest discover -s tests/cli`.
+A base, em 2026-11-03 no `ebb4e7d`: `tests/mcp` → 358 OK; `test_brza_sessions` → 39 OK.
 
 ### P1 — E1: a sonda do `worker-start` nos três runtimes
 

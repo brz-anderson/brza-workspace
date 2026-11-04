@@ -5,8 +5,8 @@ origin: request
 description: O brza sessions abre o Grok com nome e espera, e o MCP despacha ao Grok, ao Codex e ao Antigravity com conta e cota por runtime
 ready: sim
 estimate_h: 16
-executed_h: 7.25
-remaining_h: 5.25
+executed_h: 10
+remaining_h: 0
 scope:
   - brza-workflow
 opened: 2026-11-03
@@ -18,7 +18,7 @@ tags:
 
 # PLN-013: O Grok, o Codex e o Antigravity abrem pelo `brza sessions` e recebem tarefas do MCP
 
-- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. A E1 está mesclada em `brza-workflow@975fe88`; a E2 está mesclada em `7c1684f`; o P8 (a sonda) fechou; o P9 roda.
+- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. A E1 está mesclada em `brza-workflow@975fe88`; a E2 está mesclada em `7c1684f`; a E3 está mesclada em `591f0ed`; os onze passos fecharam; a revisão final do plano roda.
 - **Dividido:** [PLN-013 — Entrevista](PLN-013-interview.md) · [PLN-013 — Desenho](PLN-013-design.md)
 
 ## Pedido
@@ -271,44 +271,58 @@ segue o X3.
 Executa D6 · executor: `implementer`, pela sessão do `tools-kit`, em `~/Projects/brza-workflow/.worktrees/pln-013-e3`,
 branch `feat/pln-013-e3-rename-e-wait`
 
-Estimado: 1.5 h · Executado: — h
+Estimado: 1.5 h · Executado: 0.75 h
 
-- [ ] **1. Testes que falham:** os da D6 em `test_brza_sessions.py`.
-- [ ] **2. Implementar** o `provider_session` nos quatro, o `session_map`, o `list --json` e a leitura do agente da
+- [x] **1. Testes que falham:** os da D6 em `test_brza_sessions.py`.
+- [x] **2. Implementar** o `provider_session` nos quatro, o `session_map`, o `list --json` e a leitura do agente da
   aba.
-- [ ] **3. Rodar e ver passar:** o gate.
-- [ ] **4. Commit** na `feat/pln-013-e3-rename-e-wait`.
+- [x] **3. Rodar e ver passar:** o gate.
+- [x] **4. Commit** na `feat/pln-013-e3-rename-e-wait`.
 
-**Evidência:** —
+**Evidência:** `brza-workflow@9b76ffb`, pelo `agy` (X1): `test_brza_sessions` → 43 OK; com o
+`brza-sessions` da `master`, 9 falhas e 2 erros. Revisão do Grok (`rev-P9`, na segunda rodada, porque a primeira viu o
+worktree mudar sob ela e tentou rodar comandos): "aprova com correções", A1 (o `brza-note` lê o id de outro runtime
+como transcript Claude) e A2 (o docstring e o `README.md`), em correção.
 
 ### P10 — E3: o `--rename` por runtime
 
 Executa D7 · executor: `implementer`, pela sessão do `tools-kit`, no mesmo worktree
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 1 h
 
 > A faixa é de 1,5 h, com a sonda negativa nos três, a 3 h, com ela positiva nos três.
 
-- [ ] **1. Testes que falham:** os da D7, só das linhas de `NAMED` que a sonda confirmou, e o da saída do P6.
-- [ ] **2. Implementar** o `NAMED`, o `wait_for_name` por runtime e a linha `CHECK`.
-- [ ] **3. Rodar e ver passar:** o gate.
-- [ ] **4. Commit.**
+- [x] **1. Testes que falham:** os da D7, só das linhas de `NAMED` que a sonda confirmou, e o da saída do P6.
+- [x] **2. Implementar** o `NAMED`, o `wait_for_name` por runtime e a linha `CHECK`.
+- [x] **3. Rodar e ver passar:** o gate.
+- [x] **4. Commit.**
 
-**Evidência:** —
+**Evidência:** `brza-workflow@2c6b46f`, pelo `agy` (X1), com o X3, em duas rodadas (a primeira
+deixou os testes sem o launch registrado): `test_brza_sessions` → 44 OK; com o script do P9, 4 falhas. Revisão do
+Grok (`rev-P10`): "aprova com correções", A1 a A4, em correção.
 
 ### P11 — E3: a revisão, o merge e uma abertura de cada
 
 Executa D6, D7 · executor: `reviewer` e uma sessão Grok, pela sessão do `tools-kit`; o merge, a pedido de Anderson;
 as aberturas, a sessão, com Anderson conferindo as abas
 
-Estimado: 1 h · Executado: — h
+Estimado: 1 h · Executado: 1 h
 
-- [ ] **1. Revisão pelo `reviewer`** e **pela sessão Grok**; os achados se corrigem pelo `implementer`, com commit.
-- [ ] **2. Merge na `master` do `brza-workflow`**, com a confirmação de Anderson.
-- [ ] **3. Uma abertura de cada:** `brza sessions pln-013-<rt> --agent <rt> --rename --wait --prompt "diga oi"` nos
+- [x] **1. Revisão pelo `reviewer`** e **pela sessão Grok**; os achados se corrigem pelo `implementer`, com commit.
+- [x] **2. Merge na `master` do `brza-workflow`**, com a confirmação de Anderson.
+- [x] **3. Uma abertura de cada:** `brza sessions pln-013-<rt> --agent <rt> --rename --wait --prompt "diga oi"` nos
   três, com o `open:` só depois do `providerSession.id`.
 
-**Evidência:** —
+**Evidência:**
+- **Revisões:** a da E3 inteira pelo Grok (`rev-P11-E3`, de `7c1684f` a `3944b6b`) deu "aprova com correções", A1 (o
+  `CHECK` do `--title` antes da abertura) e A2 (a ajuda do `--wait`), corrigidos pelo `agy` em `0118a15`; os achados do
+  P9 e do P10 foram corrigidos em `3944b6b`.
+- **Gate:** `cli` em `env -i` → 491 OK; `tests/mcp` → 389 OK; `test_brza_sessions` na `master` → 47 OK.
+- **Merge:** `brza-workflow@591f0ed`, com push, pela R5.
+- **Aberturas reais** com `brza sessions pln-013-p11-<rt> --agent <rt> --rename --wait --prompt "diga oi"`:
+  - Codex: `open:` depois do `thread_name` = `pln-013-p11-codex` no `session_index.jsonl`;
+  - Grok e Antigravity: a linha `CHECK … não recebe o /rename pelo chat do app` e o `open:`;
+  - os três com o evento `session` e o `provider_session` no mapa (`01a1a573-36ae…`, `ee6ee423…` e o do Grok).
 
 ### As horas
 

@@ -17,11 +17,9 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** P8 em curso. A parte da R14 está publicada (`brza-workflow@30b3666`, sync `2130026`). As R15 e R16
-  ampliaram o P8 com o D11, a saída do workspace de origem dos repositórios `brza-*`. Próximo: abrir as sessões do D11, depois do
-  pedido de Anderson: `brza-workflow`, `brza-studio`, a master por esta sessão e as sessões donas dos cinco
-  workstreams, que também recomitam os worklogs do `refs`. Depois, a regressão final e o Fechamento, com a rodada das
-  horas.
+- **Retomar:** P8 quase feito. A parte da R14 e o D11 estão publicados e conferidos; falta o `brza-studio` corrigir o
+  autor do commit e mesclar a branch dos 3 testes (R18.1), pela sessão `d11-brza-studio`. Depois, a regressão final e
+  o Fechamento, com a rodada das horas.
 - **Histórico desta retomada:** tentativa de execução integral em 2026-11-03 encontrou a fronteira de repositório entre `workspace` e
   `brza-workflow` no Antigravity, registrando 4 issues:
   [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md),
@@ -102,6 +100,7 @@ Os cenários abaixo são provas a implementar ou executar nos passos; não afirm
 
 ## Pendências conhecidas
 
+- [O refs grava o slug novo quando o commit renomeia a issue](../../work/issues/o-refs-grava-o-slug-novo-quando-o-commit-renomeia-a-issue.md) — achado do P8, R18.2.
 - [O extrator do refs tem duas cópias sem teste de paridade](../../work/issues/o-extrator-do-refs-tem-duas-copias-sem-teste-de-paridade.md) — A5 da REV-006.
 - [O núcleo guarda o bootstrap da migração do PLN-008](../../work/issues/o-nucleo-guarda-o-bootstrap-da-migracao-do-pln-008.md) — A7 da REV-006.
 - [MIG-001: Renumeração dos pareceres REV-001..REV-004 e backfill de refs nos worklogs](../../work/issues/MIG-001-renumeracao-rev-e-refs-pln-008.md) — concluída em 2026-11-03.
@@ -310,15 +309,33 @@ em dois do `workspace`, que ganhariam o PLN-011 do `studio` (R15).
   `plan-template.md`, e acrescentar o texto do link e os avisos à norma.
 - [x] Rodar as três suítes da Regressão sem a `BRZA_WORKSPACE`, commitar, publicar e levar pelo `brza sync` e
   `brza note sync`.
-- [ ] D11 no `brza-workflow`: `FOREIGN` lendo arquivo da máquina, golden com a chave "origem", testes sem o nome do workspace de origem;
+- [x] D11 no `brza-workflow`: `FOREIGN` lendo arquivo da máquina, golden com a chave "origem", testes sem o nome do workspace de origem;
   suítes, commit, publicação e sync.
 - [ ] D11 no `brza-studio`: os 3 testes com dados neutros, pela norma de lá.
-- [ ] D11 na master: `README.md` e `.claude/rules/workspace.md` neutros.
-- [ ] D11 nas notas: cada sessão dona troca as citações ao workspace de origem por termo neutro no próprio workstream.
-- [ ] No mesmo commit, recomitar os worklogs cujo `refs` muda: o da MIG-001 em `brand`, `studio` e `playground`, o do
+- [x] D11 na master: `README.md` e `.claude/rules/workspace.md` neutros.
+- [x] D11 nas notas: cada sessão dona troca as citações ao workspace de origem por termo neutro no próprio workstream.
+- [x] No mesmo commit, recomitar os worklogs cujo `refs` muda: o da MIG-001 em `brand`, `studio` e `playground`, o do
   `tools-kit` com PLN-001 e os dois do `workspace` já sem o ID do plano do workspace de origem. Depois, o bloco 2 do critério da MIG-001
   sai com 0 nas cinco árvores, e a prova do D11, o grep pelo nome do workspace de origem, sai vazia.
 - [ ] Registrar commits, comandos, resultados e Executado neste plano.
+
+Evidência do D11, em 2026-11-03:
+- **`brza-workflow@ebb4e7d`**, pela sessão `d11-brza-workflow`, com o e-mail do `brz-anderson`: 18 arquivos; a guarda lê
+  `~/.config/brza/foreign.txt`, criado nesta máquina. Suítes sem a `BRZA_WORKSPACE`: CLI 483 OK em 197,9 s, hooks 291
+  OK, notes-checker 99 checagens e `tests/mcp` 358 OK. Desvio X2: o arquivo que existe e não se lê é recusado, aceito
+  na R18.3. O sync `8098514` levou a norma aos cinco workstreams.
+- **Master:** `bc4f5ba` deixou o `README.md` e a regra local neutros, e o `brza note sync` a levou às branches.
+- **Notas:** `tools-kit` em `9a40746`, `ffc0cf7` e `e3fd4d2` (a segunda passagem nos links); `studio` em `3297189`;
+  `brand` em `2c18797`; `playground` em `e271921`; `workspace` em `835f023`. Nove arquivos foram renomeados pelo mapa,
+  e os worklogs do `refs` ganharam novo commit nos mesmos commits.
+- **Conferência:** o grep pelo nome do workspace de origem não acha nada nos arquivos atuais das cinco branches, da
+  master e do `brza-workflow`, salvo o índice e as identidades da R17.1. O checador dá 0 erros nas cinco árvores, e os
+  três blocos do critério da MIG-001 saem com 0 com o extrator novo.
+- **Pendente:** o `brza-studio`. A branch `test/pln-008-d11-dados-neutros` (`a6ef12c`) passou com os 3 testes
+  neutros, mas saiu com o e-mail noreply e sem merge; na R18.1, Anderson escolheu "Corrigir autor e mesclar
+  (Recomendado)".
+- **Observação:** um ID citado em prosa entra no `refs` mesmo quando a frase diz que ele saiu, como o D3 manda; duas
+  sessões precisaram reescrever o próprio worklog por isso.
 
 ## Regressão
 
@@ -354,6 +371,9 @@ python3 .claude/skills/notes-checker/scripts/check_notes.py
 - [REV-006: A entrega do PLN-008 contra o Pedido e a Cobertura](../../work/reviews/REV-006-pln-008-p7-a-entrega.md) — P7; A1, A2 e A4 no P8; A5 e A7 em issues; A6 fechada; A3 e A8 descartados; quatro falsos.
 
 ## Worklogs
+
+- 2026-11-03 — P8: R14 publicada; o D11 pelas R15 a R18, em seis sessões e na master; falta o `brza-studio` mesclar.
+  [O P8 do PLN-008: o checador, o refs e o termo neutro](../../work/worklogs/2026-11-03-pln-008-p8-o-checador-o-refs-e-o-termo-neutro.md)
 
 - 2026-11-03 — P7: revisão independente, R14 com os destinos, REV-006 gravada e P8 acrescentado; aguarda pedido do P8.
   [A revisão da entrega do PLN-008 no P7](../../work/worklogs/2026-11-03-pln-008-p7-revisao-da-entrega.md)

@@ -291,7 +291,7 @@ runtime sem fonte disponível volta à rodada com evidência, sem expansão sile
 
 ## D11 — O workspace de origem sai dos arquivos atuais dos repositórios `brza-*` — notas, norma local, `brza-workflow` e `brza-studio`
 
-- **Origem:** Pedido 6; R15.1 a R15.3; R16.1 a R16.4; R17.1.
+- **Origem:** Pedido 6; R15.1 a R15.3; R16.1 a R16.4; R17.1; R18.3.
 - **Contexto:** o PLN-011 do `studio` colidiu com o ID de um plano do workspace de origem, citado em crase em dois worklogs do `workspace`;
   o D3 conta a crase, e o próximo commit desses worklogs ligaria o plano errado.
 
@@ -305,6 +305,10 @@ runtime sem fonte disponível volta à rodada com evidência, sem expansão sile
 | `brza-studio` | Os 3 testes trocam os dados de exemplo (o identificador de sessão e o domínio do Jira de origem) por nomes neutros. |
 | Histórico do git, e-mail de autor dos commits antigos, `.brza/index.jsonl` | Ficam como estão: o histórico não se reescreve, e o índice só recebe linhas novas. |
 | As identidades `issue:<slug>` das duas issues renomeadas do `tools-kit` | Fica, no índice e no `refs`; o arquivo e o H1 mudam (R17.1). |
+
+A guarda lê `$XDG_CONFIG_HOME/brza/foreign.txt`, ou `~/.config/brza/foreign.txt`, com um nome por linha e `#` de
+comentário; a `BRZA_FOREIGN` troca o caminho nos testes. Sem o arquivo, a guarda segue com os nomes do código. O
+arquivo que existe e não se lê faz o `brza init` recusar antes de escrever (X2, aceito na R18.3).
 
 A prova é um grep sem diferenciar caixa pelo nome do workspace de origem, lido do arquivo da máquina da guarda do `brza init`, sem resultado nos arquivos atuais das cinco branches, da master, do `brza-workflow` e
 do `brza-studio`, salvo o `.brza/index.jsonl` e as identidades `issue:<slug>` das duas issues renomeadas do `tools-kit`, no

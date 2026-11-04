@@ -1,1 +1,2 @@
 - [Comparar pareceres de revisão](feedback_comparar-pareceres.md) — atalhos para cruzar dois reviewers sobre os mesmos commits (PLN-009)
+- [Terreno do PLN-013: onde mora o quê](reference_pln-013-terreno-atalhos.md) — brza sessions, MCP, worker-start, runtimes; atalhos e fontes velhas

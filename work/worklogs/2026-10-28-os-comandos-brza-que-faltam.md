@@ -18,8 +18,8 @@ houve implementação.
 
 **O levantamento:** dois subagentes Sonnet, em paralelo e só lendo.
 - **As notas:** os 8 worklogs, o PLN-001 e as 3 issues. Deram os passos manuais, com contagem e atrito.
-- **Os scripts:** os de `scripts/brza/`, os da Fixfy (`~/Projects/fixfy/scripts/orca/` e o resto de `scripts/`) e os do
-  `brza-studio`. Deram o catálogo e a equivalência Fixfy → brza.
+- **Os scripts:** os de `scripts/brza/`, os do workspace de origem (os de `scripts/orca/` e o resto de `scripts/`) e os do
+  `brza-studio`. Deram o catálogo e a equivalência origem → brza.
 
 Os agregados ficaram no scratch da sessão, fora do git. O resultado está em
 [Os comandos brza que viram o PLN-002](../issues/os-comandos-brza-que-viram-o-pln-002.md).

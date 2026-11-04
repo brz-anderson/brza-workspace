@@ -48,8 +48,8 @@ cria os links.
 **Ficaram fora:**
 - **`ship`:** rebase, testes e push; Anderson não o marcou.
 - **`fanout` e status da Run:** a recomendação foi tirar, porque o `orca orchestration` já cobre.
-- **Scripts da Fixfy:** já têm gatilho em
-  [Os scripts de orquestração da Fixfy que ficaram fora do port para o BrzA](scripts-da-fixfy-fora-do-port-para-o-brza.md).
+- **Scripts do workspace de origem:** já têm gatilho em
+  [Os scripts de orquestração do workspace de origem que ficaram fora do port para o BrzA](scripts-do-workspace-de-origem-fora-do-port-para-o-brza.md).
 
 ## As restrições já conhecidas
 

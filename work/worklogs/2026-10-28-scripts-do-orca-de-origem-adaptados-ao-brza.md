@@ -4,13 +4,13 @@ scope:
   - brza-studio
 refs:
   - PLN-001
-  - issue:scripts-da-fixfy-fora-do-port-para-o-brza
+  - issue:scripts-do-workspace-de-origem-fora-do-port-para-o-brza
 ---
 
-# Os scripts do Orca da Fixfy adaptados ao BrzA Studio
+# Os scripts do Orca do workspace de origem adaptados ao BrzA Studio
 
-O pedido de Anderson, em 2026-10-28: "estude os scripts criados pela fixfy-workspace, para orquestração e delegação no
-Orca, para adaptarmos para o brza". Um subagente Sonnet levantou os dez scripts da Fixfy: os de `scripts/orca/`, o
+O pedido de Anderson, em 2026-10-28: "estude os scripts criados pelo [workspace de origem], para orquestração e delegação no
+Orca, para adaptarmos para o brza". Um subagente Sonnet levantou os dez scripts do workspace de origem: os de `scripts/orca/`, o
 `delegate.py` e o `quota.py`. Uma rodada fechou o corte, e esta sessão escreveu o que entrou. A sessão
 `brza-workspace-2d` escreveu em paralelo o abridor de sessões, coordenada pelo correio do Orca.
 
@@ -21,7 +21,7 @@ Orca, para adaptarmos para o brza". Um subagente Sonnet levantou os dez scripts 
 - **Como os scripts acham o CLI e o runtime:** "Módulo comum (Recomendado)".
 - **O que entra agora:** "Núcleo do orca-sessions, orca-run", e para o resto, "marque gatilhos de revisão para os
   outros". Os gatilhos estão em
-  [Os scripts de orquestração da Fixfy que ficaram fora do port para o BrzA](../issues/scripts-da-fixfy-fora-do-port-para-o-brza.md).
+  [Os scripts de orquestração do workspace de origem que ficaram fora do port para o BrzA](../issues/scripts-do-workspace-de-origem-fora-do-port-para-o-brza.md).
 
 ## O que se fez
 
@@ -32,14 +32,14 @@ Commit `54aefe3`, em `scripts/brza/`:
 - **`claude-brza`:** o `agentCmdOverrides.claude` do app.
   - No `brza-workspace` e no `brza-studio`, põe o `--settings` daqui e a `BRZA_WORKSPACE`.
   - Os worktrees do app em `~/orca/workspaces/…` são reconhecidos pelo `git --git-common-dir`.
-  - Fora deles (`/`, `--version`, a Fixfy), cai no claude puro.
+  - Fora deles (`/`, `--version`, o workspace de origem), cai no claude puro.
 - **`brza-run`:** o `orca-run`, com o módulo comum no lugar do `runpy` do `orca-sessions`. É opção explícita, e a regra
   da cerca `bash` do `AGENTS.md` não muda.
 - **`brza-install`:**
   - liga `claude-brza`, `brza-run` e `brza-sessions` em `~/.local/bin`;
   - aponta o `agentCmdOverrides.claude`;
   - sem flag, mostra o estado.
-- **Testes:** 15, em `scripts/brza/tests/test_brza_scripts.py`. Os do `brza-run` vêm da Fixfy. A impressão digital do
+- **Testes:** 15, em `scripts/brza/tests/test_brza_scripts.py`. Os do `brza-run` vêm do workspace de origem. A impressão digital do
   `agentSession.send` foi conferida no node contra o `structuredAgentSessionPayloadFingerprint` do `brza-studio`.
 
 O abridor, `scripts/brza/brza-sessions`, é da `brza-workspace-2d`, que o testou contra o runtime e o commitou no
@@ -61,7 +61,7 @@ O chat passou pelo `claude-brza`: a medição e a identidade, que faltavam no `b
 - **O chat estruturado já carrega o `settings.json` do projeto.** Ele roda o `claude` com
   `--setting-sources=user,project,local`, e por isso, com o cwd no `brza-workspace`, os hooks já valiam. A lacuna era
   só nos checkouts do `brza-studio` (achado da `brza-workspace-2d`).
-- **O app ainda usa os nomes do Orca por dentro:** o `orca-runtime.json` e as variáveis `ORCA_*`. Os links da Fixfy em
+- **O app ainda usa os nomes do Orca por dentro:** o `orca-runtime.json` e as variáveis `ORCA_*`. Os links do workspace de origem em
   `~/.local/bin` falam com o `Orca.app` e não servem ao BrzA.
 - **O teste da impressão digital tem um U+2028 no texto**, e o `splitlines()` do Python o trata como quebra de linha. A
   cópia por `splitlines()` cortou a linha, e a cópia por `split('\n')` a preservou.

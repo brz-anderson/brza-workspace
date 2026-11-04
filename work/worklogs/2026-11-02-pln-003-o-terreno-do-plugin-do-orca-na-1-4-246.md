@@ -4,7 +4,7 @@ scope:
   - brza-studio
 refs:
   - PLN-003
-  - issue:skills-de-documento-da-fixfy-num-plugin
+  - issue:skills-de-documento-do-workspace-de-origem-num-plugin
 ---
 
 # O PLN-003: o Terreno do plugin do Orca na 1.4.246
@@ -22,7 +22,7 @@ Pedido de Anderson, vindo da sessão `brand` em 2026-11-02: "verifique como func
   - os eventos viraram `workspace.created`, `workspace.removed`, `agent.status.changed` e `workspace.changed`.
 - **O limite do worker no host**, o que só existe no `upstream/main` (`engines.orca >=1.4.248`, que não carrega no fork) e o que segue reservado e vazio (`skills`, `mcpServers`, `agentHarnesses`, `taskSources`) estão no Terreno, com a segurança do `trusted-worker` para a análise de risco da fase 0.
 - **O C5 (UI nos dois apps) virou hipótese a medir no P0**, com o spike de sete perguntas escrito no próprio C5. B7, M17 e a R1.2/R4.2 da lista de premissas ficaram marcados "em revisão".
-- **Issue [As skills de documento da Fixfy num possível plugin do BrzA](../issues/skills-de-documento-da-fixfy-num-plugin.md):** acrescentado o fato de que o plugin do Orca não contribui skills (reservado e vazio), então o veículo é o plugin do Claude. O gatilho não mudou.
+- **Issue [As skills de documento do workspace de origem num possível plugin do BrzA](../issues/skills-de-documento-do-workspace-de-origem-num-plugin.md):** acrescentado o fato de que o plugin do Orca não contribui skills (reservado e vazio), então o veículo é o plugin do Claude. O gatilho não mudou.
 - **O `Retomar` do [PLN-003](../../plans/PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md)** manda retomar pelo spike do C5.
 
 ## A decisão de Anderson

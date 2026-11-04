@@ -228,7 +228,7 @@ de cada um diz a resposta.
 
 ### F1 — "O soft cap de 55% não tem lastro"
 > → falso
-**Por que é falso:** a opção decidida na R7.1 diz "55% e 90%, como no `quota.py` da Fixfy".
+**Por que é falso:** a opção decidida na R7.1 diz "55% e 90%, como no `quota.py` do workspace de origem".
 **Evidência:** `PLN-003-interview.md:321-322` e "Decidido — por conta e por runtime" em `:329`. Fica a lacuna de o D2
 não dizer o que o 55% faz (só o 90% tem regra em `PLN-009:109`).
 

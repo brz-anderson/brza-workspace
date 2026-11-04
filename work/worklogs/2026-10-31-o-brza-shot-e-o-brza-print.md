@@ -22,9 +22,9 @@ No meio do trabalho, Anderson pediu nesta sessão o `brza print`: "adicionar tbm
 ## O que Anderson respondeu sobre o brza print
 
 - **Alvo**, primeira rodada, em texto livre: "seria para os passos de conferencia de qualquer plano, em qualquer
-  projeto, como no `fixfy_app`, por exemplo". As opções eram o dev build pelo CDP, qualquer janela pelo macOS e os
+  projeto, como no [app de outro projeto], por exemplo". As opções eram o dev build pelo CDP, qualquer janela pelo macOS e os
   dois.
-- **Alvo**, segunda rodada, já com o `fixfy_flutter` e o simulador à vista: "Simulador, emulador e janela
+- **Alvo**, segunda rodada, já com o app Flutter de outro projeto e o simulador à vista: "Simulador, emulador e janela
   (Recomendado)".
 - **Destino:** "Pasta do plano, por caso (Recomendado)", `PLN-NNN-C1.png`, com link no Observado do caso.
 - **Norma:** "Sim, junto do brza shot (Recomendado)".
@@ -73,7 +73,7 @@ No meio do trabalho, Anderson pediu nesta sessão o `brza print`: "adicionar tbm
   `.dark` mistura 5% do primeiro plano (`--chat-canvas-mix: 5%`). É o que o chat mostra.
 - **O destino que já existe** saiu com `já existe; use --force para sobrescrever`, código 2.
 - **O `brza print`, sem opção:** com o simulador iPhone 18 Pro ligado, o print saiu com 1206×2622 px, só com a tela do
-  aparelho, que mostrava o login do app da Fixfy.
+  aparelho, que mostrava o login do app de outro projeto.
 - **O `brza print --app "brza studio"`** caiu na mensagem da permissão de Gravação de Tela, que o BrzA Studio não tem:
   o `screencapture -l 7858` dá "could not create image from window".
 - **O `brza install --all`** ligou o `brza-shot` e o `brza-print`, e o `brza shot --help` e o `brza print --help`

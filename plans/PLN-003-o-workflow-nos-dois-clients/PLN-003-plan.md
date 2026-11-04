@@ -265,7 +265,7 @@ Estimado: 3.0 h · Executado: — h
 
 ## Pendências conhecidas
 
-- [As skills de documento da Fixfy num possível plugin do BrzA](../../work/issues/skills-de-documento-da-fixfy-num-plugin.md)
+- [As skills de documento do workspace de origem num possível plugin do BrzA](../../work/issues/skills-de-documento-do-workspace-de-origem-num-plugin.md)
   — o veículo é o plugin do Claude, não o do Orca; o gatilho é de Anderson.
 - [O dev watch deixa carregado o plugin que já estava](../../work/issues/o-dev-watch-deixa-carregado-o-plugin-que-ja-estava.md)
   — o fim de um spike roda o `dev unload` nos dois apps e confere o `devPluginPaths`.

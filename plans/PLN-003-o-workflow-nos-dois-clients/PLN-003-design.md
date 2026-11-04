@@ -74,7 +74,7 @@ Reescrito em 2026-11-02 contra a `v1.4.246`, a base do fork, que é também a ve
 
 - Chat Claude dos dois apps: claude-agent-sdk stream-json (claude-stream-json-connection.ts:35), settingSources user/project/local (claude-structured-launch-resolution.ts:43,74); app injeta só o plugin de visuais (:268); ClaudeStructuredSdkOptions sem mcpServers (:50-67). mcpServers:[] é só ACP. Upstream igual (:41,:258).
 - Prova: context7 chega a este chat pelo enabledPlugins do projeto. MCP stdio herda env do claude (ORCA_CLI_COMMAND, ORCA_USER_DATA_PATH, ORCA_AGENT_SESSION_ID).
-- Overrides: BrzA claude-brza; Orca claude-orca (fixfy/scripts/orca/claude-orca, fora da Fixfy roda claude puro) → no Orca, plugin sobe com cwd no workspace, não em checkout do brza-studio.
+- Overrides: BrzA claude-brza; Orca claude-orca (scripts/orca/claude-orca do workspace de origem, fora dele roda claude puro) → no Orca, plugin sobe com cwd no workspace, não em checkout do brza-studio.
 - rpc('settings.getAgentLaunch') testado contra Orca 1.4.244: ok. Orca CLI tem terminal create|read|send, agent launch --surface chat.
 - Sem método de cartão no chat; cartão = AgentJournalProducerLinkage (agent-session-journal-types.ts:364), muda o app.
 - Norma: AGENTS.md:50-52, CLAUDE.md:49-51 (só context7). Padrão extraKnownMarketplaces directory em brza-studio/.claude/settings.json.
@@ -97,9 +97,9 @@ Reescrito em 2026-11-02 contra a `v1.4.246`, a base do fork, que é também a ve
 
 - Orca orchestration (CLI 1.4.244 e fork): run/task/dispatch/worker-start/ask/reply/gates, SQLite no main (src/main/runtime/orchestration/db/). "Run ... does not schedule or place workers". Coordinator.maxConcurrent=4 (coordinator.ts:37,243) só instanciado em gates.ts:32; coordinator-start/stop aposentados (dispatch-handlers.ts:71).
 - worker-start --agent --model --effort; agent launch --agent --model --effort --surface; sem flag de conta. agentSession.create sem conta; accounts.selectClaude global (accounts.ts:142); agentSession.switchAccount move chat (não testado). capability agent-session.account-env.v1 (agent-session-create-capabilities.ts:15-16).
-- Contas app: Claude admin@ e anderson@ (Fixfy), Codex pessoal; activeAccountId null. orca account list --json devolve usedPercent/resetsAt (session 5h, weekly, fableWeekly) por conta — sinal p/ semáforo. measure.py:84-87 account()=basename(CLAUDE_CONFIG_DIR) → contas do app viram 'home' (defeito). failure: 0 linhas.
+- Contas app: Claude admin@ e anderson@ (do workspace de origem), Codex pessoal; activeAccountId null. orca account list --json devolve usedPercent/resetsAt (session 5h, weekly, fableWeekly) por conta — sinal p/ semáforo. measure.py:84-87 account()=basename(CLAUDE_CONFIG_DIR) → contas do app viram 'home' (defeito). failure: 0 linhas.
 - measurements 7d: 178 linhas; turn opus .claude 117, home 9; subagent sonnet 11.
-- Agente interno: claude -p --model --effort --output-format json --json-schema --max-budget-usd; precedente fixfy/scripts/delegate.py:186 com CLAUDE_CONFIG_DIR; quota.py route (55%/90%). Python sem anthropic; sem API key.
+- Agente interno: claude -p --model --effort --output-format json --json-schema --max-budget-usd; precedente scripts/delegate.py:186 do workspace de origem, com CLAUDE_CONFIG_DIR; quota.py route (55%/90%). Python sem anthropic; sem API key.
 - Quem chamou: .mcp.json expande ${VAR} em url/headers de http (doc code.claude.com/docs/en/mcp); header X-Brza-Session: ${ORCA_AGENT_SESSION_ID}; não testado.
 - Riscos a medir: claude -p, expansão no .mcp.json, switchAccount.
 - Pontos: agente decide (regra+agente desempata Sonnet / tudo / regra pura / Opus); chamada na fila (abrir sessão+worker-start+send / +Agent / só abrir / toda); semáforo (por conta via usedPercent / global / conta+runtime); desativar (só modelo/esforço / agente / tudo); reaproveitar orchestration (ciclo de vida sim, roteamento não); conta por chamada (-p CLAUDE_CONFIG_DIR + switchAccount / só -p / flag no fork).
@@ -110,7 +110,7 @@ Sessões e correio
 - F1 brza sessions list|send|close por nome — PLN-002-plan.md:255-269 (P7 bloqueado); cli. Orca: precisa do CLI do client.
 - F2 correio entre contas (SendMessage não cruza contas) — I:codex-como-subagente-no-chat-do-claude.md:74-75; supõe MCP do app.
 - F3 criar worktree+sessão como ferramenta tipada — codex-como-subagente:75; supõe MCP do app.
-- F4 nome automático do chat "PLN-001 · P42" (chat-namer) — I:scripts-da-fixfy-fora-do-port-para-o-brza.md:23; cli/script.
+- F4 nome automático do chat "PLN-001 · P42" (chat-namer) — I:scripts-do-workspace-de-origem-fora-do-port-para-o-brza.md:23; cli/script.
 - F5 nome da sessão para o brza note (X3) — PLN-002-plan.md:310-312; cli.
 Subagentes e runtimes
 - F6 Codex como cartão de subagente via agente Claude que roda codex exec (caminho 1) — codex-como-subagente:27-33; agente do plugin do Claude.
@@ -120,14 +120,14 @@ Subagentes e runtimes
 - F10 delegar ao agy pela ACP do app, ferramenta "delegar ao runtime" — :72-73; MCP do app.
 - F11 chat só orquestra, subagente vira sessão de terminal com cartão — :91-112; mcp+cli+app.
 - F12 consultor (Agent nativo) × executor (sessão de terminal) escolhido pelo orquestrador — :114-125; mcp+agente do plugin.
-- F13 delegate.py portado — scripts-da-fixfy:24 (gatilho medição Fixfy 2026-10-30); cli.
-- F14 quota.py (cota por conta) — scripts-da-fixfy:25 (gatilho: mais de uma conta no mesmo trabalho); cli.
+- F13 delegate.py portado — scripts-do-workspace-de-origem:24 (gatilho medição do workspace de origem 2026-10-30); cli.
+- F14 quota.py (cota por conta) — scripts-do-workspace-de-origem:25 (gatilho: mais de uma conta no mesmo trabalho); cli.
 - F15 sandbox do Codex como argumento, visível no canUseTool — codex-como-subagente:127-134,155; MCP do app.
 - F16 "Selecionar automaticamente" modelo/esforço no seletor — PLN-001-plan.md:59-60,118; app.
 Notas e planos
 - F17 brza note (feito, P6). F18 brza ship (rebase, testes, push) — PLN-002-plan.md:64-66, fora. F19 fanout/status da Run — usar orca orchestration. F20 brza tree --list órfãos. F21 canonicalize para o runtime — os-comandos-brza:71-72.
 App e instalação
-- F22 despacho brza X (feito, fork). F23 import boundaries vermelho (external-subcommand → @orca/process-host) — I:import-boundaries-vermelho...:34-36; app. F24 app install confirma antes de sobrescrever. F25 ajuda/CLAUDE.md para brza install/run. F26 SHELL_SESSIONS_DISABLE=1 no brza-run — I:brza-run-imprime-saving-session...:55-67; cli. F27 telemetria optedIn — scripts-da-fixfy:30-34; app/config. F28 plugins da Fixfy (painel, ▶, ⤢, /rename) viram plugins do Orca — fixfy decision orca-fixfy-congelado...:35-38. F29 orca-close-idle/restart/patch descartados com gatilho.
+- F22 despacho brza X (feito, fork). F23 import boundaries vermelho (external-subcommand → @orca/process-host) — I:import-boundaries-vermelho...:34-36; app. F24 app install confirma antes de sobrescrever. F25 ajuda/CLAUDE.md para brza install/run. F26 SHELL_SESSIONS_DISABLE=1 no brza-run — I:brza-run-imprime-saving-session...:55-67; cli. F27 telemetria optedIn — scripts-do-workspace-de-origem:30-34; app/config. F28 plugins do workspace de origem (painel, ▶, ⤢, /rename) viram plugins do Orca — decisão de lá sobre o Orca congelado, linhas 35-38. F29 orca-close-idle/restart/patch descartados com gatilho.
 Notificação e remoto
 - F31 brza notify (Lembretes do iCloud) — I:brza-notify-avisa-no-iphone-pelos-lembretes.md:10-44; cli. F32 hook Stop de turno longo → notify; hook do plugin. F33 Tailscale/Remote Orca Server — I:tailscale-para-acesso-remoto-ao-brza-studio.md; infra. F34 notas do funnel.
 Conflito: issue do Codex (A3 MCP no app, só BrzA) × R3.4/R4.1 (MCP residente fora do app, dois clients); AGENTS.md ferramental só no projeto.
@@ -174,7 +174,7 @@ Horas: estimadas, na régua do PLN-002 (1,5–3 h estimado por `brza-*`, 0,2–0
   2. **Passa no Studio; no Orca, só o caminho do erro.** No Studio, o worker achou o worktree pela branch em foco e leu
      planos e notas (`brand`: 1 plano e 4 issues; `tools-kit`: 2 planos e 10 notas), e o painel de componentes mostrou o
      mesmo que o HTML, com Tree, Table e Markdown. O `readContext` não traz caminho. No Orca, que só tem os repositórios
-     da Fixfy, o painel mostrou o erro do worker ("a branch não é de um worktree do brza-workspace"): o `brza install`
+     do workspace de origem, o painel mostrou o erro do worker ("a branch não é de um worktree do brza-workspace"): o `brza install`
      do plugin precisa cadastrar o `brza-workspace` no Orca. **Medido:** o painel HTML não herda o tema do app (texto
      claro em fundo branco no tema escuro); o de componentes herda.
   3. **Passa nos dois, com duas ressalvas.** O worker escolheu sozinho o terminal sem agente (R8.4), digitou `brza

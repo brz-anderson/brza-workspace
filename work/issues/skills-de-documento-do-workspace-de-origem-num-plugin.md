@@ -9,19 +9,19 @@ tags:
   - tooling
 ---
 
-# As skills de documento da Fixfy num possível plugin do BrzA
+# As skills de documento do workspace de origem num possível plugin do BrzA
 
-Em 2026-10-31, a sessão `workspace` triou as 16 skills do `~/Projects/fixfy/fixfy-plugin/skills/` para o porte ao
+Em 2026-10-31, a sessão `workspace` triou as 16 skills do plugin do workspace de origem para o porte ao
 brza-workspace. As seis de documento ficaram fora do workspace, e Anderson as mandou para cá: "essas vão ao `tools-kit`
 para um possível plugin".
 
-| Skill, na Fixfy | O que faz lá | Por que não entrou no workspace | Tamanho (`SKILL.md` + refs) |
+| Skill, na origem | O que faz lá | Por que não entrou no workspace | Tamanho (`SKILL.md` + refs) |
 | :-------------- | :----------- | :------------------------------ | :-------------------------- |
 | `adr-writer` | ADR em `docs/adr`, com proposta, congelamento e migração | A decisão daqui já é `work/decisions/`; o molde `proposed-template.md` é o que mais se aproveita | 251 + 806 linhas |
 | `constitution-writer` | A constituição de um repositório | A norma de topo daqui é o `AGENTS.md` | 175 + 290 |
 | `manual-writer` | Manual em `docs/architecture` e `docs/conventions` | Os dois não existem; `wiki/guides/` é outro gênero | 230 + 363 |
 | `migration-writer` | Dívida de migração `MIG-NNN`, que pressupõe ADR e constituição | A dívida daqui é `work/issues/` | 196 + 513 |
-| `spec-writer` | `SPEC.md` por feature, no SDD da Fixfy, com persona e card `FIX-NN` | Não há SDD, persona nem card aqui | 162 + 979 |
+| `spec-writer` | `SPEC.md` por feature, no SDD do workspace de origem, com persona e card próprio | Não há SDD, persona nem card aqui | 162 + 979 |
 | `readme-writer` | README de pacote e feature em Dart, com emoji e badges | O repositório tem um README só | 134 + 478 |
 
 O que as seis têm em comum é o `docs/` de um repositório de código, que o `brza-studio` não tem: sem `docs/adr`, manual
@@ -34,7 +34,7 @@ agente; as seis, se virarem plugin, vão no plugin do Claude (`.claude-plugin/pl
 `brza:`. O gatilho segue o mesmo; o fato só tira o plugin do Orca das opções de veículo. Contexto em
 [PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`](../../plans/PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md).
 
-**O porte não é cópia.** Cada uma cita o `fixfy-context`, o `doc-governance` e os papéis do time da Fixfy
+**O porte não é cópia.** Cada uma cita a skill de contexto de lá, o `doc-governance` e os papéis do time de lá
 (`architect`, `product-owner`), que aqui viram os subagentes por papel do `AGENTS.md`. A triagem inteira está em
 [O porte das skills da Fixfy para o workspace](../worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md), no workstream
 `workspace`.

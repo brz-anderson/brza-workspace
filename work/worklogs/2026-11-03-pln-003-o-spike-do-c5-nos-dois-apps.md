@@ -35,8 +35,8 @@ O plugin é o de `spikes/c5-plugin/`, sem mudança de código além de um títul
   - Shot com a janela escondida → `settled: true`.
 - **Orca:**
   - `ping` → pid 78204.
-  - `notes.list` → "a branch não é de um worktree do brza-workspace", porque o Orca só tem os repositórios da Fixfy.
-  - Os shots, depois do `orca file open README.md --focus` num worktree da Fixfy, saíram `settled: true`.
+  - `notes.list` → "a branch não é de um worktree do brza-workspace", porque o Orca só tem os repositórios de outro workspace.
+  - Os shots, depois do `orca file open README.md --focus` num worktree de outro workspace, saíram `settled: true`.
   - O worker digitou no shell `c5-spike`, aberto por `orca terminal create` no worktree em foco. O `brza` desse
     terminal é o CLI do Studio.
   - `net.probe` → 200 em 15 ms.
@@ -86,10 +86,10 @@ revisão", e seguem os itens `D`. Fica no `Retomar` do PLN-003.
 - **O quê e onde:** a aprovação `cli:local` do `local.brza-spike-c5@0.1.0`, no `audit.log` e no consentimento dos dois
   apps. **Risco:** um `dev load` da mesma pasta, versão e acesso pode reusar a aprovação. **Estado:** ativo.
   **Como desfazer:** mudar a versão ou o acesso do plugin, o que gera fingerprint novo, ou apagar a pasta do spike.
-- **O quê e onde:** os terminais `c5-spike`, abertos no `tools-kit` (Studio) e no
-  `fixfy/.worktrees/fix-pln-027-p9-norm-drift` (Orca). **Risco:** nenhum. **Estado:** fechados. **Como desfazer:** já
+- **O quê e onde:** os terminais `c5-spike`, abertos no `tools-kit` (Studio) e num
+  worktree de outro workspace (Orca). **Risco:** nenhum. **Estado:** fechados. **Como desfazer:** já
   desfeito.
-- **O quê e onde:** o Orca aberto, com o `README.md` daquele worktree da Fixfy em foco, escondido e fechado; aberto e
+- **O quê e onde:** o Orca aberto, com o `README.md` daquele worktree de outro workspace em foco, escondido e fechado; aberto e
   fechado de novo para o `dev unload`. A versão ficou na `1.4.247`. **Risco:** nenhum novo. **Estado:** fechado.
   **Como desfazer:** já desfeito.
 - **O quê e onde:** a janela do BrzA Studio escondida por ~2 s, para o shot do item 6. **Risco:** nenhum. **Estado:**

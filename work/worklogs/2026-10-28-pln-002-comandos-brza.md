@@ -61,7 +61,7 @@ desenho listados na issue."
 
 - **O quê e onde:** o chat da `pln-002-p1` fechado, a pedido de Anderson: "feche as sessão que ja terminaram suas
   tarefas". Foi pelo `agentSession.close` e pelo `session.tabs.close` com `reason: 'user'`. As outras sessões abertas
-  tinham trabalho ou resposta pendente, e a `fixfy-13` é da Fixfy; nenhuma foi fechada.
+  tinham trabalho ou resposta pendente, e uma era de outro workspace; nenhuma foi fechada.
 - **O risco:** a conversa não se retoma, pela norma. O registro do chat fica no app.
 - **Estado:** fechado; o processo e a aba sumiram.
 - **Como desfazer:** não se desfaz. A tarefa dela estava fechada (`dab8fd9`).

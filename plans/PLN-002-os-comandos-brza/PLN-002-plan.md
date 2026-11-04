@@ -75,8 +75,8 @@ conduz o PLN-001, em 2026-10-29; entrou pela R11.1, na sessão `pln-002-sessions
 
 - **O `ship`, o `fanout` e o status da Run.** Ficaram fora nas rodadas da `brza-comandos-lacunas`, como diz a
   [issue de origem](../../work/issues/os-comandos-brza-que-viram-o-pln-002.md).
-- **Os scripts da Fixfy.** Já têm gatilho em
-  [Os scripts de orquestração da Fixfy que ficaram fora do port para o BrzA](../../work/issues/scripts-da-fixfy-fora-do-port-para-o-brza.md).
+- **Os scripts do workspace de origem.** Já têm gatilho em
+  [Os scripts de orquestração do workspace de origem que ficaram fora do port para o BrzA](../../work/issues/scripts-do-workspace-de-origem-fora-do-port-para-o-brza.md).
 - **Dois dev builds no mesmo worktree.** R2.2.
 - **Apagar os dois órfãos de hoje.** O `conferencia-p52-p53` pode servir às conferências pendentes do PLN-001; o
   `brza tree --list` os mostra, e quem remove é Anderson.

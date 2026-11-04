@@ -40,8 +40,8 @@ Todas as seis hipóteses (**H1 a H6**) foram **confirmadas**, com ajustes técni
   invocando `claude -p --model haiku --effort low --output-format json --json-schema ... --max-budget-usd 0.01 --no-session-persistence`.
 - **Contas gerenciadas (`CLAUDE_CONFIG_DIR` explícito):**
   - `dot-claude-adm` (`~/.claude-adm`): `exit=0`, `4,58 s`, `structured_output={"choice":"A"}`, custo `US$ 0,00376`.
-  - `studio-admin` (`~/Library/Application Support/brza-studio/claude-profiles/8eee0e1b-f5d7-40ba-8337-8cae0df3a062/home`, `admin@fixfy.com.br`): `exit=0`, `3,29 s`, `structured_output={"choice":"A"}`, custo `US$ 0,00393`.
-  - `studio-anderson` (`~/Library/Application Support/brza-studio/claude-profiles/c2e4f85c-388a-4603-8edc-a0844496c902/home`, `anderson@fixfy.com.br`): `exit=0`, `4,28 s`, `structured_output={"choice":"A"}`, custo `US$ 0,00162`.
+  - `studio-admin` (`~/Library/Application Support/brza-studio/claude-profiles/8eee0e1b-f5d7-40ba-8337-8cae0df3a062/home`, a conta `admin@` do workspace de origem): `exit=0`, `3,29 s`, `structured_output={"choice":"A"}`, custo `US$ 0,00393`.
+  - `studio-anderson` (`~/Library/Application Support/brza-studio/claude-profiles/c2e4f85c-388a-4603-8edc-a0844496c902/home`, a conta `anderson@` do workspace de origem): `exit=0`, `4,28 s`, `structured_output={"choice":"A"}`, custo `US$ 0,00162`.
 - **Achado crítico para D6 (conta `systemDefault`):** passar `CLAUDE_CONFIG_DIR=/Users/andepb/.claude` explicitamente
   faz o Claude Code calcular um sufixo de hash no serviço do Keychain (`Claude Code-credentials-<hash>`) em vez da chave
   padrão `"Claude Code-credentials"`, falhando com `OAuth session expired and could not be refreshed` (`exit=1`). Omitindo
@@ -53,8 +53,8 @@ Todas as seis hipóteses (**H1 a H6**) foram **confirmadas**, com ajustes técni
 - **Suíte de testes do `brza-studio`:** `vitest run src/main/claude/claude-account-switch.test.ts src/main/native-chat/agent-session-wire/structured-agent-session-account-switch.test.ts` → **6 arquivos / 15 testes verdes (`3,42 s`)**.
 - **Sonda ao vivo no socket RPC (`orca-runtime.json`):**
   - Criada sessão temporária `claude_d8fa320f_4040_42bc_83e1_9ab32e8eddd4` (`fence: 1`, `sequence: 1`).
-  - `agentSession.switchAccount` para `8eee0e1b-f5d7-40ba-8337-8cae0df3a062` (`admin@fixfy.com.br`) → `ok: true`, `sequence: 2`.
-  - `agentSession.switchAccount` para `c2e4f85c-388a-4603-8edc-a0844496c902` (`anderson@fixfy.com.br`) → `ok: true`, `fence: 2`, `sequence: 3`.
+  - `agentSession.switchAccount` para `8eee0e1b-f5d7-40ba-8337-8cae0df3a062` (a conta `admin@` do workspace de origem) → `ok: true`, `sequence: 2`.
+  - `agentSession.switchAccount` para `c2e4f85c-388a-4603-8edc-a0844496c902` (a conta `anderson@` do workspace de origem) → `ok: true`, `fence: 2`, `sequence: 3`.
   - `copyClaudeTranscriptsToAccount` (`src/main/claude/claude-account-switch-transcript.ts:20-58`) copia atomicamente o `.jsonl` e a pasta de subagentes para `projects/` da conta destino antes do próximo turno `--resume`.
   - Em sessão **em turno ativo (`in-run`)**, o runtime recusa com `agent_session_operation_invalid` (`details: {"reason": "turnActive"}`, `"Wait for the current turn to finish before using this command"`).
 - **Achados críticos para D6 e D7:** `agentSession.switchAccount` é método RPC do socket local (`orca-runtime.json`, com `MutationEnvelope`), não subcomando da CLI, e só opera em sessão em repouso (`at-rest`).

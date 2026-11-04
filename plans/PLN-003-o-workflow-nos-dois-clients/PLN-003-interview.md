@@ -217,7 +217,7 @@ arquivos AGENTS/CLAUDE/DESIGN do próprio workspace". A medição juntou:
   (`brza-studio/src/main/runtime/orchestration/coordinator.ts:37`). O `orca account list --json` dá o uso por conta
   (5 h, semanal). A conta não se escolhe por chamada: o `agentSession.create` não tem campo de conta, e o
   `agentSession.switchAccount` não foi testado. O `claude -p` com `CLAUDE_CONFIG_DIR` é o agente interno sem
-  dependência, com precedente em `fixfy/scripts/delegate.py:186`.
+  dependência, com precedente no `scripts/delegate.py:186` do workspace de origem.
 - **O inventário das notas:** 34 sugestões (F1–F34), a maior parte da issue
   [O Codex como subagente no chat do Claude](../../work/issues/codex-como-subagente-no-chat-do-claude.md).
 - **Os critérios de alocação**, aplicados na ordem: juízo vai à norma; o que roda fora do Claude vai à CLI, que é o
@@ -318,8 +318,8 @@ HTTP em Python stdlib e os `workflows/*.js` de plugin no chat pelo SDK.
 Respondida em 2026-10-29, no chat do BrzA Studio.
 
 1. **O escopo do semáforo.** Opções:
-   - por conta e por runtime, com o limite pelo `usedPercent` do `orca account list` (55% e 90%, como no `quota.py` da
-     Fixfy) e um teto de sessões por conta e runtime (recomendada). Custo: 4–6 h. Se paga: no 1º choque de cota entre as
+   - por conta e por runtime, com o limite pelo `usedPercent` do `orca account list` (55% e 90%, como no `quota.py` do
+     workspace de origem) e um teto de sessões por conta e runtime (recomendada). Custo: 4–6 h. Se paga: no 1º choque de cota entre as
      duas contas Claude;
    - só por conta. Custo: ~3–4 h. Se paga: até o Codex entrar na fase 3;
    - global. Custo: ~2 h. Se paga: agora, ignorando os limites por conta.

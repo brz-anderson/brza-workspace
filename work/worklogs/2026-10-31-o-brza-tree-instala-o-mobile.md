@@ -3,7 +3,6 @@ scope:
   - workspace
   - brza-studio
 refs:
-  - PLN-001
   - PLN-002
   - issue:brza-test-sai-0-com-testes-fora-do-vitest-da-raiz
   - issue:brza-tree-sai-sem-o-mobile-node-modules

@@ -36,8 +36,17 @@ fluxo do `brza sessions` e do `MCP`". Esta sessão rodou os Passos 0 a 2 da `pla
   Codex e no Antigravity. A entrega sai em três partes: E1, abrir e despachar; E2, a cota e a conta; E3, o `--rename` e
   o `--wait`. A soma vai a ~13 h.
 
+- **O Terreno**, por um `collector`, só leitura:
+  - o `worker-start` aceita os três runtimes;
+  - o MCP conta todo pedido na conta Claude ativa, e a política dele põe `sonnet` e `opus` por cima do pedido;
+  - a troca de conta do Codex é global, do app;
+  - o `agentSession.history` dá um id de sessão nos quatro runtimes.
+  
+  Os fatos e as fontes estão no Desenho do PLN-013.
+- **A R3.** O modelo e o esforço saem de uma tabela por runtime. A cota é por runtime, pelas janelas de topo. O Codex
+  troca de conta pelo gate. Uma sonda vem antes da E3.
+
 ## Em aberto
 
-- O Terreno, com os quatro pontos de "Em aberto para o Desenho" do PLN-013. O primeiro é se o `worker-start` aceita
-  `--agent grok`.
-- O `grok login`, que é de Anderson e é pré-requisito de toda abertura real.
+- Os itens `D` das três entregas, com os valores da tabela de modelo por runtime como rodada.
+- O `grok login`, que é de Anderson e é pré-requisito da sonda da E3 e de toda abertura real.

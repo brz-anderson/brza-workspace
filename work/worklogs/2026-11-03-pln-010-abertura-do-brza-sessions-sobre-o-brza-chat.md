@@ -30,9 +30,9 @@ e seguir para a entrevista. Nenhum código.
   resultado descartado em `brza_runtime.py:141-145`, o `ok` externo em `:115-117` e a origem em `:95-97`.
 - **O plano:** [PLN-010: O `brza sessions` lê e envia pelo `brza chat` do Studio, com recibo fiel](../../plans/PLN-010-brza-sessions-sobre-o-brza-chat/PLN-010-plan.md),
   reservado pelo `brza note plan-open`, em `phase: interview`, com as respostas do `playground` na R0.
-- **O `depends_on` ficou de fora.** O `PLN-011`, do `studio` (slug `chats-pela-cli-e-plugins`), foi reservado às
-  21:19 no índice da `origin/master`, mas o arquivo ainda não estava em nenhuma branch, e o `brza note commit` recusou
-  (`depends-on-not-found`). A dependência fica nos Pré-requisitos e no `Retomar` até ele aparecer.
+- **O `depends_on` é o `PLN-011`**, do `studio` (slug `chats-pela-cli-e-plugins`). No commit da abertura ele ficou
+  de fora: estava reservado no índice da `origin/master` às 21:19, mas o arquivo ainda não existia em nenhuma branch,
+  e o `brza note commit` recusou (`depends-on-not-found`). Voltou depois que o `studio` commitou o plano.
 
 - **A Rodada 1**, respondida nesta sessão: as fases 2 a 4 (`focus`, Native Chat nos plugins, `account usage` no MCP),
   os três chamadores do `send_to_chat` no recibo, o cursor com quem chama e a falha sem o `brza chat`. As fases
@@ -41,6 +41,11 @@ e seguir para a entrevista. Nenhum código.
   [Os plugins do workflow veem o Native Chat no `agents.list`](../issues/os-plugins-do-workflow-veem-o-native-chat.md) e
   [O `brza quota` lê o uso por conta pelo `account usage` do app](../issues/o-brza-quota-le-o-account-usage-do-app.md).
 
+- **A Rodada 2**, respondida nesta sessão: o código de saída por estado (0, 1, 75), o retry por `--operation`, o
+  cursor inválido com código 65, e os requisitos do contrato por correio à sessão `studio-chats-cli`. Os Pré-requisitos
+  do plano listam o que se pede ao `PLN-011`.
+
 ## O que ficou aberto
 
-- A Rodada 2, e o `depends_on: [PLN-011]` quando o `studio` commitar o plano.
+- A R5 do `PLN-011`, que fixa o contrato do `brza chat`; depois dela, o Desenho da fase 1.
+- Se o `brza-run` mantém o código de saída do comando e mostra o recibo só na linha dele (R2.1).

@@ -4,12 +4,14 @@ phase: interview
 origin: issue
 origin_ref: brza-sessions-sobre-o-brza-chat
 description: O brza sessions passa a ser alias do brza chat do Studio, com leitura por cursor, recibo fiel do envio, retry seguro e a origem do coordenador preservada
-ready: "não — faltam a Rodada 2 e o contrato do brza chat do PLN-011, no studio; isso trava o Desenho"
+ready: "não — falta o contrato do brza chat, da R5 do PLN-011, no studio; isso trava o Desenho"
 scope:
   - brza-workflow
 opened: 2026-11-03
 owner: Anderson
 priority: high
+depends_on:
+  - PLN-011
 tags:
   - chat
   - tooling
@@ -17,9 +19,9 @@ tags:
 
 # PLN-010: O `brza sessions` lê e envia pelo `brza chat` do Studio, com recibo fiel
 
-- **Retomar:** R1 respondida em 2026-11-03: quatro fases, os três chamadores do `send_to_chat`, o cursor com quem
-  chama e a falha sem o `brza chat`. Próximo: a Rodada 2 — o código de saída do recibo, o retry e o cursor inválido. Falta o
-  `depends_on: [PLN-011]`, que o checador recusa até o `studio` commitar o plano reservado.
+- **Retomar:** R1 e R2 respondidas em 2026-11-03; os requisitos do contrato foram por correio à sessão
+  `studio-chats-cli` (R2.4). Espera a R5 do `PLN-011` fixar o contrato do `brza chat`; então o Desenho da fase 1,
+  com um ponto aberto: se o `brza-run` mantém o código de saída do comando e só mostra o recibo na linha dele.
 
 ## Pedido
 
@@ -66,6 +68,9 @@ Rascunho da abertura; o critério de aceite de cada linha é proposta até a rod
 | `R1.2`     | o `open` com `--rename` e `--prompt` e o `brza-run` mostram o recibo do envio, pelo mesmo transporte do `send`          | —     | `test_brza_sessions`, `test_brza_run` (unidade) |
 | `R1.3`     | `read <nome> --since <cursor>` devolve o cursor seguinte; sem `--since`, as últimas N; nada de cursor guardado no mapa | —     | `test_brza_sessions` (unidade)        |
 | `R1.4`     | sem o `brza chat` no app alvo, os comandos saem com erro que pede o build com ele, sem cair no `rpc` antigo            | —     | `test_brza_sessions` (unidade)        |
+| `R2.1`     | `send` sai com 0 para enfileirada ou `accepted`, 1 para `rejected` e erro, 75 para `pending` ou `unknown`             | —     | `test_brza_sessions` (unidade)        |
+| `R2.2`     | o recibo traz a `operation`, e `send <nome> --operation <id> <texto>` repete sem novo disparo                         | —     | `test_brza_sessions` (unidade)        |
+| `R2.3`     | `read` com cursor inválido sai com 65 e a dica de omitir o `--since`, sem reler sozinho                                | —     | `test_brza_sessions` (unidade)        |
 | `R1.1`     | `brza sessions focus <nome>` traz o chat à frente pelo `brza chat focus`                                               | —     | `test_brza_sessions` (unidade); conferência no app (manual) |
 | `R1.1`     | os plugins do workflow enxergam o Native Chat no `agents.list`                                                         | —     | a definir no Desenho da fase 3        |
 | `R1.1`     | o `brza quota` lê o uso por conta pelo `account usage` do app                                                          | —     | a definir no Desenho da fase 4        |
@@ -81,12 +86,23 @@ Rascunho da abertura; o critério de aceite de cada linha é proposta até a rod
 
 ## Pré-requisitos
 
-- **O `brza chat` do Studio, com a forma que o `PLN-011` decidir.** Assinatura a conferir no build:
-  `brza chat list --json`, `brza chat read <chat> --since <cursor> --json` com o cursor seguinte na saída, e
-  `brza chat send <chat> <texto> --json` com o recibo do `AgentSessionSendResult` e a operação que se repete. Falta:
-  o Desenho daqui para nos itens que dependem dele, e o `ready` fica `não`.
-- **O envio leva a origem do coordenador.** O `brza chat send` aceita o chat de origem (o `ORCA_AGENT_SESSION_ID`), ou o
-  item do Pedido 5 fica no `rpc` do `brza_runtime`. É ponto a pedir ao `PLN-011`, não decisão daqui.
+O contrato é decisão do `PLN-011`; o que segue é o que este plano precisa dele, mandado por correio à sessão
+`studio-chats-cli` em 2026-11-03 (R2.4). Assinatura a conferir no build do Studio; o que faltar trava o Desenho da
+fase 1, e o `ready` fica `não`.
+
+- **`brza chat list --json`** com o id do chat, o título e o worktree, para a resolução por nome do mapa.
+- **`brza chat read <chat> --since <cursor> --json`** com o cursor seguinte na saída; sem `--since`, as últimas N
+  (R1.3). **O cursor inválido sai com erro distinguível** — código ou `error.code` próprio —, para o
+  `brza sessions read` sair com o código 65 (R2.3).
+- **`brza chat send <chat> <texto> --json`** com o recibo do `AgentSessionSendResult`: enfileirada, inclusive com
+  pergunta pendente retendo a fila, ou submetida, com `accepted`, `rejected`, `pending` ou `unknown`.
+- **A operação que se repete:** o `send` devolve a `operation` no recibo e aceita `--operation <id>`, que repete o
+  envio sem novo disparo (R2.2).
+- **A origem do coordenador:** o `send` encaminha o chat de origem (o `ORCA_AGENT_SESSION_ID`) como
+  `orchestrationCompatibilityEvidence`, como o `rpc` do `brza_runtime` faz hoje (`bin/brza_runtime.py:95-97`); sem
+  isso, o Pedido 5 fica sem caminho, porque a R1.4 tirou a reserva pelo `rpc`.
+- **Para as fases 2 a 4:** o `brza chat focus <chat>`, o Native Chat em `agents.list` e o `brza account usage`, nas
+  fases correspondentes do `PLN-011`.
 
 ## Entrevista
 
@@ -154,6 +170,51 @@ Respondida em 2026-11-03, nesta sessão, pela pergunta com opções.
 
    **Decidido — falha com aviso (Recomendado).**
 
+### Rodada 2 — o código de saída, o retry, o cursor inválido e o pedido ao `PLN-011` (enviada 2026-11-03)
+
+> **Apresentado antes:** o `PLN-011` (`origin/workstream/studio`) tem só as R1 a R4 do `playground`, deixa o contrato
+> do `brza chat` para a R5 dele, ainda não aberta, e põe fora do escopo dele "os aliases, o retry e o resultado fiel
+> do envio no wrapper". Esta rodada fica no lado do `brza sessions` e no jeito de levar ao `PLN-011` o que este
+> plano precisa do contrato.
+
+Respondida em 2026-11-03, nesta sessão, pela pergunta com opções.
+
+1. **Código de saída do `send`** (e do `open` e do `brza-run`, pela R1.2):
+   - por estado (recomendada) — 0 enfileirada ou `accepted`, 1 `rejected` e erro, 75 `pending` ou `unknown`; custo:
+     ~0,5 h e um teste por estado; se paga: agora, com o coordenador e o `brza-run` decidindo pelo código;
+   - 0 se o Studio respondeu, o estado só no recibo — custo: nenhum código; se paga: nunca para o `brza-run`, que só
+     olha o código.
+
+   **Decidido — por estado (Recomendado).** Fica para o Desenho: o `brza-run` hoje sai com o código do comando
+   (`packages/client/bin/brza-run:111-119`), e a pergunta cobria o envio dele.
+
+2. **Retry seguro:**
+   - operação explícita (recomendada) — o recibo imprime a `operation`, e `send <nome> --operation <id> <texto>`
+     repete; texto diferente o Studio recusa pela impressão digital; custo: ~1 h, e o coordenador guarda o id, como o
+     cursor; se paga: agora, sem estado novo no mapa;
+   - último envio no mapa — `send <nome> --retry`; custo: ~2 h, estado por nome e por coordenador; se paga: quando o
+     coordenador perder o id com frequência.
+
+   **Decidido — operação explícita (Recomendado).** Pré-requisito do `PLN-011`: o `send` aceita a operação.
+
+3. **Cursor inválido no `read`:**
+   - erro próprio (recomendada) — código 65 e a dica de omitir o `--since`; custo: ~0,5 h; se paga: agora, sem
+     reprocessar mensagens;
+   - recomeça sozinho — últimas N, aviso no stderr e `cursor_reset: true`; custo: ~0,5 h e o reprocessamento de quem
+     não olhar o aviso; se paga: com coordenador de script simples.
+
+   **Decidido — erro próprio (Recomendado).**
+
+4. **Como os requisitos chegam ao `PLN-011`:**
+   - correio à sessão (recomendada) — uma mensagem à `studio-chats-cli`, com o link dos Pré-requisitos; custo: uma
+     mensagem agora; se paga: na R5 do `PLN-011`;
+   - só no `PLN-010` — custo: nenhum, com o risco de a R5 fechar sem a operação ou a origem; se paga: só se a sessão
+     do `studio` já for ler o `PLN-010`;
+   - issue no `studio` — custo: uma sessão nova lá só para gravá-la; se paga: quando o pedido precisar durar além da
+     sessão do `studio`.
+
+   **Decidido — correio à sessão (Recomendado).**
+
 ## Pendências conhecidas
 
 As fases 2 a 4, abertas na R1.1, cada uma esperando a frente correspondente do `PLN-011`:
@@ -164,6 +225,6 @@ As fases 2 a 4, abertas na R1.1, cada uma esperando a frente correspondente do `
 
 ## Worklogs
 
-- 2026-11-03 — abertura: a issue da frente, o `PLN-010` e a R0 transcrita; R1 respondida, com as issues das fases 2
-  a 4. Parou na Rodada 2.
+- 2026-11-03 — abertura: a issue da frente, o `PLN-010` e a R0 transcrita; R1 e R2 respondidas, com as issues das fases 2
+  a 4 e o correio dos Pré-requisitos ao `studio-chats-cli`. Parou na espera da R5 do `PLN-011`.
   [O PLN-010: a abertura do `brza sessions` sobre o `brza chat`](../../work/worklogs/2026-11-03-pln-010-abertura-do-brza-sessions-sobre-o-brza-chat.md)

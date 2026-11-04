@@ -36,7 +36,21 @@ abrir o plano e seguir para a entrevista. Nenhum código.
   [PLN-011: Os chats do BrzA Studio se coordenam pela CLI, aparecem na navegação e chegam aos plugins](../../plans/PLN-011-chats-pela-cli-e-plugins/PLN-011-plan.md),
   `phase: interview`, com as cinco fases na ordem da prioridade e as rodadas do `playground` gravadas como R1 a R4.
 
+## A entrevista da fase 1
+
+- **Terreno** levantado por um `collector` no `brza-studio@8f41dd56a33`, com o agregado no scratch da sessão. O achado
+  que mudou o plano: o `#37774` toca só `mobile/`, `src/renderer/src/components/native-chat/` e `src/shared/`, e limpa
+  o rascunho do chat de terminal; o `brza chat send` fala com o host estruturado e não passa por ele. Conferido nesta
+  sessão pelo `gh api`. Também conferido aqui: o host lê a origem do coordenador no `agentSession.send`
+  (`structured-agent-session-send-compatibility.ts:10`), e a CLI só a manda em `agent.launch` (`src/cli/runtime/client.ts:58`).
+- **R5**, as quatro na recomendada: o `#37774` sai da fase 1 e chega no sync, reabrindo essa parte da R4.3; a base é o
+  porte do `#33115` estendido; cursor inválido sai com erro e a página `tail`; o motivo da fila vem de um `history tail`
+  depois de enfileirar.
+- **R6**, as quatro na recomendada: código de saída por estado (0, 1, 3), `--operation-id` para o retry, o contrato
+  inferido lendo o `fence` e a prova por unidade mais o caso C1 no app.
+- A issue da fase 1 deixou de pedir o porte do `#37774`.
+
 ## O que ficou aberto
 
-- A rodada R5, da fase 1, depois do levantamento do Terreno dela.
+- O Desenho e os Passos da fase 1, e então a entrevista da fase 2.
 - A issue de origem passa a `done` pelo `playground`, que lê estas pelo git.

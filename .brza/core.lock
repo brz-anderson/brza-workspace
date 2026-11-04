@@ -1,5 +1,5 @@
 # .brza/core.lock — gerado pelo brza sync; não edite
-commit = "c527e4280f21e7290775a6882c5c73a23220c888"
+commit = "3826f63887a3672d9d1e5ffb0a47187f38bc4a22"
 ref = "master"
 synced = "2026-11-03"
 
@@ -29,7 +29,7 @@ synced = "2026-11-03"
 ".gitattributes" = "sha256:6c7640100cad284568218e9edf6408e9819e424ba304fda738eb8c86641d935d"
 ".gitignore" = "sha256:bd8f1997fa84d6af967d7a5807e5c7aee0bedd3da752694141cdba0af74a9cc0"
 "AGENTS.md" = "sha256:c2798fe847073ed13627a1af03a6243ffb0233d279a9249211eb817a992a4fe8"
-"CLAUDE.md" = "sha256:5e4c86f0c2c803dc228e75dc1240add6487acec6dc23ced44c424b8a706ba4ec"
+"CLAUDE.md" = "sha256:5277f97319edda05703d2c234f836d4d1475ca0f99616e4fcaf319e9501f625a"
 "plans/README.md" = "sha256:b0e303605e158c5062274116faf5c09ee73b822d2687ce7cc4bb06a14fbc2f5c"
 "scripts/fact_outcome.py" = "sha256:ac87d22c1a849cb8965e36f9f1cc07d934c1da98c1963e0a8e80e62c547f740d"
 "scripts/summarize_measurements.py" = "sha256:2aadd8514de156d80582ff63178a7c2a68e1058a4a4f22332bda3c2353699372"

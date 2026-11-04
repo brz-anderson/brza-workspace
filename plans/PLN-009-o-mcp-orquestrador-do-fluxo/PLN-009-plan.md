@@ -20,9 +20,9 @@ tags:
 
 # PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients
 
-- **Retomar:** P1 a P8 `[x]`; C1 aprovado no launchd real (R7).
+- **Retomar:** P1 a P8 `[x]`; C1 aprovado no launchd real (R7); C4 aprovado pelo chat do Studio.
   Código em `brza-workflow@007383a`, branch `feat/pln-009-mcp`: MCP 358 OK (um pulado), CLI limpo 445 OK.
-  Faltam C2 a C4, com Anderson; confirmar o pré-requisito do C3 com a sessão do PLN-003; e a confirmação
+  Faltam C2 e C3, com Anderson; confirmar o pré-requisito do C3 com a sessão do PLN-003; e a confirmação
   de Anderson para o merge na `master` do `brza-workflow`. Depois do merge, `brza install --mcp --relink` do checkout
   principal, porque os links de `~/.local/bin` apontam o worktree da `feat`.
 
@@ -549,6 +549,7 @@ Estimado: 0,8 h · Executado: 0,8 h
   - **Antes, do terminal:** o pedido 1, de uma sessão fora do Studio, passou pelo gate e caiu no `run-create` com
     `session_caller_unknown`, sem efeito. Foi para
     [O dispatch aceita chamador fora do Studio](../../work/issues/o-dispatch-aceita-chamador-fora-do-studio.md).
+  - **Veredito:** aprovado (Anderson, 2026-11-03), com a issue do chamador fora do Studio como pendência.
 - **C3 — A fila pelo índice:** depois do PLN-003/P1, dois pedidos com `ref` de notas com `priority` e `deadline`.
 
 ## Regressão
@@ -658,6 +659,12 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 
 - 2026-11-03 — C1 no launchd real; R7; P8 (o `stop` apaga o plist) e o C1 refeito, aprovado.
   [O PLN-009: o C1 no launchd real e o stop que apaga o plist](../../work/worklogs/2026-11-03-pln-009-c1-no-launchd-real.md)
+
+- 2026-11-03 — issue dos três pareceres sem número REV, a pedido da `workspace-a6`.
+  [O PLN-009: a issue dos pareceres sem número REV](../../work/worklogs/2026-11-03-pln-009-issue-dos-pareceres-sem-rev.md)
+
+- 2026-11-03 — o MCP de pé, o `dispatch` do terminal recusado pelo Studio e o C4 aprovado pelo chat do Studio.
+  [O PLN-009: o MCP rodando e o C4 pelo chat do Studio](../../work/worklogs/2026-11-03-pln-009-c4-no-chat-do-studio.md)
 
 ## Revisões
 

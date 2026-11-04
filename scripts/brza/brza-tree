@@ -50,14 +50,41 @@ OWN_LOCKFILE = ('mobile',)
 NAME = re.compile(r'[a-z0-9][a-z0-9._-]*')
 
 
-def trees_dir() -> Path:
-    return runtime.STUDIO / '.worktrees'
+def is_workspace_repo(path: Path) -> bool:
+    return (path / 'plans').is_dir() and (path / 'work').is_dir()
 
 
-def registered() -> dict[Path, str | None]:
+def repo_root(cwd: Path | None = None) -> Path:
+    """A raiz do repositório git em foco, ou o checkout do brza-studio."""
+    target = (cwd or Path.cwd()).resolve()
+    try:
+        studio_root = runtime.STUDIO.resolve()
+        if target == studio_root or studio_root in target.parents:
+            return runtime.STUDIO
+    except Exception:
+        pass
+    try:
+        top = runtime.git('rev-parse', '--show-toplevel', cwd=target).strip()
+        if top:
+            p = Path(top).resolve()
+            if p.parent.name == '.worktrees':
+                p = p.parent.parent
+            if not is_workspace_repo(p):
+                return p
+    except runtime.BrzaError:
+        pass
+    return runtime.STUDIO
+
+
+def trees_dir(repo: Path | None = None) -> Path:
+    return (repo or repo_root()) / '.worktrees'
+
+
+def registered(repo: Path | None = None) -> dict[Path, str | None]:
     """Os worktrees do git worktree list, cada caminho com a branch, ou None quando está detached."""
+    r = repo or repo_root()
     trees, path = {}, None
-    for line in runtime.git('worktree', 'list', '--porcelain').splitlines():
+    for line in runtime.git('worktree', 'list', '--porcelain', cwd=r).splitlines():
         if line.startswith('worktree '):
             path = Path(line[len('worktree '):]).resolve()
             trees[path] = None
@@ -66,9 +93,10 @@ def registered() -> dict[Path, str | None]:
     return trees
 
 
-def fetch(required: bool = True):
+def fetch(repo: Path | None = None, required: bool = True):
+    r = repo or repo_root()
     try:
-        runtime.git('fetch', 'origin')
+        runtime.git('fetch', 'origin', cwd=r)
     except runtime.BrzaError as e:
         if required:
             raise
@@ -79,7 +107,7 @@ def dirty(path: Path) -> bool:
     return bool(runtime.git('status', '--porcelain', cwd=path).strip())
 
 
-def merged(path: Path) -> bool:
+def merged(path: Path, repo: Path | None = None) -> bool:
     try:
         runtime.git('merge-base', '--is-ancestor', 'HEAD', 'origin/master', cwd=path)
     except runtime.BrzaError:
@@ -87,11 +115,12 @@ def merged(path: Path) -> bool:
     return True
 
 
-def own_commits(branch: str) -> bool:
+def own_commits(branch: str, repo: Path | None = None) -> bool:
     """Se a branch andou depois de criada. Pelo reflog: ele começa em "branch: Created from …" e ganha uma linha por
     commit, rebase ou merge. Reflog vazio, ou expirado, conta como sem commit próprio, o lado seguro."""
+    r = repo or repo_root()
     try:
-        moves = runtime.git('reflog', 'show', '--format=%gs', f'refs/heads/{branch}').splitlines()
+        moves = runtime.git('reflog', 'show', '--format=%gs', f'refs/heads/{branch}', cwd=r).splitlines()
     except runtime.BrzaError:
         return False
     return any(not m.startswith('branch: ') for m in moves)
@@ -106,28 +135,42 @@ def contents(path: Path) -> str:
 
 
 def create(name: str, kind: str, base: str | None, chat: str | None) -> int:
-    path, branch = trees_dir() / name, f'{kind}/{name}'
+    repo = repo_root()
+    path, branch = trees_dir(repo) / name, f'{kind}/{name}'
     if path.exists():
         print(f'recusado: {path} já existe; use outro nome, ou brza tree --rm {name}')
         return 1
     try:
-        fetch()
-        runtime.worktree_add(path, base=base or 'origin/master', branch=branch, fetch=False)
+        fetch(repo)
+        if repo == runtime.STUDIO:
+            runtime.worktree_add(path, base=base or 'origin/master', branch=branch, fetch=False)
+        else:
+            runtime.git('worktree', 'add', *(('-b', branch) if branch else ('--detach',)), str(path), base or 'origin/master', cwd=repo)
     except runtime.BrzaError as e:
         print(f'falhou:   {e}')
         return 1
     print(f'worktree: {path}  ({branch}, de {base or "origin/master"})')
     if workstream_tree := link_memory(path, branch):
         link_agent_memory(path, workstream_tree)
-    packages = ['.', *(p for p in OWN_LOCKFILE if (path / p / 'pnpm-lock.yaml').exists())]
-    for package in packages:
-        try:
-            runtime.install_offline(path / package)
-        except runtime.BrzaError as e:
-            print(f'CHECK:    {e}')
-            print(f'          o worktree fica em {path}; rode em {path / package} `pnpm install --frozen-lockfile`')
-            return 1
-    print(f'install:  ok (offline: {", ".join("raiz" if p == "." else p for p in packages)})')
+    if repo == runtime.STUDIO:
+        packages = ['.', *(p for p in OWN_LOCKFILE if (path / p / 'pnpm-lock.yaml').exists())]
+        for package in packages:
+            try:
+                runtime.install_offline(path / package)
+            except runtime.BrzaError as e:
+                print(f'CHECK:    {e}')
+                print(f'          o worktree fica em {path}; rode em {path / package} `pnpm install --frozen-lockfile`')
+                return 1
+        print(f'install:  ok (offline: {", ".join("raiz" if p == "." else p for p in packages)})')
+    else:
+        if (path / 'pnpm-lock.yaml').exists():
+            try:
+                runtime.install_offline(path)
+                print('install:  ok (offline: raiz)')
+            except runtime.BrzaError as e:
+                print(f'CHECK:    {e}')
+                print(f'          o worktree fica em {path}; rode em {path} `pnpm install --frozen-lockfile`')
+                return 1
     if chat:
         r = subprocess.run([str(SESSIONS), chat, '--checkout', str(path)])
         if r.returncode != 0:
@@ -184,8 +227,9 @@ def link_agent_memory(path: Path, workstream_tree: Path):
 
 
 def remove(name: str, force: bool, empty: bool) -> int:
-    path = trees_dir() / name
-    trees = registered()
+    repo = repo_root()
+    path = trees_dir(repo) / name
+    trees = registered(repo)
     resolved = path.resolve()
     if resolved not in trees:
         if not path.is_dir():
@@ -201,14 +245,14 @@ def remove(name: str, force: bool, empty: bool) -> int:
         return 0
 
     branch = trees[resolved]
-    fetch()
+    fetch(repo)
     # O --force passa pelo que perde trabalho; o --empty, só pela branch vazia, que é o worktree de prova.
     forced, emptied = [], []
     if dirty(path):
         forced.append('o worktree está sujo')
-    if not merged(path):
+    if not merged(path, repo):
         forced.append('o HEAD não está na origin/master')
-    elif branch and not own_commits(branch):
+    elif branch and not own_commits(branch, repo):
         emptied.append(f'a branch {branch} está sem commit próprio, e pode ser trabalho que nem começou')
     target = f'{path}{f" e a branch {branch}" if branch else ""}'
     refused = False
@@ -222,23 +266,24 @@ def remove(name: str, force: bool, empty: bool) -> int:
         return 1
     for reason in forced + emptied:
         print(f'descartado: {reason}')
-    runtime.git('worktree', 'remove', *(('--force',) if forced else ()), str(path))
+    runtime.git('worktree', 'remove', *(('--force',) if forced else ()), str(path), cwd=repo)
     print(f'removido: {path}')
     if branch:
-        runtime.git('branch', '-D', branch)
+        runtime.git('branch', '-D', branch, cwd=repo)
         print(f'removido: a branch {branch}')
     return 0
 
 
 def list_trees() -> int:
-    fetch(required=False)
-    trees = registered()
-    root = trees_dir().resolve()
+    repo = repo_root()
+    fetch(repo, required=False)
+    trees = registered(repo)
+    root = trees_dir(repo).resolve()
     names = {p.name for p in trees if p.parent == root}
     if root.is_dir():
         names |= {p.name for p in root.iterdir() if p.is_dir()}
     if not names:
-        print(f'nenhum worktree em {trees_dir()}')
+        print(f'nenhum worktree em {trees_dir(repo)}')
         return 0
     width = max(map(len, names))
     for name in sorted(names):

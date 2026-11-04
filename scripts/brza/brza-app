@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
-"""Constrói o BrzA Studio e o instala em /Applications.
+"""Constrói ou baixa o BrzA Studio e o instala em /Applications.
 
-  brza-app install [--from <checkout>] [--dmg] [--yes] [--clean]
-      constrói o app num worktree temporário da origin/master, depois de git fetch origin e do install offline, ou no
-      checkout de --from, com pnpm build:mac [--dmg]. Pergunta antes de substituir /Applications/BrzA Studio.app, apaga
-      o antigo e copia o novo com ditto. Com o app aberto, recusa sem --yes; --yes também pula a pergunta. --dmg copia
-      o .dmg para ~/Downloads. --clean apaga o dist no fim. O worktree temporário sai no fim, também quando o
-      build falha.
+  brza-app install [--from-source] [--from <checkout>] [--dmg] [--yes] [--clean]
+      por padrão, baixa o DMG da última release do GitHub (brz-anderson/brza-studio), monta e instala em
+      /Applications/BrzA Studio.app. Com --from-source (ou --from <checkout>), constrói da origin/master num
+      worktree temporário (ou no checkout dado), depois de git fetch origin e do install offline, com pnpm
+      build:mac [--dmg]. Pergunta antes de substituir /Applications/BrzA Studio.app, apaga o antigo e copia o novo
+      com ditto. Com o app aberto, recusa sem --yes; --yes também pula a pergunta. --dmg copia o .dmg para
+      ~/Downloads. --clean apaga o dist no fim.
 
 Saídas: 0 instalado; 1 falhou, cancelado ou interrompido; 2 uso errado, ou o app aberto sem --yes. A troca que falha
-ou é interrompida depois de apagar o app antigo — o ditto com erro, o rmtree parcial, o Ctrl-C — deixa o worktree
-temporário onde está, com o app novo, e imprime o ditto a repetir.
+ou é interrompida depois de apagar o app antigo — o ditto com erro, o rmtree parcial, o Ctrl-C — deixa o app novo onde
+está e imprime o ditto a repetir.
 
 A primeira instalação, e toda instalação que troca o app em uso, roda de um terminal fora do app, com ele fechado: o
 chat e o `brza` do PATH dele são do próprio app.
 """
 import argparse
+import json
 import os
 import platform
 import plistlib
@@ -23,6 +25,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import urllib.request
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -128,7 +131,120 @@ def install(src: Path, dmg: bool, yes: bool, swapping=lambda: None) -> tuple[int
     return 0, False
 
 
-def run(checkout: Path | None, dmg: bool, yes: bool, clean: bool) -> int:
+def fetch_latest_release(repo: str = 'brz-anderson/brza-studio') -> dict:
+    url = f'https://api.github.com/repos/{repo}/releases/latest'
+    headers = {'User-Agent': 'brza-app', 'Accept': 'application/vnd.github.v3+json'}
+    token = os.environ.get('GITHUB_TOKEN') or os.environ.get('GH_TOKEN')
+    if token:
+        headers['Authorization'] = f'Bearer {token}'
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read().decode('utf-8'))
+    except Exception as e:
+        raise runtime.BrzaError(f'falha ao buscar release do GitHub ({url}): {e}') from e
+
+
+def download_file(url: str, dest: Path):
+    headers = {'User-Agent': 'brza-app'}
+    token = os.environ.get('GITHUB_TOKEN') or os.environ.get('GH_TOKEN')
+    if token:
+        headers['Authorization'] = f'Bearer {token}'
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=120) as resp, open(dest, 'wb') as f:
+        shutil.copyfileobj(resp, f)
+
+
+def mount_dmg(dmg_path: Path) -> Path:
+    r = subprocess.run(['hdiutil', 'attach', '-plist', '-nobrowse', '-readonly', str(dmg_path)],
+                       capture_output=True, check=True)
+    data = plistlib.loads(r.stdout)
+    for entity in data.get('system-entities', []):
+        if 'mount-point' in entity:
+            return Path(entity['mount-point'])
+    raise runtime.BrzaError(f'hdiutil attach não retornou ponto de montagem para {dmg_path}')
+
+
+def unmount_dmg(mount_point: Path) -> bool:
+    r = subprocess.run(['hdiutil', 'detach', str(mount_point), '-force'], capture_output=True)
+    return r.returncode == 0
+
+
+def find_release_dmg_asset(release_data: dict) -> tuple[str, str]:
+    assets = release_data.get('assets', [])
+    dmg_assets = [a for a in assets if a.get('name', '').endswith('.dmg')]
+    if not dmg_assets:
+        raise runtime.BrzaError('nenhum arquivo .dmg encontrado na última release')
+    if platform.machine() == 'arm64':
+        for a in dmg_assets:
+            if 'arm64' in a.get('name', '').lower():
+                return a['name'], a['browser_download_url']
+    return dmg_assets[0]['name'], dmg_assets[0]['browser_download_url']
+
+
+def install_release(dmg: bool, yes: bool) -> int:
+    if not yes and refuse_open():
+        return 2
+    try:
+        print('release:  buscando última release de brz-anderson/brza-studio...')
+        release_data = fetch_latest_release()
+        tag = release_data.get('tag_name', '?')
+        asset_name, asset_url = find_release_dmg_asset(release_data)
+        print(f'release:  {tag} ({asset_name})')
+
+        temp_dir = Path(tempfile.mkdtemp(prefix='brza-app-release-'))
+        dmg_path = temp_dir / asset_name
+        mount_point = None
+        try:
+            print(f'download: baixando {asset_name}...')
+            download_file(asset_url, dmg_path)
+            print('download: concluído')
+
+            print(f'dmg:      montando {dmg_path.name}...')
+            mount_point = mount_dmg(dmg_path)
+
+            apps = list(mount_point.glob('*.app'))
+            if not apps:
+                raise runtime.BrzaError(f'nenhum .app encontrado no DMG montado em {mount_point}')
+            new_app = apps[0]
+            print(f'dmg:      {new_app.name} ({version(new_app)})')
+
+            if not yes:
+                if refuse_open():
+                    return 2
+                installed = f'a {version(APP)}' if APP.exists() else 'nenhuma'
+                if not ask(f'Instalar a {version(new_app)} em {APP}? A instalada é {installed}.'):
+                    print('cancelado: o app instalado não mudou')
+                    return 1
+
+            try:
+                if APP.exists():
+                    shutil.rmtree(APP)
+                copied = ditto(new_app, APP)
+            except OSError as e:
+                print(f'falhou:   a troca do app parou ({e})')
+                copied = False
+
+            if not copied:
+                print(f'falhou:   o ditto não copiou o app, e o antigo já foi apagado. Repita:\n'
+                      f"          ditto '{new_app}' '{APP}'")
+                return 1
+
+            print(f'instalado: {APP}  ({version(APP)})')
+            if dmg:
+                shutil.copy2(dmg_path, DOWNLOADS / asset_name)
+                print(f'dmg:      {DOWNLOADS / asset_name}')
+            return 0
+        finally:
+            if mount_point is not None:
+                unmount_dmg(mount_point)
+            shutil.rmtree(temp_dir, ignore_errors=True)
+    except runtime.BrzaError as e:
+        print(f'falhou:   {e}')
+        return 1
+
+
+def run_from_source(checkout: Path | None, dmg: bool, yes: bool, clean: bool) -> int:
     if not yes and refuse_open():
         return 2
     if checkout is not None:
@@ -171,13 +287,21 @@ def run(checkout: Path | None, dmg: bool, yes: bool, clean: bool) -> int:
             shutil.rmtree(temp, ignore_errors=True)
 
 
+def run(checkout: Path | None, dmg: bool, yes: bool, clean: bool, from_source: bool = False) -> int:
+    if from_source or checkout is not None:
+        return run_from_source(checkout, dmg, yes, clean)
+    return install_release(dmg, yes)
+
+
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(prog='brza app', description='Constrói o BrzA Studio e o instala em /Applications.')
+    ap = argparse.ArgumentParser(prog='brza app', description='Constrói ou baixa o BrzA Studio e o instala em /Applications.')
     sub = ap.add_subparsers(dest='command', required=True)
-    inst = sub.add_parser('install', help='constrói da origin/master, ou de --from, e instala em /Applications')
+    inst = sub.add_parser('install', help='baixa da release mais recente (padrão) ou constrói (--from-source) e instala em /Applications')
+    inst.add_argument('--from-source', action='store_true',
+                      help='constrói da origin/master (ou de --from) em vez de baixar a release')
     inst.add_argument('--from', dest='checkout', type=Path, metavar='CHECKOUT',
-                      help='constrói neste checkout em vez de um worktree temporário da origin/master')
-    inst.add_argument('--dmg', action='store_true', help='gera também o .dmg e o copia para ~/Downloads')
+                      help='constrói neste checkout em vez de um worktree temporário da origin/master (implica --from-source)')
+    inst.add_argument('--dmg', action='store_true', help='gera/copia também o .dmg para ~/Downloads')
     inst.add_argument('--yes', action='store_true', help='não pergunta, e instala mesmo com o app aberto')
     inst.add_argument('--clean', action='store_true',
                       help='apaga o dist no fim; sem --from, o worktree temporário já sai com ele')
@@ -187,7 +311,8 @@ def main(argv: list[str] | None = None) -> int:
         args.checkout = args.checkout.expanduser().resolve()
         if not (args.checkout / 'package.json').is_file():
             ap.error(f'--from: {args.checkout} não é um checkout do brza-studio')
-    return run(args.checkout, args.dmg, args.yes, args.clean)
+    return run(args.checkout, args.dmg, args.yes, args.clean, from_source=args.from_source)
+
 
 
 if __name__ == '__main__':

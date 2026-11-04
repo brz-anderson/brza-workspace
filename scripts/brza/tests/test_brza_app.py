@@ -62,6 +62,8 @@ class AppInstallTest(unittest.TestCase):
         self.downloads.mkdir()
         self.tmp = self.base / 'tmp'
         self.tmp.mkdir()
+        self.mount_dir = self.base / 'mount'
+        self.mount_app = self.mount_dir / 'BrzA Studio.app'
 
         self.events = []
         self.pids, self.pids_after_build = [], None
@@ -73,9 +75,38 @@ class AppInstallTest(unittest.TestCase):
                   patch.object(tempfile, 'tempdir', str(self.tmp)),
                   patch.dict(GLOBALS, {'APP': self.app, 'DOWNLOADS': self.downloads, 'app_pids': self.fake_pids,
                                        'build': self.fake_build, 'ask': self.fake_ask,
-                                       'ditto': self.spy_ditto(GLOBALS['ditto'])})):
+                                       'ditto': self.spy_ditto(GLOBALS['ditto']),
+                                       'fetch_latest_release': self.fake_fetch_release,
+                                       'download_file': self.fake_download_file,
+                                       'mount_dmg': self.fake_mount_dmg,
+                                       'unmount_dmg': self.fake_unmount_dmg})):
             p.start()
             self.addCleanup(p.stop)
+
+    def fake_fetch_release(self, repo='brz-anderson/brza-studio'):
+        self.events.append('fetch_release')
+        return {
+            'tag_name': 'v2.1.0',
+            'assets': [
+                {'name': 'BrzA Studio-2.1.0-mac-arm64.dmg',
+                 'browser_download_url': 'https://example.com/BrzA-Studio-2.1.0-mac-arm64.dmg'}
+            ]
+        }
+
+    def fake_download_file(self, url, dest):
+        self.events.append(f'download {url}')
+        dest.write_text('dmg-content')
+
+    def fake_mount_dmg(self, dmg_path):
+        self.events.append(f'mount {dmg_path.name}')
+        self.mount_dir.mkdir(parents=True, exist_ok=True)
+        make_app(self.mount_app, '2.1.0-release')
+        return self.mount_dir
+
+    def fake_unmount_dmg(self, mount_point):
+        self.events.append('unmount')
+        shutil.rmtree(mount_point, ignore_errors=True)
+        return True
 
     def fake_install(self, path: Path):
         self.events.append('install')
@@ -130,8 +161,21 @@ class AppInstallTest(unittest.TestCase):
 
     # o caminho feliz
 
-    def test_builds_fetched_origin_master_in_temp_worktree_asks_and_replaces_app(self):
+    def test_installs_release_by_default_downloads_mounts_asks_and_replaces_app(self):
         code, out = self.run_app()
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.events, ['fetch_release',
+                                       'download https://example.com/BrzA-Studio-2.1.0-mac-arm64.dmg',
+                                       'mount BrzA Studio-2.1.0-mac-arm64.dmg',
+                                       'ask', 'ditto', 'unmount'])
+        self.assertIn('2.1.0-release', self.question)
+        self.assertIn('1.0.0-velho', self.question)
+        self.assertEqual(self.installed_version(), '2.1.0-release')
+        self.assertFalse((self.app / 'Contents' / 'so-no-velho').exists())
+        self.assert_temp_gone()
+
+    def test_builds_fetched_origin_master_in_temp_worktree_with_from_source(self):
+        code, out = self.run_app('--from-source')
         self.assertEqual(code, 0, out)
         src, head = self.built_in[0]
         self.assertEqual(head, self.tip)
@@ -157,7 +201,7 @@ class AppInstallTest(unittest.TestCase):
         code, out = self.run_app()
         self.assertEqual(code, 0, out)
         self.assertIn('nenhuma', self.question)
-        self.assertEqual(self.installed_version(), '2.0.0-novo')
+        self.assertEqual(self.installed_version(), '2.1.0-release')
 
     # o app aberto
 
@@ -172,7 +216,7 @@ class AppInstallTest(unittest.TestCase):
 
     def test_refuses_app_opened_during_build(self):
         self.pids_after_build = [4242]
-        code, out = self.run_app()
+        code, out = self.run_app('--from-source')
         self.assertEqual(code, 2, out)
         self.assertNotIn('ditto', self.events)
         self.assertEqual(self.installed_version(), '1.0.0-velho')
@@ -183,7 +227,7 @@ class AppInstallTest(unittest.TestCase):
         code, out = self.run_app('--yes')
         self.assertEqual(code, 0, out)
         self.assertNotIn('ask', self.events)
-        self.assertEqual(self.installed_version(), '2.0.0-novo')
+        self.assertEqual(self.installed_version(), '2.1.0-release')
 
     def test_app_pids_leaves_out_this_process_and_its_parents(self):
         def fake_run(cmd, **kwargs):
@@ -203,7 +247,7 @@ class AppInstallTest(unittest.TestCase):
 
     def test_failed_build_removes_temp_worktree_and_keeps_app(self):
         self.build_ok = False
-        code, out = self.run_app()
+        code, out = self.run_app('--from-source')
         self.assertEqual(code, 1, out)
         self.assertNotIn('ask', self.events)
         self.assertEqual(self.installed_version(), '1.0.0-velho')
@@ -211,7 +255,7 @@ class AppInstallTest(unittest.TestCase):
 
     def test_failed_offline_install_removes_temp_worktree(self):
         self.install_error = 'o install offline falhou'
-        code, out = self.run_app()
+        code, out = self.run_app('--from-source')
         self.assertEqual(code, 1, out)
         self.assertIn('o install offline falhou', out)
         self.assertEqual(self.built_in, [])
@@ -219,7 +263,7 @@ class AppInstallTest(unittest.TestCase):
 
     def test_failed_ditto_keeps_temp_worktree_and_prints_the_ditto(self):
         with patch.dict(GLOBALS, {'ditto': lambda source, target: False}):
-            code, out = self.run_app()
+            code, out = self.run_app('--from-source')
         self.assertEqual(code, 1, out)
         src = self.built_in[0][0]
         self.assertIn(f"ditto '{GLOBALS['built_app'](src)}' '{self.app}'", out)
@@ -235,7 +279,7 @@ class AppInstallTest(unittest.TestCase):
                     raise error
 
                 with patch.dict(GLOBALS, {'ditto': broken}):
-                    code, out = self.run_app()
+                    code, out = self.run_app('--from-source')
                 self.assertEqual(code, 1, out)
                 src = self.built_in[0][0]
                 self.assertTrue(GLOBALS['built_app'](src).is_dir())
@@ -278,12 +322,19 @@ class AppInstallTest(unittest.TestCase):
         self.assertEqual(code, 2, out)
         self.assertEqual(self.events, [])
 
-    def test_dmg_builds_with_dmg_and_copies_it_to_downloads(self):
+    def test_dmg_release_copies_it_to_downloads(self):
         code, out = self.run_app('--dmg', '--yes')
+        self.assertEqual(code, 0, out)
+        self.assertTrue((self.downloads / 'BrzA Studio-2.1.0-mac-arm64.dmg').is_file())
+        self.assert_temp_gone()
+
+    def test_dmg_from_source_builds_with_dmg_and_copies_it_to_downloads(self):
+        code, out = self.run_app('--from-source', '--dmg', '--yes')
         self.assertEqual(code, 0, out)
         self.assertIn('build dmg=True', self.events)
         self.assertEqual((self.downloads / 'brza-studio-macos-arm64.dmg').read_text(), 'dmg')
         self.assert_temp_gone()
+
 
 
 if __name__ == '__main__':

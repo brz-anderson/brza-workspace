@@ -148,7 +148,7 @@ class TreeTest(TreeBase):
     def test_chat_opens_the_session_in_the_worktree(self):
         calls = self.base / 'calls'
         fake = self.base / 'brza-sessions'
-        fake.write_text(f'#!/bin/sh\necho "$*" > {calls}\n')
+        fake.write_text(f'#!/bin/sh\necho "$*" > "{calls}"\n')
         fake.chmod(0o755)
         with patch.dict(GLOBALS, {'SESSIONS': fake}):
             code, out = self.run_tree('x', '--chat', 'pln-009-p1')
@@ -385,6 +385,46 @@ class MemoryTest(TreeBase):
         code, out = self.run_tree('y')
         self.assertFalse((self.tree('y') / '.claude' / 'agent-memory').exists())
         self.assertFalse((self.stream / '.claude' / 'agent-memory').exists())
+
+
+class GeneralRepoTreeTest(unittest.TestCase):
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.base = Path(temp.name).resolve()
+        origin = self.base / 'origin.git'
+        self.repo = self.base / 'other-repo'
+        subprocess.run(['git', 'init', '-q', '--bare', '-b', 'master', str(origin)], check=True)
+        subprocess.run(['git', 'clone', '-q', str(origin), str(self.repo)], check=True, capture_output=True)
+        git('commit', '-q', '--allow-empty', '-m', 'initial', cwd=self.repo)
+        git('push', '-q', 'origin', 'HEAD:master', cwd=self.repo)
+
+    def run_tree(self, *argv, cwd=None) -> tuple[int, str]:
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out), \
+                contextlib.chdir(cwd or self.repo):
+            try:
+                code = GLOBALS['main'](list(argv))
+            except SystemExit as e:
+                code = e.code
+        return code, out.getvalue()
+
+    def test_creates_worktree_in_any_git_repository(self):
+        code, out = self.run_tree('feature-1')
+        self.assertEqual(code, 0, out)
+        tree_path = self.repo / '.worktrees' / 'feature-1'
+        self.assertTrue(tree_path.is_dir())
+        self.assertIn(str(tree_path), out)
+
+    def test_list_and_rm_in_any_git_repository(self):
+        self.run_tree('feature-2')
+        code, out = self.run_tree('--list')
+        self.assertEqual(code, 0, out)
+        self.assertIn('feature-2', out)
+
+        code, out = self.run_tree('--rm', 'feature-2', '--empty')
+        self.assertEqual(code, 0, out)
+        self.assertFalse((self.repo / '.worktrees' / 'feature-2').exists())
 
 
 if __name__ == '__main__':

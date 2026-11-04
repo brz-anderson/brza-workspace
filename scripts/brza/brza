@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+"""CLI unificada do BrzA. Despacha comandos internos, subcomandos brza-* e comandos do client ativo.
+
+Uso:
+  brza <subcomando> [argumentos...]
+  brza --version | -v
+  brza --help | -h
+"""
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+VERSION = '1.0.0'
+HERE = Path(__file__).resolve().parent
+
+STUDIO_APP_BIN = Path('/Applications/BrzA Studio.app/Contents/Resources/bin/brza')
+ORCA_APP_BIN = Path('/Applications/Orca.app/Contents/Resources/bin/orca')
+
+KNOWN_SUBCOMMANDS = (
+    'tree', 'test', 'app', 'dev', 'shot', 'note', 'init', 'sync',
+    'doctor', 'install', 'mcp', 'quota', 'sessions', 'run', 'print',
+    'devices', 'where', 'register',
+)
+
+
+def is_app_running(app_name: str) -> bool:
+    """Verifica se o processo do aplicativo está em execução."""
+    try:
+        r = subprocess.run(['pgrep', '-x', app_name], capture_output=True)
+        return r.returncode == 0
+    except OSError:
+        return False
+
+
+def detect_client(env: dict | None = None) -> str:
+    """Detecta se o client ativo é 'studio' ou 'orca'."""
+    e = os.environ if env is None else env
+
+    # 1. Variável explícita de controle
+    if client := e.get('BRZA_CLIENT'):
+        client = client.strip().lower()
+        if client in ('studio', 'brza-studio'):
+            return 'studio'
+        if client == 'orca':
+            return 'orca'
+
+    # 2. Variáveis de ambiente herdadas do client
+    orca_vars = ('ORCA_USER_DATA_PATH', 'ORCA_VERSION', 'ORCA_AGENT_SESSION_ID', 'ORCA_CHAT_SCRATCH_DIR')
+    if any(k in e for k in orca_vars):
+        return 'orca'
+
+    studio_vars = ('BRZA_STUDIO_USER_DATA_PATH', 'BRZA_STUDIO_VERSION')
+    if any(k in e for k in studio_vars):
+        return 'studio'
+
+    # 3. Processo vivo na máquina
+    orca_alive = is_app_running('Orca')
+    studio_alive = is_app_running('BrzA Studio')
+    if orca_alive and not studio_alive:
+        return 'orca'
+    if studio_alive and not orca_alive:
+        return 'studio'
+
+    # 4. Fallback padrão
+    return 'studio'
+
+
+def find_subcommand_binary(subcmd: str) -> Path | None:
+    """Procura por um executável brza-<subcomando> no diretório atual, em ~/.local/bin ou no PATH."""
+    bin_name = f'brza-{subcmd}'
+
+    # No mesmo diretório deste script
+    local = HERE / bin_name
+    if local.is_file() and os.access(local, os.X_OK):
+        return local
+
+    # Em ~/.local/bin
+    user_bin = Path.home() / '.local' / 'bin' / bin_name
+    if user_bin.is_file() and os.access(user_bin, os.X_OK):
+        return user_bin
+
+    # No PATH
+    which_path = shutil.which(bin_name)
+    if which_path:
+        p = Path(which_path)
+        if p.is_file() and os.access(p, os.X_OK):
+            return p
+
+    return None
+
+
+def find_client_cli(client: str) -> Path | None:
+    """Localiza o binário CLI do client especificado ('studio' ou 'orca')."""
+    if client == 'orca':
+        which_orca = shutil.which('orca')
+        if which_orca:
+            return Path(which_orca)
+        if ORCA_APP_BIN.is_file() and os.access(ORCA_APP_BIN, os.X_OK):
+            return ORCA_APP_BIN
+        return None
+
+    if client == 'studio':
+        if STUDIO_APP_BIN.is_file() and os.access(STUDIO_APP_BIN, os.X_OK):
+            return STUDIO_APP_BIN
+        # Tenta achar 'brza' no PATH que não seja este próprio script
+        which_brza = shutil.which('brza')
+        if which_brza:
+            p = Path(which_brza).resolve()
+            if p != HERE / 'brza' and p.is_file() and os.access(p, os.X_OK):
+                return p
+        return None
+
+    return None
+
+
+def show_help():
+    subcmds = ', '.join(sorted(KNOWN_SUBCOMMANDS))
+    print(f"""Uso: brza <subcomando> [argumentos...]
+
+A CLI unificada do BrzA despacha comandos para ferramentas do ecossistema e para o client ativo (BrzA Studio ou Orca).
+
+Subcomandos integrados:
+  {subcmds}
+
+Opções globais:
+  -v, --version   Mostra a versão do brza
+  -h, --help      Mostra esta ajuda
+""")
+
+
+def run_proc(cmd: list[str]) -> int:
+    """Executa o subprocesso e repassa a saída para sys.stdout."""
+    # Se stdin/stdout forem pipes ou StringIO, lemos e escrevemos para sys.stdout
+    r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    if r.stdout:
+        sys.stdout.write(r.stdout)
+        sys.stdout.flush()
+    return r.returncode
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = sys.argv[1:] if argv is None else argv
+
+    if not args:
+        show_help()
+        return 2
+
+    first = args[0]
+
+    if first in ('-v', '--version'):
+        print(f'brza {VERSION}')
+        return 0
+
+    if first in ('-h', '--help'):
+        show_help()
+        return 0
+
+    subcmd = first
+    sub_args = args[1:]
+
+    # 1. Tenta achar executável brza-<subcomando>
+    if bin_path := find_subcommand_binary(subcmd):
+        return run_proc([str(bin_path), *sub_args])
+
+    # 2. Despacho hierárquico ao CLI do client detectado
+    client = detect_client()
+    client_bin = find_client_cli(client)
+
+    if client_bin:
+        return run_proc([str(client_bin), subcmd, *sub_args])
+
+    client_label = 'Orca' if client == 'orca' else 'BrzA Studio'
+    location = ORCA_APP_BIN if client == 'orca' else STUDIO_APP_BIN
+    print(f"falhou: comando '{subcmd}' desconhecido e o CLI do {client_label} não foi encontrado em {location}",
+          file=sys.stderr)
+    return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())

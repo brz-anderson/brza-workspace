@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #37896 e as issues #37892, #37899, #37838 e #37903 trazem suporte a repositórios vinculados no Source Control, respeito a ORCA_WORKTREE_ID na CLI e abertura de arquivos em split.
+description: Os PRs #37896, #38086, #38063 e #38055 e as issues #37892, #37899 e #37838 trazem suporte a repositórios vinculados, escopo canônico de worktree na CLI e membership durável de abas.
 scope:
   - brza-studio
   - workspace
@@ -13,41 +13,51 @@ tags:
 
 # Repositórios vinculados no Source Control e escopo de worktree na CLI
 
-Rastreado do PR aberto no upstream [`stablyai/orca#37896`](https://github.com/stablyai/orca/pull/37896) (Issue
-[`#37892`](https://github.com/stablyai/orca/issues/37892)) e das issues
-[`stablyai/orca#37899`](https://github.com/stablyai/orca/issues/37899),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#38086`](https://github.com/stablyai/orca/pull/38086),
+[`stablyai/orca#38063`](https://github.com/stablyai/orca/pull/38063),
+[`stablyai/orca#38055`](https://github.com/stablyai/orca/pull/38055),
+[`stablyai/orca#38072`](https://github.com/stablyai/orca/pull/38072),
+[`stablyai/orca#37896`](https://github.com/stablyai/orca/pull/37896) (Issue [`#37892`](https://github.com/stablyai/orca/issues/37892))
+e das issues [`stablyai/orca#37899`](https://github.com/stablyai/orca/issues/37899),
 [`stablyai/orca#37838`](https://github.com/stablyai/orca/issues/37838) e
 [`stablyai/orca#37903`](https://github.com/stablyai/orca/issues/37903).
 
 ## O problema
 
-1. **Alterações multi-repositório invisíveis no Source Control (`#37896`, `#37892`):** quando um agente operando em um
+1. **Desvio de abas para worktrees alheios fora do cwd gerenciado (`#37899`, `#38086`):** quando um agente no terminal
+   executava `cd /tmp && brza tab create ...` ou outros comandos de navegador/terminal, o comando não conseguia resolver
+   um worktree pelo diretório atual e caía silenciosamente no worktree atualmente focado na janela do usuário, em vez de
+   permanecer no worktree do terminal que fez a chamada.
+2. **Inconsistências de membership entre abas e workspaces (`#38063`):** atrasos na gravação de janelas, criação de
+   terminais e visibilidade de chat podiam divergir sobre a qual workspace uma aba pertencia, gerando reabertura incorreta
+   de abas fechadas ou substituição de abas durante reinicializações e restaurações.
+3. **Perda de escopo de workspace em comandos de browser e links remotos (`#38055`, `#38072`):** comandos CLI de navegador
+   disparados fora de checkouts perdiam o contexto do workspace do terminal, e links clicados a partir de terminais de
+   servidores pareados podiam abrir no workspace errado da janela desktop.
+4. **Alterações multi-repositório invisíveis no Source Control (`#37896`, `#37892`):** quando um agente operando em um
    workspace modifica arquivos em outro repositório aberto no app (ex.: uma biblioteca compartilhada, sub-repositório
-   ou pasta irmã), essas mudanças não apareciam no painel de controle de versão do workspace ativo. Era necessário
-   trocar manualmente de workspace para revisar, preparar (stage) e commitar as alterações, quebrando o fluxo de trabalho.
-2. **Desvio de abas para worktrees alheios fora do cwd gerenciado (`#37899`):** comandos CLI como `brza tab create`
-   decidiam o worktree de destino estritamente com base no diretório atual (`cwd`). Se um agente executasse comandos fora
-   de um worktree gerenciado (ex.: após `cd /tmp`), o comando ignorava as variáveis de ambiente exportadas
-   `ORCA_WORKTREE_ID` e `ORCA_WORKSPACE_ID` e criava a aba silenciosamente no worktree ativo da janela no momento,
-   misturando contextos de projetos.
-3. **Falta de opção de abertura de documentos em split na CLI (`#37838`):** ao pedir que o agente abra notas ou
-   documentações de pesquisa via `brza file open`, as abas se acumulavam no mesmo grupo de abas dos chats ativos,
-   misturando conversas e documentos sem opção de abrir diretamente em um split lateral dedicado de leitura.
-4. **Impossibilidade de abrir novo worktree em modo Chat quando o padrão é Terminal (`#37903`):** o modal de criação de
-   worktree oferecia apenas linhas `(CLI)` se o padrão global do agente estivesse em Terminal, sem permitir selecionar
-   superfície Chat para aquele worktree específico.
+   ou pasta irmã), essas mudanças não apareciam no painel de controle de versão do workspace ativo.
+5. **Falta de opção de abertura de documentos em split na CLI (`#37838`):** ao pedir que o agente abra notas ou
+   documentações de pesquisa via `brza file open`, as abas se acumulavam no mesmo grupo de abas dos chats ativos.
 
-## O que o upstream implementa
+## O que o upstream implementa e corrige
 
-- **Repositórios vinculados no Source Control (`#37896`):** adiciona a seção "Linked repositories" no painel de Source
-  Control, listando automaticamente projetos detectados com modificações e permitindo diff, stage, descarte e commit
-  direto na interface do workspace em foco, com opção de ligar/desligar em configurações (`Settings → Git → Linked Repositories`).
-- **Respeito às variáveis de ambiente de worktree (`#37899`):** faz `tab create` e comandos semelhantes honrarem
-  `ORCA_WORKTREE_ID` mesmo quando o `cwd` do processo estiver em `/tmp` ou fora da árvore do projeto.
-- **Abertura em split e seleção de superfície (`#37838`, `#37903`):** propõe `file open --split right|left|down` para
-  manter painéis de leitura de artefatos ao lado do chat e introduz controle de superfície individual na criação de worktrees.
+- **Resolução de worktree pelo terminal chamador (`#38086`, resolve `#37899`):**
+  - Implementa `callerTerminalWorkspaceSelector`: quando o lookup por `cwd` não encontra nenhum worktree gerenciado, a CLI
+    recorre a `ORCA_WORKTREE_ID` e `ORCA_WORKSPACE_ID` para direcionar a criação de abas e comandos (`tab create`,
+    `open-url`, etc.) ao workspace do terminal chamador.
+- **Canonicidade e transacionalidade de membership de workspaces (`#38063`):**
+  - Estabelece um registro canônico durável de pertença de terminais e native-chats por host;
+  - Gravações de layout comparam o estado observado antes de aplicar modificações, impedindo que saves atrasados
+    substituam abas mais novas ou reabram conteúdos fechados;
+  - Serve como alicerce transacional para a alternância de superfícies entre Chat UI e Terminal (`#31595`).
+- **Retenção de workspace em browser e links remotos (`#38055`, `#38072`):**
+  - Mantém o workspace do terminal para comandos de browser e garante que links de arquivos abram no workspace exato do clique.
+- **Repositórios vinculados no Source Control (`#37896`):**
+  - Adiciona a seção "Linked repositories" no painel de Source Control, listando projetos modificados e permitindo diff,
+    stage e commit sem chavear de janela.
 
 ## O que fazer
 
-Portar a funcionalidade de repositórios vinculados (`#37896`) para o `brza-studio`, corrigir a resolução de
-`ORCA_WORKTREE_ID` em scripts e automações do `brza-workflow` e adotar a abertura em split para visualização de relatórios.
+Portar os PRs `#38086` e `#38063` para o `brza-studio` para blindar a integridade de workspaces em comandos CLI de
+background do `brza-workflow` e viabilizar a alternância in-place entre terminais e chat.

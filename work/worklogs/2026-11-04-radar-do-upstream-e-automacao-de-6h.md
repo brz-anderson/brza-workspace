@@ -11,16 +11,18 @@ refs:
   - issue:abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao
   - issue:gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
+  - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
+  - issue:repositorios-vinculados-no-source-control-e-escopo-de-worktree-na-cli
   - issue:seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes
   - issue:subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent
   - issue:workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh
 ---
 
-# Radar de issues e PRs do upstream e automação de 6h (00:00 BRT)
+# Radar de issues e PRs do upstream e automação de 6h (00h e 06h BRT)
 
 ## O que foi feito
 
-### Ciclo de 6h (00:00 BRT / 03:00 UTC em 2026-11-04)
+### 1. Ciclo de 6h (00:00 BRT / 03:00 UTC em 2026-11-04)
 
 1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisadas 43 novos PRs e 17 novas issues criados ou
    atualizados entre `2026-11-03T21:00:00Z` e `2026-11-04T03:00:00Z`, comparando com as notas em `work/issues/` e o índice
@@ -49,8 +51,38 @@ refs:
      arquivos propostos e diffs em aprovações Codex), PR `#37952` (navegação de abas de chat por `Ctrl+PageUp`/`PageDown`),
      PR `#37932` (cache persistente de imagens em chats) e issue `#37983` (ranking unificado no menu `/` entre skills e comandos).
 
+### 2. Ciclo de 6h (06:00 BRT / 09:00 UTC em 2026-11-04)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisadas dezenas de PRs e issues criados ou
+   atualizados entre `2026-11-04T03:00:00Z` e `2026-11-04T09:00:00Z`.
+2. **Atualização de 5 issues existentes em `work/issues/`:**
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     adicionados PR `#38077` e issue `#38015` (fim do atraso de até 10 minutos na entrega de correio de conclusão de workers,
+     eliminando o bug onde o ghost text esmaecido do Claude contava como draft pendente), PR `#38079` (redução dos fundos de status),
+     PR `#37744` (emparelhamento direto entre chats locais "Work together...", atendendo `#37741`) e PR `#34895` (inspeção de
+     histórico de subagentes filhos diretamente no chat pai);
+   - [Repositórios vinculados no Source Control e escopo de worktree na CLI](../issues/repositorios-vinculados-no-source-control-e-escopo-de-worktree-na-cli.md):
+     adicionados PR `#38086` (resolve `#37899`, fazendo comandos CLI disparados fora de qualquer checkout usarem o worktree do
+     terminal chamador em vez do worktree em foco na janela), PR `#38063` (canonicidade e transacionalidade de membership de
+     workspaces em abas de terminal e chat nativo), PR `#38055` (preservação do workspace em comandos de browser) e PR `#38072`
+     (abertura de links de arquivos remotos no workspace do clique);
+   - [Abertura de agentes no Chat UI pela CLI e superfície chat na orquestração](../issues/abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao.md):
+     adicionado PR `#31595` (alternância no mesmo slot de aba entre Chat UI e Terminal sem forking nem duplicação de abas, com
+     parada ordenada com prova de saída e importação limpa da transcrição);
+   - [Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md):
+     adicionados PR `#38026` (recuperação de limite de uso diretamente na pane do terminal com tempo de reset e botão Continue now)
+     e issue `#38052` (subagentes disparados via CLI passam a herdar a conta Claude do painel chamador em vez de usar a conta
+     global ativa, evitando gasto indevido de cotas pessoais);
+   - [Segurança de hooks em worktrees e integridade de setup em automações](../issues/seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes.md):
+     adicionados PR `#38019` (seletor compartilhado de modelos/permissões no Source Control), PR `#38029` (desbloqueio imediato do
+     Run Now em automações sem checar ferramenta GitHub) e PR `#33492` (reutilização limpa de agentes retidos por monitoramento);
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados PR `#38089` / issue `#38017` (clarificação da hierarquia da barra lateral com rótulos de grupos, blocos visuais de
+     projetos e ênfase em atividade), PR `#38092` (organização de boards e catálogos por owner), PR `#38078` (reapontamento de projetos
+     de pastas movidas sem duplicações) e PR `#38049` (supressão de escape tails residuais ao trocar de workspace).
+
 ## Fora do workspace
 
 - **O quê e onde:** automação `Radar do upstream (stablyai/orca)` (`id: f75b8281-8ae3-4558-afe4-7ab5bbc35601`) ativa no
   runtime do BrzA Studio rodando a cada 6h (`0 */6 * * *`).
-- **Estado:** executando normalmente em conformidade com o cronograma estabelecido.
+- **Estado:** ciclo das 06:00 BRT processado com sucesso.

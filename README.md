@@ -67,11 +67,11 @@ workspace do cwd — pelo `.brza/workspace.toml`, ou, no `brza-studio`, pelo `~/
 configuração às sessões abertas nos dois é o bloco do shell do `brza-workflow`, que **não é copiado para cá**: a fonte
 única é o `packages/client/shell/brza.zsh` do checkout do `brza-workflow`.
 
-No `~/.zshrc` desta máquina, ele entra assim, com a função da Fixfy para o que fica fora dos dois:
+No `~/.zshrc` desta máquina, ele entra assim, com a função de outro workspace para o que fica fora dos dois:
 
 ```zsh
 source "$HOME/Projects/brza-workflow/packages/client/shell/brza.zsh"
-brza_claude_fallback() { fixfy_claude "$@"; }
+brza_claude_fallback() { outro_claude "$@"; }  # o nome real da função fica só no ~/.zshrc
 adm-claude() { CLAUDE_CONFIG_DIR="$HOME/.claude-adm" claude "$@"; }
 claude-adm() { adm-claude "$@"; }
 ```

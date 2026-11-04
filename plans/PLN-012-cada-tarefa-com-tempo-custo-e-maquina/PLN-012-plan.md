@@ -3,7 +3,7 @@ status: open
 phase: design
 origin: request
 description: Liga a medição às tarefas, para que cada uma mostre o tempo corrido, o custo de API e o recurso de máquina, e o fluxo se afine por dado.
-ready: "não — falta o Desenho dos itens D no brza-workflow; isso trava os Passos"
+ready: "não — falta o aceite do corte dos Passos; isso trava a execução"
 scope:
   - brza-workflow
 opened: 2026-11-03
@@ -15,9 +15,9 @@ tags:
 
 # PLN-012: Cada tarefa sai com o tempo corrido, o custo e a máquina que gastou
 
-- **Retomar:** R1 e R2 respondidas em 2026-11-03; a entrevista fechou a estrutura. Próximo: o Desenho, por um
-  `designer` com o Terreno — o carimbo no worklog, o evento `task`, os três tempos, a CPU no hook e no `brza run`, o
-  `--by-task` e a linha no worklog —, com os pontos em aberto listados em "O que este desenho assume".
+- **Retomar:** R1 a R4 respondidas e o Desenho (D1–D7) gravado em 2026-11-03. Próximo: a rodada do corte dos
+  Passos P1–P6 (16 h); aceito o corte, os Passos entram aqui e o plano vai a `execution`.
+- **Dividido:** [PLN-012 — Desenho](PLN-012-design.md)
 
 ## Pedido
 
@@ -168,84 +168,75 @@ Respondida em 2026-11-03, na sessão `tools-kit-produtividade`.
 
    **Decidido — "sem tarefa" e aviso.**
 
-## Desenho
+### Rodada 3 — a linha do worklog, as datas, o aviso e o corte (enviada 2026-11-03)
 
-### O que este desenho assume
+> **Apresentado antes:** o levantamento do `designer`. O `ps -S` não soma a CPU dos filhos de outro processo
+> (conferido pela sessão: 0:00.01 depois de um filho de 2 s); o `proc_pid_rusage` da `libproc` soma
+> (`child_cpu=2.02s`), e substitui o `ps -S` sem rodada, com a mesma intenção da R1.2. Na mediana, o turno do commit
+> tem 77% do custo e 88% da duração da tarefa, e 70 de 158 tarefas têm um turno só. A espera da rodada se lê no
+> transcript, entre a pergunta e a resposta, e cai dentro do `duration_s` (459 s e 166 s nesta sessão). Os subagentes
+> rodam no processo da sessão e levam o id dela (161 de 163 começam dentro de um turno da sessão). Esta sessão emendou
+> duas tarefas: os turnos do Grok cairiam na tarefa do Desenho. Decididos no rascunho, por não mudarem o resultado: o
+> campo `sessions:`, na forma do `refs:`; cada commit de worklog é um marco; dois worklogs no mesmo commit dividem o
+> trecho em partes iguais.
 
-- **R1.1, R2.1:** a tarefa é o worklog. O `brza note commit` carimba nele o `CLAUDE_CODE_SESSION_ID` e grava um evento
-  na medição; a tarefa começa no primeiro prompt depois do marco anterior da mesma sessão.
-- **R2.2, R2.3:** três tempos — agente, Anderson, pausa acima de 30 min — e o corrido como a soma.
-- **R1.2:** a máquina é a CPU e o RSS do `claude` com os filhos que saíram (`ps -S`, no hook) e o rusage do comando do
-  `brza run`.
-- **R1.3, R2.4:** "não medida" e "sem tarefa" ficam à vista; o `close-task` avisa os turnos sem tarefa; toda lacuna
-  deixada vira issue.
-- **R1.4:** o resultado aparece no `summarize_measurements.py --by-task` e numa linha do worklog.
-- **R0.3:** a forma das datas do worklog sai daqui. A leitura desta sessão é que o worklog não ganha `opened` nem hora
-  em `completed`: o começo e o fim saem da medição e do carimbo. Vai ao Desenho como ponto a confirmar.
+Respondida em 2026-11-03, na sessão `tools-kit-produtividade`.
 
-**Em aberto para o Desenho** (rascunho do `designer`, depois rodada):
-- o nome e a forma do carimbo no frontmatter (`sessions:`, como o `refs:`) e do evento na medição;
-- o worklog que recebe commits em mais de uma sessão, ou mais de um commit na mesma;
-- a atribuição do subagente à janela da tarefa — se a linha `subagent` traz o `session_id` da sessão que o chamou;
-- como o hook acha o PID do `claude` (subindo os `ppid`) e se o `ps -S` conta os netos, que é o caso do teste
-  rodado pelo `Bash`;
-- a espera da rodada lida no transcript, entre o `tool_use` da pergunta e o `tool_result`;
-- o que entra na linha de medida do worklog, e a do turno do próprio commit, que fica de fora.
+1. **A linha de medida e o turno do commit** (reabre a R1.4 no ponto do turno do commit). Opções:
+   - lê o turno em curso (recomendada) — o `brza note commit` lê o transcript da sessão até o commit, sem mexer no
+     estado do hook, e a CPU pelo processo da sessão — custo: +1,5 h no passo do commit; se paga: no primeiro commit;
+     sem isso, 44% das tarefas saem com a linha vazia;
+   - sem o turno do commit, como na R1.4 — custo: nada além das ~2 h; se paga: nunca na tarefa de um turno só;
+   - completa no commit seguinte da mesma sessão — custo: +1 h e um commit que reescreve o worklog de outra tarefa;
+     se paga: só quando a sessão commita de novo.
 
-### Terreno
+   **Decidido — lê o turno em curso.**
 
-#### O worklog e as datas
+2. **As datas do worklog** (fecha a R0.3). Opções:
+   - não; a hora fica na `## Medida` (recomendada) — sem `opened` e sem hora em `completed`; o começo e o fim ficam na
+     seção `## Medida` do worklog e no evento `task` — custo: nenhum; se paga: agora, porque o worklog nasce no fim;
+   - `opened` e `completed` com hora ISO, tirados da medição — custo: ~1 h e uma linha na norma; se paga: só se alguém
+     ler a hora no frontmatter, que nem o checador nem o índice leem.
 
-- **O frontmatter do worklog guarda só `scope`, `tags` e `refs`; a data mora no nome.** `work/README.md:310-311`.
-  `opened` e `completed` são "Data" na tabela comum (`work/README.md:229`, `:231`).
-- **O esqueleto do worklog não tem `opened`.** `brza-workflow/bin/brza-note:188-201`, a constante `WORKLOG`.
-- **O `close-task` cria o worklog à mão, quando a tarefa fecha**, sem o `brza note new worklog`.
-  `brza-workflow/core/.claude/skills/close-task/SKILL.md:30-32`. Por isso um `opened` carimbado na criação marcaria a
-  escrita da nota, minutos antes do fim, e o `completed` com hora repete o `git log --format=%aI` do worklog.
+   **Decidido — não; a hora fica na `## Medida`.**
 
-#### A medição
+3. **O aviso do `close-task`** (completa a R2.4, cuja leitura literal contaria zero). Opções:
+   - este commit e as outras sessões (recomendada) — os N turnos que este commit fecha, desde HH:MM, com o começo de
+     cada prompt, e os "sem tarefa" das outras sessões do workstream paradas há mais de 2 h — custo: ~1,5 h; se paga:
+     na primeira emenda, como já houve nesta sessão;
+   - só este commit — custo: ~1 h; se paga: na primeira emenda;
+   - a leitura literal da R2.4 — custo: ~0,5 h; se paga: nunca, porque conta zero.
 
-- **A linha `turn` não diz a tarefa nem o nome da sessão.** As chaves da última linha de
-  `.measurements/measurements.jsonl`: `account`, `agents`, `api_calls`, `bridge_session_id`, `cwd`, `denial_reasons`,
-  `denials`, `duration_s`, `effort`, `estimated_cost_usd`, `event`, `max_context`, `model`, `plugin_versions`,
-  `prompts`, `rounds`, `segment`, `session_id`, `skills`, `timestamp`, `tokens`, `tool_calls`, `workstream`.
-- **O `measure.py` não lê CPU nem memória.** `grep -n 'cpu\|rusage\|psutil\|rss'` em
-  `brza-workflow/core/.claude/hooks/measure.py` → nada.
-- **O `summarize_measurements.py` mora em `core/scripts/`**, e não em `scripts/` do `brza-workflow`.
-- **Ligar turno a tarefa hoje é inferência por cwd e hora, e erra.** Entre 18:50 e 21:30 de 2026-11-03, três sessões se
-  intercalaram, e sessões rodando em `.worktrees/workspace` escreveram worklogs do `playground` com
-  `workstream: workspace` (levantado pela sessão do `playground`).
-- **Há sessão sem medida.** 3 dos 6 worklogs do `playground` de 2026-11-03 não têm turno medido (idem).
+   **Decidido — este commit e as outras sessões.**
 
-#### O que já liga a sessão à tarefa
+4. **Duas tarefas emendadas sem worklog entre elas.** Opções:
+   - `brza note commit <worklog> --until HH:MM` (recomendada) — o marco vai à hora dada, entre o marco anterior e
+     agora, e os turnos depois dela ficam para o próximo commit — custo: ~1 h; se paga: na primeira emenda que o aviso
+     mostrar;
+   - sem corte, com issue — custo: nenhum; se paga: nunca, para separar.
 
-- **A sessão enxerga o próprio id.** `CLAUDE_CODE_SESSION_ID` está no ambiente do `Bash` da sessão, e é o mesmo id do
-  `claude_session` do mapa de sessões (`08e6c812-…` nesta sessão). Um comando que a sessão roda, como o
-  `brza note commit`, pode gravá-lo sem a sessão digitar nada.
-- **O transcript guarda o nome da sessão**, nas linhas `custom-title` e `agent-name`
-  (`~/.claude/projects/…-tools-kit/4a578e01-….jsonl`: `customTitle: tools-kit-rev-pln009`).
-- **O `brza sessions` já liga o nome e o título ao id.** `.sessions/sessions.jsonl`, desde 2026-10-29 22:31: 44
-  aberturas (42 Claude, 1 Codex, 1 Antigravity), com o título no padrão "PLN-008 P8: …" e o `claude_session`.
-- **Mas o mapa cobre a minoria da medição.** Desde 2026-10-29 22:31: 25 das 100 sessões com turno estão no mapa, com
-  US$ 156 dos US$ 394 de turno e US$ 63 dos US$ 258 de subagente.
+   **Decidido — `--until HH:MM`.**
 
-#### A máquina
+### Rodada 4 — o histórico (enviada 2026-11-03)
 
-- **O `ps -S` do macOS soma à CPU de um processo a dos filhos que já saíram.** `man ps`, flag `-S`. O processo da
-  sessão é o `claude` (`ps -p $PPID` no `Bash`: `/Users/andepb/.local/bin/claude`, 360 MB de RSS).
-- **O `brza run` roda o comando numa aba do app, fora da árvore de processos da sessão.**
-  `brza-workflow/packages/client/bin/brza-run:1-12`: abre uma aba visível e espera o comando.
+> **Apresentado antes:** ligar os worklogs antigos à sessão pelo workstream e pela hora casa 194 de 227 commits desde
+> 2026-10-29; 34 deles batem com mais de uma sessão, e 33 com nenhuma.
 
-#### O começo do turno
+Respondida em 2026-11-03, na sessão `tools-kit-produtividade`.
 
-- **O `duration_s` do turno vai da primeira linha do trecho novo do transcript à última**, e a primeira é o prompt.
-  `brza-workflow/core/.claude/hooks/measure.py:342`, `:406-413`. O começo do turno é `timestamp − duration_s`, sem
-  campo novo.
-- **A espera numa pergunta com opções cai dentro do turno.** A ferramenta segura o turno até a resposta, e o
-  `duration_s` soma o tempo de Anderson pensando na rodada (inferido do cálculo acima; a conferir no Desenho).
+1. **O dado de antes do deploy.** Opções:
+   - começa no deploy (recomendada) — a medida por tarefa começa no primeiro evento `task` — custo: nenhum; se paga:
+     agora, sem herdar a inferência por hora;
+   - `--backfill` inferido, com a tarefa marcada "inferida" — custo: ~2 h; se paga: na primeira comparação antes e
+     depois de uma mudança de fluxo, mas com 34 commits ambíguos e 33 sem par.
+
+   **Decidido — começa no deploy.**
 
 ## Worklogs
 
 - 2026-11-03 — aberto; Rodada 0 transcrita; Terreno levantado; R1 e R2 respondidas; issue do Codex e do
   Antigravity aberta. Parou antes do Desenho.
   [Abertura do PLN-012, a produtividade medida por tarefa](../../work/worklogs/2026-11-03-pln-012-abertura-da-produtividade-por-tarefa.md)
+- 2026-11-03 — R3 e R4 respondidas; D1–D7 gravados no `-design`; o `ps -S` trocado pelo `proc_pid_rusage`. Parou na
+  rodada do corte dos Passos.
+  [Desenho do PLN-012, a medida por tarefa](../../work/worklogs/2026-11-03-pln-012-desenho-da-medida-por-tarefa.md)

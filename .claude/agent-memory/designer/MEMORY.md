@@ -1,0 +1,2 @@
+- [Critérios de Anderson na medida por tarefa](anderson-criterios-medicao.md) — tempo parado fora da tarefa, lacuna vira issue, forma só com objetivo; reabrir com número medido passa
+- [Premissas e custos que erraram](custos-e-premissas-que-erraram.md) — ps -S no macOS não soma filhos; o turno do commit é a maior parte da tarefa

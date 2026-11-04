@@ -468,3 +468,28 @@ Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
 
    **Decidido — "Aceitar o X2 (Recomendado)".** → D11.
 
+### Rodada 19 — o Fechamento: identidade e horas (enviada 2026-11-03)
+
+**Apresentado antes:** a regressão final em `brza-workflow@ebb4e7d` (CLI 483, hooks 291, notes-checker 99 checagens,
+`scripts/brza/tests` 98), a causa do noreply no `brza-studio` (o `.git/config` local, sem os `GIT_AUTHOR_*` na sessão)
+e, depois da primeira pergunta, a aferição do `collector` (`/private/tmp/pln008-p7/horas.md`).
+
+Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
+
+1. **As horas.** Opções: fechar sem inferir (recomendada), ~5 min; aferir P5–P8 pela medição, ~30 min.
+
+   **Decidido — "Aferir P5–P8 pela medição".**
+2. **A identidade no `brza-studio`.** Opções: issue e config agora (recomendada); só a issue.
+
+   **Decidido — "Issue e config agora (Recomendado)".**
+3. **A espera no P6** (2,0 h medidas, 1,7 h de espera). Opções: 2,0 h com nota (recomendada); só 0,3 h ativo.
+
+   **Decidido — "2,0 h com nota (Recomendado)".**
+4. **A sessão mista `tools-kit-rev-pln009`.** Opções: só o 1º turno (recomendada); a sessão toda.
+
+   **Decidido — "Só o 1º turno (Recomendado)".**
+5. **O que não tem linha na medição** (P5, o começo do P6 e três sessões do P8). Opções: "sem medição", com o porquê
+   (recomendada); estimar pelo relógio.
+
+   **Decidido — "\"Sem medição\", com o porquê (Recomendado)".**
+

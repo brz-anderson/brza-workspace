@@ -1,2 +1,3 @@
 - [A edição renderizada, com o removido em callout](edicao-renderizada-com-o-removido-em-callout.md) — só o trecho renderizado, removido em CAUTION, sem a cerca diff; em medição
 - [LLM local fora da revisão](llm-local-fora-da-revisao-avaliar-em-outros-fluxos.md) — falhou na revisão; no desempate, o `tev1:4b` classifica texto, mas nenhum local faz regra numérica
+- [O chat do brza sessions não é o session_id da medição](o-chat-do-brza-sessions-nao-e-o-session-id-da-medicao.md) — a ponte é o claude_session do list --json; sessões fora do --settings não têm linha

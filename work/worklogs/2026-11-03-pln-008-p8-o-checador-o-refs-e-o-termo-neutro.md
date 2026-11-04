@@ -7,6 +7,8 @@ refs:
   - MIG-001
   - PLN-008
   - PLN-011
+  - REV-006
+  - issue:a-sessao-no-brza-studio-nao-recebe-a-identidade-do-workspace
   - issue:o-refs-grava-o-slug-novo-quando-o-commit-renomeia-a-issue
 ---
 
@@ -51,9 +53,27 @@ Na conferência final, nenhum arquivo atual cita o nome, salvo o índice, as ide
   [O refs grava o slug novo quando o commit renomeia a issue](../issues/o-refs-grava-o-slug-novo-quando-o-commit-renomeia-a-issue.md).
 - Para o X2, escolheu "Aceitar o X2 (Recomendado)".
 
-## Ponto de parada
+## O `brza-studio` e a regressão final
 
-Falta a sessão `d11-brza-studio` corrigir o autor e mesclar. Depois vêm a regressão final e o Fechamento.
+A proteção da sessão `d11-brza-studio` barrou o amend e o force push. Anderson os rodou à mão, e a `master` de lá
+ficou em `1ef93b3`, com o Gmail. A causa do noreply era o `.git/config` local do `brza-studio`, e a sessão não tinha os
+`GIT_AUTHOR_*`. Na rodada do Fechamento, Anderson escolheu "Issue e config agora (Recomendado)": o `user.email` local
+passou ao Gmail, e a causa foi para
+[A sessão no brza-studio não recebe a identidade do workspace](../issues/a-sessao-no-brza-studio-nao-recebe-a-identidade-do-workspace.md).
+
+A regressão final em `brza-workflow@ebb4e7d` passou: CLI 483, hooks 291, notes-checker com 99 checagens e
+`scripts/brza/tests` com 98. Para as horas, Anderson escolheu "Aferir P5–P8 pela medição".
+
+## O Fechamento
+
+O `collector` aferiu as horas pela medição: 3,2 h de turnos em P6–P8 e US$ 25,23 com os subagentes. P1 a P5 rodaram no
+Antigravity e no Codex, fora do hook; o começo do P6 e três sessões do P8 também ficaram sem linha. Na Rodada 19,
+Anderson escolheu, para o P6, "2,0 h com nota (Recomendado)"; para a sessão mista, "Só o 1º turno (Recomendado)"; e,
+para o que não tem linha, "\"Sem medição\", com o porquê (Recomendado)". A falta de linha nas sessões fora do
+workspace foi para a issue da identidade, que tem a mesma causa provável.
+
+O plano fechou com `status: done`, `phase: closed`, `executed_h: 3.2` e `remaining_h: 0`. P1 a P4 fecharam com os
+commits deles e a Cobertura da REV-006. As pendências seguem em issues abertas.
 
 ## Fora do workspace
 
@@ -62,3 +82,7 @@ Falta a sessão `d11-brza-studio` corrigir o autor e mesclar. Depois vêm a regr
   pela guarda. **Como desfazer:** apagar o arquivo.
 - **O quê e onde:** os pedidos das sessões, no scratch do chat (`d11-*.md`, `pln008-p8-prompt.md`). **Risco:**
   nenhum. **Estado:** temporários. **Como desfazer:** apagar.
+- **O quê e onde:** `user.email` do `.git/config` local de `~/Projects/brza-studio`, de
+  `240569289+brz-anderson@users.noreply.github.com` para `brz.anderson.pereira@gmail.com`. **Risco:** nenhum; é a
+  identidade que o `CLAUDE.md` exige. **Estado:** em uso. **Como desfazer:** `git -C ~/Projects/brza-studio config
+  --local user.email <o e-mail antigo>`.

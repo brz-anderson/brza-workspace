@@ -1,15 +1,16 @@
 ---
-status: in_progress
-phase: execution
+status: done
+phase: closed
 origin: request
 description: O brza note commit preenche o refs do worklog com os IDs que ele cita, e revisão e migração ganham REV-NNN e MIG-NNN
 ready: sim
 estimate_h: 23.5
-executed_h: 0
-remaining_h: 18
+executed_h: 3.2
+remaining_h: 0
 scope:
   - workspace
 opened: 2026-11-03
+completed: 2026-11-03
 owner: Anderson
 tags:
   - tooling
@@ -17,9 +18,7 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** P8 quase feito. A parte da R14 e o D11 estão publicados e conferidos; falta o `brza-studio` corrigir o
-  autor do commit e mesclar a branch dos 3 testes (R18.1), pela sessão `d11-brza-studio`. Depois, a regressão final e
-  o Fechamento, com a rodada das horas.
+- **Retomar:** fechado em 2026-11-03. O que sobrou está em `## Pendências conhecidas`, nas issues abertas.
 - **Histórico desta retomada:** tentativa de execução integral em 2026-11-03 encontrou a fronteira de repositório entre `workspace` e
   `brza-workflow` no Antigravity, registrando 4 issues:
   [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md),
@@ -100,6 +99,7 @@ Os cenários abaixo são provas a implementar ou executar nos passos; não afirm
 
 ## Pendências conhecidas
 
+- [A sessão no brza-studio não recebe a identidade do workspace](../../work/issues/a-sessao-no-brza-studio-nao-recebe-a-identidade-do-workspace.md) — achado do P8, no Fechamento.
 - [O refs grava o slug novo quando o commit renomeia a issue](../../work/issues/o-refs-grava-o-slug-novo-quando-o-commit-renomeia-a-issue.md) — achado do P8, R18.2.
 - [O extrator do refs tem duas cópias sem teste de paridade](../../work/issues/o-extrator-do-refs-tem-duas-copias-sem-teste-de-paridade.md) — A5 da REV-006.
 - [O núcleo guarda o bootstrap da migração do PLN-008](../../work/issues/o-nucleo-guarda-o-bootstrap-da-migracao-do-pln-008.md) — A7 da REV-006.
@@ -134,8 +134,8 @@ indisponível volta à rodada, conforme D7/D10.
 
 Corte aceito em 2026-11-03, R13: sete entregas e 18 h estimadas; a R14 acrescentou o P8, com 2,5 h, e a R16 o ampliou para 5,5 h. P5 está entregue com evidência abaixo. Existem commits
 de P1–P4 (`b7fb3d2`, `b7e8727`, `3fc3935`, `a168f73`); sua existência não atesta o cumprimento integral desses passos.
-Os campos `executed_h: 0` e `remaining_h: 18` permanecem como valores legados ainda não reconciliados, não como medição
-do trabalho entregue. Não há aferição recuperável de horas nesta retomada; P6 deve reconciliá-las sem inferir duração dos commits.
+As horas foram reconciliadas no Fechamento, pela R19: `executed_h` soma só o medido em P6–P8, e o que ficou sem
+medição diz por quê, sem inferir duração dos commits.
 Cada passo fecha com
 comando/resultado e commit do repositório correspondente; o plano recebe a evidência e as horas no mesmo ato.
 
@@ -143,14 +143,14 @@ comando/resultado e commit do repositório correspondente; o plano recebe a evid
 
 Executa D2, D3 e validações de D9 · executor: sessão de implementação no `brza-workflow`.
 
-Estimado: 3 h · Executado: — h
+Estimado: 3 h · Executado: sem medição (Antigravity, fora do hook; R19.3)
 
-- [ ] Escrever casos que falhem em `tests/cli/test_brza_note.py` e `tests/notes-checker/run.py`: refs antigo inválido,
+- [x] Escrever casos que falhem em `tests/cli/test_brza_note.py` e `tests/notes-checker/run.py`: refs antigo inválido,
   cercas/inline/links, citação de subitem, alvo entre branches, autorreferência/ciclo, estimate_h na issue e aviso date.
-- [ ] Implementar em `bin/brza-note` e `core/.claude/skills/notes-checker/scripts/check_notes.py` o catálogo de alvos,
+- [x] Implementar em `bin/brza-note` e `core/.claude/skills/notes-checker/scripts/check_notes.py` o catálogo de alvos,
   validação anterior ao recálculo e atualização idempotente só dos worklogs pedidos. Preservar identidade da issue após rename.
-- [ ] Rodar os testes abaixo e registrar resultados; conferir que commit com outro caminho sujo continua isolado.
-- [ ] Commit no `brza-workflow`; registrar evidência e Executado neste plano.
+- [x] Rodar os testes abaixo e registrar resultados; conferir que commit com outro caminho sujo continua isolado.
+- [x] Commit no `brza-workflow`; registrar evidência e Executado neste plano.
 
 Na raiz do `brza-workflow`:
 
@@ -162,49 +162,58 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/cli -p 'test_brz
 PYTHONDONTWRITEBYTECODE=1 python3 tests/notes-checker/run.py
 ```
 
+Evidência de 2026-11-03: commit `b7fb3d2` no `brza-workflow`; a REV-006 julgou os critérios deste passo na Cobertura, e a
+regressão final em `ebb4e7d` passou (ver o P8).
+
 ### P2 — Reservas, índice e listagem cumprem os contratos
 
 Executa D5, D6, D7 e D9 · executor: sessão de implementação no `brza-workflow` · depende de P1.
 
-Estimado: 4 h · Executado: — h
+Estimado: 4 h · Executado: sem medição (Antigravity, fora do hook; R19.3)
 
-- [ ] Escrever casos em `tests/cli/test_brza_note_index.py` e `test_brza_note.py`: reserva simultânea, três recusas,
+- [x] Escrever casos em `tests/cli/test_brza_note_index.py` e `test_brza_note.py`: reserva simultânea, três recusas,
   bootstrap repetido/conflitante, passagem reserva→nota, alteração de cada campo e rebuild idempotente.
-- [ ] Implementar `review-open`, `migration-open`, campos aprovados, aviso priority e ls em `bin/brza-note`.
-- [ ] Provar filtros/ordens/ausências, nenhuma rede por padrão, refresh com erro explícito e índice indisponível.
-- [ ] Rodar CLI completa, commitar e registrar evidência/Executado.
+- [x] Implementar `review-open`, `migration-open`, campos aprovados, aviso priority e ls em `bin/brza-note`.
+- [x] Provar filtros/ordens/ausências, nenhuma rede por padrão, refresh com erro explícito e índice indisponível.
+- [x] Rodar CLI completa, commitar e registrar evidência/Executado.
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/cli
 ```
 
+Evidência de 2026-11-03: commit `b7e8727` (o `blocks` em lista veio com `7a18392`, REV-006 A3) no `brza-workflow`; a REV-006 julgou os critérios deste passo na Cobertura, e a
+regressão final em `ebb4e7d` passou (ver o P8).
+
 ### P3 — Skills e norma descrevem o fluxo entregue
 
 Executa D1, D6, D7 e D9 · executor: sessão de implementação no `brza-workflow` · depende de P2.
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: sem medição (Antigravity, fora do hook; R19.3)
 
-- [ ] Criar `core/.claude/skills/migration-runner/SKILL.md` e seu molde com as três operações de D1.
-- [ ] Adaptar `plan-runner/references/conduct.md` e `plan-template.md`, `notes-checker/SKILL.md`, `close-task/SKILL.md`,
+- [x] Criar `core/.claude/skills/migration-runner/SKILL.md` e seu molde com as três operações de D1.
+- [x] Adaptar `plan-runner/references/conduct.md` e `plan-template.md`, `notes-checker/SKILL.md`, `close-task/SKILL.md`,
   `core/work/README.md`, `core/plans/README.md` e `README.md`: REV/MIG, refs, campos, ls e gatilho da R12.3.
-- [ ] Conferir revisão independente, core sem client e coerência entre norma/checador/CLI; atualizar fixtures golden.
-- [ ] Rodar hooks, commitar e registrar evidência/Executado.
+- [x] Conferir revisão independente, core sem client e coerência entre norma/checador/CLI; atualizar fixtures golden.
+- [x] Rodar hooks, commitar e registrar evidência/Executado.
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/hooks
 ```
 
+Evidência de 2026-11-03: commit `3fc3935` no `brza-workflow`; a REV-006 julgou os critérios deste passo na Cobertura, e a
+regressão final em `ebb4e7d` passou (ver o P8).
+
 ### P4 — Medição e nome de sessão são provados nas fontes atuais
 
 Executa D10 e D5 · executor: sessão de implementação no `brza-workflow` · depende de P3.
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: sem medição (Antigravity, fora do hook; R19.3)
 
-- [ ] Reproduzir entradas atuais em notas/código, branch de plano e conta configurada; registrar a sonda sem reescrever histórico.
-- [ ] Acrescentar casos necessários em `tests/hooks/test_measure.py`, `test_measure_workstream.py` e testes CLI de sessão.
-- [ ] Corrigir apenas falhas reproduzidas em `core/.claude/hooks/measure.py` e `bin/brza-note`; provar fallback de nome
+- [x] Reproduzir entradas atuais em notas/código, branch de plano e conta configurada; registrar a sonda sem reescrever histórico.
+- [x] Acrescentar casos necessários em `tests/hooks/test_measure.py`, `test_measure_workstream.py` e testes CLI de sessão.
+- [x] Corrigir apenas falhas reproduzidas em `core/.claude/hooks/measure.py` e `bin/brza-note`; provar fallback de nome
   vazio e funcionamento com/sem client. Fonte nova de runtime volta à rodada antes de integrar.
-- [ ] Rodar testes focais de medição e sessão, commitar a entrega necessária e registrar evidência/Executado.
+- [x] Rodar testes focais de medição e sessão, commitar a entrega necessária e registrar evidência/Executado.
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/hooks -p 'test_measure*.py'
@@ -214,11 +223,14 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/hooks -p 'test_m
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/cli -p 'test_brza_note.py'
 ```
 
+Evidência de 2026-11-03: commit `a168f73` no `brza-workflow`; a REV-006 julgou os critérios deste passo na Cobertura, e a
+regressão final em `ebb4e7d` passou (ver o P8).
+
 ### P5 — O script migra um acervo de teste sem resíduos
 
 Executa D4 e D8, usando D3/D7 · executor: sessão de implementação no `brza-workflow` · depende de P4.
 
-Estimado: 3 h · Executado: concluído; horas não aferidas, sem estimativa retrospectiva.
+Estimado: 3 h · Executado: sem medição (Antigravity e Codex, fora do hook; R19.3).
 
 - [x] Criar fixture de dois workstreams que prove bootstrap repetido/conflitante, mapa D4, H1, links cruzados,
   refs antigo inválido, remoção de date sem perder tags e worktree ausente.
@@ -241,7 +253,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/cli
 Executa D1 a D10 · executores: sessão do `brza-workflow` publica; sessões donas dos workstreams aplicam nas notas;
 sessão principal consolida evidências · depende de P5.
 
-Estimado: 2 h · Executado: concluído; horas não aferidas.
+Estimado: 2 h · Executado: 2,0 h medidas, das quais 1,7 h de espera das sessões da MIG-001 e ~0,3 h ativas (R19.1); US$ 8,14; o trecho de 18:55 a 19:02 ficou sem medição.
 
 - [x] Rodar as três suítes completas da Regressão, publicar a entrega e levar a norma por `brza sync`/`brza note sync`.
 - [x] Produzir e conferir a prévia no acervo atual; só então aplicar o bootstrap e criar MIG-001 no molde aprovado.
@@ -269,7 +281,7 @@ dia, nada a acrescentar", com a master parada em `e8606a4`. MIG-001 `done`. P6 c
 
 Executa D1 a D10 · executores: revisor independente e sessão principal · depende de P6.
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0,1 h, mais 0,2 h do subagente revisor; US$ 6,19.
 
 - [x] Revisor independente confere Pedido/Cobertura contra disco e evidências; devolve achados com fonte e confiança.
   Ponto a conferir, por escolha de Anderson em 2026-11-03 ("Achado para P7 (Recomendado)"): o checador não avisa
@@ -283,8 +295,8 @@ Evidência de 2026-11-03: subagente `reviewer` isolado, em `brza-workflow@7a1839
 cinco árvores e os três blocos da MIG-001 com 0. Oito achados e quatro falsos; a sessão refez a evidência de A1, A2,
 A3 e A6. R14 deu os destinos: A1, A2 e A4 corrigidos no P8; A5 e A7 em issues; A6 fechada aqui (as duas issues ficaram
 `done`); A3 e A8 descartados. Parecer em REV-006.
-- [ ] Rodar regressão final pertinente, registrar evidências/Executado e dar destino a todo achado.
-- [ ] Fechar o worklog e o plano quando os itens de Fechamento forem verdadeiros; nenhum achado aberto é ocultado.
+- [x] Rodar regressão final pertinente, registrar evidências/Executado e dar destino a todo achado: ver a evidência do P8.
+- [x] Fechar o worklog e o plano quando os itens de Fechamento forem verdadeiros; nenhum achado aberto é ocultado.
   Depende do P8.
 
 ### P8 — O checador avisa a nota fora de número, a norma volta ao D2, o refs ignora o texto do link e o workspace de origem sai
@@ -292,7 +304,7 @@ A3 e A6. R14 deu os destinos: A1, A2 e A4 corrigidos no P8; A5 e A7 em issues; A
 Executa D7, D2 e D3, pela R14, e D11, pelas R15 e R16 · executores: sessões de implementação no `brza-workflow` e no
 `brza-studio`; a sessão principal na master; as sessões donas dos cinco workstreams nas notas · depende do P7.
 
-Estimado: 5,5 h · Executado: — h
+Estimado: 5,5 h · Executado: 1,1 h medidas até 22:56, mais 0,1 h de subagente; US$ 10,90. As sessões `pln008-p8`, `d11-brza-workflow` e `d11-brza-studio` ficaram sem medição, porque rodaram fora do `--settings` (R19.3).
 
 Evidência parcial de 2026-11-03: `brza-workflow@30b3666`, pela sessão `pln008-p8`, com e-mail do `brz-anderson`.
 Ele traz os três avisos (`review-without-number`, `migration-without-type`, `migration-type-without-number`), a norma
@@ -311,13 +323,13 @@ em dois do `workspace`, que ganhariam o PLN-011 do `studio` (R15).
   `brza note sync`.
 - [x] D11 no `brza-workflow`: `FOREIGN` lendo arquivo da máquina, golden com a chave "origem", testes sem o nome do workspace de origem;
   suítes, commit, publicação e sync.
-- [ ] D11 no `brza-studio`: os 3 testes com dados neutros, pela norma de lá.
+- [x] D11 no `brza-studio`: os 3 testes com dados neutros, pela norma de lá.
 - [x] D11 na master: `README.md` e `.claude/rules/workspace.md` neutros.
 - [x] D11 nas notas: cada sessão dona troca as citações ao workspace de origem por termo neutro no próprio workstream.
 - [x] No mesmo commit, recomitar os worklogs cujo `refs` muda: o da MIG-001 em `brand`, `studio` e `playground`, o do
   `tools-kit` com PLN-001 e os dois do `workspace` já sem o ID do plano do workspace de origem. Depois, o bloco 2 do critério da MIG-001
   sai com 0 nas cinco árvores, e a prova do D11, o grep pelo nome do workspace de origem, sai vazia.
-- [ ] Registrar commits, comandos, resultados e Executado neste plano.
+- [x] Registrar commits, comandos, resultados e Executado neste plano.
 
 Evidência do D11, em 2026-11-03:
 - **`brza-workflow@ebb4e7d`**, pela sessão `d11-brza-workflow`, com o e-mail do `brz-anderson`: 18 arquivos; a guarda lê
@@ -331,9 +343,12 @@ Evidência do D11, em 2026-11-03:
 - **Conferência:** o grep pelo nome do workspace de origem não acha nada nos arquivos atuais das cinco branches, da
   master e do `brza-workflow`, salvo o índice e as identidades da R17.1. O checador dá 0 erros nas cinco árvores, e os
   três blocos do critério da MIG-001 saem com 0 com o extrator novo.
-- **Pendente:** o `brza-studio`. A branch `test/pln-008-d11-dados-neutros` (`a6ef12c`) passou com os 3 testes
-  neutros, mas saiu com o e-mail noreply e sem merge; na R18.1, Anderson escolheu "Corrigir autor e mesclar
-  (Recomendado)".
+- **`brza-studio`:** a branch `test/pln-008-d11-dados-neutros` passou com os 3 testes neutros (36 testes OK), mas saiu
+  com o e-mail noreply (`a6ef12c`). Na R18.1, Anderson escolheu "Corrigir autor e mesclar (Recomendado)". A proteção
+  da sessão de lá barrou o amend e o force push, e Anderson rodou os dois à mão: `origin/master` ficou em `1ef93b3`,
+  com o Gmail, e o grep sai vazio. O `user.email` local do `brza-studio` passou ao Gmail.
+- **Regressão final**, em `brza-workflow@ebb4e7d`, sem a `BRZA_WORKSPACE`: CLI 483 OK em 194,1 s, hooks 291 OK em
+  19,7 s, notes-checker com 99 checagens e 0 falhas, e `scripts/brza/tests` do workspace com 98 OK em 24,6 s.
 - **Observação:** um ID citado em prosa entra no `refs` mesmo quando a frase diz que ele saiu, como o D3 manda; duas
   sessões precisaram reescrever o próprio worklog por isso.
 
@@ -372,7 +387,7 @@ python3 .claude/skills/notes-checker/scripts/check_notes.py
 
 ## Worklogs
 
-- 2026-11-03 — P8: R14 publicada; o D11 pelas R15 a R18, em seis sessões e na master; falta o `brza-studio` mesclar.
+- 2026-11-03 — P8 e Fechamento: R14 publicada; o D11 pelas R15 a R18; `brza-studio` mesclado; R19 das horas; plano fechado.
   [O P8 do PLN-008: o checador, o refs e o termo neutro](../../work/worklogs/2026-11-03-pln-008-p8-o-checador-o-refs-e-o-termo-neutro.md)
 
 - 2026-11-03 — P7: revisão independente, R14 com os destinos, REV-006 gravada e P8 acrescentado; aguarda pedido do P8.
@@ -394,9 +409,11 @@ python3 .claude/skills/notes-checker/scripts/check_notes.py
 
 ## Fechamento
 
-- [ ] P1 a P8 feitos com evidência/Executado ou descartados com motivo; horas reconciliadas.
-- [ ] Todo achado tem destino existente; parecer numerado e apontado pelo plano: REV-006 com destinos, falta o P8.
-- [ ] Norma durável entregue no core, sincronizada e documentada nos commits do `brza-workflow`.
+- [x] P1 a P8 feitos com evidência/Executado ou descartados com motivo; horas reconciliadas: 3,2 h medidas em P6–P8,
+  US$ 25,23 com os subagentes; P1–P5 e três sessões do P8 sem medição, com o porquê (R19). Agregado temporário em
+  `/private/tmp/pln008-p7/horas.md`.
+- [x] Todo achado tem destino existente; parecer numerado e apontado pelo plano: REV-005 e REV-006, todos com destino.
+- [x] Norma durável entregue no core, sincronizada e documentada nos commits do `brza-workflow`.
 - [x] MIG-001 concluída e acervo conferido em todos os workstreams afetados.
-- [ ] Resumo da entrega com link do plano nos commits; worklog final gravado.
-- [ ] `status: done`, `phase: closed` e `completed` no frontmatter.
+- [x] Resumo da entrega com link do plano nos commits; worklog final gravado.
+- [x] `status: done`, `phase: closed` e `completed` no frontmatter.

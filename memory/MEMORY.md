@@ -1,0 +1,1 @@
+- [Debate de consultores por inteiro](consultant-debate-shown-in-full.md) — a argumentação completa de cada consultor vai no chat antes da rodada

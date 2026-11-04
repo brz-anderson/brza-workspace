@@ -7,3 +7,4 @@
 - [oxfmt/oxlint no worktree](oxfmt-oxlint-no-worktree.md) — com vários caminhos não acham arquivo; um por um, e o lint vale pelo lint-staged
 - [O brza-mcp coordena de um chat do Studio](brza-mcp-coordena-de-um-chat-do-studio.md) — dispatch só com os headers de um chat do Studio, por HTTP; --mcp-config fora dele falha
 - [Rodadas com o agy às cegas](rodadas-com-agy-as-cegas.md) — sem a recomendação, opções embaralhadas; discordou, discute-se até o acordo, cinco rodadas e depois Anderson
+- [A revisão em Gemini Flash perdeu um bug](revisao-gemini-flash-perdeu-bug.md) — no P3 do PLN-011, o Grok 4.7 Alto achou o que o Flash aprovou

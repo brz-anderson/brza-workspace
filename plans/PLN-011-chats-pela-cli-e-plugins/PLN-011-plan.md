@@ -6,8 +6,8 @@ origin_ref: brza-chat-list-read-send-no-studio
 description: O brza-studio ganha brza chat list/read/send com cursor, fila e recibos, a navegação de chats pela CLI, pela barra lateral e pela Jump Palette, o Native Chat na API de plugins e o account usage, em fases por prioridade.
 ready: sim
 estimate_h: 31
-executed_h: 0.3
-remaining_h: 29.5
+executed_h: 0.6
+remaining_h: 28.5
 priority: high
 scope:
   - brza-studio
@@ -20,9 +20,9 @@ tags:
 
 # PLN-011: Os chats do BrzA Studio se coordenam pela CLI, aparecem na navegação e chegam aos plugins
 
-- **Retomar:** em 2026-11-03, o P1 fechou (`brza-studio@df8adc29574`, REV-007), e as R13 a R16 refizeram às cegas
-  as R8 a R11, com o cursor como `--cursor` (X3); o próximo passo é o P2, pelo `dispatch` de um `implementer` no
-  worktree `pln-011-chat-cli`, na sessão coordenadora "pln-011-coord".
+- **Retomar:** em 2026-11-03, o P1 e o P2 fecharam (`brza-studio@594c4a7e13c`, REV-007 e REV-008), e as R13 a R17
+  correram às cegas pelo `agy`; o próximo passo é o P3, pelo `dispatch` de um `implementer` no worktree
+  `pln-011-chat-cli`, na sessão coordenadora "pln-011-coord".
 - **Dividido:** [PLN-011 — Entrevista](PLN-011-interview.md) · [PLN-011 — Desenho](PLN-011-design.md)
 
 ## Pedido
@@ -151,20 +151,23 @@ corrigido no D1
 
 Executa D2 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
 
-Estimado: 1 h · Executado: — h, com a revisão
+Estimado: 1 h · Executado: 0,3 h, com a revisão
 
-- [ ] **1. Teste que falha** — em `src/cli/runtime/client-execution-host.test.ts`: `evidenceSent(client, 'agentSession.send')`
+- [x] **1. Teste que falha** — em `src/cli/runtime/client-execution-host.test.ts`: `evidenceSent(client, 'agentSession.send')`
       igual a `{ agentSessionId: CALLER_CHAT }` (falha hoje: `undefined`); `agentSession.history` continua `undefined`; o
       caso WSL e o pareado com `agentSession.send` continuam sem evidência.
-- [ ] **2. Implementar** — o diff do D2.
-- [ ] **3. Rodar e ver passar** —
+- [x] **2. Implementar** — o diff do D2.
+- [x] **3. Rodar e ver passar** —
       `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/runtime/client-execution-host.test.ts src/cli/runtime-client.test.ts --maxWorkers=2`; `pnpm tc:cli`.
-- [ ] **4. Commit** — `feat(cli): agentSession.send leva o chat chamador como coordenador`.
-- [ ] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P2`, revisa o commit
+- [x] **4. Commit** — `feat(cli): agentSession.send leva o chat chamador como coordenador`.
+- [x] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P2`, revisa o commit
       contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
       antes do passo seguinte.
 
-**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
+**Evidência:** `brza-studio@63aa99c2505` e `brza-studio@594c4a7e13c` (o A1) · o teste novo falha na `df8adc29574` (1
+failed, 7 passed) e passa no commit; `client-execution-host` e `runtime-client` → 24 passed; a regressão de terminal e
+chat → 73 passed; `pnpm tc:cli` → exit 0; `pnpm check:changed --force` → 22/22 ·
+[REV-008: o P2 do PLN-011, a origem do coordenador no `agentSession.send`](../../work/reviews/REV-008-pln-011-p2-origem-do-coordenador.md)
 
 #### P3 — `chat read` com cursor, ids e reset
 
@@ -470,14 +473,21 @@ Estimado: 1 h · Executado: — h
   R6 fecham a entrevista da fase 1, e o `#37774` sai dela; R7 com Anderson e R8 a R11 pelo `agy`; Desenho e P1 a P17
   gravados, o `brza-mcp` de pé e a R12 refaz a R7.3. Parou antes do P1, com a coordenadora aberta.
   [PLN-011: abertura do plano dos chats pela CLI e pelos plugins](../../work/worklogs/2026-11-03-pln-011-abertura-chats-pela-cli-e-plugins.md)
-- 2026-11-03 — execução: o P1 fecha pelo `brza-mcp` (X1, X2, REV-007); as R13 a R16 às cegas, com a R13.4 em acordo
-  na volta 1 (X3).
+- 2026-11-03 — execução: o P1 e o P2 fecham pelo `brza-mcp` (X1, X2, REV-007, REV-008); as R13 a R16 às cegas, com
+  a R13.4 em acordo na volta 1 (X3); a R17 manda o A2 da REV-008 a uma issue.
   [PLN-011: execução dos passos pela sessão coordenadora](../../work/worklogs/2026-11-03-pln-011-execucao.md)
 
 ## Revisões
 
 - [REV-007: o P1 do PLN-011, o porte do `#33115`](../../work/reviews/REV-007-pln-011-p1-porte-33115.md) — aprova; A1
   (a contagem de testes do D1) corrigido aqui.
+- [REV-008: o P2 do PLN-011, a origem do coordenador no `agentSession.send`](../../work/reviews/REV-008-pln-011-p2-origem-do-coordenador.md)
+  — aprova; A1 (a cobertura do WSL e do pareado) corrigido em `brza-studio@594c4a7e13c`; A2 vai à issue, pela R17.1.
+
+## Pendências conhecidas
+
+- [O `--session` do `brza chat` recusa o endereço `orca_session_id:<id>`](../../work/issues/chat-session-recusa-o-endereco-orca-session-id.md)
+  — o A2 da REV-008, com gatilho (R17.1).
 
 ## Fechamento
 

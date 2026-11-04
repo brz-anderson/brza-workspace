@@ -62,6 +62,36 @@ def worktree_root(path: Path) -> Path | None:
     return Path(top).resolve()
 
 
+def git_repo_root(path: Path) -> Path | None:
+    """A raiz de qualquer repositório git que contém `path`, ou None."""
+    try:
+        top = runtime.git('rev-parse', '--show-toplevel', cwd=path).strip()
+        return Path(top).resolve()
+    except runtime.BrzaError:
+        return None
+
+
+def detect_test_command(root: Path, paths: list[str] | None = None) -> list[str] | None:
+    """Detecta o comando de teste apropriado para um repositório genérico."""
+    paths = paths or []
+    if (root / 'Cargo.toml').is_file():
+        return ['cargo', 'test', *paths]
+    if (root / 'go.mod').is_file():
+        return ['go', 'test', *(paths or ['./...'])]
+    if (root / 'package.json').is_file():
+        if (root / 'pnpm-lock.yaml').is_file():
+            return ['pnpm', 'test', *(['--'] + paths if paths else [])]
+        elif (root / 'yarn.lock').is_file():
+            return ['yarn', 'test', *paths]
+        else:
+            return ['npm', 'test', *(['--'] + paths if paths else [])]
+    if any((root / f).is_file() for f in ('pytest.ini', 'pyproject.toml', 'setup.cfg', 'setup.py')) or (root / 'tests').is_dir():
+        return ['pytest', *paths]
+    if (root / 'Makefile').is_file():
+        return ['make', 'test']
+    return None
+
+
 def changed_files(root: Path) -> list[str]:
     """O que difere do merge-base com a origin/master — commitado, no índice ou no disco — e o não rastreado, sem os
     apagados."""
@@ -177,9 +207,19 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument('--no-baseline', action='store_true', help='não confere as falhas na origin/master')
     args = ap.parse_args(argv)
 
-    root = worktree_root(Path(args.worktree or '.').resolve())
+    target = Path(args.worktree or '.').resolve()
+    root = worktree_root(target)
     if root is None:
-        ap.error(f'{args.worktree or Path.cwd()} não é um worktree do brza-studio ({runtime.STUDIO})')
+        repo_root = git_repo_root(target) or (target if target.is_dir() else None)
+        if repo_root is not None:
+            cmd = detect_test_command(repo_root, paths)
+            if cmd:
+                print(f'test:     {repo_root} ({" ".join(cmd)})')
+                start = time.monotonic()
+                r = subprocess.run(cmd, cwd=repo_root)
+                print(f'tempo:    {seconds(start)}')
+                return r.returncode
+        ap.error(f'{args.worktree or Path.cwd()} não é um worktree do brza-studio ({runtime.STUDIO}) nem possui framework de testes reconhecido')
     if not (root / '.git').is_file():
         ap.error(f'{root} é o checkout principal, que o brza test não toca; crie um com brza tree <nome>')
 

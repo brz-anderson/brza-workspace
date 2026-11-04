@@ -80,8 +80,8 @@ class BrzaTestTest(unittest.TestCase):
         bin_dir = self.base / 'bin'
         bin_dir.mkdir(exist_ok=True)
         pnpm = bin_dir / 'pnpm'
-        pnpm.write_text(f'#!/bin/sh\necho "$*" >> {self.pnpm_args}\necho "saída do check"\n'
-                        f'exit $(cat {self.base / "check-exit"})\n')
+        pnpm.write_text(f'#!/bin/sh\necho "$*" >> "{self.pnpm_args}"\necho "saída do check"\n'
+                        f'exit $(cat "{self.base / "check-exit"}")\n')
         pnpm.chmod(0o755)
         p = patch.dict(os.environ, {'PATH': f'{bin_dir}:{os.environ["PATH"]}'})
         p.start()
@@ -263,6 +263,57 @@ class BrzaTestTest(unittest.TestCase):
             with self.subTest(argv=argv):
                 code, _ = self.run_test(*argv)
                 self.assertEqual(code, 2)
+
+    def test_detect_test_command(self):
+        d = self.base / 'generic'
+        d.mkdir(parents=True, exist_ok=True)
+        detect = GLOBALS['detect_test_command']
+
+        (d / 'Cargo.toml').write_text('[package]')
+        self.assertEqual(detect(d), ['cargo', 'test'])
+        self.assertEqual(detect(d, ['tests/foo.rs']), ['cargo', 'test', 'tests/foo.rs'])
+        (d / 'Cargo.toml').unlink()
+
+        (d / 'go.mod').write_text('module foo')
+        self.assertEqual(detect(d), ['go', 'test', './...'])
+        self.assertEqual(detect(d, ['pkg/...']), ['go', 'test', 'pkg/...'])
+        (d / 'go.mod').unlink()
+
+        (d / 'package.json').write_text('{}')
+        (d / 'pnpm-lock.yaml').write_text('')
+        self.assertEqual(detect(d), ['pnpm', 'test'])
+        self.assertEqual(detect(d, ['test/a.ts']), ['pnpm', 'test', '--', 'test/a.ts'])
+        (d / 'pnpm-lock.yaml').unlink()
+        (d / 'package.json').unlink()
+
+        (d / 'pyproject.toml').write_text('[project]')
+        self.assertEqual(detect(d), ['pytest'])
+        self.assertEqual(detect(d, ['tests/test_x.py']), ['pytest', 'tests/test_x.py'])
+        (d / 'pyproject.toml').unlink()
+
+    def test_generic_repo_runs_detected_test_command(self):
+        generic_repo = self.base / 'generic_repo'
+        generic_repo.mkdir()
+        subprocess.run(['git', 'init', '-q', str(generic_repo)], check=True)
+        (generic_repo / 'pyproject.toml').write_text('[project]')
+
+        real_run = subprocess.run
+        executed = []
+
+        def fake_run(cmd, *args, **kwargs):
+            if isinstance(cmd, list) and cmd and cmd[0] == 'pytest':
+                executed.append((cmd, kwargs.get('cwd')))
+                return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
+            return real_run(cmd, *args, **kwargs)
+
+        with patch.object(GLOBALS['subprocess'], 'run', side_effect=fake_run):
+            code, out = self.run_test(str(generic_repo), '--', 'tests/test_foo.py')
+            self.assertEqual(code, 0, out)
+            self.assertEqual(executed, [(['pytest', 'tests/test_foo.py'], generic_repo)])
+            self.assertIn('test:     ', out)
+            self.assertIn('pytest', out)
+
+
 
 
 if __name__ == '__main__':

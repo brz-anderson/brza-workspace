@@ -358,3 +358,33 @@ Respondida em 2026-11-03, na sessão `workspace`: "aceito".
    **Decidido — "aceito".** Sete passos, estimados em 18 h; contratos consolidados em D1 a D10, com numeração dos
    itens restantes ajustada ao Desenho vigente. O plano passa a execution/in_progress, sem passo iniciado.
    Cada passo continua dependendo de pedido explícito de execução; o aceite não autoriza executar P1.
+
+### Rodada 14 — destinos da revisão da entrega (enviada 2026-11-03)
+
+**Apresentado antes:** a devolução do revisor independente do P7, com a evidência de A1, A2, A3 e A6 refeita pela
+sessão principal (`check_notes.py:350-368`, `core/work/README.md:226`, `a666e78:bin/brza-note:946-947`, as duas issues
+`open`). O parecer é a [REV-006: A entrega do PLN-008 contra o Pedido e a Cobertura](../../work/reviews/REV-006-pln-008-p7-a-entrega.md).
+
+Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
+
+1. **A1 — o checador não avisa parecer novo sem `REV-NNN`.** Opções: aviso, num passo novo P8 (recomendada) — custo
+   ~1 h e o sync; se paga no próximo parecer escrito sem `review-open`; erro, no P8 — custo igual, travando o
+   `tools-kit` até a issue dos três pareceres fechar; só a issue do `tools-kit` — custo zero; não se paga.
+
+   **Decidido — "Aviso, passo novo P8 (Recomendado)".** → D7.
+2. **A2 — a norma aceita `REV-NNN` e `decision:` em `depends_on`, e o checador barra.** Opções: a norma volta ao D2
+   (recomendada) — custo ~15 min e o sync; se paga agora; o checador amplia e o D2 muda — custo ~1–1,5 h; se paga na
+   primeira dependência de uma decisão.
+
+   **Decidido — "Norma volta ao D2 (Recomendado)".** → D2.
+3. **A4 — ID no texto de um link entra no `refs`, e o intervalo marca só as pontas.** Opções: manter e documentar
+   (recomendada) — custo ~10 min; se paga agora; tirar o texto do link — custo ~1 h e recomitar 4 worklogs em 4
+   workstreams; se paga na primeira busca por REV que traga worklog que só linkou a MIG; expandir intervalos — custo
+   ~1–2 h, regra frágil; provavelmente nunca se paga.
+
+   **Decidido — "Tirar o texto do link".** → D3, reaberto; a R10.1 continua, com o texto do link fora da contagem.
+4. **Os achados menores** (seleção múltipla). Opções: A5 e A7 como issues no workspace; A6, fechar as duas issues
+   resolvidas; A3 e A8 descartados.
+
+   **Decidido — as três: "A5, A7: issues no workspace", "A6: fechar 2 issues", "A3, A8: descartados".**
+

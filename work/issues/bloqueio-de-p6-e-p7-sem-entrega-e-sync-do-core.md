@@ -1,10 +1,11 @@
 ---
-status: open
+status: done
 description: Os passos P6 e P7 do PLN-008 dependem estritamente da entrega das ferramentas e normas no brza-workflow e sincronização com o core antes da migração do acervo.
 scope:
   - workspace
   - brza-workflow
 opened: 2026-11-03
+completed: 2026-11-03
 owner: Anderson
 tags:
   - tooling
@@ -39,3 +40,7 @@ Ao solicitar a execução até o final do plano na sessão atual:
 - Concluir a implementação e testes de P1 a P5 no repositório `brza-workflow`.
 - Publicar a branch e rodar `brza sync` no `brza-workspace`.
 - Executar P6 nos workstreams correspondentes e conduzir a revisão independente em P7.
+
+## Resolução
+
+Resolvida em 2026-11-03: P1 a P5 publicados em `brza-workflow@a666e78`, sincronizados no workspace em `5dcc2b3`; o P6 aplicou e concluiu a MIG-001 e o P7 rodou a revisão, [REV-006: A entrega do PLN-008 contra o Pedido e a Cobertura](../reviews/REV-006-pln-008-p7-a-entrega.md), A6.

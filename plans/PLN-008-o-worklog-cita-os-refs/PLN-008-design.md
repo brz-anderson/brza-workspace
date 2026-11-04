@@ -79,7 +79,7 @@ independência do revisor.
 
 ## D2 — Dependência exige entrega concluída — `core/work/README.md`, checador e índice
 
-- **Origem:** R5.1; R7.2; R9.1 e R9.2.
+- **Origem:** R5.1; R7.2; R9.1 e R9.2; R14.2.
 - **Contexto:** referências agrupam assuntos; dependências declaram pré-requisitos e não são inferidas das citações.
 
 ### Como fica
@@ -108,12 +108,15 @@ Esta regra não autoriza execução nem substitui o `ready` do plano. O índice 
 o despacho do coordenador continua no PLN-003. Branches desatualizadas exigem nova validação após atualização;
 o checador não garante impedir ciclos introduzidos simultaneamente em workstreams isolados.
 
+Só PLN, MIG e `issue:` são alvos de `depends_on`. A norma comum (`core/work/README.md` e `plan-template.md`) lista
+os mesmos três; REV e `decision:` saem dela, porque o checador os barra (R14.2).
+
 **Alternativas recusadas em R9:** aceitar `dropped` como dependência satisfeita; permitir referências inválidas ou
 ciclos com aviso. A escolha exige entrega e corrige a relação inválida antes do commit.
 
 ## D3 — O refs extrai as menções fora das cercas — `bin/brza-note` e checador
 
-- **Origem:** R1.1; R7.3; R10.1 e R10.2.
+- **Origem:** R1.1; R7.3; R10.1 e R10.2; R14.3.
 - **Contexto:** o filtro atual apaga crases inline, embora elas contenham citações reais; exemplos cercados podem
   mencionar IDs sem relação com o trabalho.
 
@@ -122,7 +125,8 @@ ciclos com aviso. A escolha exige entrega e corrige a relação inválida antes 
 Antes de reescrever qualquer worklog solicitado, o `brza note commit` valida o `refs:` explícito atual contra notas
 existentes. ID inexistente gera erro sem reescrita, para que o recálculo não esconda a referência inválida.
 Depois extrai do corpo, confere os alvos e links e atualiza somente os caminhos pedidos, antes do checador completo.
-A extração considera prosa, crases inline, links e citações históricas, excluindo blocos cercados de código.
+A extração considera prosa, crases inline, o destino dos links e citações históricas, excluindo blocos cercados de
+código e o texto dos links (R14.3): o link conta pelo alvo, e não pelos IDs do título que ele mostra.
 O resultado é ordenado e sem duplicatas; sem referências, o campo é omitido. O preenchimento do acervo reutiliza
 essa sequência e é idempotente.
 
@@ -131,6 +135,7 @@ essa sequência e é idempotente.
 | `PLN-008/D1` fora de cerca | Referência `PLN-008`, sem validar o item D1. |
 | `PLN-003` somente em bloco cercado | Não gera referência. |
 | Link para issue comum existente | Referência `issue:<slug>` com a identidade do índice. |
+| ID só no texto de um link, como o título "REV-001..REV-004" de outra nota | Não gera referência; o alvo do link gera. |
 | Menção textual a ID inexistente | Aviso com ID e localização; não entra no refs. |
 | ID inexistente no próprio refs | Erro no checador, conforme R1.1. |
 | Link relativo quebrado fora de código | Continua erro no checador. |
@@ -208,7 +213,7 @@ nem autoriza execução.
 
 ## D7 — REV e MIG reservam números pelo índice — `bin/brza-note`
 
-- **Origem:** R1.2; R2.2; R3.2 e R3.4; R11.1; contratos aceitos na R13.
+- **Origem:** R1.2; R2.2; R3.2 e R3.4; R11.1; contratos aceitos na R13; R14.1.
 - **Contexto:** a reserva precisa suportar concorrência entre workstreams e distinguir número reservado de nota existente.
 
 ### Como fica
@@ -228,6 +233,9 @@ renumeração. Reexecução aceita o mesmo mapa; colisão diferente recusa e vol
 Reserva sem arquivo não satisfaz referências/dependências nem aparece como nota materializada no ls. O primeiro
 commit registra a passagem de reserva para nota mesmo quando título e estado coincidem; a ausência de `commit`
 distingue a reserva inicial.
+
+O checador avisa, sem barrar, a nota de `work/reviews/` fora de `REV-NNN-<slug>.md`, a nota `MIG-NNN-…` sem
+`type: migration` e a issue `type: migration` sem número `MIG-NNN` (R14.1).
 
 ## D8 — A migração tem prévia e aplicação idempotente — `scripts/migrate_pln008.py`
 

@@ -19,6 +19,9 @@ tags:
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
 - **Retomar:** P0, P1, P2 e P3 concluídos em 2026-11-03; os passos de MCP (P6–P9) passaram ao [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md); próximo passo: **P4** (o plugin do Claude com skills e hooks nos dois apps).
+- **Pedido do PLN-013 (2026-11-03):** marcar o P12 como `[-]` → [PLN-013](../PLN-013-grok-codex-e-agy-no-brza-sessions-e-no-mcp/PLN-013-plan.md),
+  que absorveu o roteador multiruntime do `brza sessions`, agora com o Grok, pela PLN-013/R1.1 ("PLN novo
+  (Recomendado)"); o `remaining_h` perde as 3,5 h dele.
 - **A fila do orquestrador (2026-11-03):** a R9, respondida na sessão `bb0fd632` do `workspace`, fez do coordenador o
   orquestrador e deu a ordem da fila e os três tetos de workers; o Desenho mudou nas premissas, no M8, no M17, na
   regra da fila e no M24 novo (o índice da `master` grava `priority`, `blocks` e `deadline`). Os itens `D` partem daí.

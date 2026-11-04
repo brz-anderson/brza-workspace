@@ -5,6 +5,7 @@ scope:
   - brza-studio
 priority: medium
 opened: 2026-11-03
+trigger: o stablyai/orca#37802 integrado no upstream
 tags:
   - chat
 ---
@@ -13,9 +14,9 @@ tags:
 
 Frente `medium` da issue de origem
 [Ler e enviar mensagens a chats pela CLI e expor Native Chat aos plugins](ler-e-enviar-mensagens-a-chats-pela-cli-e-expor-native-chat-aos-plugins.md),
-do `playground`. Conduzida pelo
+do `playground`. Era a fase 3 do
 [PLN-011: Os chats do BrzA Studio se coordenam pela CLI, aparecem na navegação e chegam aos plugins](../../plans/PLN-011-chats-pela-cli-e-plugins/PLN-011-plan.md),
-na fase dela.
+e saiu do plano em 2026-11-03, pela R11.4: fica aqui até o gatilho, e volta por plano ou por sync.
 
 ## O recorte
 
@@ -33,4 +34,5 @@ do upstream. O caminho apontado lá é mover as operações pesadas do journal a
 
 ## O que fecha
 
-O `#37802` no `brza-studio`, pelo sync do upstream ou pelo porte, conforme o PLN-011 decidir quando ele for integrado.
+O `#37802` no `brza-studio`, pelo sync do upstream ou pelo porte, decidido quando o gatilho valer: o PR integrado no
+upstream (`gh api repos/stablyai/orca/pulls/37802 --jq .merged_at` diferente de `null`).

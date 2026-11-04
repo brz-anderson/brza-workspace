@@ -1,0 +1,1 @@
+- [Critérios de Anderson no PLN-011](anderson-criterios-pln-011.md) — aceitou R4–R6 recomendadas (wire intacto, versões misturadas); recusou corte de escopo na R3

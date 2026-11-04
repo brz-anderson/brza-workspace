@@ -5,6 +5,8 @@ tags:
   - chat
   - planning
 refs:
+  - PLN-009
+  - PLN-010
   - PLN-011
   - issue:brza-account-usage-na-cli
   - issue:brza-chat-list-read-send-no-studio
@@ -50,7 +52,32 @@ abrir o plano e seguir para a entrevista. Nenhum código.
   inferido lendo o `fence` e a prova por unidade mais o caso C1 no app.
 - A issue da fase 1 deixou de pedir o porte do `#37774`.
 
+## As rodadas pelo `agy`, o Desenho e os Passos
+
+- **Delegação:** Anderson pediu as rodadas de lacuna ao `agy` com o `gemini-3.8-flash-high`, e depois a execução até
+  fechar, com uma revisão independente por passo e o `brza-mcp` coordenando. A R7, da condução, foi a Anderson: liga o
+  `brza-mcp` da `feat`, gates de `implementer` e `reviewer` do PLN-011 pré-aprovados, sessão coordenadora reaberta com
+  `--mcp-config`.
+- **Levantamento:** um `designer` rascunhou o D1 a D6 e o P1 a P6 da fase 1; um `collector` levantou as fases 2, 4 e 5.
+  Os agregados ficaram no scratch da sessão.
+- **R8 a R11, pelo `agy`:** as dezesseis na recomendada. As que mudaram o desenho: `--since` e `--operation` no lugar da
+  R6 (R8.4, pelo pedido do PLN-010); o `pending` esperado até 30 s (R9.1); a fase 3 sai do plano e fica na issue, com
+  gatilho (R11.4).
+- **Gravado:** o plano dividido em `-plan`, `-interview` e `-design`, com `phase: execution`, P1 a P17 e 31 h
+  estimadas; a issue do journal com o `trigger`.
+- **O PLN-010** (`tools-kit`) mandou por correio os requisitos do contrato; o D3 a D5 os cobrem, e o `chat list` do
+  `#33115` já traz `session`, `handle`, `worktree` e `title`. Sem resposta por correio, como ele pediu.
+
+## Fora do workspace
+
+- **O quê e onde:** o `brza-mcp` ligado pelo `brza-mcp start`, com o código de `brza-workflow@007383a`
+  (`feat/pln-009-mcp`): o agente `com.brza.orchestrator` em `~/Library/LaunchAgents/com.brza.orchestrator.plist`,
+  escutando em `127.0.0.1:4242`.
+  - **O risco:** código sem merge, com o C2 e o C3 do PLN-009 pendentes; escuta só no `localhost`, com Bearer.
+  - **Estado:** ativo.
+  - **Como desfazer:** `brza-mcp stop`, que descarrega o agente e apaga o plist.
+
 ## O que ficou aberto
 
-- O Desenho e os Passos da fase 1, e então a entrevista da fase 2.
+- O P1, pela sessão coordenadora com o `brza-mcp`.
 - A issue de origem passa a `done` pelo `playground`, que lê estas pelo git.

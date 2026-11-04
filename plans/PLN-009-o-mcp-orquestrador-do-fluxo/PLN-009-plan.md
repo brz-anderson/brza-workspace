@@ -537,6 +537,18 @@ Estimado: 0,8 h · Executado: 0,8 h
 - **C2 — O `tev1` real:** um desempate com o Ollama de pé, frio e carregado, medindo o tempo.
 - **C4 — O ciclo real:** um `dispatch` de consultor no Studio abre run, task e worker, e o `--json` de cada verbo traz
   as chaves que o `cycle.py` procura (X24); o fim volta pelo `task-list`.
+  - **Observado (2026-11-03, `007383a`):** o servidor estava de pé no launchd (pid 34093). Pelo `/mcp`, com o
+    `X-Brza-Session` e o `X-Brza-Client` de uma sessão do chat do Studio, o `dispatch` de um `consultant` com
+    `ref: PLN-009` (contar as issues `open` do `tools-kit`, só leitura) saiu `queued`, Sonnet `low`, `reason: policy`,
+    sem gate. Pedido 2:
+    - entrou às 21:18:04;
+    - o worker 4 tinha `run_482348be0728`, `task_767283dce2dc` e `ctx_8861b8dce804`, as chaves do X24;
+    - estava `done` às 21:18:21, 17 s depois;
+    - o `worker_done` chegou com "C4: 13 issues open", a contagem que o `grep` confere;
+    - o `task-list` mostrou a task `completed`.
+  - **Antes, do terminal:** o pedido 1, de uma sessão fora do Studio, passou pelo gate e caiu no `run-create` com
+    `session_caller_unknown`, sem efeito. Foi para
+    [O dispatch aceita chamador fora do Studio](../../work/issues/o-dispatch-aceita-chamador-fora-do-studio.md).
 - **C3 — A fila pelo índice:** depois do PLN-003/P1, dois pedidos com `ref` de notas com `priority` e `deadline`.
 
 ## Regressão
@@ -669,6 +681,8 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
   Opus A3); sem trava entre processos, até a primeira automação que chame os dois verbos.
 - [Os pareceres do PLN-009 sem número REV](../../work/issues/os-pareceres-do-pln-009-sem-numero-rev.md) — da MIG-001
   do `workspace`; os três pareceres de `work/reviews/` ganham o `REV-NNN` antes do fechamento deste plano.
+- [O dispatch aceita chamador fora do Studio](../../work/issues/o-dispatch-aceita-chamador-fora-do-studio.md) — do
+  C4; o gate abre para um `caller` que o Studio não conhece, até o primeiro client fora do Studio.
 
 ## Fechamento
 

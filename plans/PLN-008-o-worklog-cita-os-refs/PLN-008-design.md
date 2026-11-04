@@ -288,3 +288,22 @@ apenas falhas reproduzidas. O nome da sessão usa as fontes disponíveis: variá
 provedor. Nome vazio permite fallback disponível. Sem fonte, o nome fica ausente; não inventar autoria.
 Não acrescentar runtime, session_id ou modelo às notas nem reconstruir a medição histórica. Integração nova de
 runtime sem fonte disponível volta à rodada com evidência, sem expansão silenciosa do core.
+
+## D11 — A Fixfy sai dos arquivos atuais dos repositórios `brza-*` — notas, norma local, `brza-workflow` e `brza-studio`
+
+- **Origem:** Pedido 6; R15.1 a R15.3; R16.1 a R16.4.
+- **Contexto:** o PLN-011 do `studio` colidiu com o PLN-011 da Fixfy, citado em crase em dois worklogs do `workspace`;
+  o D3 conta a crase, e o próximo commit desses worklogs ligaria o plano errado.
+
+### Como fica
+
+| Onde | O que muda |
+| :--- | :--------- |
+| Notas dos cinco workstreams (`work/`, `plans/`, `wiki/`, `memory/`, `.claude/agent-memory/`) | Toda citação à Fixfy vira termo neutro, como "outro workspace" ou "o workspace de origem", sem nome nem ID. Inclui planos e worklogs fechados. |
+| Master do `brza-workspace` | O `README.md` e a `.claude/rules/workspace.md` ficam neutros. A regra "As notas do workspace da Fixfy" vira uma regra sobre notas de outro workspace, que se citam sem link, sem nome e sem ID. |
+| `brza-workflow` | O `FOREIGN` do `bin/brza-init` lê os nomes proibidos de um arquivo da máquina, fora do git. O `golden_differences.py` troca a chave "fixfy" por "origem", com textos neutros. Os testes e o golden seguem. |
+| `brza-studio` | Os 3 testes trocam os dados de exemplo (`fixfy-cc`, `fixfy.atlassian.net`) por nomes neutros. |
+| Histórico do git, e-mail de autor dos commits antigos, `.brza/index.jsonl` | Ficam como estão: o histórico não se reescreve, e o índice só recebe linhas novas. |
+
+A prova é um `git grep -il fixfy` sem resultado nos arquivos atuais das cinco branches, da master, do `brza-workflow` e
+do `brza-studio`, salvo o `.brza/index.jsonl`.

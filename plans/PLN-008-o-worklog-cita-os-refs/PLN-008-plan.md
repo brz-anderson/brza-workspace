@@ -4,7 +4,7 @@ phase: execution
 origin: request
 description: O brza note commit preenche o refs do worklog com os IDs que ele cita, e revisão e migração ganham REV-NNN e MIG-NNN
 ready: sim
-estimate_h: 20.5
+estimate_h: 23.5
 executed_h: 0
 remaining_h: 18
 scope:
@@ -17,11 +17,11 @@ tags:
 
 # PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca
 
-- **Retomar:** P7 com a revisão feita e os destinos dados na R14: parecer
-  [REV-006: A entrega do PLN-008 contra o Pedido e a Cobertura](../../work/reviews/REV-006-pln-008-p7-a-entrega.md).
-  Próximo: o P8, que corrige A1, A2 e A4 no `brza-workflow` e recomita 4 worklogs pelas sessões donas; só começa a
-  pedido de Anderson. Depois, a regressão final e o Fechamento, com a rodada das horas. P1–P4 sem atestado integral
-  de horas; os critérios estão julgados na REV-006.
+- **Retomar:** P8 em curso. A parte da R14 está publicada (`brza-workflow@30b3666`, sync `2130026`). As R15 e R16
+  ampliaram o P8 com o D11, a saída da Fixfy dos repositórios `brza-*`. Próximo: abrir as sessões do D11, depois do
+  pedido de Anderson: `brza-workflow`, `brza-studio`, a master por esta sessão e as sessões donas dos cinco
+  workstreams, que também recomitam os worklogs do `refs`. Depois, a regressão final e o Fechamento, com a rodada das
+  horas.
 - **Histórico desta retomada:** tentativa de execução integral em 2026-11-03 encontrou a fronteira de repositório entre `workspace` e
   `brza-workflow` no Antigravity, registrando 4 issues:
   [A fronteira de execução e o acesso ao brza-workflow no Antigravity](../../work/issues/fronteira-de-execucao-e-acesso-ao-brza-workflow-no-antigravity.md),
@@ -57,6 +57,11 @@ Os itens, numerados para a Cobertura:
 frontmatter das notas pode melhorar visando um nelhor desempenhi no fluxo do coordenador" — Anderson, em 2026-11-03, na
 mesma sessão.
 
+"remover citações a fixfy de todos os repos brza-*" — Anderson, em 2026-11-03, na sessão `workspace-a6`, na R15.1,
+com o alcance "Tudo, inclusive código" (R15.2).
+
+6. os arquivos atuais dos repositórios `brza-*` não citam a Fixfy (D11).
+
 ### Cobertura
 
 Os cenários abaixo são provas a implementar ou executar nos passos; não afirmam testes já existentes ou aprovados.
@@ -86,6 +91,7 @@ Os cenários abaixo são provas a implementar ou executar nos passos; não afirm
 | `R14.1` | checador avisa parecer fora de REV-NNN e MIG incoerente com type, sem barrar | P8 | três casos de aviso e um de nota correta (notes-checker) |
 | `R14.2` | norma lista só PLN, MIG e issue em depends_on | P8 | conferir `core/work/README.md` e `plan-template.md` contra o checador (revisão documental) |
 | `R14.3` | ID só no texto do link não entra no refs, nas duas cópias do extrator | P8 | caso da tabela do D3 em `run.py` e na CLI; bloco 2 da MIG-001 com 0 nas cinco árvores (unidade e integração) |
+| `Pedido 6` | nenhum arquivo atual dos repositórios `brza-*` cita a Fixfy, salvo o índice; a guarda do `brza init` continua | P8 | `git grep -il fixfy` vazio nas cinco branches, na master, no `brza-workflow` e no `brza-studio`; teste do `FOREIGN` com o arquivo da máquina (unidade e integração) |
 
 ### Fora de escopo
 
@@ -127,7 +133,7 @@ indisponível volta à rodada, conforme D7/D10.
 
 ## Passos
 
-Corte aceito em 2026-11-03, R13: sete entregas e 18 h estimadas; a R14 acrescentou o P8, com 2,5 h. P5 está entregue com evidência abaixo. Existem commits
+Corte aceito em 2026-11-03, R13: sete entregas e 18 h estimadas; a R14 acrescentou o P8, com 2,5 h, e a R16 o ampliou para 5,5 h. P5 está entregue com evidência abaixo. Existem commits
 de P1–P4 (`b7fb3d2`, `b7e8727`, `3fc3935`, `a168f73`); sua existência não atesta o cumprimento integral desses passos.
 Os campos `executed_h: 0` e `remaining_h: 18` permanecem como valores legados ainda não reconciliados, não como medição
 do trabalho entregue. Não há aferição recuperável de horas nesta retomada; P6 deve reconciliá-las sem inferir duração dos commits.
@@ -282,22 +288,36 @@ A3 e A6. R14 deu os destinos: A1, A2 e A4 corrigidos no P8; A5 e A7 em issues; A
 - [ ] Fechar o worklog e o plano quando os itens de Fechamento forem verdadeiros; nenhum achado aberto é ocultado.
   Depende do P8.
 
-### P8 — O checador avisa a nota fora de número, a norma volta ao D2 e o refs ignora o texto do link
+### P8 — O checador avisa a nota fora de número, a norma volta ao D2, o refs ignora o texto do link e a Fixfy sai
 
-Executa D7, D2 e D3, pela R14 · executores: sessão de implementação no `brza-workflow`; sessões donas de `brand`,
-`studio`, `playground` e `tools-kit` recomitam seus worklogs · depende do P7.
+Executa D7, D2 e D3, pela R14, e D11, pelas R15 e R16 · executores: sessões de implementação no `brza-workflow` e no
+`brza-studio`; a sessão principal na master; as sessões donas dos cinco workstreams nas notas · depende do P7.
 
-Estimado: 2,5 h · Executado: — h
+Estimado: 5,5 h · Executado: — h
 
-- [ ] Escrever os casos que falham antes em `tests/notes-checker/run.py` e na CLI: parecer sem `REV-NNN`, `MIG-NNN`
+Evidência parcial de 2026-11-03: `brza-workflow@30b3666`, pela sessão `pln008-p8`, com e-mail do `brz-anderson`.
+Ele traz os três avisos (`review-without-number`, `migration-without-type`, `migration-type-without-number`), a norma
+de `depends_on` de volta ao D2, o texto do link fora das duas cópias do extrator e um teste de paridade entre elas.
+`tests/cli` deu 471 OK em 197,8 s, `tests/hooks` 288 OK e o notes-checker 99 verificações, tudo sem a `BRZA_WORKSPACE`.
+O `brza sync --ref 30b3666` publicou `2130026` e levou a norma aos cinco workstreams. Desvio X1: a crase dentro do
+texto de um link sai com ele, como o D3 da R14.3 manda. Com o extrator novo, o `refs` muda nos 4 worklogs previstos e
+em dois do `workspace`, que ganhariam o PLN-011 do `studio` (R15).
+
+- [x] Escrever os casos que falham antes em `tests/notes-checker/run.py` e na CLI: parecer sem `REV-NNN`, `MIG-NNN`
   sem `type`, issue `type: migration` sem número (aviso, não erro) e ID só no texto do link (sem referência).
-- [ ] Implementar o aviso em `check_notes.py` e tirar o texto do link da extração nas duas cópias, `bin/brza-note` e
+- [x] Implementar o aviso em `check_notes.py` e tirar o texto do link da extração nas duas cópias, `bin/brza-note` e
   `check_notes.py`, que a issue da A5 aponta; tirar REV e `decision:` de `depends_on` em `core/work/README.md` e
   `plan-template.md`, e acrescentar o texto do link e os avisos à norma.
-- [ ] Rodar as três suítes da Regressão sem a `BRZA_WORKSPACE`, commitar, publicar e levar pelo `brza sync` e
+- [x] Rodar as três suítes da Regressão sem a `BRZA_WORKSPACE`, commitar, publicar e levar pelo `brza sync` e
   `brza note sync`.
-- [ ] Recomitar pelas sessões donas os 4 worklogs cujo `refs` muda (o da MIG-001 em `brand`, `studio` e `playground`,
-  e o do `tools-kit` com PLN-001); depois, o bloco 2 do critério da MIG-001 sai com 0 nas cinco árvores.
+- [ ] D11 no `brza-workflow`: `FOREIGN` lendo arquivo da máquina, golden com a chave "origem", testes sem a Fixfy;
+  suítes, commit, publicação e sync.
+- [ ] D11 no `brza-studio`: os 3 testes com dados neutros, pela norma de lá.
+- [ ] D11 na master: `README.md` e `.claude/rules/workspace.md` neutros.
+- [ ] D11 nas notas: cada sessão dona troca as citações à Fixfy por termo neutro no próprio workstream.
+- [ ] No mesmo commit, recomitar os worklogs cujo `refs` muda: o da MIG-001 em `brand`, `studio` e `playground`, o do
+  `tools-kit` com PLN-001 e os dois do `workspace` já sem o PLN-011 da Fixfy. Depois, o bloco 2 do critério da MIG-001
+  sai com 0 nas cinco árvores, e o `git grep -il fixfy` do D11 sai vazio.
 - [ ] Registrar commits, comandos, resultados e Executado neste plano.
 
 ## Regressão

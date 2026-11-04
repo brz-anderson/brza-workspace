@@ -388,3 +388,49 @@ Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
 
    **Decidido — as três: "A5, A7: issues no workspace", "A6: fechar 2 issues", "A3, A8: descartados".**
 
+
+### Rodada 15 — as citações da Fixfy (enviada 2026-11-03)
+
+**Apresentado antes:** a lista de worklogs cujo `refs` muda com o extrator do P8 (`brza-workflow@30b3666`): os 4
+previstos e mais dois do `workspace`, que ganhariam o PLN-011 porque citam em crase o PLN-011 da Fixfy, enquanto o
+`studio` tem agora um PLN-011 próprio (`plans/PLN-011-chats-pela-cli-e-plugins`). O lookbehind de `bin/brza-note:185`
+ignora `fixfy:PLN-011`.
+
+Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
+
+1. **Como tratar a colisão de IDs da Fixfy?** Opções: prefixo `fixfy:` na regra local (recomendada); issue, sem mexer
+   agora; aceitar o PLN-011 no `refs`.
+
+   **Resposta em texto livre:** "remover citações a fixfy de todos os repos brza-*". É uma contraproposta.
+2. **O alcance** (pergunta de volta, com a medida: 80 arquivos de notas, cerca de 41 linhas com ID da Fixfy, 16 arquivos
+   no `brza-workflow` e 3 testes no `brza-studio`). Opções: IDs da Fixfy nas notas (recomendada); toda menção nas
+   notas; tudo, inclusive código.
+
+   **Resposta: "Tudo, inclusive código".**
+3. **Onde o trabalho mora?** Opções: dentro do P8 (recomendada), que valia "só se o alcance for o dos IDs"; issue ou
+   plano separado.
+
+   **Resposta: "Dentro do P8 (Recomendado)".** Ela cruza com a resposta 2 e volta à Rodada 16.
+
+### Rodada 16 — o alcance da remoção da Fixfy (enviada 2026-11-03)
+
+**Apresentado antes:** a resposta 3 da R15 cruzava com a 2. No `brza-workflow`, "Fixfy" é guarda: o `FOREIGN`
+(`bin/brza-init:60`) e o `tests/hooks/golden_differences.py:19`. No `brza-studio`, são dados de 3 testes.
+
+Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
+
+1. **Fica no P8?** Opções: P8 ampliado (recomendada) — ~5–6 h, numa rodada só de sessões; passo P9; plano novo.
+
+   **Decidido — "P8 ampliado (Recomendado)".**
+2. **O que fica no lugar das guardas?** Opções: o nome fora do repositório (recomendada) — `FOREIGN` lê os nomes
+   proibidos de um arquivo da máquina, fora do git, e o golden troca a chave "fixfy" por "origem", ~1 h; tirar sem
+   substituto, ~20 min, perdendo a guarda.
+
+   **Decidido — "Nome fora do repositório (Recomendado)".**
+3. **O texto no lugar da citação, nas notas?** Opções: termo neutro (recomendada) — "outro workspace" ou "o workspace
+   de origem", sem nome nem ID; apagar o trecho.
+
+   **Decidido — "Termo neutro (Recomendado)".**
+4. **O histórico do git e as linhas do índice?** Opções: ficam como estão (recomendada); reescrever o histórico.
+
+   **Decidido — "Ficam como estão (Recomendado)".** → D11.

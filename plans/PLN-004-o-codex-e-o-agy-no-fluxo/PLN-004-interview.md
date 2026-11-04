@@ -667,3 +667,47 @@ rodadas, por ora".
 `--runtime` pega o padrão e o texto dos três focos) e R16 (a medição e a máquina: onde fica a captura de fatos, a
 tabela por runtime, o `~/.zshrc` e a conferência do override) ficam abertas, com as opções que o `designer` deixou no
 fim do `pln-004-design-v2.md` (P5 a P11). A aprovação do Desenho só vem depois delas.
+
+### Rodada 15 — a delegação (enviada 2026-11-03, no chat)
+
+**Apresentado antes:** o `brza-workflow` ainda não tem `brza delegate` (a `bin/` tem `brza-agents`, `-init`, `-install`,
+`-note`, `-register`, `-sync` e `-where`), então o D11 cria `packages/runtimes/bin/brza-delegate`. O rascunho antigo se
+contradizia sobre o papel na chamada (`pln-004-design-rascunho.md:327` e `:475`); o experimento da 12.2 usou o corpo do
+`reviewer` no prompt; o `codex exec` não tem `--agent` e o `agy` tem. A tabela de papéis do núcleo está em
+`core/AGENTS.md:139`. A minuta do D11 ainda mostrava a revisão do Codex em `xhigh`, e passa a `high` pela R14.2.
+
+Respondida em 2026-11-03, na sessão `workspace`: "15.3, o ferramental de `agents` | `skills` | `memory` passarão a viver
+dentro de `.brzAgents`, não mais dentro de `.claude`; restante recomendado".
+
+1. **O `brza delegate` usa o papel?** (D11) Opções:
+   - sim: no `agy`, `--agent <papel>`; no Codex, o `developer_instructions` do papel gerado vai no começo do prompt
+     (recomendada) — custo: ~15 linhas e o teste da montagem; se paga: na primeira revisão delegada, com a régua que a
+     R12.2 mediu;
+   - não: o prompt é o do pedido, como no rascunho antigo — custo: a régua do `reviewer` não chega ao segundo passe, e
+     quem pede a cola à mão; se paga: nunca, enquanto o corpo for igual nos três focos.
+
+   **Decidido — a recomendada.**
+
+2. **Onde o `--runtime` pega o padrão quando falta** (D11). Opções:
+   - não pega: `--runtime codex|agy` obrigatório, no lugar do `--to` da R3.4; a revisão padrão do Claude segue pelo
+     `Agent`, sem `brza delegate` (recomendada) — custo: nenhum código além da recusa do `argparse`; se paga: agora;
+   - padrão `claude`, que roda `claude -p` com o papel `reviewer` — custo: ~40 linhas, a medição pelo hook do
+     `claude -p` e uma revisão sem a memória do papel na sessão; se paga: só se um roteiro precisar chamar os três
+     runtimes do mesmo jeito.
+
+   **Decidido — a recomendada.**
+
+3. **Onde mora o texto dos três focos, e quem manda usá-lo** (D11). Opções:
+   - `core/.claude/review-focus.md` com os três textos, apontado pela linha do `reviewer` em `core/AGENTS.md:139`, sem a
+     junção da Fixfy (recomendada) — custo: um arquivo de ~30 linhas, uma linha no núcleo e uma entrada no
+     `golden_differences.py`; se paga: na próxima revisão de entrega, também nos workspaces sem o pacote;
+   - o mesmo arquivo no pacote `runtimes` — custo: o foco só existe onde o pacote está; se paga: nunca, se o foco vale
+     no Claude;
+   - o arquivo mais a regra de junção da Fixfy — custo: régua que o experimento não testou; se paga: quando a sessão
+     juntar três devoluções com sobreposição.
+
+   **Contraproposta de Anderson, em texto livre, sem decidir:** "o ferramental de `agents` | `skills` | `memory`
+   passarão a viver dentro de `.brzAgents`, não mais dentro de `.claude`". Não escolheu uma das três opções. A mudança é
+   maior que o ponto: toca onde moram os papéis, as skills e a memória dos subagentes em todo workspace, o `brza sync`,
+   o `brza init` e o Desenho inteiro (D1, D4, D7, D11). A sessão mede o custo antes de voltar com opções, e o D11 fica
+   em aberto até lá. Não há menção ao `.brzAgents` em nenhum repositório nem nota hoje.

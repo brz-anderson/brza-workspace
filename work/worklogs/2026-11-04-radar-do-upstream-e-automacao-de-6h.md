@@ -9,6 +9,7 @@ tags:
   - tooling
 refs:
   - issue:abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao
+  - issue:consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks
   - issue:gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
   - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
@@ -19,7 +20,7 @@ refs:
   - issue:workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh
 ---
 
-# Radar de issues e PRs do upstream e automação de 6h (00h, 06h e 12h BRT)
+# Radar de issues e PRs do upstream e automação de 6h (00h, 06h, 12h e 18h BRT)
 
 ## O que foi feito
 
@@ -115,8 +116,37 @@ refs:
      `#38100` (recuperação de sessões do Antigravity ACP no Session History), issue `#38124` (suporte a blocos advisor `server_tool_use`)
      e issue `#38115` (detalhes técnicos do modelo em hover no picker).
 
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-04)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisadas mais de 40 novas issues e PRs criados ou
+   atualizados entre `2026-11-04T15:00:00Z` e `2026-11-04T21:00:00Z`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Consumo de recursos em agentes: reaper de LSP e overhead de hooks](../issues/consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks.md)
+     (PR `#38189` / issue `#38188`, PR `#38180` / issue `#38179` e PR `#38199` / issue `#38181`): idle reaper para
+     encerrar instâncias ociosas de TypeScript LSP após 1h sem arquivos abertos (evitando acúmulo de mais de 28 GB de RAM
+     em múltiplos agentes), redução de 17 para 7 subprocessos por evento de hook do Claude no macOS (diminuindo contenção
+     de `AppleSystemPolicy`) e preservação da pasta `runtimes/` contra evicção indevida no `orcad`.
+3. **Atualização de 4 issues existentes em `work/issues/`:**
+   - [Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md):
+     adicionados PR `#38227` (subcomando `orca account select --agent claude --account <id|system>` com suporte a `--environment`
+     para alternância remota via CLI), issue `#38224` (diagnóstico de consumo 1,5× maior da cota de 5h em abas de chat nativo
+     em relação a terminais) e PR `#38201` / issue `#38195` (preservação da contagem integral de tokens do Claude em transcripts forked);
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     adicionados PR `#38174` (resolve `#38123`, garantindo que falhas em `worker_done` reportem o erro SQLite real em vez de
+     `cannot rollback`), PR `#38207` e issue `#38210` (keep-awake para chats Pi enquanto subagentes rodam em background e suporte
+     a sessões Pi RPC), PR `#38159` (recusa de submissão automática de prompt CLI sobre rascunho não enviado do composer) e
+     PR `#38222` / issue `#38172` (notificação de término de turnos OpenCode sobre OSC 7501);
+   - [Melhorias de Native Chat, ACP do Gemini CLI, abas e diff no upstream](../issues/melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream.md):
+     adicionados PR `#38190` / issue `#37906` (inclusão do comando `/mcp` no seletor de slash commands do Claude Code no Native Chat),
+     PR `#38183` (detalhes técnicos de contexto e custo ao passar o mouse sobre modelos) e PR `#38215` / issue `#38185` (renderização
+     automática de diagramas Mermaid em comentários de PRs no painel Checks);
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados PR `#38168` / issue `#38138` (ações "Collapse all" / "Expand all" e atalhos na barra lateral), PR `#38193` / issue
+     `#38134` (dashboard Home global consolidando status e limites de frota), PR `#38208` (manutenção de worktrees ocultos ao adicionar
+     projetos) e issue `#38214` (criação de grupos de projetos vazios pela sidebar).
+
 ## Fora do workspace
 
 - **O quê e onde:** automação `Radar do upstream (stablyai/orca)` (`id: f75b8281-8ae3-4558-afe4-7ab5bbc35601`) ativa no
   runtime do BrzA Studio rodando a cada 6h (`0 */6 * * *`).
-- **Estado:** ciclo das 12:00 BRT processado com sucesso.
+- **Estado:** ciclo das 18:00 BRT processado com sucesso.

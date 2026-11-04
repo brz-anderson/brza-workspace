@@ -538,3 +538,26 @@ Respondida em 2026-11-03, pelo `agy`, às cegas.
 
    **Decidido — "Fase 3 vira issue fora de escopo e o plano fecha"**, por acordo na primeira volta. Confirma a R11.4.
 
+### Rodada 17 — o seletor `orca_session_id:<id>` no `--session` (enviada 2026-11-03, ao `agy`)
+
+> **Apresentado antes:** a revisão do P2 observou, fora do escopo dele, que o `parseChatSessionSelector`
+> (`src/cli/chat-sessions.ts:29-42`, do porte) corta no primeiro `:`, e o endereço `orca_session_id:<id>` da
+> orquestração vira uma sessão inexistente, com falha fechada; o `chat list --json` devolve o id cru, que é o que o
+> PLN-010 passa; o `#33115` segue aberto. Às cegas, pela regra de Anderson. Conversa do `agy`:
+> `825c25ff-ac81-45e8-b67f-9515f0f84f50`.
+
+Respondida em 2026-11-03, pelo `agy`, às cegas.
+
+1. **O destino do ponto.** Opções, na ordem enviada: Corrigir no P3, em src/cli/brza/ · Descartar · Issue no
+   workstream studio, com gatilho.
+
+   Escolha cega do `agy`: "Corrigir no P3, em src/cli/brza/" — "Coordenação entre sessões vem primeiro: o endereço canônico da orquestração (orca_session_id:<id>) não pode falhar com erro enganoso ao ser reutilizado na CLI. Isolar o tratamento em um helper dentro de src/cli/brza/ protege a sincronização com o upstream mantendo os arquivos portados intactos, com custo baixo e prova por teste unitário no P3." Recomendação da coordenadora, gravada antes: "Issue no
+   workstream studio, com gatilho".
+
+   **Discussão, volta 1.** A coordenadora defendeu a issue: nenhum consumidor usa a forma com prefixo (o PLN-010 passa o
+   id cru do `chat list`), a falha é fechada, o helper faz o `chat.ts` do porte chamá-lo no `read` e no `send`, e o
+   `#33115` aberto pode resolver no upstream. O `agy` mudou: "Mudo para respeitar o critério de menor divergência com o upstream, já que o #33115 segue aberto e qualquer intervenção em chat.ts criaria atrito desnecessário em sincronizações futuras. Como o consumidor real planejado (PLN-010 via chat list --json) consome o ID cru e a falha em caso de endereço de orquestração é fechada, não há quebra em fluxos existentes hoje. O gatilho na issue garante que o caso será revisitado exatamente quando o upstream fundir o PR ou se surgir um uso concreto, sem acumular código especulativo no fork."
+
+   **Decidido — "Issue no workstream studio, com gatilho"**, por acordo na volta 1:
+   [O `--session` do `brza chat` recusa o endereço `orca_session_id:<id>`](../../work/issues/chat-session-recusa-o-endereco-orca-session-id.md).
+

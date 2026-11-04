@@ -8,8 +8,6 @@ refs:
   - PLN-001
   - PLN-002
   - PLN-008
-  - REV-001
-  - REV-004
 ---
 
 # O termo neutro nas notas do `studio`, no lugar do workspace de origem
@@ -48,8 +46,8 @@ Commit `3297189`, com push na `workstream/studio`: 17 arquivos, com 121 citaçõ
     com o H1 de antes, que já era neutro.
 - **O link para o `tools-kit`.** A issue dos scripts de orquestração já tinha o nome novo lá (`9a40746`), e o link da
   issue do Codex como subagente foi junto, com o H1 novo de lá.
-- **O worklog da MIG-001** recomitado: com o extrator do `brza-workflow@30b3666` (R14.3), o `refs` dele perdeu o
-  REV-001 e o REV-004, que vinham só do rótulo do link para a MIG-001.
+- **O worklog da MIG-001** recomitado: com o extrator do `brza-workflow@30b3666` (R14.3), o `refs` dele perdeu os
+  dois pareceres que vinham só do rótulo do link para a MIG-001.
 - **As linhas que passaram de 120 colunas** foram rebatidas, só nos parágrafos que mudaram.
 
 ## Conferência

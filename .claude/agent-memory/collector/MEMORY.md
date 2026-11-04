@@ -2,4 +2,5 @@
 - [Auditoria de qualidade do fork](reference_studio_fork_quality_audit_tricks.md) — árvore pura temporária, run-vitest, catálogos, armadilhas de comparar por arquivo
 - [Expandir do chat e prévia de Markdown](reference_studio_chat_expand_and_markdown_preview.md) — BrzaExpandLayer (DOM), MarkdownPreviewBody, EditorViewToggle, o que reaproveita
 - [Coexistência Orca e auditoria do perfil](reference_studio_orca_coexistence_and_profile_audit.md) — onde moram identidade, updater, perfil real e as armadilhas de zsh/permissão
+- [Terreno nav/plugins/account usage](reference_studio_nav_plugins_account_usage_terrain.md) — reveal de chat, barra lateral, Jump Palette, API de plugins, #37467
 - [Terreno CLI chat/coordenação](reference_studio_cli_chat_coordination_terrain.md) — cursor, fila, #33115, simulação de PR por índice temporário

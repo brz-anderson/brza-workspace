@@ -1,10 +1,13 @@
 ---
-status: open
-phase: interview
+status: in_progress
+phase: execution
 origin: issue
 origin_ref: brza-chat-list-read-send-no-studio
-description: O brza-studio ganha brza chat list/read/send com cursor, fila e recibos, a navegação de chats pela CLI, pela barra lateral e pela Jump Palette, a limpeza do journal fora do thread principal, o Native Chat na API de plugins e o account usage, em fases por prioridade.
-ready: "não — falta o Desenho e os Passos da fase 1, e a entrevista das fases 2 a 5"
+description: O brza-studio ganha brza chat list/read/send com cursor, fila e recibos, a navegação de chats pela CLI, pela barra lateral e pela Jump Palette, o Native Chat na API de plugins e o account usage, em fases por prioridade.
+ready: sim
+estimate_h: 31
+executed_h: 0
+remaining_h: 31
 priority: high
 scope:
   - brza-studio
@@ -17,16 +20,16 @@ tags:
 
 # PLN-011: Os chats do BrzA Studio se coordenam pela CLI, aparecem na navegação e chegam aos plugins
 
-- **Retomar:** em 2026-11-03, a entrevista da fase 1 fechou na R6 (base, cursor, fila, recibo, retry, contrato e
-  prova); o próximo passo é o Desenho da fase 1 (os itens `D` do contrato da CLI) e os Passos dela, e depois a
-  entrevista da fase 2.
+- **Retomar:** em 2026-11-03, o plano fechou o Desenho e os Passos (R7 a R11) e entra em execução, a pedido de Anderson
+  ("siga com os passos até encerrar o plano"); o `brza-mcp` está de pé (R7.1), e o próximo passo é o P1, pelo
+  `dispatch` de um `implementer`, na sessão coordenadora aberta com `--mcp-config` (R7.3).
+- **Dividido:** [PLN-011 — Entrevista](PLN-011-interview.md) · [PLN-011 — Desenho](PLN-011-design.md)
 
 ## Pedido
 
 - **Origem:** [O `brza chat list/read/send` coordena chats abertos no BrzA Studio](../../work/issues/brza-chat-list-read-send-no-studio.md),
   com as outras frentes em
   [O chat ativo se escolhe pela CLI e aparece na barra lateral e na Jump Palette](../../work/issues/chat-ativo-pela-cli-na-barra-lateral-e-na-jump-palette.md),
-  [A limpeza do journal de chats sai do thread principal](../../work/issues/limpeza-do-journal-de-chats-fora-do-thread-principal.md),
   [Os plugins enxergam as sessões de Native Chat](../../work/issues/native-chat-na-api-de-plugins.md) e
   [O `brza account usage` mostra o uso dos limites por conta](../../work/issues/brza-account-usage-na-cli.md); todas
   nascem da issue do `playground`
@@ -44,213 +47,413 @@ E o pedido da issue de origem, em "O que fazer":
 
 ### Fases
 
-Na ordem da prioridade, como decidido em R4.2 e R4.3; cada fase fecha a issue dela.
+Na ordem da prioridade, como decidido em R4.2 e R4.3; cada fase fecha a issue dela. A fase 3 saiu do plano em R11.4,
+e a numeração das outras fica.
 
 | Fase | Prioridade | Frente | Issue |
 | :--- | :--------- | :----- | :---- |
 | 1 | `high` | Coordenação: `brza chat list/read/send` com cursor, fila e recibos, pelo porte do `#33115` estendido (R5.2); o `#37774` saiu da fase em R5.1 | [O `brza chat list/read/send` coordena chats abertos no BrzA Studio](../../work/issues/brza-chat-list-read-send-no-studio.md) |
 | 2 | `medium` | Navegação: `brza chat focus`, a seleção da barra lateral e a Jump Palette | [O chat ativo se escolhe pela CLI e aparece na barra lateral e na Jump Palette](../../work/issues/chat-ativo-pela-cli-na-barra-lateral-e-na-jump-palette.md) |
-| 3 | `medium` | Journal: a limpeza do SQLite fora do thread principal, depois da integração do `#37802` no upstream | [A limpeza do journal de chats sai do thread principal](../../work/issues/limpeza-do-journal-de-chats-fora-do-thread-principal.md) |
+| 3 | `medium` | Journal: fora do plano desde a R11.4, pelo `### Fora de escopo` | — |
 | 4 | `low` | Plugins: Native Chat em `agents.list` e `agent.status.changed`, e o caminho em `workspace.readContext` | [Os plugins enxergam as sessões de Native Chat](../../work/issues/native-chat-na-api-de-plugins.md) |
 | 5 | `low` | `brza account usage` | [O `brza account usage` mostra o uso dos limites por conta](../../work/issues/brza-account-usage-na-cli.md) |
 
 ### Cobertura
 
-Os critérios de aceite saem das rodadas de cada fase; os passos, do Desenho. Até lá, cada linha diz o que a fase prova.
-
 | Origem | Critério de aceite | Passo | Teste (nível) |
 | :----- | :----------------- | :---- | :------------ |
-| Fase 1, R5.2 | `brza chat list` lista as sessões de Native Chat abertas com o id que `read` e `send` aceitam | a planejar | `chat.test.ts` (unidade) |
-| Fase 1, R2.1, R6.3 | `brza chat read --cursor <epoch:sequence>` devolve só o que mudou depois do cursor, e o `--json` traz `itemId`, `revision`, `sequence`, `nextCursor` e `hasNewer` | a planejar | `chat.test.ts` (unidade); C1 (manual) |
-| Fase 1, R5.3 | o cursor inválido sai com código não zero e `cursor_reset: <motivo>`, com a página `tail` e o `nextCursor` novos | a planejar | `chat.test.ts`, um caso por motivo (unidade) |
-| Fase 1, R2.2, R5.4 | o `send` enfileirado diz a posição, o `nextQueuedMessageId` e `held_by: question\|working` | a planejar | `chat.test.ts` (unidade); C1 (manual) |
-| Fase 1, R6.1 | o código de saída do `send` é 0 em `accepted` e `queued`, 1 em recusa e `rejected`, 3 em `pending` e `unknown` | a planejar | `chat.test.ts` (unidade) |
-| Fase 1, R6.2 | `send --operation-id <id>` com o mesmo texto devolve o resultado gravado sem reenviar, e o `unknown` continua `unknown` | a planejar | `chat.test.ts` (unidade) |
-| Fase 1, R6.3 | o `send` leva o `ORCA_AGENT_SESSION_ID` como origem do coordenador e o `expectedRuntimeFence` lido do histórico | a planejar | `chat.test.ts` e o teste do `client.ts` (unidade) |
-| Fase 2 | `brza chat focus`, a barra lateral e a Jump Palette seguem o chat ativo | a planejar | a definir na rodada |
-| Fase 3 | a limpeza do journal não roda no thread principal | a planejar | a definir na rodada |
-| Fase 4 | um plugin vê as sessões de Native Chat em `agents.list` e `agent.status.changed` | a planejar | a definir na rodada |
-| Fase 5 | `brza account usage` imprime o uso por conta | a planejar | a definir na rodada |
+| Fase 1, R5.2, R8.4 | `brza chat list --json` lista os chats abertos com `session`, `handle`, `worktree` e `title`, e o id que `read` e `send` aceitam | P1 | `chat.test.ts` (unidade) |
+| Fase 1, R2.1, R6.3, R8.3, R8.4 | `brza chat read --since <epoch:sequence>` lê uma página `after` e devolve só o que mudou, com `itemId`, `revision`, `sequence`, `removedItemIds`, `nextCursor` e `hasNewer`; recusa `--limit` junto | P3 | `chat.test.ts`, `chat-cursor.test.ts` (unidade); C1 (manual) |
+| Fase 1, R5.3, R8.1, R8.2 | o cursor inválido sai 2 com `cursor_reset: <motivo>`, a página `tail` e o `nextCursor` novos, também no reset repetido | P3 | `chat.test.ts`, um caso por motivo (unidade) |
+| Fase 1, R2.2, R5.4, R9.2 | o `send` enfileirado diz a posição, o `nextQueuedMessageId` e `held_by: question\|working\|null`, com `queuePaused` no Stop | P4 | `chat.test.ts`, `chat-queue-hold.test.ts` (unidade); C1 (manual) |
+| Fase 1, R6.1, R9.1, R9.3 | o `send` sai 0 em `accepted` e `queued`, 1 em recusa, `rejected`, `returned` e `withdrawn`, 3 em `unknown` e no `pending` que não resolve em 30 s | P4 | `chat-send-outcome.test.ts`, `chat.test.ts` (unidade) |
+| Fase 1, R6.2, R8.4 | `send --operation <id>` com o mesmo texto devolve o gravado sem reenviar, e o `unknown` continua `unknown` | P5 | `chat.test.ts` (unidade); C1 (manual) |
+| Fase 1, R6.3 | o `send` leva o `ORCA_AGENT_SESSION_ID` como origem do coordenador e o `expectedRuntimeFence` lido do histórico | P2, P4 | `client-execution-host.test.ts`, `chat.test.ts` (unidade); C1 (manual) |
+| Fase 2, R10.1 | `brza chat focus --session <id>` traz o app à frente com o chat ativo | P8 | teste do roteamento do reveal (unidade); C2 (manual) |
+| Fase 2, R10.2 | a barra lateral destaca o chat ativo, qualquer que seja a origem da troca | P9 | testes da barra lateral (unidade); C2 (manual) |
+| Fase 2, R10.3 | a Jump Palette lista os chats nas recentes, os acha pelo título e os abre como chat | P10 | testes do builder e da ativação (unidade); C2 (manual) |
+| Fase 4, R11.1, R11.2 | `agents.list` e `agent.status.changed` trazem `kind`, `sessionId`, `model` e `providerSessionId` do chat, sem caminho, e o contrato só cresce | P13, P14 | testes da projeção e do schema (unidade) |
+| Fase 5, R11.3 | `brza account usage` imprime o uso por conta, em texto e `--json` | P16 | `account-usage-*.test.ts` (unidade) |
 
 ### Fora de escopo
 
 - **O `brza sessions` do `brza-workflow` sobre a CLI nova** — os aliases, o retry e o resultado fiel do envio no
-  wrapper. Vão ao plano do `tools-kit`, com `depends_on` neste, como decidido em R4.1.
+  wrapper. Vão ao PLN-010 do `tools-kit`, com `depends_on` neste, como decidido em R4.1.
 - **O porte do `stablyai/orca#37774`** (o rascunho do chat de terminal limpo antes do envio). Chega no próximo sync do
   upstream; só se porta antes se o `brza chat send` passar a cobrir chat PTY, como decidido em R5.1.
+- **A fase 3, a limpeza do journal fora do thread principal.** Saiu do plano em R11.4 e fica na issue
+  [A limpeza do journal de chats sai do thread principal](../../work/issues/limpeza-do-journal-de-chats-fora-do-thread-principal.md),
+  com o gatilho "o `#37802` integrado no upstream".
+- **O caminho do worktree em `workspace.readContext` e o `cwd` do chat.** Não agora, pela R11.2: volta depois da
+  sandbox do worker de plugin, por permissão.
+
+## Restrições
+
+- **Os gates pré-aprovados valem só para `implementer` e `reviewer` com `ref: PLN-011`, na conta ativa** (R7.2). Gate
+  de troca de conta ou de outro papel para e vai a Anderson.
+- **O `brza-mcp` roda o código da `feat/pln-009-mcp`, sem merge** (R7.1): defeito do orquestrador vai ao PLN-009, numa
+  issue do `tools-kit`, e não se corrige daqui.
 
 ## Pré-requisitos
 
-- **Fase 3:** o `stablyai/orca#37802` integrado no upstream (`gh api repos/stablyai/orca/pulls/37802 --jq .merged_at`
-  diferente de `null`). Sem isso, a fase espera, como decidido em R4.3.
+- **O `brza-mcp` de pé:** `brza-mcp status` → "carregado: sim" e "health: responde". Parado, `brza-mcp start`.
+- **A sessão coordenadora com o servidor:** aberta com `claude --mcp-config <arquivo fora do git>`, com a URL de
+  `brza-mcp url` e o token por `headersHelper` (`brza-workflow@3826f63`).
 
-## Entrevista
+## Passos
 
-As rodadas R1 a R4 foram respondidas por Anderson em 2026-11-03, na sessão "Plano: chat via CLI e plugins" do
-`playground`, e estão gravadas na issue de origem com o que foi apresentado antes; entram aqui com a resposta literal,
-sem perguntar de novo. As opções sem preço registrado na origem ficam sem preço aqui.
+Cada passo de código roda num worker `implementer` aberto pelo `dispatch` do `brza-mcp`, e é revisado por um worker
+`reviewer` antes do passo seguinte (R7). Os gates dos dois, com `ref: PLN-011`, estão pré-aprovados (R7.2). Cada passo é
+um commit verde; o worker roda só o alvo, e a suíte inteira roda uma vez, no merge de cada fase, pela coordenação.
 
-### Rodada 1 — o foco (enviada 2026-11-03, no `playground`)
+### Fase 1 — coordenação
 
-> **Apresentado antes:** o aprofundamento verificado da issue de origem, no `brza-studio@8f41dd56a33` e no
-> `brza-workflow`.
+Branch `feat/pln-011-chat-cli`, worktree `~/Projects/brza-studio/.worktrees/pln-011-chat-cli`, nascido da `master`
+`8f41dd56a33`.
 
-Respondida em 2026-11-03.
+Preparação do worktree, uma vez, no início do P1:
 
-1. **Foco do detalhamento.** **Decidido:** "Coordenação entre sessões (Recomendado). Custo: adaptar list/read/send à
-   CLI e integrar nomes, recibos e retry ao wrapper existente. Se paga: ao encaminhar trabalho para chats já abertos e
-   acompanhar suas respostas."
+```bash
+cd "$HOME/Projects/brza-studio" && git worktree add .worktrees/pln-011-chat-cli -b feat/pln-011-chat-cli master
+```
 
-### Rodada 2 — acompanhamento e envio (enviada 2026-11-03, no `playground`)
+```bash
+cd "$HOME/Projects/brza-studio/.worktrees/pln-011-chat-cli" && pnpm install --offline --frozen-lockfile
+```
 
-> **Apresentado antes:** as restrições do contrato — o `AgentSessionSendResult` que distingue fila de submissão, o
-> `unknown` que não é envio nem falha, o replay que não resolve o `unknown`, e o cliente da CLI que não encaminha a
-> origem do coordenador em `agentSession.send`.
+#### P1 — O porte do `#33115`, sozinho
 
-Respondida em 2026-11-03.
+Executa D1 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
 
-1. **Acompanhamento.** **Decidido:** leitura incremental por cursor, com tratamento de cursor inválido.
-2. **Envio durante atividade.** **Decidido:** preservar `queue-if-active` e expor que a mensagem está enfileirada,
-   inclusive quando uma pergunta pendente retém a fila.
+Estimado: 1,5 h · Executado: — h, com a revisão
 
-### Rodada 3 — abertura do plano (enviada 2026-11-03, no `playground`)
+- [ ] **1. Teste que falha** — antes do porte, `src/cli/handlers/chat.test.ts` não existe; o teste chega com o diff e
+      falha só se o porte quebrar.
+- [ ] **2. Aplicar** — `gh pr diff 33115 -R stablyai/orca | git apply --3way`, conferindo que a cabeça ainda é
+      `a007c29e248` (`gh pr view 33115 -R stablyai/orca --json headRefOid`).
+- [ ] **3. Rodar e ver passar** —
+      `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/handler-group-manifest.test.ts --maxWorkers=2`;
+      `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
+- [ ] **4. Commit** — `feat(cli): porta chat list/read/send do stablyai/orca#33115`, com o trailer
+      `Upstream: stablyai/orca#33115 @ a007c29e248`. Nenhuma linha nossa no commit.
+- [ ] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P1`, revisa o commit
+      contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
+      antes do passo seguinte.
 
-> **Apresentado antes:** o recorte já respondido (coordenação por cursor e fila, aliases de `brza sessions`, recibos e
-> retry) e as frentes fora dele (focus e barra lateral, Jump Palette, robustez do journal, plugins, `account usage`).
+**Evidência:** `brza-studio@<sha>` · os comandos acima → `chat.test.ts` 10 passed · REV-NNN
 
-Respondida em 2026-11-03.
+#### P2 — A origem do coordenador no `agentSession.send`
 
-1. **Destino.** Opções: `PLN` em `plans/` (recomendado); seção num worklog. **Resposta:** "um plano pra cada
-   `workstream` e elas se coordenam na execução" — vai à R4.1.
-2. **Recorte.** Opções: só a coordenação (recomendado); coordenação + `chat focus`; a issue inteira, por fases.
-   **Resposta:** "A issue inteira, por fases".
-3. **Restante.** Opções: fica na issue de origem (recomendado); vira issues próprias. **Resposta:** "issues próprias,
-   repriorize individualmente" — vai à R4.2 e à R4.3.
+Executa D2 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
 
-### Rodada 4 — esclarecimento do plano (enviada 2026-11-03, no `playground`)
+Estimado: 1 h · Executado: — h, com a revisão
 
-> **Apresentado antes:** a leitura das respostas em texto livre da R3 — `studio` para o código do `brza-studio` e
-> `tools-kit` para o `brza sessions` — e o estado no upstream: `#37774` integrado em 2026-11-03 18:28 UTC e ausente do
-> checkout local `8f41dd56a33`, `#37802` e `#37467` abertos.
+- [ ] **1. Teste que falha** — em `src/cli/runtime/client-execution-host.test.ts`: `evidenceSent(client, 'agentSession.send')`
+      igual a `{ agentSessionId: CALLER_CHAT }` (falha hoje: `undefined`); `agentSession.history` continua `undefined`; o
+      caso WSL e o pareado com `agentSession.send` continuam sem evidência.
+- [ ] **2. Implementar** — o diff do D2.
+- [ ] **3. Rodar e ver passar** —
+      `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/runtime/client-execution-host.test.ts src/cli/runtime-client.test.ts --maxWorkers=2`; `pnpm tc:cli`.
+- [ ] **4. Commit** — `feat(cli): agentSession.send leva o chat chamador como coordenador`.
+- [ ] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P2`, revisa o commit
+      contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
+      antes do passo seguinte.
 
-Respondida em 2026-11-03.
+**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
-1. **Workstreams.** **Decidido:** "studio + tools-kit (Recomendado)". Um `PLN` no `studio` e outro no `tools-kit`,
-   este com `depends_on` no do `studio`, cada um aberto por sessão nova no worktree dele.
-2. **Fases.** **Decidido:** "Todas as frentes, por prioridade (Recomendado)". Cada frente vira issue com prioridade
-   própria; os planos cobrem todas, em fases na ordem da prioridade, cada fase citando a issue dela.
-3. **Prioridades.** **Decidido:** "Proposta abaixo (Recomendado)". `high`: coordenação (`list/read/send`) e o porte do
-   `#37774` antes do `send` **→ o `#37774` reaberto em R5.1**. `medium`: navegação (`focus`, barra lateral, Jump Palette) e o journal do `#37802`, que
-   espera a integração no upstream. `low`: plugins e `account usage` (`#37467`).
-4. **Issues.** **Decidido:** "No workstream da frente (Recomendado)". A sessão que abre o plano cria as issues dele.
+#### P3 — `chat read` com cursor, ids e reset
 
-### Rodada 5 — a base da fase 1 (enviada 2026-11-03)
+Executa D3, D6 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
 
-> **Apresentado antes:** o Terreno da fase 1, levantado por um `collector` no `brza-studio@8f41dd56a33` e conferido
-> nesta sessão. O `#37774` toca só `mobile/`, `src/renderer/src/components/native-chat/` e `src/shared/`, nenhum
-> arquivo de `src/main`, e limpa o rascunho do chat de **terminal** antes de um envio do celular ou do desktop; o
-> `brza chat send` fala com o host estruturado (`agentSession.send`). Portá-lo agora traz 6 conflitos de lógica e 4
-> commits do upstream posteriores à `v1.4.246` (`#37212`, `#36493`, `#37334`, `#37565`). O `#33115` aplica limpo na
-> `master` (`git apply --3way` num índice temporário: 11 arquivos, sem conflito), com `list` por `worktree.ps`, `read`
-> por `tail`/`before`, `send` com `queue-if-active` e 10 testes, sem cursor, sem o estado da submissão e sem o motivo
-> da fila. O host já tem o cursor `{epoch, sequence}` (`src/shared/agent-session-journal-identity.ts:5-8`) e cinco
-> motivos de reset com a página `tail` pronta (`agent-session-journal-types.ts:477-483`,
-> `agent-session-history-page.ts:87-104`). O motivo da retenção da fila (`prompt|working`) só existe no host
-> (`structured-agent-session-queued-messages.ts:46-58`).
+Estimado: 3,5 h · Executado: — h, com a revisão
 
-Respondida em 2026-11-03.
+- [ ] **1. Testes que falham** — em `src/cli/handlers/chat.test.ts`, com o `fakeClient` do `#33115`:
+      - sem `--since`: `entries` com `itemId`, `revision`, `sequence`; `nextCursor` = `liveCursor` formatado; `hasNewer: false`;
+      - `--since e:9`: uma chamada `after` com `cursor: { epoch: 'e', sequence: 9 }` e `limit: 200`; `nextCursor` =
+        `window.nextCursor`; `hasNewer` da página; `removedItemIds` passa;
+      - um caso por motivo de reset (`epoch_changed`, `cursor_ahead`, `cursor_compacted`, `journal_gap`,
+        `schema_unreadable`): `cursor_reset` no JSON, `entries` da página `tail`, `nextCursor` = `liveCursor`, e
+        `process.exitCode` igual a 2, pela R8.1;
+      - cursor malformado (`abc`, `e:-1`, `:3`): `invalid_argument`, sem chamada ao host;
+      - epoch com `:` (`a:b:7`) vira `{ epoch: 'a:b', sequence: 7 }`;
+      - reset `cursor_compacted` duas vezes seguidas → as duas saem 2, com a página `tail`, e o guia diz "leia sem `--since`" (R8.2);
+      - `--since` com `--limit`: recusado com `invalid_argument`, pela R8.3.
+      E `src/cli/brza/chat-cursor.test.ts` para o parse e o formato.
+- [ ] **2. Implementar** — `src/cli/brza/chat-cursor.ts`; o ramo `--since` no `chat read`; os ids no
+      `chatTranscript` (o tipo de entrada ganha `itemId`, `revision`, `sequence`); o `nextCursor` e o `hasNewer` no
+      resultado; o spec e a linha do guia (D6), e `pnpm generate:bundled-skill-guides`.
+- [ ] **3. Rodar e ver passar** —
+      `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-cursor.test.ts --maxWorkers=2`;
+      `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
+- [ ] **4. Commit** — `feat(cli): chat read --since lê só o que mudou e avisa o cursor_reset`.
+- [ ] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P3`, revisa o commit
+      contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
+      antes do passo seguinte.
 
-1. **O `#37774`, que a R4.3 punha antes do `send`.** Opções:
-   - sai da fase 1 (recomendada) — custo: nenhum agora; o envio a chat PTY fica como está até o sync; se paga: já, a
-     fase 1 começa sem 4 commits de pré-requisito e 6 conflitos;
-   - porta antes, com os 4 prévios — custo: estimada uma sessão de código e risco de regressão no composer PTY, antes
-     da coordenação; se paga: só se o `chat send` cobrir chat PTY na fase 1;
-   - fica, mas no fim da fase 1 — custo: o mesmo, no fim da fase; se paga: se o Studio usar o envio do celular a chat
-     PTY antes do sync.
+**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
-   **Decidido — "Sai da fase 1 (Recomendado)"**: chega no próximo sync do upstream, e só se porta antes se o `chat send`
-   passar a cobrir chat PTY. Reabre a parte do `#37774` da R4.3.
+#### P4 — `chat send` com estado, códigos de saída e fila
 
-2. **A base do `list/read/send`.** Opções:
-   - portar o `#33115` e estender (recomendada) — custo: estender o `chat read` e conviver com divergência no sync se
-     o upstream fundir outra forma; se paga: na fase 1, poupa o parse do `worktree.ps`, o laço de reset e os testes;
-   - escrever do zero — custo: estimado em cerca de 3 vezes o porte, sem os testes do upstream; se paga: nunca, hoje;
-   - esperar o `#33115` fundir — custo: a prioridade `high` parada por tempo indefinido, com o PR aberto desde
-     2026-10-24; se paga: nunca, para a coordenação de agora.
+Executa D4, D6 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
 
-   **Decidido — "Portar o #33115 e estender (Recomendado)"**: o porte vai num commit separado, e o cursor, o recibo e o
-   motivo da fila vêm depois.
+Estimado: 4 h · Executado: — h, com a revisão
 
-3. **O cursor inválido.** Opções:
-   - erro com a página `tail` (recomendada) — custo: um contrato de erro a documentar e testar; se paga: na fase 1, a
-     sessão coordenadora nunca segue com estado misturado sem saber;
-   - reabre sozinho, com aviso — custo: o script que não olha `reset: true` duplica ou pula itens; se paga: nunca, para
-     a coordenação.
+- [ ] **1. Testes que falham** — `src/cli/brza/chat-send-outcome.test.ts`, uma linha da tabela do D4 por caso; e em
+      `src/cli/handlers/chat.test.ts`:
+      - `queued` com página seguinte de `actionablePromptIds: ['p1']` → `held_by: 'question'`, `queuePosition`,
+        `nextQueuedMessageId`, saída 0;
+      - `queued` com `working: true` e sem prompt → `held_by: 'working'`;
+      - `queuePause: { reason: 'stopped' }` → `held_by: null`, `queuePaused: true`; fila escoada → `held_by: null` (R9.2);
+      - replay `returned` ou `withdrawn` → `rejected`, 1 (R9.3);
+      - `queued` com prompt e `working` → `question` (o prompt vence);
+      - `accepted` → 0; `rejected` → 1; `pending` resolvido em até 30 s → o estado resolvido; sem resolver → 3, pela R9.1, com relógio falso; `unknown` → 3;
+      - recusa do host → resultado `refused`, saída 1 (substitui o teste do `#33115` que esperava erro lançado);
+      - `agent_session_operation_unknown` → `unknown`, 3;
+      - o `call` do `send` rejeita com `RuntimeClientError('runtime_timeout')` → `unknown`, 3, com o
+        `operation` no resultado;
+      - a origem: com `ORCA_AGENT_SESSION_ID` no ambiente, a chamada do `send` sai pelo `client.call` sem mudar os
+        parâmetros (a evidência é do D2, conferida no P2); o `envelope.expectedRuntimeFence` é o `fence` do `tail`.
+- [ ] **2. Implementar** — `src/cli/brza/chat-send-outcome.ts`, `src/cli/brza/chat-queue-hold.ts`, o `history tail`
+      depois de `queued`, o `process.exitCode` depois do `printResult`, o spec e as linhas do guia (D6).
+- [ ] **3. Rodar e ver passar** —
+      `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-send-outcome.test.ts src/cli/brza/chat-queue-hold.test.ts --maxWorkers=2`;
+      `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
+- [ ] **4. Commit** — `feat(cli): chat send diz o estado da entrega, o motivo da fila e sai pelo código do estado`.
+- [ ] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P4`, revisa o commit
+      contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
+      antes do passo seguinte.
 
-   **Decidido — "Erro com a página tail (Recomendado)"**: código de saída não zero e `cursor_reset: <motivo>`, com a
-   página `tail` e o `nextCursor` novos no JSON.
+**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
-4. **O motivo da fila.** Opções:
-   - lê o histórico após enfileirar (recomendada) — custo: um RPC a mais por envio enfileirado, com o motivo deduzido no
-     cliente; se paga: na fase 1, cumpre a R2.2 sem mudar o contrato do host;
-   - o host passa a devolver o motivo — custo: muda o contrato do wire e conflita no sync; se paga: só quando um segundo
-     cliente precisar do motivo.
+#### P5 — `chat send --operation`
 
-   **Decidido — "Lê o histórico após enfileirar (Recomendado)"**: depois de `queued`, um `history tail`, e o JSON traz a
-   posição, o `nextQueuedMessageId` e `held_by: question|working`.
+Executa D5, D6 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
 
-### Rodada 6 — o contrato e a prova da fase 1 (enviada 2026-11-03)
+Estimado: 2 h · Executado: — h, com a revisão
 
-> **Apresentado antes:** as inferências do código, com a fonte. O cursor como string opaca `epoch:sequence`, que mapeia
-> 1:1 o `{epoch, sequence}` do host; o `--json` com `itemId`, `revision`, `sequence`, `nextCursor` e `hasNewer`, que
-> o do `#33115` não traz; a origem do coordenador no `send` pelo `ORCA_AGENT_SESSION_ID`, como o wrapper já faz
-> (`brza-workflow/bin/brza_runtime.py:95-97`), lida pelo host no `send`
-> (`src/main/runtime/rpc/methods/structured-agent-session-send-compatibility.ts:10`) e ausente da CLI, que só a manda
-> em `agent.launch` (`src/cli/runtime/client.ts:58,140`); e a divergência com o levantamento sobre o `fence`, que o
-> host atual ignora, mas que a norma do `brza-studio` manda manter, pela compatibilidade entre versões misturadas
-> (`AGENTS.md:61`).
+- [ ] **1. Testes que falham** — em `src/cli/handlers/chat.test.ts`:
+      - com `--operation <id>`, o `envelope.clientOperationId` é o id dado e o `payloadFingerprint` é igual ao da
+        primeira tentativa com o mesmo texto (os dois montados pela mesma chamada, e comparados);
+      - o mesmo id com `replayed: true` e o valor gravado → o estado do valor, sem segundo `send` (uma só chamada
+        `agentSession.send` no mock);
+      - id malformado → `invalid_argument`, nenhuma chamada ao host;
+      - recusa `operationIdReused` → `refused`, 1;
+      - replay que responde `agent_session_operation_unknown` → `unknown`, 3, nas duas tentativas;
+      - sem a flag, o `operation` impresso casa com o regex do gerador.
+- [ ] **2. Implementar** — `src/cli/brza/chat-operation-id.ts` (o regex e o parse), a flag no spec e no handler, a nota
+      do limite do `delivery` (D5) no spec e a linha do guia (D6).
+- [ ] **3. Rodar e ver passar** —
+      `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-operation-id.test.ts --maxWorkers=2`;
+      `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
+- [ ] **4. Commit** — `feat(cli): chat send --operation repete o envio sem reenviar`.
+- [ ] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P5`, revisa o commit
+      contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
+      antes do passo seguinte.
 
-Respondida em 2026-11-03.
+**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
-1. **O código de saída do `send`.** Opções:
-   - código por estado (recomendada) — custo: um contrato de códigos a documentar e testar na fase 1; se paga: no
-     plano do `tools-kit`, quando o wrapper decide sem ler o JSON e o `sent: true` falso acaba;
-   - sempre 0, estado só no JSON — custo: quem chama lê o JSON, e o `sent: true` falso se repete em quem esquecer; se
-     paga: nunca, para a coordenação.
+#### P6 — O caso manual C1 no app de dev
 
-   **Decidido — "Código por estado (Recomendado)"**: 0 em `accepted` e `queued`; 1 em recusa e `rejected`; 3 em
-   `pending` e `unknown`, entrega incerta que não se reenvia. O JSON traz sempre `delivery` e `submission.state`.
+Executa D2, D3, D4, D5 · executor: Anderson
 
-2. **O retry.** Opções:
-   - `--operation-id` no `send` (recomendada) — custo: uma flag e o teste de replay na fase 1; se paga: no `tools-kit`,
-     no primeiro timeout de envio, sem mensagem duplicada no chat;
-   - sem retry na CLI — custo: o retry depois de um timeout duplica a mensagem, ou o wrapper mantém o socket cru; se
-     paga: nunca, se o wrapper migrar para a CLI.
+Estimado: 0,5 h · Executado: — h — o preço que a R6.4 deu, "cerca de 30 min de Anderson".
 
-   **Decidido — "--operation-id no send (Recomendado)"**: o `send` imprime o `clientOperationId`, e o mesmo id com o
-   mesmo texto devolve o resultado gravado, sem reenviar.
+- [ ] **1. Subir o app de dev e a CLI** — no worktree: `pnpm dev`, e em outro terminal `pnpm run build:cli`; a CLI de
+      dev é `pnpm orca-dev …`, que aponta o perfil do `pnpm dev` deste worktree (`config/scripts/orca-dev.mjs`).
+- [ ] **2. Rodar o caso manual C1** da tabela abaixo e preencher Observado e veredito, com o print pelo
+      `brza print plans/PLN-011-chats-pela-cli-e-plugins/PLN-011-C1.png --app`.
 
-3. **O contrato inferido.** Opções:
-   - confirma, lendo o `fence` (recomendada) — custo: um RPC por envio, desde a fase 1; se paga: no primeiro host
-     remoto mais velho que ainda confere o `fence`;
-   - confirma, sem ler o `fence` — custo: o host mais velho recusa o envio, e o código diverge do `#33115`; se paga: uma
-     chamada a menos por envio, agora; com versões misturadas, nunca.
+#### P7 — O merge da fase 1 na `master` do `brza-studio`
 
-   **Decidido — "Confirma, lendo o fence (Recomendado)"**: cursor `epoch:sequence`, `--json` com os ids, origem do
-   coordenador no `send` e o `expectedRuntimeFence` lido do histórico antes do envio.
+Executa D1 a D6 · executor: a sessão coordenadora
 
-4. **A prova da fase 1.** Opções:
-   - unidade e um caso manual (recomendada) — custo: cerca de 30 min de Anderson no app ao fechar a fase; se paga: no
-     fim da fase 1, porque a fila retida por pergunta só aparece com o agente real;
-   - só unidade — custo: nenhum de Anderson; se paga: agora, mas a dedução do `held_by` só se confere no `tools-kit`.
+Estimado: 1 h · Executado: — h
 
-   **Decidido — "Unidade + 1 caso manual (Recomendado)"**: `chat.test.ts` cobre cursor, reset, fila com `held_by`,
-   códigos de saída, replay e origem; o C1 roda no app de dev com dois chats.
+- [ ] **1. Suíte inteira, uma vez** — no worktree, `pnpm test --maxWorkers=2`, sozinha na máquina, comparada à linha de
+      base da `master`.
+- [ ] **2. Merge** — `feat/pln-011-chat-cli` na `master`, com o push; o `brza install` da CLI, se a CLI instalada vem do
+      checkout.
+- [ ] **3. Fechar a issue da fase** — `brza-chat-list-read-send-no-studio` a `done`, com `completed` e a linha do
+      merge.
+
+**Evidência:** `brza-studio@<sha do merge>` · a suíte → N passed, a mesma base de falhas da `master`
+
+### Fase 2 — navegação
+
+Branch `feat/pln-011-chat-nav`, worktree `~/Projects/brza-studio/.worktrees/pln-011-chat-nav`, nascido da `master` com
+a fase 1.
+
+#### P8 — `brza chat focus` pelo `terminal.reveal`
+
+Executa D7 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+
+Estimado: 2,5 h · Executado: — h, com a revisão
+
+- [ ] **1. Testes que falham** — o roteamento do `ui:revealTerminalPane` com o `tabId` de um chat ativa a aba
+      `agent-session` e confirma; com o de terminal, o caminho de hoje; com aba inexistente, não confirma. Na CLI,
+      `chat focus` resolve a sessão e chama `terminal.reveal` com o `tabId` do chat; chat inexistente sai 1.
+- [ ] **2. Implementar** — o ramo do D7 no renderer, o `chat focus` no handler, no spec e no guia.
+- [ ] **3. Rodar e ver passar** — os arquivos de teste tocados, pelo `node config/scripts/run-vitest.mjs run --config
+      config/vitest.config.ts <arquivos> --maxWorkers=2`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master
+      --maxWorkers=2`.
+- [ ] **4. Commit** — `feat(chat): brza chat focus abre o chat pelo terminal.reveal`.
+- [ ] **5. Revisão independente** — worker `reviewer`, `ref: PLN-011/P8`, parecer em `work/reviews/`.
+
+**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
+
+#### P9 — A barra lateral segue a aba ativa
+
+Executa D8 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+
+Estimado: 2,5 h · Executado: — h, com a revisão
+
+- [ ] **1. Testes que falham** — a seleção da barra lateral muda quando a aba ativa passa a um chat por runtime, por
+      atalho e por notificação; o destaque por workspace vale para `agent-session` e segue valendo para `terminal`.
+- [ ] **2. Implementar** — o D8: a seleção derivada da aba ativa e o `focused-agent-row-highlight.ts` com
+      `agent-session`.
+- [ ] **3. Rodar e ver passar** — os testes tocados e `pnpm check:changed --base=origin/master --maxWorkers=2`.
+- [ ] **4. Commit** — `fix(sidebar): a seleção de agentes segue o chat ativo`.
+- [ ] **5. Revisão independente** — worker `reviewer`, `ref: PLN-011/P9`, parecer em `work/reviews/`.
+
+**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
+
+#### P10 — Native Chats na Jump Palette
+
+Executa D9 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+
+Estimado: 3 h · Executado: — h, com a revisão
+
+- [ ] **1. Testes que falham** — o builder inclui a aba `agent-session` nas recentes e a acha pelo título; a ativação
+      abre o chat, e não um arquivo.
+- [ ] **2. Implementar** — o D9.
+- [ ] **3. Rodar e ver passar** — os testes tocados e `pnpm check:changed --base=origin/master --maxWorkers=2`.
+- [ ] **4. Commit** — `fix(palette): a Jump Palette lista e acha os Native Chats`.
+- [ ] **5. Revisão independente** — worker `reviewer`, `ref: PLN-011/P10`, parecer em `work/reviews/`.
+
+**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
+
+#### P11 — O caso manual C2 no app de dev
+
+Executa D7, D8, D9 · executor: Anderson
+
+Estimado: 0,5 h · Executado: — h — o preço que a R10.4 deu, "~20 min de Anderson no app".
+
+- [ ] **1. Rodar o C2** da tabela de Casos manuais, com o print pelo `brza print
+      plans/PLN-011-chats-pela-cli-e-plugins/PLN-011-C2.png --app`.
+
+#### P12 — O merge da fase 2
+
+Executa D7 a D9 · executor: a sessão coordenadora
+
+Estimado: 1 h · Executado: — h
+
+- [ ] **1. Suíte inteira, uma vez**, como no P7.
+- [ ] **2. Merge** na `master`, com o push.
+- [ ] **3. Fechar a issue** `chat-ativo-pela-cli-na-barra-lateral-e-na-jump-palette`.
+
+**Evidência:** `brza-studio@<sha do merge>` · a suíte → N passed
+
+### Fase 4 — plugins
+
+Branch `feat/pln-011-plugin-chats`, worktree `~/Projects/brza-studio/.worktrees/pln-011-plugin-chats`.
+
+#### P13 — A conferência no app: o chat já aparece em `agents.list`?
+
+Executa D10 · executor: worker `implementer` do `brza-mcp`
+
+Estimado: 1 h · Executado: — h
+
+- [ ] **1. Teste de projeção** — um teste de unidade de `plugin-workspace-projection.ts` com um snapshot do hook server
+      que traz a linha de um chat estruturado; registra se a linha sai em `agents.list` e com que campos.
+- [ ] **2. Registrar** — o resultado vai ao `## Desvios` como fato, e decide se o P14 inclui a linha ou só os campos.
+
+**Evidência:** o teste e o resultado, em `arquivo:linha`
+
+#### P14 — Os campos opcionais do chat
+
+Executa D10 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+
+Estimado: 3,5 h · Executado: — h, com a revisão
+
+- [ ] **1. Testes que falham** — a linha do chat em `agents.list` traz `kind: 'chat'`, `sessionId`, `model` e
+      `providerSessionId`; a de terminal traz `kind: 'terminal'` e os campos de hoje; o `agent.status.changed` do chat
+      traz os mesmos; `workspace.readContext` continua sem `path` (R11.2); o schema público só cresce.
+- [ ] **2. Implementar** — o D10, o schema em `plugin-host-api-panel-methods.ts` e no evento, e a doc em
+      `docs/reference/plugin-host-api.md`.
+- [ ] **3. Rodar e ver passar** — os testes de `src/main/plugins` e `src/shared/plugins` tocados, e `pnpm check:changed
+      --base=origin/master --maxWorkers=2`.
+- [ ] **4. Commit** — `feat(plugins): os chats nativos em agents.list e agent.status.changed`.
+- [ ] **5. Revisão independente** — worker `reviewer`, `ref: PLN-011/P14`, parecer em `work/reviews/`.
+
+**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
+
+#### P15 — O merge da fase 4
+
+Executa D10 · executor: a sessão coordenadora
+
+Estimado: 1 h · Executado: — h
+
+- [ ] **1. Suíte inteira, uma vez**; **2. Merge** na `master`; **3. Fechar a issue** `native-chat-na-api-de-plugins`.
+
+**Evidência:** `brza-studio@<sha do merge>` · a suíte → N passed
+
+### Fase 5 — `account usage`
+
+Branch `feat/pln-011-account-usage`, worktree `~/Projects/brza-studio/.worktrees/pln-011-account-usage`.
+
+#### P16 — O porte do `#37467`
+
+Executa D11 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+
+Estimado: 1,5 h · Executado: — h, com a revisão
+
+- [ ] **1. Aplicar** — `gh pr diff 37467 -R stablyai/orca | git apply --3way`, com a cabeça conferida pelo
+      `gh pr view 37467 -R stablyai/orca --json headRefOid`; o conflito de `src/cli/root-help-text-primary.ts` fica com
+      "BrzA Studio host", e as strings "Orca host/runtime" do PR passam a "BrzA Studio".
+- [ ] **2. Rodar e ver passar** — `src/cli/handlers/account-usage-command.test.ts` e
+      `src/cli/handlers/account-usage-format.test.ts`, com as expectativas de texto acertadas ao rebrand; `pnpm tc:cli`.
+- [ ] **3. Commit** — `feat(cli): porta account usage do stablyai/orca#37467`, com o trailer `Upstream:`.
+- [ ] **4. Revisão independente** — worker `reviewer`, `ref: PLN-011/P16`, parecer em `work/reviews/`.
+
+**Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
+
+#### P17 — O merge da fase 5 e o fechamento
+
+Executa D11 · executor: a sessão coordenadora
+
+Estimado: 1 h · Executado: — h
+
+- [ ] **1. Suíte inteira, uma vez**; **2. Merge** na `master`; **3. Fechar a issue** `brza-account-usage-na-cli`.
+- [ ] **4. Fechar o plano**, pela `references/close.md` da `plan-runner`.
+
+**Evidência:** `brza-studio@<sha do merge>` · a suíte → N passed
+
+## Casos manuais
+
+| ID  | Critério | Passos | Esperado | Observado | Veredito |
+| :-- | :------- | :----- | :------- | :-------- | :------- |
+| C1  | R2.1, R2.2, R5.4, R6.1, R6.2, R6.3: o coordenador lê por cursor, envia, vê a fila retida e a origem | No app de dev, dois chats Claude: A (coordenador) e B (alvo). 1) `pnpm orca-dev chat list --json` e anote o `session` dos dois. 2) Em B, peça uma tarefa longa (ex.: "liste os arquivos de src/cli um a um, devagar"). 3) `ORCA_AGENT_SESSION_ID=<A> pnpm orca-dev chat send --session <B> --text "pare e resuma" --json; echo "saída $?"`. 4) Em B, peça uma pergunta com opções e deixe sem responder; repita o passo 3. 5) `pnpm orca-dev chat read --session <B> --json`, anote o `nextCursor`; responda a pergunta em B; `pnpm orca-dev chat read --session <B> --since <nextCursor> --json`. 6) Repita o passo 3 com `--operation <operation do passo 4>`. | 3) `delivery: queued`, `held_by: working`, saída 0. 4) `held_by: question`, saída 0. Em B, a mensagem aparece como tarefa de A, não como de pessoa. 5) só as entradas depois do cursor, com a resposta e a nova revisão da pergunta (`pending: false`), `hasNewer` e `nextCursor`. 6) `replayed: true`, saída 0, e nenhuma mensagem nova em B. | | |
+| C2  | R10.2, R10.3, R10.4: o `focus`, a barra lateral e a Jump Palette seguem o chat | No app de dev, dois chats e um terminal. 1) Com outra janela na frente, `pnpm orca-dev chat focus --session <B>`. 2) Troque para o chat A pelo atalho de aba e depois pela notificação de B. 3) Na Jump Palette, busque o título de B e abra. | 1) o app vem à frente com B ativo. 2) a barra lateral destaca o chat da tela a cada troca. 3) B aparece nas recentes e na busca, e abre como chat. | | |
+
+## Regressão
+
+- **`worktree ps` não muda.** O `chat list` só lê a resposta dele. Como se confere: `src/cli/worktree-ps-*.test.ts` e
+  `src/cli/handler-group-manifest.test.ts`, no P1.
+- **`terminal read` e `terminal send` não mudam**, nem o código de saída do `terminal send`. Como se confere:
+  `src/cli/handlers/terminal.test.ts`, `src/cli/terminal-read-screen.test.ts`, `src/cli/index-terminal-commands.test.ts`,
+  no P2 e no P4.
+- **O `agent.launch` e o `agent.launchReplay` levam a mesma evidência, e nada mais a leva.** Como se confere: os três
+  casos de `src/cli/runtime/client-execution-host.test.ts:134-161`, no P2.
+- **O código de saída dos outros comandos fica 1 no erro, e o do `plugin` fica o dele** (`src/cli/cli-exit-code.ts`):
+  o D3 e o D4 põem o `process.exitCode` dentro do handler, sem tocar o `cliErrorExitCode`.
+- **O envio do próprio chat segue como de pessoa** (`userSend`) (F8): um teste do P4 com
+  `ORCA_AGENT_SESSION_ID` igual ao `--session` não muda os parâmetros; a regra é do host e não muda.
 
 ## Worklogs
 
 - 2026-11-03 — abertura: as cinco issues das frentes, o PLN-011 com as fases e as R1 a R4 do `playground`; R5 e
-  R6 fecham a entrevista da fase 1, e o `#37774` sai dela. Parou antes do Desenho da fase 1.
+  R6 fecham a entrevista da fase 1, e o `#37774` sai dela; R7 com Anderson e R8 a R11 pelo `agy`; Desenho e P1 a P17
+  gravados, e o `brza-mcp` de pé. Parou antes do P1.
   [PLN-011: abertura do plano dos chats pela CLI e pelos plugins](../../work/worklogs/2026-11-03-pln-011-abertura-chats-pela-cli-e-plugins.md)
 
 ## Fechamento
@@ -260,5 +463,5 @@ Respondida em 2026-11-03.
 - [ ] Um resumo por commit ou PR do `brza-studio` da entrega, com o link do plano: os achados e o destino de cada um.
 - [ ] O durável saiu para a casa dona e está em `## Decisões` e `## Documentação`.
 - [ ] As decisões que o plano respondeu estão `done`, citando a rodada.
-- [ ] As cinco issues das fases estão `done`, com `completed`.
+- [ ] As issues das fases 1, 2, 4 e 5 estão `done`, com `completed`.
 - [ ] `status: done`, `phase: closed` e `completed` no frontmatter.

@@ -1,9 +1,10 @@
 ---
-status: open
+status: done
 description: O test_brza_note falha indevidamente em dois testes quando o TMPDIR do ambiente contém brza-studio em seu caminho absoluto.
 scope:
   - brza-workflow
 opened: 2026-11-03
+completed: 2026-11-03
 owner: Anderson
 tags:
   - tooling
@@ -41,3 +42,7 @@ AssertionError: 'brza-studio' unexpectedly found in 'recusado: sem workstream: a
 - Em `tests/cli/test_brza_note.py`, ajustar a asserção para validar especificamente a menção ao código ou mascarar o
   prefixo do diretório de trabalho/temporário na saída testada, evitando falsas falhas em qualquer ambiente cujo path
   contenham o nome do produto.
+
+## Resolução
+
+Resolvida em 2026-11-03: `brza-workflow@b7fb3d2` tira o caminho da base da saída antes do `assertNotIn` (`tests/cli/test_brza_note.py`), e a suíte CLI passou com 468 testes na revisão do P7, [REV-006: A entrega do PLN-008 contra o Pedido e a Cobertura](../reviews/REV-006-pln-008-p7-a-entrega.md), A6.

@@ -1,2 +1,2 @@
-- [Padrões de erro nas entregas](project_padroes-de-erro-nas-entregas.md) — override que vence o cwd, cópia local velha, dry-run que mente, D sem rodada; o que cai; higiene do clone
+- [Padrões de erro nas entregas](project_padroes-de-erro-nas-entregas.md) — override que vence o cwd, norma × checador, forma nova sem guarda; o que cai; higiene do clone
 - [O log de medição como dado](reference_o-log-de-medicao-como-dado.md) — onde ficam o log, o estado do fact_audit e os transcripts do auditor

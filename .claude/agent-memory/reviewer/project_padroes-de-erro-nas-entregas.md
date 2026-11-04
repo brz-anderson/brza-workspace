@@ -5,7 +5,8 @@ metadata:
   type: project
 ---
 
-Padrões vistos nas revisões do PLN-005 (2026-10-31) e do PLN-006 (P1–P7 e P8, 2026-11-02), no workstream `workspace`.
+Padrões vistos nas revisões do PLN-005 (2026-10-31), do PLN-006 (P1–P7 e P8, 2026-11-02) e do PLN-008 (P7,
+2026-11-03), no workstream `workspace`.
 
 **Os que se repetem e onde se escondem:**
 - **O corte que alimenta outro consumidor.** Uma constante de limite (`TEXT_LIMIT`, `[:300]`) pensada para o log vai
@@ -58,7 +59,22 @@ Padrões vistos nas revisões do PLN-005 (2026-10-31) e do PLN-006 (P1–P7 e P8
   ao molde do `brza note new`. O aceite roda o checador num workspace vazio, e por isso passa. Testar criando a nota
   pelo comando.
 
+- **Norma do passo de docs que promete mais do que o checador do passo de código aceita** (PLN-008: o `work/README.md`
+  e o `plan-template.md` do P3 aceitam `REV-NNN` e `decision:` em `depends_on`, mas o `dep_targets` do P1 só tem
+  PLN/MIG/issue). Para conferir, cada lista de vocabulário da norma vira uma nota numa sonda, e o checador roda nela.
+  Confiança dada: 97.
+- **Norma nova de nome sem guarda no checador** (PLN-008: o parecer sem `REV-NNN` nasce, fica fora do índice e do
+  `refs`, e nada avisa). Três nasceram no mesmo dia, um depois de a norma chegar. Quando a norma muda nome ou forma,
+  procurar o caso "nota fora da forma nova" no checador e no `note_kind`. Confiança dada: 95.
+- **Teste que só cobre a forma escalar de um campo que a norma escreve em lista** (o `blocks` no P2 do PLN-008).
+  Rodar o `note_state`/parser com a forma de lista do molde em cada commit (`git show <sha>:bin/...`).
+- **Commit de outra tarefa que conserta em silêncio o que o plano revisado deixou** (o `7a18392` do PLN-003 consertou o
+  `blocks`). Ao revisar os commits alheios, diferenciar "quebra" de "altera para cumprir".
+
 **Hipóteses que costumam cair** (deixar como `→ falso` no parecer):
+- a suíte CLI do `brza-workflow` "falhando" (20 falhas) dentro da sessão do revisor: é a `BRZA_WORKSPACE` herdada, que
+  dispara o `foreign_cwd`. Rodar sempre com `env -u BRZA_WORKSPACE -u BRZA_STUDIO -u BRZA_WORKFLOW` antes de acusar;
+- o `refs` gravado divergir do extrator: conferir com o bloco 2 do critério da MIG-001, que compara gravado e calculado;
 - a trava compartilhada do `measure.State` segurando o hook — conferir pelos timestamps `subagent` → `fact_capture`;
 - a sessão no worktree do `brza-studio` sem o modelo ou a permissão — o `env` do `settings.json` chega aos filhos, e o
   `defaultMode: auto` é de usuário;

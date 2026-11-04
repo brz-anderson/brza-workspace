@@ -18,7 +18,8 @@ Além do que o papel manda, a revisão de mudança no `brza` roda os `unittest` 
 `scripts/brza/tests/`, e os do `brza-workflow`, em `~/Projects/brza-workflow/tests/` (`cli`, `hooks` e
 `notes-checker`).
 
-## As notas do workspace da Fixfy
+## As notas de outro workspace
 
-Nota, plano ou decisão que mora no workspace da Fixfy fica lá, e daqui se cita em crase, sem link. O mesmo vale para
-quem aponta uma nota de lá como origem.
+Nota, plano ou decisão que mora em outro workspace fica lá, e daqui se cita sem link, sem o nome do workspace e sem o
+ID da nota: o ID de lá colide com o daqui, e o `refs` o contaria. Descreva a nota pelo assunto. O mesmo vale para quem
+aponta uma nota de lá como origem.

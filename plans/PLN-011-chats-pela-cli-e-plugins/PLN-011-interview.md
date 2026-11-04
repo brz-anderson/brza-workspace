@@ -603,3 +603,35 @@ Respondida em 2026-11-03, por Anderson.
    --to orca_session_id:…`. O `agy` fica nas rodadas cegas. A revisão do P3 em Antigravity, que terminou antes da
    resposta, entra no parecer do P3 junto com a do Grok. Reabre a R18.1 só na revisora.
 
+
+### Rodada 20 — falhas de transporte depois do envio, às cegas (2026-11-04)
+
+Apresentado: o Grok apontou que as releituras do `history` após `pending` e `queued` podiam lançar e sair 1 sem
+recibo, enquanto D4 só especificava transporte do `send`. Rodada respondida pelo `agy`, modelo
+`gemini-3.8-flash-high`, conversa `7a7a2150-9609-4202-aad6-6706eca7c6a3`. A recomendação foi gravada antes no scratch
+`r20-recomendacao.md`; o prompt foi sem recomendação e com opções em ordens diferentes.
+
+1. **Transporte do poll de `pending` falha.** Opções na ordem enviada:
+   - A: manter erro comum 1. Custo: nenhum código novo. Se paga: agora, mantendo comportamento existente, mas o recibo continua ausente.
+   - B: imprimir unknown/3 com operation e retry da mesma operação. Custo: ramo de captura, testes e complemento do D4 no P4. Se paga: na primeira falha após envio, preservando recuperação sem duplicação.
+   - C: repetir polls até o teto original de 30 s e então pending/3. Custo: captura, retenção do último erro e testes de recuperação e teto. Se paga: quando a falha transitória se resolve dentro dos 30 s; a espera continua pelo tempo restante.
+
+   Escolha cega: **C**. Resposta: “Releitura de histórico é idempotente e segura”; “Manter as tentativas permite que uma
+   recuperação na sondagem seguinte observe a resolução”. A coordenadora havia recomendado B e mudou para C,
+   convencida de que recuperar consultas dentro do teto já contratado evita incerteza sem repetir a mutação.
+   **Acordo — C**, com captura restrita a transporte; erro de programação é relançado. No teto sem resolução,
+   `submitted/pending`, saída 3 e `operation`; se o transporte continua indisponível, reason traz o último erro observado.
+
+2. **Transporte do tail adicional após `queued` falha.** Opções na ordem enviada:
+   - A: preservar queued/0 e posição do send, indicar queueMetadataUnavailable:true e omitir held_by/nextQueuedMessageId não observados. Custo: estender D4/D6 e tipos, ramo de erro e testes no P4. Se paga: na primeira falha da observação adicional, distinguindo envio confirmado e metadados indisponíveis.
+   - B: imprimir unknown/3 com operation e retry. Custo: ramo de erro, testes e complemento do D4 no P4. Se paga: na primeira falha, reaproveitando a resposta de incerteza; deixa de expressar a fila confirmada.
+   - C: manter erro comum 1. Custo: nenhum código novo. Se paga: agora, mantendo comportamento existente, mas o recibo continua ausente.
+
+   Escolha cega: **A**, igual à recomendação anterior da coordenadora. Resposta: “A indisponibilidade de transporte
+   desse enriquecimento não anula a confirmação da fila recebida no retorno da mutação”. **Acordo — A**, só para
+   transporte. O recibo mantém o estado confirmado pelo send; inclusive replay retirado mantém rejected/1. Campos
+   não observados de fila são omitidos, incluindo queuePaused. A retentativa adicional do tail, sugerida como opcional,
+   não foi adotada: conserva-se a única leitura do R5.4.
+
+O D4 e o D6 foram complementados no lugar; execução e testes seguem no P4, desvio X5. Não houve reabertura dos
+códigos de saída dos recibos confirmados nem autorização de reenvio automático.

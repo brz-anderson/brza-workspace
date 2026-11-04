@@ -23,8 +23,9 @@ tags:
 - **Retomar:** em 2026-11-04, o P4 tem os commits `brza-studio@55225f8cb878` e `brza-studio@ed5bf0283e1` no
   worktree `pln-011-chat-cli`, branch `feat/pln-011-chat-cli`. O complemento cobre os casos obrigatórios e corrige
   `held_by` na pausa; passaram 60 testes do alvo, 62 de regressão e os 22 gates. A revisão independente foi enviada
-  ao Grok por `msg_3c493c16db32`; o parecer vai ao scratch da coordenadora, `p4-rev-grok.md`. Próximo ato: receber a
-  revisão, tratar os achados, reservar o parecer, fechar P4 e seguir P5. P3 está fechado com REV-009.
+  ao Grok por `msg_3c493c16db32`; A1/A2 foram corrigidos em `a243520d41f` e confirmados pelo revisor. A R20 fechou
+  a lacuna de transporte nas releituras; o worker `ctx_c72808414a56` implementa o complemento D4/D6 (X5).
+  Próximo ato: receber o complemento, revisá-lo com Grok, reservar o parecer, fechar P4 e seguir P5. P3 está fechado com REV-009.
 - **Dividido:** [PLN-011 — Entrevista](PLN-011-interview.md) · [PLN-011 — Desenho](PLN-011-design.md)
 
 ## Pedido
@@ -482,6 +483,10 @@ Estimado: 1 h · Executado: — h
 - **X4 — Do P3 em diante, os workers saem do `brza-mcp`.** A cota da Claude reteve o P3 (pedido 7); pela R18.1, Codex
   implementa e Antigravity revisa. O pedido 7 foi cancelado no SQLite da fila, sem ferramenta para isso, o que virou
   a issue `o-mcp-nao-cancela-pedido-na-fila` do `tools-kit`; afeta P3 a P16.
+
+- **X5 — Transporte das releituras após o envio (P4).** O Grok apontou a lacuna não definida em D4; a R20, respondida
+  pelo agy às cegas, preserva polls pending até o teto original de 30 s e recibos queued com metadados indisponíveis
+  explícitos. D4/D6 complementados; implementação e revisão seguem no P4.
 
 ## Worklogs
 

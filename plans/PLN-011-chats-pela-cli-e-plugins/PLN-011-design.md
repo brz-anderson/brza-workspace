@@ -316,6 +316,9 @@ Exit codes: 0 accepted or queued; 1 refused or rejected, nothing was delivered;
 5. resultado `queued` → mais um `history tail limit 1` para a fila (R5.4);
 6. resultado `submission.dispatchState === 'pending'` → relê `history tail limit 1` a cada 500 ms, até 30 s, e procura a
    submissão do `clientMessageId` (R9.1); resolvida, vale a tabela abaixo; no teto, `pending`, saída 3.
+   Pela R20.1, falha de transporte nessa leitura não interrompe os polls: a espera continua dentro do teto original
+   de 30 s, sem novo envio. Se não resolver, preserva `operation`, `submitted/pending` e saída 3; se o transporte
+   continuar indisponível no teto, `submission.reason` traz o último erro de transporte. Erros de programação são relançados.
 
 **O JSON** (`result`), mantendo os nomes do `#33115` e acrescentando:
 
@@ -338,6 +341,8 @@ type ChatSendResult = {
   held_by?: 'question' | 'working' | null // R9.2: null com a fila escoada ou pausada
   /** Só quando a fila está parada pelo Stop (R9.2). */
   queuePaused?: boolean
+  /** R20.2: o send confirmou a fila, mas falhou o transporte da leitura dos metadados. */
+  queueMetadataUnavailable?: boolean
   refusal?: { code: string; message: string }
 }
 ```
@@ -377,6 +382,10 @@ type ChatSendResult = {
   error" muda para conferir o resultado `refused` e a saída 1.
 - No erro de transporte, o resultado impresso traz o `operation` e a linha de texto
   `retry without resending: orca chat send --session <s> --text <t> --operation <id>`.
+- R20.2: se o transporte do `tail` adicional após `queued` falhar, preserva o recibo e o código de saída derivados
+  do `send` (incluindo `queuePosition`); acrescenta `queueMetadataUnavailable: true` e omite `held_by`,
+  `nextQueuedMessageId` e `queuePaused`, que não foram observados. Recibo `waiting/dispatched` continua `queued/0`;
+  replay `returned/withdrawn` continua `rejected/1`. Não faz retry adicional desse tail. Só captura falhas de transporte.
 
 **O `held_by`** (`src/cli/brza/chat-queue-hold.ts`, função pura sobre a página):
 
@@ -449,6 +458,9 @@ regravado pelo gerador (F4); cada passo leva a sua linha:
   `working` (the current turn has not ended) or null (the queue drained or was stopped,
   with `queuePaused: true`).                                                                     (P4)
 - Repeated `cursor_reset` in the same chat: read without `--cursor` and start over.               (P3)
+- Transport failures while polling a pending send are retried within the original 30-second
+  wait. A queued receipt remains valid if queue metadata cannot be read: the result reports
+  `queueMetadataUnavailable: true` and omits the unobserved queue fields.                        (P4, R20)
 ```
 
 ---

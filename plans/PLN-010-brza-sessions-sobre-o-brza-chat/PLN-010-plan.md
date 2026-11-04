@@ -206,7 +206,7 @@ Respondida em 2026-11-03, nesta sessão, pela pergunta com opções.
    **Decidido — erro próprio (Recomendado).**
 
 4. **Como os requisitos chegam ao `PLN-011`:**
-   - correio à sessão (recomendada) — uma mensagem à `studio-chats-cli`, com o link dos Pré-requisitos; custo: uma
+   - correio à sessão (recomendada) — uma mensagem à sessão do `studio`, com o link dos Pré-requisitos; custo: uma
      mensagem agora; se paga: na R5 do `PLN-011`;
    - só no `PLN-010` — custo: nenhum, com o risco de a R5 fechar sem a operação ou a origem; se paga: só se a sessão
      do `studio` já for ler o `PLN-010`;
@@ -226,5 +226,5 @@ As fases 2 a 4, abertas na R1.1, cada uma esperando a frente correspondente do `
 ## Worklogs
 
 - 2026-11-03 — abertura: a issue da frente, o `PLN-010` e a R0 transcrita; R1 e R2 respondidas, com as issues das fases 2
-  a 4 e o correio dos Pré-requisitos ao `studio-chats-cli`. Parou na espera da R5 do `PLN-011`.
+  a 4 e o correio dos Pré-requisitos à sessão do `studio`. Parou na espera da R5 do `PLN-011`.
   [O PLN-010: a abertura do `brza sessions` sobre o `brza chat`](../../work/worklogs/2026-11-03-pln-010-abertura-do-brza-sessions-sobre-o-brza-chat.md)

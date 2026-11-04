@@ -22,10 +22,11 @@ tags:
 
 - **Retomar:** P1 a P8 `[x]`; C1 aprovado no launchd real (R7); C2 aprovado com o `tev1` real; C3 aprovado com a fila
   isolada; C4 aprovado pelo chat do Studio.
-  Código em `brza-workflow@007383a`, branch `feat/pln-009-mcp`: MCP 358 OK (um pulado), CLI limpo 445 OK.
-  Anderson confirmou o merge
-  em 2026-11-03 ("Merge agora") na `master` do `brza-workflow`. Depois do merge, `brza install --mcp --relink` do checkout
-  principal, porque os links de `~/.local/bin` apontam o worktree da `feat`.
+  A `feat/pln-009-mcp` (`007383a`) foi mesclada na `master` do `brza-workflow` em `23d812d`, com a confirmação de
+  Anderson ("Merge agora"). O gate na árvore mesclada deu `tests/mcp` 358, `tests/hooks` 291, `tests/cli` limpo 477 e
+  `notes-checker` 26. O `brza install --mcp --relink` religou o `brza-mcp` e o `brza-quota` ao checkout principal.
+  - **O que falta:** a R5.3 no PLN-003; os três pareceres sem número REV; o plist do serviço, que ainda aponta o
+    worktree da `feat`.
 
 ## Pedido
 
@@ -691,6 +692,9 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 - 2026-11-03 — o MCP de pé, o `dispatch` do terminal recusado pelo Studio e o C4 aprovado pelo chat do Studio.
   [O PLN-009: o MCP rodando e o C4 pelo chat do Studio](../../work/worklogs/2026-11-03-pln-009-c4-no-chat-do-studio.md)
 
+- 2026-11-03 — a regra do MCP local na norma; C2 e C3 aprovados; o merge em `brza-workflow@23d812d` e o relink.
+  [O PLN-009: a regra do MCP local na norma, o C2, o C3 e o merge](../../work/worklogs/2026-11-03-pln-009-c2-c3-e-merge.md)
+
 ## Revisões
 
 - [REV: o Desenho do PLN-009 antes da execução](../../work/reviews/pln-009-o-desenho-antes-da-execucao.md) —
@@ -722,5 +726,5 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 
 - [x] Todo passo `[x]`, com revisão independente e os achados com destino (R3 a R6; P7; P8).
 - [x] Os casos C1 a C4 com o Observado e o veredito.
-- [ ] O `feat/pln-009-mcp` integrado à `master` do `brza-workflow`, com a confirmação de Anderson.
+- [x] O `feat/pln-009-mcp` integrado à `master` do `brza-workflow`, com a confirmação de Anderson (`23d812d`).
 - [ ] A R5.3 reaberta no PLN-003, e os P6 a P9 de lá passados a este plano.

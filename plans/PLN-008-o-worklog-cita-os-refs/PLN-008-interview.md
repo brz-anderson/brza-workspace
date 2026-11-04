@@ -446,3 +446,25 @@ Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
    reabrindo o contrato do P1 e o D3.
 
    **Decidido — "Exceção: ID de issue fica (Recomendado)".** → D11.
+
+### Rodada 18 — o fim do D11 (enviada 2026-11-03)
+
+**Apresentado antes:** os avisos das seis sessões do D11 e a conferência final: nenhum arquivo atual cita o nome, salvo
+o índice, as identidades da R17.1 e a `master` do `brza-studio`, onde a branch não foi mesclada. O checador deu zero erros nas cinco
+árvores, e os três blocos da MIG-001 saíram com 0.
+
+Respondida por Anderson em 2026-11-03, na sessão `workspace-a6`.
+
+1. **O `brza-studio`**: a branch `test/pln-008-d11-dados-neutros` (`a6ef12c`) não foi mesclada, e o commit saiu com o
+   e-mail noreply do GitHub. Opções: corrigir o autor e mesclar (recomendada), ~10 min; mesclar como está; deixar a
+   branch para Anderson.
+
+   **Decidido — "Corrigir autor e mesclar (Recomendado)".**
+2. **O defeito do `refs` no rename de issue.** Opções: issue no workspace (recomendada), ~5 min; passo P9, ~1 h.
+
+   **Decidido — "Issue no workspace (Recomendado)".**
+3. **O desvio X2**, a recusa do arquivo da guarda que existe e não se lê. Opções: aceitar (recomendada); voltar ao
+   pedido, ~20 min.
+
+   **Decidido — "Aceitar o X2 (Recomendado)".** → D11.
+

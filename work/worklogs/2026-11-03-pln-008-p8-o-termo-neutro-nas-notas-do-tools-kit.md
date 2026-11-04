@@ -43,12 +43,18 @@ editados daqui.
   caminho novo para o ID antigo, e o checador acusou `ref-not-found`. A linha do `refs` se corrige à mão e se recomita.
   O defeito é do `brza-workflow` e foi à `workspace-a6`.
 
+## A segunda passagem
+
+Dois links para notas de outros workstreams ficaram da primeira passagem, porque o destino novo ainda não existia na
+branch dona (`git ls-tree` na `origin`). A `workspace-a6` pediu a troca depois do push do `studio` e do `workspace`
+(`835f023`), e o caminho e o rótulo vieram do H1 de lá (`git show origin/workstream/<dono>:<caminho> | grep -m1 '^# '`):
+- no `PLN-002-interview.md`, o link para o worklog do ▶ e do ⤢, no `studio`, quebrado desde o push de lá;
+- na issue das skills de documento, o link para o worklog do porte das skills, no `workspace`.
+
+Esse commit não renomeia issue, e o `refs` dos worklogs manteve as identidades antigas.
+
 ## O que ficou
 
-- **Dois links para notas de outros workstreams ficam para a segunda passagem**, porque o destino novo ainda não existe
-  na branch dona (`git ls-tree` na `origin`):
-  - no `PLN-002-interview.md`, o link para o worklog do ▶ e do ⤢, no `studio`;
-  - na issue das skills de documento, o link para o worklog do porte das skills, no `workspace`, com o rótulo antigo.
-- **O `git grep -il` final** acha só esses dois links e as duas identidades antigas no `refs` dos worklogs.
+- **O `git grep -il` final** acha só as duas identidades antigas no `refs` de três worklogs, as exceções da R17.1.
 - **O checador:** 0 erros, 0 links não resolvidos, 3 avisos `review-without-number`, os pareceres do PLN-009 sem número
   que já vinham de antes.

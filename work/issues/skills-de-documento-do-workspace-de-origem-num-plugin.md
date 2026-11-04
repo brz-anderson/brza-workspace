@@ -36,5 +36,5 @@ agente; as seis, se virarem plugin, vão no plugin do Claude (`.claude-plugin/pl
 
 **O porte não é cópia.** Cada uma cita a skill de contexto de lá, o `doc-governance` e os papéis do time de lá
 (`architect`, `product-owner`), que aqui viram os subagentes por papel do `AGENTS.md`. A triagem inteira está em
-[O porte das skills da Fixfy para o workspace](../worklogs/2026-10-31-o-porte-das-skills-da-fixfy.md), no workstream
+[O porte das skills do workspace de origem para o workspace](../worklogs/2026-10-31-o-porte-das-skills-do-workspace-de-origem.md), no workstream
 `workspace`.

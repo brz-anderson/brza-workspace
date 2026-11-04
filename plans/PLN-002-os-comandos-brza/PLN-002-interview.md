@@ -9,7 +9,7 @@
   `feat/pln-001-p48` e `feat/pln-001-p44-p47`.
 - **O `brza-sessions --checkout`:** só abre o chat (`scripts/brza/brza-sessions:115,135`).
 - **O conserto do node_modules:** foi `pnpm install --offline --frozen-lockfile` no próprio worktree, em menos de 1 s
-  ([o worklog do ▶ e do ⤢](../../work/worklogs/2026-10-27-o-executar-e-o-expandir-do-orca-fixfy-no-chat.md), linhas
+  ([O ▶ que executa o bloco de shell, o ⤢ que expande o bloco e o copiar sem o `\n` final no chat](../../work/worklogs/2026-10-27-o-executar-e-o-expandir-do-orca-de-origem-no-chat.md), linhas
   48-52).
 - **Os órfãos:**
   - o `conferencia-p52-p53` é worktree registrado, em detached HEAD;

@@ -310,3 +310,5 @@ Estimado: 3.0 h · Executado: — h
   [O PLN-003 P2: a CLI brza unificada e o despacho nos dois clients](../../work/worklogs/2026-11-03-pln-003-p2-cli-unificada-e-despacho.md)
 - 2026-11-03 — o P3 criou e publicou o repositório `brz-anderson/brza` com pyproject.toml, fórmula brew e teste em venv limpo.
   [O PLN-003 P3: o repositório público brz-anderson/brza e empacotamento (pipx, brew)](../../work/worklogs/2026-11-03-pln-003-p3-repo-publico-brza-e-packaging.md)
+- 2026-11-03 — o PLN-013 absorveu o P12, pela PLN-013/R1.1; o pedido de marcá-lo `[-]` está no `Retomar`.
+  [Abertura e entrevista do PLN-013, o Grok no `brza sessions` e no MCP](../../work/worklogs/2026-11-03-pln-013-abertura-e-entrevista.md)

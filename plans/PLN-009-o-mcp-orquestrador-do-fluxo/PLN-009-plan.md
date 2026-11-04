@@ -20,10 +20,11 @@ tags:
 
 # PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients
 
-- **Retomar:** P1 a P8 `[x]`; C1 aprovado no launchd real (R7); C4 aprovado pelo chat do Studio.
+- **Retomar:** P1 a P8 `[x]`; C1 aprovado no launchd real (R7); C2 aprovado com o `tev1` real; C3 aprovado com a fila
+  isolada; C4 aprovado pelo chat do Studio.
   Código em `brza-workflow@007383a`, branch `feat/pln-009-mcp`: MCP 358 OK (um pulado), CLI limpo 445 OK.
-  Faltam C2 e C3, com Anderson; confirmar o pré-requisito do C3 com a sessão do PLN-003; e a confirmação
-  de Anderson para o merge na `master` do `brza-workflow`. Depois do merge, `brza install --mcp --relink` do checkout
+  Anderson confirmou o merge
+  em 2026-11-03 ("Merge agora") na `master` do `brza-workflow`. Depois do merge, `brza install --mcp --relink` do checkout
   principal, porque os links de `~/.local/bin` apontam o worktree da `feat`.
 
 ## Pedido
@@ -535,6 +536,15 @@ Estimado: 0,8 h · Executado: 0,8 h
     `launchctl print` 113 → `stop` repetido 0. Fila nova vazia.
   - **Veredito:** aprovado.
 - **C2 — O `tev1` real:** um desempate com o Ollama de pé, frio e carregado, medindo o tempo.
+  - **Observado (2026-11-03, `007383a`):** o `Resolver` real, com o Ollama e o Haiku de verdade, desempatou duas tarefas.
+    - **Sem limiar**, o padrão da R2.2, o caminho foi `haiku`. A de desenho saiu `alta` e a de contagem, `rapida`.
+    - **O tempo do `tev1`:** 1.564 ms a frio, com a carga do modelo, e 7 ms a 145 ms carregado.
+    - **O tempo do Haiku:** 3,2 s a 3,7 s.
+    - **No total:** 4,9 s a frio e 3,2 s a 3,9 s carregado.
+    - **Com o limiar 0,5**, só de teste, a tarefa de desenho ficou no `tev1` (0,55) em 15 ms, e a de contagem (0,41)
+      foi ao Haiku.
+  - **Veredito:** aprovado (Anderson, 2026-11-03), com
+    [O limiar do tev1 sem calibração](../../work/issues/o-limiar-do-tev1-sem-calibracao.md).
 - **C4 — O ciclo real:** um `dispatch` de consultor no Studio abre run, task e worker, e o `--json` de cada verbo traz
   as chaves que o `cycle.py` procura (X24); o fim volta pelo `task-list`.
   - **Observado (2026-11-03, `007383a`):** o servidor estava de pé no launchd (pid 34093). Pelo `/mcp`, com o
@@ -551,6 +561,21 @@ Estimado: 0,8 h · Executado: 0,8 h
     [O dispatch aceita chamador fora do Studio](../../work/issues/o-dispatch-aceita-chamador-fora-do-studio.md).
   - **Veredito:** aprovado (Anderson, 2026-11-03), com a issue do chamador fora do Studio como pendência.
 - **C3 — A fila pelo índice:** depois do PLN-003/P1, dois pedidos com `ref` de notas com `priority` e `deadline`.
+  - **Observado (2026-11-03, `007383a`):** nenhuma nota aberta do índice da `master` tinha `deadline`. Anderson
+    escolheu "Fila isolada, dois índices".
+    - **O montado:** um `brza-mcp serve` em primeiro plano, com `BRZA_HOME` temporário, porta 4343 e
+      `orchestrator.max_workers: 0` pelo `config`. Sem worker, sem Studio e sem a fila real. Cada `dispatch` de
+      `consultant` com `ref` saiu `queued`, `held_by: workspace`.
+    - **O índice real** (`BRZA_WORKSPACE` no workspace), com quatro pedidos despachados na ordem sem `ref`, `low`,
+      `medium` e `high`. O `status` ordenou `PLN-010` (`high`), `import-boundaries-…` (`medium`),
+      `o-start-e-o-stop-…` (`low`) e, por último, o sem `ref`. A `priority` gravada em cada pedido veio do índice.
+    - **O índice de teste**, num repo git temporário com `.brza/index.jsonl` na `master`, com cinco pedidos despachados
+      na ordem `low`, `high`, `blocks` (`low`), `deadline` 2026-12-31 e `deadline` 2026-11-10. O `status` ordenou
+      `deadline` 2026-11-10, `deadline` 2026-12-31, `blocks`, `high` e `low`, como manda a R9.2. O `deadline`, o
+      `blocks` e a `priority` gravados vieram do `git show master:.brza/index.jsonl`.
+    - **O que o `status` não mostra:** o item da fila não traz a `priority`, o `deadline` nem o `blocks`. Foram lidos
+      no `orchestrator.db` da base temporária.
+  - **Veredito:** aprovado (Anderson, 2026-11-03).
 
 ## Regressão
 
@@ -690,10 +715,12 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
   do `workspace`; os três pareceres de `work/reviews/` ganham o `REV-NNN` antes do fechamento deste plano.
 - [O dispatch aceita chamador fora do Studio](../../work/issues/o-dispatch-aceita-chamador-fora-do-studio.md) — do
   C4; o gate abre para um `caller` que o Studio não conhece, até o primeiro client fora do Studio.
+- [O limiar do tev1 sem calibração](../../work/issues/o-limiar-do-tev1-sem-calibracao.md) — do C2; todo desempate
+  vai ao Haiku (~3,5 s) até o `resolver.tev1_min_confidence` ser calibrado.
 
 ## Fechamento
 
 - [x] Todo passo `[x]`, com revisão independente e os achados com destino (R3 a R6; P7; P8).
-- [ ] Os casos C1 a C4 com o Observado e o veredito.
+- [x] Os casos C1 a C4 com o Observado e o veredito.
 - [ ] O `feat/pln-009-mcp` integrado à `master` do `brza-workflow`, com a confirmação de Anderson.
 - [ ] A R5.3 reaberta no PLN-003, e os P6 a P9 de lá passados a este plano.

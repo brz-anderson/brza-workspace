@@ -5,8 +5,8 @@ origin: request
 description: O brza sessions abre o Grok com nome e espera, e o MCP despacha ao Grok, ao Codex e ao Antigravity com conta e cota por runtime
 ready: sim
 estimate_h: 16
-executed_h: 0.25
-remaining_h: 15.25
+executed_h: 3.75
+remaining_h: 10.25
 scope:
   - brza-workflow
 opened: 2026-11-03
@@ -18,7 +18,7 @@ tags:
 
 # PLN-013: O Grok, o Codex e o Antigravity abrem pelo `brza sessions` e recebem tarefas do MCP
 
-- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. O P1 fechou; o P2 roda pelo `agy`.
+- **Retomar:** o plano foi aceito na R5 (2026-11-04), com a execução de ponta a ponta. A E1 (P1 a P4) fechou e foi mesclada em `brza-workflow@975fe88`; próximo: o P5.
 - **Dividido:** [PLN-013 — Entrevista](PLN-013-interview.md) · [PLN-013 — Desenho](PLN-013-design.md)
 
 ## Pedido
@@ -169,15 +169,26 @@ exit 1. Revisão do Grok (`rev-P3`): "VEREDITO: aprova", sem achado.
 
 Executa D1, D2, D3 · executor: `reviewer` e uma sessão Grok, pela sessão do `tools-kit`; o merge, a pedido de Anderson
 
-Estimado: 0.75 h · Executado: — h
+Estimado: 0.75 h · Executado: 1 h
 
-- [ ] **1. Revisão pelo `reviewer`** e **pela sessão Grok**, sobre o diff da `feat/pln-013-e1-abrir-e-despachar`,
+- [x] **1. Revisão pelo `reviewer`** e **pela sessão Grok**, sobre o diff da `feat/pln-013-e1-abrir-e-despachar`,
   com a suíte do `cli` limpa; os achados se corrigem pelo `implementer`, com commit.
-- [ ] **2. Merge na `master` do `brza-workflow`**, com a confirmação de Anderson, e o `brza mcp stop` e `brza mcp
+- [x] **2. Merge na `master` do `brza-workflow`**, com a confirmação de Anderson, e o `brza mcp stop` e `brza mcp
   start` do checkout principal, para o servidor carregar o código novo.
-- [ ] **3. Um `dispatch` real** de consultant a cada runtime, pela sessão, e o `status` mostrando os três.
+- [x] **3. Um `dispatch` real** de consultant a cada runtime, pela sessão, e o `status` mostrando os três.
 
-**Evidência:** —
+**Evidência:**
+- **Revisão da E1 pelo Grok** (`rev-P4-E1`, de `ebb4e7d` a `b4fe5f2`): "aprova com correções", dois docstrings, feitos
+  pelo `agy` em `e219215`. Os A1 a A5 do P2 conferidos como corrigidos.
+- **Gate:** `tests/mcp` → 372 OK; `test_brza_sessions` → 40 OK; a suíte do `cli` em `env -i` → 484 OK.
+- **Merge:** `brza-workflow@975fe88` na `master`, com push, pela R5. `brza mcp stop` e `start`: o plist passou do
+  worktree `pln-009-mcp` ao checkout principal (`packages/mcp/bin/brza-mcp`), o que também fecha a pendência do plist do
+  PLN-009.
+- **Dispatch real:** o `tools/list` dá o enum `claude, codex, grok, antigravity, agy`. Os pedidos 11 (`codex`,
+  `gpt-6.1-sol`/`low`), 12 (`grok`, `grok-4.7`/`low`) e 13 (`agy` → `gemini-4-argon-low`, sem esforço) ficaram `running`
+  na conta `systemDefault`. A primeira tentativa (8 a 10) falhou com `session_caller_provider_id`: a sessão passou o id
+  do Claude no `X-Brza-Session`, e não o `ORCA_AGENT_SESSION_ID`. O erro foi da chamada, e não do código.
+- **Issue:** [O `status` do MCP não diz o runtime do pedido](../../work/issues/o-status-do-mcp-nao-diz-o-runtime-do-pedido.md).
 
 ### P5 — E2: a conta e o uso por runtime
 
@@ -318,3 +329,4 @@ Estimado: 1 h · Executado: — h
 
 - [O app não lê a cota do Grok](../../work/issues/o-app-nao-le-a-cota-do-grok.md) — da R4.2; o Grok fica em
   `quota_unknown` até o app ler a cota.
+- [O `status` do MCP não diz o runtime do pedido](../../work/issues/o-status-do-mcp-nao-diz-o-runtime-do-pedido.md) — do P4.

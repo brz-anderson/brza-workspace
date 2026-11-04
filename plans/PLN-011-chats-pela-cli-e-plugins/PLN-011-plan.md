@@ -91,6 +91,8 @@ e a numeração das outras fica.
 
 - **Os gates pré-aprovados valem só para `implementer` e `reviewer` com `ref: PLN-011`, na conta ativa** (R7.2). Gate
   de troca de conta ou de outro papel para e vai a Anderson.
+- **Do P3 em diante, os workers saem do `brza-mcp`** (R18.1): ele só aceita o runtime `claude`, e a cota da Claude
+  segurava o P3. O `brza-mcp` fica de pé, sem pedidos deste plano.
 - **O `brza-mcp` roda o código da `feat/pln-009-mcp`, sem merge** (R7.1): defeito do orquestrador vai ao PLN-009, numa
   issue do `tools-kit`, e não se corrige daqui.
 
@@ -103,8 +105,9 @@ e a numeração das outras fica.
 
 ## Passos
 
-Cada passo de código roda num worker `implementer` aberto pelo `dispatch` do `brza-mcp`, e é revisado por um worker
-`reviewer` antes do passo seguinte (R7). Os gates dos dois, com `ref: PLN-011`, estão pré-aprovados (R7.2). Cada passo é
+Cada passo de código roda num worker `implementer` e é revisado por um worker `reviewer` antes do passo seguinte (R7).
+O P1 e o P2 rodaram pelo `dispatch` do `brza-mcp`; do P3 em diante, pela R18.1, o `implementer` roda em Codex e o
+`reviewer` em Antigravity, pelo `orchestration worker-start` do Studio, no worktree da fase. Os gates dos dois, com `ref: PLN-011`, estão pré-aprovados (R7.2). Cada passo é
 um commit verde; o worker roda só o alvo, e a suíte inteira roda uma vez, no merge de cada fase, pela coordenação.
 
 ### Fase 1 — coordenação
@@ -171,7 +174,7 @@ chat → 73 passed; `pnpm tc:cli` → exit 0; `pnpm check:changed --force` → 2
 
 #### P3 — `chat read` com cursor, ids e reset
 
-Executa D3, D6 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+Executa D3, D6 · executor: worker `implementer` em Codex (R18.1), no worktree do `brza-studio`
 
 Estimado: 3,5 h · Executado: — h, com a revisão
 
@@ -194,7 +197,7 @@ Estimado: 3,5 h · Executado: — h, com a revisão
       `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-cursor.test.ts --maxWorkers=2`;
       `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `feat(cli): chat read --cursor lê só o que mudou e avisa o cursor_reset`.
-- [ ] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P3`, revisa o commit
+- [ ] **5. Revisão independente** — um worker `reviewer` em Antigravity (R18.1), com `ref: PLN-011/P3`, revisa o commit
       contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
       antes do passo seguinte.
 
@@ -202,7 +205,7 @@ Estimado: 3,5 h · Executado: — h, com a revisão
 
 #### P4 — `chat send` com estado, códigos de saída e fila
 
-Executa D4, D6 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+Executa D4, D6 · executor: worker `implementer` em Codex (R18.1), no worktree do `brza-studio`
 
 Estimado: 4 h · Executado: — h, com a revisão
 
@@ -227,7 +230,7 @@ Estimado: 4 h · Executado: — h, com a revisão
       `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-send-outcome.test.ts src/cli/brza/chat-queue-hold.test.ts --maxWorkers=2`;
       `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `feat(cli): chat send diz o estado da entrega, o motivo da fila e sai pelo código do estado`.
-- [ ] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P4`, revisa o commit
+- [ ] **5. Revisão independente** — um worker `reviewer` em Antigravity (R18.1), com `ref: PLN-011/P4`, revisa o commit
       contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
       antes do passo seguinte.
 
@@ -235,7 +238,7 @@ Estimado: 4 h · Executado: — h, com a revisão
 
 #### P5 — `chat send --operation`
 
-Executa D5, D6 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+Executa D5, D6 · executor: worker `implementer` em Codex (R18.1), no worktree do `brza-studio`
 
 Estimado: 2 h · Executado: — h, com a revisão
 
@@ -254,7 +257,7 @@ Estimado: 2 h · Executado: — h, com a revisão
       `node config/scripts/run-vitest.mjs run --config config/vitest.config.ts src/cli/handlers/chat.test.ts src/cli/brza/chat-operation-id.test.ts --maxWorkers=2`;
       `pnpm verify:bundled-skill-guides`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `feat(cli): chat send --operation repete o envio sem reenviar`.
-- [ ] **5. Revisão independente** — um worker `reviewer` do `brza-mcp`, com `ref: PLN-011/P5`, revisa o commit
+- [ ] **5. Revisão independente** — um worker `reviewer` em Antigravity (R18.1), com `ref: PLN-011/P5`, revisa o commit
       contra o D e a Cobertura; o parecer vai a `work/reviews/` (`brza note review-open`), e cada achado tem destino
       antes do passo seguinte.
 
@@ -293,7 +296,7 @@ a fase 1.
 
 #### P8 — `brza chat focus` pelo `terminal.reveal`
 
-Executa D7 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+Executa D7 · executor: worker `implementer` em Codex (R18.1), no worktree do `brza-studio`
 
 Estimado: 2,5 h · Executado: — h, com a revisão
 
@@ -305,13 +308,13 @@ Estimado: 2,5 h · Executado: — h, com a revisão
       config/vitest.config.ts <arquivos> --maxWorkers=2`; `pnpm tc:cli`; `pnpm check:changed --base=origin/master
       --maxWorkers=2`.
 - [ ] **4. Commit** — `feat(chat): brza chat focus abre o chat pelo terminal.reveal`.
-- [ ] **5. Revisão independente** — worker `reviewer`, `ref: PLN-011/P8`, parecer em `work/reviews/`.
+- [ ] **5. Revisão independente** — worker `reviewer` em Antigravity, `ref: PLN-011/P8`, parecer em `work/reviews/`.
 
 **Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
 #### P9 — A barra lateral segue a aba ativa
 
-Executa D8 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+Executa D8 · executor: worker `implementer` em Codex (R18.1), no worktree do `brza-studio`
 
 Estimado: 2,5 h · Executado: — h, com a revisão
 
@@ -321,13 +324,13 @@ Estimado: 2,5 h · Executado: — h, com a revisão
       `agent-session`.
 - [ ] **3. Rodar e ver passar** — os testes tocados e `pnpm check:changed --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `fix(sidebar): a seleção de agentes segue o chat ativo`.
-- [ ] **5. Revisão independente** — worker `reviewer`, `ref: PLN-011/P9`, parecer em `work/reviews/`.
+- [ ] **5. Revisão independente** — worker `reviewer` em Antigravity, `ref: PLN-011/P9`, parecer em `work/reviews/`.
 
 **Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
 #### P10 — Native Chats na Jump Palette
 
-Executa D9 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+Executa D9 · executor: worker `implementer` em Codex (R18.1), no worktree do `brza-studio`
 
 Estimado: 3 h · Executado: — h, com a revisão
 
@@ -336,7 +339,7 @@ Estimado: 3 h · Executado: — h, com a revisão
 - [ ] **2. Implementar** — o D9.
 - [ ] **3. Rodar e ver passar** — os testes tocados e `pnpm check:changed --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `fix(palette): a Jump Palette lista e acha os Native Chats`.
-- [ ] **5. Revisão independente** — worker `reviewer`, `ref: PLN-011/P10`, parecer em `work/reviews/`.
+- [ ] **5. Revisão independente** — worker `reviewer` em Antigravity, `ref: PLN-011/P10`, parecer em `work/reviews/`.
 
 **Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
@@ -367,7 +370,7 @@ Branch `feat/pln-011-plugin-chats`, worktree `~/Projects/brza-studio/.worktrees/
 
 #### P13 — A conferência no app: o chat já aparece em `agents.list`?
 
-Executa D10 · executor: worker `implementer` do `brza-mcp`
+Executa D10 · executor: worker `implementer` em Codex (R18.1)
 
 Estimado: 1 h · Executado: — h
 
@@ -379,7 +382,7 @@ Estimado: 1 h · Executado: — h
 
 #### P14 — Os campos opcionais do chat
 
-Executa D10 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+Executa D10 · executor: worker `implementer` em Codex (R18.1), no worktree do `brza-studio`
 
 Estimado: 3,5 h · Executado: — h, com a revisão
 
@@ -391,7 +394,7 @@ Estimado: 3,5 h · Executado: — h, com a revisão
 - [ ] **3. Rodar e ver passar** — os testes de `src/main/plugins` e `src/shared/plugins` tocados, e `pnpm check:changed
       --base=origin/master --maxWorkers=2`.
 - [ ] **4. Commit** — `feat(plugins): os chats nativos em agents.list e agent.status.changed`.
-- [ ] **5. Revisão independente** — worker `reviewer`, `ref: PLN-011/P14`, parecer em `work/reviews/`.
+- [ ] **5. Revisão independente** — worker `reviewer` em Antigravity, `ref: PLN-011/P14`, parecer em `work/reviews/`.
 
 **Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
@@ -411,7 +414,7 @@ Branch `feat/pln-011-account-usage`, worktree `~/Projects/brza-studio/.worktrees
 
 #### P16 — O porte do `#37467`
 
-Executa D11 · executor: worker `implementer` do `brza-mcp`, no worktree do `brza-studio`
+Executa D11 · executor: worker `implementer` em Codex (R18.1), no worktree do `brza-studio`
 
 Estimado: 1,5 h · Executado: — h, com a revisão
 
@@ -421,7 +424,7 @@ Estimado: 1,5 h · Executado: — h, com a revisão
 - [ ] **2. Rodar e ver passar** — `src/cli/handlers/account-usage-command.test.ts` e
       `src/cli/handlers/account-usage-format.test.ts`, com as expectativas de texto acertadas ao rebrand; `pnpm tc:cli`.
 - [ ] **3. Commit** — `feat(cli): porta account usage do stablyai/orca#37467`, com o trailer `Upstream:`.
-- [ ] **4. Revisão independente** — worker `reviewer`, `ref: PLN-011/P16`, parecer em `work/reviews/`.
+- [ ] **4. Revisão independente** — worker `reviewer` em Antigravity, `ref: PLN-011/P16`, parecer em `work/reviews/`.
 
 **Evidência:** `brza-studio@<sha>` · os comandos acima → N passed · REV-NNN
 
@@ -466,6 +469,9 @@ Estimado: 1 h · Executado: — h
   `brza-studio@df8adc29574`; afeta P1 e D1.
 - **X3 — O cursor é `--cursor`, e não `--since`.** A R13.4, às cegas, reabriu a R8.4 só no nome do cursor; o D3, o D6, o
   P3, a Cobertura e o C1 foram reescritos. O PLN-010 do `tools-kit` chama `brza chat read --cursor`.
+- **X4 — Do P3 em diante, os workers saem do `brza-mcp`.** A cota da Claude reteve o P3 (pedido 7); pela R18.1, Codex
+  implementa e Antigravity revisa. O pedido 7 foi cancelado no SQLite da fila, sem ferramenta para isso, o que virou
+  a issue `o-mcp-nao-cancela-pedido-na-fila` do `tools-kit`; afeta P3 a P16.
 
 ## Worklogs
 

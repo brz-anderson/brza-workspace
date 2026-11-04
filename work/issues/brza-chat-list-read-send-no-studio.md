@@ -1,6 +1,6 @@
 ---
 status: open
-description: O brza-studio ganha brza chat list/read/send, com leitura por cursor, a fila do queue-if-active à vista e recibos fiéis, depois do porte do #37774, para que uma sessão encaminhe trabalho a um chat aberto e acompanhe a resposta.
+description: O brza-studio ganha brza chat list/read/send, com leitura por cursor, a fila do queue-if-active à vista e recibos fiéis, a partir do porte do #33115, para que uma sessão encaminhe trabalho a um chat aberto e acompanhe a resposta.
 scope:
   - brza-studio
 priority: high
@@ -26,7 +26,8 @@ deste.
 - **`brza chat send`:** o envio a um chat aberto, **preservando o `queue-if-active`** e dizendo no resultado que a
   mensagem foi enfileirada, inclusive quando uma pergunta pendente retém a fila; o recibo distingue recusa, fila e
   submissão `pending`, `accepted`, `rejected` ou `unknown`, e o retry não promete resolver o `unknown`.
-- **Antes do `send`:** o porte do `#37774`, que isola os rascunhos do terminal dos envios de chat.
+- **Fora desde 2026-11-03:** o porte do `#37774`, que isola os rascunhos do terminal dos envios de chat. Ele não toca o
+  host estruturado que o `chat send` usa, e chega no próximo sync do upstream (PLN-011, R5.1).
 
 As três primeiras saíram das rodadas de 2026-11-03 na sessão "Plano: chat via CLI e plugins" do `playground`, citadas na
 issue de origem: foco "Coordenação entre sessões (Recomendado)", acompanhamento por cursor e envio que preserva o
@@ -60,5 +61,5 @@ pontos que pesam no recorte:
 
 ## O que fecha
 
-O `brza chat list/read/send` no `brza-studio`, com testes, e o `#37774` portado antes do `send`. O como fica no
-PLN-011.
+O `brza chat list/read/send` no `brza-studio`, com testes, a partir do porte do `#33115` (PLN-011, R5.2). O como fica
+no PLN-011.

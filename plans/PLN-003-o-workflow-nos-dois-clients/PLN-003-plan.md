@@ -2,10 +2,10 @@
 status: in_progress
 phase: execution
 origin: request
-ready: sim — P0, P1 e P2 concluídos; próximo passo: P3
+ready: sim — P0, P1, P2 e P3 concluídos; próximo passo: P4
 estimate_h: 37.5
-executed_h: 1.9
-remaining_h: 28.0
+executed_h: 2.7
+remaining_h: 24.0
 scope:
   - workspace
   - brza-studio
@@ -18,7 +18,7 @@ tags:
 
 # PLN-003: O workflow do workspace roda igual no BrzA Studio e no Orca, por plugins e pelo `brza`
 
-- **Retomar:** P0, P1 e P2 concluídos em 2026-11-03; os passos de MCP (P6–P9) passaram ao [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md); próximo passo: **P3** (o repositório público `brz-anderson/brza` e empacotamento `pipx` e `brew`).
+- **Retomar:** P0, P1, P2 e P3 concluídos em 2026-11-03; os passos de MCP (P6–P9) passaram ao [PLN-009](../PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md); próximo passo: **P4** (o plugin do Claude com skills e hooks nos dois apps).
 - **A fila do orquestrador (2026-11-03):** a R9, respondida na sessão `bb0fd632` do `workspace`, fez do coordenador o
   orquestrador e deu a ordem da fila e os três tetos de workers; o Desenho mudou nas premissas, no M8, no M17, na
   regra da fila e no M24 novo (o índice da `master` grava `priority`, `blocks` e `deadline`). Os itens `D` partem daí.
@@ -132,14 +132,14 @@ Estimado: 5.0 h · Executado: 1.2 h
 
 Executa D1 (B4) · executor: sessão do `tools-kit`
 
-Estimado: 4.0 h · Executado: — h
+Estimado: 4.0 h · Executado: 0.8 h
 
-- [ ] **1. Estrutura do repo:** configurar `pyproject.toml` (hatchling/flit, stdlib), entrypoint `brza`.
-- [ ] **2. Fórmula Homebrew:** template da fórmula `brza.rb` para o tap `brz-anderson/homebrew-tap`.
-- [ ] **3. Testar instalação:** testar `pip install -e .` e conferir comandos no PATH em ambiente limpo.
-- [ ] **4. Commit:** commit no repositório `brz-anderson/brza`.
+- [x] **1. Estrutura do repo:** configurar `pyproject.toml` (hatchling/flit, stdlib), entrypoint `brza`.
+- [x] **2. Fórmula Homebrew:** template da fórmula `brza.rb` para o tap `brz-anderson/homebrew-tap`.
+- [x] **3. Testar instalação:** testar `pip install -e .` e conferir comandos no PATH em ambiente limpo.
+- [x] **4. Commit:** commit no repositório `brz-anderson/brza`.
 
-**Evidência:** —
+**Evidência:** commit `c1e4796` no repositório público [brz-anderson/brza](https://github.com/brz-anderson/brza) e [O PLN-003 P3: o repositório público brz-anderson/brza e empacotamento (pipx, brew)](../../work/worklogs/2026-11-03-pln-003-p3-repo-publico-brza-e-packaging.md).
 
 ### P4 — O plugin do Claude com skills e hooks de sessão
 
@@ -301,3 +301,5 @@ Estimado: 3.0 h · Executado: — h
   [O PLN-003 P1: o índice da master com priority, blocks e deadline](../../work/worklogs/2026-11-03-pln-003-p1-indice-master-ordering-properties.md)
 - 2026-11-03 — o P2 unificou a CLI `brza`, generalizou `tree` e `test`, adicionou install release no `app` e testou despacho nos dois clients.
   [O PLN-003 P2: a CLI brza unificada e o despacho nos dois clients](../../work/worklogs/2026-11-03-pln-003-p2-cli-unificada-e-despacho.md)
+- 2026-11-03 — o P3 criou e publicou o repositório `brz-anderson/brza` com pyproject.toml, fórmula brew e teste em venv limpo.
+  [O PLN-003 P3: o repositório público brz-anderson/brza e empacotamento (pipx, brew)](../../work/worklogs/2026-11-03-pln-003-p3-repo-publico-brza-e-packaging.md)

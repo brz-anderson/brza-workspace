@@ -19,8 +19,8 @@ tags:
 
 # PLN-010: O `brza sessions` lê e envia pelo `brza chat` do Studio, com recibo fiel
 
-- **Retomar:** R1 e R2 respondidas em 2026-11-03; os requisitos do contrato foram por correio à sessão
-  `studio-chats-cli` (R2.4). Espera a R5 do `PLN-011` fixar o contrato do `brza chat`; então o Desenho da fase 1,
+- **Retomar:** R1 e R2 respondidas em 2026-11-03; os requisitos do contrato foram por correio à sessão do
+  `studio` (R2.4). Espera a R5 do `PLN-011` fixar o contrato do `brza chat`; então o Desenho da fase 1,
   com um ponto aberto: se o `brza-run` mantém o código de saída do comando e só mostra o recibo na linha dele.
 
 ## Pedido
@@ -86,8 +86,8 @@ Rascunho da abertura; o critério de aceite de cada linha é proposta até a rod
 
 ## Pré-requisitos
 
-O contrato é decisão do `PLN-011`; o que segue é o que este plano precisa dele, mandado por correio à sessão
-`studio-chats-cli` em 2026-11-03 (R2.4). Assinatura a conferir no build do Studio; o que faltar trava o Desenho da
+O contrato é decisão do `PLN-011`; o que segue é o que este plano precisa dele, mandado por correio à sessão do
+`studio`, "Plano: chats pela CLI e plugins (studio)", em 2026-11-03 (R2.4). Assinatura a conferir no build do Studio; o que faltar trava o Desenho da
 fase 1, e o `ready` fica `não`.
 
 - **`brza chat list --json`** com o id do chat, o título e o worktree, para a resolução por nome do mapa.

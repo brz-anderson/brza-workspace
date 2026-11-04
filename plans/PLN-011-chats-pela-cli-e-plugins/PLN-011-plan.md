@@ -20,9 +20,10 @@ tags:
 
 # PLN-011: Os chats do BrzA Studio se coordenam pela CLI, aparecem na navegação e chegam aos plugins
 
-- **Retomar:** em 2026-11-03, o P1 e o P2 fecharam (`brza-studio@594c4a7e13c`, REV-007 e REV-008), e as R13 a R17
-  correram às cegas pelo `agy`; o próximo passo é o P3, pelo `dispatch` de um `implementer` no worktree
-  `pln-011-chat-cli`, na sessão coordenadora "pln-011-coord".
+- **Retomar:** em 2026-11-03, a coordenação passou a uma sessão Codex no chat do Studio, a pedido de Anderson; o P3
+  tem o commit `brza-studio@77a1cca1af2` e duas revisões (Antigravity, sem achados; Grok, A1 a A3 "corrigido aqui",
+  em `/private/tmp/pln011coord/rev/`), e o próximo ato é o conserto deles pelo worker Codex `ctx_24dec7223f04`, o
+  parecer REV-009 e o P4. O prompt da passagem está em `/private/tmp/pln011coord/handoff-codex.md`.
 - **Dividido:** [PLN-011 — Entrevista](PLN-011-interview.md) · [PLN-011 — Desenho](PLN-011-design.md)
 
 ## Pedido
@@ -484,7 +485,9 @@ Estimado: 1 h · Executado: — h
   gravados, o `brza-mcp` de pé e a R12 refaz a R7.3. Parou antes do P1, com a coordenadora aberta.
   [PLN-011: abertura do plano dos chats pela CLI e pelos plugins](../../work/worklogs/2026-11-03-pln-011-abertura-chats-pela-cli-e-plugins.md)
 - 2026-11-03 — execução: o P1 e o P2 fecham pelo `brza-mcp` (X1, X2, REV-007, REV-008); as R13 a R16 às cegas, com
-  a R13.4 em acordo na volta 1 (X3); a R17 manda o A2 da REV-008 a uma issue.
+  a R13.4 em acordo na volta 1 (X3); a R17 manda o A2 da REV-008 a uma issue; a R18 e a R19 passam os workers a Codex
+  e a revisão à sessão Grok (X4); o P3 commitado e revisado, com os achados do Grok por corrigir; a coordenação passa
+  a uma sessão Codex.
   [PLN-011: execução dos passos pela sessão coordenadora](../../work/worklogs/2026-11-03-pln-011-execucao.md)
 
 ## Revisões

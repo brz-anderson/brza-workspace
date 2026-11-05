@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #38227, o PR #38149 e o PR #38026 trazem seleção CLI de contas Claude, perfis de pasta isolados e recuperação de limites de uso em terminais.
+description: Os PRs #38227, #38149, #38026 e #38298 e a issue #38254 trazem seleção CLI de contas Claude, perfis isolados, chaveamento mobile e propagação de CLAUDE_CONFIG_DIR em todas as panes.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Gestão de contas Claude, chaveamento de cota e preservação de prompt cache
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38227`](https://github.com/stablyai/orca/pull/38227),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#38298`](https://github.com/stablyai/orca/pull/38298),
+[`stablyai/orca#38227`](https://github.com/stablyai/orca/pull/38227),
 [`stablyai/orca#38149`](https://github.com/stablyai/orca/pull/38149),
 [`stablyai/orca#38026`](https://github.com/stablyai/orca/pull/38026),
 [`stablyai/orca#38201`](https://github.com/stablyai/orca/pull/38201) (Issue [`#38195`](https://github.com/stablyai/orca/issues/38195)),
@@ -23,6 +24,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38227`](https://github.com
 [`stablyai/orca#37567`](https://github.com/stablyai/orca/pull/37567),
 [`stablyai/orca#37568`](https://github.com/stablyai/orca/pull/37568) e
 [`stablyai/orca#37569`](https://github.com/stablyai/orca/pull/37569), além das issues
+[`stablyai/orca#38254`](https://github.com/stablyai/orca/issues/38254),
 [`stablyai/orca#38224`](https://github.com/stablyai/orca/issues/38224),
 [`stablyai/orca#38134`](https://github.com/stablyai/orca/issues/38134),
 [`stablyai/orca#38116`](https://github.com/stablyai/orca/issues/38116),
@@ -36,21 +38,28 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38227`](https://github.com
 1. **Inexistência de seleção CLI para contas Claude (`#38227`):** o comando `orca account select` aceitava apenas OpenCode
    e Devin. Não era possível alternar ou automatizar via scripts e agentes qual conta Claude ativa deve ser usada para novos
    disparos, nem rotear a seleção para hosts remotos (`--environment`).
-2. **Consumo desproporcional de cota em abas de chat vs. terminal (`#38224`):** usuários observaram que conversas conduzidas
+2. **Panes de longa duração mantêm `CLAUDE_CONFIG_DIR` antigo após troca de conta (`#38254`):**
+   Ao alternar a conta Claude ativa pelo app ou CLI, apenas a aba em foco ou processos recém-criados recebiam o novo ambiente;
+   panes em execução contínua ou terminais abertos em segundo plano continuavam apontando para o diretório de perfil antigo,
+   causando consumo fantasma na conta anterior.
+3. **Parada sem ação ao atingir limite de cota no cliente mobile (`#38298`):**
+   Ao receber notificações de limite de uso no app mobile, o usuário não dispunha de atalhos rápidos para alternar para uma
+   conta secundária ou programar retomada automática ("Automatic continue") assim que a janela de cota resetar.
+4. **Consumo desproporcional de cota em abas de chat vs. terminal (`#38224`):** usuários observaram que conversas conduzidas
    em abas de Chat UI consomem cerca de 1,5× mais da janela de 5 horas do Claude do que as mesmas tarefas em abas de
    terminal cru, devido a diferenças na injeção de preâmbulos e repasse de histórico não compactado.
-3. **Subcontagem de tokens em transcripts bifurcados (`#38201`, `#38195`):** ao chavear sessões ou forkar transcrições, a
+5. **Subcontagem de tokens em transcripts bifurcados (`#38201`, `#38195`):** ao chavear sessões ou forkar transcrições, a
    contabilidade de tokens de saída descartava valores maiores computados por outros arquivos de transcrição compartilhados.
-4. **Perfis customizados de Claude atrelados a diretórios do usuário (`#38149`):** desenvolvedores que mantêm múltiplas
+6. **Perfis customizados de Claude atrelados a diretórios do usuário (`#38149`):** desenvolvedores que mantêm múltiplas
    instalações/contas locais de Claude (ex.: `~/.claude-trabalho`, `~/.claude-pessoal`) não tinham como cadastrá-las no app
    como opções persistentes no menu de agentes da barra de abas sem sobrescrever o diretório padrão `~/.claude`.
-5. **Parada sem feedback em usage limits de terminais (`#38026`):** agentes Claude e Codex rodando em terminais paravam
+7. **Parada sem feedback em usage limits de terminais (`#38026`):** agentes Claude e Codex rodando em terminais paravam
    abruptamente ao bater no teto de uso da conta sem exibir quando a cota seria resetada nem oferecer um meio interativo de
    retomada sem ter que digitar novamente no terminal ou reiniciar o processo.
-6. **Subagentes disparados via CLI não herdam a conta do chamador (`#38052`):** quando um agente coordenador dispara um
+8. **Subagentes disparados via CLI não herdam a conta do chamador (`#38052`):** quando um agente coordenador dispara um
    subagente ou revisor via CLI, o novo agente inicia na conta globalmente selecionada no app, arriscando debitar cotas
    pessoais em tarefas de trabalho.
-7. **Perda de prompt cache em chats ociosos (`#37833`):** uma aba de Native Chat com Claude deixada ociosa perde a
+9. **Perda de prompt cache em chats ociosos (`#37833`):** uma aba de Native Chat com Claude deixada ociosa perde a
    janela de cache de prompt (1 hora em contextos ≥ 200k tokens), multiplicando custos e tempo de resposta.
 
 ## O que o upstream propõe e implementa
@@ -59,6 +68,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38227`](https://github.com
   - Estende `orca account select --agent claude --account <id|system>`;
   - Permite direcionar a seleção para instâncias remotas usando `--environment <selector>`;
   - Reutiliza a RPC interna `accounts.selectClaude` já validada no app desktop.
+- **Propagação consistente de conta entre todas as panes (`#38254`):**
+  - Proposta para sinalizar e reiniciar uniformemente todas as panes atreladas ao runtime de Claude quando houver troca de
+    conta, atualizando `CLAUDE_CONFIG_DIR` em tempo real.
+- **Ações de retomada e troca de conta em avisos de limite (`#38298`):**
+  - Oferece suporte a "Automatic continue" e "Switch Account" diretamente nos avisos de usage limit no cliente mobile e
+    notificações push.
 - **Preservação de contagem cheia de tokens (`#38201`):** retém o maior valor de tokens de saída medido entre transcrições
   irmãs concorrentes.
 - **Lançamento de Claude em perfis locais definidos pelo usuário (`#38149`):**
@@ -77,6 +92,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38227`](https://github.com
 
 ## O que fazer
 
-Portar o comando `orca account select --agent claude` (`#38227`) para a CLI do `brza`, adotar o suporte a
-`claudeConfigProfiles` (`#38149`) no `brza-studio` e ajustar a parametrização de preâmbulos para mitigar o consumo de
-tokens no Native Chat (`#38224`).
+- Portar o comando `orca account select --agent claude` (`#38227`) para a CLI do `brza`.
+- Adotar o suporte a `claudeConfigProfiles` (`#38149`) no `brza-studio` e garantir reinício/atualização de `CLAUDE_CONFIG_DIR`
+  em todas as panes (`#38254`).
+- Incorporar o fluxo de "Automatic continue / Switch Account" (`#38298`, `#38026`) nas notificações e terminais.
+- Ajustar a parametrização de preâmbulos para mitigar o consumo de tokens no Native Chat (`#38224`).

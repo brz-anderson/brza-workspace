@@ -12,12 +12,13 @@ refs:
   - issue:gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache
   - issue:modos-build-e-plan-e-ferramentas-de-artifacts-no-native-chat
   - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
+  - issue:seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes
   - issue:seguranca-macos-remocao-de-allow-dyld-environment-variables-dos-entitlements
   - issue:subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent
   - issue:workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh
 ---
 
-# Radar de issues e PRs do upstream e automação de 6h (00h e 06h BRT)
+# Radar de issues e PRs do upstream e automação de 6h (00h, 06h e 12h BRT)
 
 ## O que foi feito
 
@@ -77,3 +78,31 @@ refs:
      adicionada a issue `#38347` (recuperação de ambientes SSH atrás de Coder / ProxyCommand quando `orca serve` retém a porta 6768)
      e as issues `#38340`, `#38341`, `#38342` e `#38343` (mensageria de plugins entre host pareado e cliente desktop, exibição
      de painéis remotos de plugins, evento de foco `ui:focus` e distinção do tipo de prompt de agente).
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-05)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados mais de 30 novos PRs e issues criados ou
+   atualizados entre `2026-11-05T09:00:00Z` e `2026-11-05T15:00:00Z`.
+2. **Atualização de 5 issues existentes em `work/issues/`:**
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     adicionados o PR `#38529` e issue `#38539` (entrega de correio sem invasão do prompt via canal `$.prompt.submit` do plugin
+     do Claude em vez de injeção direta no PTY, com trava de 5s pós-digitação para outros agentes), o PR `#38445` (amarração
+     estrita de retomada de perguntas `ask --resume` e sessões de chat ao dispatch exato), o PR `#38416` (workers remotos iniciando
+     em child worktrees dedicados sob o workspace do coordenador) e o PR `#38451` (respeito a rascunhos digitados no OpenCode).
+   - [Modos Build e Plan e ferramentas de artifacts no Native Chat](../issues/modos-build-e-plan-e-ferramentas-de-artifacts-no-native-chat.md):
+     adicionados o PR `#38574` (inclusão de chats nativos na lista de recentes do Cmd+J e na busca global de abas por título),
+     o PR `#38498` (exibição de seletores de modelo e esforço antes da primeira mensagem em chats de pasta) e os PRs `#38495`
+     e `#38510` (links de arquivos diretamente clicáveis e acionáveis em cartões de aprovação de plano no desktop e mobile).
+   - [Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md):
+     adicionados o PR `#38509` (exibição de tokens vitalícios do `/stats` do Claude Code diretamente no painel Claude Usage Tracking
+     a partir de `stats-cache.json`), a issue `#38547` (desbloqueio de reinício automático na troca de contas quando a sessão
+     estiver limitada por cota e contiver crons ativos) e a issue `#38528` (fallback para contas secundárias salvas em falhas
+     de cota de geradores pontuais).
+   - [Segurança de hooks em worktrees e integridade de setup em automações](../issues/seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes.md):
+     adicionado o PR `#38558` (sandbox estritamente read-only para geradores automáticos de texto em background como nomeação de
+     chats, mensagens de commit, nomes de branches e sumários de issues/PRs, com tentativa única e limpeza delimitada da sessão).
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados o PR `#38561` (botão de criação "+" ao lado do título do workspace nos cartões da sidebar abrindo o
+     `WorkspaceCreateMenu` sem deslocamento até a barra de abas), o PR `#38518` (preservação do nome real da sessão do agente
+     em abas de terminal via `resolveTabNameSource` em vez de rótulo estático do primeiro prompt) e a issue `#38550` (opção para
+     ocultar chip de projeto em cartões fixados da sidebar).

@@ -11,6 +11,7 @@ refs:
   - issue:bifurcacao-de-conversas-no-chat-ui-e-resiliencia-de-inicializacao-do-claude
   - issue:gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache
   - issue:modos-build-e-plan-e-ferramentas-de-artifacts-no-native-chat
+  - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
   - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
   - issue:seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes
   - issue:seguranca-macos-remocao-de-allow-dyld-environment-variables-dos-entitlements
@@ -18,7 +19,7 @@ refs:
   - issue:workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh
 ---
 
-# Radar de issues e PRs do upstream e automação de 6h (00h, 06h e 12h BRT)
+# Radar de issues e PRs do upstream e automação de 6h (00h, 06h, 12h e 18h BRT)
 
 ## O que foi feito
 
@@ -106,3 +107,33 @@ refs:
      `WorkspaceCreateMenu` sem deslocamento até a barra de abas), o PR `#38518` (preservação do nome real da sessão do agente
      em abas de terminal via `resolveTabNameSource` em vez de rótulo estático do primeiro prompt) e a issue `#38550` (opção para
      ocultar chip de projeto em cartões fixados da sidebar).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-05)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados mais de 35 novos PRs e issues criados ou
+   atualizados entre `2026-11-05T15:00:00Z` e `2026-11-05T21:00:00Z`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md)
+     (PRs `#38632`, `#38633`, `#38640`, `#38470`, `#38452`, `#38594`, `#38627`, `#38649` e `#38625`):
+     barra de atividades de subagentes no desktop e folha de subagentes no cliente móvel com visualizador dedicado de transcript
+     e descarte/limpeza em lote de filhos; ferramenta "Comment on image" no Native Chat permitindo adicionar pins numerados
+     e notas textuais em imagens e exportar diretamente para o composer; otimização crítica de desempenho para conversas longas
+     eliminando o rescaneamento completo do histórico a cada 60 ms; e ativação por padrão de retomada automática de chats em
+     andamento após reinício ou atualização.
+3. **Atualização de 3 issues existentes em `work/issues/`:**
+   - [Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md):
+     adicionados o PR `#38581` (fixação de conta Claude e Codex no escopo de cada projeto, impedindo alternâncias globais
+     indesejadas entre contas pessoais e corporativas), o PR `#38654` (fallback automático para outras contas secundárias
+     salvas quando helpers de texto pontuais como commits/PRs atingem o limite de cota) e a issue `#38618` (isolamento de logins
+     OAuth de servidores MCP no Codex).
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados o PR `#38588` e a issue `#38586` (menu de ações diretas na linha de agentes da sidebar: renomeação in-place,
+     continuação da sessão em terminal, cópia do ID da sessão e fechamento rápido), o PR `#38634` (controles globais para
+     colapsar e expandir todos os projetos na sidebar) e a issue `#38617` (metadados `createdAt` e `lastActivityAt` em `workspace.list`).
+   - [Segurança de hooks em worktrees e integridade de setup em automações](../issues/seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes.md):
+     adicionados a issue `#38566` (proposta de ganchos `scripts.sleep` e `scripts.wake` no `orca.yaml` para suspender e acordar
+     serviços e containers em worktrees locais), o PR `#38648` (limpeza proativa do estado "needs permission" quando o Claude
+     cancela internamente a solicitação) e o PR `#38585` (relatório de status de saída de setup antes de pular a inicialização do agente).
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     adicionados o PR `#38464` (continuação de worker finalizado quando o coordenador responde ao seu relatório final) e o
+     PR `#38461` (herança automática da conta Claude e `CLAUDE_CONFIG_DIR` do chamador para novos subagentes CLI).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38558, #38128, #37977, #37978, #37979 e #38029 trazem geração de texto em sandbox estritamente read-only, integridade criptográfica de hooks e teardown seguro.
+description: Os PRs #38558, #38648, #38585, #38128 e #37977 e a issue #38566 tratam de hooks sleep/wake, sandbox read-only, integridade de setup e teardown seguro.
 scope:
   - brza-studio
   - brza-workflow
@@ -15,6 +15,8 @@ tags:
 # Segurança de hooks em worktrees e integridade de setup em automações
 
 Rastreado dos PRs abertos no upstream [`stablyai/orca#38558`](https://github.com/stablyai/orca/pull/38558),
+[`stablyai/orca#38648`](https://github.com/stablyai/orca/pull/38648),
+[`stablyai/orca#38585`](https://github.com/stablyai/orca/pull/38585),
 [`stablyai/orca#38128`](https://github.com/stablyai/orca/pull/38128) (Issue [`#37902`](https://github.com/stablyai/orca/issues/37902)),
 [`stablyai/orca#37977`](https://github.com/stablyai/orca/pull/37977),
 [`stablyai/orca#37978`](https://github.com/stablyai/orca/pull/37978),
@@ -23,33 +25,55 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38558`](https://github.com
 [`stablyai/orca#38029`](https://github.com/stablyai/orca/pull/38029),
 [`stablyai/orca#33492`](https://github.com/stablyai/orca/pull/33492),
 [`stablyai/orca#37941`](https://github.com/stablyai/orca/pull/37941) e
-[`stablyai/orca#37931`](https://github.com/stablyai/orca/pull/37931).
+[`stablyai/orca#37931`](https://github.com/stablyai/orca/pull/37931), além da issue
+[`stablyai/orca#38566`](https://github.com/stablyai/orca/issues/38566).
 
 ## O problema
 
-1. **Geração automática de texto em background com permissões amplas de escrita (`#38558`):**
+1. **Ausência de hooks de sleep e wake para serviços em worktrees locais (`#38566`):**
+   Ao colocar um workspace em modo sleep, o app finaliza os terminais e chats de agentes, mas processos e serviços iniciados
+   no worktree (ex.: containers rodando via `docker compose up`) continuam consumindo CPU, memória RAM e portas de rede.
+   O arquivo de configuração só oferecia ganchos `scripts.setup` e `scripts.archive`, não havendo evento para suspender e
+   reativar containers e daemons locais.
+2. **Espera de permissão travada quando o Claude encerra a solicitação internamente (`#38648`):**
+   Uma aba de terminal do Claude continuava exibindo status "needs permission" indefinidamente até o fim do turno quando
+   o próprio Claude cancelava uma solicitação de permissão (por timeout interno, recusa de segurança de `rm -rf` embutida
+   ou decisão autônoma). Como o Claude não enviava evento `PostToolUse` nesses casos, o app não recebia evidência direta
+   para liberar o estado de espera.
+3. **Falta de visibilidade do código de saída de setup ao abortar agente (`#38585`):**
+   Quando um script de setup falhava e o app pulava a inicialização do agente, o código exato de saída e log de erro não
+   eram propagados adequadamente para o painel de status.
+4. **Geração automática de texto em background com permissões amplas de escrita (`#38558`):**
    Ao abrir um chat, o app disparava agentes secundários em segundo plano para gerar títulos automáticos, mensagens de
    commit, nomes de branches e sumários de issues. Esses agentes compartilhavam a rota padrão de geração com permissões de
    build/edição/execução no worktree, com até 3 tentativas concorrentes sob timeout, criando riscos de modificações espúrias
    não solicitadas em arquivos do projeto.
-2. **Falha espúria na remoção de worktrees externos por negação de acesso no watcher (`#38128`, `#37902`):** ao remover
+5. **Falha espúria na remoção de worktrees externos por negação de acesso no watcher (`#38128`, `#37902`):** ao remover
    worktrees situados fora da pasta principal do workspace, o `git worktree remove` concluía com sucesso, mas o encerramento
    do observador de arquivos (`closeFileExplorerWatchersForPath`) tentava re-autorizar o caminho já desregistrado pelo Git.
    Isso disparava `PATH_ACCESS_DENIED_MESSAGE` e abortava com erro a rotina de exclusão, deixando o usuário em estado inconsistente.
-3. **Execução cega de scripts de setup em branches untrusted (`#37977`, `#37978`):** ao alternar branches ou criar
+6. **Execução cega de scripts de setup em branches untrusted (`#37977`, `#37978`):** ao alternar branches ou criar
    worktrees vinculados a PRs externos, comandos definidos em `orca.yaml` (ou ganchos equivalentes de inicialização de
    worktree) eram disparados automaticamente. Isso abria vetor de execução arbitrária de código (RCE) caso uma branch
    ou fork malicioso alterasse o script de setup.
-4. **Automações e runners executando hooks alterados sem validação (`#37979`):** o runner de automações não persistia o
+7. **Automações e runners executando hooks alterados sem validação (`#37979`):** o runner de automações não persistia o
    hash do script de setup previamente aprovado pelo usuário. Se uma automação baixasse ou fizesse checkout de uma branch
    com hook adulterado, o hook rodava com as permissões do app.
-5. **Bloqueio espúrio em disparos manuais de automações (`#38029`):** ao clicar em "Run Now" no painel de Automações,
+8. **Bloqueio espúrio em disparos manuais de automações (`#38029`):** ao clicar em "Run Now" no painel de Automações,
    o disparo falhava se a verificação da ferramenta de fonte do GitHub estivesse indisponível ou desconectada.
-6. **Vazamento e retenção de agentes completados em automações (`#33492`):** agentes de automações anteriores mantidos
+9. **Vazamento e retenção de agentes completados em automações (`#33492`):** agentes de automações anteriores mantidos
    abertos apenas para monitoramento de término não eram reutilizados eficientemente, gerando processos órfãos.
 
 ## O que o upstream propõe e implementa
 
+- **Hooks `scripts.sleep` e `scripts.wake` no manifesto do worktree (`#38566`):**
+  - Propõe suporte declarativo a comandos de suspensão (ex.: `docker compose stop`) e restauração (`docker compose start`)
+    no manifesto `orca.yaml`, liberando recursos de máquina quando worktrees locais entram em repouso.
+- **Limpeza proativa de estados de permissão no Claude (`#38648`):**
+  - Utiliza o evento `PostToolBatch` enviado pelo Claude (versão 2.1.118+) para desarmar a retenção de espera de permissão
+    quando o lote de ferramentas do turno for concluído, prevenindo abas presas em falsos bloqueios.
+- **Propagação de status de saída de setup (`#38585`):**
+  - Registra e exibe o código exato de saída quando scripts de setup de worktree falham antes da submissão do agente.
 - **Isolamento estrito de tarefas de texto em background como read-only (`#38558`):**
   - Impõe sandbox estritamente somente leitura para geração de títulos de chat, nomes de branches, mensagens de commit e
     sumários de issues/PRs;
@@ -75,6 +99,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38558`](https://github.com
 
 ## O que fazer
 
+- Implementar ganchos de suspensão e restauração (`scripts.sleep` / `scripts.wake`, `#38566`) no orquestrador de worktrees do `brza-studio`.
+- Incorporar o fix de descarte de espera de permissões do Claude (`#38648`).
 - Aplicar a restrição read-only para geradores de texto em background (`#38558`) no `brza-studio` e `brza-workflow`.
-- Portar as proteções de integridade de hooks (`#37977`, `#37978`, `#37979`) e o conserto de remoção de worktrees (`#38128`)
-  para o `brza-studio`, além de aplicar o reuso de agentes de automações (`#38029`, `#33492`) no agendador de 6h do `brza-workflow`.
+- Portar as proteções de integridade de hooks (`#37977`, `#37978`, `#37979`) e o conserto de remoção de worktrees (`#38128`).

@@ -5,8 +5,8 @@ origin: request
 description: Liga a medição às tarefas, para que cada uma mostre o tempo corrido, o custo de API e o recurso de máquina, e o fluxo se afine por dado.
 ready: sim
 estimate_h: 16
-executed_h: 0
-remaining_h: 16
+executed_h: 3.5
+remaining_h: 7
 scope:
   - brza-workflow
 opened: 2026-11-03
@@ -18,10 +18,9 @@ tags:
 
 # PLN-012: Cada tarefa sai com o tempo corrido, o custo e a máquina que gastou
 
-- **Retomar:** em 2026-11-06, o P5 (código e norma) está na integração (`cbbe0bd`), e falta o merge na `master` no
-  fim; P1, P2 e P4 seguem nas sessões `pln012-p1`, `-p2` e `-p4`. A devolução de cada passo é o worklog dele: o correio
-  só chega a esta sessão num turno. Ao fechar cada um, juntar a branch na integração e marcar o `[x]`. Próximo: o P3,
-  depois do P1 e do P2, já com o X2; o P6 por último.
+- **Retomar:** em 2026-11-06, P1, P2 e P4 fecharam e estão na integração `feat/pln-012-medida-por-tarefa`, com o P5
+  (`0a6f181`, as três suítes verdes); as sessões dos passos foram fechadas e as branches deles apagadas. Próximo: o P3,
+  a pedido de Anderson, num worktree saído da integração, com o P5.6 junto; depois o merge na `master` (P5.4) e o P6.
 - **Dividido:** [PLN-012 — Desenho](PLN-012-design.md)
 
 ## Pedido
@@ -271,37 +270,44 @@ Respondida em 2026-11-06, na sessão `tools-kit-produtividade`.
 
 Executa D2 · executor: sessão do `brza-workflow`, na `feat/pln-012-medida-por-tarefa`
 
-Estimado: 3.5 h · Executado: — h
+Estimado: 3.5 h · Executado: 1.1 h
 
-- [ ] **1. Teste que falha** — `tests/hooks/test_measure.py`: transcript com um `AskUserQuestion` respondido 459 s
+- [x] **1. Teste que falha** — `tests/hooks/test_measure.py`: transcript com um `AskUserQuestion` respondido 459 s
   depois e um segundo pedido depois de 120 s parado → `waits_s == [459, 120]`; pedido `isMeta` não gera espera;
   `prompt_head` cortado em 80, sem quebra de linha; `machine` com o `proc_pid_rusage` falso — dois turnos do mesmo `pid`
   dão o delta, `CLAUDE_PID` ausente dá `from: "ppid"`, leitura que falha dá `null` e a linha sai.
-- [ ] **2. Implementar** — `measure()`, `turn()`, `machine_of(pid)`, `claude_pid()`.
-- [ ] **3. Rodar e ver passar** — `python3 -m unittest discover -s tests/hooks`
-- [ ] **4. Conferir na sessão real** — depois do `brza sync`, um turno com um comando de 2 s de CPU: `machine.from`
+- [x] **2. Implementar** — `measure()`, `turn()`, `machine_of(pid)`, `claude_pid()`.
+- [x] **3. Rodar e ver passar** — `python3 -m unittest discover -s tests/hooks`
+- [-] **4. Conferir na sessão real** — movido ao P6, que roda depois do `brza sync`; — depois do `brza sync`, um turno com um comando de 2 s de CPU: `machine.from`
   diz se o hook herda a `CLAUDE_PID` [F19], e `cpu_children_s` ≥ 2.
-- [ ] **5. Commit**
+- [x] **5. Commit**
 
-**Evidência:** `brza-workflow@<sha>` · `python3 -m unittest discover -s tests/hooks` → N passed
+**Evidência:** `brza-workflow@7f38397` (`feat/pln-012-p1`), juntado na integração em `9e82bb1` ·
+`python3 -m unittest discover -s tests/hooks` → 317 OK · revisão:
+[REV-017: O P1 do PLN-012, revisado pelo agy e pelo reviewer](../../work/reviews/REV-017-pln-012-p1-o-turno-com-esperas-e-maquina.md) ·
+desvios do D2 no worklog (X3)
 
 ### P2 — `--by-task` e o `--pending`
 
 Executa D4 · executor: sessão do `brza-workflow`, na `feat/pln-012-medida-por-tarefa`
 
-Estimado: 4.0 h · Executado: — h
+Estimado: 4.0 h · Executado: 1.3 h
 
-- [ ] **1. Teste que falha** — `tests/hooks/test_summarize_measurements.py`, com o caso desta sessão em fixture (5
+- [x] **1. Teste que falha** — `tests/hooks/test_summarize_measurements.py`, com o caso desta sessão em fixture (5
   turnos, 3 `task`, 2 subagentes): a abertura do PLN-012 com agente 452 s, Anderson 625 s, pausa 0; o grok com T2;
   ociosa 13,8 min; T3–T5 "sem tarefa". E: espera de 50 min → 30 de Anderson e 20 de pausa; dois worklogs num commit →
   metade cada; `task` sem sessão → "não medida"; `until` desloca o marco; turno antes do primeiro `task` fica de fora;
   turno `fact_audit` fica de fora; `--pending --session` lista os turnos depois do último marco e as outras sessões
   paradas há mais de 2 h.
-- [ ] **2. Implementar** — `task_segments`, `task_measure`, as três tabelas, o `--json`, o `--pending --session`.
-- [ ] **3. Rodar e ver passar** — `python3 -m unittest tests/hooks/test_summarize_measurements.py`
-- [ ] **4. Commit**
+- [x] **2. Implementar** — `task_segments`, `task_measure`, as três tabelas, o `--json`, o `--pending --session`.
+- [x] **3. Rodar e ver passar** — `python3 -m unittest tests/hooks/test_summarize_measurements.py`
+- [x] **4. Commit**
 
-**Evidência:** `brza-workflow@<sha>` · `python3 -m unittest tests/hooks/test_summarize_measurements.py` → N passed
+**Evidência:** `brza-workflow@a4e98bf` (`feat/pln-012-p2`), juntado na integração em `5ecddfe` ·
+`python3 -m unittest discover -s tests/hooks -p test_summarize_measurements.py` → 79 OK (o comando do plano não acha o
+`repo_fixture`) · revisão:
+[REV-020: O P2 do PLN-012, o --by-task e o --pending, revisado pelo agy e pelo Opus](../../work/reviews/REV-020-pln-012-p2-by-task-e-pending.md) ·
+desvios no worklog (X4)
 
 ### P3 — O carimbo, o `task`, o `--until` e a `## Medida`
 
@@ -321,20 +327,29 @@ Estimado: 4.0 h · Executado: — h
 
 **Evidência:** `brza-workflow@<sha>` · `python3 -m unittest tests/cli/test_brza_note.py tests/cli/test_brza_note_index.py` → N passed
 
+**Do P1 e do P2, para o P3:** `machine_of(pid, origin, last)` é puro e devolve `(machine, marca)`, para o turno em curso
+sem gravar a marca; `measure(lines)` devolve `waits_s` e `prompt_head` no 2º dicionário. O resumo exporta
+`task_segments`, `task_measure`, `aggregate_by_task`, `parse_time` e `human_duration`; a `## Medida` sai de
+`aggregate_by_task(rows)["tasks"]`, filtrado pelo worklog, para bater com a tabela na divisão por n (REV-020). O
+segmento é `[marco anterior, marco)` (X2), a chave do tempo humano é `requester_s` e o texto diz "quem pediu" (X6).
+
 ### P4 — O `brza run` mede
 
 Executa D5 · executor: sessão do `brza-workflow`, na `feat/pln-012-medida-por-tarefa`
 
-Estimado: 1.5 h · Executado: — h
+Estimado: 1.5 h · Executado: 1.1 h
 
-- [ ] **1. Teste que falha** — `tests/cli/test_brza_scripts.py`: `run_here` com um comando que gasta CPU e aloca
+- [x] **1. Teste que falha** — `tests/cli/test_brza_scripts.py`: `run_here` com um comando que gasta CPU e aloca
   memória → `cpu_s > 0`, `max_rss_mb > 0`, `duration_s > 0`; `run_in_tab` com `result.json` de fixture → linha `run`
   com o `session_id` do ambiente; sem workspace → sem linha e aviso no stderr; os blocos impressos não mudam.
-- [ ] **2. Implementar**
-- [ ] **3. Rodar e ver passar** — `python3 -m unittest tests/cli/test_brza_scripts.py`
-- [ ] **4. Commit**
+- [x] **2. Implementar**
+- [x] **3. Rodar e ver passar** — `python3 -m unittest tests/cli/test_brza_scripts.py`
+- [x] **4. Commit**
 
-**Evidência:** `brza-workflow@<sha>` · `python3 -m unittest tests/cli/test_brza_scripts.py` → N passed
+**Evidência:** `brza-workflow@aa752e6` (`feat/pln-012-p4`), juntado na integração em `2602b6d` ·
+`python3 -m unittest tests/cli/test_brza_scripts.py` → 41 OK · revisão:
+[REV-019: A revisão do P4 do PLN-012, o brza run que mede](../../work/reviews/REV-019-pln-012-p4-o-brza-run-mede.md) ·
+desvios do D5 no worklog (X5)
 
 ### P5 — O `close-task`, a norma e as issues
 
@@ -352,6 +367,8 @@ Estimado: 2.0 h · Executado: — h
   que espera o P1 a P4.
 - [x] **5. Abrir as issues** das lacunas, pela sessão que conduz, com `brza note new issue` e `brza note commit` —
   as 10 de `## Pendências conhecidas`, em 2026-11-06.
+- [ ] **6. O `--workstream` no `--pending` do `close-task`** — sem ele, a sessão cujo único turno está em curso fica
+  sem a linha das outras sessões paradas (REV-020, A4). Vai junto do P3.
 
 **Evidência:** `brza-workflow@<sha>` · `python3 tests/notes-checker/run.py` → N passed · as issues no
 `tools-kit@<sha>` · código e norma em `brza-workflow@22805fb` (`feat/pln-012-p5`); revisão: [REV-018: A revisão do P5 do PLN-012, o close-task e a norma](../../work/reviews/REV-018-pln-012-p5-o-close-task-e-a-norma.md)
@@ -404,6 +421,16 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   que o aviso não mostra e que, cortada no minuto, pode cair antes do começo do turno. Com o intervalo fechado à
   direita, o turno que começa no `until` ficaria na tarefa anterior. A R3.4 não muda. Afeta D1, P2 e P3; o P2 foi
   avisado por correio em 2026-11-06.
+- **X3 — Os desvios do P1 ao D2** estão no worklog dele, com o porquê (seis). Afeta P3, pelo `machine_of` puro.
+- **X4 — Os desvios do P2 ao D4** estão no worklog dele: o X2 aplicado, o comando de teste por `discover`, o formato do
+  `--pending` e as seis escolhas que o D4 não fixava.
+- **X5 — Os desvios do P4 ao D5** estão no worklog dele (lá numerados X1–X5): a CPU como diferença em volta do comando,
+  o `provider_session` copiado, o workstream pelo `measure.py`, o cwd guardado antes do comando e o `ru_maxrss` em KB no
+  Linux.
+- **X6 — "Anderson" sai do `core/`.** O P1 e o P2 escreveram o nome no `measure.py` e no resumo, e o `brza init`, que
+  recusa nome de workspace no que escreve, falhou 43 vezes no `test_brza_init` do conjunto. A chave vira `requester_s`,
+  a coluna "quem pediu" (`brza-workflow@0a6f181`). O D2, o D3 e o D4 dizem "Anderson" no texto; o código diz "quem
+  pediu". Afeta P3 e a `## Medida`.
 
 ## Pendências conhecidas
 
@@ -417,9 +444,17 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
 - [A CPU do subagente em segundo plano cai no turno em que ele termina](../../work/issues/cpu-do-subagente-em-segundo-plano-cai-no-turno-errado.md) — D7, P5.5.
 - [O ▶ do brza run sem resposta do app grava o comando sem sessão](../../work/issues/brza-run-sem-resposta-do-app-grava-sem-sessao.md) — D7, P5.5.
 - [O pico do brza run é o do maior processo, não o da árvore](../../work/issues/pico-do-brza-run-e-o-do-maior-processo.md) — D7, P5.5.
+- [O brza-run copia o provider_session e lê o workstream pelo hook de medição](../../work/issues/o-brza-run-copia-o-provider-session-e-le-o-workstream-pelo-hook.md) — do REV-019, no P4.
+- [O aviso do --pending soma as sessões paradas de qualquer idade](../../work/issues/o-pending-mostra-sessoes-paradas-sem-teto-de-idade.md) — do REV-020, no P2.
 
 ## Revisões
 
+- 2026-11-06 — P1, o turno com as esperas e a máquina: três rodadas do agy e a final do reviewer; 9 achados e o ponto F
+  corrigidos aqui. [REV-017: O P1 do PLN-012, revisado pelo agy e pelo reviewer](../../work/reviews/REV-017-pln-012-p1-o-turno-com-esperas-e-maquina.md)
+- 2026-11-06 — P4, o brza run que mede: duas rodadas do agy e a final do reviewer; seis corrigidos aqui, dois à issue.
+  [REV-019: A revisão do P4 do PLN-012, o brza run que mede](../../work/reviews/REV-019-pln-012-p4-o-brza-run-mede.md)
+- 2026-11-06 — P2, o --by-task e o --pending: três rodadas do agy e a final do reviewer; um ponto à issue.
+  [REV-020: O P2 do PLN-012, o --by-task e o --pending, revisado pelo agy e pelo Opus](../../work/reviews/REV-020-pln-012-p2-by-task-e-pending.md)
 - 2026-11-06 — P5, o `close-task` e a norma: duas rodadas do agy e a final do reviewer, aprovado com correções aplicadas.
   [REV-018: A revisão do P5 do PLN-012, o close-task e a norma](../../work/reviews/REV-018-pln-012-p5-o-close-task-e-a-norma.md)
 
@@ -437,3 +472,9 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   [Os passos do PLN-012 em paralelo](../../work/worklogs/2026-11-06-pln-012-passos-em-paralelo.md)
 - 2026-11-06 — P5 (código e norma) fechado em `feat/pln-012-p5`, sha `22805fb`: close-task, `core/work/README.md` e `CLAUDE.md`; desvio do `--until` no D6.
   [O P5 do PLN-012, o close-task e a norma](../../work/worklogs/2026-11-06-pln-012-p5-o-close-task-e-a-norma.md)
+- 2026-11-06 — P1 fechado em `feat/pln-012-p1@7f38397`, 1,1 h; o subpasso 4 vai ao P6.
+  [O P1 do PLN-012, o turno com as esperas, o começo do pedido e a máquina](../../work/worklogs/2026-11-06-pln-012-p1-o-turno-com-esperas-e-maquina.md)
+- 2026-11-06 — P2 fechado em `feat/pln-012-p2@a4e98bf`, 1,3 h, com o X2.
+  [O P2 do PLN-012, o --by-task e o --pending no resumo da medição](../../work/worklogs/2026-11-06-pln-012-p2-by-task-e-pending.md)
+- 2026-11-06 — P4 fechado em `feat/pln-012-p4@aa752e6`, 1,1 h.
+  [O P4 do PLN-012, o brza run que mede](../../work/worklogs/2026-11-06-pln-012-p4-o-brza-run-mede.md)

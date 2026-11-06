@@ -3,6 +3,7 @@ scope:
   - brza-workflow
 refs:
   - PLN-012
+  - REV-018
 ---
 
 # Os passos do PLN-012 em paralelo
@@ -20,6 +21,19 @@ O pedido de Anderson, em 2026-11-06, na sessão `tools-kit-produtividade`: "inic
   `pln012-p5`. Cada pedido leva o passo, o D, o contrato dos outros passos, o laço de revisão pelo `agy` com a rodada
   final pelo `reviewer` e o aviso por correio ao fechar. Os pedidos estão no scratch do chat, em `pedidos/`.
 - **O P5.5 está feito:** as 10 issues de lacuna do D7, listadas em `## Pendências conhecidas` do plano.
+
+- **O aviso do P5 foi para a sessão errada.** Anderson perguntou: "o `P5` terminou e não retornou pra vc, pq?". O P5
+  mandou o correio às 19:12:37, e o processo desta sessão só subiu às 19:13:50, no turno seguinte de Anderson
+  (`ps -o lstart` do `claude`): o app encerra o processo da sessão parada, e ela some do `ListAgents`. Sem o nome
+  exato na lista, o P5 mandou o aviso a `tools-kit`, outra sessão, que o leu e editou o PLN-012 em `0b65202`, de novo
+  com o e-mail `noreply` do GitHub. As edições conferem com o REV-018: o comando de teste do checador, a
+  `## Revisões` e a linha do worklog.
+- **O P1, o P2 e o P4 foram avisados** por correio para não mandar o aviso a outra sessão: o worklog de cada um é a
+  devolução.
+- **O P5 foi juntado na integração** (`feat/pln-012-medida-por-tarefa@cbbe0bd`), com `python3 tests/notes-checker/run.py`
+  → saída 0; falta o merge na `master` do `brza-workflow`, no fim.
+- **X2:** o `--until` do P5 leva o começo do primeiro turno da tarefa seguinte (REV-018, A15), e por isso o segmento
+  passou a `[marco anterior, marco)` no D1. O P2 foi avisado por correio.
 
 ## O que ficou
 

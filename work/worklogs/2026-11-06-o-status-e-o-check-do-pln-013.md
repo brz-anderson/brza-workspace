@@ -37,7 +37,11 @@ O pedido de Anderson, em 2026-11-06, depois de fechar a cota do Grok: "siga com 
 
 ## Fora do workspace
 
-- **O quê e onde:** dois commits no `master` local de `~/Projects/brza-workflow`, `190cf58` (o `status`) e `d1fa1d7`
-  (o docstring e o `CHECK`). **Risco:** o `origin/master` não os tem, e o processo do MCP que já estava no ar segue
-  com o código anterior até um restart. **Estado:** no `origin/master` desde 2026-11-06 (`591f0ed..d1fa1d7`), a pedido
-  de Anderson. **Como desfazer:** `git revert d1fa1d7` e `git revert 190cf58` nesse checkout.
+- **O quê e onde:** dois commits no `master` de `~/Projects/brza-workflow`, `190cf58` (o `status`) e `d1fa1d7`
+  (o docstring e o `CHECK`). **Risco:** nenhum além do código publicado. **Estado:** no `origin/master` desde
+  2026-11-06 (`591f0ed..d1fa1d7`). **Como desfazer:** `git revert d1fa1d7` e `git revert 190cf58` nesse checkout.
+- **O quê e onde:** o serviço `com.brza.orchestrator` parado e subido de novo, a pedido de Anderson. O plist segue
+  `~/Library/LaunchAgents/com.brza.orchestrator.plist`, com o `brza-mcp` do checkout principal. O pid passou de 71714
+  para 18765. **Risco:** os três pedidos da sonda do P4 (11 Codex, 12 Grok, 13 Antigravity) continuam `running` na
+  fila. **Estado:** de pé; o `/health` responde, e o `status` ao vivo já traz `runtime`, `model` e `effort`.
+  **Como desfazer:** `brza mcp stop`.

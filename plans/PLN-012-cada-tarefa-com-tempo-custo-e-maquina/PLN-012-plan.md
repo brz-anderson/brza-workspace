@@ -1,9 +1,12 @@
 ---
-status: open
-phase: design
+status: in_progress
+phase: execution
 origin: request
 description: Liga a medição às tarefas, para que cada uma mostre o tempo corrido, o custo de API e o recurso de máquina, e o fluxo se afine por dado.
-ready: "não — falta o aceite do corte dos Passos; isso trava a execução"
+ready: sim
+estimate_h: 16
+executed_h: 0
+remaining_h: 16
 scope:
   - brza-workflow
 opened: 2026-11-03
@@ -15,8 +18,8 @@ tags:
 
 # PLN-012: Cada tarefa sai com o tempo corrido, o custo e a máquina que gastou
 
-- **Retomar:** R1 a R4 respondidas e o Desenho (D1–D7) gravado em 2026-11-03. Próximo: a rodada do corte dos
-  Passos P1–P6 (16 h); aceito o corte, os Passos entram aqui e o plano vai a `execution`.
+- **Retomar:** corte aceito em 2026-11-06 (R5.1); o plano está em `execution`, nenhum passo começou. Próximo: o P1,
+  a pedido de Anderson, numa sessão aberta no `~/Projects/brza-workflow`, na branch `feat/pln-012-medida-por-tarefa`.
 - **Dividido:** [PLN-012 — Desenho](PLN-012-design.md)
 
 ## Pedido
@@ -31,14 +34,21 @@ tags:
 
 ### Cobertura
 
-| Origem     | Critério de aceite                                                                     | Passo        | Teste (nível)       |
-| :--------- | :------------------------------------------------------------------------------------- | :----------- | :------------------ |
-| `Pedido 1`, `R1.1`, `R2.1` | O `brza note commit` de um worklog grava o id da sessão nele e um evento `task` na medição, e a tarefa vai do primeiro prompt depois do marco anterior da sessão até esse commit | a planejar | a planejar |
-| `Pedido 1`, `R2.2`, `R2.3` | Cada tarefa tem o tempo do agente, o de Anderson e a pausa (o parado acima de 30 min), e o corrido como a soma | a planejar | a planejar |
-| `Pedido 2` | Cada tarefa tem o custo de API dos turnos e dos subagentes da janela dela | a planejar | a planejar |
-| `Pedido 3`, `R1.2` | Cada tarefa tem a CPU e a memória da sessão, pelo `ps -S` do `claude` no hook, e a dos comandos rodados pelo `brza run` | a planejar | a planejar |
-| `Pedido 4`, `R1.4` | `summarize_measurements.py --by-task` compara as tarefas, e o worklog leva uma linha de medida ao fechar | a planejar | a planejar |
-| `R1.3`, `R2.4` | A tarefa sem turno medido aparece como "não medida"; os turnos sem worklog, como "sem tarefa", e o `close-task` avisa quantos são; toda lacuna que o plano deixar tem issue | a planejar | a planejar |
+| Origem | Critério de aceite | Passo | Teste (nível) |
+| Origem | Critério de aceite | Passo | Teste (nível) |
+| :-- | :-- | :-- | :-- |
+| `Pedido 1`, `R1.1`, `R2.1` | O `brza note commit` de um worklog grava `sessions:` nele e um evento `task`, e a tarefa vai do primeiro turno depois do marco anterior da sessão ao commit, com o intervalo entre os dois como ociosa da sessão | P3, P2 | `test_brza_note` e `test_summarize_measurements` (unidade); P6 (manual) |
+| `Pedido 1`, `R2.2`, `R2.3` | Cada tarefa tem o tempo do agente, o de Anderson e a pausa acima de 30 min por espera, com as esperas da rodada e da interrupção lidas no transcript, e o corrido como a soma | P1, P2 | `test_measure` e `test_summarize_measurements` (unidade); P6 contra o transcript (manual) |
+| `Pedido 2` | Cada tarefa tem o custo de API dos turnos e dos subagentes, cada subagente no turno da sessão que contém o começo dele | P2 | `test_summarize_measurements` (unidade) |
+| `Pedido 3`, `R1.2` | Cada turno traz a CPU do `claude` e dos filhos e o RSS, pelo `proc_pid_rusage`, e cada `brza run` grava a CPU, o pico e a duração do comando com a sessão que o chamou | P1, P4 | `test_measure` e `test_brza_scripts` (unidade); P1.4 na sessão real (manual) |
+| `Pedido 4`, `R1.4` | `summarize_measurements.py --by-task` compara as tarefas por workstream e dia | P2 | `test_summarize_measurements` (unidade); P6 (manual) |
+| `R3.1` | A `## Medida` do worklog traz a tarefa até o commit, com o turno em curso lido no transcript, e bate com o `--by-task` | P3, P6 | `test_brza_note` (unidade); P6 (manual) |
+| `R0.3`, `R3.2` | O worklog não ganha `opened` nem hora em `completed`; a hora do fim está na `## Medida` | P3 | `test_brza_note` (unidade) |
+| `R1.3`, `R2.4` | A tarefa sem turno medido aparece "não medida", e os turnos depois do último marco de cada sessão, "sem tarefa" | P2 | `test_summarize_measurements` (unidade) |
+| `R3.3` | O `close-task` mostra os turnos que o commit vai fechar e os sem tarefa das outras sessões do workstream | P2, P5 | `test_summarize_measurements` (unidade); P6 (manual) |
+| `R3.4` | `brza note commit --until HH:MM` põe o marco na hora dada, e recusa a hora fora da janela | P3, P2 | `test_brza_note` e `test_summarize_measurements` (unidade) |
+| `R4.1` | O `--by-task` começa no primeiro evento `task` do log | P2 | `test_summarize_measurements` (unidade) |
+| `R1.3` | Toda lacuna da lista tem issue aberta | P5 | `brza note ls` com as issues (manual) |
 
 ### Fora de escopo
 
@@ -232,6 +242,154 @@ Respondida em 2026-11-03, na sessão `tools-kit-produtividade`.
 
    **Decidido — começa no deploy.**
 
+### Rodada 5 — o corte dos Passos (enviada 2026-11-03)
+
+> **Apresentado antes:** o texto inteiro dos Passos P1–P6, da Cobertura, da Regressão e das 10 lacunas que viram
+> issue, na mensagem, com a pergunta em texto, sem a ferramenta.
+
+Respondida em 2026-11-06, na sessão `tools-kit-produtividade`.
+
+1. **O corte.** Opções:
+   - aceitar P1 a P6, 16 h (recomendada) — custo: 16 h numa sessão do `brza-workflow`, um commit por passo; se paga:
+     no P3, com a medida por tarefa pronta para a primeira comparação; o P4 e o P5 completam a máquina e o aviso;
+   - juntar P1–P3 num passo só, 11,5 h — custo: o mesmo, com uma revisão maior; se paga: só se a revisão por passo
+     pesar mais que o código;
+   - dividir em duas fases, P1–P3 e P6 agora, P4 e P5 depois — custo: o `brza run` e o aviso ficam para depois; se
+     paga: só com urgência de ter o número, com a R3.3 e a R3.4 pela metade no intervalo.
+
+   **Decidido — "aceito o corte"**: P1 a P6, 16 h. É o aceite do plano.
+
+## Passos
+
+> O código é do `brza-workflow`. P1 a P4 e a parte de código do P5 são de uma sessão aberta no
+> `~/Projects/brza-workflow`, na branch `feat/pln-012-medida-por-tarefa`, com revisão do `reviewer` antes de cada `[x]`;
+> chegam aos workspaces pelo `brza sync`. Ordem: P1 → P2 → P3; P4 independe de P2 e P3; P5 depois de P2; P6 por último.
+
+### P1 — O turno com as esperas, o começo do pedido e a máquina
+
+Executa D2 · executor: sessão do `brza-workflow`, na `feat/pln-012-medida-por-tarefa`
+
+Estimado: 3.5 h · Executado: — h
+
+- [ ] **1. Teste que falha** — `tests/hooks/test_measure.py`: transcript com um `AskUserQuestion` respondido 459 s
+  depois e um segundo pedido depois de 120 s parado → `waits_s == [459, 120]`; pedido `isMeta` não gera espera;
+  `prompt_head` cortado em 80, sem quebra de linha; `machine` com o `proc_pid_rusage` falso — dois turnos do mesmo `pid`
+  dão o delta, `CLAUDE_PID` ausente dá `from: "ppid"`, leitura que falha dá `null` e a linha sai.
+- [ ] **2. Implementar** — `measure()`, `turn()`, `machine_of(pid)`, `claude_pid()`.
+- [ ] **3. Rodar e ver passar** — `python3 -m unittest discover -s tests/hooks`
+- [ ] **4. Conferir na sessão real** — depois do `brza sync`, um turno com um comando de 2 s de CPU: `machine.from`
+  diz se o hook herda a `CLAUDE_PID` [F19], e `cpu_children_s` ≥ 2.
+- [ ] **5. Commit**
+
+**Evidência:** `brza-workflow@<sha>` · `python3 -m unittest discover -s tests/hooks` → N passed
+
+### P2 — `--by-task` e o `--pending`
+
+Executa D4 · executor: sessão do `brza-workflow`, na `feat/pln-012-medida-por-tarefa`
+
+Estimado: 4.0 h · Executado: — h
+
+- [ ] **1. Teste que falha** — `tests/hooks/test_summarize_measurements.py`, com o caso desta sessão em fixture (5
+  turnos, 3 `task`, 2 subagentes): a abertura do PLN-012 com agente 452 s, Anderson 625 s, pausa 0; o grok com T2;
+  ociosa 13,8 min; T3–T5 "sem tarefa". E: espera de 50 min → 30 de Anderson e 20 de pausa; dois worklogs num commit →
+  metade cada; `task` sem sessão → "não medida"; `until` desloca o marco; turno antes do primeiro `task` fica de fora;
+  turno `fact_audit` fica de fora; `--pending --session` lista os turnos depois do último marco e as outras sessões
+  paradas há mais de 2 h.
+- [ ] **2. Implementar** — `task_segments`, `task_measure`, as três tabelas, o `--json`, o `--pending --session`.
+- [ ] **3. Rodar e ver passar** — `python3 -m unittest tests/hooks/test_summarize_measurements.py`
+- [ ] **4. Commit**
+
+**Evidência:** `brza-workflow@<sha>` · `python3 -m unittest tests/hooks/test_summarize_measurements.py` → N passed
+
+### P3 — O carimbo, o `task`, o `--until` e a `## Medida`
+
+Executa D1, D3 · executor: sessão do `brza-workflow`, na `feat/pln-012-medida-por-tarefa`
+
+Estimado: 4.0 h · Executado: — h
+
+- [ ] **1. Teste que falha** — `tests/cli/test_brza_note.py`: commit com `CLAUDE_CODE_SESSION_ID` → `sessions:` no
+  frontmatter, sem repetir no segundo commit, e sem `opened`; linha `task` no log da `MEASURE_DIR`, também com
+  `--no-push`; sem a variável → sem carimbo, sem `## Medida` e `session_id: null`; commit recusado → sem evento;
+  `--until` fora da janela recusa sem tocar o worklog; `## Medida` reescrita no segundo commit, com o turno em curso lido
+  de um transcript de fixture, e com "sem o turno do commit" quando o transcript falta; o `state.json` não muda.
+- [ ] **2. Implementar** — `set_frontmatter_list`, `write_task_event`, `--until`, `measure_line` (pelo `runpy` do
+  resumo e do `measure.py`).
+- [ ] **3. Rodar e ver passar** — `python3 -m unittest tests/cli/test_brza_note.py tests/cli/test_brza_note_index.py`
+- [ ] **4. Commit**
+
+**Evidência:** `brza-workflow@<sha>` · `python3 -m unittest tests/cli/test_brza_note.py tests/cli/test_brza_note_index.py` → N passed
+
+### P4 — O `brza run` mede
+
+Executa D5 · executor: sessão do `brza-workflow`, na `feat/pln-012-medida-por-tarefa`
+
+Estimado: 1.5 h · Executado: — h
+
+- [ ] **1. Teste que falha** — `tests/cli/test_brza_scripts.py`: `run_here` com um comando que gasta CPU e aloca
+  memória → `cpu_s > 0`, `max_rss_mb > 0`, `duration_s > 0`; `run_in_tab` com `result.json` de fixture → linha `run`
+  com o `session_id` do ambiente; sem workspace → sem linha e aviso no stderr; os blocos impressos não mudam.
+- [ ] **2. Implementar**
+- [ ] **3. Rodar e ver passar** — `python3 -m unittest tests/cli/test_brza_scripts.py`
+- [ ] **4. Commit**
+
+**Evidência:** `brza-workflow@<sha>` · `python3 -m unittest tests/cli/test_brza_scripts.py` → N passed
+
+### P5 — O `close-task`, a norma e as issues
+
+Executa D6, D7 e a norma do D3 · executor: sessão do `brza-workflow` (skill e norma), e a sessão que conduz (issues)
+
+Estimado: 2.0 h · Executado: — h
+
+- [ ] **1. Teste que falha** — `tests/notes-checker`: worklog com `sessions:` e `## Medida` passa sem aviso.
+- [ ] **2. Escrever** — o passo "2. O que o commit vai fechar" do `close-task`; a linha `sessions` e a `## Medida` no
+  `core/work/README.md`; no `CLAUDE.md` do adaptador, os eventos `task` e `run` na tabela do hook e o `--by-task` no
+  resumo.
+- [ ] **3. Rodar e ver passar** — `python3 -m unittest discover -s tests/notes-checker`
+- [ ] **4. Commit** — no `brza-workflow`, e merge da `feat/pln-012-medida-por-tarefa` na `master` dele depois da
+  revisão.
+- [ ] **5. Abrir as issues** das lacunas, pela sessão que conduz, com `brza note new issue` e `brza note commit`.
+
+**Evidência:** `brza-workflow@<sha>` · `python3 -m unittest discover -s tests/notes-checker` → N passed · as issues no
+`tools-kit@<sha>`
+
+### P6 — Uma tarefa medida de ponta a ponta
+
+Executa a conferência de D1–D6 · executor: sessão que conduz, com Anderson
+
+Estimado: 1.0 h · Executado: — h
+
+- [ ] **1. `brza sync`** no workspace, e conferir que o `.brza/core.lock` aponta o merge do P5.
+- [ ] **2. Uma tarefa real** com rodada, subagente e `brza run`, fechada pelo `close-task`: o aviso aparece, e o
+  worklog sai com `sessions:` e `## Medida`.
+- [ ] **3. Conferir** — a `## Medida` e a linha do `python3 scripts/summarize_measurements.py --by-task` batem entre si,
+  e com o transcript (as esperas lidas à mão), dentro de 5%.
+
+**Evidência:** o worklog da tarefa · a saída do `--by-task`
+
+**Total estimado:** 16 h (P1 3,5 + P2 4 + P3 4 + P4 1,5 + P5 2 + P6 1) contra ~12,5 h somadas
+nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e as issues (+0,5 h).
+
+## Regressão
+
+- **A linha `turn` e a `subagent` mantêm todos os campos de hoje**, e o hook nunca falha nem bloqueia: `machine`
+  `null` quando a leitura falha. Como se confere: `python3 -m unittest discover -s tests/hooks` (os testes de hoje do
+  `test_measure.py` e do `test_measure_workstream.py` sem mudança).
+- **O estado de leitura do transcript avança como hoje**, e a leitura do `brza note commit` não o avança. Como se
+  confere: o teste do P3 que compara o `state.json` antes e depois do commit.
+- **O resumo sem `--by-task` sai igual**: o relatório padrão, o `--by-workstream` e o `--facts` ignoram `task` e `run`,
+  sem contá-los como `hook_error`. Como se confere: `python3 -m unittest tests/hooks/test_summarize_measurements.py`, e
+  a saída do `summarize_measurements.py` sobre uma cópia do log de hoje igual antes e depois (`diff`).
+- **O `brza note commit` commita só os caminhos dados, extrai o `refs:` e grava o índice como hoje**; sem
+  `CLAUDE_CODE_SESSION_ID`, o worklog commitado é o mesmo de hoje byte a byte. Como se confere:
+  `python3 -m unittest tests/cli/test_brza_note.py tests/cli/test_brza_note_index.py`.
+- **O `close-task` mantém os passos de hoje e a trava do `/compact` não muda.** Como se confere:
+  `python3 -m unittest tests/hooks/test_compact_guard.py`, e a leitura do diff da skill.
+- **O `brza run` imprime os mesmos blocos, sai com o código do comando e fecha a aba com 0**; o `result.json` continua
+  com `code`. Como se confere: `python3 -m unittest tests/cli/test_brza_scripts.py`.
+- **O checador aceita o worklog novo e o antigo.** Como se confere: `python3 -m unittest discover -s
+  tests/notes-checker`, e `python3 .claude/skills/notes-checker/scripts/check_notes.py` no `tools-kit` depois do
+  `brza sync`.
+
 ## Worklogs
 
 - 2026-11-03 — aberto; Rodada 0 transcrita; Terreno levantado; R1 e R2 respondidas; issue do Codex e do
@@ -240,3 +398,5 @@ Respondida em 2026-11-03, na sessão `tools-kit-produtividade`.
 - 2026-11-03 — R3 e R4 respondidas; D1–D7 gravados no `-design`; o `ps -S` trocado pelo `proc_pid_rusage`. Parou na
   rodada do corte dos Passos.
   [Desenho do PLN-012, a medida por tarefa](../../work/worklogs/2026-11-03-pln-012-desenho-da-medida-por-tarefa.md)
+- 2026-11-06 — R5.1: corte aceito, P1–P6 (16 h); Passos, Cobertura e Regressão gravados; `phase: execution`.
+  [Aceite do corte do PLN-012](../../work/worklogs/2026-11-06-pln-012-aceite-do-corte.md)

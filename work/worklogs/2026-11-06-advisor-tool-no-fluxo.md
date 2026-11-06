@@ -41,7 +41,11 @@ O plano é o [PLN-015: O executor consulta um advisor mais forte, com o custo me
   política e norma, piloto A/B.
 - **O PLN-015 aberto** no `tools-kit`, ao lado do PLN-009, do PLN-012 e do PLN-013, que tratam do MCP e da medição.
 
+- **A rodada 1 do PLN-015, respondida com as quatro recomendadas.** O custo do advisor entra no `measure.py` por este
+  plano, antes do PLN-012; o advisor do piloto é o Opus 5.5; o piloto liga à mão (`claude --advisor opus`), e a
+  política e o dispatch só entram se ele se pagar; a prioridade é `medium`.
+
 ## O que ficou
 
-- A rodada 1 do PLN-015: onde mora o custo do advisor na medição, frente ao PLN-012; o modelo do advisor; como ligar
-  só no executor; a prioridade.
+- O Desenho do PLN-015: D1 o custo do advisor na medição, D2 a norma do `implementer`, D3 o protocolo do piloto.
+- O PLN-012 precisa partir do `measure.py` com o advisor (PLN-015/R1.1).

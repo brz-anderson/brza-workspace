@@ -4,3 +4,7 @@
 - [Teste que falha só no merge do upstream](brza-studio-sync-test-failures.md) — linha de base, URL do Orca, overrides do terminal que segue o chat
 - [Conflitos do merge do upstream](brza-studio-upstream-merge-conflicts.md) — git add por caminho, imports movidos, max-lines, catálogo RPC, linha do fork perdida
 - [Testes de CSS do renderer (brza-studio)](brza-studio-css-tests.md) — happy-dom resolve a cascata, sem import.meta.url, sem `as` no teste
+- [Receita UD/UU de teste no sync](brza-studio-sync-ud-uu-recipes.md) — achar destino do movido, reaplicar rebrand por bloco, untracked do antigo
+- [Lições do sync v1.4.251](brza-studio-sync-251-lessons.md) — base ruidosa, resíduo do auto-merge, tsc temporário, features duplicadas
+- [Consertos pós-merge v1.4.251](brza-studio-sync-251-fixes.md) — teste escondido por import, remover feature do fork, default de setting, sed no macOS
+- [Consertos pós-revisão v1.4.251](brza-studio-sync-251-review-fixes.md) — entrada de build movida, hash gravado de leitor, bundle versionado, max-lines por helper

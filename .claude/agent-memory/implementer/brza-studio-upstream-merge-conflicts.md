@@ -42,3 +42,19 @@ Consolidado das quatro notas dos resolvedores do sync da v1.4.246 (2026-11-02), 
   - O hook que assina `s.settings` inteiro quebra "isolates mounted chats from unrelated settings": use `useShallow`.
 
 Relacionadas: [[brza-studio-sync-test-failures]], [[brza-studio-lint-gates-after-sync]], [[brza-studio-rebrand-sweep]].
+
+Sync da v1.4.251 (2026-11-06, grupo tema/settings):
+- **"ours" pode ser versão antiga do upstream, não código do fork.** O merge-base é um commit de `main`; o fork trouxe
+  PRs do upstream pela linha do 246. Antes de juntar, `git log --no-merges 54ef0dea2045..HEAD -- <arq>`: sem commit do fork
+  (só `(#NNNN)` ou rebrand), pegue `git show :3:<arq>` inteiro e confira `grep Orca` no resultado.
+- **Nunca `git add -N .` nem `git add <pasta>`:** o `-N` tira de `UU` os arquivos dos outros grupos (ficam ` A`/` M` com
+  marcador) e deixa intent-to-add nos novos. Só `git add` por arquivo.
+- **Import relativo que o fork acrescentou num arquivo movido** fica com a profundidade errada (o git só reescreve o que
+  o upstream tocou). O `tsc --noEmit -p config/tsconfig.web.json` (~25 s com `--composite false`) acha tudo; filtre
+  pelos seus caminhos com `grep`.
+- **Auxiliares que sumiram do upstream:** `terminal-theme.ts` deixou de reexportar `DEFAULT_TERMINAL_THEME_*` e
+  `isTerminalBackgroundLight`; o import vai a `shared/terminal-themes/…`.
+- **Teste de componente por função (React com `useState` stub):** `TerminalThemeCatalogSection` roda como função; o mock de
+  `react` devolve `['light', () => {}]` em todo `useState`. Serve para o caso "segue o chat".
+- **Script que resolve hunk:** colar o texto final num `python3` que substitui o 1º bloco `<<<<<<< ours…>>>>>>> theirs`
+  é mais rápido que `Edit` com o bloco inteiro. zsh não divide `$R` com espaços: use função.

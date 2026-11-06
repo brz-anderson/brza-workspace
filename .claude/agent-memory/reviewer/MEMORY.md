@@ -1,2 +1,2 @@
-- [Padrões da revisão de sync do upstream](sync-review-patterns.md) — identidade copiada, slug, pino P36 vs global e fork, ~/.orca × Keychain
+- [Padrões da revisão de sync do upstream](sync-review-patterns.md) — identidade copiada, slug, pino P36, ~/.orca × Keychain, caminho em config de build
 - [Calibração da confiança](reviewer-confidence-calibration.md) — arquivo sob edição cai; teste temporário; hipóteses P36 e /tmp que caem

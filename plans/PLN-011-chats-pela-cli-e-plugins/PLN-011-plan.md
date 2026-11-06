@@ -4,7 +4,7 @@ phase: blocked
 origin: issue
 origin_ref: brza-chat-list-read-send-no-studio
 description: O brza-studio ganha brza chat list/read/send com cursor, fila e recibos, a navegação de chats pela CLI, pela barra lateral e pela Jump Palette, o Native Chat na API de plugins e o account usage, em fases por prioridade.
-ready: aguarda Anderson executar e relatar C1 no app de desenvolvimento
+ready: aguarda conclusão do sync v1.4.251 e integração na branch para recompilar o app e executar C1 com Anderson
 estimate_h: 31
 executed_h: 1.8
 remaining_h: 19.0
@@ -30,6 +30,9 @@ tags:
   depois do push do sync, a sessão do sync mescla a `master` nova em `feat/pln-011-chat-cli` e resolve os três conflitos
   de CLI (`root-help-text-primary.ts`, `runtime/client.ts`, `runtime/client-execution-host.test.ts`). Com o C1 aberto,
   o app de dev precisa de rebuild depois disso.
+  Conferido nesta retomada: a branch ainda está em `7ee6b1e5cc6`; `c96b82cd77c`, o merge da tag no worktree do sync,
+  ainda não foi integrado e o sync tem alterações pendentes. Próximo ato: conferir a conclusão dessa integração,
+  recompilar a CLI e o app de dev e retomar C1 com Anderson, confirmando o processo e o perfil corretos.
 - **Dividido:** [PLN-011 — Entrevista](PLN-011-interview.md) · [PLN-011 — Desenho](PLN-011-design.md)
 
 ## Pedido
@@ -518,6 +521,9 @@ Estimado: 1 h · Executado: — h
 
 - 2026-11-04 — P5 fechado em `7ee6b1e5cc6` com REV-012; P6 aguarda C1 manual por Anderson.
   [PLN-011: cobertura e revisão do P4](../../work/worklogs/2026-11-04-pln-011-execucao.md)
+
+- 2026-11-06 — retomada: P1–P5 fechados, C1 sem resultado; integração da v1.4.251 ainda pendente, antes do rebuild.
+  [PLN-011: retomada com a integração da v1.4.251 pendente](../../work/worklogs/2026-11-06-pln-011-retomada.md)
 
 ## Revisões
 

@@ -32,4 +32,5 @@ e no worklog e siga".
 
 ## Resolução (2026-11-06)
 
-O `brief` do `status` em `packages/mcp/brza_mcp/tools.py` inclui `runtime`, `model` e `effort`. Vale para `queued`, `gated`, `running` e `finished`, porque as quatro listas usam o mesmo `brief`. O teste `test_status_lines_carry_runtime_model_and_effort` vê o `running` `codex`/`gpt-6.1-sol`/`low`, o `queued` `grok`/`grok-4.7`/`low` e o `finished` com os mesmos três do Codex. `python3 -m unittest test_mcp_dispatch` → 32 OK. Commit local `brza-workflow@190cf58`, ainda sem push.
+O `brief` do `status` em `packages/mcp/brza_mcp/tools.py` inclui `runtime`, `model` e `effort`. Vale para `queued`, `gated`, `running` e `finished`, porque as quatro listas usam o mesmo `brief`. O teste `test_status_lines_carry_runtime_model_and_effort` vê o `running` `codex`/`gpt-6.1-sol`/`low`, o `queued` `grok`/`grok-4.7`/`low` e o `finished` com os mesmos três do Codex. `python3 -m unittest test_mcp_dispatch` → 32 OK. Commit `brza-workflow@190cf58`. Em 2026-11-06, a pedido de Anderson,
+foi ao `origin/master` (`591f0ed..d1fa1d7`).

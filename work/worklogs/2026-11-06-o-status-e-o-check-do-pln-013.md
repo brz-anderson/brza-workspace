@@ -39,5 +39,5 @@ O pedido de Anderson, em 2026-11-06, depois de fechar a cota do Grok: "siga com 
 
 - **O quê e onde:** dois commits no `master` local de `~/Projects/brza-workflow`, `190cf58` (o `status`) e `d1fa1d7`
   (o docstring e o `CHECK`). **Risco:** o `origin/master` não os tem, e o processo do MCP que já estava no ar segue
-  com o código anterior até um restart. **Estado:** locais, `master` dois commits à frente de `origin/master`.
-  **Como desfazer:** `git revert d1fa1d7` e `git revert 190cf58` nesse checkout.
+  com o código anterior até um restart. **Estado:** no `origin/master` desde 2026-11-06 (`591f0ed..d1fa1d7`), a pedido
+  de Anderson. **Como desfazer:** `git revert d1fa1d7` e `git revert 190cf58` nesse checkout.

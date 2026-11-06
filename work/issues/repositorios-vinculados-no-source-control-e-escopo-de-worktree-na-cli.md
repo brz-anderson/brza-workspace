@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38744, #38773, #37896, #38086, #38063 e #38055 trazem bloqueio de checkout inseguro, preparações de worktrees com timeout, repositórios vinculados e escopo de worktree na CLI.
+description: Os PRs #39096, #39089, #39087, #38744 e as issues #38940, #37896 trazem histórico zsh por worktree, snapshots headless limpos e status de perguntas Codex.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,10 @@ tags:
 
 # Repositórios vinculados no Source Control e escopo de worktree na CLI
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38744`](https://github.com/stablyai/orca/pull/38744),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39096`](https://github.com/stablyai/orca/pull/39096) (resolve Issue [`#38940`](https://github.com/stablyai/orca/issues/38940)),
+[`stablyai/orca#39089`](https://github.com/stablyai/orca/pull/39089),
+[`stablyai/orca#39087`](https://github.com/stablyai/orca/pull/39087),
+[`stablyai/orca#38744`](https://github.com/stablyai/orca/pull/38744),
 [`stablyai/orca#38773`](https://github.com/stablyai/orca/pull/38773),
 [`stablyai/orca#38086`](https://github.com/stablyai/orca/pull/38086),
 [`stablyai/orca#38063`](https://github.com/stablyai/orca/pull/38063),
@@ -26,55 +29,52 @@ e das issues [`stablyai/orca#37899`](https://github.com/stablyai/orca/issues/378
 
 ## O problema
 
-1. **Trocas de branch inseguras no mobile e desktop corrompendo estados (`#38744`):**
+1. **Histórico zsh isolado por worktree não carregado na abertura do terminal (`#39096`, `#38940`):**
+   No macOS, ao abrir um novo terminal com histórico zsh configurado por worktree, o shell salvava novos comandos no arquivo
+   específico do workspace, mas não lia os comandos gravados anteriormente porque a restauração da variável `HISTFILE` ocorria
+   após o zsh já ter carregado o histórico global na inicialização.
+2. **Resíduos de sequências de escape ANSI em restaurações de terminais headless (`#39089`):**
+   Ao restaurar o buffer de um terminal que executava em modo headless, sequências parciais de escape ficavam pendentes no
+   fluxo de escrita e eram cuspidas como caracteres literais de controle (`^[[...`) na reconexão da interface.
+3. **Falta de indicação quando o Codex aguarda resposta em perguntas assíncronas no meio do turno (`#39087`):**
+   Quando o agente Codex faz uma pergunta ao usuário no meio do turno e segue executando em background, a barra lateral e o
+   cliente móvel continuavam exibindo o status genérico "working", sem alertar o operador de que sua resposta estava pendente.
+4. **Trocas de branch inseguras no mobile e desktop corrompendo estados (`#38744`):**
    Ao solicitar troca de branch via ação "Switch branch", o app executava `git checkout` cego sem validar se havia arquivos
-   modificados ou não rastreados, rebases/merges em andamento ou agentes trabalhando ativamente no checkout, arriscando
-   perda silenciosa de trabalho ou colisões de estado.
-2. **Preparações de worktree travadas indefinidamente sem expiração (`#38773`):**
-   A criação de worktrees herdava checkouts especulativos em background. Ao reivindicar o checkout, o app removia o timeout,
-   fazendo com que a criação do worktree ficasse pendente para sempre mesmo após nenhum processo git estar rodando.
-3. **Desvio de abas para worktrees alheios fora do cwd gerenciado (`#37899`, `#38086`):** quando um agente no terminal
-   executava `cd /tmp && brza tab create ...` ou outros comandos de navegador/terminal, o comando não conseguia resolver
-   um worktree pelo diretório atual e caía silenciosamente no worktree atualmente focado na janela do usuário, em vez de
-   permanecer no worktree do terminal que fez a chamada.
-4. **Inconsistências de membership entre abas e workspaces (`#38063`):** atrasos na gravação de janelas, criação de
-   terminais e visibilidade de chat podiam divergir sobre a qual workspace uma aba pertencia, gerando reabertura incorreta
-   de abas fechadas ou substituição de abas durante reinicializações e restaurações.
-5. **Perda de escopo de workspace em comandos de browser e links remotos (`#38055`, `#38072`):** comandos CLI de navegador
-   disparados fora de checkouts perdiam o contexto do workspace do terminal, e links clicados a partir de terminais de
-   servidores pareados podiam abrir no workspace errado da janela desktop.
-6. **Alterações multi-repositório invisíveis no Source Control (`#37896`, `#37892`):** quando um agente operando em um
-   workspace modifica arquivos em outro repositório aberto no app (ex.: uma biblioteca compartilhada, sub-repositório
-   ou pasta irmã), essas mudanças não apareciam no painel de controle de versão do workspace ativo.
-7. **Falta de opção de abertura de documentos em split na CLI (`#37838`):** ao pedir que o agente abra notas ou
-   documentações de pesquisa via `brza file open`, as abas se acumulavam no mesmo grupo de abas dos chats ativos.
+   modificados ou não rastreados, rebases/merges em andamento ou agentes trabalhando ativamente no checkout.
+5. **Preparações de worktree travadas indefinidamente sem expiração (`#38773`):**
+   A criação de worktrees herdava checkouts especulativos em background sem timeout.
+6. **Desvio de abas para worktrees alheios fora do cwd gerenciado (`#37899`, `#38086`):**
+   Comandos de terminal fora de pastas de worktree caíam no workspace atualmente focado na janela.
+7. **Inconsistências de membership entre abas e workspaces (`#38063`):**
+   Atrasos na gravação de layouts podiam misturar abas entre diferentes workspaces.
+8. **Alterações multi-repositório invisíveis no Source Control (`#37896`, `#37892`):**
+   Modificações em submódulos ou repositórios irmãos não apareciam no Source Control do workspace ativo.
 
 ## O que o upstream implementa e corrige
 
+- **Carregamento correto de histórico zsh por worktree (`#39096`):**
+  - Após definir o `HISTFILE` específico do workspace no gancho de inicialização diferida do shell, executa `builtin fc -RI`
+    para carregar incrementalmente as linhas do arquivo de histórico do worktree sem descartar o histórico global já presente.
+- **Captura atômica de snapshots em terminais headless (`#39089`):**
+  - Sincroniza a captura de estados do buffer entre ciclos completos de escrita PTY, garantindo que o snapshot nunca seja
+    congelado no meio de uma sequência de controle ANSI.
+- **Status "Waiting for user" em perguntas assíncronas do Codex (`#39087`):**
+  - Mapeia o estado de perguntas mid-turn do Codex para que a barra lateral, o cabeçalho e as notificações reflitam com
+    precisão que o agente está aguardando a entrada do usuário.
 - **Validação de segurança antes de alternar branches (`#38744`):**
-  - Compartilha uma única rotina de verificação no desktop e cliente móvel: recusa a troca de branch e informa com clareza
-    quando houver alterações pendentes ("Commit or discard N changed files before switching branches"), operações em curso
-    (merge, rebase, cherry-pick) ou agentes trabalhando no worktree.
+  - Recusa a troca de branch quando houver alterações pendentes, operações em curso (merge, rebase) ou agentes trabalhando.
 - **Ciclo de vida delimitado para preparações de worktrees (`#38773`):**
-  - Estabelece prazos de expiração para checkouts especulativos em background, garantindo fallback para criação normal e
-    evitando que comandos de criação fiquem travados.
+  - Prazos de expiração para checkouts especulativos em background.
 - **Resolução de worktree pelo terminal chamador (`#38086`, resolve `#37899`):**
-  - Implementa `callerTerminalWorkspaceSelector`: quando o lookup por `cwd` não encontra nenhum worktree gerenciado, a CLI
-    recorre a `ORCA_WORKTREE_ID` e `ORCA_WORKSPACE_ID` para direcionar a criação de abas e comandos (`tab create`,
-    `open-url`, etc.) ao workspace do terminal chamador.
+  - Direciona comandos ao workspace correto via `ORCA_WORKTREE_ID` e `ORCA_WORKSPACE_ID`.
 - **Canonicidade e transacionalidade de membership de workspaces (`#38063`):**
-  - Estabelece um registro canônico durável de pertença de terminais e native-chats por host;
-  - Gravações de layout comparam o estado observado antes de aplicar modificações, impedindo que saves atrasados
-    substituam abas mais novas ou reabram conteúdos fechados;
-  - Serve como alicerce transacional para a alternância de superfícies entre Chat UI e Terminal (`#31595`).
-- **Retenção de workspace em browser e links remotos (`#38055`, `#38072`):**
-  - Mantém o workspace do terminal para comandos de browser e garante que links de arquivos abram no workspace exato do clique.
+  - Registro canônico durável de pertença de terminais e native-chats.
 - **Repositórios vinculados no Source Control (`#37896`):**
-  - Adiciona a seção "Linked repositories" no painel de Source Control, listando projetos modificados e permitindo diff,
-    stage e commit sem chavear de janela.
+  - Seção "Linked repositories" no painel de Source Control.
 
 ## O que fazer
 
-- Adotar as travas de segurança em troca de branch (`#38744`) no `brza-studio`.
-- Incorporar o controle de timeout de preparações de worktrees (`#38773`).
-- Implementar o `callerTerminalWorkspaceSelector` (`#38086`) e repositórios vinculados (`#37896`).
+- Adotar o carregamento de histórico zsh por worktree (`#39096`) no script de inicialização do terminal do `brza-studio`.
+- Incorporar a captura de snapshots headless sem escape tails (`#39089`) e a indicação de perguntas Codex (`#39087`).
+- Adotar as travas de segurança em troca de branch (`#38744`) e repositórios vinculados (`#37896`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38588, #38634, #38561, #38518, #38378 e #38168 trazem menu de ações de agentes na sidebar, colapso em massa de projetos, menu "+" em cartões e nomes de abas consistentes.
+description: Os PRs #39100, #39080, #39081, #38588 e as issues #38617, #39086 trazem timestamps de workspaces para plugins, ocultação de projetos vazios e ações na sidebar.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,10 @@ tags:
 
 # Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38588`](https://github.com/stablyai/orca/pull/38588) (Issue [`#38586`](https://github.com/stablyai/orca/issues/38586)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39100`](https://github.com/stablyai/orca/pull/39100) (resolve Issue [`#38617`](https://github.com/stablyai/orca/issues/38617)),
+[`stablyai/orca#39080`](https://github.com/stablyai/orca/pull/39080),
+[`stablyai/orca#39081`](https://github.com/stablyai/orca/pull/39081),
+[`stablyai/orca#38588`](https://github.com/stablyai/orca/pull/38588) (Issue [`#38586`](https://github.com/stablyai/orca/issues/38586)),
 [`stablyai/orca#38634`](https://github.com/stablyai/orca/pull/38634),
 [`stablyai/orca#38561`](https://github.com/stablyai/orca/pull/38561),
 [`stablyai/orca#38518`](https://github.com/stablyai/orca/pull/38518),
@@ -39,7 +42,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38588`](https://github.com
 [`stablyai/orca#37730`](https://github.com/stablyai/orca/pull/37730),
 [`stablyai/orca#37557`](https://github.com/stablyai/orca/pull/37557) e
 [`stablyai/orca#37510`](https://github.com/stablyai/orca/pull/37510), além das issues
-[`#38617`](https://github.com/stablyai/orca/issues/38617),
+[`#39086`](https://github.com/stablyai/orca/issues/39086),
 [`#38550`](https://github.com/stablyai/orca/issues/38550),
 [`#38361`](https://github.com/stablyai/orca/issues/38361),
 [`#38214`](https://github.com/stablyai/orca/issues/38214),
@@ -50,58 +53,63 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38588`](https://github.com
 
 ## O que está entrando no upstream
 
-1. **Menu de ações diretas na linha de agentes da barra lateral (`#38588`, `#38586`):**
+1. **Exposição de timestamps de criação e atividade na API de plugins (`#39100`, resolve `#38617`):**
+   - Os registros retornados por `workspace.list` passam a incluir `createdAt` e `lastActivityAt` (em milissegundos epoch);
+   - Permite que plugins e automações identifiquem workspaces antigos, inativos ou abandonados para higienização programática
+     sem depender de scripts auxiliares de terminal.
+2. **Opção para ocultar projetos e grupos vazios na barra lateral (`#39080`):**
+   - Adiciona configuração para recolher ou omitir automaticamente pastas de projetos e agrupamentos que não possuam
+     worktrees ativos ou abas abertas, limpando a árvore de navegação.
+3. **Indicador de estado visual com cor no ícone do Linear (`#39081`):**
+   - Renderiza a cor de status da issue do Linear diretamente no ícone correspondente na barra lateral e nos cartões de tarefas.
+4. **Resolução de sessões de folder-workspaces no filtro Projects do Search Palette (`#39086`):**
+   - Corrige falha onde selecionar o filtro de projeto na paleta de busca ocultava indevidamente sessões pertencentes a
+     workspaces do tipo pasta multirrepositório.
+5. **Menu de ações diretas na linha de agentes da barra lateral (`#38588`, `#38586`):**
    - Adiciona menu contextual acessível em cada linha compacta de agente nos cartões de workspace:
      - **Rename:** renomeia a sessão ativa do agente no próprio local;
      - **Continue in Terminal:** bifurca/continua a sessão estruturada em uma nova aba de terminal;
      - **Copy Session ID:** copia o identificador interno da sessão do provedor;
      - **Close:** encerra a sessão e fecha a aba correspondente sem precisar localizá-la e ativá-la na barra superior.
-2. **Ações para colapsar e expandir todos os projetos (`#38634`):**
+6. **Ações para colapsar e expandir todos os projetos (`#38634`):**
    - Adiciona controles globais no cabeçalho da barra lateral para recolher ou expandir simultaneamente todos os agrupamentos
      de projetos e seus respectivos worktrees.
-3. **Metadados de criação e atividade na listagem de workspaces (`#38617`):**
-   - Exponibiliza os campos `createdAt` e `lastActivityAt` na RPC `workspace.list` e CLI, facilitando automações de limpeza.
-4. **Botão de criação "+" ao lado do título do workspace na sidebar (`#38561`):**
+7. **Botão de criação "+" ao lado do título do workspace na sidebar (`#38561`):**
    - Adiciona botão acessível "New tab" ao lado do nome do workspace nos cartões da barra lateral, abrindo o mesmo
-     `WorkspaceCreateMenu` disponível na barra de abas superior (lançamento de agente, terminal, browser ou markdown);
-   - Elimina a necessidade de selecionar primeiro o workspace e depois se deslocar até a barra superior.
-5. **Preservação do nome real da sessão do agente em abas de terminal (`#38518`):**
+     `WorkspaceCreateMenu` disponível na barra de abas superior.
+8. **Preservação do nome real da sessão do agente em abas de terminal (`#38518`):**
    - Unifica a hierarquia de nomes de abas (`resolveTabNameSource`): renomeação manual → nome de comando rápido → título
-     ao vivo do OpenCode → nome próprio da sessão do agente → título gerado pelo primeiro prompt;
-   - Impede que abas de terminais com agentes ativos fiquem presas em títulos genéricos do primeiro prompt.
-6. **Opção para ocultar chip de projeto em cartões fixados da sidebar (`#38550`):**
+     ao vivo do OpenCode → nome próprio da sessão do agente → título gerado pelo primeiro prompt.
+9. **Opção para ocultar chip de projeto em cartões fixados da sidebar (`#38550`):**
    - Proposta para permitir ocultar o badge redundante de projeto em cartões de workspace fixados.
-7. **Preservação de workspaces de servidor aninhados após reinício (`#38378`):**
-   - Garante que a estrutura aninhada de workspaces em servidores remotos permaneça preservada e visível na hierarquia
-     correta mesmo após a reinicialização do app desktop.
-8. **Atualização e integridade de alterações em submódulos Git (`#38334`, `#38318`):**
-   - Corrige bug onde diffs e árvores de alterações em submódulos expandidos ficavam obsoletos ou vazios e perdiam pastas
-     internas na exibição da sidebar.
-9. **Destaque visual para o chat focado nas linhas de agentes (`#38367`):**
-   - Destaca graficamente a linha do chat ativo dentro dos cartões de workspace da barra lateral, facilitando saber qual
-     sessão está em primeiro plano.
-10. **Opção de ocultar worktree principal na barra lateral (`#38361`):**
+10. **Preservação de workspaces de servidor aninhados após reinício (`#38378`):**
+    - Garante que a estrutura aninhada de workspaces em servidores remotos permaneça preservada e visível na hierarquia correta.
+11. **Atualização e integridade de alterações em submódulos Git (`#38334`, `#38318`):**
+    - Corrige bug onde diffs e árvores de alterações em submódulos expandidos ficavam obsoletos ou vazios na exibição da sidebar.
+12. **Destaque visual para o chat focado nas linhas de agentes (`#38367`):**
+    - Destaca graficamente a linha do chat ativo dentro dos cartões de workspace da barra lateral.
+13. **Opção de ocultar worktree principal na barra lateral (`#38361`):**
     - Proposta para permitir manter o worktree primário fora da lista da sidebar em projetos focados exclusivamente em worktrees de feature.
-11. **Limpeza de workspaces inativos e indicador de repositório (`#38281`):**
+14. **Limpeza de workspaces inativos e indicador de repositório (`#38281`):**
     - Interface aprimorada para limpeza em lote e indicador visual de repositório de origem.
-12. **API com permissão para aparência dinâmica desktop de plugins (`#38282`, `#38277`):**
+15. **API com permissão para aparência dinâmica desktop de plugins (`#38282`, `#38277`):**
     - Expõe endpoint controlado por permissões para que plugins ajustem elementos de UI no app desktop.
-13. **Fallback com detecção de conteúdo binário para editores (`#38296`, `#38249`):**
+16. **Fallback com detecção de conteúdo binário para editores (`#38296`, `#38249`):**
     - Detecção prévia de arquivos binários acionando fallback em editores customizados de plugins.
-14. **Ações de colapso e expansão em massa de workspaces (`#38168`, resolve `#38138`):**
+17. **Ações de colapso e expansão em massa de workspaces (`#38168`, resolve `#38138`):**
     - "Collapse all" e "Expand all" no menu de opções de workspaces e atalho configurável.
-15. **Dashboard Global Home (`#38193`, resolve `#38134`):**
+18. **Dashboard Global Home (`#38193`, resolve `#38134`):**
     - Visão consolidada da frota de agentes e limites de uso em um único painel.
-16. **Preservação de worktrees ocultos ao adicionar projetos (`#38208`):**
+19. **Preservação de worktrees ocultos ao adicionar projetos (`#38208`):**
     - Garante que worktrees explicitamente ocultados permaneçam ocultos.
-17. **Criação de grupos de projeto vazios na sidebar e CLI (`#38214`, `#38118`):**
+20. **Criação de grupos de projeto vazios na sidebar e CLI (`#38214`, `#38118`):**
     - Subcomando `orca project-group create` e menu de contexto.
-18. **Criação de folder workspaces via CLI (`#38112`):**
+21. **Criação de folder workspaces via CLI (`#38112`):**
     - Proposta para `orca workspace create --folder <path>`.
 
 ## O que fazer
 
-- Implementar o menu contextual de ações de agentes na sidebar (`#38588`) no `brza-studio`.
+- Adotar a exposição de `createdAt` e `lastActivityAt` na API de plugins (`#39100`) para suportar métricas do `brza-workflow`.
+- Implementar as opções de ocultar projetos vazios (`#39080`) e o menu contextual de ações de agentes na sidebar (`#38588`).
 - Adicionar os controles de colapso e expansão em massa de projetos (`#38634`).
 - Incorporar o botão de novo item "+" nos cartões de workspace (`#38561`) e a resolução de títulos (`#38518`).
-- Incorporar os comandos `project-group` (`#38118`) no `brza-cli`.

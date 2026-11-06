@@ -8,11 +8,13 @@ completed: 2026-11-06
 tags:
   - tooling
 refs:
+  - issue:acoes-de-commit-no-git-graph-checkout-cherry-pick-e-revert
   - issue:adaptadores-acp-customizados-e-isolamento-de-permissoes-de-sessao
   - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
   - issue:ler-e-enviar-mensagens-a-chats-pela-cli-e-expor-native-chat-aos-plugins
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
+  - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
   - issue:repositorios-vinculados-no-source-control-e-escopo-de-worktree-na-cli
   - issue:resultados-de-ci-no-chat-e-disparo-automatico-de-agentes-em-falhas-de-pr
   - issue:seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio
@@ -121,3 +123,30 @@ refs:
      adicionadas a issue `#39042` (prevenção de cancelamento espúrio de turnos em execução do OMP quando `orchestration send` pressiona Enter com steer
      enfileirado), issue `#38951` (bloqueio de injeção cega de avisos de ponteiro em buffers de digitação ativa) e issue `#39021` (inclusão de `statusMessage`
      explícita nos hooks do Codex).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-06)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados mais de 50 novos PRs e issues criados ou
+   atualizados entre `2026-11-06T15:00:00Z` e `2026-11-06T21:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Ações de commit no Git Graph (checkout, cherry-pick e revert)](../issues/acoes-de-commit-no-git-graph-checkout-cherry-pick-e-revert.md):
+     rastreia o PR `#39069` (menu de contexto e barra de confirmação inline no Git Graph para Check out commit desanexado seguro, Cherry-pick
+     com abort automático se vazio e Revert com detecção de conflitos e `GIT_EDITOR=true`), PR `#39124` (catálogo completo de UI em Português do Brasil)
+     e as issues `#39083` (filtro de worktrees por status de atividade) e `#39067` / PR `#39091` (tratamento de jobs GitLab com `allow_failure: true`).
+3. **Atualização de 4 issues existentes em `work/issues/`:**
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados o PR `#39100` (resolve a issue `#38617` expondo `createdAt` e `lastActivityAt` em `workspace.list` para a API de plugins),
+     PR `#39080` (opção para ocultar pastas e grupos de projetos vazios na barra lateral), PR `#39081` (ícone colorido do Linear refletindo o estado da issue)
+     e a issue `#39086` (correção do filtro Projects no Search palette que ocultava sessões em folder-workspaces).
+   - [Cartões de Pull Request, feedback de Steer e atalhos no Native Chat](../issues/cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat.md):
+     adicionados o PR `#39050` (redimensionamento proporcional automático de imagens coladas com alta resolução no chat/terminal em vez de erro
+     fatal `Clipboard image is too large`), PR `#39141` (eliminação de cartões sintéticos redundantes "Ran /model" ao trocar de modelo pelo seletor visual)
+     e a issue `#39060` (ajuste na espessura de renderização de fontes em negrito no Chat UI).
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados o PR `#39082` e issue `#39074` (pré-visualização sob demanda de transcrições de chat estruturado em modo read-only diretamente dentro do Agent Dashboard)
+     e o PR `#39079` / issue `#39073` (notificações desktop opt-in exclusivamente para perguntas de agentes, silenciando aprovações e conclusões).
+   - [Repositórios vinculados no Source Control e escopo de worktree na CLI](../issues/repositorios-vinculados-no-source-control-e-escopo-de-worktree-na-cli.md):
+     adicionados o PR `#39096` e issue `#38940` (carregamento diferido do histórico zsh por worktree `HISTFILE` via `builtin fc -RI` na inicialização do terminal macOS),
+     PR `#39089` (captura atômica de snapshots headless entre escritas PTY para eliminar sequências ANSI residuais) e o PR `#39087` (indicação de status
+     "Waiting for user" na sidebar e mobile durante perguntas assíncronas no meio do turno do Codex).

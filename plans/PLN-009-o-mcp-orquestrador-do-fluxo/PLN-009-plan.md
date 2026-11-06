@@ -1,17 +1,18 @@
 ---
-status: in_review
-phase: review
+status: done
+phase: closed
 origin: plan
 origin_ref: PLN-003
 description: O servidor MCP residente gerencia o fluxo com fila de prioridade sob três tetos, política declarativa e desempate com tev1 e Haiku
 ready: sim
 estimate_h: 31.3
 executed_h: 4.3
-remaining_h: 2.0
+remaining_h: 0
 scope:
   - workspace
   - brza-studio
 opened: 2026-11-03
+completed: 2026-11-06
 owner: Anderson
 priority: high
 tags:
@@ -20,11 +21,13 @@ tags:
 
 # PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients
 
-- **Retomar:** P1 a P8 `[x]`; C1 a C4 aprovados; a `feat/pln-009-mcp` mesclada na `master` do `brza-workflow` em
-  `23d812d`. Em 2026-11-06 a sessão do `tools-kit` conferiu que a R5.3 já estava reaberta no PLN-003
-  (`PLN-003-interview.md:260`), que o plist do serviço aponta o checkout principal e que o `brza mcp status` responde.
-  Os três pareceres ganharam o número REV-014, REV-015 e REV-016.
-  - **O que falta:** a rodada de fechamento (`close.md`).
+- **Retomar:** fechado em 2026-11-06. P1 a P8 `[x]`, C1 a C4 aprovados, o código mesclado em `brza-workflow@23d812d`
+  e a R1.1 gravada em `work/decisions/`. O que sobrou está nas issues de `## Decisões
+
+- [O código do MCP mora no `brza-workflow`, em `packages/mcp/`](../../work/decisions/o-codigo-do-mcp-mora-no-brza-workflow.md)
+  — R1.1, `done`.
+
+## Pendências conhecidas`.
 
 ## Pedido
 
@@ -693,6 +696,10 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 - 2026-11-03 — a regra do MCP local na norma; C2 e C3 aprovados; o merge em `brza-workflow@23d812d` e o relink.
   [O PLN-009: a regra do MCP local na norma, o C2, o C3 e o merge](../../work/worklogs/2026-11-03-pln-009-c2-c3-e-merge.md)
 
+- 2026-11-06 — a R5.3 e o plist conferidos no disco; os pareceres numerados REV-014 a REV-016; a decisão da R1.1
+  gravada; o plano fechado.
+  [O PLN-009: os pareceres numerados, a decisão do código do MCP e o fechamento](../../work/worklogs/2026-11-06-pln-009-fechamento.md)
+
 ## Revisões
 
 - [REV-014: o Desenho do PLN-009 antes da execução](../../work/reviews/REV-014-pln-009-o-desenho-antes-da-execucao.md) —
@@ -734,4 +741,8 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 - [x] Todo passo `[x]`, com revisão independente e os achados com destino (R3 a R6; P7; P8).
 - [x] Os casos C1 a C4 com o Observado e o veredito.
 - [x] O `feat/pln-009-mcp` integrado à `master` do `brza-workflow`, com a confirmação de Anderson (`23d812d`).
-- [ ] A R5.3 reaberta no PLN-003, e os P6 a P9 de lá passados a este plano.
+- [x] A R5.3 reaberta no PLN-003, e os P6 a P9 de lá passados a este plano (`PLN-003-interview.md:260`).
+- [x] O durável na casa dona: a R1.1 em `work/decisions/`, e a regra do MCP e o `README.md` em `## Documentação`.
+- [x] Sem resumo a publicar: a entrega não abriu commit nem PR no `brza-studio`; o merge `23d812d` traz o gate e os
+  casos.
+- [x] `status: done`, `phase: closed` e `completed` no frontmatter.

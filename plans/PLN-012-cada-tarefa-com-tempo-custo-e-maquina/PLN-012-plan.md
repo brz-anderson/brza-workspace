@@ -346,14 +346,14 @@ Estimado: 2.0 h · Executado: — h
 - [ ] **2. Escrever** — o passo "2. O que o commit vai fechar" do `close-task`; a linha `sessions` e a `## Medida` no
   `core/work/README.md`; no `CLAUDE.md` do adaptador, os eventos `task` e `run` na tabela do hook e o `--by-task` no
   resumo.
-- [ ] **3. Rodar e ver passar** — `python3 -m unittest discover -s tests/notes-checker`
+- [ ] **3. Rodar e ver passar** — `python3 tests/notes-checker/run.py`
 - [ ] **4. Commit** — no `brza-workflow`, e merge da `feat/pln-012-medida-por-tarefa` na `master` dele depois da
   revisão.
 - [x] **5. Abrir as issues** das lacunas, pela sessão que conduz, com `brza note new issue` e `brza note commit` —
   as 10 de `## Pendências conhecidas`, em 2026-11-06.
 
-**Evidência:** `brza-workflow@<sha>` · `python3 -m unittest discover -s tests/notes-checker` → N passed · as issues no
-`tools-kit@<sha>`
+**Evidência:** `brza-workflow@<sha>` · `python3 tests/notes-checker/run.py` → N passed · as issues no
+`tools-kit@<sha>` · código e norma em `brza-workflow@22805fb` (`feat/pln-012-p5`); revisão: [REV-018: A revisão do P5 do PLN-012, o close-task e a norma](../../work/reviews/REV-018-pln-012-p5-o-close-task-e-a-norma.md)
 
 ### P6 — Uma tarefa medida de ponta a ponta
 
@@ -389,8 +389,7 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   `python3 -m unittest tests/hooks/test_compact_guard.py`, e a leitura do diff da skill.
 - **O `brza run` imprime os mesmos blocos, sai com o código do comando e fecha a aba com 0**; o `result.json` continua
   com `code`. Como se confere: `python3 -m unittest tests/cli/test_brza_scripts.py`.
-- **O checador aceita o worklog novo e o antigo.** Como se confere: `python3 -m unittest discover -s
-  tests/notes-checker`, e `python3 .claude/skills/notes-checker/scripts/check_notes.py` no `tools-kit` depois do
+- **O checador aceita o worklog novo e o antigo.** Como se confere: `python3 tests/notes-checker/run.py`, e `python3 .claude/skills/notes-checker/scripts/check_notes.py` no `tools-kit` depois do
   `brza sync`.
 
 ## Desvios
@@ -413,6 +412,11 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
 - [O ▶ do brza run sem resposta do app grava o comando sem sessão](../../work/issues/brza-run-sem-resposta-do-app-grava-sem-sessao.md) — D7, P5.5.
 - [O pico do brza run é o do maior processo, não o da árvore](../../work/issues/pico-do-brza-run-e-o-do-maior-processo.md) — D7, P5.5.
 
+## Revisões
+
+- 2026-11-06 — P5, o `close-task` e a norma: duas rodadas do agy e a final do reviewer, aprovado com correções aplicadas.
+  [REV-018: A revisão do P5 do PLN-012, o close-task e a norma](../../work/reviews/REV-018-pln-012-p5-o-close-task-e-a-norma.md)
+
 ## Worklogs
 
 - 2026-11-03 — aberto; Rodada 0 transcrita; Terreno levantado; R1 e R2 respondidas; issue do Codex e do
@@ -425,3 +429,5 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   [Aceite do corte do PLN-012](../../work/worklogs/2026-11-06-pln-012-aceite-do-corte.md)
 - 2026-11-06 — X1: P1, P2, P4 e P5 abertos em paralelo, cada um na sua sessão e branch; P5.5 feito, com as 10 issues.
   [Os passos do PLN-012 em paralelo](../../work/worklogs/2026-11-06-pln-012-passos-em-paralelo.md)
+- 2026-11-06 — P5 (código e norma) fechado em `feat/pln-012-p5`, sha `22805fb`: close-task, `core/work/README.md` e `CLAUDE.md`; desvio do `--until` no D6.
+  [O P5 do PLN-012, o close-task e a norma](../../work/worklogs/2026-11-06-pln-012-p5-o-close-task-e-a-norma.md)

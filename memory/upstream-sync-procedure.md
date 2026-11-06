@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 7884383f-7a82-4f9c-a066-e1d749d6c2a6
-  modified: 2026-11-02T18:07:10.020Z
+  modified: 2026-11-06T22:26:23.171Z
 ---
 
 O sync da v1.4.246 (2026-11-02) teve 404 arquivos em conflito, e o que funcionou fica aqui. O registro inteiro está no
@@ -22,6 +22,16 @@ worklog `2026-11-02-sync-da-v1-4-246-do-upstream.md`.
   testando, ela dá centenas de `disk I/O error` do SQLite que não são do código.
 - **Cada grupo de conflito vai a um `implementer`, com um brief comum** que traz as decisões das rodadas e as features a
   preservar. Depois, um `reviewer` faz a revisão adversária.
+
+Do sync da v1.4.251 (2026-11-06, 610 conflitos), mais:
+- **Os marcadores não saem em diff3 por padrão** neste clone. Antes de classificar, rode
+  `git checkout --conflict=diff3 -- <arquivos>`. O `merge.renameLimit` alto não mudou nada.
+- **Os `UD` também se classificam:** compare `:1:` e `:2:` com o `rebrand_only`. Os que são só rebrand vão de `git rm`, e
+  o resto vai aos `implementer`.
+- **Nenhum agente dá `git add` de pasta ou `-A`.** Um deu, e o índice perdeu o `UU` dos outros grupos no meio do
+  trabalho. O brief diz isso, e a conferência final procura marcador no conteúdo, não no `git status`.
+- **Rode a suíte inteira de novo depois dos consertos da revisão.** Um helper `brza/` que só movia texto passou a fazer
+  `await` em toda chamada. O microtask a mais inverteu uma ordem testada, e só a suíte pegou.
 
 **Why:** cada sync fica maior sem isso; a linha de base separa o que é do merge do que já vem quebrado do upstream.
 

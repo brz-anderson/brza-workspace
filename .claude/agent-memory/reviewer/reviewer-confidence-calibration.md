@@ -25,4 +25,15 @@ metadata:
 - **Colisão de coexistência por recurso em `/tmp` ou `~/.orca`** costuma cair (hash do runtimeDir, shim
   idêntico, ledger de PTY compartilhado de propósito). O que fica é o que é **cifrado por app**.
 
+- **Entrada de build que aponta a arquivo inexistente**: 90, com a premissa de que o Rollup recusa
+  `input` não resolvido. Reforça: o app instalado em `/Applications/BrzA Studio.app/…/app.asar.unpacked`
+  mostra o que o build de fato emite (leitura, sem rodar build).
+- **Hipóteses que caíram no sync da 251** (não gaste tempo sem caminho novo): retomada automática
+  do upstream em chat fixado (vai pelo envio comum, que lê `record.accountSwitch`); componente do
+  brief que "sumiu" na junção mas o próprio fork tinha tirado antes (confira `git log --all -S`);
+  cherry-pick posterior "vai conflitar" (simule com `git merge-tree --write-tree --merge-base`).
+- **Falha de teste vista só por outro agente, sob carga**: abaixo de 80 sem rodar; vai a ponto
+  para rodada, conferida contra o `test-base.failed` da tag pura.
+- **zsh**: `$r:src/...` também quebra em `git show`/`git grep` com `$r` antes de `:`; use `"${r}:…"`.
+
 Related: [[sync-review-patterns]]

@@ -51,6 +51,11 @@ tags:
   Anderson. Dois pontos da R66 são leitura da sessão, a confirmar no C31: o que "aparece fora do hover" quer dizer
   (R66.1) e o escopo (R66.3). O pedido 42 (o botão de expandir do bloco de código com a aparência e a fileira dos
   vizinhos) entrou com o D63 e o P80, que fechou em `brza-studio@d501bb230ff`, com os X78 ao X80, e espera só o C33.
+  **O sync da `v1.4.251`** (2026-11-06, `brza-studio@cb573babbfd`) mudou dois itens deste plano, pela R2 daquele sync:
+  o "Retomar automaticamente" do P79 passa a ser a retomada do upstream, ligada por padrão, e o agendador do fork saiu
+  ("Upstream, ligado por padrão (Recomendado)"); o C32 se confere com ela. O Markdown abre na prévia como o valor
+  `'preview'` do `markdownDefaultViewMode` do upstream ("'preview' na configuração (Recomendado)"). O registro está em
+  [O sync da v1.4.251 do upstream, que trouxe o cartão de arquivos alterados](../../work/worklogs/2026-11-06-sync-da-v1-4-251-do-upstream.md).
 - **Dividido:** o Desenho em [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat — Desenho](PLN-001-design.md);
   a Entrevista, o Terreno e o Log até a divisão ficam no plano de origem, no workspace de origem
   (na entrevista e no desenho de lá, R28.3); as rodadas

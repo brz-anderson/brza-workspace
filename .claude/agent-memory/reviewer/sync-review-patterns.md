@@ -28,6 +28,17 @@ Padrões que se repetiram na revisão do merge da v1.4.246 (2026-11-02):
   o que o Orca selou, e reconectar sobrescreve o do Orca. Confira `ls ~/.orca` e as datas `cdat` dos itens
   (`security find-generic-password -s ...` sem `-w`).
 
+- **Caminho de arquivo em config que o typecheck não vê** (sync da 251, 2026-11-06). O upstream
+  reorganiza pastas a cada versão; o conserto do fork que mora em config não acompanha e nada
+  reclama: `CLI_MAIN_ENTRY_NAMES` (`config/build-plugins/plain-node-entry-guard.ts`), que vira
+  `input` do Rollup via `src/main/<nome>.ts`; o `asarUnpack` do electron-builder; os scripts próprios
+  em `config/scripts/*.mjs` (`build-win-local`). Typecheck, lint e vitest passam e o `pnpm build`
+  quebra. Rode um script que confira cada nome contra o `git ls-tree HEAD` e cada import relativo
+  dos `.mjs/.cjs` de config, HEAD contra a tag pura.
+- **O upstream apaga o teste-inventário que guardava um conserto do fork** ("remove low-value
+  tests"): a linha do fork vai junto e o conserto fica sem guarda. Ao ver um conserto antigo do
+  fork em arquivo de config, procure o teste dele no HEAD.
+
 **Método que rendeu:** listar as linhas que o fork somou (`git diff -U0 <base do último sync> <master do
 fork> -- src`) e que não existem em lugar nenhum da árvore atual. Quase tudo é refatoração ou texto
 reescrito; o resto aponta o que caiu. Depois, `git diff v1.4.246 -- <arquivo>` nas junções.

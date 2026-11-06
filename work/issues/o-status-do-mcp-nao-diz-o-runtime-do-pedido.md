@@ -1,9 +1,10 @@
 ---
-status: open
+status: done
 description: As linhas queued, running e finished do status do MCP não trazem o runtime, o modelo nem o esforço do pedido, e com três runtimes não se sabe qual worker é de qual.
 scope:
   - brza-workflow
 opened: 2026-11-04
+completed: 2026-11-06
 priority: medium
 tags:
   - tooling
@@ -28,3 +29,7 @@ e no worklog e siga".
 ## O que falta
 
 1. O `status` passa a trazer `runtime`, `model` e `effort` em cada linha, com um teste no `test_mcp_dispatch.py`.
+
+## Resolução (2026-11-06)
+
+O `brief` do `status` em `packages/mcp/brza_mcp/tools.py` inclui `runtime`, `model` e `effort`. Vale para `queued`, `gated`, `running` e `finished`, porque as quatro listas usam o mesmo `brief`. O teste `test_status_lines_carry_runtime_model_and_effort` vê o `running` `codex`/`gpt-6.1-sol`/`low`, o `queued` `grok`/`grok-4.7`/`low` e o `finished` com os mesmos três do Codex. `python3 -m unittest test_mcp_dispatch` → 32 OK. Commit local `brza-workflow@190cf58`, ainda sem push.

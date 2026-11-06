@@ -18,8 +18,10 @@ tags:
 
 # PLN-012: Cada tarefa sai com o tempo corrido, o custo e a máquina que gastou
 
-- **Retomar:** corte aceito em 2026-11-06 (R5.1); o plano está em `execution`, nenhum passo começou. Próximo: o P1,
-  a pedido de Anderson, numa sessão aberta no `~/Projects/brza-workflow`, na branch `feat/pln-012-medida-por-tarefa`.
+- **Retomar:** em 2026-11-06, P1, P2, P4 e P5 rodam em paralelo (X1), cada um numa sessão (`pln012-p1`, `-p2`,
+  `-p4`, `-p5`) e num worktree do `brza-workflow`, saindo de `feat/pln-012-medida-por-tarefa`; as 10 issues do P5.5
+  estão abertas. Cada sessão avisa por correio ao fechar; esta sessão junta a branch do passo na integração e marca o
+  `[x]`. Próximo: o P3, depois do merge do P1 e do P2; o P6 por último.
 - **Dividido:** [PLN-012 — Desenho](PLN-012-design.md)
 
 ## Pedido
@@ -347,7 +349,8 @@ Estimado: 2.0 h · Executado: — h
 - [ ] **3. Rodar e ver passar** — `python3 -m unittest discover -s tests/notes-checker`
 - [ ] **4. Commit** — no `brza-workflow`, e merge da `feat/pln-012-medida-por-tarefa` na `master` dele depois da
   revisão.
-- [ ] **5. Abrir as issues** das lacunas, pela sessão que conduz, com `brza note new issue` e `brza note commit`.
+- [x] **5. Abrir as issues** das lacunas, pela sessão que conduz, com `brza note new issue` e `brza note commit` —
+  as 10 de `## Pendências conhecidas`, em 2026-11-06.
 
 **Evidência:** `brza-workflow@<sha>` · `python3 -m unittest discover -s tests/notes-checker` → N passed · as issues no
 `tools-kit@<sha>`
@@ -390,6 +393,26 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   tests/notes-checker`, e `python3 .claude/skills/notes-checker/scripts/check_notes.py` no `tools-kit` depois do
   `brza sync`.
 
+## Desvios
+
+- **X1 — P1, P2, P4 e P5 em paralelo, cada um na sua branch.** Anderson pediu em 2026-11-06 "inicie os passos em
+  paralelo"; o corte previa P1 → P2 → P3 e o P5 depois do P2. O P2 e o P5 se escrevem contra o contrato do D1, do D2 e
+  do D4, e cada passo vai a `feat/pln-012-<pN>`, que esta sessão junta em `feat/pln-012-medida-por-tarefa`; a `master`
+  do `brza-workflow` só recebe a integração no fim do P5, como estava. Afeta P1–P5.
+
+## Pendências conhecidas
+
+- [A sessão aberta sem a função do shell fica sem medida por tarefa](../../work/issues/sessao-sem-a-funcao-do-shell-fica-sem-medida-por-tarefa.md) — D7, P5.5.
+- [A espera de permissão de ferramenta conta como tempo do agente](../../work/issues/espera-de-permissao-conta-como-tempo-do-agente.md) — D7, P5.5.
+- [A memória dos comandos rodados pelo Bash não se mede](../../work/issues/memoria-dos-comandos-do-bash-nao-se-mede.md) — D7, P5.5.
+- [O processo em segundo plano entra na CPU só quando sai](../../work/issues/processo-em-segundo-plano-entra-na-cpu-so-quando-sai.md) — D7, P5.5.
+- [O commit de worklog fora do brza note commit não marca tarefa](../../work/issues/commit-de-worklog-fora-do-brza-note-nao-marca-tarefa.md) — D7, P5.5.
+- [O /clear pode partir a tarefa em duas sessões](../../work/issues/clear-pode-partir-a-tarefa-em-duas-sessoes.md) — D7, P5.5.
+- [O worklog renomeado muda a chave da tarefa](../../work/issues/worklog-renomeado-muda-a-chave-da-tarefa.md) — D7, P5.5.
+- [A CPU do subagente em segundo plano cai no turno em que ele termina](../../work/issues/cpu-do-subagente-em-segundo-plano-cai-no-turno-errado.md) — D7, P5.5.
+- [O ▶ do brza run sem resposta do app grava o comando sem sessão](../../work/issues/brza-run-sem-resposta-do-app-grava-sem-sessao.md) — D7, P5.5.
+- [O pico do brza run é o do maior processo, não o da árvore](../../work/issues/pico-do-brza-run-e-o-do-maior-processo.md) — D7, P5.5.
+
 ## Worklogs
 
 - 2026-11-03 — aberto; Rodada 0 transcrita; Terreno levantado; R1 e R2 respondidas; issue do Codex e do
@@ -400,3 +423,5 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   [Desenho do PLN-012, a medida por tarefa](../../work/worklogs/2026-11-03-pln-012-desenho-da-medida-por-tarefa.md)
 - 2026-11-06 — R5.1: corte aceito, P1–P6 (16 h); Passos, Cobertura e Regressão gravados; `phase: execution`.
   [Aceite do corte do PLN-012](../../work/worklogs/2026-11-06-pln-012-aceite-do-corte.md)
+- 2026-11-06 — X1: P1, P2, P4 e P5 abertos em paralelo, cada um na sua sessão e branch; P5.5 feito, com as 10 issues.
+  [Os passos do PLN-012 em paralelo](../../work/worklogs/2026-11-06-pln-012-passos-em-paralelo.md)

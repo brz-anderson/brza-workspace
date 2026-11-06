@@ -359,6 +359,8 @@ Estimado: 1 h · Executado: 1 h
 - 2026-11-04 — R5: o plano aceito e executado de ponta a ponta, P1 a P11, com as três entregas mescladas e a revisão
   final; o plano fechou.
   [A execução do PLN-013, o Grok, o Codex e o Antigravity no `brza sessions` e no MCP](../../work/worklogs/2026-11-04-pln-013-execucao.md)
+- 2026-11-06 — A issue da cota do Grok fechou: a leitura `weekly` se manteve, e o MCP já segura essa janela.
+  [A cota do Grok lida pelo app](../../work/worklogs/2026-11-06-a-cota-do-grok-lida.md)
 
 ## Revisões
 
@@ -370,7 +372,8 @@ Estimado: 1 h · Executado: 1 h
 ## Pendências conhecidas
 
 - [O app não lê a cota do Grok](../../work/issues/o-app-nao-le-a-cota-do-grok.md) — da R4.2; o Grok fica em
-  `quota_unknown` até o app ler a cota.
+  `quota_unknown` até o app ler a cota. Em 2026-11-06 a leitura `weekly` se manteve (38%, a mesma janela do dia 04) e
+  a issue fechou.
 - [O `status` do MCP não diz o runtime do pedido](../../work/issues/o-status-do-mcp-nao-diz-o-runtime-do-pedido.md) — do P4.
 - [O `/rename` pelo chat não chega ao Grok](../../work/issues/o-rename-pelo-chat-nao-chega-ao-grok.md) — do P8.
 - [O `/rename` pelo chat não chega ao Antigravity](../../work/issues/o-rename-pelo-chat-nao-chega-ao-antigravity.md) — do P8, com o `yolo`.

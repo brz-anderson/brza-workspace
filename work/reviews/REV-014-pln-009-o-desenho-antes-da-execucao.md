@@ -1,5 +1,6 @@
 ---
 status: done
+description: O parecer do Desenho do PLN-009, com a R1 em disco, antes de qualquer passo
 scope:
   - workspace
 opened: 2026-11-03
@@ -8,7 +9,7 @@ tags:
   - tooling
 ---
 
-# REV: o Desenho do PLN-009 antes da execução
+# REV-014: o Desenho do PLN-009 antes da execução
 
 O parecer do Desenho do
 [PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients](../../plans/PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md),

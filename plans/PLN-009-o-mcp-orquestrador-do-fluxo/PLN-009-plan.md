@@ -20,13 +20,11 @@ tags:
 
 # PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients
 
-- **Retomar:** P1 a P8 `[x]`; C1 aprovado no launchd real (R7); C2 aprovado com o `tev1` real; C3 aprovado com a fila
-  isolada; C4 aprovado pelo chat do Studio.
-  A `feat/pln-009-mcp` (`007383a`) foi mesclada na `master` do `brza-workflow` em `23d812d`, com a confirmação de
-  Anderson ("Merge agora"). O gate na árvore mesclada deu `tests/mcp` 358, `tests/hooks` 291, `tests/cli` limpo 477 e
-  `notes-checker` 26. O `brza install --mcp --relink` religou o `brza-mcp` e o `brza-quota` ao checkout principal.
-  - **O que falta:** a R5.3 no PLN-003; os três pareceres sem número REV; o plist do serviço, que ainda aponta o
-    worktree da `feat`.
+- **Retomar:** P1 a P8 `[x]`; C1 a C4 aprovados; a `feat/pln-009-mcp` mesclada na `master` do `brza-workflow` em
+  `23d812d`. Em 2026-11-06 a sessão do `tools-kit` conferiu que a R5.3 já estava reaberta no PLN-003
+  (`PLN-003-interview.md:260`), que o plist do serviço aponta o checkout principal e que o `brza mcp status` responde.
+  Os três pareceres ganharam o número REV-014, REV-015 e REV-016.
+  - **O que falta:** a rodada de fechamento (`close.md`).
 
 ## Pedido
 
@@ -121,7 +119,7 @@ Respondida em 2026-11-03, na sessão do `tools-kit` que retomou o plano.
 
 ### Rodada 2 — os pontos da revisão do Desenho (2026-11-03)
 
-> **Apresentado antes:** o parecer [REV: o Desenho do PLN-009 antes da execução](../../work/reviews/pln-009-o-desenho-antes-da-execucao.md),
+> **Apresentado antes:** o parecer [REV-014: o Desenho do PLN-009 antes da execução](../../work/reviews/REV-014-pln-009-o-desenho-antes-da-execucao.md),
 > com 14 achados e quatro pontos para rodada.
 
 Respondida em 2026-11-03, nesta sessão, pela regra que Anderson deu antes dela: "escolha o encaminhamento dos achados
@@ -409,7 +407,7 @@ Estimado: 5.0 h · Executado: 0.7 h
 - [x] **5. Commit** no `brza-workflow`, branch `feat/pln-009-mcp`.
 - [x] **6. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** `brza-workflow@1dfc9d9`, correções `f8829f4`, `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Argon r1 (6 corrigidos), Flash r2 e r3, Opus final (5 corrigidos) — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md). O `launchd` real fica no C1.
+**Evidência:** `brza-workflow@1dfc9d9`, correções `f8829f4`, `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Argon r1 (6 corrigidos), Flash r2 e r3, Opus final (5 corrigidos) — [REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/REV-015-pln-009-a-revisao-dos-passos.md). O `launchd` real fica no C1.
 
 ### P2 — A fila e os três tetos
 
@@ -425,7 +423,7 @@ Estimado: 5.5 h · Executado: 0.5 h
 - [x] **4. Commit.**
 - [x] **5. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** `brza-workflow@084cc62`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash e Opus r1 (medição, R4), Flash r2 e r3, Opus final — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md).
+**Evidência:** `brza-workflow@084cc62`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash e Opus r1 (medição, R4), Flash r2 e r3, Opus final — [REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/REV-015-pln-009-a-revisao-dos-passos.md).
 
 ### P3 — As ferramentas, o despacho e os gates
 
@@ -441,7 +439,7 @@ Estimado: 4.5 h · Executado: 0.5 h
 - [x] **4. Commit.**
 - [x] **5. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** `brza-workflow@e7d8fa6`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash e Opus r1, Flash r2, Opus final — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md).
+**Evidência:** `brza-workflow@e7d8fa6`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash e Opus r1, Flash r2, Opus final — [REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/REV-015-pln-009-a-revisao-dos-passos.md).
 
 ### P4 — A política e o desempatador
 
@@ -459,7 +457,7 @@ Estimado: 5.0 h · Executado: 0.5 h
 - [x] **5. Commit.**
 - [x] **6. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** `brza-workflow@8801c77`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); casos do M11 em `tests/mcp/fixtures/m11_cases.json` (o `tev1` real: 9/10); revisão: Flash e Opus r1, Flash r2, Opus final — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md). O `tev1` frio fica no C2.
+**Evidência:** `brza-workflow@8801c77`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); casos do M11 em `tests/mcp/fixtures/m11_cases.json` (o `tev1` real: 9/10); revisão: Flash e Opus r1, Flash r2, Opus final — [REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/REV-015-pln-009-a-revisao-dos-passos.md). O `tev1` frio fica no C2.
 
 ### P5 — O ciclo e a conta
 
@@ -475,7 +473,7 @@ Estimado: 7.0 h · Executado: 0.6 h
 - [x] **4. Commit.**
 - [x] **5. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** `brza-workflow@a4ff8db`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash e Opus r1, Flash r2, Opus final — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md). O `--json` real do `orchestration` fica no C4.
+**Evidência:** `brza-workflow@a4ff8db`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash e Opus r1, Flash r2, Opus final — [REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/REV-015-pln-009-a-revisao-dos-passos.md). O `--json` real do `orchestration` fica no C4.
 
 ### P6 — A telemetria `route` e a ponta a ponta
 
@@ -491,7 +489,7 @@ Estimado: 3.0 h · Executado: 0.4 h
 - [x] **4. Commit.**
 - [x] **5. Revisão pelo `agy`** até 3 rodadas.
 
-**Evidência:** `brza-workflow@1fa3e60`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash r1 e r2, Opus final — [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md).
+**Evidência:** `brza-workflow@1fa3e60`, correções `77b917f` e `b2c87a6`; `tests/mcp` → 346 OK, `tests/hooks` → 290 OK, `tests/cli` limpo → 445 OK (no `b2c87a6`); revisão: Flash r1 e r2, Opus final — [REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/REV-015-pln-009-a-revisao-dos-passos.md).
 
 ### P7 — Corrigir conta e perfil encontrados na revisão da entrega
 
@@ -504,7 +502,7 @@ Estimado: 0,5 h · Executado: 0,3 h
 - [x] **3. Revisar e testar:** revisor independente, 63 testes pontuais OK; MCP 349 OK (um pulado).
 - [x] **4. Commit:** `brza-workflow@354d004`, na `feat/pln-009-mcp`.
 
-**Evidência:** [REV: a entrega do PLN-009 contra o Pedido e a Cobertura](../../work/reviews/pln-009-a-revisao-da-entrega.md).
+**Evidência:** [REV-016: a entrega do PLN-009 contra o Pedido e a Cobertura](../../work/reviews/REV-016-pln-009-a-revisao-da-entrega.md).
 O gate MCP rodou no worktree real, com leitura de `sysctl` liberada. Desvios X46 e X47.
 
 ### P8 — O `stop` apaga o plist e espera o agente descarregar
@@ -522,7 +520,7 @@ Estimado: 0,8 h · Executado: 0,8 h
 
 **Evidência:** `tests/mcp` → 358 OK (um pulado), `tests/cli` limpo → 445 OK, `test_mcp_lifecycle` em 8 s (o teste do
 `start` depois do `stop` levava 15 s e passava com o `start` falhando); pareceres na seção do P8 de
-[REV: a entrega do PLN-009 contra o Pedido e a Cobertura](../../work/reviews/pln-009-a-revisao-da-entrega.md). Desvio X48.
+[REV-016: a entrega do PLN-009 contra o Pedido e a Cobertura](../../work/reviews/REV-016-pln-009-a-revisao-da-entrega.md). Desvio X48.
 
 ### Casos manuais
 
@@ -697,12 +695,12 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 
 ## Revisões
 
-- [REV: o Desenho do PLN-009 antes da execução](../../work/reviews/pln-009-o-desenho-antes-da-execucao.md) —
+- [REV-014: o Desenho do PLN-009 antes da execução](../../work/reviews/REV-014-pln-009-o-desenho-antes-da-execucao.md) —
   2026-11-03, 14 achados, todos com destino.
-- [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/pln-009-a-revisao-dos-passos.md) —
+- [REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../../work/reviews/REV-015-pln-009-a-revisao-dos-passos.md) —
   2026-11-03, 3 rodadas por passo, todos os achados com destino.
 
-- [REV: a entrega do PLN-009 contra o Pedido e a Cobertura](../../work/reviews/pln-009-a-revisao-da-entrega.md) —
+- [REV-016: a entrega do PLN-009 contra o Pedido e a Cobertura](../../work/reviews/REV-016-pln-009-a-revisao-da-entrega.md) —
   2026-11-03, três achados corrigidos; delta revisado; C1 a C4 pendentes.
 
 ## Pendências conhecidas
@@ -716,11 +714,20 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 - [O start e o stop do MCP concorrentes](../../work/issues/o-start-e-o-stop-do-mcp-concorrentes.md) — do P8 (Flash 5,
   Opus A3); sem trava entre processos, até a primeira automação que chame os dois verbos.
 - [Os pareceres do PLN-009 sem número REV](../../work/issues/os-pareceres-do-pln-009-sem-numero-rev.md) — da MIG-001
-  do `workspace`; os três pareceres de `work/reviews/` ganham o `REV-NNN` antes do fechamento deste plano.
+  do `workspace`; `done` em 2026-11-06, com o REV-014, o REV-015 e o REV-016.
 - [O dispatch aceita chamador fora do Studio](../../work/issues/o-dispatch-aceita-chamador-fora-do-studio.md) — do
   C4; o gate abre para um `caller` que o Studio não conhece, até o primeiro client fora do Studio.
 - [O limiar do tev1 sem calibração](../../work/issues/o-limiar-do-tev1-sem-calibracao.md) — do C2; todo desempate
   vai ao Haiku (~3,5 s) até o `resolver.tev1_min_confidence` ser calibrado.
+- [O `brza-mcp` não cancela um pedido que espera na fila](../../work/issues/o-mcp-nao-cancela-pedido-na-fila.md) —
+  do PLN-011; o pedido retido pela cota saiu por um `UPDATE` direto no SQLite.
+
+## Documentação
+
+- `brza-workflow/core/CLAUDE.md`, "Os plugins são habilitados só aqui" — a regra do servidor MCP de um workstream só,
+  sem `--scope local`, em `brza-workflow@3826f63`; chegou ao workspace pelo `brza sync` (`75fba13`).
+- `brza-workflow/README.md`, a linha do `packages/mcp/` — o `brza-mcp` e os verbos, escrita no P1 (`1dfc9d9`) e
+  mesclada em `23d812d`.
 
 ## Fechamento
 

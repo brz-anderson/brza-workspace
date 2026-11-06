@@ -3,6 +3,7 @@ scope:
   - workspace
 refs:
   - PLN-009
+  - REV-016
   - issue:o-start-e-o-stop-do-mcp-concorrentes
 ---
 
@@ -36,7 +37,7 @@ Anderson escolheu as duas recomendadas:
 - A r2 pelo `agy` não achou nada.
 - Gate: MCP 358 OK (um pulado) e CLI limpo 445 OK. Commit `brza-workflow@007383a`, publicado na `feat/pln-009-mcp`.
 - Parecer: na seção do P8 de
-  [REV: a entrega do PLN-009 contra o Pedido e a Cobertura](../reviews/pln-009-a-revisao-da-entrega.md).
+  [REV-016: a entrega do PLN-009 contra o Pedido e a Cobertura](../reviews/REV-016-pln-009-a-revisao-da-entrega.md).
 
 **O C1 refeito com o `007383a`** foi aprovado: o `stop` em 1 s, o plist apagado, o `status` 3 logo depois e a porta
 livre.

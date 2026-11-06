@@ -1,12 +1,13 @@
 ---
 status: done
+description: A revisão independente da entrega do PLN-009 contra o Pedido e a Cobertura, com os achados e o delta do P8
 completed: 2026-11-03
 scope:
   - workspace
 opened: 2026-11-03
 ---
 
-# REV: a entrega do PLN-009 contra o Pedido e a Cobertura
+# REV-016: a entrega do PLN-009 contra o Pedido e a Cobertura
 
 Revisão independente do `brza-workflow@b2c87a6`, branch `feat/pln-009-mcp`, contra o
 [PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients](../../plans/PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md).

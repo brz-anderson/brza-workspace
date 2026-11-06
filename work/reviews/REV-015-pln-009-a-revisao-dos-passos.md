@@ -1,5 +1,6 @@
 ---
 status: done
+description: As revisões dos passos P1 a P6 do PLN-009 pelo agy e pelo Opus, até 3 rodadas por passo
 scope:
   - workspace
 opened: 2026-11-03
@@ -8,7 +9,7 @@ tags:
   - tooling
 ---
 
-# REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus
+# REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus
 
 Os seis passos do [PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients](../../plans/PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md),
 revisados na versão `brza-workflow@b2c87a6`, o commit que fecha a correção da última rodada. O `agy` revisou com o Gemini

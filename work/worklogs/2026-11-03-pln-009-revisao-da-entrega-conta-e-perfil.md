@@ -4,6 +4,7 @@ scope:
 refs:
   - PLN-003
   - PLN-009
+  - REV-016
 ---
 
 # O PLN-009: a revisão da entrega e a correção da conta e do perfil
@@ -15,7 +16,7 @@ Um `reviewer` independente conferiu Pedido, Cobertura e testes: encontrou conta 
 consulta de contas da produção para worker de perfil de desenvolvimento e omissão do C4 no fechamento.
 Pela preferência registrada de corrigir aqui, um `implementer` corrigiu A1/A2, e o revisor aprovou o delta.
 A3 foi corrigido no plano. Parecer:
-[REV: a entrega do PLN-009 contra o Pedido e a Cobertura](../reviews/pln-009-a-revisao-da-entrega.md).
+[REV-016: a entrega do PLN-009 contra o Pedido e a Cobertura](../reviews/REV-016-pln-009-a-revisao-da-entrega.md).
 
 O P7 fechou em `brza-workflow@354d004`: três regressões falharam antes; 63 testes pontuais passaram depois;
 gate final MCP 349 OK (um pulado). Hooks 290 OK e CLI limpo 445 OK foram refeitos no código original da entrega.

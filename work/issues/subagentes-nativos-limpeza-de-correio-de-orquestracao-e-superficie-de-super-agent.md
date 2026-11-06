@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38901, #38899, #38814, #38713 e as issues #38850, #38720 trazem prontidão de workers agy deslogados, travas FIFO em DAGs, reparo de hooks e correio OMP.
+description: Os PRs #38901, #38899, #38814, #38713 e as issues #39042, #38951, #39021, #38850 trazem proteção contra aborto de turnos OMP, statusMessage em hooks Codex e travas FIFO.
 scope:
   - brza-studio
   - brza-workflow
@@ -54,6 +54,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38901`](https://github.com
 [`stablyai/orca#37891`](https://github.com/stablyai/orca/pull/37891),
 [`stablyai/orca#37850`](https://github.com/stablyai/orca/pull/37850) e
 [`stablyai/orca#11279`](https://github.com/stablyai/orca/pull/11279), além das issues
+[`stablyai/orca#39042`](https://github.com/stablyai/orca/issues/39042),
+[`stablyai/orca#38951`](https://github.com/stablyai/orca/issues/38951),
+[`stablyai/orca#39021`](https://github.com/stablyai/orca/issues/39021),
 [`stablyai/orca#38850`](https://github.com/stablyai/orca/issues/38850),
 [`stablyai/orca#38720`](https://github.com/stablyai/orca/issues/38720),
 [`stablyai/orca#38687`](https://github.com/stablyai/orca/issues/38687),
@@ -81,66 +84,41 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38901`](https://github.com
 
 ## Os pontos do upstream
 
-1. **Falha rápida de prontidão de worker Antigravity quando a CLI está deslogada (`#38901`):**
-   - Ao disparar `orca orchestration worker-start --agent antigravity` em um host com o binário `agy` sem sessão autenticada,
-     o orquestrador tentava digitar a tarefa no menu interativo de login ou aguardava indefinidamente o timeout;
+1. **Prevenção de aborto acidental em turnos OMP ao entregar correio (`#39042`):**
+   - Ao enviar mensagens de orquestração (`orca orchestration send`) para uma pane rodando OMP enquanto um steer já estava
+     enfileirado, a tentativa de injeção de `Enter` no PTY podia acidentalmente interpretar como sinal de interrupção,
+     abortando o turno ativo com "Interrupted by user". A entrega precisa aguardar a conclusão do turno ou usar a extensão OMP.
+2. **Invasão de digitação de ponteiro de correio no terminal (`#38951`):**
+   - Quando um agente coordenador Claude recebe mensagens de correio, o texto do aviso era digitado no meio do buffer
+     que o operador estava editando no momento, enviando comandos truncados com `Enter`. Requer uso do canal dedicado `$.prompt.submit`.
+3. **Identificação anônima de hooks do Codex como "Hook 1" a "Hook 9" (`#39021`):**
+   - No diálogo de revisão de hooks (`/hooks`) do Codex, os 9 hooks instalados pelo app apareciam anonimamente porque faltava
+     o campo descritivo `statusMessage` no `~/.codex/hooks.json`.
+4. **Falha rápida de prontidão de worker Antigravity quando a CLI está deslogada (`#38901`):**
    - O PR `#38901` aborta imediatamente com erro explícito `Agent startup blocked: agent-sign-in-prompt`, mantendo a pane
      aberta para que o operador faça login e use `--retry-of <dispatch>`.
-2. **Reparo automático de ganchos de status do Antigravity (`#38899`):**
-   - Quando o `agy` era instalado após o início do app ou o arquivo `~/.gemini/config/hooks.json` era limpo, os ganchos de status
-     não eram reinstalados e as panes sumiam da barra de tarefas;
+5. **Reparo automático de ganchos de status do Antigravity (`#38899`):**
    - O PR `#38899` faz a verificação contínua e permite restaurar os ganchos com `orca agent hooks on`.
-3. **Travas determinísticas FIFO de recursos e quadro compartilhado de colaboração (`#38850`):**
+6. **Travas determinísticas FIFO de recursos e quadro compartilhado de colaboração (`#38850`):**
    - Proposta de mecanismos transacionais em SQLite (`orca orchestration lock-acquire`, `lock-release`, `lock-list`) com
      concessão FIFO, renovação de leases com TTL e quadro de colaboração para coordenar subagentes concorrentes em DAGs sem race conditions.
-4. **Modularização de donos de correio e transcrições de workers (`#38814`):**
+7. **Modularização de donos de correio e transcrições de workers (`#38814`):**
    - Refatoração do banco de dados de orquestração, caixas de correio e federação por donos de recursos no runtime.
-5. **Entrega de correio em terminais OMP via extensão em vez de digitação no PTY (`#38720`):**
-   - Em terminais com OMP (Open Multi-Processing / OpenCode), a entrega de aviso de correio por digitação direta no PTY
-     splicava o texto da notificação no meio de frases que o usuário estava digitando;
-   - Propõe entregar ponteiros de orquestração através da extensão instalada do OMP como canal limpo, seguindo o padrão
-     implementado para o Claude (`#38529`).
-6. **Suporte a roles de modelo, seletores e effort em chats e workers OMP (`#38713`):**
+8. **Entrega de correio em terminais OMP via extensão em vez de digitação no PTY (`#38720`):**
+   - Propõe entregar ponteiros de orquestração através da extensão instalada do OMP como canal limpo.
+9. **Suporte a roles de modelo, seletores e effort em chats e workers OMP (`#38713`):**
    - Configura parâmetros de reasoning effort, papéis de modelo e seleção precisa em sessões e workers do OMP.
-7. **Proteção de abas ativas em clientes pareados contra sleep automático (`#38768`):**
-   - Garante que workspaces e agentes não entrem em modo sleep se um cliente móvel ou desktop pareado estiver visualizando
-     ou digitando ativamente naquela aba.
-8. **Continuação de worker finalizado mediante resposta do coordenador (`#38464`):**
-   - Quando um worker emite seu `worker_done`, o app mantinha o processo em estado terminal imutável. Agora, caso o
-     coordenador envie um follow-up ou responda ao relatório antes da liberação do terminal, o worker é reativado
-     continuando o fluxo de raciocínio na mesma sessão sem exigir novo bootstrap.
-9. **Herança da conta Claude do chamador para subagentes CLI (`#38461`):**
-   - Garante que invocações de subagentes disparadas a partir de um terminal Orca herdem automaticamente a conta e o
-     `CLAUDE_CONFIG_DIR` do processo pai, eliminando o débito involuntário de cotas na conta padrão global.
-10. **Validação estrita de chamadores em `orchestration check` (`#38460`, resolve `#38446`):**
-    - Recusa chamadas de checagem de orquestração ambíguas onde a identidade do chamador não pode ser verificada com precisão.
-11. **Aninhamento visual de workers sob coordenadores no cliente móvel (`#38494`):**
-    - Agrupa hierarquicamente workers remotos sob seus respectivos coordenadores mesmo quando distribuídos entre múltiplos
-      worktrees.
-12. **Entrega de correio sem invasão do prompt via canal do Claude (`#38529`, `#38539`):**
-    - Substitui a injeção cega de texto e `\r` (Enter) no PTY do terminal pelo canal de prompt dedicado do plugin Claude
-      (`$.prompt.submit`), submetendo avisos de correio como turnos limpos e independentes sem sujar a digitação do usuário.
-13. **Amarração de retomada de perguntas e sessões de chat ao worker correto (`#38445`):**
-    - Garante que perguntas abertas (`ask --resume`) só possam ser retomadas e respondidas pelo exato Dispatch ou follow-up
-      legítimo que a formulou.
-14. **Workers remotos iniciando em child worktrees aninhados (`#38416`):**
-    - Permite que workers despachados para servidores remotos sejam criados dentro de worktrees filhos dedicados aninhados
-      sob o workspace do coordenador.
-15. **Retenção de correio diante de rascunhos digitados no OpenCode (`#38451`):**
-    - Estende a trava de entrega de correio para respeitar rascunhos em digitação também em terminais do agente OpenCode.
-16. **Permissão padrão para workers criarem seus próprios workers até profundidade 4 (`#38348`):**
-    - A configuração `Settings → Orchestration → Nested worker depth` é elevada de 1 para 4 por padrão.
-17. **Wake de coordenador Claude mesmo com subagentes ativos em background (`#38379`):**
-    - Corrige cenário onde o aviso de `worker_done` ficava represado por até 5 minutos quando o app reiniciava.
-18. **Comunicação persistente de workers concluídos em hosts remotos pareados (`#38376`):**
-    - Introduz o protocolo de federação v4 (`orchestration.federation-finished-worker-mail.v1`).
-19. **Interrupção de helpers auxiliares ao parar worker (`#38373`):**
-    - Garante que todos os processos e auxiliares filhos iniciados por um worker sejam finalizados imediatamente na parada.
+10. **Proteção de abas ativas em clientes pareados contra sleep automático (`#38768`):**
+    - Garante que workspaces e agentes não entrem em modo sleep se um cliente móvel ou desktop pareado estiver visualizando
+      ou digitando ativamente naquela aba.
+11. **Continuação de worker finalizado mediante resposta do coordenador (`#38464`):**
+    - Reativa workers terminados quando o coordenador envia follow-up antes da liberação do terminal.
+12. **Herança da conta Claude do chamador para subagentes CLI (`#38461`):**
+    - Garante que invocações de subagentes herdem automaticamente a conta e o `CLAUDE_CONFIG_DIR` do processo pai.
 
 ## O que fazer
 
+- Bloquear a injeção cega de `Enter` em terminais OMP quando houver turnos em execução ou steers enfileirados (`#39042`).
+- Adicionar `statusMessage` legíveis aos hooks do Codex (`#39021`) para clareza na auditoria de segurança.
 - Incorporar a detecção imediata de bloqueio de autenticação do Antigravity em workers (`#38901`).
 - Avaliar a introdução de locks FIFO e quadro de colaboração de recursos para o `brza-workflow` (`#38850`).
-- Implementar entrega de correio via extensão OMP (`#38720`) eliminando injeção em terminais OMP.
-- Adotar a reativação de workers finalizados sob resposta do coordenador (`#38464`) no `brza-workflow`.
-- Assegurar a herança da conta do chamador para novos subagentes CLI (`#38461`).

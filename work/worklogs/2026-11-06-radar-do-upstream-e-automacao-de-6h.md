@@ -12,7 +12,9 @@ refs:
   - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
   - issue:ler-e-enviar-mensagens-a-chats-pela-cli-e-expor-native-chat-aos-plugins
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
+  - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
   - issue:repositorios-vinculados-no-source-control-e-escopo-de-worktree-na-cli
+  - issue:resultados-de-ci-no-chat-e-disparo-automatico-de-agentes-em-falhas-de-pr
   - issue:seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio
   - issue:subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent
   - issue:vazamento-de-memoria-gpu-webgl-no-terminal-e-performance-macos
@@ -86,3 +88,36 @@ refs:
      adicionados o PR `#38826` (suporte a credenciais em chaveiro do SO / Windows Credential Manager para contas Codex), PR `#38807` e issue `#38806`
      (alinhamento do algoritmo de slug de confiança de workspace com o `cursor-agent`), issue `#38866` (respeito estrito às políticas de permissão do host
      remoto em handoffs de agentes) e issue `#38849` (conector de primeira classe e scanner no AI Vault para o agente ZeroClaw).
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-06)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados mais de 50 novos PRs e issues criados ou
+   atualizados entre `2026-11-06T09:00:00Z` e `2026-11-06T15:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Resultados de CI no chat e disparo automático de agentes em falhas de PR](../issues/resultados-de-ci-no-chat-e-disparo-automatico-de-agentes-em-falhas-de-pr.md):
+     rastreia o PR `#39020` (linhas contextuais de status de CI no diário do chat que abriu ou enviou commits para o PR, com links diretos
+     e supressão de estados cancelados transitórios) e o PR `#38950` ("Automatic follow-ups for failing checks", disparando autonomamente
+     o fluxo "Fix with AI" no workspace do PR ao detectar checks quebrados, com prevenção estrita de loops, limite de 3 tentativas por commit
+     e 6 execuções por PR/dia).
+3. **Atualização de 4 issues existentes em `work/issues/`:**
+   - [Melhorias de Native Chat, ACP do Gemini, CLI, abas e diff no upstream](../issues/melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream.md):
+     adicionados o PR `#39006` (implementa a execução do Antigravity Chat diretamente via `agy acp` nativo do host para versões >= 1.5.0,
+     unificando contas e histórico de sessões com o terminal e resolvendo a issue `#38833`), PR `#39012` (ação interativa "Sign in" em chats nativos
+     para recuperação de autenticação em terminais de OpenCode, Pi e OMP) e PR `#38976` (retry resiliente em erros `-32603` de catálogo ACP).
+   - [Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório](../issues/seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio.md):
+     adicionados o PR `#39018` (subcomando `orca worktree set --parent-worktree folder:<id>` para anexar worktrees existentes a pastas multirrepositório
+     e resolução de `--parent-worktree active`), PR `#39000` (resolução da issue `#38931` iniciando sufixo numérico de worktrees além do maior existente)
+     e PR `#38955` (`orca repo delete-branch` com validação de commits integrados e cerca transacional).
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados o PR `#38995` e issue `#38994` (agrupamento de sessões floating e subagentes na sidebar com contadores ao vivo), PR `#38963`
+     (ação "Background" para transferir ferramentas e subagentes Claude Bash longos para segundo plano, liberando o chat), PR `#38945`
+     (isolamento do SQLite de busca do Session History em worker threads dedicadas para manter fluidez em históricos gigantes) e PR `#39013`
+     / issue `#39010` (contabilização no Resource Usage de processos órfãos que desanexaram de seus terminais usando as tags `ORCA_WORKTREE_ID`).
+   - [Ler e enviar mensagens a chats pela CLI e expor Native Chat aos plugins](../issues/ler-e-enviar-mensagens-a-chats-pela-cli-e-expor-native-chat-aos-plugins.md):
+     adicionada a issue `#38952` (subcomandos `orca chat list` para listar chats abertos por CLI e `orca session resume --session <id>` para
+     retomar sessões salvas) e issue `#39043` (exposição de foco visual ativo da interface `focusedCard`/`focusedTerminal` na CLI para limpezas seguras).
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     adicionadas a issue `#39042` (prevenção de cancelamento espúrio de turnos em execução do OMP quando `orchestration send` pressiona Enter com steer
+     enfileirado), issue `#38951` (bloqueio de injeção cega de avisos de ponteiro em buffers de digitação ativa) e issue `#39021` (inclusão de `statusMessage`
+     explícita nos hooks do Codex).

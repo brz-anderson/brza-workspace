@@ -9,7 +9,7 @@ refs:
 # O PLN-004: as sondas da R6 e o Desenho do Codex e do agy
 
 A continuação do
-[PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude](../../plans/PLN-004-o-codex-e-o-agy-no-fluxo/PLN-004-plan.md),
+[PLN-004: Os runtimes Codex, `agy` e Grok trabalham no fluxo do workspace como o Claude](../../plans/PLN-004-os-runtimes-codex-agy-e-grok-no-fluxo/PLN-004-plan.md),
 na sessão `workspace`, depois da R6 de 2026-10-30. O dia anterior está em
 [O PLN-004: a abertura do Codex e do agy no fluxo](2026-10-30-pln-004-a-abertura-do-codex-e-do-agy-no-fluxo.md).
 

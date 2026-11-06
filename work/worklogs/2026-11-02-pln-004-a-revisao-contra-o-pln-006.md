@@ -12,7 +12,7 @@ refs:
 
 Anderson pediu, na sessão `workspace`, em 2026-11-02: "revise o plano contra as mudanças feitas no `BrzA Studio`,
 `brza-workspace` e `brza-workflow`". O plano é o
-[PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude](../../plans/PLN-004-o-codex-e-o-agy-no-fluxo/PLN-004-plan.md);
+[PLN-004: Os runtimes Codex, `agy` e Grok trabalham no fluxo do workspace como o Claude](../../plans/PLN-004-os-runtimes-codex-agy-e-grok-no-fluxo/PLN-004-plan.md);
 o dia anterior está em
 [O PLN-004: as sondas da R6 e o Desenho do Codex e do agy](2026-10-31-pln-004-as-sondas-e-o-desenho.md).
 

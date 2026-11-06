@@ -12,21 +12,23 @@ tags:
   - tooling
 ---
 
-# PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude
+# PLN-004: Os runtimes Codex, `agy` e Grok trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** a Entrevista fechou até a R16 e a 16.5. A 12.2 saiu decidida pela medição (o Claude padrão nos três
-  focos; o `agy` e o Codex como segundo passe, por `--runtime`); a R13 e a R14 fixaram a norma do pacote, o render do
-  `.toml`, o `tomllib` e os modelos (Codex: `gpt-6-astra` em `high`, sem a medição do `high`); a R15 decidiu o papel no
-  `brza delegate` e o `--runtime` obrigatório; a R16 decidiu que `agents` e `skills` passam a viver em `.brzAgents/`,
-  com `.claude/agents` e `.claude/skills` como links e o D15 emendado, e a 16.5, medida na sessão interativa, que a
-  memória dos subagentes fica real em `.claude/agent-memory/` (o link a faz perguntar a cada gravação), com
-  `.brzAgents/memory` como link para ela. Falta a R17 (a medição, o `~/.zshrc` e as sessões, P8 a P11 do `designer`),
-  o Desenho reescrito com o `.brzAgents` (D1, D4, D7, D11 e D15) no `pln-004-design-v2.md`, no scratch, e a
+- **Retomar:** a Entrevista fechou até a R19. A 12.2 saiu decidida pela medição (o Claude padrão nos três focos; o
+  `agy` e o Codex como segundo passe, por `--runtime`); a R13 e a R14 fixaram a norma do pacote, o render do `.toml`,
+  o `tomllib` e os modelos (Codex: `gpt-6-astra` em `high`, sem a medição do `high`); a R15 decidiu o papel no `brza
+  delegate` e o `--runtime` obrigatório; a R16 e a 16.5 puseram `agents` e `skills` em `.brzAgents/`, com
+  `.claude/agents` e `.claude/skills` como links, o D15 emendado, e a memória dos subagentes real em
+  `.claude/agent-memory/`, com `.brzAgents/memory` como link para ela. A R18 (2026-11-06) trouxe o Grok ao plano, pelo
+  pedido de 2026-11-03: um wrapper `grok-brza` com `GROK_FOLDER_TRUST=0`, o adaptador em `.grok/rules/runtime.md`, e
+  os hooks do núcleo saindo cedo com `GROK_HOOK_EVENT`, com um `.grok/hooks/runtime.json` do pacote chamando o
+  `measure_runtimes.py grok`. A R19 decidiu o `GROK_MEMORY=0` no wrapper, os papéis herdando o modelo do pai e o Grok
+  no D12; a 19.3, depois da medição que Anderson pediu (`/private/tmp/pln004/bench/out/pontuacao-grok.md`), pôs o
+  `brza delegate --runtime grok` em `--permission-mode plan --sandbox read-only`, com `grok-4.6` em `medium`. Falta a
+  R17 de volta (a medição, o `~/.zshrc` e as sessões, P8 a P11 do `designer`, agora com o Grok), o Desenho reescrito
+  com o `.brzAgents` e o Grok (D1, D4, D5, D7, D8, D9, D11, D12, D15 e D16) no `pln-004-design-v2.md`, no scratch, e a
   aprovação, na mensagem, antes de gravá-lo em `PLN-004-design.md`. O código passa ao `brza-workflow`, com o pacote
-  `packages/runtimes`, executado pela sessão `workspace`. **Pedido novo de Anderson, 2026-11-03, no meio da R17: "agora
-  temos que inserir também o `Grok`"** (o Grok Build CLI 1.0.70, já instalado, com o dialeto dele no app). O `collector`
-  levantou o `grok` eixo a eixo (`/private/tmp/pln004/grok/levantamento.md`); o escopo do plano (título, Pedido,
-  Cobertura) e a R17 aguardam a R18, que vem dele.
+  `packages/runtimes`, executado pela sessão `workspace`.
 - **Dividido:** [PLN-004 — Entrevista](PLN-004-interview.md)
 
 ## Pedido
@@ -39,6 +41,10 @@ tags:
   do `studio`, que se liga a este plano (R1.2).
 
 "vamos integrar o `codex` e o `agy` ao nosso fluxo de trabalho" — Anderson, em 2026-10-30.
+
+"agora temos que inserir também o `Grok`" — Anderson, em 2026-11-03, na sessão `workspace`; entra neste plano pela
+R18.1. O Grok é o Grok Build CLI 1.0.70, e entra nas quatro frentes abaixo; o que ele já lê do `.claude/` — a norma, as
+skills, os papéis e os hooks — não pede gerador nem link novo.
 
 As frentes do pedido, pela R1.2, numeradas para a Cobertura:
 
@@ -62,6 +68,9 @@ As frentes do pedido, pela R1.2, numeradas para a Cobertura:
 | `R1.2` 1 | o commit feito numa sessão Codex, no worktree, sai com o noreply do `brz-anderson`, e o push vai pela chave `personal` com a aprovação de Anderson (R1.4, R5.3); o `agy` não comita (R5.1) | —     | —             |
 | `R3.3`   | a medição do Codex grava o `guardian_review` numa linha própria, ligada ao pai e fora da soma dele (R5.2)                           | —     | —             |
 | `R3.1`   | a memória gravada fora do Claude leva `metadata.runtime`, e o evento `memory` o carrega (R4.1)                                      | —     | —             |
+| `R18.2`  | o `grok` aberto pelo `grok-brza` — no terminal e no chat do app, pelo `agentCmdOverrides.grok` — carrega a norma, as skills, os papéis e o `env` do projeto no brza-workspace, no brza-studio e nos worktrees | —     | —             |
+| `R18.3`  | a sessão Grok lê o vocabulário do `.grok/rules/runtime.md`, e não o do adaptador do Claude Code                                     | —     | —             |
+| `R18.4`  | numa sessão Grok confiada, os hooks do núcleo saem sem gravar, e a linha da sessão vem do `measure_runtimes.py grok`, com o filho fora da soma do pai | —     | —             |
 | `R1.2` 2 | os quatro papéis existem nos três runtimes, gerados de uma fonte só, e a geração acusa a divergência                                 | —     | —             |
 | `R1.2` 2 | o papel rodado no Codex ou no `agy` grava na memória do workstream da sessão                                                         | —     | —             |
 | `R1.2` 3 | a sessão Codex e a `agy` geram linhas em `.measurements/measurements.jsonl`, com o `runtime` e o `workstream`                        | —     | —             |
@@ -81,7 +90,7 @@ As frentes do pedido, pela R1.2, numeradas para a Cobertura:
 
 ## Entrevista
 
-As rodadas R1–R12 estão em [PLN-004 — Entrevista](PLN-004-interview.md), por passarem de 400 linhas.
+As rodadas R1–R19 estão em [PLN-004 — Entrevista](PLN-004-interview.md), por passarem de 400 linhas.
 
 ## Worklogs
 
@@ -100,3 +109,7 @@ As rodadas R1–R12 estão em [PLN-004 — Entrevista](PLN-004-interview.md), po
 - 2026-11-03 — a R12.2 decidida (o Claude como padrão, o `agy` e o Codex como segundo passe) e a divisão do plano em
   `-plan` e `-interview`. Parou antes do Desenho.
   [O PLN-004: a R12.2 fecha e o plano se divide](../../work/worklogs/2026-11-03-pln-004-a-12-2-fecha-e-o-plano-se-divide.md)
+- 2026-11-06 — a R18 (o Grok entra no plano, com o `grok-brza`, o `.grok/rules/runtime.md` e os hooks saindo cedo), o
+  plano renomeado, a R19 e a medição da 19.3 no banco da R12.2 (o `grok-4.6` em `medium`, em `plan` com `--sandbox
+  read-only`). Parou antes da R17 de volta.
+  [O PLN-004: o Grok entra no plano](../../work/worklogs/2026-11-06-pln-004-o-grok-entra-no-plano.md)

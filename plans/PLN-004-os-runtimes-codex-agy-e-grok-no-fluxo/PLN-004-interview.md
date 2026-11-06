@@ -1,6 +1,6 @@
 # PLN-004 — Entrevista
 
-Do [PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude](PLN-004-plan.md): as rodadas R1–R12, que só crescem. Saíram do `-plan` em 2026-11-03, quando ele passou de 670 linhas.
+Do [PLN-004: Os runtimes Codex, `agy` e Grok trabalham no fluxo do workspace como o Claude](PLN-004-plan.md): as rodadas, que só crescem. Saíram do `-plan` em 2026-11-03, quando ele passou de 670 linhas.
 
 ### Rodada 1 — destino, escopo, partida e identidade (enviada 2026-10-30)
 
@@ -812,3 +812,112 @@ aberta (17.1 a 17.4, a medição, o `~/.zshrc` e as sessões). Conferi no disco:
 (norma, skills, subagentes, hooks, memória, modo headless, sessões e transcript, modelos, o app) e devolve a tabela
 Claude, Codex, `agy` e Grok; o escopo do plano (o título "O Codex e o `agy`…", o Pedido e a Cobertura) muda só depois da
 rodada que vem dele.
+
+### Rodada 18 — o Grok no plano (enviada 2026-11-06, no chat)
+
+**Apresentado antes:** o levantamento do `collector` (`/private/tmp/pln004/grok/levantamento.md`, 103 fatos, US$ 0,509
+nas sondas). O Grok lê o `AGENTS.md`, o `CLAUDE.md` e o `.claude/rules/*.md` (F3, F7), as skills em `.claude/skills` e
+`.agents/skills`, também por link de diretório (F26), os papéis direto de `.claude/agents/*.md` (F34), e o `env` do
+`.claude/settings.json` vale no shell das ferramentas (F19) — tudo só com a pasta confiada (F11, F12). O app não
+pré-confia o Grok (`tui-agent-config.ts:289-297`, F14), e as sessões Grok do app rodam sem norma (`agents_md_files: []`,
+F13). O `@AGENTS.md` não é seguido, e o `CLAUDE.md` entra como norma, sem como desligá-lo (F5, F6); não há ferramenta
+`Skill` (F28). Os hooks do `.claude/settings.json` rodam no Grok com outro payload, `subagentType` e o `updates.jsonl`
+(F47, F53, F54), e o risco de linha errada no `measure.py` é inferido, não rodado (F57, 65); o hook recebe
+`GROK_HOOK_EVENT` (F55). O `usage.json` traz o custo pronto, e o pai já soma o filho (F81 a F84). A R17 fica aberta, e
+volta depois da R19, com o Grok no P10 e no P11.
+
+Respondida em 2026-11-06, na sessão `workspace`: as quatro recomendadas.
+
+1. **Onde entra o Grok?** Opções:
+   - no PLN-004 (recomendada) — custo: renomear o plano ("Os runtimes Codex, agy e Grok…"), a frase de 2026-11-03 no
+     Pedido, o Grok na Cobertura e no D1, D5, D8, D9, D11, D12 e D16, sem D4 nem D7 novos; se paga: agora;
+   - plano novo, depois — custo: um segundo Desenho que reabre o D1, D5, D8, D9 e D11; se paga: só se o PLN-004 tiver de
+     chegar ao código antes;
+   - só a base agora — custo: com a pasta confiada, os hooks do Claude rodam no Grok sem tratamento até o plano seguinte;
+     se paga: se o Grok for de uso raro.
+
+   **Decidido — a recomendada.** O plano passa a "Os runtimes Codex, `agy` e Grok trabalham no fluxo do workspace como
+   o Claude".
+
+2. **Como a pasta fica confiada?** Opções:
+   - um wrapper `grok-brza`, no molde do `agy-brza` (D5), com `GROK_FOLDER_TRUST=0` só no `brza-workspace`, no
+     `brza-studio` e nos worktrees, a entrada no `brza install` e o `agentCmdOverrides.grok` do app, que aceita programa
+     e argumentos (F99) (recomendada) — medido em F16; se paga: na primeira sessão Grok pelo app;
+   - o `brza install` grava as raízes em `~/.grok/trusted_folders.toml` — custo: arquivo de usuário, formato e cobertura
+     dos worktrees novos não medidos; se paga: só se o Grok abrir fora do wrapper;
+   - `--trust` no wrapper — custo: grava o `trusted_folders.toml` a cada pasta, não medido; se paga: nunca melhor que a
+     variável.
+
+   **Decidido — a recomendada.**
+
+3. **Qual adaptador?** Opções:
+   - `.grok/rules/runtime.md` no pacote, no molde do D3, sempre carregado (F7), que diz que o `CLAUDE.md` é do Claude
+     Code e dá o vocabulário do Grok; o sync passa a conhecer o `.grok/` (recomendada) — se paga: na primeira sessão
+     confiada;
+   - `--rules` no wrapper (F21) — custo: o texto fora de arquivo de norma e do sync; se paga: só se o `.grok/` não puder
+     entrar no pacote;
+   - sem adaptador — custo: o Grok traduz o vocabulário do `CLAUDE.md` sozinho, com nomes de ferramenta que não existem
+     nele; se paga: nunca, se o vocabulário errado custar uma rodada.
+
+   **Decidido — a recomendada.**
+
+4. **Os hooks do `.claude/settings.json` no Grok.** Opções:
+   - o `measure.py`, o `fact_audit.py` e o `compact_guard.py` do núcleo saem cedo com `GROK_HOOK_EVENT` (F55), ~5 linhas
+     cada (estimativa), e um `.grok/hooks/runtime.json` do pacote (F46) chama o `measure_runtimes.py grok`, que lê o
+     `usage.json`; o núcleo não conhece o pacote, como no D8 (recomendada) — se paga: na primeira sessão Grok confiada;
+   - o núcleo despacha ao modo `grok` do pacote — custo: o núcleo passa a depender do pacote `runtimes`; se paga: só se
+     uma segunda fonte de hook na sessão incomodar;
+   - só sair cedo — custo: a sessão Grok não é medida; se paga: se o Grok for de uso raro.
+
+   **Decidido — a recomendada.**
+
+### Rodada 19 — a memória, os papéis, a delegação e as sessões do Grok (enviada 2026-11-06, no chat)
+
+**Apresentado antes:** a cota fica fora, como a do Codex e a do `agy` (o `brza-quota` não cobre o Grok, F89, e a
+Cobertura não tem critério de cota para nenhum dos três). A `memory-v2` vem ligada nas sessões do app por configuração
+remota (F59), por repositório e fora do git (F60, F61). O `model: haiku` do papel é ignorado, e o filho herda o modelo
+do pai (F38); o `grok-4.5` e o `grok-4.6` parecem custar o mesmo, ~US$ 2 por milhão de entrada nova (F93, inferido, 72),
+e a variante rápida custa o dobro.
+
+Respondida em 2026-11-06, na sessão `workspace`: a 19.1, a 19.2 e a 19.4 na recomendada; a 19.3, "medição primeiro".
+
+1. **A `memory-v2`.** Opções: `GROK_MEMORY=0` no `grok-brza` (recomendada) — custo: uma linha; se paga: na primeira
+   sessão; `[memory] enabled=false` no `~/.grok/config.toml` — custo: vale fora do brza, contra a norma do escopo; deixar
+   ligada — custo: aprendizado fora do git e da medição; se paga: nunca.
+
+   **Decidido — a recomendada.**
+
+2. **A camada dos papéis no Grok.** Opções: herdar do pai (recomendada) — custo: zero, sem camada média; se paga: agora;
+   `[subagents.models]` no config de usuário — custo: arquivo de usuário, formato não medido; o id do Grok no `model:`
+   do papel — custo: quebra o Claude; se paga: nunca.
+
+   **Decidido — a recomendada.**
+
+3. **O `brza delegate --runtime grok`: o modo só leitura e o modelo.** Opções: `--permission-mode plan --sandbox
+   read-only`, com `grok-4.7` em `high` nos dois tipos (recomendada); o mesmo, com `grok-4.6` em `medium` na leitura; só
+   `--permission-mode plan`. Nada disso medido (F70, F94).
+
+   **Contraproposta de Anderson: "medição primeiro".** A sessão mede o modo só leitura e o custo e o tempo por modelo
+   antes de voltar com as opções.
+
+   **A medição (2026-11-06, `collector`, US$ 4,84; `/private/tmp/pln004/bench/out/pontuacao-grok.md` e
+   `/private/tmp/pln004/grok/ro/`):** só o `--sandbox read-only` barra a escrita no sistema ("Operation not permitted",
+   `out-sandbox.json`), e não atrapalhou a revisão (o `ref-pln005` limpo nas três corridas); o `--permission-mode plan`
+   é recusa do modelo, não provada na ferramenta. No banco da R12.2, o foco defeito deu os mesmos dois reais (A3, A6)
+   com `grok-4.7` em `high` (US$ 2,51, 938 s) e `grok-4.6` em `medium` (US$ 1,28, 564 s), recall 0,20, igual ao do
+   Claude; o `grok-4.6` em `medium` na convenção deu 0 real (US$ 0,78). Três das seis corridas não rodaram, pelo teto
+   (4.7 em convenção, as duas em simplicidade); uma corrida por célula.
+
+   **Rodada refeita, respondida em 2026-11-06, na sessão `workspace`.** Opções: `--permission-mode plan --sandbox
+   read-only`, com `grok-4.6` em `medium` nos dois tipos (recomendada) — custo: US$ 0,8 a 1,3 e 6 a 9 min por revisão;
+   se paga: agora, como segundo passe barato; o mesmo com `grok-4.7` em `high` — custo: o dobro, sem mais recall na
+   amostra; se paga: nunca com este banco; só o `reading` agora e a revisão depois das três corridas que faltam — custo:
+   ~US$ 3 a 5 numa sessão futura; só `--permission-mode plan` — custo: sem a trava do sistema; se paga: nunca.
+
+   **Decidido — a recomendada.** O `brza delegate --runtime grok` roda `grok -p --permission-mode plan --sandbox
+   read-only --output-format json -m grok-4.6 --effort medium`, nos dois tipos, com o teto de tempo por fora (F72).
+
+4. **O `brza sessions --agent grok`.** Opções: entra no D12, com a conferência do override do P11 e uma aba de verdade
+   no teste (recomendada) — custo: um turno no teste; fica de fora — custo: a sessão Grok só se abre à mão.
+
+   **Decidido — a recomendada.**

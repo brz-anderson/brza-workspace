@@ -10,7 +10,7 @@ refs:
 O pedido de Anderson, em 2026-10-30, no chat do BrzA Studio, na sessão `brza-workspace-80`: "vamos integrar o `codex` e
 o `agy` ao nosso fluxo de trabalho". Lá fechou a rodada 1 — destino, escopo, partida e identidade — e o número foi
 reservado na `master` (`233ea9a`). O plano é o
-[PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude](../../plans/PLN-004-o-codex-e-o-agy-no-fluxo/PLN-004-plan.md).
+[PLN-004: Os runtimes Codex, `agy` e Grok trabalham no fluxo do workspace como o Claude](../../plans/PLN-004-os-runtimes-codex-agy-e-grok-no-fluxo/PLN-004-plan.md).
 
 ## O que se fez
 

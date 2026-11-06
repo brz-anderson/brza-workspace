@@ -41,7 +41,7 @@ tags:
   acerto dele fica para depois que este mecanismo tiver amostra:
   [A confiança dos achados do reviewer se mede contra o desfecho deles](../../work/issues/a-confianca-do-reviewer-medida-contra-o-desfecho.md).
 - **A marca nos agentes do Codex e do `agy`.** Os papéis deles são do
-  [PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude](../PLN-004-o-codex-e-o-agy-no-fluxo/PLN-004-plan.md).
+  [PLN-004: Os runtimes Codex, `agy` e Grok trabalham no fluxo do workspace como o Claude](../PLN-004-os-runtimes-codex-agy-e-grok-no-fluxo/PLN-004-plan.md).
 
 ## Entrevista
 

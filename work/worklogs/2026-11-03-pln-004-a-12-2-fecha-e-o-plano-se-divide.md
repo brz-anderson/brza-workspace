@@ -8,7 +8,7 @@ refs:
 # O PLN-004: a R12.2 fecha e o plano se divide
 
 Anderson respondeu "recomendado" à R12.2 revista, em 2026-11-03, na sessão `workspace`. O plano é o
-[PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude](../../plans/PLN-004-o-codex-e-o-agy-no-fluxo/PLN-004-plan.md);
+[PLN-004: Os runtimes Codex, `agy` e Grok trabalham no fluxo do workspace como o Claude](../../plans/PLN-004-os-runtimes-codex-agy-e-grok-no-fluxo/PLN-004-plan.md);
 o dia anterior está em
 [O PLN-004: a revisão do plano contra a migração ao brza-workflow](2026-11-02-pln-004-a-revisao-contra-o-pln-006.md).
 
@@ -20,7 +20,7 @@ o dia anterior está em
   0,20 a 0,30, então a vantagem que justificaria dobrar o defeito não se repetiu; a convenção do Claude ficou em 1,00
   nas duas.
 - **O plano se dividiu**, como manda o `plans/README.md` (passava de 400 linhas, e tinha 670): a Entrevista, R1 a R12,
-  foi para [PLN-004 — Entrevista](../../plans/PLN-004-o-codex-e-o-agy-no-fluxo/PLN-004-interview.md), e o `-plan` ficou
+  foi para [PLN-004 — Entrevista](../../plans/PLN-004-os-runtimes-codex-agy-e-grok-no-fluxo/PLN-004-interview.md), e o `-plan` ficou
   com 92 linhas. O `Retomar` foi reescrito, e o checador das notas passa sem erro nem aviso.
 
 - **O `designer` reescreveu o Desenho** (`pln-004-design-v2.md`, no scratch) e devolveu 11 pontos sem lastro, em 4

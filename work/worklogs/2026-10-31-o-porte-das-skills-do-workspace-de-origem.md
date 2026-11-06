@@ -58,7 +58,7 @@ papel `reviewer` nunca rodou, e houve um parecer só, o do PLN-002, sem achado f
 - **Ordem de revisão:** "No reviewer.md", sem o "estado presente" do workspace de origem, porque a norma daqui guarda medição datada
   de propósito.
 - **Três revisores com foco:** "Com a frente 4", numa linha no `Retomar` do
-  [PLN-004: O Codex e o `agy` trabalham no fluxo do workspace como o Claude](../../plans/PLN-004-o-codex-e-o-agy-no-fluxo/PLN-004-plan.md).
+  [PLN-004: Os runtimes Codex, `agy` e Grok trabalham no fluxo do workspace como o Claude](../../plans/PLN-004-os-runtimes-codex-agy-e-grok-no-fluxo/PLN-004-plan.md).
 - **Os detalhes:** a `dúvida` "Sai" dos tipos de achado; a confiança vai "Antes da seta"; a lista "Não é achado" "Fica
   de fora".
 

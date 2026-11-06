@@ -4,3 +4,4 @@
 - [PLN-006: rodadas e sondas](project_pln-006-rodadas-e-sondas.md) — R4 trocou git config por registro visível; hook roda no 3.14
 - [Symlink de arquivo confiado](feedback_custo-de-symlink-com-confianca.md) — hooks.json do Codex por link não roda (R8.1); não renumerar D
 - [PLN-004 R10–R12: recusas](project_pln-004-r10-r12-recusas.md) — pacote e hook nativo acima do barato; o nome do `agy` se valida na superfície certa
+- [PLN-004 R13–R19: trocas e o que envelheceu](project_pln-004-r13-r19-recusas.md) — `high` no Codex, a sessão aplica o `~/.zshrc`; ver o git log antes de reescrever um D

@@ -921,3 +921,83 @@ Respondida em 2026-11-06, na sessão `workspace`: a 19.1, a 19.2 e a 19.4 na rec
    no teste (recomendada) — custo: um turno no teste; fica de fora — custo: a sessão Grok só se abre à mão.
 
    **Decidido — a recomendada.**
+
+### Rodada 17 — a medição e a máquina, com o Grok (enviada 2026-11-06, no chat)
+
+**Apresentado antes:** a R17 aberta em 2026-11-03 (os P8 a P11 da Rodada D do `designer`, no
+`/private/tmp/pln004/pln-004-design-v2.md:875-909`) não foi respondida antes do pedido do Grok, e volta aqui com ele. Não
+há função `grok` no `~/.zshrc` (F2 do levantamento do Grok), então o `runtimes.zsh` ganha um `grok()` que cai em
+`command grok` fora do workspace, e a edição do `~/.zshrc` segue em 3 linhas. O `brza install --runtimes` liga também o
+`grok-brza`, e o `--chat-command`, o `agentCmdOverrides.grok`, que o app honra no chat e no terminal
+(`acp-structured-launch-resolution.ts:106`, F98). O `SubagentStop` do Grok traz `subagentType` e `lastAssistantMessage`
+(F53). Os custos das opções são as estimativas do `designer`, com as marcas no arquivo.
+
+Respondida em 2026-11-06, na sessão `workspace`: a 17.1, a 17.2 e a 17.4 na recomendada; a 17.3, "Sessão aplica tudo".
+
+1. **Onde fica a captura de fatos do Codex, do `agy` e do Grok?** (D16) Opções: um `fact_audit_runtimes.py` no pacote,
+   ao lado do `measure_runtimes.py`, ~140 linhas e ~8 testes, mais o modo `grok` (recomendada) — se paga: agora; modos
+   `codex-facts`, `agy-facts` e `grok-facts` dentro do `measure_runtimes.py` — custo: o hook de medição solta processo;
+   se paga: nunca.
+
+   **Decidido — a recomendada.**
+
+2. **Onde fica a tabela "Por runtime"?** (D10) Opções: no `core/scripts/summarize_measurements.py`, só quando há linha
+   de outro runtime, ~40 linhas (recomendada) — se paga: no primeiro resumo com linha do Codex, do `agy` ou do Grok; um
+   `summarize_runtimes.py` do pacote — custo: dois resumos; se paga: só se o núcleo não puder conhecer o `runtime`.
+
+   **Decidido — a recomendada.**
+
+3. **Quem edita o `~/.zshrc` e roda o `brza install --runtimes --chat-command`?** (D5, D6) Opções: a sessão mostra o
+   diff e Anderson aplica o `~/.zshrc`, e a sessão roda o `brza install` (recomendada) — custo: ~2 min de Anderson; se
+   paga: agora, como a R11.2; a sessão aplica tudo, com o "pode aplicar" de Anderson — custo: a sessão mexe num arquivo
+   de usuário; se paga: agora, sem passo manual.
+
+   **Decidido — a opção 2, não a recomendada: a sessão aplica tudo.** Substitui, para o `~/.zshrc`, o "Anderson edita o
+   `~/.zshrc`" da R11.2. A sessão aplica no passo que o Desenho der, depois do "pode aplicar" de Anderson naquele passo,
+   e grava a edição e o desfazer no worklog, em "Fora do workspace".
+
+4. **Como o `brza sessions --agent` confere o override?** (D12) Opções: só que o `agentCmdOverrides.<agente>` não está
+   vazio (recomendada) — custo: um override trocado passa sem aviso; se paga: agora, sem o `client` nomear o pacote
+   `runtimes`; que o nome é `<agente>-brza` — custo: o `client` depende da convenção do outro pacote.
+
+   **Decidido — a recomendada.**
+
+### Rodada 20 — a delegação, o papel, o commit e o `brza-studio` no Grok (enviada 2026-11-06, no chat)
+
+**Apresentado antes:** o rascunho do Desenho v3, pelo `designer` (`/private/tmp/pln004/pln-004-design-v3.md`, 1059
+linhas), com as rodadas R16 a R19 aplicadas e a revisão do Codex no D11 em `high` (R14). Fatos novos conferidos pela
+sessão: o `brza-studio` passou a `cb573ba` (o override reconferido sem mudança); o `agy` é o 1.5.2; o PLN-013 do
+`tools-kit` (fechado em 2026-11-04) entregou o `--agent` dos quatro no `brza sessions` e o `dispatch` do MCP aos
+workers do Grok, do Codex e do Antigravity, com o modelo por papel do `brza.toml` (`grok-4.7` nos três papéis,
+`PLN-013-design.md:221-260`), que o PLN-004 nunca tratou; o `grok agent` não tem `--rules` nem `--sandbox`, e o `grok`
+de topo tem `--agent <NAME>` (`--help`). A 15.3 (o texto dos focos) segue aberta: a resposta de 2026-11-03 foi a
+contraproposta do `.brzAgents`.
+
+Respondida em 2026-11-06, na sessão `workspace`: as quatro recomendadas.
+
+1. **O `brza delegate` e o `dispatch` do MCP** (D11). Opções: os dois, com papéis distintos — o `brza delegate`
+   síncrono, só leitura e com a devolução na sessão; o `dispatch`, o worker de sessão inteira —, citando o PLN-013 no D1
+   e no D11 (recomendada) — custo: dois caminhos e dois modelos do Grok (o `grok-4.6` da R19.3 e o `grok-4.7` do
+   `brza.toml`); se paga: agora, pela trava de leitura medida na 19.3; o D11 sai e o segundo passe vai pelo `dispatch` —
+   custo: a R15 e a R19.3 caem, a revisão fica assíncrona e sem a trava; se paga: só se um caminho único valer mais.
+
+   **Decidido — a recomendada.**
+
+2. **O papel no Grok, na delegação** (D11). Opções: `--agent <papel>`, com um turno de prova no primeiro teste, e o
+   corpo no prompt se não valer (recomendada) — custo: ~3 linhas e US$ 0,04 a 0,18; o corpo do papel no prompt, como no
+   Codex — custo: o `tools` do papel não vale.
+
+   **Decidido — a recomendada.**
+
+3. **O Grok comita?** (D1, D3, D5) Opções: comita como o Claude, sem trava de sistema, e o push pela pergunta de
+   permissão — que o chat com acesso total pula, com o `--always-approve` (recomendada); não comita, como o `agy`, com
+   `GROK_SANDBOX=workspace` — não medido no chat; comita com trava, como o Codex, por um perfil em `~/.grok/sandbox.toml`
+   por repositório.
+
+   **Decidido — a recomendada.**
+
+4. **O adaptador no worktree do `brza-studio`** (D5, D8). Opções: o `brza tree` copia o `.grok/rules/runtime.md` e
+   recopia quando difere, e liga o `.grok/hooks` e o `.grok/agents` (recomendada) — custo: ~15 linhas, 3 testes, e a
+   cópia pode envelhecer; `--rules` no `grok-brza` — custo: o chat fica sem o adaptador; sem adaptador lá.
+
+   **Decidido — a recomendada.**

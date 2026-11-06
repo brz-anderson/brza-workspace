@@ -1,6 +1,6 @@
 ---
 status: open
-description: As issues #37788, #37826, #37949, #38347 e #38342 e os PRs #37806, #37971 e #37926 tratam de workers em hosts remotos, ProxyCommand, mensageria de plugins e SSH CLI.
+description: O PR #38774 e as issues #37788, #37826, #37949, #38347 e #38673 trazem implementação de orca host rm na CLI, recuperação de portas e correção de EPERM remoto.
 scope:
   - brza-studio
   - workspace
@@ -14,63 +14,62 @@ tags:
 
 # Workers de plugins em hosts remotos e gerenciamento CLI de SSH
 
-Rastreado das issues abertas no upstream [`stablyai/orca#38347`](https://github.com/stablyai/orca/issues/38347),
+Rastreado do PR aberto no upstream [`stablyai/orca#38774`](https://github.com/stablyai/orca/pull/38774) (Issues [`#37826`](https://github.com/stablyai/orca/issues/37826) e [`#37949`](https://github.com/stablyai/orca/issues/37949)),
+além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues/38673),
+[`stablyai/orca#38669`](https://github.com/stablyai/orca/issues/38669),
+[`stablyai/orca#38347`](https://github.com/stablyai/orca/issues/38347),
 [`stablyai/orca#38342`](https://github.com/stablyai/orca/issues/38342),
 [`stablyai/orca#38343`](https://github.com/stablyai/orca/issues/38343),
 [`stablyai/orca#38341`](https://github.com/stablyai/orca/issues/38341),
-[`stablyai/orca#38340`](https://github.com/stablyai/orca/issues/38340),
-[`stablyai/orca#37788`](https://github.com/stablyai/orca/issues/37788),
-[`stablyai/orca#37826`](https://github.com/stablyai/orca/issues/37826) e
-[`stablyai/orca#37949`](https://github.com/stablyai/orca/issues/37949), além dos PRs
+[`stablyai/orca#38340`](https://github.com/stablyai/orca/issues/38340) e
+[`stablyai/orca#37788`](https://github.com/stablyai/orca/issues/37788), e dos PRs
+[`stablyai/orca#38782`](https://github.com/stablyai/orca/pull/38782),
 [`stablyai/orca#37971`](https://github.com/stablyai/orca/pull/37971),
 [`stablyai/orca#37926`](https://github.com/stablyai/orca/pull/37926) e
 [`stablyai/orca#37806`](https://github.com/stablyai/orca/pull/37806).
 
 ## O problema
 
-1. **Hosts SSH atrás de ProxyCommand travados por porta 6768 em uso (`#38347`):**
+1. **Remoção de servidores SSH restrita à interface gráfica (`#38774`, `#37826`, `#37949`):**
+   Agentes de IA e scripts de CI/CD que criam instâncias remotas efêmeras não conseguiam remover alvos SSH salvos via CLI,
+   acumulando conexões fantasmas e nomes customizados no app principal.
+2. **Falha de comandos CLI somente-leitura remotos com `chmod EPERM` local (`#38673`):**
+   Comandos CLI de leitura remota (ex.: `orca worktree ps --environment <server>`) falhavam abruptamente no macOS com
+   `EPERM: operation not permitted, chmod '<userData>/orca'` ao tentar registrar métricas de uso de ambiente em disco local.
+3. **Criação de novo workspace desviando para o runtime remoto ativo (`#38669`, `#38782`):**
+   Ao tentar criar um novo workspace com opção visível "Run on: Local Mac" enquanto um workspace em runtime remoto (VM)
+   estava focado, o criador criava inadvertidamente o novo worktree no servidor remoto em vez da máquina local.
+4. **Hosts SSH atrás de ProxyCommand travados por porta 6768 em uso (`#38347`):**
    Em servidores remotos acessados via túneis ou Coder ProxyCommand, quando uma sessão anterior encerra ou é desconectada
    manualmente, o processo `orca serve` anterior permanece prendendo a porta 6768, impossibilitando novas conexões e
    deixando o ambiente em estado zumbi difícil de recuperar sem matar o processo manualmente via terminal SSH direto.
-2. **Workers de plugins isolados da máquina onde os repositórios moram (`#37788`):** ao conectar a um ambiente de
+5. **Workers de plugins isolados da máquina onde os repositórios moram (`#37788`):** ao conectar a um ambiente de
    execução pareado remoto (`orcad`), o daemon remoto não possui o serviço de execução de plugins. Todos os workers de
    plugins rodam localmente no processo Electron do desktop, longe dos arquivos, ferramentas e repositórios Git remotos.
-   Além disso, as views declarativas de plugins só podiam ser renderizadas na barra lateral direita, sem suporte a
-   abertura como abas dedicadas de workspace.
-3. **Isolamento de plugins entre cliente desktop pareado e host remoto (`#38342`, `#38343`, `#38341`, `#38340`):**
-   - Não havia como um plugin rodando no host repassar pequenas mensagens ou sincronizar estado com a instância do mesmo
-     plugin rodando no cliente desktop conectado (`#38343`);
-   - Falta de renderização de painéis de plugins remotos no cliente desktop pareado (`#38342`);
-   - Falta de sinalização de superfície em foco (`ui:focus`) para que plugins saibam onde o usuário está trabalhando (`#38341`);
-   - Dificuldade dos plugins em distinguir perguntas interativas do agente de esperas de background comuns (`#38340`).
-4. **Falta de gerenciamento CLI de servidores SSH para agentes (`#37826`, `#37949`, `#37971`):** embora o runtime possua
-   as chamadas RPC internas de gerenciamento de alvos SSH (`ssh.target-management.v1`), faltavam comandos públicos na
-   linha de comando para listar e remover hosts salvos (`orca host rm` / `brza host rm`). Agentes autônomos que
-   provisionam e desprovisionam máquinas em nuvem não conseguiam limpar hosts efêmeros nem respeitar regras de blocos
-   `Match` importados do `~/.ssh/config`.
-5. **Respeito a `IdentitiesOnly` no transporte SSH nativo (`#37926`):** conexões manuais com chave específica falhavam
+6. **Isolamento de plugins entre cliente desktop pareado e host remoto (`#38342`, `#38343`, `#38341`, `#38340`):**
+   - Falta de repasse de mensagens leves entre o worker no host e o plugin pareado no cliente desktop (`#38343`);
+   - Falta de renderização de painéis de plugins remotos no cliente desktop pareado (`#38342`).
+7. **Respeito a `IdentitiesOnly` no transporte SSH nativo (`#37926`):** conexões manuais com chave específica falhavam
    quando o agente SSH local oferecia múltiplas identidades antes da chave configurada, porque o transporte interno não
    repassava o parâmetro `IdentitiesOnly=yes`.
-6. **Falta de suporte a syntax highlight para MDX em painéis de plugins (`#37806`):** plugins que exibem código e
-   documentação rica não tinham suporte a realce de sintaxe de arquivos `.mdx`.
 
 ## O caminho proposto no upstream
 
-- **Para hosts e transporte SSH (`#38347`, `#37971`, `#37949`, `#37926`, `#37826`):**
-  - Implementa detecção e liberação limpa de portas ocupadas (6768) ao inicializar servidor remoto em ambientes ProxyCommand;
-  - Implementa `orca host rm <host-alias>` na CLI para remoção de servidores salvos com confirmação ou flag `--yes`;
-  - Aplica estritamente a diretiva `IdentitiesOnly` em conexões SSH manuais no transporte embutido;
-  - Documenta a resolução de blocos `Match` na importação de configurações SSH do sistema.
-- **Para plugins (`#38342`, `#38343`, `#38341`, `#38340`, `#37788`, `#37806`):**
-  - Introduzir relay de mensagens leves entre o worker do host e o plugin pareado no cliente desktop (`#38343`);
-  - Suporte para expor painéis de plugins hospedados remotamente diretamente no app desktop pareado (`#38342`);
-  - Introduzir evento declarativo de foco de interface (`ui:focus`) e tipagem de prompts (`agent prompt kind`);
-  - Introduzir propriedade no manifesto do plugin (ex.: `"runsOn": "workspace"`) permitindo execução remota;
-  - Habilitar gramática de sintaxe MDX para visualizadores de documentação.
+- **Subcomando CLI `orca host rm` com limpeza profunda (`#38774`, resolve `#37826` e `#37949`):**
+  - Adiciona `orca host rm <host>` permitindo excluir servidores SSH diretamente pelo terminal;
+  - Limpa de forma consistente em todo o aplicativo o estado da conexão ao vivo, alvos pareados e rótulos customizados.
+- **Correção no roteamento de criação de novos workspaces (`#38782`, resolve `#38669`):**
+  - Assegura que a escolha explícita do seletor "Run on" (ex.: máquina local) seja respeitada mesmo quando uma VM remota
+    estiver em foco no momento da abertura do composer.
+- **Tratamento de permissões locais em consultas remotas (`#38673`):**
+  - Isola a gravação de telemetria local para evitar bloqueios `EPERM` durante consultas somente leitura via CLI.
+- **Liberação de portas e robustez SSH (`#38347`, `#37926`):**
+  - Limpeza de processos zumbis de `orca serve` e aplicação estrita de `IdentitiesOnly`.
+- **Comunicação de plugins host-cliente (`#38342`, `#38343`):**
+  - Relay leve de mensagens e espelhamento de painéis de plugins.
 
 ## O que fazer
 
-- Incorporar o subcomando `brza host rm` e o respeito a `IdentitiesOnly` no ferramental de infraestrutura do `brza-studio`
-  e `tools-kit`.
-- Mitigar retenção de portas em reconexões remotas (`#38347`).
-- Preparar a infraestrutura de plugins para comunicação pareada host-cliente (`#38342`, `#38343`).
+- Implementar `brza host rm` (`#38774`) na CLI do `brza`, permitindo ciclo de vida completo de servidores em automações.
+- Adotar o isolamento estrito de host em criação de novos workspaces (`#38782`) no `brza-studio`.
+- Incorporar o fix de permissões `chmod EPERM` (`#38673`) no ferramental de infraestrutura.

@@ -18,10 +18,10 @@ tags:
 
 # PLN-012: Cada tarefa sai com o tempo corrido, o custo e a máquina que gastou
 
-- **Retomar:** em 2026-11-06, P1, P2, P4 e P5 rodam em paralelo (X1), cada um numa sessão (`pln012-p1`, `-p2`,
-  `-p4`, `-p5`) e num worktree do `brza-workflow`, saindo de `feat/pln-012-medida-por-tarefa`; as 10 issues do P5.5
-  estão abertas. Cada sessão avisa por correio ao fechar; esta sessão junta a branch do passo na integração e marca o
-  `[x]`. Próximo: o P3, depois do merge do P1 e do P2; o P6 por último.
+- **Retomar:** em 2026-11-06, o P5 (código e norma) está na integração (`cbbe0bd`), e falta o merge na `master` no
+  fim; P1, P2 e P4 seguem nas sessões `pln012-p1`, `-p2` e `-p4`. A devolução de cada passo é o worklog dele: o correio
+  só chega a esta sessão num turno. Ao fechar cada um, juntar a branch na integração e marcar o `[x]`. Próximo: o P3,
+  depois do P1 e do P2, já com o X2; o P6 por último.
 - **Dividido:** [PLN-012 — Desenho](PLN-012-design.md)
 
 ## Pedido
@@ -342,13 +342,14 @@ Executa D6, D7 e a norma do D3 · executor: sessão do `brza-workflow` (skill e 
 
 Estimado: 2.0 h · Executado: — h
 
-- [ ] **1. Teste que falha** — `tests/notes-checker`: worklog com `sessions:` e `## Medida` passa sem aviso.
-- [ ] **2. Escrever** — o passo "2. O que o commit vai fechar" do `close-task`; a linha `sessions` e a `## Medida` no
+- [x] **1. Teste que falha** — `tests/notes-checker`: worklog com `sessions:` e `## Medida` passa sem aviso.
+- [x] **2. Escrever** — o passo "2. O que o commit vai fechar" do `close-task`; a linha `sessions` e a `## Medida` no
   `core/work/README.md`; no `CLAUDE.md` do adaptador, os eventos `task` e `run` na tabela do hook e o `--by-task` no
   resumo.
-- [ ] **3. Rodar e ver passar** — `python3 tests/notes-checker/run.py`
+- [x] **3. Rodar e ver passar** — `python3 tests/notes-checker/run.py`
 - [ ] **4. Commit** — no `brza-workflow`, e merge da `feat/pln-012-medida-por-tarefa` na `master` dele depois da
-  revisão.
+  revisão. Commit feito em `feat/pln-012-p5@22805fb` e juntado na integração em `cbbe0bd`; falta o merge na `master`,
+  que espera o P1 a P4.
 - [x] **5. Abrir as issues** das lacunas, pela sessão que conduz, com `brza note new issue` e `brza note commit` —
   as 10 de `## Pendências conhecidas`, em 2026-11-06.
 
@@ -398,6 +399,11 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   paralelo"; o corte previa P1 → P2 → P3 e o P5 depois do P2. O P2 e o P5 se escrevem contra o contrato do D1, do D2 e
   do D4, e cada passo vai a `feat/pln-012-<pN>`, que esta sessão junta em `feat/pln-012-medida-por-tarefa`; a `master`
   do `brza-workflow` só recebe a integração no fim do P5, como estava. Afeta P1–P5.
+- **X2 — O segmento passa a `[marco anterior, marco)`, e o `--until` leva o começo do primeiro turno da tarefa
+  seguinte.** O P5 (REV-018, A15) fixou no `close-task` a hora que o `--pending` mostra, e não a do fim do último turno,
+  que o aviso não mostra e que, cortada no minuto, pode cair antes do começo do turno. Com o intervalo fechado à
+  direita, o turno que começa no `until` ficaria na tarefa anterior. A R3.4 não muda. Afeta D1, P2 e P3; o P2 foi
+  avisado por correio em 2026-11-06.
 
 ## Pendências conhecidas
 

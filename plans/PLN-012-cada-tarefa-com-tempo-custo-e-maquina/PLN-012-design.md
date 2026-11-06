@@ -160,7 +160,8 @@ sessions:
 - `chat_id` é o `ORCA_AGENT_SESSION_ID`, quando houver; liga a tarefa ao chat do app mesmo sem `session_id`.
 - O commit recusado (checador, nada a commitar, `--until` inválido) não grava evento.
 
-**O corte, `--until HH:MM`** (ou hora ISO): o marco do evento vai à hora dada, gravada em `until`. Ela tem de cair
+**O corte, `--until HH:MM`** (ou hora ISO): a hora do começo do primeiro turno da tarefa seguinte, como o
+`--pending` a mostra (X2); o marco do evento vai à hora dada, gravada em `until`. Ela tem de cair
 entre o marco anterior da sessão e agora; fora disso, o commit recusa antes de tocar o worklog. `HH:MM` é de hoje, no
 fuso local.
 
@@ -169,7 +170,8 @@ fuso local.
 - **Cada commit com worklog é um marco da sessão**, qualquer worklog; o marco é o `until` ou, sem ele, o `timestamp`.
   O commit só de plano ou issue não é marco.
 - **O segmento k** de uma sessão são os turnos dela cujo começo (`timestamp − duration_s`) cai em
-  `(marco k−1, marco k]`; o primeiro segmento começa no primeiro turno da sessão. O turno que contém o commit fica com
+  `[marco k−1, marco k)` — o começo antes do marco, para o turno que começa no `until` ir à tarefa seguinte (X2);
+  o primeiro segmento começa no primeiro turno da sessão. O turno que contém o commit fica com
   a tarefa que ele fecha.
 - **O worklog commitado mais de uma vez na mesma sessão** soma os segmentos que fecha; o segmento de um commit de outro
   worklog no meio vai a esse outro.

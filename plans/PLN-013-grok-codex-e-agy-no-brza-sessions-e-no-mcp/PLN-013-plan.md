@@ -361,6 +361,8 @@ Estimado: 1 h · Executado: 1 h
   [A execução do PLN-013, o Grok, o Codex e o Antigravity no `brza sessions` e no MCP](../../work/worklogs/2026-11-04-pln-013-execucao.md)
 - 2026-11-06 — A issue da cota do Grok fechou: a leitura `weekly` se manteve, e o MCP já segura essa janela.
   [A cota do Grok lida pelo app](../../work/worklogs/2026-11-06-a-cota-do-grok-lida.md)
+- 2026-11-06 — O `status` passou a dizer o runtime, e o `CHECK` do `--rename` passou a distinguir a aba do mapa.
+  [O status e o CHECK das pendências do PLN-013](../../work/worklogs/2026-11-06-o-status-e-o-check-do-pln-013.md)
 
 ## Revisões
 
@@ -374,10 +376,10 @@ Estimado: 1 h · Executado: 1 h
 - [O app não lê a cota do Grok](../../work/issues/o-app-nao-le-a-cota-do-grok.md) — da R4.2; o Grok fica em
   `quota_unknown` até o app ler a cota. Em 2026-11-06 a leitura `weekly` se manteve (38%, a mesma janela do dia 04) e
   a issue fechou.
-- [O `status` do MCP não diz o runtime do pedido](../../work/issues/o-status-do-mcp-nao-diz-o-runtime-do-pedido.md) — do P4.
+- [O `status` do MCP não diz o runtime do pedido](../../work/issues/o-status-do-mcp-nao-diz-o-runtime-do-pedido.md) — do P4. Em 2026-11-06 o `status` passou a trazer `runtime`, `model` e `effort` (`brza-workflow@190cf58`) e a issue fechou.
 - [O `/rename` pelo chat não chega ao Grok](../../work/issues/o-rename-pelo-chat-nao-chega-ao-grok.md) — do P8.
 - [O `/rename` pelo chat não chega ao Antigravity](../../work/issues/o-rename-pelo-chat-nao-chega-ao-antigravity.md) — do P8, com o `yolo`.
-- [O texto do ciclo e o `CHECK` do `--rename` fora do Claude](../../work/issues/o-texto-do-ciclo-e-o-check-do-rename-fora-do-claude.md) — da revisão final (REV-013/A1, A2).
+- [O texto do ciclo e o `CHECK` do `--rename` fora do Claude](../../work/issues/o-texto-do-ciclo-e-o-check-do-rename-fora-do-claude.md) — da revisão final (REV-013/A1, A2). Em 2026-11-06 o docstring e o `CHECK` foram corrigidos (`brza-workflow@d1fa1d7`) e a issue fechou.
 
 ## Documentação
 

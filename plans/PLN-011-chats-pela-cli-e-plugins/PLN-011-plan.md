@@ -25,6 +25,11 @@ tags:
   P6/C1 aguarda Anderson no app de dev, com dois chats Claude, observação da fila, origem, cursor e replay.
   O merge da fase 1 e os passos seguintes aguardam o caso manual C1 executado por Anderson. Após o Observado e
   veredito de C1, fechar P6 com revisão independente e seguir P7 (suíte completa isolada, comparação à base e merge).
+  **Em 2026-11-06, a `master` do `brza-studio` está congelada pelo sync da `v1.4.251`** (worktree
+  `.worktrees/sync-v1.4.251`). Na rodada daquele dia, Anderson respondeu "Sync agora; eu mesclo no 011 (Recomendado)":
+  depois do push do sync, a sessão do sync mescla a `master` nova em `feat/pln-011-chat-cli` e resolve os três conflitos
+  de CLI (`root-help-text-primary.ts`, `runtime/client.ts`, `runtime/client-execution-host.test.ts`). Com o C1 aberto,
+  o app de dev precisa de rebuild depois disso.
 - **Dividido:** [PLN-011 — Entrevista](PLN-011-interview.md) · [PLN-011 — Desenho](PLN-011-design.md)
 
 ## Pedido

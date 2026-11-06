@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38737, #38767, #38190, #38183 e #38215 e a issue #38606 trazem login Gemini Enterprise no Antigravity Chat, limpeza de memória ACP, /mcp no picker e Mermaid em PR comments.
+description: Os PRs #38872, #38815, #38737 e as issues #38833 e #38606 trazem perguntas interativas OpenCode, preservação de modelo ACP, transição para agy acp e login Gemini Enterprise.
 scope:
   - brza-studio
 priority: medium
@@ -12,7 +12,9 @@ tags:
 
 # Melhorias de Native Chat, ACP do Gemini CLI, abas e diff no upstream
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38737`](https://github.com/stablyai/orca/pull/38737) (Issue [`#38606`](https://github.com/stablyai/orca/issues/38606)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#38872`](https://github.com/stablyai/orca/pull/38872),
+[`stablyai/orca#38815`](https://github.com/stablyai/orca/pull/38815),
+[`stablyai/orca#38737`](https://github.com/stablyai/orca/pull/38737) (Issue [`#38606`](https://github.com/stablyai/orca/issues/38606)),
 [`stablyai/orca#38767`](https://github.com/stablyai/orca/pull/38767),
 [`stablyai/orca#38190`](https://github.com/stablyai/orca/pull/38190) (Issue [`#37906`](https://github.com/stablyai/orca/issues/37906)),
 [`stablyai/orca#38183`](https://github.com/stablyai/orca/pull/38183) (Issue [`#38115`](https://github.com/stablyai/orca/issues/38115)),
@@ -28,6 +30,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38737`](https://github.com
 [`stablyai/orca#37532`](https://github.com/stablyai/orca/pull/37532),
 [`stablyai/orca#37494`](https://github.com/stablyai/orca/pull/37494) e
 [`stablyai/orca#37503`](https://github.com/stablyai/orca/pull/37503), além das issues
+[`stablyai/orca#38833`](https://github.com/stablyai/orca/issues/38833),
 [`stablyai/orca#38663`](https://github.com/stablyai/orca/issues/38663),
 [`stablyai/orca#38100`](https://github.com/stablyai/orca/issues/38100),
 [`stablyai/orca#38124`](https://github.com/stablyai/orca/issues/38124),
@@ -39,52 +42,62 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38737`](https://github.com
 
 ## Os itens no upstream
 
-1. **Suporte a login Gemini Enterprise no Antigravity Chat (`#38737`, resolve `#38606`):**
+1. **Perguntas interativas de múltipla escolha do OpenCode em cartões de chat (`#38872`):**
+   - Nas versões recentes do OpenCode (>= 2.0.22), quando o agente faz perguntas estruturadas de escolha ou esclarecimento,
+     o Chat UI informava falsamente que o popup não podia ser exibido;
+   - O PR `#38872` declara suporte ao protocolo de formulários interativos ACP para o OpenCode, permitindo responder a
+     perguntas de múltipla escolha diretamente nos cartões de chat, combinar seleções customizadas, digitar respostas livres
+     ou cancelar a solicitação sem perda de contexto.
+2. **Preservação de modelo salvo e redução síncrona de status ao reabrir chats ACP (`#38815`):**
+   - Ao reabrir conversas salvas de agentes ACP, o app enviava uma troca de modelo redundante antes que o inventário de modelos
+     do provedor estivesse carregado, gerando recusa prematura na primeira mensagem;
+   - O PR `#38815` retém o modelo exato da conversa e atualiza as observações nativas de inicialização e permissão de forma
+     síncrona na chegada de respostas validadas, evitando sobrescritas por respostas defasadas.
+3. **Migração do Antigravity Chat para o binário nativo `agy acp` do host (`#38833`):**
+   - O Antigravity Chat ainda opera em um runtime empacotado separado (`agy_acp_server.par`) com diretório de conta próprio
+     sob `<userData>/antigravity-chat`, gerando problemas de compatibilidade multiplataforma e impedindo a continuação de
+     sessões de chat em terminais CLI ("Continue with Terminal Agent");
+   - A issue `#38833` propõe migrar a execução do chat para `agy acp` oficial da CLI instalada no host (versões >= 1.5.0),
+     unificando o armazenamento de conversas, autenticações e histórico entre a interface gráfica e o terminal.
+4. **Suporte a login Gemini Enterprise no Antigravity Chat (`#38737`, resolve `#38606`):**
    - O Antigravity Chat forçava autenticação pessoal Google OAuth (`oauth-personal`), bloqueando o uso de contas Gemini
      Enterprise corporativas mesmo quando o terminal ou CLI do desenvolvedor já possuía a licença corporativa ativa;
    - O PR `#38737` adiciona na seção de contas Antigravity a escolha entre "Google account (personal)" e "Gemini Enterprise",
      permitindo configurar o Google Cloud project ID e location (região), persistindo a escolha por host de execução e
      usando a credencial enterprise tanto para novos chats quanto para retomadas e titulação automática.
-2. **Liberação de memória em contabilidade de ferramentas e mensagens ACP (`#38767`):**
+5. **Liberação de memória em contabilidade de ferramentas e mensagens ACP (`#38767`):**
    - Elimina retenção desnecessária de chamadas de ferramentas e mensagens intermediárias obsoletas do protocolo ACP
      (Agent Client Protocol), aliviando o consumo de memória da thread principal do app.
-3. **Tratamento de saída prematura do provedor OpenCode ACP (`#38663`):**
+6. **Tratamento de saída prematura do provedor OpenCode ACP (`#38663`):**
    - Investiga e mitiga interrupções espontâneas com exit code 0 durante streaming de respostas de agentes OpenCode ACP.
-4. **Comando `/mcp` disponível no menu barra do Claude Code em Chat UI (`#38190`, resolve `#37906`):**
-   - O comando `/mcp` estava disponível apenas em terminais interativos do Claude Code. O PR `#38190` adiciona o `/mcp`
-     ao seletor de slash commands do Native Chat, permitindo inspecionar e gerenciar servidores Model Context Protocol
+7. **Comando `/mcp` disponível no menu barra do Claude Code em Chat UI (`#38190`, resolve `#37906`):**
+   - Adiciona o `/mcp` ao seletor de slash commands do Native Chat, permitindo inspecionar e gerenciar servidores MCP
      diretamente pela interface gráfica.
-5. **Exibição de detalhes técnicos do modelo ao passar o mouse (`#38183`, resolve `#38115`):**
-   - Ao passar o mouse sobre cada modelo no picker do Native Chat, uma janela de hover exibe a janela de contexto, custos
-     por milhão de tokens e recursos suportados.
-6. **Renderização de diagramas Mermaid em comentários de PRs no Checks panel (`#38215`, resolve `#38185`):**
-   - Comentários de code review automatizados (ex.: Greptile) exibiam código-fonte bruto em blocos `mermaid`. O PR `#38215`
-     passa a renderizar os diagramas interativos diretamente dentro do painel Checks.
-7. **Continuação correta em chats Codex (`#38094`, resolve `#38090`):**
-   - Ao importar e retomar conversas do Codex no Native Chat, o app lia um arquivo canônico estático defasado em vez de
-     importar a continuação indexada mais recente. O PR `#38094` garante a leitura da continuação viva da conversa.
-8. **Preservação de conversas de Native Chat Antigravity no Session History (`#38100`):**
-   - Ao fechar uma conversa de Antigravity iniciada no Native Chat do app, a sessão sumia da lista de Agent Session History.
-     O scanner de histórico procurava apenas na raiz CLI tradicional (`~/.gemini/antigravity-cli/brain`) e ignorava o
-     diretório gerenciado pelo app (`antigravity-chat/antigravity-acp/brain/`), impedindo a reabertura de chats passados.
-9. **Limpeza de comandos de barra na superfície Codex (`#37640`):**
-   - Deixa de oferecer comandos curados exclusivos de terminal no menu barra (`/`) do Codex em modo Chat nativo.
-10. **Suporte a blocos `server_tool_use` (advisor) do Claude (`#38124`):**
-    - Corrige mensagem "cannot display yet" ao receber respostas com ferramentas do servidor / blocos de consultoria no Native Chat.
-11. **Recuperação de respostas bloqueadas e isolamento de UI de plugins (`#37965`, `#37480`, `#37455`):**
-    - Evita poluição visual no transcript do Native Chat por quadros de status de plugins do Claude Code e recupera
-      respostas interrompidas em caso de bloqueio temporário de streaming.
-12. **Exibição de arquivos propostos e diffs em aprovações Codex (`#37960`, `#37436`):**
-    - Os cards de confirmação de escrita de ferramentas ACP/Codex agora exibem diretamente os arquivos afetados e o diff
-      inline com highlight antes de o usuário clicar em "Aprovar".
-13. **Navegação por abas com atalhos de teclado (`#37952`, `#37532`, `#37462`):**
+8. **Exibição de detalhes técnicos do modelo ao passar o mouse (`#38183`, resolve `#38115`):**
+   - Hover card exibe contexto, custos por milhão de tokens e recursos suportados para cada modelo no picker do Native Chat.
+9. **Renderização de diagramas Mermaid em comentários de PRs no Checks panel (`#38215`, resolve `#38185`):**
+   - Passa a renderizar diagramas interativos diretamente dentro do painel Checks.
+10. **Continuação correta em chats Codex (`#38094`, resolve `#38090`):**
+    - Garante a leitura da continuação viva da conversa ao retomar sessões do Codex.
+11. **Preservação de conversas de Native Chat Antigravity no Session History (`#38100`):**
+    - Scanner de histórico passa a cobrir tanto o diretório de dados do chat quanto a raiz da CLI.
+12. **Limpeza de comandos de barra na superfície Codex (`#37640`):**
+    - Deixa de oferecer comandos curados exclusivos de terminal no menu barra (`/`) do Codex em modo Chat nativo.
+13. **Suporte a blocos `server_tool_use` (advisor) do Claude (`#38124`):**
+    - Corrige mensagem \"cannot display yet\" ao receber respostas com ferramentas do servidor / blocos de consultoria no Native Chat.
+14. **Recuperação de respostas bloqueadas e isolamento de UI de plugins (`#37965`, `#37480`, `#37455`):**
+    - Evita poluição visual no transcript do Native Chat por quadros de status de plugins do Claude Code.
+15. **Exibição de arquivos propostos e diffs em aprovações Codex (`#37960`, `#37436`):**
+    - Os cards de confirmação de escrita de ferramentas ACP/Codex exibem arquivos afetados e diff inline antes da aprovação.
+16. **Navegação por abas com atalhos de teclado (`#37952`, `#37532`, `#37462`):**
     - Incorpora abas de Native Chat no ciclo de navegação `Ctrl+PageUp` / `Ctrl+PageDown`.
-14. **Cache persistente de imagens em chats nativos (`#37932`):**
+17. **Cache persistente de imagens em chats nativos (`#37932`):**
     - Retém imagens renderizadas em memória de cache durante rolagens longas de histórico ou alternâncias entre workspaces.
 
 ## O que fazer
 
+- Adotar o suporte a formulários interativos OpenCode (`#38872`) e a preservação de modelos ao restaurar sessões ACP (`#38815`).
+- Avaliar e preparar o runtime do `brza-studio` para migrar de `agy_acp_server.par` para `agy acp` nativo (`#38833`),
+  unificando as sessões de chat com os terminais do workspace.
 - Adotar o suporte a Gemini Enterprise no Antigravity Chat (`#38737`) no `brza-studio`, permitindo uso corporativo do modelo.
 - Incorporar a liberação de memória em contabilidade ACP (`#38767`).
-- Adotar o comando `/mcp` no Native Chat (`#38190`) e a renderização de diagramas Mermaid (`#38215`) no `brza-studio`.
-- Incorporar a rota de transcrições do Antigravity ACP (`#38100`) no histórico para reabertura de sessões passadas.

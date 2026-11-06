@@ -4,6 +4,8 @@ scope:
 refs:
   - PLN-003
   - PLN-009
+  - REV-014
+  - REV-015
   - issue:o-mcp-propoe-a-conta-do-pedido
   - issue:os-passos-do-mcp-no-pln-003-passam-ao-pln-009
   - issue:testes-do-brza-workflow-falham-dentro-do-chat-do-app
@@ -27,7 +29,7 @@ O plano é o [PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos
   dono do trabalho do MCP ("PLN-009 (Recomendado)"). O pedido ao PLN-003 está na issue
   [Os passos do MCP no PLN-003 passam ao PLN-009](../issues/os-passos-do-mcp-no-pln-003-passam-ao-pln-009.md).
 - **A revisão do Desenho antes da execução:** um `reviewer` (Opus) deu 14 achados,
-  [REV: o Desenho do PLN-009 antes da execução](../reviews/pln-009-o-desenho-antes-da-execucao.md). A R2 os encaminhou
+  [REV-014: o Desenho do PLN-009 antes da execução](../reviews/REV-014-pln-009-o-desenho-antes-da-execucao.md). A R2 os encaminhou
   pela regra de Anderson, e o plano foi reescrito: um D6 novo (o ciclo e a conta), o P5 e o P6, os achados do P0 do
   PLN-003 no Desenho, a forma do molde. Estimativa de 22,5 h para 30 h.
 - **Os passos, no `brza-workflow`** (worktree `.worktrees/pln-009-mcp`, branch `feat/pln-009-mcp`, sem push), cada um
@@ -122,7 +124,7 @@ o `USER` no env, e por isso todo desempate caía no `fallback`; o revisor o prov
 Com isso, o P2 a P6 completaram as 3 rodadas do teto, e o P1, quatro. A última correção (`brza-workflow@b2c87a6`) não
 teve revisão própria; a prova é o gate, com cada teste visto falhando antes: `tests/mcp` 346, `tests/hooks` 290 e
 `tests/cli` limpo 445, todos OK. Os seis passos ganharam o `[x]`, e o plano foi a `phase: review`. O parecer
-consolidado é [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../reviews/pln-009-a-revisao-dos-passos.md).
+consolidado é [REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../reviews/REV-015-pln-009-a-revisao-dos-passos.md).
 
 - **A cota de 5 h do Claude:** Anderson pediu para parar a 90% e voltar às 8h. A vigia lê o `orca account list --json`,
   que o app só renova de tempos em tempos (a leitura das 06:30 era das 06:05, em 58%): ela não vê o uso em tempo real.

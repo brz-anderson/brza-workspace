@@ -1,9 +1,10 @@
 ---
-status: open
+status: done
 description: Os três pareceres do PLN-009 em work/reviews/ nasceram sem o número REV-NNN; a sessão dona do plano reserva cada número com o brza note review-open e os renomeia com o move_note.py.
 scope:
   - workspace
 opened: 2026-11-03
+completed: 2026-11-06
 owner: Anderson
 priority: low
 tags:
@@ -17,9 +18,9 @@ moram em `work/reviews/` com H1 `# REV: …` e sem o número `REV-NNN` que a nor
 
 | Parecer | Criado em |
 | :------ | :-------- |
-| [REV: o Desenho do PLN-009 antes da execução](../reviews/pln-009-o-desenho-antes-da-execucao.md) | `3d94663` |
-| [REV: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../reviews/pln-009-a-revisao-dos-passos.md) | `8b622f8` |
-| [REV: a entrega do PLN-009 contra o Pedido e a Cobertura](../reviews/pln-009-a-revisao-da-entrega.md) | `5ef53de`, às 18:59 de 2026-11-03, depois de a norma do REV chegar no merge `5dcc2b3` |
+| [REV-014: o Desenho do PLN-009 antes da execução](../reviews/REV-014-pln-009-o-desenho-antes-da-execucao.md) | `3d94663` |
+| [REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../reviews/REV-015-pln-009-a-revisao-dos-passos.md) | `8b622f8` |
+| [REV-016: a entrega do PLN-009 contra o Pedido e a Cobertura](../reviews/REV-016-pln-009-a-revisao-da-entrega.md) | `5ef53de`, às 18:59 de 2026-11-03, depois de a norma do REV chegar no merge `5dcc2b3` |
 
 A origem é a MIG-001 do workstream `workspace`,
 `workspace:work/issues/MIG-001-renumeracao-rev-e-refs-pln-008.md`: o script dela não renomeia os três, porque nasceram
@@ -39,3 +40,9 @@ A sessão que conduzir o PLN-009, para cada parecer:
 Os worklogs que citam os nomes antigos em crase ficam como estão: são o registro do dia.
 
 O gatilho é o fechamento do PLN-009, como a escolha de Anderson previu.
+
+## Resolução (2026-11-06)
+
+A sessão do `tools-kit` reservou o REV-014, o REV-015 e o REV-016 pelo `brza note review-open`, na ordem em que os
+pareceres nasceram, e os renomeou pelo `move_note.py`, que reescreveu o H1 e os links. Os três ganharam a
+`description` no frontmatter. Anderson escolheu "Numerar e conferir (Recomendado)", na rodada da retomada do PLN-009.

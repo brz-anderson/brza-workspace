@@ -1,0 +1,1 @@
+- [Atalhos dos apps](reference_atalhos_apps.md) — onde ficam os keybindings de BrzA Studio, Orca, Cursor, Antigravity; buscas que falharam

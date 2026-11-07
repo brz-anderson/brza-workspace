@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #38326, o PR #38381 e os PRs #38388, #38352 e #38335 trazem bifurcação de chats no Chat UI, resiliência de startup do Claude CLI e melhorias de navegação e teclado.
+description: Os PRs #38326, #39168, #38381 e os PRs #38388, #38352 e #38335 trazem bifurcação fiel de chats, resiliência de startup do Claude CLI e melhorias de navegação e teclado.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,6 +14,7 @@ tags:
 # Bifurcação de conversas no Chat UI e resiliência de inicialização do Claude
 
 Rastreado dos PRs abertos no upstream [`stablyai/orca#38326`](https://github.com/stablyai/orca/pull/38326),
+[`stablyai/orca#39168`](https://github.com/stablyai/orca/pull/39168),
 [`stablyai/orca#38381`](https://github.com/stablyai/orca/pull/38381) (Issue [`#38369`](https://github.com/stablyai/orca/issues/38369)),
 [`stablyai/orca#38388`](https://github.com/stablyai/orca/pull/38388) (Issue [`#38385`](https://github.com/stablyai/orca/issues/38385)),
 [`stablyai/orca#38352`](https://github.com/stablyai/orca/pull/38352),
@@ -45,6 +46,11 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38326`](https://github.com
 6. **Inconsistência entre esforço exibido e consumido (`#38355`):**
    O Native Chat exibia no cabeçalho um valor padrão de `effortLevel` descolado do nível de esforço de raciocínio real
    utilizado pelo motor do Claude na requisição.
+7. **Perda de formatação e replay indevido de turnos ao bifurcar conversa (`#39168`):**
+   Ao acionar a bifurcação de conversa ("Fork"), a implementação inicial tentava reconstruir as mensagens no novo chat a
+   partir do histórico semântico do agente em vez de duplicar a transcrição nativa da UI. Isso resultava na perda de formatação
+   rica, eliminação de timestamps originais e reexecução espúria de turnos de terminal ou ferramentas herdadas devido à falta
+   de recibos imutáveis de identidade nativa.
 
 ## O que o upstream implementa
 
@@ -53,6 +59,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38326`](https://github.com
   - Cria uma nova aba de chat no mesmo worktree e configurações (modelo, permissões), preservando o histórico completo
     e ferramentas até o fim daquele turno através de cópia nativa de transcript do Claude (em worker thread) ou thread do Codex;
   - Insere um divisor visual "Forked from <origem>" vinculando diretamente ao chat original, sem interromper nem modificar a sessão original.
+- **Cópia fiel da transcrição nativa e preservação de identidades ao bifurcar (`#39168`):**
+  - Refatora o mecanismo de fork para duplicar diretamente o registro serializado da conversa da UI do Orca/Studio;
+  - Preserva integralmente o histórico visual, metadados de execução, timestamps e recibos imutáveis de identidades nativas herdadas,
+    garantindo que o agente bifurcado não reexecute turnos concluídos e mantenha fidelidade visual exata.
 - **Elevação do timeout de inicialização do Claude para 3 minutos (`#38381`):**
   - Ajusta `CLAUDE_INITIALIZE_TIMEOUT_MS` de 60s para 180s (180.000 ms), permitindo inicializações seguras de projetos
     com servidores MCP pesados e LSP associados sem falhas falsas de handshake.
@@ -66,6 +76,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38326`](https://github.com
 ## O que fazer
 
 - Adotar o recurso de fork de mensagens (`#38326`) no `brza-studio` e `brza-workflow`.
+- Adotar a replicação fiel de transcrições nativas e recibos de identidade na bifurcação de chats (`#39168`).
 - Incorporar o aumento de timeout de inicialização do Claude CLI para 180s (`#38381`) para estabilizar o carregamento de
   projetos com MCP servers no `brza-studio`.
 - Adotar as melhorias de teclado e comandos (`#38388`, `#38352`, `#38335`) nas interfaces de chat nativo.

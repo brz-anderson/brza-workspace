@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38901, #38899, #38814, #38713 e as issues #39042, #38951, #39021, #38850 trazem proteção contra aborto de turnos OMP, statusMessage em hooks Codex e travas FIFO.
+description: Os PRs #38901, #38899, #38814, #38713 e as issues #39263, #39262, #39042, #38951 trazem classificação de decisões em reply, resiliência de correio remoto e proteção contra aborto.
 scope:
   - brza-studio
   - brza-workflow
@@ -54,6 +54,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38901`](https://github.com
 [`stablyai/orca#37891`](https://github.com/stablyai/orca/pull/37891),
 [`stablyai/orca#37850`](https://github.com/stablyai/orca/pull/37850) e
 [`stablyai/orca#11279`](https://github.com/stablyai/orca/pull/11279), além das issues
+[`stablyai/orca#39263`](https://github.com/stablyai/orca/issues/39263),
+[`stablyai/orca#39262`](https://github.com/stablyai/orca/issues/39262),
 [`stablyai/orca#39042`](https://github.com/stablyai/orca/issues/39042),
 [`stablyai/orca#38951`](https://github.com/stablyai/orca/issues/38951),
 [`stablyai/orca#39021`](https://github.com/stablyai/orca/issues/39021),
@@ -115,6 +117,15 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38901`](https://github.com
     - Reativa workers terminados quando o coordenador envia follow-up antes da liberação do terminal.
 12. **Herança da conta Claude do chamador para subagentes CLI (`#38461`):**
     - Garante que invocações de subagentes herdem automaticamente a conta e o `CLAUDE_CONFIG_DIR` do processo pai.
+13. **Classificação explícita de decisões em `orchestration reply` (`#39263`):**
+    - Introdução do parâmetro `--decision user|technical` no subcomando `orca orchestration reply`. Permite que agentes
+      coordenadores classifiquem se a resposta a uma dúvida de worker exigiu decisão de produto/humana ou se tratava-se de
+      orientação puramente técnica/arquitetural, gravando o metadado no registro de Run/Dispatch para auditoria e redução de
+      perguntas evitáveis.
+14. **Mitigação de perda silenciosa de mensagens de correio aceitas (`#39262`):**
+    - Mensagens enviadas a workers remotos com retorno `accepted: true` podiam ser descartadas silenciosamente caso a
+      desanexação de Dispatch ocorresse antes da persistência final na caixa de entrada do worker. Proposta para exigir
+      confirmação durável de gravação em disco antes de retornar sucesso ao coordenador.
 
 ## O que fazer
 
@@ -122,3 +133,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38901`](https://github.com
 - Adicionar `statusMessage` legíveis aos hooks do Codex (`#39021`) para clareza na auditoria de segurança.
 - Incorporar a detecção imediata de bloqueio de autenticação do Antigravity em workers (`#38901`).
 - Avaliar a introdução de locks FIFO e quadro de colaboração de recursos para o `brza-workflow` (`#38850`).
+- Adotar a classificação de decisão `--decision user|technical` no subcomando de resposta de orquestração (`#39263`).
+- Garantir a confirmação durável de entrega de correio a workers remotos (`#39262`).

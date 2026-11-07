@@ -30,5 +30,12 @@ Decidir se o fluxo vira skill (por exemplo, `meeting-runner`) e corrigir o que a
   e o único número errado; a cética (Codex) deu seis votos contra e foi a mais bem avaliada pelos colegas.
 - **Os dados movem mais que os argumentos:** a medição de daltonismo da coordenação causou três viradas na rodada 2.
 - **O `--title` do `brza sessions`** é trocado pelo nome no Claude e no Codex.
+- **O `brza shot` não roda** contra o `brza-studio` atual: "não achei BASE_CSS em
+  `src/shared/native-chat/native-chat-visual-shell.ts`; o brza-studio mudou, e o brza-shot precisa acompanhar". A
+  folha de contato do símbolo saiu do Chrome headless (`--headless=new --force-device-scale-factor=1|2 --screenshot`).
+- **A evidência renderizada destravou o assunto mais fraco:** o símbolo foi de 64,5 a 79,7 de confiança com duas
+  rodadas curtas sobre uma folha de contato — vale como passo padrão do fluxo quando a disputa é visual.
+- **O revisor independente ficou 12 pontos abaixo da sala** (74 contra 85,8 na v3) e achou o que as seis personas não
+  acharam (os mixes do chat, o estilo inline, os portões que não se mediam): vale como etapa fixa antes do aceite.
 
 Fontes: os seis worklogs da reunião e a [Reunião Carvão em Brasa: a coordenação e a proposta de plano](../worklogs/2026-11-07-reuniao-carvao-em-brasa-coordenacao.md).

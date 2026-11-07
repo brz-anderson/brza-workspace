@@ -311,14 +311,14 @@ duas semanas da flag, o recrutamento, o retrabalho e o CLI.
 
 ## O que ficou
 
-- **A proposta de plano espera Anderson:** as cinco decisões da tabela "Para Anderson decidir" e a aprovação do texto.
+- **A proposta de plano espera Anderson:** as seis decisões da tabela "Para Anderson decidir" e a aprovação do texto.
   Aprovada, ela vira um PLN no workstream `brand` (seis de seis personas), pela skill `plan-runner`, ao lado do PLN-007.
 - **O `brza shot` quebrado** entra na issue do fluxo da reunião, e cabe ao `tools-kit`.
 - **A contestação da Faísca sobre os picos de 64 px** fica registrada acima; não muda a recomendação, que se decide no
   16 px.
 - **As seis sessões seguem abertas** no BrzA Studio, para consulta; fecham com `brza sessions close reuniao-brasa-<nome>`.
 - **O material da reunião fica fora do git**, em `.sessions/reuniao-brasa/` no worktree do `playground`: o briefing, as
-  personas, os pedidos das seis rodadas, as sínteses, a proposta de plano, o script de auditoria do Cinza e a folha de
+  personas, os pedidos das oito rodadas, as sínteses, a proposta de plano, o script de auditoria do Cinza e a folha de
   contato do símbolo.
 
 ## Fora do workspace

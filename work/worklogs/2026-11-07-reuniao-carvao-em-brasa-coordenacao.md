@@ -60,6 +60,7 @@ ou C; (4) a brasa viva na interface; (5) a narrativa, a voz e o rollout. Seis op
 | 6 · o símbolo em tamanho real | 20h25 | 20h31 | o julgamento da folha de contato de hoje, A, B e C a 13–64 px, em 1× e 2× |
 | 6b · a variante da B | 20h27 | 20h35 | a escolha entre a B com o núcleo de rescaldo largo e a B com o topo claro, as duas sem halo |
 | 7 · a confiança final | 20h35 | 20h38 | a confiança de cada uma na v3 do plano e o voto na norma do rótulo da ação |
+| contraprova 1 e 2 · outros modelos | 20h47 | 20h53 | a rodada 1 refeita às cegas por seis sessões novas e a confiança delas na v3.1 |
 
 Um revisor independente (o papel `reviewer`, de fora da reunião) revisou a v2 da proposta em paralelo à rodada 5 e
 releu a v3 depois da rodada 7.
@@ -133,12 +134,61 @@ daltonismo de Machado 2009, severidade 1):
 - **O formato falhou uma vez, por culpa da coordenação:** o briefing dizia "no fim do arquivo" e o pedido da rodada,
   "dentro da seção"; três personas puseram o marcador de fim nos dois lugares.
 
-### A proposta de plano (v3.1, 20h45, não aprovada)
+### A contraprova: as mesmas personas em outros modelos
+
+Depois da rodada 7, Anderson pediu: "ajuste o modelo/esforço do agente/sessão, para ficar condizente com o papel dele
+na reunião; tente diversificar o máximo o uso de modelo/esforço". Nenhum comando troca o modelo de um chat aberto, e o
+`brza sessions` não repassa `--model` nem `--effort` ao `brza agent launch`; a coordenação abriu seis sessões novas
+com um lançador no scratch que usa a biblioteca do próprio `brza sessions` (`brza_runtime`) e registra o nome no mesmo
+mapa. Cada persona mudou numa dimensão, para separar o efeito do modelo do da persona; contexto limpo, a rodada 1 refeita
+às cegas e, depois, a confiança na proposta v3.1.
+
+| Persona | Na reunião | Na contraprova | Por quê, pelo papel | Worklog |
+| :------ | :--------- | :------------- | :------------------ | :------ |
+| Cinza, o Cético | Codex `gpt-6.1-sol` `medium` | Codex `gpt-6-astra` `xhigh` | conta, simula e refuta: o raciocínio mais pesado | [Reunião Carvão em Brasa: a contraprova de Cinza, o Cético Analítico, em outro modelo](2026-11-07-reuniao-carvao-em-brasa-contraprova-cinza.md) |
+| Lenha, a Pragmática | Codex `gpt-6.1-sol` `medium` | Codex `gpt-6.1-terra` `medium` | o modelo de código; a pragmática não pensa demais | [Reunião Carvão em Brasa: a contraprova de Lenha, a Engenheira Pragmática, em outro modelo](2026-11-07-reuniao-carvao-em-brasa-contraprova-lenha.md) |
+| Fole, a Estrategista | Claude Opus 5.5 `high` | Claude Fable 5.1 `high` | conceito, narrativa e julgamento de marca | [Reunião Carvão em Brasa: a contraprova de Fole, a Estrategista de Marca, em outro modelo](2026-11-07-reuniao-carvao-em-brasa-contraprova-fole.md) |
+| Tição, o Guardião | Claude Opus 5.5 `high` | Claude Sonnet 5.5 `medium` | conferir regra e consistência, sem inventar | [Reunião Carvão em Brasa: a contraprova de Tição, o Guardião, em outro modelo](2026-11-07-reuniao-carvao-em-brasa-contraprova-ticao.md) |
+| Faísca, a Provocadora | Grok `grok-4.7` `xhigh` | Grok `grok-4.7-build-fast` `low` | a ideia que salta antes de pensar demais | [Reunião Carvão em Brasa: a contraprova de Faísca, a Provocadora, em outro modelo](2026-11-07-reuniao-carvao-em-brasa-contraprova-faisca.md) |
+| Fogareiro, o Usuário | Antigravity, Gemini 3.8 Flash (High) | Claude Haiku 5.5 `low` | a reação imediata de quem usa | [Reunião Carvão em Brasa: a contraprova de Fogareiro, o Advogado do Usuário, em outro modelo](2026-11-07-reuniao-carvao-em-brasa-contraprova-fogareiro.md) |
+
+**O Antigravity não aceitou modelo explícito pelo chat do app:** `gemini-4-argon-high`, `gemini-4-argon`, `gpt-oss-120b`,
+`gemini-3.8-flash` e `gemini-3.8-flash-low` foram recusados ("not available for the current authentication method"),
+embora o `agy models` os liste. Por isso o Fogareiro foi ao Claude Haiku 5.5.
+
+| Persona | Latência R1: reunião → contraprova | Palavras R1 | Confiança R1 | Confiança no plano: autor (R7, v3) → contraprova (v3.1) | Custo por rodada |
+| :------ | :--------------------------------- | :---------- | :----------- | :------------------------------------------------------ | :--------------- |
+| Tição | 2:00 → 0:54 | 1498 → 1267 | 73 → 64 | 80 → 79 | US$ 0,69 → 0,27 (Opus `high` → Sonnet `medium`) |
+| Faísca | **6:32 → 0:44** | 1484 → 1107 | 70 → 71 | 81 → 78 | sem medição |
+| Cinza | 1:28 → 2:15 | 1138 → 1388 | 79 → 79 | 88 → 76 | tokens de saída 32 mil → 10 mil |
+| Lenha | 1:13 → 1:04 | 1156 → 821 | 87 → 83 | 90 → 79 | tokens de saída 24 mil → 6 mil |
+| Fogareiro | 2:14 → 0:53 | 1247 → 1103 | **89 → 67** | 94 → 74 | sem medição → **US$ 0,02** (Haiku `low`) |
+| Fole | 2:14 → 3:15 | 1771 → 1984 | 68 → 72 | 82 → 80 | US$ 0,74 → **2,18** (Opus `high` → Fable `high`) |
+
+- **A posição é da persona; o modelo não a muda.** As seis repetiram as posições da rodada 1 original. A Faísca, no
+  Grok Fast `low`, voltou ao fundo `#14110F`, à C desde 24 px e a "um dia de flag"; Fole e Faísca votaram de novo pelo
+  núcleo do Dock aceso; o Cinza voltou à A como provisória. Nas decisões, as seis sessões novas votaram como as seis
+  originais, exceto no símbolo, onde leram a medida e foram seis de seis ao rescaldo largo.
+- **A confiança, a extensão e a latência são do modelo.** O Fogareiro caiu de 89 para 67 ao sair do Gemini 3.8 Flash
+  (High) para o Haiku 5.5 `low`: **a superconfiança medida na reunião era, em boa parte, do modelo, não da persona
+  empática**. O Tição no Sonnet `medium` escreveu menos e confiou menos (73 → 64). A Faísca no Grok Fast `low` foi nove
+  vezes mais rápida sem perder ousadia (6 ideias de ousadia alta antes, 5 agora).
+- **Os autores confiam mais no que fizeram.** Na v3/v3.1, os autores deram 85,8; as sessões novas, 77,7; o revisor, 74.
+- **Olhos novos acham erros novos, em qualquer modelo:** o critério ausente da regra de saída (Tição, Sonnet); o
+  portão 4 de cinco pessoas como chave do padrão (Faísca, Grok Fast); o "piloto limitado" contado como aprovação
+  (Cinza, Astra); o controle de contraste de 56% que o produto oferece e o portão dispensa (Lenha, Terra); a cota por
+  região que deixa acender quatro brasas na tela (Fogareiro, Haiku); a assinatura "código em brasa" que contradiz o
+  conceito (Fole, Fable). A v3.2 incorpora os seis.
+- **Custo contra achado:** o Haiku `low` custou US$ 0,02 por rodada e achou um erro real; o Fable `high`, US$ 2,18 na
+  rodada 1 — três vezes o Opus `high` — e achou o erro de narrativa que ninguém mais viu.
+
+### A proposta de plano (v3.2, 20h58, não aprovada)
 
 > Rascunho da coordenação, montado com as oito rodadas das seis personas e com a revisão de um revisor independente.
 > **Nada aqui está decidido**: as decisões são de Anderson, e a seção "Para Anderson decidir" lista as que a sala não
 > fechou. A v1 foi revista pelas personas na rodada 5 (marcas "R5"); a v2, pelo revisor independente (marcas
-> "revisor"); o símbolo, pela folha de contato das rodadas 6 e 6b (marcas "R6").
+> "revisor"); o símbolo, pela folha de contato das rodadas 6 e 6b (marcas "R6"); a v3.1, pela contraprova — seis sessões
+> novas das mesmas personas, em outros modelos e com contexto limpo (marcas "contraprova").
 
 #### O objetivo
 
@@ -161,6 +211,7 @@ logotipo e as quatro filhas do PLN-007 ficam.
 | A parte que mais subiu | fase 4 (símbolo): 64,5 na R5 → **79,7** depois da folha de contato e das variantes (R6, R6b) |
 | As medições de sucesso | média 68,5 na R5 |
 | **A confiança final das personas na v3 (R7)** | **média 85,8**; mediana 85; de 80 (Tição) a 94 (Fogareiro) — todas subiram, a Faísca de 64 para 81 |
+| **A contraprova na v3.1** — seis sessões novas, outros modelos, contexto limpo | **média 77,7**; de 74 a 80. Quem leu sem ter escrito ficou perto do revisor; **os autores confiam ~8 pontos a mais no que fizeram** |
 | **O revisor independente na v3** | **74** (era 60 na v2); ~82 com três correções — o secundário na origem do placeholder, o placar da decisão 2 e o recrutamento que caiba nos usuários reais —, que a v3.1 incorpora |
 
 **O que a v3 fez com as mudanças pedidas na R5:** entraram as de Tição (as regras de uso no `README` e conferidas no
@@ -191,10 +242,10 @@ limitado —; e a da Faísca (gerar a C na fase 4) caiu com a folha de contato, 
 | R4 | **Aviso no limão `#FACC15`** (ΔE 17,3 contra 12,1 do de hoje, em deuteranopia); no claro, texto neutro, ícone e fundo tingido | 6/6 | 78,0 | medido | alta |
 | R5 | **A ação de marca tem token próprio, `--action-brand`**, fora do `--primary` (o ramo de catálogo da segunda camada reescreve o `--primary`: `native-chat-theme-surface-style.ts:38-39`); rótulo sempre `#1A1B1E`; **uma brasa sólida por região — cabeçalho, transcript, composer e o cartão de aprovação** (R5, Faísca), contada no portão 2 | 6/6 | 76,6 | lido no código + medido | alta |
 | R6 | **Código em linha sai da 07:** `#FFB088` no escuro (6,79:1 no pior fundo); neutro `#1A1B1E` no claro | 6/6 | 62,5 | medido (sem a caixa real) | média |
-| R7 | **Símbolo B, um só, com o núcleo de rescaldo largo** (R6): a chama vai do `#FFB088` no centro (7,74:1 contra o tile, onde a 07 dá 3,88:1) a `#FF6A33`, 07 e 06 na borda, **sem halo abaixo de 128 px**; tray template; os tiles novos (R5, Tição). Pico de luminância no Dock escuro, medido pela Faísca e conferido pela coordenação — 16 px: hoje 142, B chapada 97, **rescaldo largo 142**, topo claro 125; 32 px: 166, 98, 161, 170; 64 px: 177, 98, 171, 189. O rescaldo largo tem o melhor pior caso; a massa quente média segue mais escura que a de hoje (83 contra 96 a 16 px). A C é a pior a 16, 32 e 64 px. **Regra de saída** (Tição, Lenha): se a B ajustada não ler como a de hoje a 16 e 32 px no teste, o símbolo de hoje fica **inteiro** — em todos os tamanhos, para não criar duas leituras — e a brasa muda só a interface (R7, Tição) | 6/6 na R6 | 55,0 | renderizado | média |
+| R7 | **Símbolo B, um só, com o núcleo de rescaldo largo** (R6): a chama vai do `#FFB088` no centro (7,74:1 contra o tile, onde a 07 dá 3,88:1) a `#FF6A33`, 07 e 06 na borda, **sem halo abaixo de 128 px**; tray template; os tiles novos (R5, Tição). Pico de luminância no Dock escuro, medido pela Faísca e conferido pela coordenação — 16 px: hoje 142, B chapada 97, **rescaldo largo 142**, topo claro 125; 32 px: 166, 98, 161, 170; 64 px: 177, 98, 171, 189. O rescaldo largo tem o melhor pior caso; a massa quente média segue mais escura que a de hoje (83 contra 96 a 16 px). A C é a pior a 16, 32 e 64 px. **Regra de saída** (Tição, Lenha), com o critério que a contraprova do Tição pediu: se, no `iconutil`, o pico de luminância da B ajustada ficar abaixo de 95% do de hoje a 16 ou 32 px, **ou** se menos de 4 de 5 a acharem entre seis chamas na fase 0, o símbolo de hoje fica **inteiro** — em todos os tamanhos, para não criar duas leituras — e a brasa muda só a interface (R7, Tição) | 6/6 na R6 | 55,0 | renderizado | média |
 | R8 | **O Enviar acende por disponibilidade** (texto ou anexo válido), sem depender do foco; foco de teclado em anel neutro de 2 px com offset de 2 px | 6/6 | **88,0** | lido no código (`native-chat-composer-send-state.ts:39-59`) | alta — a mais forte da reunião |
 | R9 | **Movimento:** só o halo da chama focada respira (2,4 s, opacidade); painéis não focados na 06 parada, e na 07 no hover da superfície elevada, onde a 06 cai a 2,72:1 (R5, Cinza); esfria em 600 ms; com `prefers-reduced-motion`, nada anima; sem fagulha, sem modo noturno | 5/6 | 57,3 | medido + suposto | média |
-| R10 | **Voz literal no app, conferida por lint; a voz da marca fora dele**, com a assinatura "BrzA — código em brasa". A cópia "Ask Claude…" **não existe no app** — era do protótipo (`build.py:33`); a cópia real vem do upstream e fica | 6/6 | 67,4 | lido no código | média |
+| R10 | **Voz literal no app, conferida por lint; a voz da marca fora dele**, com a assinatura "BrzA — código em brasa". A cópia "Ask Claude…" **não existe no app** — era do protótipo (`build.py:33`); a cópia real vem do upstream e fica. **A assinatura segue aberta** (contraprova da Fole): "código em brasa" põe o fogo no código, território do fogo-velocidade, enquanto o plano põe a brasa no agente; as alternativas são "BrzA — calmo por fora, quente por dentro" e "BrzA — carvão em brasa", testadas com o wordmark na fase 0 | 6/6 | 67,4 | lido no código | média |
 | R11 | **Tema claro "Cinza de Fogueira":** papel `#F6F1EC`, texto `#1A1B1E`, secundário `#5C5650`, brasa de texto `#9A3812` (ver tokens), a 07 só como preenchimento | 6/6 | 74,1 | medido | alta |
 | R12 | **A Claude se testa antes de implementar, já na fase 0** (R5, Fole): teste pré-registrado de 5 s com os mockups estáticos e a marca de hoje como controle, separando associação de atribuição; 0/5 sucesso, 1/5 observação, ≥ 2/5 investigação e reteste. Oito matizes a ΔE ≤ 5 da 07 chegam no máximo a ΔE 13,7 da Claude, e os mais vermelhos derrubam o rótulo abaixo de 4,5 (revisor) | 5/6 | 52,9 | medido | média |
 | R13 | **Portões e métricas** (ver a fase 5 e "As medições") | 5/6 | 50,6–58,5 | — | baixa |
@@ -240,7 +291,7 @@ pares se afastam.
 | 2 · Ações | Variante `brand` em `ui/button.tsx` (sem trocar o `default`); Enviar, Continue, Allow, Submit; código em linha; foco; **condicionar à flag a regra de `main.css:1207-1211`**, que pinta o Enviar com o degradê e o branco no foco — a borda do composer em foco (`:1199-1205`) fica, pela regra 5 do Tição (revisor) | 3–5 | sim | alta |
 | 3 · Movimento | Halo no cabeçalho focado (`data-native-chat-working`), 06 nos não focados, esfriar em 600 ms, `prefers-reduced-motion`; teste de "brasa presa" | 2–4 | sim | média |
 | 4 · Símbolo | A B com o rescaldo largo no gerador `brza-brand-build.mjs` e no `generate.sh` (fonte por tamanho lógico, sem halo abaixo de 128 px); tiles 02 → 01 e o claro `#FFFFFF` → `#F6F1EC`; previews nativos (`iconutil`) a 13/16/32 px em 1× e 2×, contra a de hoje; lockups com `#E8E2DC` e `#A8A29E`; **as oito regras de uso da brasa e a tabela por tamanho no `resources/brand/README.md`** (R5, Tição). As variantes renderizadas estão em `.sessions/reuniao-brasa/entregas/simbolo/` (`BR2-sem-halo.svg`, o rescaldo largo; `BT-sem-halo.svg`, o topo claro) | 3–5 | previews sim | média (R6) |
-| 5 · Portões | **(1)** um auditor que **lê os pares efetivos do app** — estilos computados das fixtures das oito cenas, no contraste padrão, nos dois temas, no BrzA Dark e nos 26 fundos do catálogo — e **sai com erro** quando um par reprova: texto ≥ 4,5, ícone ≥ 3, ΔE ≥ 15 entre sinais nas três deficiências, como triagem; o script do Cinza vira a tabela de referência, não o portão (revisor: ele tem os HEX fixos e sai com 0 com 31 reprovações); mais o lint das strings do app (`queim`, `brasa`, `🔥`) (R5, Fole). **(2)** As oito cenas em `grayscale(1)`, com critério de forma e texto e revisão humana; a cota de uma brasa por região contada; as oito regras de uso do Tição conferidas. **(3)** A flag por duas semanas no uso de Anderson, com o ensaio de reversão no meio de um turno; **passa se** a flag não foi desligada por desconforto ou defeito, não houve brasa presa nem regressão de contraste, e cada incômodo anotado foi corrigido ou virou issue. **(4)** O teste com cinco pessoas (ver "As medições"). Passados os quatro, a flag vira padrão | 6–10 | sim | média |
+| 5 · Portões | **(1)** um auditor que **lê os pares efetivos do app** — estilos computados das fixtures das oito cenas, no contraste padrão, nos dois temas, no BrzA Dark e nos 26 fundos do catálogo — e **sai com erro** quando um par reprova: texto ≥ 4,5, ícone ≥ 3, ΔE ≥ 15 entre sinais nas três deficiências, como triagem; o script do Cinza vira a tabela de referência, não o portão (revisor: ele tem os HEX fixos e sai com 0 com 31 reprovações); mais o lint das strings do app (`queim`, `brasa`, `🔥`) (R5, Fole). **(2)** As oito cenas em `grayscale(1)`, com critério de forma e texto e revisão humana; a cota de uma brasa por região contada; as oito regras de uso do Tição conferidas. **(3)** A flag por duas semanas no uso de Anderson, com o ensaio de reversão no meio de um turno; **passa se** a flag não foi desligada por desconforto ou defeito, não houve brasa presa nem regressão de contraste, e cada incômodo anotado foi corrigido ou virou issue. **(4)** O teste com cinco pessoas (ver "As medições"), que **só barra, não valida** (contraprova da Faísca): devolve `aprovado` (nenhum sinal vermelho e ao menos uma pessoa com deuteranopia), `piloto-limitado` (sem essa pessoa) ou `reprovado`. **Só `aprovado` vira padrão**; `piloto-limitado` mantém a flag e registra a pendência (contraprova do Cinza) | 6–10 | sim | média |
 | 6 · Ativos | Empacotamento dos ícones (`icns`, `ico`, tray), lockups das quatro filhas; nota de lançamento com o par cinza → brasa e a regra de captura: toda imagem pública mostra um turno vivo (R5, Fole) | 2–4 | não | média |
 | Depois | `brand.tokens.json`, a brasa no BrzA CLI (ANSI 202 de reserva) e no Workspace | a estimar | — | — |
 
@@ -286,12 +337,14 @@ duas semanas da flag, o recrutamento, o retrabalho e o CLI.
 
 | Decisão | Opções e votos | Recomendação da coordenação |
 | :------ | :------------- | :-------------------------- |
-| 1. O estado no tray e no Dock | adiar — Tição, Cinza, Lenha; o núcleo do Dock acende enquanto trabalha — Fole, Faísca; ponto estático no tray — Fogareiro. O tray já tem um estado de atenção âmbar (`system-tray.ts:64-93`) | adiar |
-| 2. O símbolo | depois da folha de contato (R6b), empate: B com o rescaldo largo, sem halo — Fole, Faísca (pelo pico medido); B com o topo claro, sem halo — Tição, Lenha, Fogareiro (a olho); o rescaldo largo no pequeno e o topo claro a 64 px — Cinza. A C saiu da disputa | B com o rescaldo largo em todos os tamanhos, pelo pior caso medido (161 contra 166 de hoje; o topo claro cai a 125 no 16 px); o topo claro como segundo braço do teste da fase 0 |
-| 3. A flag | duas semanas no seu uso — cinco; um dia de cinza e padrão — Faísca | duas semanas |
-| 4. O fundo | `#1A1B1E` — cinco; `#171615` — Faísca | `#1A1B1E` |
-| 5. Onde o plano mora | `brand`, ao lado do PLN-007 — seis de seis | `brand` |
-| 6. A norma do rótulo da ação (revisor) | WCAG 2.x, com rótulo escuro (4,85) e o APCA como aviso — Tição, Cinza, Lenha, Fogareiro, Fole; rótulo de 16 px com peso 700 — Faísca; APCA, com rótulo branco (Lc −66,7, mas 3,55 no WCAG, que reprova o portão 1) — ninguém | WCAG 2.x com rótulo escuro |
+| 1. O estado no tray e no Dock | nas doze sessões (reunião + contraprova): adiar — 7; o núcleo do Dock acende enquanto trabalha — 4 (Fole e Faísca, nos dois modelos); ponto estático no tray — 1. O tray já tem um estado de atenção âmbar (`system-tray.ts:64-93`) | adiar |
+| 2. O símbolo | na reunião (R6b), empate: rescaldo largo — Fole, Faísca (pelo pico medido); topo claro — Tição, Lenha, Fogareiro (a olho); misto — Cinza. Na contraprova, que leu a medida: **rescaldo largo, seis de seis**. Somadas, 8 a 3 | B com o rescaldo largo em todos os tamanhos, pelo pior caso medido (161 contra 166 de hoje; o topo claro cai a 125 no 16 px); o topo claro como segundo braço do teste da fase 0 |
+| 3. A flag | duas semanas no seu uso — 10; um dia de cinza e padrão — 2 (a Faísca, nos dois modelos) | duas semanas |
+| 4. O fundo | `#1A1B1E` — 10; `#171615` — 2 (a Faísca, nos dois modelos) | `#1A1B1E` |
+| 5. Onde o plano mora | `brand`, ao lado do PLN-007 — 12 de 12 | `brand` |
+| 6. A norma do rótulo da ação (revisor) | WCAG 2.x, com rótulo escuro (4,85) e o APCA como aviso — Tição, Cinza, Lenha, Fogareiro, Fole; rótulo de 16 px com peso 700 — Faísca (reunião); APCA, com rótulo branco (Lc −66,7, mas 3,55 no WCAG, que reprova o portão 1) — ninguém. Na contraprova, WCAG com rótulo escuro seis de seis; somadas, 11 a 1 | WCAG 2.x com rótulo escuro |
+| 7. O controle de contraste abaixo do padrão (contraprova da Lenha) | (a) fora do aceite, registrado como limite (v3.1; Cinza e Lenha da reunião pediram que se definisse); (b) **sob a flag, o mix mínimo do texto sobe de 56% para 66%**, o menor que mantém 4,5:1 no hover elevado (66% rende 4,53); (c) corrigir a rampa e testar a faixa inteira | (b): o produto não oferece uma configuração que reprova o próprio portão |
+| 8. A cota de brasa (contraprova do Fogareiro) | (a) uma brasa sólida por região — até quatro na tela (v3.1, Faísca); (b) uma por tela (Tição e Fole na R1); (c) uma por região, com a área de 07 sólida medida por cena no portão 2 e um teto decidido pelo dado | (c): mede antes de cortar |
 
 ### As issues abertas
 
@@ -311,19 +364,24 @@ duas semanas da flag, o recrutamento, o retrabalho e o CLI.
 
 ## O que ficou
 
-- **A proposta de plano espera Anderson:** as seis decisões da tabela "Para Anderson decidir" e a aprovação do texto.
+- **A proposta de plano espera Anderson:** as oito decisões da tabela "Para Anderson decidir" e a aprovação do texto.
   Aprovada, ela vira um PLN no workstream `brand` (seis de seis personas), pela skill `plan-runner`, ao lado do PLN-007.
 - **O `brza shot` quebrado** entra na issue do fluxo da reunião, e cabe ao `tools-kit`.
 - **A contestação da Faísca sobre os picos de 64 px** fica registrada acima; não muda a recomendação, que se decide no
   16 px.
-- **As seis sessões seguem abertas** no BrzA Studio, para consulta; fecham com `brza sessions close reuniao-brasa-<nome>`.
+- **As doze sessões seguem abertas** no BrzA Studio, para consulta (`reuniao-brasa-<nome>` e `reuniao-brasa-c-<nome>`);
+  fecham com `brza sessions close <nome>`.
+- **O `brza sessions` não repassa `--model` e `--effort`**, e o chat do Antigravity recusa modelo explícito: entram na
+  issue do fluxo, para o `tools-kit`.
 - **O material da reunião fica fora do git**, em `.sessions/reuniao-brasa/` no worktree do `playground`: o briefing, as
   personas, os pedidos das oito rodadas, as sínteses, a proposta de plano, o script de auditoria do Cinza e a folha de
   contato do símbolo.
 
 ## Fora do workspace
 
-- **O quê e onde:** seis sessões de chat abertas no BrzA Studio (`reuniao-brasa-ticao`, `-faisca`, `-cinza`, `-lenha`,
-  `-fogareiro`, `-fole`), duas no Claude, duas no Codex, uma no Grok e uma no Antigravity. **O risco:** consomem cota
+- **O quê e onde:** doze sessões de chat abertas no BrzA Studio: as seis da reunião (`reuniao-brasa-ticao`, `-faisca`,
+  `-cinza`, `-lenha`, `-fogareiro`, `-fole`) e as seis da contraprova (`reuniao-brasa-c-…`), em Claude (Opus, Sonnet,
+  Fable, Haiku), Codex (Sol, Astra, Terra), Grok (4.7 e 4.7 Fast) e Antigravity; mais quatro chats do Antigravity que
+  recusaram o modelo e foram fechados pelo `brza sessions close`. **O risco:** consomem cota
   dos quatro runtimes enquanto recebem mensagem; paradas, só ocupam abas. **Estado:** abertas e paradas. **Como
-  desfazer:** `brza sessions close reuniao-brasa-<nome>`.
+  desfazer:** `brza sessions close <nome>`.

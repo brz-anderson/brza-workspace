@@ -25,6 +25,13 @@ Levantado na [Reunião Carvão em Brasa: a coordenação e a proposta de plano](
 - **Conferir em fonte, antes de publicar:** a etimologia "Brasil vem de brasa, pelo pau-brasil" e os territórios de cor
   dos concorrentes, que o Fole trouxe de memória.
 
+## A assinatura está em aberto
+
+A contraprova da Fole (Fable 5.1) apontou que "BrzA — código em brasa" contradiz o conceito do plano: o plano põe a
+brasa no agente e no trabalho vivo, e a assinatura põe o fogo no código, território do fogo-velocidade que a rodada 1
+mandou evitar. Alternativas: "BrzA — calmo por fora, quente por dentro" e "BrzA — carvão em brasa". A assinatura vai ao
+teste de 5 s da fase 0, junto do wordmark.
+
 ## O que a reunião levantou
 
 Faísca defende uma frase no estado vazio ("A brasa está fria."), com teste de tempo até o primeiro envio; a sala votou

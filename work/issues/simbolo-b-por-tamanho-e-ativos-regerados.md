@@ -45,8 +45,10 @@ A coordenação renderizou o símbolo de hoje, A, B, C e duas variantes da B a 1
 - **O voto empatou:** rescaldo largo (Fole, Faísca) contra topo claro (Tição, Lenha, Fogareiro); Cinza dividiu por
   tamanho. A coordenação recomenda o rescaldo largo, pelo pior caso. As variantes estão em
   `.sessions/reuniao-brasa/entregas/simbolo/` (`BR2-sem-halo.svg`, `BT-sem-halo.svg`), no worktree do `playground`.
-- **Regra de saída** (Tição, Lenha): se a B ajustada não ler como a de hoje a 16 e 32 px no `iconutil`, o símbolo de
-  hoje fica inteiro, em todos os tamanhos, e a brasa muda só a interface.
+- **Regra de saída** (Tição, Lenha), com o critério da contraprova do Tição: se, no `iconutil`, o pico de luminância
+  da B ajustada ficar abaixo de 95% do de hoje a 16 ou 32 px, ou se menos de 4 de 5 a acharem entre seis chamas na
+  fase 0, o símbolo de hoje fica inteiro, em todos os tamanhos, e a brasa muda só a interface.
+- **A contraprova** (seis sessões novas, em outros modelos) leu a medida e votou seis de seis pelo rescaldo largo.
 
 ## O que a reunião levantou
 

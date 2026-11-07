@@ -3,7 +3,10 @@ status: open
 phase: interview
 origin: request
 description: Perfil comum e extras por app (BrzA Studio, Orca, Antigravity, Cursor) no Logi Options+, com o perfil exportado e o guia em wiki/guides.
-ready: "não — falta o levantamento dos atalhos por app e a rodada que escolhe as ações do ring"
+ready: "não — falta a rodada 3, que escolhe as ações do ring e o caminho do export"
+estimate_h: 6
+executed_h: 0.3
+remaining_h: 5.5
 scope:
   - workspace
 opened: 2026-11-07
@@ -15,7 +18,8 @@ tags:
 
 # PLN-016: O Actions Ring do MX Master 4 tem ações práticas por app no dia a dia
 
-- **Retomar:** rodadas 1 e 2 fechadas; próximo é o levantamento dos atalhos do Orca, Cursor, Antigravity e BrzA Studio por um `collector`, e a rodada 3, que escolhe as ações do ring.
+- **Retomar:** P1 feito (terreno no Desenho); próximo é a rodada 3, que escolhe as ações do ring e o caminho do export (o Options+ não exporta perfil em arquivo).
+- **Dividido:** [PLN-016 — Desenho](PLN-016-design.md)
 
 ## Pedido
 
@@ -86,11 +90,13 @@ Rascunho de ordem, a fechar na rodada 3. **Nenhum passo executa sem pedido expl�
 
 Executa R2.3 · executor: subagente `collector`, com a sessão que conduz
 
-Estimado: 1.5 h · Executado: — h
+Estimado: 1.5 h · Executado: 0.3 h
 
-- [ ] **1. Tabela de atalhos** de Orca, Cursor, Antigravity e BrzA Studio, com a fonte de cada um
-- [ ] **2. Exportação do perfil:** onde o backup nativo do Options+ grava e se o arquivo é portável
-- [ ] **3. Capacidades de ação do ring:** o que o Options+ aceita (atalho, app, script, Smart Action) na versão instalada
+- [x] **1. Tabela de atalhos** de Orca, Cursor, Antigravity e BrzA Studio, com a fonte de cada um
+- [x] **2. Exportação do perfil:** onde o backup nativo do Options+ grava e se o arquivo é portável
+- [x] **3. Capacidades de ação do ring:** o que o Options+ aceita (atalho, app, script, Smart Action) na versão instalada
+
+**Evidência:** dois `collector` (Sonnet), ~3,5 min cada; terreno em [PLN-016-design.md](PLN-016-design.md). Conferido por amostra: `definitions-core-4.ts:36` (`Mod+Shift+J` no darwin) e `agy/package.json` (`escape` interrompe o agente, `alt+enter` aceita). Fora do achado: perfil exportável em arquivo, ação de shell nativa, passo oficial de adicionar app ao ring.
 
 ### P2 — Rodada 3: escolher as ações do ring
 

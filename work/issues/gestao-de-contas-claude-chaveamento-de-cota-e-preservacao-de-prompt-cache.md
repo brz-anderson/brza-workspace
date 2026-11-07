@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38581, #38654, #38509, #38298 e #38227 trazem fixação de conta por projeto, fallback de cota em helpers, métricas /stats e chaveamento CLI de contas Claude e Codex.
+description: Os PRs #38581, #39169, #38654, #38509, #38298 e #38227 trazem fixação de conta por projeto, retomada imediata em chaveamento de cota, fallback em helpers e métricas /stats.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,6 +14,7 @@ tags:
 # Gestão de contas Claude, chaveamento de cota e preservação de prompt cache
 
 Rastreado dos PRs abertos no upstream [`stablyai/orca#38581`](https://github.com/stablyai/orca/pull/38581),
+[`stablyai/orca#39169`](https://github.com/stablyai/orca/pull/39169),
 [`stablyai/orca#38654`](https://github.com/stablyai/orca/pull/38654),
 [`stablyai/orca#38509`](https://github.com/stablyai/orca/pull/38509),
 [`stablyai/orca#38298`](https://github.com/stablyai/orca/pull/38298),
@@ -86,9 +87,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38581`](https://github.com
     pessoais em tarefas de trabalho.
 14. **Perda de prompt cache em chats ociosos (`#37833`):** uma aba de Native Chat com Claude deixada ociosa perde a
     janela de cache de prompt (1 hora em contextos ≥ 200k tokens), multiplicando custos e tempo de resposta.
+15. **Sessão parada em stop após troca de conta durante limite de cota (`#39169`):**
+    Ao alternar para uma nova conta no Claude switcher com uma sessão pausada por limite de uso (5h usage limit), a interface
+    não disparava a continuação automática (`continueUsageLimit`), exigindo que o usuário clicasse manualmente em botões de retomada
+    ou perdesse o fluxo de trabalho.
 
 ## O que o upstream propõe e implementa
 
+- **Continuação automática de chats ao trocar de conta no switcher (`#39169`):**
+  - Conecta o evento `onSwitched` do seletor de contas do Claude diretamente ao dispatch de `continueUsageLimit`;
+  - Ao selecionar uma nova conta válida, retoma instantaneamente a execução da tarefa pausada por cota sem requerer intervenção manual.
 - **Fixação de conta por projeto (`#38581`):**
   - Adiciona o campo "Account" no painel de setup do agente no projeto, permitindo amarrar sessões Claude e Codex a uma
     conta salva específica (local, WSL ou servidor remoto pareado);
@@ -120,5 +128,6 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38581`](https://github.com
 
 - Adotar a fixação de conta por projeto (`#38581`) no `brza-studio`, separando contas corporativas de pessoais.
 - Habilitar o fallback de cota em helpers de texto (`#38654`) para fluxos de commit e PR no `brza-workflow`.
+- Incorporar o disparo imediato de continuação de limites ao chavear contas Claude (`#39169`).
 - Integrar a leitura de `stats-cache.json` (`#38509`) no `brza-studio`.
 - Portar o comando `orca account select --agent claude` (`#38227`) para a CLI do `brza`.

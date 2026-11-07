@@ -55,6 +55,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39283`](https://github.com
 [`stablyai/orca#37891`](https://github.com/stablyai/orca/pull/37891),
 [`stablyai/orca#37850`](https://github.com/stablyai/orca/pull/37850) e
 [`stablyai/orca#11279`](https://github.com/stablyai/orca/pull/11279), além das issues
+[`stablyai/orca#39517`](https://github.com/stablyai/orca/issues/39517),
+[`stablyai/orca#39499`](https://github.com/stablyai/orca/issues/39499),
 [`stablyai/orca#39300`](https://github.com/stablyai/orca/issues/39300),
 [`stablyai/orca#39263`](https://github.com/stablyai/orca/issues/39263),
 [`stablyai/orca#39262`](https://github.com/stablyai/orca/issues/39262),
@@ -139,6 +141,14 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39283`](https://github.com
       alocado permanece conectado ao shell padrão, o coordenador não era notificado do término, ficando indefinidamente aguardando;
     - A issue `#39300` introduz o observador `observeSupervisedCodex`, detectando o fim do processo filho e disparando
       `reportWorkerTurnStop` com causa explícita.
+17. **Papéis pré-configurados de workers para `orchestration worker-start` (`#39517`):**
+    - Coordenadores precisam especificar `--agent`, `--model` e `--effort` a cada invocação de worker, gerando inconsistências
+      e uso acidental de modelos inadequados para tarefas específicas (ex.: revisão vs. implementação rápida);
+    - A issue `#39517` propõe papéis nomeados em Configurações (`--role <name>`, ex.: research, implementation, review)
+      pré-validando a combinação de modelo e esforço no catálogo do host antes da criação da tarefa.
+18. **Linhas obsoletas de "Done" retidas na barra lateral após término do agente (`#39499`):**
+    - A barra lateral de workspaces retinha a linha do agente no estado "Done" mesmo após o processo do agente ter saído
+      completamente de volta para o prompt do shell, gerando poluição visual e falsos indicativos de sessões em execução.
 
 ## O que fazer
 
@@ -150,3 +160,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39283`](https://github.com
 - Garantir a confirmação durável de entrega de correio a workers remotos (`#39262`).
 - Adotar o backoff exponencial em federation relays com falha (`#39283`) para eliminar consumo excessivo de CPU.
 - Implementar a detecção de término de processos Codex em PTYs abertos (`#39300`).
+- Adotar papéis pré-configurados de workers (`--role`) na CLI de orquestração (`#39517`).
+- Corrigir a limpeza de linhas "Done" de agentes na sidebar quando o terminal retornar ao shell (`#39499`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38581, #39169, #38654, #38509, #38298 e #38227 trazem fixação de conta por projeto, retomada imediata em chaveamento de cota, fallback em helpers e métricas /stats.
+description: Os PRs #38581, #39169 e as issues #39495, #39502 trazem rotação automática de contas Claude por host, janelas por modelo, chaveamento de cota e métricas /stats.
 scope:
   - brza-studio
   - brza-workflow
@@ -28,6 +28,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38581`](https://github.com
 [`stablyai/orca#37567`](https://github.com/stablyai/orca/pull/37567),
 [`stablyai/orca#37568`](https://github.com/stablyai/orca/pull/37568) e
 [`stablyai/orca#37569`](https://github.com/stablyai/orca/pull/37569), além das issues
+[`stablyai/orca#39495`](https://github.com/stablyai/orca/issues/39495),
+[`stablyai/orca#39502`](https://github.com/stablyai/orca/issues/39502),
 [`stablyai/orca#38618`](https://github.com/stablyai/orca/issues/38618),
 [`stablyai/orca#38547`](https://github.com/stablyai/orca/issues/38547),
 [`stablyai/orca#38528`](https://github.com/stablyai/orca/issues/38528),
@@ -91,9 +93,25 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38581`](https://github.com
     Ao alternar para uma nova conta no Claude switcher com uma sessão pausada por limite de uso (5h usage limit), a interface
     não disparava a continuação automática (`continueUsageLimit`), exigindo que o usuário clicasse manualmente em botões de retomada
     ou perdesse o fluxo de trabalho.
+16. **Interrupção de agentes autônomos por esgotamento de limites semanais e de modelos (`#39495`):**
+    Desenvolvedores que mantêm múltiplas assinaturas Claude enfrentam paradas não assistidas de tarefas longas quando uma conta
+    bate no limite de 5h ou limite semanal. Além disso, quando a cota semanal de modelos específicos (ex.: Fable) se esgota,
+    o Claude Code interrompe o terminal com uma pergunta interativa ("Switch to fallback model and continue"), paralisando
+    agentes autônomos por falta de detecção e rotação automática de contas entre hosts locais e remotos SSH.
+17. **Requisições de rede em background indesejadas pelo medidor de cota OAuth (`#39502`):**
+    O painel de monitoramento de uso realizava chamadas periódicas em background para endpoints da Anthropic (`api.anthropic.com`),
+    gerando consumo indesejado de rede e alertas em ambientes corporativos com restrições estritas de telemetria.
 
 ## O que o upstream propõe e implementa
 
+- **Motor de rotação automática de contas Claude e monitoramento por modelo (`#39495`):**
+  - Proposta de diálogo unificado de contas Claude no status bar e menu de contexto de worktrees;
+  - Rotação por host: chaveia automaticamente para a próxima conta cadastrada quando o limite de 5h ou semanal atinge um limiar crítico;
+  - Barras de visualização de cota com janelas semanais discriminadas por modelo e watcher opt-in para responder automaticamente
+    ao prompt de fallback de modelo no terminal sem cobrança adicional;
+  - Sincronização opcional de contas e preferências de rotação entre dispositivos conectados.
+- **Configuração para desativar polling OAuth do medidor de uso (`#39502`):**
+  - Adiciona chave de configuração permitindo desligar completamente as requisições em background à API de limites de uso.
 - **Continuação automática de chats ao trocar de conta no switcher (`#39169`):**
   - Conecta o evento `onSwitched` do seletor de contas do Claude diretamente ao dispatch de `continueUsageLimit`;
   - Ao selecionar uma nova conta válida, retoma instantaneamente a execução da tarefa pausada por cota sem requerer intervenção manual.
@@ -131,3 +149,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38581`](https://github.com
 - Incorporar o disparo imediato de continuação de limites ao chavear contas Claude (`#39169`).
 - Integrar a leitura de `stats-cache.json` (`#38509`) no `brza-studio`.
 - Portar o comando `orca account select --agent claude` (`#38227`) para a CLI do `brza`.
+- Avaliar a introdução de motor de rotação automática de contas Claude por host e janelas por modelo (`#39495`).
+- Disponibilizar a opção para desativar chamadas periódicas em background da cota OAuth (`#39502`).

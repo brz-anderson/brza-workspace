@@ -23,7 +23,11 @@ o Cinza deixou um script que mede 182 pares e 20 comparações de sinais
 - **Portão 2:** as oito cenas do chat renderizadas com `grayscale(1)`, com critério verificável de forma e texto para
   cada par de estados (repouso e foco, CTA e erro, aviso e informação), mais revisão humana. Ideia do Cinza (piloto sem
   cor), levada a portão permanente pelo Tição.
-- Promover o script do Cinza a teste do `brza-studio`, conferindo o APCA contra o pacote oficial.
+- **O auditor lê o app, não uma tabela** (revisor independente): o script do Cinza tem os HEX fixos e sai com 0 mesmo
+  com 31 reprovações. O portão mede os estilos computados das fixtures das oito cenas — depois dos mixes do chat e do
+  controle de contraste —, nos dois temas, no BrzA Dark e nos 26 fundos do catálogo, e sai com erro quando um par de
+  produção reprova. O script do Cinza vira a tabela de referência; o APCA se confere contra o pacote oficial.
+- Contar, no portão 2, a cota de uma brasa por região e conferir as oito regras de uso do Tição.
 
 ## O que a reunião levantou
 

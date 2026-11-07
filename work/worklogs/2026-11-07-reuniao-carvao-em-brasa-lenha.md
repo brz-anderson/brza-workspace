@@ -246,6 +246,74 @@ P8 (estado dinâmico de Dock/tray), ANSI/CLI e contrato `brand.tokens.json` entr
 
 <!-- fim-rodada-4 -->
 
+### Rodada 5: revisão do plano
+
+#### A confiança no plano
+
+| Parte | Confiança (0–100) | Uma linha |
+| :---- | :---------------- | :-------- |
+| O plano inteiro | 81 | Executável após corrigir escopo/custo da fase 6 e explicitar cobertura do catálogo. |
+| Tabela de tokens v2 | 85 | Compostos melhoraram; rosa claro candidato, inline real e APCA pedem render, não só peso 600. |
+| Fases 0–3 (tokens, ações, movimento) | 89 | Integrações conferem; preservar composição local e 05 no claro para painéis sem foco. |
+| Fase 4 (símbolo) | 76 | Gerador correto; fechar 13–16 e 65–127 px sem inferir regra pelo tamanho físico do PNG. |
+| Fases 5–6 (portões, ativos) | 73 | Contrato entre produtos entrou sem orçamento; manutenção do CI não foi estimada. |
+| As medições de sucesso | 72 | Cinco pessoas são sinal; simulação não substitui participantes daltônicos: registrar a lacuna. |
+#### O erro do plano
+
+A fase 6 atribui às minhas 2–4 h o `brand.tokens.json`, ANSI do CLI e Workspace: excluí contrato e migração na R4. Meu total de 20–33 h cobre chat e ativos estáticos/lockups, não integração funcional entre produtos. “A leitura dobrou” também omite ampliação explícita de escopo/verificação; não houve horas executadas medidas.
+#### A mudança que mais subiria a sua confiança
+
+Retirar contrato/ANSI/integração CLI–Workspace da fase 6 e do “pronto quando”, conservando geração dos lockups; registrar a extensão como etapa posterior a estimar. Meu total volta ao escopo estimado e a confiança no plano inteiro sobe de **81 para 90/100**.
+#### O risco que o plano não vê
+
+Tokens aprovados em 01/02 não garantem contraste em fundos arbitrários do catálogo. O helper também serve ao editor Markdown; composição global pode afetá-lo. Exigir matriz padrão/BrzA Dark/catálogo com esquemas opostos e delimitar consumidores antes do portão 1.
+
+#### O seu voto nas decisões de Anderson
+
+| Decisão | Opção | Confiança |
+| :------ | :---- | :-------- |
+| 1. Tray e Dock | Adiar P8; manter ícones estáticos e template mono nesta entrega. | 95 |
+| 2. Símbolo | B como único candidato; C só como controle do teste, sem segundo sistema distribuído de ativos. | 88 |
+| 3. Flag | Duas semanas, com reversão durante turno vivo; padrão depende dos portões, não do prazo. | 96 |
+| 4. Fundo | Manter #1A1B1E; ganho funcional do carvão quente segue não demonstrado. | 95 |
+| 5. Onde o plano mora | Workstream brand existente, junto do PLN-007; playground conserva o registro da reunião. | 94 |
+
+<!-- fim-rodada-5 -->
+
+### Rodada 6: o símbolo em tamanho real
+
+- **Vi as imagens:** sim, `folha-1x.png` e `folha-2x.png`; avaliação visual minha, sem teste com participantes ou render nativo do macOS.
+- **A ordem de leitura a 16 px** (melhor → pior, entre hoje, A, B e C): hoje → A → B → C; o âmbar atual destaca mais a chama, A/B ficam próximos e o interior de C parece mais fechado, sobretudo em 1× escuro.
+- **A ordem a 32 px:** hoje → A → B → C; a silhueta abre nos quatro, mas A delimita melhor o desenho que o halo de B, e C acrescenta calor sem recuperar detalhe interno.
+- **A B passa a 16 e a 32 px?** só com ajuste: a 32 reconheço chama; a 16 não aprovo circuito/`{}` como legíveis. Retirar halo no miúdo e conferir nova fonte sólida; 2× ajuda o contorno, não demonstra reconhecimento.
+- **O núcleo de rescaldo:** apoio como experimento ≤32 px, preservando a silhueta; os 7,74:1 contra o tile, medidos pela coordenação, justificam tentar #FFB088, mas não aprovam uma variante ainda não renderizada — confiança 90.
+- **O voto na decisão 2 (símbolo), agora:** B como candidata com correção pequena; comparar B sólida e B com rescaldo contra hoje/A nas mesmas folhas antes de distribuir. Não abrir sistema C/B; se a correção não recuperar leitura, manter o símbolo atual no pequeno — confiança 85.
+- **A confiança na fase 4, agora:** 80 (antes: 76); as folhas removem a suposição de que B já escala, mas falta validar a variante corrigida e o pacote nativo. Suponho que a correção caiba nas 3–5 h já reservadas; se exigir redesenho da geometria, reestimar.
+
+<!-- fim-rodada-6 -->
+
+### Rodada 6b: a variante da B
+
+- **Vi as imagens:** sim, `folha-2-1x.png` e `folha-2-2x.png`; julgamento visual, sem teste humano ou pacote nativo.
+- **A melhor variante a 16 e 32 px:** B + topo claro, sem halo — chega à leitura de hoje? quase: recupera a ponta e separa melhor a chama; a 16 px o circuito continua apertado, sobretudo em 1×.
+- **A melhor a 64 px:** B + topo claro, sem halo; desenho mais limpo e mesma receita dos pequenos, reduzindo variantes a manter.
+- **O voto final no símbolo:** B + topo claro #FFB088, sem halo, como candidata única; retiro a preferência pelo núcleo radial, pois o topo recupera melhor a silhueta nesta comparação. Preservar teste nativo e tray mono — confiança 89.
+- **A confiança na fase 4, agora:** 87; há uma correção renderizada viável, ainda sem evidência de reconhecimento por usuários.
+<!-- fim-rodada-6b -->
+
+### Rodada 7: a confiança final
+
+- **Confiança no plano inteiro (v3):** 90 (na R5, sobre a v1: 81).
+- **O que mais pesou para subir ou descer:** CLI fora do orçamento, composição inline local, auditor de cores efetivas e saída para o símbolo pequeno tornam a entrega verificável; 25–41 h continua estimativa da coordenação, não medição minha.
+- **A decisão 6, a norma do rótulo da ação:** WCAG com rótulo escuro; APCA como aviso e render obrigatório, sem trocar por branco que reprova o portão nem presumir que 16 px/700 resolve sozinho — confiança 94.
+- **Algo ainda errado na v3:** portão 1 exige 100% dos pares ≥4,5, mas o mínimo do controle rende 4,01 e “se registra”: definir se esse ajuste está fora do aceite padrão ou corrigir o mínimo; como escrito, o auditor pode impedir o próprio lançamento.
+
+<!-- fim-rodada-7 -->
+
+
+
+
+
 
 
 ## O que ficou

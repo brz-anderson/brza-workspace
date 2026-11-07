@@ -3,6 +3,8 @@ scope:
   - brza-studio
 tags:
   - design
+refs:
+  - PLN-007
 ---
 
 # Reunião Carvão em Brasa: a participação de Cinza, o Cético Analítico
@@ -257,6 +259,72 @@ Sem extração de pixels/computed styles: outras transparências, caixa inline r
 **Confiança na peça:** 91/100
 
 <!-- fim-rodada-4 -->
+
+### Rodada 5: revisão do plano
+
+#### A confiança no plano
+
+| Parte | Confiança (0–100) | Uma linha |
+| :---- | :---------------- | :-------- |
+| O plano inteiro | 77 | Executável como piloto, mas mistura triagem simulada com validação humana. |
+| Tabela de tokens v2 | 88 | Incorpora quase toda a auditoria; falta 06 → 07 no hover do indicador de trabalho escuro. |
+| Fases 0–3 (tokens, ações, movimento) | 83 | Base e reversão bem situadas; conferir todos os fundos efetivos antes de declarar contraste aprovado. |
+| Fase 4 (símbolo) | 70 | Continua candidata sem teste; o texto não especifica 65–127 px nem resolve reconhecimento pequeno. |
+| Fases 5–6 (portões, ativos) | 68 | Portões úteis; triagem não pode virar aceite humano, e a saída do auditor exige contrato de falha. |
+| As medições de sucesso | 65 | Contagens e base são adequadas ao piloto; simulação não mede confusão de participantes daltônicos. |
+
+#### O erro do plano
+
+Em `plano-proposta.md:20`, APCA aparece conferido por duas fontes; minha R4 declara que a implementação local não foi confrontada com pacote oficial. Em `:25`, meus contras sobre método viram “redação”: eram substantivos, e correção não é revoto. Em `:65`/`:77`, faltou a exceção 06 → 07 no hover escuro (06 cai a 2,72:1). Em `:104`, um candidato vermelho medido não sustenta “nenhum matiz próximo resolve”. Peso 600 (`:68`) é hipótese para teste, não correção APCA comprovada.
+
+#### A mudança que mais subiria a sua confiança
+
+Reescrever o aceite do portão 4: remover “simulação substitui recrutamento” (`:98`), separar resultados computacionais de tarefas observadas e registrar “validação com pessoas com deficiência de visão de cores pendente” quando não houver participantes. Pode avançar como piloto limitado, sem declarar essa validação concluída. Minha confiança no plano inteiro subiria de **77 para 87**.
+
+#### O risco que o plano não vê
+
+Meu script retorna código 0 mesmo contendo reprovações deliberadas da v1. Ligá-lo diretamente ao CI pode deixar o portão verde com pares inválidos. A implementação precisa separar casos diagnósticos dos tokens de produção e sair com erro quando um par obrigatório de produção falhar.
+
+#### O seu voto nas decisões de Anderson
+
+| Decisão | Opção | Confiança |
+| :------ | :---- | :-------- |
+| 1. Tray e Dock | Adiar P8; concluir contraste e estado no painel antes de acrescentar agregação no sistema. | 92 |
+| 2. Símbolo | B com C como braço do teste, comparadas à marca atual; B segue candidata até o resultado. | 80 |
+| 3. Flag | Duas semanas no uso de Anderson, com reversão testada; prazo não substitui os portões. | 94 |
+| 4. Fundo | Manter `#1A1B1E`; ganho funcional da troca continua não demonstrado. | 91 |
+| 5. Onde o plano mora | `brand`, junto do PLN-007 segundo a proposta; branch existente conferida, sem abrir workstream. | 95 |
+<!-- fim-rodada-5 -->
+
+### Rodada 6: o símbolo em tamanho real
+
+- **Vi as imagens:** sim — `folha-1x.png` e `folha-2x.png`, em resolução original; inspeção visual das folhas, sem teste humano nem validação do rasterizador macOS.
+- **A ordem de leitura a 16 px** (melhor → pior, entre hoje, A, B e C): hoje → A → B → C — o topo âmbar atual destaca a chama; A/B ficam próximas, com pouca separação interna; C perde o topo escurecido. Ordem perceptiva minha, confiança baixa na diferença A/B.
+- **A ordem a 32 px:** hoje → A → B → C — o atual preserva melhor a separação das partes; A mantém a chama mais contínua; B concentra o brilho; a crosta de C reduz a presença do topo, sobretudo no escuro.
+- **A B passa a 16 e a 32 px?** só com ajuste: a 32 px identifico a chama, mas a 16 px não confirmo leitura de circuito e `{}`; não declaro paridade com hoje. Remover halo no pequeno e testar detalhe simplificado com núcleo claro.
+- **O núcleo de rescaldo:** apoio como protótipo ≤32 px — `#FFB088` daria 7,74:1 no tile, contra pico 3,88:1 da 07 (dados da rodada); não equivale a aprovar a variante, ainda não mostrada, nem garante cada borda legível — confiança 90.
+- **O voto na decisão 2 (símbolo), agora:** B ajustada como candidata; hoje como controle e C como braço exploratório do teste, sem aprovar B original a 16 px. Incluir A na comparação pequena, pois minha inspeção a favoreceu — confiança 78.
+- **A confiança na fase 4, agora:** 79 (antes: 70); as folhas reduzem a incerteza de escala, mas expõem perda de contraste e não substituem teste de reconhecimento ou exportação nativa.
+
+<!-- fim-rodada-6 -->
+
+### Rodada 6b: a variante da B
+
+- **Vi as imagens:** sim — `folha-2-1x.png` e `folha-2-2x.png`; inspeção das duas folhas, sem teste de reconhecimento com pessoas.
+- **A melhor variante a 16 e 32 px:** B + rescaldo largo, sem halo — chega à leitura de hoje? **quase**: recupera separação interna, sobretudo a 32 px; a 16 px ainda não confirmo circuito e `{}`.
+- **A melhor a 64 px:** B + topo claro, sem halo; a ponta recupera presença e a geometria fica mais definida que com brilho difuso — julgamento visual, não tempo de reconhecimento medido.
+- **O voto final no símbolo:** B ajustada: rescaldo largo sem halo ≤32 px; topo claro sem halo a 64 px, com o traçado único. Liberar para teste com hoje como controle, sem declarar paridade comprovada — confiança 86.
+- **A confiança na fase 4, agora:** 86 (antes: 79); ajuste mostrado reduz a incerteza, mas faltam reconhecimento, exportação nativa e escalas intermediárias.
+<!-- fim-rodada-6b -->
+
+### Rodada 7: a confiança final
+
+- **Confiança no plano inteiro (v3):** 88 (na R5, sobre a v1: 77).
+- **O que mais pesou para subir ou descer:** auditor passa a medir estilos efetivos e falhar no CI; simulação não substitui pessoas, APCA tem atribuição correta e o símbolo pequeno ganhou controle e regra de saída.
+- **A decisão 6, a norma do rótulo da ação:** WCAG com rótulo escuro — confiança 95; 4,85:1 passa o portão; branco a 3,55:1 reprova. APCA segue alerta, e 16 px/peso 700 sozinho não comprova legibilidade.
+- **Algo ainda errado na v3:** portão 1 exige 100% de pares efetivos ≥4,5:1, mas o controle a 56% produz 4,01 e seria apenas registrado; explicitar se a faixa reprovada fica fora do aceite ou se será corrigida, para o portão não prometer e dispensar o mesmo requisito.
+
+<!-- fim-rodada-7 -->
 
 ## O que ficou
 

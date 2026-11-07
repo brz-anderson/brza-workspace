@@ -3,6 +3,8 @@ scope:
   - brza-studio
 tags:
   - design
+refs:
+  - PLN-007
 ---
 
 # Reunião Carvão em Brasa: a participação de Fole, a Estrategista de Marca
@@ -373,6 +375,97 @@ com as capturas do portão 2. Ela sai depois do portão 4, e não no dia em que 
 **Confiança na peça:** 72/100
 
 <!-- fim-rodada-4 -->
+
+### Rodada 5: revisão do plano
+
+#### A confiança no plano
+
+| Parte | Confiança (0–100) | Uma linha |
+| :---- | :---------------- | :-------- |
+| O plano inteiro | 74 | Sólido no contraste e no código; fraco no que é marca: a identidade só se testa no fim |
+| Tabela de tokens v2 | 80 | Medida duas vezes. O Lc 40,9 do rótulo na 07 é o ponto mais frágil |
+| Fases 0–3 (tokens, ações, movimento) | 78 | Token próprio, flag reativa e a regra de `main.css:1199-1210` desligada: bem amarrado ao código |
+| Fase 4 (símbolo) | 55 | A B é escolhida por continuidade, sem teste a 13, 16 e 32 px nem contra a C |
+| Fases 5–6 (portões, ativos) | 70 | Portões bons, mas o reconhecimento só se mede no portão 4, depois de 20 a 30 h gastas |
+| As medições de sucesso | 68 | "Brasa, fogo, carvão" mede a metáfora, não a marca: falta perguntar se reconhecem o BrzA |
+
+#### O erro do plano
+
+**O guia de voz ficou sem dono e sem critério.** A R10 diz "voz literal", mas as regras da minha peça não entram em
+nenhuma fase nem em nenhum portão. São três: nunca "queimar" tokens nem créditos; nenhum sinal chamado brasa; nenhuma
+metáfora em estado, erro, permissão ou cobrança. Sem um lint das strings do app (`queim`, `brasa`, `🔥`) no portão 1,
+a voz literal não se verifica. **A atribuição está certa:** a assinatura, os primitivos `--brz-*`, a escala 0/1/2 de 5
+e o núcleo do Dock aparecem com o dono certo.
+
+#### A mudança que mais subiria a sua confiança
+
+**Antecipar o teste de 5 s para a fase 0.** Ele roda com os mockups estáticos que já existem em `material/` e com a
+marca de hoje como controle, e a C entra como um braço. Custa cerca de 2 h e tira o maior risco de marca, a Claude,
+antes das 20 a 30 h de implementação. Hoje, um resultado de 2/5 no portão 4 chega quando nenhum matiz próximo resolve
+mais. **Eu subiria de 74 para 82.**
+
+#### O risco que o plano não vê
+
+**A vitrine apaga a marca.** Pela regra "a brasa só no que está vivo", toda captura em repouso (site, README, App Store,
+post) mostra um app cinza e genérico. O plano precisa de uma regra de captura: toda imagem pública mostra um turno vivo.
+
+#### O seu voto nas decisões de Anderson
+
+| Decisão | Opção | Confiança |
+| :------ | :---- | :-------- |
+| 1. Tray e Dock | O núcleo do ícone do Dock acende enquanto trabalha, sem piscar e atrás da flag; o tray em template | 60 |
+| 2. Símbolo | B, com a C como braço do teste de 5 s, antecipado para a fase 0 | 70 |
+| 3. Flag | Duas semanas no uso de Anderson | 75 |
+| 4. Fundo | `#1A1B1E` | 75 |
+| 5. Onde o plano mora | No workstream `brand`, ao lado do PLN-007: a arquitetura de marca das quatro filhas mora junta | 80 |
+
+<!-- fim-rodada-5 -->
+
+### Rodada 6: o símbolo em tamanho real
+
+- **Vi as imagens:** sim, as folhas em 1× e 2× (render do Chrome, não do `iconutil`).
+- **A ordem de leitura a 16 px:** hoje → B → A → C. Só a de hoje tem um topo claro (`#ffaa44`) que desenha a
+  silhueta. A B guarda um ponto mais quente no centro, a A e a C viram uma mancha vermelha, e a C quase some no tile
+  no Dock escuro.
+- **A ordem a 32 px:** hoje → B ≈ A → C. A A e a B são quase iguais, e a C fica a mais escura e a de borda mais
+  apagada. A 64 px a ordem se inverte em memorabilidade: a C é a mais distinta, mas também a mais apagada.
+- **A B passa a 16 e a 32 px?** Só com ajuste. Com o pico em 3,88:1 contra o tile, a leitura depende da borda.
+- **O núcleo de rescaldo:** apoio. O `#FFB088` (7,74:1) devolve o ponto claro que a silhueta perdeu. Na narrativa,
+  ele é o "calor por dentro" que eu queria da C, posto na forma da B: a história da C sem o preço dela no miúdo. Eu
+  levaria o núcleo a todos os tamanhos, e não só aos de 32 px ou menos, para não haver duas marcas — confiança 75
+- **O voto na decisão 2 (símbolo), agora:** B com o núcleo de rescaldo, como símbolo único. A C entra no teste de 5 s
+  só a 64 px, como braço de memorabilidade. Cedo as duas leituras: a folha mostra que a C não se sustenta a 32 px ou
+  menos — confiança 68
+- **A confiança na fase 4, agora:** 62 (antes: 55). Agora há evidência, e o ajuste é barato e mensurável. Falta ver
+  no `iconutil` e no tray real.
+
+<!-- fim-rodada-6 -->
+
+### Rodada 6b: a variante da B
+
+- **Vi as imagens:** sim, a folha-2 em 1× e 2×.
+- **A melhor variante a 16 e 32 px:** B + rescaldo largo, sem halo. O centro claro separa a chama do tile, e a 32 px o
+  circuito volta a aparecer. O topo claro vem logo atrás. Chega à leitura de hoje? **Quase**: a de hoje ainda tem mais
+  área clara.
+- **A melhor a 64 px:** B + rescaldo largo, sem halo, a que mostra o circuito e o `{}` com mais nitidez. A de topo
+  claro com halo é a mais quente, mas o halo borra o traço.
+- **O voto final no símbolo:** B + rescaldo largo, sem halo, como símbolo único em todos os tamanhos. É o "calor por
+  dentro" da narrativa, e não a volta à chama de hoje que o topo claro sugere — confiança 72
+- **A confiança na fase 4, agora:** 68
+
+<!-- fim-rodada-6b -->
+
+### Rodada 7: a confiança final
+
+- **Confiança no plano inteiro (v3):** 82 (na R5, sobre a v1: 74)
+- **O que mais pesou para subir ou descer:** o teste de 5 s foi para a fase 0, com a pergunta de atribuição do
+  símbolo isolado. O portão 1 passou a medir o par efetivo do app, e não o HEX de origem.
+- **A decisão 6, a norma do rótulo da ação:** WCAG com rótulo escuro. O branco reprova o portão 1, e "carvão sobre
+  brasa" já é a própria marca — confiança 75
+- **Algo ainda errado na v3:** a decisão 2 diz "A C saiu: só Fole a quer, a 64 px". Na 6b eu larguei a C e votei na B
+  com o rescaldo largo como símbolo único; ninguém mais quer a C.
+
+<!-- fim-rodada-7 -->
 
 ## O que ficou
 

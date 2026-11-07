@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39465, #39445, #38861, #38857 e #38120 corrigem vazamento de portas Mach no macOS, sobrecarga de ps, alto consumo de CPU/GPU em terminais e atlas WebGL.
+description: Os PRs #39465, #39445, #38861 e as issues #39579, #39405, #38120 corrigem travamento modal no macOS, vazamento de portas Mach, sobrecarga de ps e GPU WebGL.
 scope:
   - brza-studio
   - tooling
@@ -23,6 +23,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39465`](https://github.com
 [`stablyai/orca#38859`](https://github.com/stablyai/orca/pull/38859),
 [`stablyai/orca#38120`](https://github.com/stablyai/orca/pull/38120) (Issue
 [`stablyai/orca#38108`](https://github.com/stablyai/orca/issues/38108)), além das issues
+[`stablyai/orca#39579`](https://github.com/stablyai/orca/issues/39579),
 [`stablyai/orca#38150`](https://github.com/stablyai/orca/issues/38150) e
 [`stablyai/orca#38096`](https://github.com/stablyai/orca/issues/38096) (PR [`stablyai/orca#38098`](https://github.com/stablyai/orca/pull/38098)).
 
@@ -55,6 +56,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39465`](https://github.com
 8. **Invocação de subshells desnecessárias para comando `ps` no Resource Manager (`#39445`):**
    O monitor de recursos invocava um shell intermediário (`/bin/sh -c ps ...`) a cada ciclo de polling para inspecionar
    processos de terminais, gerando criação e destruição contínua de processos no host.
+9. **Travamento modal da thread principal no macOS por exceção não capturada (`#39579`):**
+   No macOS, uma exceção não capturada no processo principal (`Error: setTypeOfService EINVAL`, lançada pelo `undici` em
+   reconexões de socket ou alternâncias de rede/VPN) é exibida pelo Electron como um diálogo modal nativo `NSAlert`.
+   O loop de eventos é bloqueado em `-[NSAlert runModal]` indefinidamente, paralisando o runtime por completo:
+   `orca status` sofre timeout, conexões móveis e remotas ficam inacessíveis e comandos de quit são cancelados com erro `-128`,
+   permanecendo travado silenciosamente por dezenas de horas até a emissão manual de `kill -KILL`.
 
 ## O que o upstream propõe e implementa
 
@@ -90,3 +97,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39465`](https://github.com
   e `#38857` para o `brza-studio`, protegendo o consumo de CPU e GPU durante sessões simultâneas de chat e terminais de agentes.
 - Adotar o cache do snapshot de layout de teclado com invalidação TIS (`#39465`) para estancar vazamentos de portas Mach no macOS.
 - Utilizar a execução direta de `ps` sem shell intermediário no monitor de recursos (`#39445`).
+- Impedir que exceções não capturadas no processo principal abram diálogos modais bloqueantes (`NSAlert runModal`) no macOS,
+  tratando `setTypeOfService EINVAL` e implementando watchdog de autorrecuperação quando a thread principal travar (`#39579`).

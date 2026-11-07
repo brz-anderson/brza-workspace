@@ -1,9 +1,9 @@
 ---
 status: open
-description: Os PRs #39398, #39006, #39012, #38872, #38815, #38737 e as issues #39395, #38833 trazem detecção de tokens agy, chat no agy acp nativo, formulários OpenCode e Gemini Enterprise.
+description: Os PRs #39398, #39006, #33360 e as issues #39523, #39528, #39556, #39514 trazem correção de auth no macOS, isolamento de skills, launch de modelos e ACP do Gemini CLI.
 scope:
   - brza-studio
-priority: medium
+priority: high
 opened: 2026-11-03
 tags:
   - chat
@@ -35,6 +35,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39398`](https://github.com
 [`stablyai/orca#37532`](https://github.com/stablyai/orca/pull/37532),
 [`stablyai/orca#37494`](https://github.com/stablyai/orca/pull/37494) e
 [`stablyai/orca#37503`](https://github.com/stablyai/orca/pull/37503), além das issues
+[`stablyai/orca#39523`](https://github.com/stablyai/orca/issues/39523),
+[`stablyai/orca#39528`](https://github.com/stablyai/orca/issues/39528),
+[`stablyai/orca#39556`](https://github.com/stablyai/orca/issues/39556),
+[`stablyai/orca#39514`](https://github.com/stablyai/orca/issues/39514),
 [`stablyai/orca#38663`](https://github.com/stablyai/orca/issues/38663),
 [`stablyai/orca#38100`](https://github.com/stablyai/orca/issues/38100),
 [`stablyai/orca#38124`](https://github.com/stablyai/orca/issues/38124),
@@ -107,12 +111,36 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39398`](https://github.com
     - O validador `hasManagedAntigravityChatSignIn` procurava por nomes terminados em `oauth-token`, enquanto o servidor oficial
       empacotado grava `acp_token.json` e `acp_business_token.json`;
     - Sem a correção, o app considerava o usuário deslogado e podia migrar indevidamente novos chats para a conta do host do `agy`.
+21. **Descompasso de credenciais do Antigravity Chat no macOS (`#39523`):**
+    - No macOS, a autenticação em Settings -> Accounts grava `acp_token.json` sob `<userData>/antigravity-chat/antigravity-acp/`,
+      enquanto o servidor ACP gerenciado (`agy_acp_server`) usa `HybridCredentialStore` que lê exclusivamente o item do Keychain
+      `service=gemini, account=antigravity-acp` sem fallback para o arquivo de token;
+    - Como a chave no Keychain não existe, o servidor tenta login interativo no browser e é morto pelo timeout de ~6s do app,
+      falhando com `provider-open-failed` (código JSON-RPC `-32603`).
+22. **Isolamento de skills por redirecionamento de `GEMINI_HOME` (`#39528`):**
+    - Ao lançar o Antigravity ACP, o runtime define `GEMINI_HOME="<userData>/antigravity-chat"`. O servidor busca skills
+      exclusivamente em `antigravity-cli/skills` e `config/skills` dentro dessa pasta isolada;
+    - Skills instaladas globalmente pelo usuário ou via comando de instalação (em `~/.gemini/config/skills` e
+      `~/.gemini/antigravity-cli/skills`) ficam invisíveis nas sessões de Native Chat do Antigravity.
+23. **Conflito entre `--model` e `--effort` no lançamento do Antigravity via terminal (`#39556`):**
+    - Ao invocar um agente de terminal Antigravity passando tanto `--model` quanto `--effort`, o `agy` falha na resolução dos
+      identificadores (cujos IDs já codificam o esforço, ex.: `claude-sonnet-5-5-medium`) e executa silenciosamente Gemini 4 Argon
+      sem aviso ou erro.
+24. **Execução nativa de chats Gemini CLI sobre ACP (`#33360`, atendendo `#39514`):**
+    - Habilita sessões de chat nativo diretamente com a CLI Gemini via protocolo ACP, integrando ferramentas de inspeção,
+      aprovações estruturadas e streaming de respostas na interface do usuário.
 
 ## O que fazer
 
+- Implementar fallback no `HybridCredentialStore` para leitura de `acp_token.json` quando o item do Keychain não existir,
+  ou sincronizar o token no Keychain do macOS durante o sign-in no `brza-studio` (`#39523`).
+- Garantir symlink ou descoberta compartilhada das pastas globais de skills em `~/.gemini/` mesmo quando `GEMINI_HOME` for
+  redirecionado para o diretório de dados do usuário (`#39528`).
+- Ajustar a passagem de argumentos na CLI de lançamento de agentes para mapear ou omitir `--effort` redundante em modelos do
+  Antigravity cujos identificadores já contêm o sufixo de esforço (`#39556`).
 - Adotar o suporte a execução de Chat via `agy acp` nativo (`#39006`), eliminando a necessidade de gerenciar o runtime avulso
   `.par` e permitindo continuidade perfeita de histórico com a CLI Antigravity.
 - Incorporar a detecção correta dos arquivos `acp_token.json` e `acp_business_token.json` para o runtime do Antigravity Chat (`#39398`).
 - Implementar a recuperação de autenticação com atalho "Sign in" em chats nativos (`#39012`).
 - Adotar o suporte a formulários interativos OpenCode (`#38872`) e a preservação de modelos ao restaurar sessões ACP (`#38815`).
-- Adotar o suporte a Gemini Enterprise no Antigravity Chat (`#38737`) no `brza-studio`.
+- Adotar o suporte a Gemini Enterprise no Antigravity Chat (`#38737`) e chats Gemini CLI sobre ACP (`#33360`).

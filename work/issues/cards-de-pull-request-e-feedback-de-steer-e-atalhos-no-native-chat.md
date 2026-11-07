@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39050, #39141, #38877, #38848, #38892 e #38879 trazem auto-shrink de imagens coladas, limpeza de cards /model do picker, cartões de PR e atalhos de envio no Native Chat.
+description: Os PRs #39287, #39309, #39369, #39050, #39141 trazem retenção de cards de aprovação, menções #N seguras, auto-shrink de imagens e atalhos no Native Chat.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,10 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39050`](https://github.com/stablyai/orca/pull/39050) (Issue [`#37855`](https://github.com/stablyai/orca/issues/37855)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39287`](https://github.com/stablyai/orca/pull/39287) (Issue [`#39286`](https://github.com/stablyai/orca/issues/39286)),
+[`stablyai/orca#39309`](https://github.com/stablyai/orca/pull/39309),
+[`stablyai/orca#39369`](https://github.com/stablyai/orca/pull/39369),
+[`stablyai/orca#39050`](https://github.com/stablyai/orca/pull/39050) (Issue [`#37855`](https://github.com/stablyai/orca/issues/37855)),
 [`stablyai/orca#39141`](https://github.com/stablyai/orca/pull/39141),
 [`stablyai/orca#38877`](https://github.com/stablyai/orca/pull/38877),
 [`stablyai/orca#38848`](https://github.com/stablyai/orca/pull/38848),
@@ -67,9 +70,28 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39050`](https://github.com
     O composer interceptava teclas de navegação e atalhos de workspace.
 13. **Renderização excessivamente pesada de texto em negrito no Chat UI (`#39060`):**
     Fontes bold renderizavam com peso de traço desproporcional sob certos temas.
+14. **Desaparecimento do cartão interativo de permissão (*approval card*) do Claude (`#39287`, `#39286`):**
+    Quando o Claude publica uma solicitação de permissão (`PermissionRequest` com `interactivePrompt`) e logo em seguida
+    atualiza o título do terminal para o estado de permissão, a mudança de título invalidava o registro do gancho e reconstruía
+    o status a partir do título cru. Isso mantinha o status como bloqueado ("Awaiting user input"), mas descartava `interactivePrompt`,
+    `toolName` e `toolInput`, deixando o usuário sem nenhum cartão com botões Allow/Deny para responder.
+15. **Conversão espúria de `#N` em cartões quando uma mensagem cita outro repositório (`#39309`):**
+    Com a extensão de cartões para múltiplos repositórios remotos, referências simples a `#N` no texto passavam a ser
+    interpretadas incorretamente como links para o repositório externo mencionado na mensagem, em vez de ficarem como texto plano.
+16. **Poluição visual da barra lateral de mensagens durante leitura (`#39369`):**
+    Os controles e trilhos de ação de mensagem (*message rail*) ficavam constantemente visíveis com opacidade cheia,
+    distraindo a leitura de código e respostas longas no chat.
 
 ## O que o upstream implementa
 
+- **Preservação de campos de prompt em títulos de permissão do Claude (`#39287`):**
+  - Mantém `interactivePrompt`, `toolName` e `toolInput` (`withWaitPrompt`) mesmo após atualizações de título do PTY que
+    confirmam a espera do hook, garantindo que o cartão de aprovação (Allow/Deny) continue sempre visível e funcional.
+- **Tratamento estrito de referências `#N` em mensagens (`#39309`):**
+  - Garante que menções `#N` isoladas permaneçam como texto comum caso façam referência a contextos de outros repositórios
+    sem URI explícita, evitando associações indevidas.
+- **Esmaecimento sutil da message rail no Chat UI (`#39369`):**
+  - Reduz a opacidade da barra de ações de mensagem até que o usuário passe o mouse (hover), foque ou role o chat.
 - **Redimensionamento automático de imagens coladas (*auto-shrink*) (`#39050`):**
   - Implementa `encodeClipboardImageWithinLimit`: se a imagem recodificada em PNG ultrapassar os tetos de bytes ou resolução,
     aplica um ciclo de redução proporcional suave até que caiba perfeitamente no limite permitido, garantindo colagem fluida.
@@ -99,5 +121,6 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39050`](https://github.com
 ## O que fazer
 
 - Incorporar o auto-shrink de imagens coladas (`#39050`) e a limpeza de cartões de modelo redundantes (`#39141`) no `brza-studio`.
+- Adotar a preservação contínua de cartões de aprovação de permissões do Claude (`#39287`).
 - Incorporar os cartões ricos de PR (`#38750`, `#38892`) e as melhorias de teclado de Steer/Queue (`#38749`, `#38877`, `#38848`).
 - Adotar as otimizações de streaming incremental de texto com genéricos (`#38879`) e despacho isolado de status (`#38883`).

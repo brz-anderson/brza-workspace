@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39006, #39012, #38872, #38815, #38737 e as issues #38833, #38606 trazem chat no agy acp nativo, recuperação de login em chat, formulários OpenCode e Gemini Enterprise.
+description: Os PRs #39398, #39006, #39012, #38872, #38815, #38737 e as issues #39395, #38833 trazem detecção de tokens agy, chat no agy acp nativo, formulários OpenCode e Gemini Enterprise.
 scope:
   - brza-studio
 priority: medium
@@ -12,7 +12,8 @@ tags:
 
 # Melhorias de Native Chat, ACP do Gemini CLI, abas e diff no upstream
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39006`](https://github.com/stablyai/orca/pull/39006) (atendendo à Issue [`#38833`](https://github.com/stablyai/orca/issues/38833)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39398`](https://github.com/stablyai/orca/pull/39398) (Issue [`#39395`](https://github.com/stablyai/orca/issues/39395)),
+[`stablyai/orca#39006`](https://github.com/stablyai/orca/pull/39006) (atendendo à Issue [`#38833`](https://github.com/stablyai/orca/issues/38833)),
 [`stablyai/orca#39012`](https://github.com/stablyai/orca/pull/39012),
 [`stablyai/orca#38976`](https://github.com/stablyai/orca/pull/38976) (Issue [`#38975`](https://github.com/stablyai/orca/issues/38975)),
 [`stablyai/orca#38997`](https://github.com/stablyai/orca/pull/38997),
@@ -102,11 +103,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39006`](https://github.com
     - Incorpora abas de Native Chat no ciclo de navegação `Ctrl+PageUp` / `Ctrl+PageDown`.
 19. **Cache persistente de imagens em chats nativos (`#37932`):**
     - Retém imagens renderizadas em memória de cache durante rolagens longas de histórico ou alternâncias entre workspaces.
+20. **Detecção correta de login no Antigravity Chat por arquivos de token do servidor (`#39398`, resolve `#39395`):**
+    - O validador `hasManagedAntigravityChatSignIn` procurava por nomes terminados em `oauth-token`, enquanto o servidor oficial
+      empacotado grava `acp_token.json` e `acp_business_token.json`;
+    - Sem a correção, o app considerava o usuário deslogado e podia migrar indevidamente novos chats para a conta do host do `agy`.
 
 ## O que fazer
 
 - Adotar o suporte a execução de Chat via `agy acp` nativo (`#39006`), eliminando a necessidade de gerenciar o runtime avulso
   `.par` e permitindo continuidade perfeita de histórico com a CLI Antigravity.
+- Incorporar a detecção correta dos arquivos `acp_token.json` e `acp_business_token.json` para o runtime do Antigravity Chat (`#39398`).
 - Implementar a recuperação de autenticação com atalho "Sign in" em chats nativos (`#39012`).
 - Adotar o suporte a formulários interativos OpenCode (`#38872`) e a preservação de modelos ao restaurar sessões ACP (`#38815`).
 - Adotar o suporte a Gemini Enterprise no Antigravity Chat (`#38737`) no `brza-studio`.

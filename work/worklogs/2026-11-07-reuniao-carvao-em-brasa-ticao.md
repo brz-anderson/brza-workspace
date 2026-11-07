@@ -334,6 +334,94 @@ de cor. Os quatro valores saem do mesmo `brand.tokens.json` do app e do workspac
 
 <!-- fim-rodada-4 -->
 
+### Rodada 5: revisão do plano
+
+#### A confiança no plano
+
+| Parte | Confiança (0–100) | Uma linha |
+| :---- | :---------------- | :-------- |
+| O plano inteiro | 76 | É a menor mudança que entrega o objetivo: traçado intacto, cor por token, tudo reversível até a fase 6 |
+| Tabela de tokens v2 | 74 | Medida em 182 pares; o placeholder igual ao secundário e o erro claro `#6E3C5A` "a testar" ainda pesam |
+| Fases 0–3 (tokens, ações, movimento) | 78 | Variante `brand` sem tocar o `default` e flag reativa: é o caminho de volta que um guardião quer |
+| Fase 4 (símbolo) | 66 | A B segue sem o teste a 13/16/32 px, e a fase cita só o texto dos lockups, não os tiles |
+| Fases 5–6 (portões, ativos) | 70 | Os portões vêm antes da fase 6, a única irreversível; falta a regra do CLI em 16 cores |
+| As medições de sucesso | 68 | Honestas ao chamar cinco pessoas de sinal; ainda dependem da base da fase 0, que não existe |
+
+#### O erro do plano
+
+Três omissões da minha peça da rodada 4: as oito regras de uso da brasa viraram só "uma brasa por região" (sumiu
+"ação destrutiva não usa a 07"); a fase 4 não troca os tiles (`#373A41` → `#19161D` para 02 → 01; claro `#F6F6F8`
+para `#F6F1EC`); e a decisão 1 omite que o tray já tem um estado de atenção âmbar (`system-tray.ts:64-93`).
+
+#### A mudança que mais subiria a sua confiança
+
+Gravar as oito regras e a tabela por tamanho no `resources/brand/README.md` como entrega da fase 4, e conferi-las no
+portão 2. Sem regra escrita, a marca deriva no primeiro PR de outra frente. **Plano inteiro: 76 → 82.**
+
+#### O risco que o plano não vê
+
+As fases 1 e 2 editam arquivos do upstream (`main.css`, `ui/button.tsx`, a segunda camada de tema); com o radar do
+upstream a cada 6 h, cada sync pode abrir conflito na marca. Remédio: uma camada própria, `brza-brand.css`, importada
+depois. Suposição: o radar vira merge do upstream.
+
+#### O seu voto nas decisões de Anderson
+
+| Decisão | Opção | Confiança |
+| :------ | :---- | :-------- |
+| 1. Tray e Dock | Adiar. Viro do "só o tray": ele já tem um estado âmbar de atenção, e um segundo estado colorido competiria com ele | 70 |
+| 2. Símbolo | B, com a C como braço do teste de 5 s: toda ruptura tem de provar o ganho, e o teste ou fecha a questão ou mostra que a C ganha | 72 |
+| 3. Flag | Duas semanas no uso de Anderson | 80 |
+| 4. Fundo | `#1A1B1E` | 82 |
+| 5. Onde o plano mora | No workstream `brand`, ao lado do PLN-007 que ele recolore | 85 |
+
+<!-- fim-rodada-5 -->
+
+### Rodada 6: o símbolo em tamanho real
+
+- **Vi as imagens:** sim, `folha-1x.png` e `folha-2x.png`.
+- **A ordem de leitura a 16 px:** hoje > A ≈ B > C. Só a de hoje mostra forma; o topo âmbar (6,01:1 no tile) recorta
+  a chama, e A, B e C viram um ponto vermelho escuro. A C é o mais apagado.
+- **A ordem a 32 px:** hoje > A > B > C. A de hoje mostra o circuito e o `{}`; a base acesa da A segura a silhueta;
+  na B o núcleo some no miolo; a crosta da C come a chama.
+- **A B passa a 16 e a 32 px?** Não a 16, e a 32 só com ajuste. O pico de 3,88:1 da 07 no tile não recorta a forma; o
+  que os separa é a luz que a brasa tirou.
+- **O núcleo de rescaldo:** apoio, e estender até 64 px. Não é cor nova: é o `#FFB088` do código em linha, e devolve a
+  chama clara do PLN-007 (7,74:1 no tile) — confiança 74.
+- **O voto na decisão 2 (símbolo), agora:** B com o núcleo de rescaldo, e a C sai do teste, porque a folha já a mostra
+  a pior em 16 e 32 px. Regra de guardião: se a B com rescaldo não ler como a de hoje numa nova folha a 16 e 32 px, o
+  símbolo de hoje fica, e a brasa muda só a interface — confiança 72.
+- **A confiança na fase 4, agora:** 62 (antes: 66). A evidência mostra que a brasa piora o ícone pequeno, mas o
+  remédio é barato e se mede.
+
+<!-- fim-rodada-6 -->
+
+### Rodada 6b: a variante da B
+
+- **Vi as imagens:** sim, `folha-2-1x.png` e `folha-2-2x.png`.
+- **A melhor variante a 16 e 32 px:** empate entre a B + rescaldo largo e a B + topo claro, as duas sem halo. A 32 px,
+  o circuito e o `{}` voltam; a 16 px a chama ganha forma, mas não o recorte âmbar de hoje — **quase**.
+- **A melhor a 64 px:** a B + rescaldo largo, sem halo, que mostra o circuito mais limpo. O halo turva as duas.
+- **O voto final no símbolo:** B + topo claro, sem halo. No pequeno, lê como o rescaldo; e mantém a direção do degradê
+  do PLN-007, com o claro em cima, de modo que só muda a temperatura. Fica a regra: sem halo abaixo de 128 px —
+  confiança 74.
+- **A confiança na fase 4, agora:** 70.
+
+<!-- fim-rodada-6b -->
+
+### Rodada 7: a confiança final
+
+- **Confiança no plano inteiro (v3):** 80 (na R5, sobre a v1: 76)
+- **O que mais pesou para subir ou descer:** os portões agora medem o par renderizado, com o auditor que lê o app e
+  sai com erro e os semânticos pelo objeto inline; e o símbolo ganhou uma regra de saída. Para baixo pesa só o "quase"
+  a 16 px.
+- **A decisão 6, a norma do rótulo da ação:** WCAG com rótulo escuro (4,85, com o peso ≥ 600 que o plano já pede);
+  o branco reprova o portão 1 — confiança 82
+- **Algo ainda errado na v3:** a regra de saída da R7 diz "o símbolo de hoje fica no pequeno". A minha diz que o de
+  hoje fica *inteiro* e que a brasa muda só a interface; manter o de hoje só no pequeno cria as duas leituras que a
+  sala recusou na C.
+
+<!-- fim-rodada-7 -->
+
 ## O que ficou
 
 ## Fora do workspace

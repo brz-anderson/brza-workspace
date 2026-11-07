@@ -228,6 +228,71 @@ O canvas `#171615` eu votei contra na P1; repetir aqui é teimosia, o teste de n
 
 <!-- fim-rodada-4 -->
 
+### Rodada 5: revisão do plano
+
+#### A confiança no plano
+
+| Parte | Confiança (0–100) | Uma linha |
+| :---- | :---------------- | :-------- |
+| O plano inteiro | 64 | Portões e `--action-brand` estão sólidos. O plano entrega o símbolo menos memorável e chama isso de continuidade. |
+| Tabela de tokens v2 | 76 | Rosa `#FF7AA2`, limão e `#FFB088` fecham. Lc 40,9 no rótulo da 07 e o placeholder igual ao secundário seguram a nota. |
+| Fases 0–3 (tokens, ações, movimento) | 82 | Variante `brand`, Enviar por disponibilidade, 06 nos painéis parados, teste de brasa presa. É aqui que o plano acerta. |
+| Fase 4 (símbolo) | 40 | Gera só o B, antes do teste. Índice 55, evidência suposta. A C não está no gerador, então não pode ganhar. |
+| Fases 5–6 (portões, ativos) | 58 | Portões 1 e 2 filtram de verdade. Duas semanas num uso só, e o empacotamento da fase 6 não volta atrás. |
+| As medições de sucesso | 52 | Contraste de 100% eu assino. "Calor" em 4/5 a marca de hoje já passa. Cinco pessoas não separam o B de uma chama genérica. |
+
+#### O erro do plano
+
+A R1 ainda diz "4,85 contra 4,89: ganho nulo". Esse par é o `#1C1A19`. O `#171615`, que Fogareiro e eu defendemos, foi medido a 5,09:1 sob a 07, e esse número não entrou. Também sumiu a quarta região: o cartão de aprovação. Allow e Enviar podem dividir a mesma brasa.
+
+#### A mudança que mais subiria a sua confiança
+
+A fase 4 gera B e C. O portão 4 escolhe às cegas "qual é a BrzA", contra a chama de hoje, e não pela palavra brasa ou calor. A confiança no plano inteiro sobe de 64 para 78.
+
+#### O risco que o plano não vê
+
+A tabela v2 deixa o ícone ativo na 06 o tempo todo. O anel de contexto, laranja aos 62% no artboard 7, é brasa permanente no composer, e a cota "uma por região" não o conta. O lint passa com a cota já estourada.
+
+#### O seu voto nas decisões de Anderson
+
+| Decisão | Opção | Confiança |
+| :------ | :---- | :-------- |
+| 1. Tray e Dock | Núcleo do Dock acende com o turno; o tray fica template, sem ponto | 74 |
+| 2. Símbolo | B com a C no teste de 5 s, em pé de igualdade | 70 |
+| 3. Flag | Um dia de cinza e a brasa vira padrão | 66 |
+| 4. Fundo | `#171615` | 78 |
+| 5. Onde o plano mora | No workstream `brand`, junto do PLN-007. No playground isto vira protótipo | 72 |
+<!-- fim-rodada-5 -->
+
+### Rodada 6: o símbolo em tamanho real
+
+- **Vi as imagens:** sim, `folha-1x.png` e `folha-2x.png`, no Dock `#1A1B1E` e no papel `#F6F1EC`.
+- **A ordem de leitura a 16 px:** Hoje → B → A → C. O pico de hoje chega a 142; B fica em 97, A em 96, C em 94. Medi a luminância dos pixels quentes na folha 1×, no papel; o Dock repete a ordem.
+- **A ordem a 32 px:** Hoje → B → A → C. O núcleo do B é o pico mais alto dos três novos (111); a massa da C é a mais escura (média 68).
+- **A B passa a 16 e a 32 px?** só com ajuste. Sem núcleo claro ela perde de hoje nos dois: a 16 px o pico dela é 97 contra 142.
+- **O núcleo de rescaldo:** apoio. `#FFB088` no miúdo devolve o contraste que a 07 perdeu, 7,74:1 contra 3,88:1 no tile. Confiança 82.
+- **O voto na decisão 2 (símbolo), agora:** B, com esse núcleo até 32 px. A C sai da disputa em pé de igualdade: é a mais escura a 16, 32 e 64. Confiança 76.
+- **A confiança na fase 4, agora:** 48 (antes: 40). O B agora tem folha. O chapado na 07, que a fase 4 ainda gera, não passou.
+
+<!-- fim-rodada-6 -->
+
+### Rodada 6b: a variante da B
+
+- **Vi as imagens:** sim, `folha-2-1x.png` e `folha-2-2x.png`.
+- **A melhor variante a 16 e 32 px:** B + rescaldo largo, sem halo — quase. O pico empata o de hoje a 16 (142 nos dois temas); a 32 fica em 161 contra 166. A massa continua mais escura.
+- **A melhor a 64 px:** B + topo claro, sem halo. A ponta chega no pico de hoje (225); o halo cai para 207.
+- **O voto final no símbolo:** rescaldo largo, sem halo, em todos os tamanhos. O 16 px decide, e o topo claro cai para 125 aí. Confiança 80.
+- **A confiança na fase 4, agora:** 72
+<!-- fim-rodada-6b -->
+
+### Rodada 7: a confiança final
+
+- **Confiança no plano inteiro (v3):** 81 (na R5, sobre a v1: 64)
+- **O que mais pesou para subir ou descer:** O símbolo passou a ser o rescaldo que empata o pico a 16 px, com regra de saída, e o portão 1 mede o par efetivo.
+- **A decisão 6, a norma do rótulo da ação:** rótulo de 16 px, peso 700 — confiança 68
+- **Algo ainda errado na v3:** Os picos de 64 px no Dock (177, 98, 171, 189) são o recorte desalinhado; no papel os quatro batem ~225 e só o halo cai a 207.
+<!-- fim-rodada-7 -->
+
 ## O que ficou
 
 ## Fora do workspace

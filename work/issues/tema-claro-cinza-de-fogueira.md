@@ -15,8 +15,8 @@ Levantado na [Reunião Carvão em Brasa: a coordenação e a proposta de plano](
 
 ## O pedido
 
-- Papel `#F6F1EC`, texto `#1A1B1E` (15,3:1), secundário `#5C5650` (6,45), placeholder `#625C56`, brasa de texto na 05
-  `#A83E15` (5,56). A 07 só como preenchimento com rótulo escuro, ou ícone (3,16:1 no papel).
+- Papel `#F6F1EC`, texto `#1A1B1E` (15,3:1), secundário `#5C5650` (6,45), placeholder `#625C56`, brasa de texto `#9A3812`
+  (6,35 no papel; a 05 `#A83E15` dava 4,30 no fundo `#d5d6db` do Tokyo Night Light, do catálogo — revisor independente). A 07 só como preenchimento com rótulo escuro, ou ícone (3,16:1 no papel).
 - Link `#005EA8` sublinhado; código em linha neutro; chama sem foco `#625C56`.
 - **O aviso não usa texto ocre:** o ocre legível colide com a 05 em deuteranopia (ΔE 2,2–3,6). Texto e ícone neutros,
   fundo tingido.

@@ -3,6 +3,8 @@ scope:
   - brza-studio
 tags:
   - design
+refs:
+  - PLN-007
 ---
 
 # Reunião Carvão em Brasa: a participação de Fogareiro, o Advogado do Usuário
@@ -218,6 +220,74 @@ Ficaram de fora sensores biométricos de eye-tracking e EEG, inviáveis para o c
 **Confiança na peça:** 95/100
 
 <!-- fim-rodada-4 -->
+
+### Rodada 5: revisão do plano
+
+#### A confiança no plano
+
+| Parte | Confiança (0–100) | Uma linha |
+| :---- | :---------------- | :-------- |
+| O plano inteiro | 88 | Estrutura ergonômica sólida, pautada em dados objetivos de contraste e usabilidade. |
+| Tabela de tokens v2 | 92 | Excelente refino de acessibilidade corrigindo foco, divisórias e sinais no daltonismo. |
+| Fases 0–3 (tokens, ações, movimento) | 90 | Sequenciamento seguro e reversível, protegendo o composer de distrações permanentes. |
+| Fase 4 (símbolo) | 80 | Símbolo B é estável, mas legibilidade em 13/16 px ainda exige verificação renderizada. |
+| Fases 5–6 (portões, ativos) | 92 | CI com escala de cinza e auditoria automática garante que a entrega não quebre a visão. |
+| As medições de sucesso | 86 | Boas metas, mas flexibilizar o recrutamento de daltônicos afrouxa a proteção real. |
+
+#### O erro do plano
+
+A coordenação rebaixou o teste com daltônicos reais para opcional ("simulação substitui recrutamento quando não houver quem recrutar"), enfraquecendo a garantia de validação com humanos reais.
+
+#### A mudança que mais subiria a sua confiança
+
+Tornar obrigatória a validação com ao menos 1 desenvolvedor deuteranope real no portão 4 (a confiança no plano subiria para 94/100), pois simuladores matemáticos não medem fadiga perceptual contínua.
+
+#### O risco que o plano não vê
+
+O plano assume que peso `font-weight: 600` compensa o APCA baixo (Lc 40,9) do rótulo escuro na 07, mas em monitores antirreflexo ou com brilho noturno reduzido, o texto escuro pode sofrer perda severa de legibilidade foveal.
+
+#### O seu voto nas decisões de Anderson
+
+| Decisão | Opção | Confiança |
+| :------ | :---- | :-------- |
+| 1. Tray e Dock | Só o tray com template monocromático e ponto estático de atividade | 90 |
+| 2. Símbolo | B como único (evita dispersar o reconhecimento da marca em duas silhuetas) | 90 |
+| 3. Flag | Duas semanas no uso real de Anderson antes de tornar padrão | 95 |
+| 4. Fundo | `#1A1B1E` aprovado, com veto estrito a gradientes frios decorativos | 85 |
+| 5. Onde o plano mora | No workstream `brand`, junto ao PLN-007 para preservar a história da marca | 95 |
+
+<!-- fim-rodada-5 -->
+
+### Rodada 6: o símbolo em tamanho real
+
+- **Vi as imagens:** sim (inspecionei `folha-1x.png`, `folha-2x.png` e os SVGs renderizados no Dock e no claro).
+- **A ordem de leitura a 16 px** (melhor → pior, entre hoje, A, B e C): Hoje > B > A > C — Hoje vence pelo topo âmbar (#FFAA44 a 6:1), B mantém miolo aceso, A perde as pontas e C vira mancha sem contraste.
+- **A ordem a 32 px:** Hoje > B > C > A — A 32 px a B ganha contorno e corpo térmico claro; C começa a ler como crosta, enquanto A parece lâmpada fosca.
+- **A B passa a 16 e a 32 px?** só com ajuste: a 32 px passa bem; a 16 px precisa do núcleo de rescaldo clareado e remoção do halo para não sumir no tile escuro (3,88:1 é arriscado para ícone minúsculo).
+- **O núcleo de rescaldo:** no miúdo (≤ 32 px), a chama ganha um núcleo `#FFB088` para recuperar o contraste perdido — apoio (entrega 7,74:1 contra o tile e devolve a acuidade visual ao usuário cansado) — confiança 95
+- **O voto na decisão 2 (símbolo), agora:** B único, com núcleo de rescaldo `#FFB088` para tamanhos ≤ 32 px e versão estritamente sólida — confiança 90
+- **A confiança na fase 4, agora:** 88 (antes: 80)
+
+<!-- fim-rodada-6 -->
+
+### Rodada 6b: a variante da B
+
+- **Vi as imagens:** sim (inspecionei `folha-2-1x.png`, `folha-2-2x.png` e os SVGs das novas variantes no escuro e no claro).
+- **A melhor variante a 16 e 32 px:** B + topo claro, sem halo (`BT-sem-halo`) — chega à leitura de hoje? quase (o rescaldo `#FFB088` no topo devolve o contraste de 7,7:1 e a silhueta nítida contra o tile escuro).
+- **A melhor a 64 px:** B + topo claro, com halo (`BT`) no dock/ícone ampliado, onde o calor tem espaço para respirar.
+- **O voto final no símbolo:** B com topo claro (`BT`), sem halo em ≤ 32 px e com halo em 64 px — confiança 95
+- **A confiança na fase 4, agora:** 95 (o rescaldo no topo eliminou em definitivo o risco de perda visual em telas pequenas).
+
+<!-- fim-rodada-6b -->
+
+### Rodada 7: a confiança final
+
+- **Confiança no plano inteiro (v3):** 94 (na R5, sobre a v1: 88)
+- **O que mais pesou para subir ou descer:** Subiu com o cálculo dos mixes reais do chat, a exigência de um deuteranope humano no portão 4 e o topo de rescaldo no símbolo.
+- **A decisão 6, a norma do rótulo da ação:** WCAG com rótulo escuro (com peso 600/700 para segurança perceptual) — confiança 95
+- **Algo ainda errado na v3:** nada
+
+<!-- fim-rodada-7 -->
 
 ## O que ficou
 

@@ -28,7 +28,11 @@ só o CSS não vence a declaração inline (Lenha).
   Faísca), conferida renderizando as oito cenas — o lint confere o uso do token, não a cota.
 - **Rótulo sempre `#1A1B1E`:** branco sobre a 07 dá 3,55:1. O APCA do rótulo dá Lc 40,9: peso ≥ 600 e conferência no
   render.
-- Desligar a regra de `main.css:1199-1210`, que força o degradê e o branco no Enviar em foco.
+- Condicionar à flag a regra de `main.css:1207-1211`, que pinta o Enviar com o degradê e o branco em foco; a borda do
+  composer em foco (`:1199-1205`) fica.
+- **Os semânticos entram pela composição do objeto inline** (`native-chat-appearance-style.ts:88-90`): uma folha de
+  estilo não vence o estilo inline que a segunda camada põe na raiz, e o BrzA Dark também passa pelo ramo de catálogo
+  (revisor independente).
 
 ## O que a reunião levantou
 

@@ -35,6 +35,15 @@ Decidir se o fluxo vira skill (por exemplo, `meeting-runner`) e corrigir o que a
   folha de contato do símbolo saiu do Chrome headless (`--headless=new --force-device-scale-factor=1|2 --screenshot`).
 - **A evidência renderizada destravou o assunto mais fraco:** o símbolo foi de 64,5 a 79,7 de confiança com duas
   rodadas curtas sobre uma folha de contato — vale como passo padrão do fluxo quando a disputa é visual.
+- **O `brza sessions` não repassa `--model` nem `--effort`** ao `brza agent launch`, que os aceita; a contraprova usou
+  um lançador no scratch que importa a biblioteca do `brza sessions` e registra o nome no mesmo mapa. Falta a opção no
+  próprio `brza sessions`, e um jeito de trocar o modelo de um chat aberto.
+- **O chat do Antigravity recusa modelo explícito:** `gemini-4-argon[-high]`, `gpt-oss-120b`, `gemini-3.8-flash[-low]`
+  voltaram "not available for the current authentication method", embora o `agy models` os liste.
+- **A posição é da persona; a confiança, a extensão e a latência são do modelo.** A contraprova (as mesmas personas em
+  outros modelos, contexto limpo) repetiu as posições; o Fogareiro caiu de 89 para 67 de confiança ao sair do Gemini
+  3.8 Flash (High) para o Haiku 5.5 `low`; a Faísca no Grok Fast `low` foi nove vezes mais rápida sem perder ousadia.
+  O fluxo deve escolher o modelo pelo papel, e medir a confiança com sessões que não escreveram o plano.
 - **O revisor independente ficou 12 pontos abaixo da sala** (74 contra 85,8 na v3) e achou o que as seis personas não
   acharam (os mixes do chat, o estilo inline, os portões que não se mediam): vale como etapa fixa antes do aceite.
 

@@ -1,10 +1,10 @@
 ---
 status: open
-description: Os PRs #39100, #39080, #39081, #38588 e as issues #38617, #39086 trazem timestamps de workspaces para plugins, ocultação de projetos vazios e ações na sidebar.
+description: Os PRs #39542, #39538, #39532, #39588, #39582, #39100 e as issues #39541, #39584 trazem cabeçalho compacto, indentação por host e filtros de sidebar.
 scope:
   - brza-studio
   - workspace
-priority: medium
+priority: high
 opened: 2026-11-03
 tags:
   - design
@@ -13,7 +13,13 @@ tags:
 
 # Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39100`](https://github.com/stablyai/orca/pull/39100) (resolve Issue [`#38617`](https://github.com/stablyai/orca/issues/38617)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39542`](https://github.com/stablyai/orca/pull/39542) (resolve Issue [`#39541`](https://github.com/stablyai/orca/issues/39541)),
+[`stablyai/orca#39538`](https://github.com/stablyai/orca/pull/39538) (Issue [`#39537`](https://github.com/stablyai/orca/issues/39537)),
+[`stablyai/orca#39532`](https://github.com/stablyai/orca/pull/39532) (resolve Issue [`#39531`](https://github.com/stablyai/orca/issues/39531)),
+[`stablyai/orca#39588`](https://github.com/stablyai/orca/pull/39588) (resolve Issue [`#39584`](https://github.com/stablyai/orca/issues/39584)),
+[`stablyai/orca#39582`](https://github.com/stablyai/orca/pull/39582) (resolve Issue [`#39573`](https://github.com/stablyai/orca/issues/39573)),
+[`stablyai/orca#39559`](https://github.com/stablyai/orca/pull/39559) (resolve Issue [`#39549`](https://github.com/stablyai/orca/issues/39549)),
+[`stablyai/orca#39100`](https://github.com/stablyai/orca/pull/39100) (resolve Issue [`#38617`](https://github.com/stablyai/orca/issues/38617)),
 [`stablyai/orca#39080`](https://github.com/stablyai/orca/pull/39080),
 [`stablyai/orca#39081`](https://github.com/stablyai/orca/pull/39081),
 [`stablyai/orca#38588`](https://github.com/stablyai/orca/pull/38588) (Issue [`#38586`](https://github.com/stablyai/orca/issues/38586)),
@@ -106,9 +112,27 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39100`](https://github.com
     - Subcomando `orca project-group create` e menu de contexto.
 21. **Criação de folder workspaces via CLI (`#38112`):**
     - Proposta para `orca workspace create --folder <path>`.
+22. **Cabeçalho compacto opcional em cartões de workspace (`#39542`, resolve `#39541`):**
+    - Introduz o preset de layout "Compact header" em Workspace options -> Card layout. Condensa o nome do branch, contagem/disclosure
+      de agentes e ação direta de trabalho vinculado em uma única linha de título, economizando 66px verticais por cartão.
+23. **Indentação de linhas sob seções de host remoto (`#39538`, `#39537`):**
+    - Indenta visualmente os cartões de workspace pertencentes a hosts remotos ou pareados sob suas respectivas seções de host,
+      melhorando a hierarquia visual na barra lateral.
+24. **Preservação de grupos colapsados sob a seção de host correta (`#39532`, resolve `#39531`):**
+    - Corrige bug de ordenação visual onde grupos de projetos colapsados saltavam para o topo da lista acima das seções de host.
+25. **Desduplicação de projetos compartilhados nos filtros da barra lateral (`#39588`, resolve `#39584`):**
+    - Evita que um projeto compartilhado entre múltiplos hosts apareça duplicado na lista de filtros da barra lateral,
+      agrupando checkouts por projeto e omitindo entradas redundantes.
+26. **Exibição contínua de status de PR em cartões de workspaces adormecidos (`#39582`, `#39583`, resolve `#39573`):**
+    - Mantém o badge e indicador de status do Pull Request visíveis mesmo quando o workspace está em repouso (*sleeping*).
+27. **Atenuação visual de contadores de referências vinculadas (`#39559`, resolve `#39549`):**
+    - Reduz o tamanho e brilho excessivo dos contadores de referências e tarefas vinculadas nos cartões de workspace.
 
 ## O que fazer
 
+- Adotar o layout opcional "Compact header" nos cartões de workspace (`#39542`), reduzindo a rolagem vertical na sidebar.
+- Incorporar as correções de indentação por host (`#39538`) e ordenação de grupos colapsados (`#39532`).
+- Aplicar a desduplicação de filtros de projeto (`#39588`) e a visibilidade de PRs em workspaces em repouso (`#39582`).
 - Adotar a exposição de `createdAt` e `lastActivityAt` na API de plugins (`#39100`) para suportar métricas do `brza-workflow`.
 - Implementar as opções de ocultar projetos vazios (`#39080`) e o menu contextual de ações de agentes na sidebar (`#38588`).
 - Adicionar os controles de colapso e expansão em massa de projetos (`#38634`).

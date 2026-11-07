@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39283, #38901, #38899, #38814 e as issues #39300, #39263 trazem backoff em federation relays, detecção de saída de Codex e classificação de replies.
+description: Os PRs #39564, #39283, #38901, #38899 e as issues #39517, #39300, #39263 trazem background workers no chat, papéis salvos e backoff em relays.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39283`](https://github.com/stablyai/orca/pull/39283),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39564`](https://github.com/stablyai/orca/pull/39564),
+[`stablyai/orca#39283`](https://github.com/stablyai/orca/pull/39283),
 [`stablyai/orca#38901`](https://github.com/stablyai/orca/pull/38901),
 [`stablyai/orca#38899`](https://github.com/stablyai/orca/pull/38899),
 [`stablyai/orca#38814`](https://github.com/stablyai/orca/pull/38814),
@@ -149,9 +150,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39283`](https://github.com
 18. **Linhas obsoletas de "Done" retidas na barra lateral após término do agente (`#39499`):**
     - A barra lateral de workspaces retinha a linha do agente no estado "Done" mesmo após o processo do agente ter saído
       completamente de volta para o prompt do shell, gerando poluição visual e falsos indicativos de sessões em execução.
+19. **Exibição de native background workers no chat para agentes Pi (`#39564`):**
+    - Agentes Pi que disparavam subprocessos de background workers não possuíam representação no chat nativo, tornando o trabalho
+      secundário invisível ao usuário;
+    - O PR `#39564` adiciona suporte a workers nativos em background na interface do chat com Pi (pacote `pi-subagents`),
+      oferecendo indicador compacto/expandido, status assíncrono em tempo real e recuperação de IDs de workers através de recarregamentos
+      do renderer sem poluir a lista de workspaces ou criar abas redundantes.
 
 ## O que fazer
 
+- Integrar o suporte a native background workers no chat para agentes Pi (`#39564`), permitindo acompanhar subagentes em segundo plano.
 - Bloquear a injeção cega de `Enter` em terminais OMP quando houver turnos em execução ou steers enfileirados (`#39042`).
 - Adicionar `statusMessage` legíveis aos hooks do Codex (`#39021`) para clareza na auditoria de segurança.
 - Incorporar a detecção imediata de bloqueio de autenticação do Antigravity em workers (`#38901`).

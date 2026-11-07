@@ -15,12 +15,15 @@ refs:
   - issue:historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
+  - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
+  - issue:seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio
   - issue:sincronizacao-de-temas-com-claude-code-titulos-localizados-e-sugestoes-no-chat
   - issue:subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent
+  - issue:validacao-de-conclusao-em-automacoes-cli-de-extensoes-e-destravamento-de-rate-limit
   - issue:vazamento-de-memoria-gpu-webgl-no-terminal-e-performance-macos
 ---
 
-# Radar de issues e PRs do upstream e automação de 6h (00h, 06h e 12h BRT)
+# Radar de issues e PRs do upstream e automação de 6h (00h, 06h, 12h e 18h BRT)
 
 ## O que foi feito
 
@@ -110,3 +113,44 @@ refs:
      adicionadas a issue `#39516` (isolamento de trocas de modelo/esforço mid-turn rotuladas como "Next turn: ..." para não distorcer o
      turno em andamento, e entrega prioritária imediata de respostas a perguntas sem retenção na fila) e a issue `#39520` (ação "Background"
      para comandos Bash e subagentes Claude longos diretamente na interface de chat).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-07)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados mais de 60 novos PRs e issues criados ou
+   atualizados entre `2026-11-07T15:00:00Z` e `2026-11-07T21:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Validação de conclusão em automações, CLI de extensões e destravamento de rate limit](../issues/validacao-de-conclusao-em-automacoes-cli-de-extensoes-e-destravamento-de-rate-limit.md):
+     rastreia a issue `#39563` (contrato de validação de objetivos e recuperação delimitada em automações não assistidas para
+     evitar que respostas de recusa textual ou `end_turn` sem ferramentas sejam registradas como `status: completed`),
+     issue `#39578` (comandos `orca extension list` e `orca extension reload` na CLI para desenvolvimento e teste ágil de
+     extensões de navegador por agentes sem intervenção na UI), PR `#39581` (eliminação de deadlock no semáforo de concorrência do
+     GitHub com 4 slots em consultas `/rate_limit` expiradas, destravando páginas de PRs e checks locais e remotos),
+     PR `#39540` (persistência de miniaturas de imagens visualizadas via ferramenta `Read` em attachment store SHA-256 da sessão,
+     garantindo visualização mesmo após a exclusão do arquivo no disco), PR `#39555` / issue `#39122` (liberação imediata do composer
+     ao despachar `/compact` ou `/clear`, repassando o callback `onSent` antes do round-trip do host remoto) e PR `#39530` /
+     issue `#39529` / `#32242` (implementação de `colorQueryFallback` para responder a consultas de cores OSC 10/11 do terminal
+     mesmo quando o tema não possuir cores explícitas, destravando TUIs em temas claros).
+3. **Atualização de 5 issues existentes em `work/issues/`:**
+   - [Melhorias de Native Chat, ACP do Gemini CLI, abas e diff no upstream](../issues/melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream.md):
+     adicionadas a issue `#39523` (descompasso crítico no macOS onde sign-in grava `acp_token.json` sob o diretório do usuário mas o
+     servidor ACP `agy_acp_server` lê apenas o Keychain `service=gemini, account=antigravity-acp` vazio, abortando com erro `-32603`
+     após timeout de 6s), issue `#39528` (isolamento indevido de skills pelo redirecionamento de `GEMINI_HOME` para `<userData>/antigravity-chat`,
+     ocultando skills globais em `~/.gemini/config/skills`), issue `#39556` (conflito entre `--model` e `--effort` no lançamento do Antigravity
+     via terminal que executa silenciosamente Gemini 4 Argon) e PR `#33360` / issue `#39514` (execução nativa de chats Gemini CLI sobre ACP).
+   - [Vazamento de memória GPU WebGL no terminal e performance no macOS](../issues/vazamento-de-memoria-gpu-webgl-no-terminal-e-performance-macos.md):
+     adicionada a issue `#39579` (exceção não capturada `Error: setTypeOfService EINVAL` abrindo diálogo modal nativo `NSAlert` no macOS,
+     bloqueando `-[NSAlert runModal]` na thread principal e congelando runtime, conexões móveis e remotas por mais de 24h até `SIGKILL`).
+   - [Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório](../issues/seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio.md):
+     adicionados o PR `#39575` (botões diretos "Create worktree" para repositórios de pastas vazias nos painéis de Source Control,
+     Attached Worktrees e PR Checks) e o PR `#39572` / issue `#39545` (sanitização com `.trim()` em `workspaceDir`, evitando que caminhos
+     com espaços iniciais sejam resolvidos como relativos e criem diretórios espúrios `" /..."` em todos os repositórios registrados).
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados o PR `#39542` / issue `#39541` (layout opcional "Compact header" em cartões de workspace, condensando título, branch,
+     disclosure de agentes e ação de trabalho vinculado em linha única e economizando 66px verticais), PR `#39538` / issue `#39537`
+     (indentação visual de linhas sob seções de host remoto), PR `#39532` / issue `#39531` (preservação da ordenação de grupos colapsados),
+     PR `#39588` / issue `#39584` (desduplicação de projetos compartilhados nos filtros da barra lateral), PR `#39582` / issue `#39573`
+     (manutenção de status de PR visível em workspaces adormecidos) e PR `#39559` / issue `#39549` (atenuação visual de contadores de referências).
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     adicionado o PR `#39564` (exibição de native background workers no chat para agentes Pi com indicador compacto/expandido,
+     árvore de subprocessos e status em tempo real sem criar abas ou workspaces redundantes).

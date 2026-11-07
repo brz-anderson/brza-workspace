@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39018, #39000, #38955, #38869, #38836, #38831 e #38904 trazem anexação CLI de worktrees a pastas, correção de sufixos, remoção segura de branches e status bar.
+description: Os PRs #39575, #39572, #39018, #39000, #38955 e as issues #39545, #38931 trazem criação de worktree em pastas, sanitização de caminhos e status bar.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,9 @@ tags:
 
 # Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39018`](https://github.com/stablyai/orca/pull/39018),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39575`](https://github.com/stablyai/orca/pull/39575),
+[`stablyai/orca#39572`](https://github.com/stablyai/orca/pull/39572) (resolve Issue [`#39545`](https://github.com/stablyai/orca/issues/39545)),
+[`stablyai/orca#39018`](https://github.com/stablyai/orca/pull/39018),
 [`stablyai/orca#39000`](https://github.com/stablyai/orca/pull/39000) (resolve [`#38931`](https://github.com/stablyai/orca/issues/38931)),
 [`stablyai/orca#38955`](https://github.com/stablyai/orca/pull/38955),
 [`stablyai/orca#38869`](https://github.com/stablyai/orca/pull/38869),
@@ -49,9 +51,23 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39018`](https://github.com
    no cliente móvel, poluindo a lista de workspaces planos.
 7. **Ocultação indevida de workspace ao remover subdiretório `.git` aninhado (`#38830`):**
    A deleção acidental de um repositório `.git` aninhado desanexava todo o workspace pai e ocultava as abas de agentes ativos.
+8. **Dificuldade de inicialização de worktrees em pastas multirrepositório vazias (`#39575`):**
+   Ao abrir uma pasta com repositórios Git mas sem worktrees anexados, os painéis de Source Control, Attached Worktrees
+   e PR Checks exibiam apenas mensagens estáticas de "No attached worktrees yet" sem ação para criar o primeiro checkout.
+9. **Criação de árvores de pastas vazias com espaço inicial em repositórios (`#39572`, `#39545`):**
+   Ao colar um caminho com espaço inicial (ex.: `" /Users/user/dev"`) nas configurações de Workspace Directory, o caminho não era
+   sanitizado antes da validação. Como o Node `posix.isAbsolute` retorna `false` para caminhos iniciados por espaço, o Orca tratava a
+   rota como relativa e criava pastas `" <repo>/ /Users/user/dev"` em todos os repositórios registrados.
 
 ## O que o upstream implementa e corrige
 
+- **Criação rápida de worktrees em pastas vazias (`#39575`):**
+  - Nos painéis de Source Control, Attached Worktrees e PR Checks de pastas sem worktrees anexados, lista os repositórios Git da pasta
+    com botões diretos "Create worktree", criando o checkout nomeado com base na pasta sem sair do contexto;
+  - Valida se o branch já existe no repositório antes de criar, abrindo o modal preenchido caso o nome esteja ocupado.
+- **Sanitização estrita com `.trim()` em `workspaceDir` (`#39572`, resolve `#39545`):**
+  - Aplica `.trim()` no input de configurações, no sanitizador IPC e em todas as rotas de resolução de base path de worktree,
+    garantindo que espaços antes ou depois da barra não corrompam caminhos absolutos nem criem diretórios espúrios.
 - **Anexação de worktrees existentes a Folder Workspaces (`#39018`):**
   - Habilita `orca worktree set --parent-worktree folder:<id>` para vincular worktrees preexistentes a uma pasta pai;
   - Resolve `--parent-worktree active`/`current` para a pasta pai do próprio terminal ou checkout envolvente;
@@ -75,3 +91,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39018`](https://github.com
 1. Adotar os comandos CLI de vinculação de worktrees a pastas (`#39018`), permitindo reorganizar worktrees sob pastas de projeto.
 2. Incorporar a correção de sufixos numéricos (`#39000`) e a exclusão segura de branches (`#38955`).
 3. Integrar o `BranchStatusSegment` na barra de status do `brza-studio` (`#38869`).
+4. Adotar o botão "Create worktree" nos painéis vazios de pastas multirrepositório (`#39575`).
+5. Aplicar sanitização e `.trim()` em todos os campos de diretório de workspace para evitar criação de pastas acidentais (`#39572`).

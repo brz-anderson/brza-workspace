@@ -3,7 +3,7 @@ status: open
 phase: interview
 origin: request
 description: Perfil comum e extras por app (BrzA Studio, Orca, Antigravity, Cursor) no Logi Options+, com o perfil exportado e o guia em wiki/guides.
-ready: "não — falta a rodada 3, que escolhe as ações do ring e o caminho do export"
+ready: "não — falta o teste de herança, de Anderson, e a rodada 4 com o conteúdo dos slots"
 estimate_h: 6
 executed_h: 0.3
 remaining_h: 5.5
@@ -18,7 +18,7 @@ tags:
 
 # PLN-016: O Actions Ring do MX Master 4 tem ações práticas por app no dia a dia
 
-- **Retomar:** P1 feito (terreno no Desenho); próximo é a rodada 3, que escolhe as ações do ring e o caminho do export (o Options+ não exporta perfil em arquivo).
+- **Retomar:** rodada 3 fechada; Anderson cria o perfil de Orca, Cursor e Antigravity no Options+ e diz se o ring herdou o global; depois a rodada 4 escolhe o conteúdo de cada slot (P2).
 - **Dividido:** [PLN-016 — Desenho](PLN-016-design.md)
 
 ## Pedido
@@ -35,8 +35,8 @@ Os critérios abaixo são **propostas** minhas, a confirmar na rodada 3.
 | :----- | :----------------- | :---- | :------------ |
 | `Pedido 1`, R1.1 | O MX Master 4 abre o Actions Ring em cada um dos 4 apps, com o perfil comum mais os extras do app | P3 | conferência no aparelho (manual) |
 | `Pedido 1`, R2.3 | Toda ação de atalho do ring existe no app dono, conferida no keybinding ou na documentação dele | P1 | a tabela do levantamento, com fonte |
-| `Pedido 1`, R1.3 | Há ações de macro/script (`brza`, `orca` CLI, shell) que rodam a partir do ring | P4 | conferência no aparelho (manual) |
-| R1.4 | O perfil exportado e o guia em `wiki/guides/` bastam para refazer a configuração numa máquina nova | P5 | reconfiguração a partir do guia (manual) |
+| `Pedido 1`, R1.3, R3.2 | Há ações de macro/script (`brza`, `orca` CLI, shell) que rodam a partir do ring | P4 | conferência no aparelho (manual) |
+| R1.4, R3.1 | Os `ProfileInfo.json` copiados e o guia em `wiki/guides/` bastam para refazer a configuração numa máquina nova | P5 | reconfiguração a partir do guia (manual) |
 
 ### Fora de escopo
 
@@ -82,6 +82,24 @@ Respondida em 2026-11-07, na sessão `logi-options`.
 4. **Papel do MX Keys Mini.** Opções: teclas F e de ação por app (recomendado; custo: ~+2 h; se paga: fase 2) · só globais · fora desta fase.
    **Resposta:** "opção 1, mas para uma fase futura, o teclado só chega dia 16/11". **Leitura:** o teclado sai deste plano e vira o plano seguinte, a partir de 16/11; consta no Fora de escopo.
 
+### Rodada 3 — export, scripts, desenho do ring e teste de herança (enviada 2026-11-07)
+
+**Apresentado antes:** o terreno do P1 ([PLN-016-design.md](PLN-016-design.md)): o Options+ não exporta perfil em arquivo, não tem ação de shell nativa, e o BrzA Studio e o Orca não têm atalho de parar o agente nem de aceitar/rejeitar diff.
+
+Respondida em 2026-11-07, na sessão `logi-options`.
+
+1. **Export.** Opções: copiar os `ProfileInfo.json` + guia (recomendada; custo: ~1 h, método não documentado que pode quebrar numa atualização, o P5 testa a restauração; se paga: na 1ª troca de máquina) · só o guia com screenshots (custo: ~0,5 h + ~1 h por máquina; se paga: nunca, se não reconfigurar) · backup da nuvem + guia curto (custo: ~0,3 h, não vale entre Mac e Windows nem fica no git; se paga: se só usa este Mac).
+   **Decidido — copiar os `ProfileInfo.json` + guia.** Isso emenda R1.4: o "perfil exportado" é a cópia dos JSON, e o P5 testa a restauração.
+
+2. **Scripts.** Opções: wrapper `.app` pela ação Application (recomendada; custo: ~1,5 h no P4 e um `.app` por macro; se paga: no P4, se o teste passar) · plugin SDK em C# (custo: ~8 h ou mais; se paga: só com 10+ macros) · sem macros por ora (custo: zero, perde R1.3; se paga: se o teste falhar).
+   **Decidido — testar o wrapper `.app`;** se falhar, volta à rodada.
+
+3. **Desenho do ring.** Opções: comum = navegação, extras = agente (recomendada; custo: ~2 h no P3; se paga: no 1º dia) · comum = só sistema (custo: ~2 h; se paga: se quer o ring igual fora destes apps) · 8 slots próprios por app (custo: ~2,5 h e contradiz R1.2; se paga: nunca, a menos que a herança falhe).
+   **Decidido — página 1 comum com navegação; extras do agente na página 2.** O conteúdo exato de cada slot vai à rodada 4.
+
+4. **Teste de herança.** Opções: Anderson cria o perfil dos 3 apps e diz se herdou (recomendada; custo: ~15 min dele; se paga: antes do P3) · automação por Computer Use (custo: ~30 min meus, GUI Electron frágil; se paga: só se ele não quiser).
+   **Decidido — Anderson cria o perfil de Orca, Cursor e Antigravity e informa se herdou.**
+
 ## Passos
 
 Rascunho de ordem, a fechar na rodada 3. **Nenhum passo executa sem pedido explícito de Anderson.**
@@ -114,7 +132,7 @@ Executa R1.3 · executor: sessão que conduz, com Anderson
 
 Estimado: 1.5 h · Executado: — h
 
-### P5 — Exportar o perfil e escrever o guia
+### P5 — Copiar os `ProfileInfo.json`, testar a restauração e escrever o guia
 
 Executa R1.4 · executor: sessão que conduz
 
@@ -122,5 +140,5 @@ Estimado: 1 h · Executado: — h
 
 ## Worklogs
 
-- 2026-11-07 — R1 e R2 fechadas; destino `PLN`; teclado fica para depois de 16/11.
+- 2026-11-07 — R1 a R3 fechadas; P1 feito; destino `PLN`; teclado fica para depois de 16/11. Parou na rodada 4 (conteúdo dos slots), à espera do teste de herança.
   [Plano do Actions Ring: abertura e entrevista](../../work/worklogs/2026-11-07-plano-do-actions-ring-abertura-e-entrevista.md)

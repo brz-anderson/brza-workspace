@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38861, #38857, #38858 e #38120 corrigem alto consumo de CPU/GPU em terminais sob chats nativos, dessincronização de atlas WebGL e vazamento de VRAM no macOS.
+description: Os PRs #39465, #39445, #38861, #38857 e #38120 corrigem vazamento de portas Mach no macOS, sobrecarga de ps, alto consumo de CPU/GPU em terminais e atlas WebGL.
 scope:
   - brza-studio
   - tooling
@@ -13,7 +13,9 @@ tags:
 
 # Vazamento de memória GPU WebGL no terminal e performance no macOS
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38861`](https://github.com/stablyai/orca/pull/38861) (Issue
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39465`](https://github.com/stablyai/orca/pull/39465) (Issue [`#39405`](https://github.com/stablyai/orca/issues/39405)),
+[`stablyai/orca#39445`](https://github.com/stablyai/orca/pull/39445),
+[`stablyai/orca#38861`](https://github.com/stablyai/orca/pull/38861) (Issue
 [`stablyai/orca#38860`](https://github.com/stablyai/orca/issues/38860)),
 [`stablyai/orca#38857`](https://github.com/stablyai/orca/pull/38857) (Issue
 [`stablyai/orca#38856`](https://github.com/stablyai/orca/issues/38856)),
@@ -46,9 +48,22 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38861`](https://github.com
 6. **Bloqueio da thread principal em acessos a arquivos com prompts do sistema pendentes (`#38150`):** no macOS, se outro
    aplicativo estiver exibindo um modal de permissões de privacidade do sistema, operações síncronas de I/O de arquivos na
    thread principal do app bloqueiam a interface gráfica inteira até a dispensa do prompt.
+7. **Spawns contínuos de helper de teclado e vazamento de portas Mach no WindowServer (`#39465`, `#39405`):**
+   A cada vez que uma janela recebia foco no macOS, o app disparava um subprocesso `orca-keyboard-layout` para consultar
+   o layout ativo. Cada execução efêmera estabelecia conexão com o WindowServer e vazava portas Mach no sistema operacional,
+   causando crescimento contínuo de portas e desperdício de CPU.
+8. **Invocação de subshells desnecessárias para comando `ps` no Resource Manager (`#39445`):**
+   O monitor de recursos invocava um shell intermediário (`/bin/sh -c ps ...`) a cada ciclo de polling para inspecionar
+   processos de terminais, gerando criação e destruição contínua de processos no host.
 
 ## O que o upstream propõe e implementa
 
+- **Cache de layout de teclado no macOS e invalidação por TIS notification (`#39465`):**
+  - Armazena em cache no processo principal o último snapshot de layout obtido com sucesso;
+  - Descarta o cache e incrementa a época somente quando o sistema emitir `com.apple.Carbon.TISNotifySelectedKeyboardInputSourceChanged`,
+    eliminando execuções redundantes de `orca-keyboard-layout` em eventos de foco de janela.
+- **Execução direta de `ps` sem shell intermediário (`#39445`):**
+  - Invoca o binário `ps` diretamente via `execFile` com argumentos estruturados, eliminando a sobrecarga de subshells.
 - **Suspensão de renderização oculta e coalescência de streaming de terminais (`#38861`):**
   - Trata panes de terminal sob coberturas de Native Chat como estritamente ocultas para visibilidade PTY e WebGL;
   - Retém quadros sincronizados DEC `?2026` cross-platform e agrupa rajadas de saída foreground não atendidas (`scheduleDrain(0)`
@@ -71,5 +86,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38861`](https://github.com
 
 ## O que fazer
 
-Portar as melhorias de `terminal-hidden-view-parking.ts`, contenção de DEC `?2026` e recuperação de atlas WebGL do PR `#38861`
-e `#38857` para o `brza-studio`, protegendo o consumo de CPU e GPU durante sessões simultâneas de chat e terminais de agentes.
+- Portar as melhorias de `terminal-hidden-view-parking.ts`, contenção de DEC `?2026` e recuperação de atlas WebGL do PR `#38861`
+  e `#38857` para o `brza-studio`, protegendo o consumo de CPU e GPU durante sessões simultâneas de chat e terminais de agentes.
+- Adotar o cache do snapshot de layout de teclado com invalidação TIS (`#39465`) para estancar vazamentos de portas Mach no macOS.
+- Utilizar a execução direta de `ps` sem shell intermediário no monitor de recursos (`#39445`).

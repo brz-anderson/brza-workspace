@@ -15,10 +15,12 @@ refs:
   - issue:historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
+  - issue:sincronizacao-de-temas-com-claude-code-titulos-localizados-e-sugestoes-no-chat
   - issue:subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent
+  - issue:vazamento-de-memoria-gpu-webgl-no-terminal-e-performance-macos
 ---
 
-# Radar de issues e PRs do upstream e automação de 6h (00h e 06h BRT)
+# Radar de issues e PRs do upstream e automação de 6h (00h, 06h e 12h BRT)
 
 ## O que foi feito
 
@@ -77,3 +79,34 @@ refs:
      adicionados o PR `#39283` (backoff exponencial de até 60s em relays de federação com falha em vez de polling contínuo a cada segundo,
      eliminando alto consumo de CPU e acessos a disco no macOS) e a issue `#39300` (observador para notificar o término de processos
      supervisionados do Codex cujo PTY permaneça aberto).
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-07)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados mais de 50 novos PRs e issues criados ou
+   atualizados entre `2026-11-07T09:00:00Z` e `2026-11-07T15:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Sincronização de temas com Claude Code, títulos localizados e sugestões no chat](../issues/sincronizacao-de-temas-com-claude-code-titulos-localizados-e-sugestoes-no-chat.md):
+     rastreia o PR `#39447` (sincronização automática e dinâmica do tema do terminal do Orca com a interface do Claude Code,
+     injetando temas customizados no `settings.json` com hot-reload e toggle dedicado em configurações), PR `#37107` / issue `#22316`
+     (sugestões de prompt nativas do Claude Code no composer do Native Chat, renderizadas de forma transitória sem gravar no histórico e
+     aceitas com <kbd>Tab</kbd> ou <kbd>Seta para a Direita</kbd>), PR `#39437` / issue `#39281` (suporte a títulos de workspace
+     localizados desacoplados dos slugs ASCII dos branches Git) e PR `#37190` / issue `#36722` (reabertura de chats nativos órfãos após
+     remoção e recadastro de pastas de projetos com restauração de rascunhos e transcripts).
+3. **Atualização de 4 issues existentes em `work/issues/`:**
+   - [Vazamento de memória GPU WebGL no terminal e performance no macOS](../issues/vazamento-de-memoria-gpu-webgl-no-terminal-e-performance-macos.md):
+     adicionados o PR `#39465` e a issue `#39405` (cache do snapshot de layout de teclado no processo principal com invalidação via
+     notificação TIS Carbon, estancando vazamento de portas Mach no WindowServer a cada foco de janela no macOS) e o PR `#39445`
+     (execução direta do binário `ps` sem invocação de shell intermediário no Resource Manager).
+   - [Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md):
+     adicionadas a issue `#39495` (proposta de motor de rotação automática de contas Claude por host quando o limite de 5h ou semanal
+     esgotar, com limites discriminados por modelo e sincronização cross-device) e a issue `#39502` (configuração para desativar polling
+     em background da cota OAuth à API da Anthropic).
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     adicionadas a issue `#39517` (papéis salvos de workers `--role <name>` para `orchestration worker-start` com pré-validação de
+     combinações de modelo e esforço no catálogo do host) e a issue `#39499` (limpeza oportuna de linhas de agentes marcadas como "Done"
+     na sidebar quando a pane já encerrou e retornou ao shell).
+   - [Cartões de Pull Request, feedback de Steer e atalhos no Native Chat](../issues/cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat.md):
+     adicionadas a issue `#39516` (isolamento de trocas de modelo/esforço mid-turn rotuladas como "Next turn: ..." para não distorcer o
+     turno em andamento, e entrega prioritária imediata de respostas a perguntas sem retenção na fila) e a issue `#39520` (ação "Background"
+     para comandos Bash e subagentes Claude longos diretamente na interface de chat).

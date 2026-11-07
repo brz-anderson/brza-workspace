@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39287, #39309, #39369, #39050, #39141 trazem retenção de cards de aprovação, menções #N seguras, auto-shrink de imagens e atalhos no Native Chat.
+description: Os PRs #39287, #39309 e as issues #39516, #39520 trazem escolhas mid-turn isoladas, backgrounding de subagentes, retenção de aprovações e atalhos no chat.
 scope:
   - brza-studio
   - brza-workflow
@@ -30,6 +30,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39287`](https://github.com
 [`stablyai/orca#38724`](https://github.com/stablyai/orca/pull/38724),
 [`stablyai/orca#38756`](https://github.com/stablyai/orca/pull/38756),
 [`stablyai/orca#38660`](https://github.com/stablyai/orca/pull/38660) e das issues
+[`stablyai/orca#39516`](https://github.com/stablyai/orca/issues/39516),
+[`stablyai/orca#39520`](https://github.com/stablyai/orca/issues/39520),
 [`stablyai/orca#39060`](https://github.com/stablyai/orca/issues/39060),
 [`stablyai/orca#38792`](https://github.com/stablyai/orca/issues/38792) e
 [`stablyai/orca#38780`](https://github.com/stablyai/orca/issues/38780).
@@ -81,9 +83,24 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39287`](https://github.com
 16. **Poluição visual da barra lateral de mensagens durante leitura (`#39369`):**
     Os controles e trilhos de ação de mensagem (*message rail*) ficavam constantemente visíveis com opacidade cheia,
     distraindo a leitura de código e respostas longas no chat.
+17. **Distorção de turnos em execução por seleções de modelo mid-turn e bloqueio de respostas em fila (`#39516`):**
+    Ao alterar o modelo ou nível de esforço durante a execução de um turno para preparar a próxima mensagem, a escolha
+    podia ser enviada junto com um steer no turno ativo, perturbando a tarefa em andamento. Além disso, quando o agente
+    faz uma pergunta no meio do turno, a resposta do usuário era tratada como follow-up comum, ficando presa atrás do próprio
+    turno que a aguardava quando a fila de espera (*Queue follow-ups*) estava ativada.
+18. **Falta de controle para despachar comandos Bash e subagentes Claude para segundo plano (`#39520`):**
+    Comandos longos de compilação, testes ou execução de subagentes bloqueavam todo o turno no Native Chat sem opção de liberação
+    da conversa, enquanto no terminal do Claude Code o atalho <kbd>Ctrl+B</kbd> permite backgrounding nativo imediato.
 
 ## O que o upstream implementa
 
+- **Isolamento de escolhas de modelo mid-turn e entrega direta de respostas (`#39516`):**
+  - Rotula os seletores de modelo/esforço durante a execução do agente como "Next turn: ...", aplicando as escolhas
+    exclusivamente no envio do próximo turno sem alterar o turno corrente;
+  - Roteia respostas a perguntas interativas diretamente para o turno em andamento, contornando a fila de espera.
+- **Ação "Background" para comandos e subagentes Claude no chat (`#39520`):**
+  - Adiciona o botão "Background" ao lado de chamadas de topo de `Bash`, `Agent` ou `Task` do Claude no chat e na barra
+    expandida de tarefas, liberando a conversa para novas instruções enquanto o comando segue executando.
 - **Preservação de campos de prompt em títulos de permissão do Claude (`#39287`):**
   - Mantém `interactivePrompt`, `toolName` e `toolInput` (`withWaitPrompt`) mesmo após atualizações de título do PTY que
     confirmam a espera do hook, garantindo que o cartão de aprovação (Allow/Deny) continue sempre visível e funcional.
@@ -124,3 +141,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39287`](https://github.com
 - Adotar a preservação contínua de cartões de aprovação de permissões do Claude (`#39287`).
 - Incorporar os cartões ricos de PR (`#38750`, `#38892`) e as melhorias de teclado de Steer/Queue (`#38749`, `#38877`, `#38848`).
 - Adotar as otimizações de streaming incremental de texto com genéricos (`#38879`) e despacho isolado de status (`#38883`).
+- Aplicar o isolamento de escolhas de modelo mid-turn para o próximo turno e entrega direta de respostas (`#39516`).
+- Habilitar o backgrounding de comandos e subagentes Claude diretamente pela interface de chat (`#39520`).

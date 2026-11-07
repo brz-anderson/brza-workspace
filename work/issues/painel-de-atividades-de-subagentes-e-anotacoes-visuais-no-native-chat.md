@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39082, #39079, #38995, #38963, #38945 e #39013 trazem preview de chats no Dashboard, notificações só para perguntas, subagentes na sidebar e SQLite em workers.
+description: Os PRs #39276, #39082, #39079, #38995, #38963 trazem subagentes OpenCode no Chat UI, preview no Dashboard e notificações de perguntas.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39082`](https://github.com/stablyai/orca/pull/39082) (Issue [`#39074`](https://github.com/stablyai/orca/issues/39074)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39276`](https://github.com/stablyai/orca/pull/39276) (Issue [`#39275`](https://github.com/stablyai/orca/issues/39275)),
+[`stablyai/orca#39082`](https://github.com/stablyai/orca/pull/39082) (Issue [`#39074`](https://github.com/stablyai/orca/issues/39074)),
 [`stablyai/orca#39079`](https://github.com/stablyai/orca/pull/39079) (Issue [`#39073`](https://github.com/stablyai/orca/issues/39073)),
 [`stablyai/orca#38995`](https://github.com/stablyai/orca/pull/38995) (Issue [`#38994`](https://github.com/stablyai/orca/issues/38994)),
 [`stablyai/orca#38963`](https://github.com/stablyai/orca/pull/38963),
@@ -53,9 +54,18 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39082`](https://github.com
    desenvolvimento desanexados iniciados pelo agente.
 7. **Invisibilidade e falta de inspeção de subagentes no Native Chat (`#38632`, `#38633`, `#38470`):**
    Falta de elenco estruturado (*roster*) dos subagentes em execução no chat desktop e mobile.
+8. **Subagentes do OpenCode 2.x não renderizados no Chat UI (`#39276`, `#39275`):**
+   Quando um agente OpenCode delegava tarefas a subagentes auxiliares (`subagent` no 2.x ou `task` no 1.x), as ações do filho
+   apareciam como ferramentas genéricas na conversa principal, sem identificação do subagente, sem cartão dedicado de estado
+   (running/done/stopped) e sem presença na faixa de agentes ativos acima do composer.
 
 ## O que o upstream implementa
 
+- **Renderização e ciclo de vida de subagentes OpenCode no Chat UI (`#39276`):**
+  - Implementa o gancho de dialeto ACP `childSession` para capturar frames filhos marcados com `_meta["opencode/child-session"]`,
+    vinculando o ID do agente filho à linha do tempo da conversa;
+  - Cria um cartão dedicado com o nome da tarefa delegada, exibe o status ao vivo na faixa de agentes acima do composer e
+    alinha as ferramentas e comandos do filho sob o seu próprio cartão.
 - **Pré-visualização read-only de chats no Agent Dashboard (`#39082`):**
   - Carrega a transcrição da conversa sob demanda em modo somente leitura reutilizando o protocolo de histórico e os
     componentes de renderização de mensagens, sem inicializar provedores pesados nem interferir nas observações de PR links.
@@ -77,5 +87,6 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39082`](https://github.com
 ## O que fazer
 
 - Adotar a pré-visualização read-only de chats no Agent Dashboard (`#39082`) e o filtro de notificações de perguntas (`#39079`).
+- Adotar o suporte nativo a subagentes OpenCode no Chat UI (`#39276`).
 - Adotar o agrupamento visual de subagentes na sidebar (`#38995`) e a ação de backgrounding de ferramentas (`#38963`) no `brza-studio`.
 - Portar o isolamento em threads de workers para o SQLite de histórico (`#38945`) e o rastreamento de processos órfãos (`#39013`).

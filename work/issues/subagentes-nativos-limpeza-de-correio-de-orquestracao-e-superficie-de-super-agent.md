@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38901, #38899, #38814, #38713 e as issues #39263, #39262, #39042, #38951 trazem classificação de decisões em reply, resiliência de correio remoto e proteção contra aborto.
+description: Os PRs #39283, #38901, #38899, #38814 e as issues #39300, #39263 trazem backoff em federation relays, detecção de saída de Codex e classificação de replies.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38901`](https://github.com/stablyai/orca/pull/38901),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39283`](https://github.com/stablyai/orca/pull/39283),
+[`stablyai/orca#38901`](https://github.com/stablyai/orca/pull/38901),
 [`stablyai/orca#38899`](https://github.com/stablyai/orca/pull/38899),
 [`stablyai/orca#38814`](https://github.com/stablyai/orca/pull/38814),
 [`stablyai/orca#38713`](https://github.com/stablyai/orca/pull/38713),
@@ -54,6 +55,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38901`](https://github.com
 [`stablyai/orca#37891`](https://github.com/stablyai/orca/pull/37891),
 [`stablyai/orca#37850`](https://github.com/stablyai/orca/pull/37850) e
 [`stablyai/orca#11279`](https://github.com/stablyai/orca/pull/11279), além das issues
+[`stablyai/orca#39300`](https://github.com/stablyai/orca/issues/39300),
 [`stablyai/orca#39263`](https://github.com/stablyai/orca/issues/39263),
 [`stablyai/orca#39262`](https://github.com/stablyai/orca/issues/39262),
 [`stablyai/orca#39042`](https://github.com/stablyai/orca/issues/39042),
@@ -126,6 +128,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38901`](https://github.com
     - Mensagens enviadas a workers remotos com retorno `accepted: true` podiam ser descartadas silenciosamente caso a
       desanexação de Dispatch ocorresse antes da persistência final na caixa de entrada do worker. Proposta para exigir
       confirmação durável de gravação em disco antes de retornar sucesso ao coordenador.
+15. **Sobrecarga de CPU por polling fixo a cada segundo em federation relays com falha (`#39283`):**
+    - Cada worker remoto ativo mantinha um `setInterval` rígido de 1 segundo para sincronização de correio com seu host.
+      Em ambientes com dezenas de workers em servidores deletados ou inacessíveis, o aplicativo executava centenas de
+      tentativas por segundo, relendo arquivos de registro até 727 vezes/s e consumindo de 40% a 110% de CPU contínua no processo principal;
+    - O PR `#39283` substitui o timer fixo por backoff exponencial com teto de 1 minuto (2s, 4s, …, 60s) em falhas, resetando
+      imediatamente para 1s sob novas mensagens ou ações explícitas do coordenador (reply, start, stop).
+16. **Travamento de coordenadores por processos Codex terminados com PTY remanescente (`#39300`):**
+    - Quando um processo nativo do Codex supervisionado finaliza sua execução (por saída, erro ou interrupção) mas o PTY
+      alocado permanece conectado ao shell padrão, o coordenador não era notificado do término, ficando indefinidamente aguardando;
+    - A issue `#39300` introduz o observador `observeSupervisedCodex`, detectando o fim do processo filho e disparando
+      `reportWorkerTurnStop` com causa explícita.
 
 ## O que fazer
 
@@ -135,3 +148,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38901`](https://github.com
 - Avaliar a introdução de locks FIFO e quadro de colaboração de recursos para o `brza-workflow` (`#38850`).
 - Adotar a classificação de decisão `--decision user|technical` no subcomando de resposta de orquestração (`#39263`).
 - Garantir a confirmação durável de entrega de correio a workers remotos (`#39262`).
+- Adotar o backoff exponencial em federation relays com falha (`#39283`) para eliminar consumo excessivo de CPU.
+- Implementar a detecção de término de processos Codex em PTYs abertos (`#39300`).

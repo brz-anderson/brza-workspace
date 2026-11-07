@@ -1,0 +1,120 @@
+---
+status: open
+phase: interview
+origin: request
+description: Perfil comum e extras por app (BrzA Studio, Orca, Antigravity, Cursor) no Logi Options+, com o perfil exportado e o guia em wiki/guides.
+ready: "não — falta o levantamento dos atalhos por app e a rodada que escolhe as ações do ring"
+scope:
+  - workspace
+opened: 2026-11-07
+owner: Anderson
+priority: medium
+tags:
+  - tooling
+---
+
+# PLN-016: O Actions Ring do MX Master 4 tem ações práticas por app no dia a dia
+
+- **Retomar:** rodadas 1 e 2 fechadas; próximo é o levantamento dos atalhos do Orca, Cursor, Antigravity e BrzA Studio por um `collector`, e a rodada 3, que escolhe as ações do ring.
+
+## Pedido
+
+- **Origem:** pedido livre, na sessão `logi-options` de 2026-11-07.
+
+> "esse workstream foi criado afim de configurarmos atalhos práticos e ações do `Actions Ring` ficado no uso do dia-a-dia tanto dentro do `BrzA Studio`, quanto em outros apps, como o `Orca`, o `Antigravity`, o `Cursor`, entre outros"
+
+### Cobertura
+
+Os critérios abaixo são **propostas** minhas, a confirmar na rodada 3.
+
+| Origem | Critério de aceite | Passo | Teste (nível) |
+| :----- | :----------------- | :---- | :------------ |
+| `Pedido 1`, R1.1 | O MX Master 4 abre o Actions Ring em cada um dos 4 apps, com o perfil comum mais os extras do app | P3 | conferência no aparelho (manual) |
+| `Pedido 1`, R2.3 | Toda ação de atalho do ring existe no app dono, conferida no keybinding ou na documentação dele | P1 | a tabela do levantamento, com fonte |
+| `Pedido 1`, R1.3 | Há ações de macro/script (`brza`, `orca` CLI, shell) que rodam a partir do ring | P4 | conferência no aparelho (manual) |
+| R1.4 | O perfil exportado e o guia em `wiki/guides/` bastam para refazer a configuração numa máquina nova | P5 | reconfiguração a partir do guia (manual) |
+
+### Fora de escopo
+
+- **O MX Keys Mini.** O teclado só chega em 16/11 (R2.4); a configuração por app das teclas F e de ação vai a plano ou issue depois dessa data.
+- **Apps além dos 4**, como Terminal, navegador e Finder (R2.2). Voltam como "outros apps" depois da fase 1.
+- **Dictation e prompts de IA no ring** (R1.3): não foram marcados.
+
+## Entrevista
+
+### Rodada 1 — dispositivos, perfis, ações e entrega (enviada 2026-11-07)
+
+**Apresentado antes:** o workstream estava vazio; o Logi Options+ está instalado, e os 4 apps estão em `/Applications`. Dois bloqueios em vigor, de outras frentes (PLN-014 e PLN-011), não tocam este trabalho.
+
+Respondida em 2026-11-07, na sessão `logi-options`.
+
+1. **Dispositivo.** Opções: MX Master (recomendado pela inferência; custo: confirmar o modelo; se paga: agora) · MX Creative Console (custo: desenho de dials e teclas LCD; se paga: se fosse o caso) · outro.
+   **Resposta:** "mouse Mx Master 4 e teclado Mx Keys Mini". **Decidido:** MX Master 4 é o dispositivo do ring; o MX Keys Mini vira fase futura (R2.4).
+
+2. **Variação por app.** Opções: perfil comum + extras por app (recomendado; custo: perfil base e 4 camadas; se paga: na fase 2, quando o 2º app herda o base) · um perfil por app (custo: 4 perfis em separado; se paga: só se os apps divergirem muito) · ring único e global (custo: baixo, mas sem ações por app; se paga: nunca).
+   **Decidido — perfil comum + extras por app.**
+
+3. **Tipos de ação** (múltipla). Opções: atalhos de teclado (custo baixo; fase 1) · ações de sistema/janela (baixo a médio; fase 1) · macros e scripts (médio; fase 2) · dictation e IA (médio a alto; só se já usa).
+   **Decidido — atalhos de teclado, ações de sistema/janela e macros/scripts (`brza`, `orca` CLI, shell).**
+
+4. **Entrega.** Opções: exportar o perfil + guia em `wiki/guides` (recomendado; custo: export manual a cada ajuste grande; se paga: na 1ª reinstalação ou troca de máquina) · só o guia (custo: refazer à mão; se paga: nunca, se não reconfigurar) · automatizar por script (custo alto: formato interno que pode mudar; se paga: só para sincronizar entre máquinas).
+   **Decidido — exportar o perfil + guia em `wiki/guides/`.**
+
+### Rodada 2 — destino, apps, descoberta dos atalhos e teclado (enviada 2026-11-07)
+
+**Apresentado antes:** o estado do Options+ mora em `~/Library/Application Support/LogiOptionsPlus/`. O `settings.db` é SQLite e guarda o perfil como `BLOB` binário na tabela `data`, com backups internos em `snapshots`; o `macros.db` tem o mesmo desenho. Não há JSON de perfil editável, então a exportação precisa passar pelo backup do próprio app (a verificar em P1).
+
+Respondida em 2026-11-07, na sessão `logi-options`.
+
+1. **Onde mora o plano.** Opções: `PLN` em `plans/` (recomendado; custo: número e molde, ~20 min; se paga: na 2ª sessão) · worklog com plano aceito (custo menor; se paga: só se fechar hoje).
+   **Decidido — `PLN`.**
+
+2. **Apps do perfil por app.** Opções: os 4 citados (recomendado; custo: 4 camadas; se paga: fase 1) · os 4 + Terminal, navegador e Finder (custo: ~+3 h; se paga: se usa todo dia) · outra lista.
+   **Decidido — os 4 citados: BrzA Studio, Orca, Antigravity IDE e Cursor.**
+
+3. **Como descobrir os atalhos.** Opções: levantar nos próprios apps e Anderson escolhe (recomendado; custo: ~1 h e US$ pequeno; se paga: fase 1) · Anderson dita as ações (custo: lista sem conferência; se paga: só se já sabe de cabeça).
+   **Decidido — levantar nos próprios apps, e Anderson escolhe.**
+
+4. **Papel do MX Keys Mini.** Opções: teclas F e de ação por app (recomendado; custo: ~+2 h; se paga: fase 2) · só globais · fora desta fase.
+   **Resposta:** "opção 1, mas para uma fase futura, o teclado só chega dia 16/11". **Leitura:** o teclado sai deste plano e vira o plano seguinte, a partir de 16/11; consta no Fora de escopo.
+
+## Passos
+
+Rascunho de ordem, a fechar na rodada 3. **Nenhum passo executa sem pedido explícito de Anderson.**
+
+### P1 — Levantar atalhos por app e o caminho de exportação do Options+
+
+Executa R2.3 · executor: subagente `collector`, com a sessão que conduz
+
+Estimado: 1.5 h · Executado: — h
+
+- [ ] **1. Tabela de atalhos** de Orca, Cursor, Antigravity e BrzA Studio, com a fonte de cada um
+- [ ] **2. Exportação do perfil:** onde o backup nativo do Options+ grava e se o arquivo é portável
+- [ ] **3. Capacidades de ação do ring:** o que o Options+ aceita (atalho, app, script, Smart Action) na versão instalada
+
+### P2 — Rodada 3: escolher as ações do ring
+
+Executa R2.3 · executor: sessão que conduz, com Anderson
+
+### P3 — Montar perfil comum e extras por app
+
+Executa o que a rodada 3 decidir · executor: Anderson, na GUI do Options+
+
+Estimado: 2 h · Executado: — h
+
+### P4 — Ações de macro e script
+
+Executa R1.3 · executor: sessão que conduz, com Anderson
+
+Estimado: 1.5 h · Executado: — h
+
+### P5 — Exportar o perfil e escrever o guia
+
+Executa R1.4 · executor: sessão que conduz
+
+Estimado: 1 h · Executado: — h
+
+## Worklogs
+
+- 2026-11-07 — R1 e R2 fechadas; destino `PLN`; teclado fica para depois de 16/11.
+  [Plano do Actions Ring: abertura e entrevista](../../work/worklogs/2026-11-07-plano-do-actions-ring-abertura-e-entrevista.md)

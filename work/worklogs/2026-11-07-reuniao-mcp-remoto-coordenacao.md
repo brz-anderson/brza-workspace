@@ -310,7 +310,7 @@ o proxy, a sessão-caixa, o G, a Cloud com network secret e o Cursor.
 
 - **A proposta v3.3 não está aprovada** (a v2.1, do correio, ficou em `.sessions/reuniao-mcp-remoto/proposta-v2.1.md`). As decisões de Anderson foram à rodada de perguntas na sessão, às 21h52:
   por onde começar (D1), o gate remoto (D2), como a mensagem remota chega às sessões do Mac (D3) e o alcance do
-  primeiro marco (D4). Aprovada, ela vira plano pelo `brza note plan-open`.
+  primeiro marco (D4).
 - **A rodada respondida por Anderson, na sessão, na virada para 2026-11-08** — as quatro na opção recomendada:
   - **D1, por onde começar:** "Proxy, depois o G" — a fase 0 (o proxy no `brza-mcp`), depois o G num usuário macOS
     separado; túnel e domínio só depois.
@@ -320,8 +320,10 @@ o proxy, a sessão-caixa, o G, a Cloud com network secret e o Cursor.
     fase 3.
   - **D4, o alcance:** "Parcial: Claude primeiro" — Claude Cloud e outra máquina; o Cursor na fase 4; o Codex Cloud fora.
 
-  São respostas de rodada, não a aprovação da proposta: o texto da v3.3 ainda espera o aceite explícito para virar
-  plano.
+  São respostas de rodada, não a aprovação da proposta.
+- **Nada se implementa agora, e nada sai do workstream** — Anderson, logo depois da rodada: "nada será implementado
+  agora, nem sairá desse workstream". A proposta v3.3 e as issues ficam no `playground` como registro da reunião; não
+  se abre plano nem sessão no `brza-workflow`.
 - **As issues abertas pela reunião:**
   - [O proxy remoto de autorização no brza-mcp](../issues/proxy-remoto-de-autorizacao-no-brza-mcp.md) — a fase 0 da v3, o trabalho principal;
   - [O correio remoto por MCP para sessões fora do Mac](../issues/correio-remoto-por-mcp-para-sessoes-fora-do-mac.md) — a volta da conversa, a fase 3;

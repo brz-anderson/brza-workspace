@@ -8,7 +8,8 @@
     "GIT_SSH_COMMAND": "ssh -F ~/.ssh/config"
   },
   "enabledPlugins": {
-    "context7@claude-plugins-official": true
+    "context7@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true
   },
   "promptCacheTtl": "1h",
   "subagentPromptCacheTtl": "5m",

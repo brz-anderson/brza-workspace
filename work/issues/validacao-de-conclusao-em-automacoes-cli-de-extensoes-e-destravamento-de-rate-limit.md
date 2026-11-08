@@ -1,6 +1,6 @@
 ---
 status: open
-description: A issue #39563 e os PRs #39581, #39578, #39540, #39555 e #39530 trazem validação de objetivos em automações, comandos CLI de extensões, desobstrução de rate limit e resiliência de chat.
+description: A issue #39563 e os PRs #39613, #39581, #39540, #39555 e #39530 trazem validação de objetivos em automações, comandos CLI de extensões, desobstrução de rate limit e resiliência de chat.
 scope:
   - brza-studio
   - brza-workflow
@@ -15,8 +15,8 @@ tags:
 # Validação de conclusão em automações, CLI de extensões e destravamento de rate limit
 
 Rastreado da issue aberta no upstream [`stablyai/orca#39563`](https://github.com/stablyai/orca/issues/39563),
+do PR [`stablyai/orca#39613`](https://github.com/stablyai/orca/pull/39613) (resolve Issue [`#39578`](https://github.com/stablyai/orca/issues/39578)),
 do PR [`stablyai/orca#39581`](https://github.com/stablyai/orca/pull/39581),
-da issue [`stablyai/orca#39578`](https://github.com/stablyai/orca/issues/39578),
 dos PRs [`stablyai/orca#39540`](https://github.com/stablyai/orca/pull/39540),
 [`stablyai/orca#39555`](https://github.com/stablyai/orca/pull/39555) (atendendo à Issue [`#39122`](https://github.com/stablyai/orca/issues/39122)) e
 [`stablyai/orca#39530`](https://github.com/stablyai/orca/pull/39530) (atendendo à Issue [`#39529`](https://github.com/stablyai/orca/issues/39529) e [`#32242`](https://github.com/stablyai/orca/issues/32242)).

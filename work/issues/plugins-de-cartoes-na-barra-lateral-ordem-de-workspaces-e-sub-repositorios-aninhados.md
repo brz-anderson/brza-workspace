@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39542, #39538, #39532, #39588, #39582, #39100 e as issues #39541, #39584 trazem cabeçalho compacto, indentação por host e filtros de sidebar.
+description: Os PRs #39542, #39538, #39532, #39490, #39588, #39582 e as issues #39541, #18401 trazem indentação por host, deduplicação offline e filtros de sidebar.
 scope:
   - brza-studio
   - workspace
@@ -16,6 +16,7 @@ tags:
 Rastreado dos PRs abertos no upstream [`stablyai/orca#39542`](https://github.com/stablyai/orca/pull/39542) (resolve Issue [`#39541`](https://github.com/stablyai/orca/issues/39541)),
 [`stablyai/orca#39538`](https://github.com/stablyai/orca/pull/39538) (Issue [`#39537`](https://github.com/stablyai/orca/issues/39537)),
 [`stablyai/orca#39532`](https://github.com/stablyai/orca/pull/39532) (resolve Issue [`#39531`](https://github.com/stablyai/orca/issues/39531)),
+[`stablyai/orca#39490`](https://github.com/stablyai/orca/pull/39490),
 [`stablyai/orca#39588`](https://github.com/stablyai/orca/pull/39588) (resolve Issue [`#39584`](https://github.com/stablyai/orca/issues/39584)),
 [`stablyai/orca#39582`](https://github.com/stablyai/orca/pull/39582) (resolve Issue [`#39573`](https://github.com/stablyai/orca/issues/39573)),
 [`stablyai/orca#39559`](https://github.com/stablyai/orca/pull/39559) (resolve Issue [`#39549`](https://github.com/stablyai/orca/issues/39549)),
@@ -54,6 +55,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39542`](https://github.com
 [`#38214`](https://github.com/stablyai/orca/issues/38214),
 [`#38112`](https://github.com/stablyai/orca/issues/38112),
 [`#38017`](https://github.com/stablyai/orca/issues/38017),
+[`#18401`](https://github.com/stablyai/orca/issues/18401),
 [`#15323`](https://github.com/stablyai/orca/issues/15323) e
 [`#37761`](https://github.com/stablyai/orca/issues/37761).
 
@@ -127,9 +129,19 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39542`](https://github.com
     - Mantém o badge e indicador de status do Pull Request visíveis mesmo quando o workspace está em repouso (*sleeping*).
 27. **Atenuação visual de contadores de referências vinculadas (`#39559`, resolve `#39549`):**
     - Reduz o tamanho e brilho excessivo dos contadores de referências e tarefas vinculadas nos cartões de workspace.
+28. **Deduplicação de repositórios placeholder em sessões offline (`#39490`):**
+    - Durante a hidratação de sessões enquanto o host remoto está desconectado, o app sintetizava repositórios placeholder duplicados
+      para o mesmo diretório caso houvesse discrepância de IDs;
+    - O PR `#39490` casa repositórios pelo caminho normalizado (`normalizeRuntimePathForComparison`) no mesmo host, consolidando worktrees
+      sob uma única entrada na barra lateral.
+29. **Ocultação indevida de worktrees remotos por filtro local de repo-id (`#18401`):**
+    - O filtro `filterRepoIds` aplicava checagens restritas ao catálogo local, ocultando todos os worktrees situados em hosts remotos pareados
+      e corrompendo a reordenação por arrasto quando grupos de worktrees fixados estavam ativos.
 
 ## O que fazer
 
+- Adotar a deduplicação de repositórios placeholder offline por caminho normalizado (`#39490`).
+- Corrigir o escopo de `filterRepoIds` para preservar worktrees de hosts remotos pareados (`#18401`).
 - Adotar o layout opcional "Compact header" nos cartões de workspace (`#39542`), reduzindo a rolagem vertical na sidebar.
 - Incorporar as correções de indentação por host (`#39538`) e ordenação de grupos colapsados (`#39532`).
 - Aplicar a desduplicação de filtros de projeto (`#39588`) e a visibilidade de PRs em workspaces em repouso (`#39582`).

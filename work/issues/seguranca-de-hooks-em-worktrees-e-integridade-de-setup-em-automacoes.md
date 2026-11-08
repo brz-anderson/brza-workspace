@@ -19,6 +19,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39229`](https://github.com
 [`stablyai/orca#38648`](https://github.com/stablyai/orca/pull/38648),
 [`stablyai/orca#38585`](https://github.com/stablyai/orca/pull/38585),
 [`stablyai/orca#38128`](https://github.com/stablyai/orca/pull/38128) (Issue [`#37902`](https://github.com/stablyai/orca/issues/37902)),
+[`stablyai/orca#37848`](https://github.com/stablyai/orca/pull/37848) (resolve Issue [`#37799`](https://github.com/stablyai/orca/issues/37799)),
 [`stablyai/orca#37977`](https://github.com/stablyai/orca/pull/37977),
 [`stablyai/orca#37978`](https://github.com/stablyai/orca/pull/37978),
 [`stablyai/orca#37979`](https://github.com/stablyai/orca/pull/37979),
@@ -72,10 +73,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39229`](https://github.com
     No Claude Code 2.1.319+, a checagem interna para pular recusas/checagens de segurança embutidas (ex.: `rm`) exige que nenhum hook
     `PermissionRequest` esteja configurado no ambiente. Como o Orca instalava incondicionalmente um hook `PermissionRequest` gerenciado
     (com matcher `*`), a flag de ignorar recusas era ineficaz mesmo em modo Full access.
-11. **Relaunch de `claude --resume` no worktree errado por colisão de IDs numéricos legados (`#39609`):**
-    Após atualizações do app, abas que retinham identificadores numéricos de PTY legados (ex.: `"6"`, `"8"`, `"9"`) compartilhados
-    com abas de outros projetos foram relançadas no diretório (`cwd`) de outro worktree. O Claude continuou a sessão original
-    usando as regras (`CLAUDE.md`), hooks de segurança e skills do repositório alheio, quebrando o isolamento de segurança.
+11. **Relaunch de `claude --resume` no worktree errado por colisão de IDs e herança em tmux (`#37848`, resolve `#37799`, `#39609`):**
+    Após atualizações do app ou quando um servidor tmux iniciado em uma aba preserva variáveis de ambiente herdadas (`ORCA_AGENT_PANE`),
+    hooks de sessões em outros worktrees podiam postar com a chave de pane da aba original. No reinício, o comando `cd <outro> && claude --resume`
+    era injetado na aba errada;
+    - O PR `#37848` implementa a proteção `cwdInsideOtherTabbedWorktree` no host de execução: se a pasta reportada pelo hook pertencer
+      a outro worktree que já possui suas próprias abas na janela, o registro de resume é rejeitado, impedindo que a sessão estranha sobrescreva
+      ou capture a aba.
 12. **Perda de status do agente quando `claude` no PATH é um symlink para wrapper launcher (`#39771`):**
     Quando o executável `claude` no PATH do host aponta para um script wrapper customizado via symlink, a inspeção de processos
     do gancho gerenciado não consegue casar a linha de comando com binários conhecidos, marcando o remetente como `unknown`
@@ -130,7 +134,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39229`](https://github.com
 - Tratar descritores restritivos e falhas de escrita no `printf` do SessionStart hook do Claude (`#39714`).
 - Adicionar verificação defensiva de existência do `cwd` no hook do Hermes para evitar quebras em limpezas de Kanban (`#39736`).
 - Adotar a opção de dispensa de recusas do Claude Code (`agentPermissionGuardSkip`, `#39229`) para agentes sob Full access.
-- Validar se o diretório de execução (`cwd`) pertence estritamente ao worktree da aba ao relançar `claude --resume`, migrando identificadores numéricos de PTY (`#39609`).
+- Validar se o diretório de execução (`cwd`) pertence estritamente ao worktree da aba ao relançar `claude --resume` via `cwdInsideOtherTabbedWorktree` (`#37848`, resolve `#37799`, `#39609`).
 - Implementar ganchos de suspensão e restauração (`scripts.sleep` / `scripts.wake`, `#38566`) no orquestrador de worktrees do `brza-studio`.
 - Incorporar o fix de descarte de espera de permissões do Claude (`#38648`).
 - Aplicar a restrição read-only para geradores de texto em background (`#38558`) no `brza-studio` e `brza-workflow`.

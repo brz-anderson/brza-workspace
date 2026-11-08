@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39020 e #38950 trazem resultados de CI diretamente nos chats de PRs e disparo automático de agentes para correção de checks com falha.
+description: Os PRs #39658, #39020 e #38950 trazem cards unificados de CI no desktop/mobile, resultados no chat e follow-up automático em falhas de PR.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Resultados de CI no chat e disparo automático de agentes em falhas de PR
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39020`](https://github.com/stablyai/orca/pull/39020) e
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39658`](https://github.com/stablyai/orca/pull/39658),
+[`stablyai/orca#39020`](https://github.com/stablyai/orca/pull/39020) e
 [`stablyai/orca#38950`](https://github.com/stablyai/orca/pull/38950).
 
 ## O problema
@@ -48,6 +49,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39020`](https://github.com
     - Fila de espera: nunca inicia um agente se outro já estiver trabalhando no workspace;
     - Exibe linha explicativa "Automatic follow-ups" no painel Checks, etiqueta "Fixing checks · auto" no cartão do workspace e
       notificação nativa de desktop caso a janela do aplicativo não esteja em foco.
+- **Cartões de uma linha para CI no desktop e celular (`#39658`):**
+  - Substitui o texto estático centralizado por cartões compactos de uma linha (`NativeChatPullRequestEventLine`), com o mesmo
+    estilo visual (borda, cantos arredondados, padding) dos cartões de "Opened PR";
+  - Exibe ícone colorido de status (verde/vermelho), texto resumido "CI failing on `repo#N` at `sha`", links diretos para o PR e commit,
+    e botão de ocultação rápida no desktop;
+  - No cliente móvel (iOS/Android), sincroniza o cartão ao vivo seguindo a configuração do desktop pareado (`nativeChatCiResultLines`),
+    filtrando em tempo de projeção sem exigir recargas do histórico de mensagens.
 
 ## O que fazer no BrzA Studio
 
@@ -55,3 +63,4 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39020`](https://github.com
    de desenvolvimento e revisão dentro da conversa.
 2. Integrar a automação de auto-healing de PRs (`#38950`) ao fluxo do `brza-workflow`, permitindo que workspaces corrijam
    testes quebrados autonomamente sob supervisão configurável.
+3. Adotar o formato de cartões de uma linha de CI para desktop e mobile (`#39658`), sincronizando preferências de exibição entre dispositivos.

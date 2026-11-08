@@ -11,6 +11,9 @@ refs:
   - issue:agente-kiro-no-native-chat-janela-flutuante-e-enderecamento-de-workspaces
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
+  - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
+  - issue:projecoes-sqlite-de-native-chat-submenu-de-agentes-e-links-no-terminal
+  - issue:resultados-de-ci-no-chat-e-disparo-automatico-de-agentes-em-falhas-de-pr
   - issue:seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes
   - issue:seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio
   - issue:subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent
@@ -18,7 +21,7 @@ refs:
   - issue:validacao-de-conclusao-em-automacoes-cli-de-extensoes-e-destravamento-de-rate-limit
 ---
 
-# Radar de issues e PRs do upstream e automação de 6h (00h e 06h BRT)
+# Radar de issues e PRs do upstream e automação de 6h (00h, 06h e 12h BRT)
 
 ## O que foi feito
 
@@ -77,3 +80,26 @@ refs:
      adicionadas a Issue `#39771` (perda de status de agente na UI quando `claude` no PATH é symlink para wrapper launcher),
      a Issue `#39714` (falha no SessionStart hook por erro de permissão no `printf`) e
      a Issue `#39736` (exceção `FileNotFoundError` no hook do Hermes após remoção de `cwd` em tarefas Kanban).
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-08)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues criados ou
+   atualizados entre `2026-11-08T09:00:00Z` e `2026-11-08T15:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Projeções SQLite de Native Chat, submenu de agentes e links no terminal](../issues/projecoes-sqlite-de-native-chat-submenu-de-agentes-e-links-no-terminal.md):
+     rastreia o PR `#39256` (migração de journals de chat nativo no host para projeções tipadas SQLite persistidas com background writer e leituras delimitadas),
+     o PR `#39106` (resolve Issue `#39105`, fazendo o fallback de arquivos locais no terminal ceder a links HTTP, corrigindo erro `File not found` em URLs com portas e subdiretórios),
+     o PR `#39569` (submenu flutuante via `DropdownMenuSub` para setup de agentes nas buscas do omnibox `+`, preservando o foco de digitação),
+     o PR `#37778` (reset de mouse tracking em terminais quando processos encerram sem enviar códigos de desativação) e
+     as issues `#39704` (hot-swapping de modelos no Cursor) e `#38825` (reattach de terminais remotos em clientes desktop pareados).
+3. **Atualização de 4 issues existentes em `work/issues/`:**
+   - [Resultados de CI no chat e disparo automático de agentes em falhas de PR](../issues/resultados-de-ci-no-chat-e-disparo-automatico-de-agentes-em-falhas-de-pr.md):
+     adicionado o PR `#39658` (cartões compactos de uma linha para CI no desktop e celular, links diretos para PR/commit e sincronização de preferência entre dispositivos).
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados o PR `#39490` (deduplicação de seções placeholder de repositórios offline por caminho normalizado) e a Issue `#18401` (correção no filtro `filterRepoIds` para evitar ocultação de worktrees de hosts remotos).
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     incorporados os detalhes do PR `#39501` (resolve Issue `#39499`, descartando linhas obsoletas de agentes no estado "Done" na sidebar via `retireConfirmedShellAgent`).
+   - [Segurança de hooks em worktrees e integridade de setup em automações](../issues/seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes.md):
+     incorporados os detalhes do PR `#37848` (resolve Issue `#37799`, `#39609`), adicionando a guarda `cwdInsideOtherTabbedWorktree` para recusar registros de resume com `cwd` pertencente a outros worktrees abertos.
+

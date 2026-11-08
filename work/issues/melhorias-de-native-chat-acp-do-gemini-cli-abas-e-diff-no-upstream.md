@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39398, #39006, #33360 e as issues #39523, #39528, #39556, #39514 trazem correção de auth no macOS, isolamento de skills, launch de modelos e ACP do Gemini CLI.
+description: Os PRs #39398, #39006, #33360 e as issues #39742, #39523, #39528, #39556, #39514 trazem fix de account switch, auth macOS, skills e ACP.
 scope:
   - brza-studio
 priority: high
@@ -35,6 +35,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39398`](https://github.com
 [`stablyai/orca#37532`](https://github.com/stablyai/orca/pull/37532),
 [`stablyai/orca#37494`](https://github.com/stablyai/orca/pull/37494) e
 [`stablyai/orca#37503`](https://github.com/stablyai/orca/pull/37503), além das issues
+[`stablyai/orca#39742`](https://github.com/stablyai/orca/issues/39742),
 [`stablyai/orca#39523`](https://github.com/stablyai/orca/issues/39523),
 [`stablyai/orca#39528`](https://github.com/stablyai/orca/issues/39528),
 [`stablyai/orca#39556`](https://github.com/stablyai/orca/issues/39556),
@@ -129,9 +130,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39398`](https://github.com
 24. **Execução nativa de chats Gemini CLI sobre ACP (`#33360`, atendendo `#39514`):**
     - Habilita sessões de chat nativo diretamente com a CLI Gemini via protocolo ACP, integrando ferramentas de inspeção,
       aprovações estruturadas e streaming de respostas na interface do usuário.
+25. **Falso aviso recorrente 'The native Antigravity account changed' após cada worker run (`#39742`):**
+    - Após cada execução de worker invocando `agy`, o Orca exibe incorretamente a notificação toast "The native Antigravity account changed",
+      mesmo quando a conta ativa permanece idêntica;
+    - O problema ocorre porque o comparador de identidade de conta valida o hash completo do token armazenado em vez do
+      identificador durável de usuário/e-mail; como a CLI atualiza o timestamp e tokens de renovação a cada turno, o hash
+      diverge e o app interpreta a renovação como troca de usuário.
 
 ## O que fazer
 
+- Corrigir a comparação de identidade de conta no Antigravity (`#39742`), validando ID/e-mail do usuário em vez do hash mutável de credenciais para eliminar avisos falsos após cada execução de worker.
 - Implementar fallback no `HybridCredentialStore` para leitura de `acp_token.json` quando o item do Keychain não existir,
   ou sincronizar o token no Keychain do macOS durante o sign-in no `brza-studio` (`#39523`).
 - Garantir symlink ou descoberta compartilhada das pastas globais de skills em `~/.gemini/` mesmo quando `GEMINI_HOME` for

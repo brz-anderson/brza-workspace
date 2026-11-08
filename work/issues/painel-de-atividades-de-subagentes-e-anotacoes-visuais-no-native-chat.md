@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39606, #39276, #39082 e as issues #39619, #39074 trazem limpeza de títulos após /clear, isolamento de sessões irmãs e subagentes OpenCode.
+description: Os PRs #39649, #39606, #39276 e as issues #39619, #39074 trazem isolamento de OSC 7501 do OpenCode, limpeza de títulos após /clear e subagentes OpenCode.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39606`](https://github.com/stablyai/orca/pull/39606) (resolve Issue [`#37379`](https://github.com/stablyai/orca/issues/37379)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39649`](https://github.com/stablyai/orca/pull/39649) (resolve Issue [`#39619`](https://github.com/stablyai/orca/issues/39619)),
+[`stablyai/orca#39606`](https://github.com/stablyai/orca/pull/39606) (resolve Issue [`#37379`](https://github.com/stablyai/orca/issues/37379)),
 [`stablyai/orca#39276`](https://github.com/stablyai/orca/pull/39276) (Issue [`#39275`](https://github.com/stablyai/orca/issues/39275)),
 [`stablyai/orca#39082`](https://github.com/stablyai/orca/pull/39082) (Issue [`#39074`](https://github.com/stablyai/orca/issues/39074)),
 [`stablyai/orca#39079`](https://github.com/stablyai/orca/pull/39079) (Issue [`#39073`](https://github.com/stablyai/orca/issues/39073)),
@@ -95,11 +96,15 @@ além da issue [`stablyai/orca#39619`](https://github.com/stablyai/orca/issues/3
 - **Supressão de textos de harness do Claude nos títulos de abas (`#39606`, resolve `#37379`):**
   - Impede que marcações de meta/harness (como `<local-command-caveat>`) sejam promovidas a título de sessão de fallback,
     preservando o título ao vivo (`✳ Claude Code`) após execuções de `/clear`.
+- **Prevenção de falso status 'working' por OSC 7501 do OpenCode (`#39649`, resolve `#39619`):**
+  - Filtra as sequências de escape OSC 7501 emitidas pelo OpenCode em instâncias compartilhadas (`opencode serve --service`),
+    impedindo que o broadcast de status marque abas ociosas como em execução e garantindo que apenas a aba dona do comando
+    exiba o status `working`.
 
 ## O que fazer
 
 - Adotar a supressão de textos de harness em títulos de abas do Claude (`#39606`).
-- Isolar sessões irmãs do OpenCode no mesmo serviço (`#39619`), computando `working` apenas para a sessão da pane e seus filhos reais.
+- Isolar sessões irmãs do OpenCode no mesmo serviço (`#39649`, `#39619`), contendo sequências OSC 7501 e computando `working` apenas para a sessão ativa e seus filhos reais.
 - Adotar a pré-visualização read-only de chats no Agent Dashboard (`#39082`) e o filtro de notificações de perguntas (`#39079`).
 - Adotar o suporte nativo a subagentes OpenCode no Chat UI (`#39276`).
 - Adotar o agrupamento visual de subagentes na sidebar (`#38995`) e a ação de backgrounding de ferramentas (`#38963`) no `brza-studio`.

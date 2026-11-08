@@ -390,9 +390,20 @@ levantamento já rodou); o teste de aceite do `tally.py` 1 h; uma reunião curta
 1,25 h e ~US$ 5; a revisão 0,5 h e ~US$ 3. [C33 · inferido · 60] Base: o tamanho da forma (F22) e dos scripts que já
 existem; nenhuma escrita de skill deste workspace tem duração medida.
 
+### Revisão pela R5 e R6: a abertura, o sinal de fim e o encerramento (2026-11-08)
+
+O requisito da R5 e a via da R6 mudam três passos do esqueleto acima e dois scripts; o resto fica.
+
+- **Passo 2, abrir as sessões:** cada persona abre com o ciclo de vida dos workers do Orca, pela via que a sonda P4a.0 do plano decidir (a híbrida: `agent launch --surface chat` e `worker-start --terminal orca_session_id:<chat>`; ou a via A: `worker-start --spec --agent --model --effort --worktree path:`). O `launch_persona.py` v1 implementa a via e grava `dispatch_id` e `orca_session_id` no mapa, além de modelo e esforço; quando o `brza sessions open` ganhar a via (D2, P4a), o script sai. O prompt da persona chega depois do preâmbulo do Orca, como turno do coordenador: o briefing diz à persona que o `worker_done` que o preâmbulo pede é o do encerramento, não o de cada rodada.
+- **Passo 3, o sinal de fim de rodada (R6.2):** ao fechar a seção da rodada no worklog, a persona roda `brza orchestration send --to <coordenação> "fim-rodada-N"`; a coordenação espera por `brza orchestration check --wait --types message` (v1: `wait_round.py` embrulha o `check --wait` e imprime quem chegou e quem falta, em uma linha por chegada; v2: `brza sessions wait`). O marcador `<!-- fim-rodada-N -->` na última linha do worklog continua, como registro escrito que o `tally.py` lê, não como sinal.
+- **Passo 7, fechar:** a mensagem de encerramento da coordenação diz "a reunião acabou; envie `worker_done`"; o host arma os 2 min e o botão "manter aberta" aparece no chat de cada persona, para Anderson guardar a que quiser consultar; quem não responder é liberado por `brza orchestration worker-release`. O `brza sessions close` de cada persona sai do passo. A contraprova e a "rodada a mais se as decisões pedirem" acontecem antes do encerramento, ou reabrem a persona pelo `fallback`.
+- **A narração:** a linha de status por chegada sai do `check --wait`, não do `grep`; o resto da tabela de narração vale igual.
+- **O que a persona precisa poder fazer:** rodar dois comandos de shell (`brza orchestration send` por rodada e `worker_done` no fim); as personas das duas reuniões escreveram arquivos, logo têm shell. O briefing traz os dois comandos prontos, com o destinatário preenchido.
+- **Assumido sem rodada:** a sonda roda antes da primeira reunião pela skill (P4a.0 antes de P7); até lá, o `launch_persona.py` aceita `--via agent-launch` para abrir como hoje, sem ciclo de vida, só para testar o resto da skill.
+
 ### O que as rodadas decidiram
 
-R2, 2026-11-08: A1 (protótipo na branch do `playground`), B1 (`SKILL.md`, oito references e quatro scripts), C-1 (o revisor como número), D-1 (contraprova por gatilho) e, na rodada final de decisão, o voto e o argumento mais forte a favor e contra por persona. As perguntas, como foram feitas, ficam abaixo; o texto das respostas está na Entrevista do plano.
+R2, 2026-11-08: A1 (protótipo na branch do `playground`), B1 (`SKILL.md`, oito references e quatro scripts), C-1 (o revisor como número), D-1 (contraprova por gatilho) e, na rodada final de decisão, o voto e o argumento mais forte a favor e contra por persona. **R5 e R6, 2026-11-08:** as personas abrem com o ciclo de vida dos workers do Orca; o fim de rodada é `brza orchestration send` da persona; o `worker_done` só no encerramento (seção "Revisão pela R5 e R6"). As perguntas, como foram feitas, ficam abaixo; o texto das respostas está na Entrevista do plano.
 
 ### Como foi perguntado (R2)
 

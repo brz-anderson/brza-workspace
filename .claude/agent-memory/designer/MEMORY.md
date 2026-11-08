@@ -1,0 +1,1 @@
+- [Decisor quer estado e números no chat](decisor-quer-estado-e-numeros-no-chat.md) — painel barato agora, alternativa maior medida, conteúdo integral adiado

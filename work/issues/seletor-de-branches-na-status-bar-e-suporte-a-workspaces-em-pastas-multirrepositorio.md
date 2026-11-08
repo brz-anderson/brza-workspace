@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39637, #39575, #39572, #39018, #39000 trazem seletores path: e name: para pastas, criação de worktree e status bar.
+description: Os PRs #39779, #39637, #39575, #39572, #39018 trazem busca de projetos e hosts, seletores para pastas e status bar.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,8 @@ tags:
 
 # Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39637`](https://github.com/stablyai/orca/pull/39637),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39779`](https://github.com/stablyai/orca/pull/39779) (resolve Issue [`#39777`](https://github.com/stablyai/orca/issues/39777)),
+[`stablyai/orca#39637`](https://github.com/stablyai/orca/pull/39637),
 [`stablyai/orca#39575`](https://github.com/stablyai/orca/pull/39575),
 [`stablyai/orca#39572`](https://github.com/stablyai/orca/pull/39572) (resolve Issue [`#39545`](https://github.com/stablyai/orca/issues/39545)),
 [`stablyai/orca#39018`](https://github.com/stablyai/orca/pull/39018),
@@ -96,6 +97,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39637`](https://github.com
   - Renderiza seções colapsáveis por worktree no Source Control de pastas multirrepositório.
 - **Hierarquia de pastas e linhagem cross-machine (`#38904`, `#38875`):**
   - Aninha workspaces sob a pasta pai na barra lateral do desktop e mobile com resolução persistente na criação.
+- **Busca combinada de projetos e hosts nos seletores de workspace (`#39779`, resolve `#39777`):**
+  - Introduz o matcher compartilhado `project-host-query`, permitindo digitar `<host> <projeto>` (ex.: `box orca`) nos drawers
+    de seleção de projetos e no quick-pick do cliente móvel, além do combobox de projetos no desktop;
+  - Atualiza simultaneamente o projeto e o host de execução (*Run on*) em uma única seleção rápida.
 
 ## O que fazer no BrzA Studio
 
@@ -105,3 +110,4 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39637`](https://github.com
 4. Adotar o botão "Create worktree" nos painéis vazios de pastas multirrepositório (`#39575`).
 5. Aplicar sanitização e `.trim()` em todos os campos de diretório de workspace para evitar criação de pastas acidentais (`#39572`).
 6. Suportar seletores unificados `path:` e `name:` para folder workspaces na CLI e separar instâncias por host no `worktree ps` (`#39637`).
+7. Integrar a busca combinada de projetos e hosts (`project-host-query`, `#39779`) nos modais de criação de workspace.

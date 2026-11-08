@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39599, #39564, #39283 e as issues #39807, #39694, #39631, #39598, #39517 trazem controle de auto-release de workers, retenção de worker-list e background workers no chat.
+description: Os PRs #39804, #39802, #39599, #39564, #39501 trazem liveness honesto de workers, recusa de reply a worker_done e retenção de worker-list.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,9 @@ tags:
 
 # Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39599`](https://github.com/stablyai/orca/pull/39599) (resolve Issue [`#39598`](https://github.com/stablyai/orca/issues/39598)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39804`](https://github.com/stablyai/orca/pull/39804),
+[`stablyai/orca#39802`](https://github.com/stablyai/orca/pull/39802),
+[`stablyai/orca#39599`](https://github.com/stablyai/orca/pull/39599) (resolve Issue [`#39598`](https://github.com/stablyai/orca/issues/39598)),
 [`stablyai/orca#39564`](https://github.com/stablyai/orca/pull/39564),
 [`stablyai/orca#39501`](https://github.com/stablyai/orca/pull/39501) (resolve Issue [`#39499`](https://github.com/stablyai/orca/issues/39499)),
 [`stablyai/orca#39283`](https://github.com/stablyai/orca/pull/39283),
@@ -182,9 +184,23 @@ além da issue [`stablyai/orca#39631`](https://github.com/stablyai/orca/issues/3
     - Quando um worker em chat que foi auto-liberado (*auto-released*) por inatividade é reaberto pelo usuário ou pelo coordenador,
       chamadas posteriores a `worker_done` são rejeitadas de forma intermitente com o erro `worker_identity_changed`;
     - Isso decorre de uma discrepância entre o token de identidade/sessão recriado na interface e o registro original retido no banco de orquestração.
+24. **Falsos alertas de liveness 'unverifiable' em workers em modo chat (`#39804`):**
+    - Ao listar workers de orquestração com `orca orchestration worker-list`, qualquer worker executando como chat nativo (Codex, Claude,
+      OpenCode) recebia o status `liveness=unverifiable attention=unverifiable`, mesmo enquanto trabalhava ativamente em um comando.
+      Isso ocorria porque a projeção da frota avaliava apenas linhas de gancho de terminal, que nunca são vinculadas a handles `structworker_`;
+    - O PR `#39804` integra as observações estruturadas de sessão (`session-worker-liveness.ts`), permitindo que workers de chat relatem
+      fielmente `liveness=live activity=working` ou `activity=idle`, restringindo `unverifiable` a falhas reais de contato com o host.
+25. **Perda silenciosa de mensagens de `reply` a relatórios de workers concluídos (`#39802`):**
+    - Sob relatórios `worker_done`, coordenadores visualizavam sugestões de resposta como `[Reply: orca orchestration reply --id …]`.
+      No entanto, ao executar o comando, a mensagem era aceita com ID mas nunca lida pelo worker (que já havia encerrado o turno),
+      sendo entregue horas depois a tarefas não relacionadas no mesmo terminal;
+    - O PR `#39802` recusa formalmente `orchestration reply` em relatórios concluídos (`dispatch_inactive`, `effectsApplied: false`) e
+      orienta explicitamente o uso de `orca orchestration send --to dispatch:<id>`, que inicia um follow-up rastreado no mesmo worker.
 
 ## O que fazer
 
+- Integrar o reporte honesto de liveness e activity para workers em modo chat (`#39804`), eliminando alertas espúrios de `unverifiable`.
+- Adotar a recusa de `orchestration reply` em relatórios de workers concluídos e sugerir `send --to dispatch:<id>` para follow-ups (`#39802`).
 - Implementar política de expurgo periódico (*pruning*) para registros antigos de workers em `worker-list` (`#39807`).
 - Corrigir a sincronização de identidade de workers auto-released e reabertos ao processar `worker_done` (`#39694`).
 - Suportar as variáveis de ambiente de auto-release (`ORCA_WORKER_AUTO_RELEASE` e `ORCA_WORKER_AUTO_RELEASE_GRACE_SECONDS`)

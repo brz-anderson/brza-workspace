@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38326, #39168, #38381 e os PRs #38388, #38352 e #38335 trazem bifurcação fiel de chats, resiliência de startup do Claude CLI e melhorias de navegação e teclado.
+description: Os PRs #39823, #38326, #39168, #38381 trazem bifurcação fiel de chats, fork de respostas copiadas e resiliência de startup.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Bifurcação de conversas no Chat UI e resiliência de inicialização do Claude
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38326`](https://github.com/stablyai/orca/pull/38326),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39823`](https://github.com/stablyai/orca/pull/39823) (atendendo à Issue [`#38326`](https://github.com/stablyai/orca/issues/38326)),
+[`stablyai/orca#38326`](https://github.com/stablyai/orca/pull/38326),
 [`stablyai/orca#39168`](https://github.com/stablyai/orca/pull/39168),
 [`stablyai/orca#38381`](https://github.com/stablyai/orca/pull/38381) (Issue [`#38369`](https://github.com/stablyai/orca/issues/38369)),
 [`stablyai/orca#38388`](https://github.com/stablyai/orca/pull/38388) (Issue [`#38385`](https://github.com/stablyai/orca/issues/38385)),
@@ -66,6 +67,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38326`](https://github.com
 - **Elevação do timeout de inicialização do Claude para 3 minutos (`#38381`):**
   - Ajusta `CLAUDE_INITIALIZE_TIMEOUT_MS` de 60s para 180s (180.000 ms), permitindo inicializações seguras de projetos
     com servidores MCP pesados e LSP associados sem falhas falsas de handshake.
+- **Bifurcação de respostas copiadas a partir do chat original (`#39823`, atendendo `#38326`):**
+  - Respostas copiadas acima do divisor de um fork pertencem ao chat original; a ação "Fork from this response" sobre essas mensagens
+    resolve e bifurca a partir da conversa original raiz (inclusive recursivamente através de bifurcações de bifurcações);
+  - Oculta o botão "Rewind" nas respostas copiadas acima do divisor no desktop e mobile, e garante que o rewinding no primeiro prompt
+    abaixo do divisor retorne exatamente ao ponto de bifurcação;
+  - Se a conversa original tiver sido deletada ou não contiver mais a resposta, a solicitação é recusada antes de criar abas órfãs.
 - **Atalho Cmd+R a partir do Chat Composer (`#38388`):**
   - Integra o handler de renomeação de aba ao editor de texto do composer de chat.
 - **Cartão `/usage` para Codex no Native Chat (`#38352`):**
@@ -75,7 +82,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38326`](https://github.com
 
 ## O que fazer
 
-- Adotar o recurso de fork de mensagens (`#38326`) no `brza-studio` e `brza-workflow`.
+- Adotar o recurso de fork de mensagens (`#38326`) e a resolução de forks a partir do chat original raiz (`#39823`) no `brza-studio`.
 - Adotar a replicação fiel de transcrições nativas e recibos de identidade na bifurcação de chats (`#39168`).
 - Incorporar o aumento de timeout de inicialização do Claude CLI para 180s (`#38381`) para estabilizar o carregamento de
   projetos com MCP servers no `brza-studio`.

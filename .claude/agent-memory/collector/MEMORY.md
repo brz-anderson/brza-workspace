@@ -1,0 +1,1 @@
+- [Mapa das fontes das reuniões](meeting-sources-map.md) — onde estão sessions/measurements/rollouts das reuniões de 2026-11-07 e o que enganou

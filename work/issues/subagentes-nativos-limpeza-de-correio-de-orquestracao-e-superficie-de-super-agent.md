@@ -15,6 +15,7 @@ tags:
 
 Rastreado dos PRs abertos no upstream [`stablyai/orca#39599`](https://github.com/stablyai/orca/pull/39599) (resolve Issue [`#39598`](https://github.com/stablyai/orca/issues/39598)),
 [`stablyai/orca#39564`](https://github.com/stablyai/orca/pull/39564),
+[`stablyai/orca#39501`](https://github.com/stablyai/orca/pull/39501) (resolve Issue [`#39499`](https://github.com/stablyai/orca/issues/39499)),
 [`stablyai/orca#39283`](https://github.com/stablyai/orca/pull/39283),
 [`stablyai/orca#38901`](https://github.com/stablyai/orca/pull/38901),
 [`stablyai/orca#38899`](https://github.com/stablyai/orca/pull/38899),
@@ -151,9 +152,11 @@ além da issue [`stablyai/orca#39631`](https://github.com/stablyai/orca/issues/3
       e uso acidental de modelos inadequados para tarefas específicas (ex.: revisão vs. implementação rápida);
     - A issue `#39517` propõe papéis nomeados em Configurações (`--role <name>`, ex.: research, implementation, review)
       pré-validando a combinação de modelo e esforço no catálogo do host antes da criação da tarefa.
-18. **Linhas obsoletas de "Done" retidas na barra lateral após término do agente (`#39499`):**
+18. **Linhas obsoletas de "Done" retidas na barra lateral após término do agente (`#39501`, resolve `#39499`):**
     - A barra lateral de workspaces retinha a linha do agente no estado "Done" mesmo após o processo do agente ter saído
-      completamente de volta para o prompt do shell, gerando poluição visual e falsos indicativos de sessões em execução.
+      completamente de volta para o prompt do shell, gerando poluição visual e falsos indicativos de sessões em execução;
+    - O PR `#39501` introduz `retireConfirmedShellAgent` e a flag `suppressRetention` em `dropAgentStatus`, descartando a linha no renderer
+      assim que o retorno ao shell for confirmado e impedindo que snapshots posteriores de retenção recriem a linha obsoleta.
 19. **Exibição de native background workers no chat para agentes Pi (`#39564`):**
     - Agentes Pi que disparavam subprocessos de background workers não possuíam representação no chat nativo, tornando o trabalho
       secundário invisível ao usuário;
@@ -197,4 +200,4 @@ além da issue [`stablyai/orca#39631`](https://github.com/stablyai/orca/issues/3
 - Adotar o backoff exponencial em federation relays com falha (`#39283`) para eliminar consumo excessivo de CPU.
 - Implementar a detecção de término de processos Codex em PTYs abertos (`#39300`).
 - Adotar papéis pré-configurados de workers (`--role`) na CLI de orquestração (`#39517`).
-- Corrigir a limpeza de linhas "Done" de agentes na sidebar quando o terminal retornar ao shell (`#39499`).
+- Corrigir a limpeza de linhas "Done" de agentes na sidebar quando o terminal retornar ao shell (`#39501`, `#39499`).

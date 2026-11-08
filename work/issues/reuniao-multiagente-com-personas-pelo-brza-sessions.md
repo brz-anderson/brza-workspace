@@ -48,3 +48,22 @@ Decidir se o fluxo vira skill (por exemplo, `meeting-runner`) e corrigir o que a
   acharam (os mixes do chat, o estilo inline, os portões que não se mediam): vale como etapa fixa antes do aceite.
 
 Fontes: os seis worklogs da reunião e a [Reunião Carvão em Brasa: a coordenação e a proposta de plano](../worklogs/2026-11-07-reuniao-carvao-em-brasa-coordenacao.md).
+
+## A segunda reunião: MCP remoto (2026-11-07, 21h19–21h50)
+
+A [Reunião MCP remoto: a coordenação e a proposta de arquitetura](../worklogs/2026-11-07-reuniao-mcp-remoto-coordenacao.md)
+repetiu o fluxo com as correções da primeira:
+
+- **O marcador com uma regra só funcionou:** "acrescente no fim; a última linha do arquivo é o marcador", igual no
+  briefing e em cada pedido — todos os marcadores no lugar, contra três duplicados na primeira.
+- **Modelo e esforço pelo papel desde o início** (Opus `high`, Astra `xhigh`, Terra `medium`, Grok Fast `low`, Haiku
+  `low`, Antigravity), por um lançador no scratch que importa o `brza-sessions` e repassa `--model`/`--effort`. Ainda
+  falta a opção no próprio `brza sessions`.
+- **O Antigravity repetiu a superconfiança num papel técnico** (83,8 na R1, 85 no plano, contra 50–68 dos outros e 45
+  do revisor), com as menores notas dos colegas: o efeito é do modelo, não da persona empática.
+- **Rodadas de 30 s a 4 min:** o fluxo inteiro (três rodadas, prova de conceito, revisor) coube em 30 min; o gargalo foi
+  o Astra `xhigh` (2–4 min), o único que rodou contraprova em todas as rodadas.
+- **A prova na nuvem é possível de dentro da sessão:** `claude --cloud "<sonda>"` num pseudo-terminal (`script -q`) abre
+  uma sessão Cloud real, e o `get_run_log` do `RemoteTrigger` lê o resultado sem abrir o navegador.
+- **O revisor ficou 17 pontos abaixo da sala** (45 contra 61,8 na v1) e achou o que mudou o desenho (a mensagem remota
+  chegando como da pessoa, a volta que não acorda o agente, o [medido] confundido).

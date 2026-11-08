@@ -1,2 +1,3 @@
 - [Planos de reunião de personas](meeting-plan-review-patterns.md) — onde a síntese erra (confiança × regra, valor trocado, horas) e o que costuma cair
 - [Contraste no brza-studio](brza-studio-contrast-review.md) — HEX cru ≠ render (color-mix, contraste do usuário, inline); WCAG × APCA na 07
+- [Correio/MCP remoto](remote-mcp-correio-review.md) — sem evidência a mensagem chega como a pessoa; [medido] confundido; poll não acorda

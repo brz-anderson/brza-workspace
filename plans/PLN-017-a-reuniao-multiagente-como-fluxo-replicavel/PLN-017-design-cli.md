@@ -418,9 +418,60 @@ marker`); e `model` (`name, chat, model, effort`).
 - O `--persona` não entra: a persona cabe no `--prompt-file`.
 - O fallback de runtime quando a cota cai (P14 do levantamento) não entra; o `wait` só a mostra como `failed`.
 
+### Revisão pela R5 e R6: o ciclo de vida das personas (2026-11-08)
+
+A R5 trouxe o requisito ("as sessões abertas pelo coordenador devem abrir como o `orca-orchestrator` faz, fechando sozinho 2min após não ser mais necessário, com o botão de `manter aberta` acima do input de conversa do chat") e a R6 escolheu a via. O que muda neste D2, verbo a verbo; o que não é citado fica como desenhado acima.
+
+#### O terreno do mecanismo (`brza-studio@8abbde720ce`, só leitura)
+
+- **O prazo de 2 min** é `WORKER_TERMINAL_AUTO_RELEASE_GRACE_MS`, em `src/main/runtime/orchestration/db/worker-terminal/worker-terminal-auto-release.ts:10`. [L1 · lido · 95]
+- **Só o `worker_done` aceito arma o prazo** (`worker-report-settlement.ts:280-281`); o fim de turno de um chat sem `worker_done` não arma nada, e o host avisa a coordenação com "Worker stopped without reporting" (`worker-turn-stop-report.ts:74-130`). [L2 · lido · 95]
+- **O worker em trabalho suspende a contagem**, que recomeça com mais 2 min ao repousar (`worker-auto-release-activity.ts:32-55`); "Keep open" e `worker-keep-open` a cancelam (`worker-terminal-user-keep.ts:55-119`, `worker-keep-open.ts:16-50`); no prazo, a liberação fecha a sessão do chat e retira a aba, sem remover o worktree (`structured-agent-session-close.ts`). [L3 · lido · 90]
+- **A faixa com o botão** é `NativeChatStructuredWorkerLifetimeStrip.tsx`, montada por `NativeChatStructuredComposerTabStrips.tsx:21`; só aparece em aba com Dispatch (`renderer/src/lib/worker-auto-close.ts:85-125`); o `relation: 'worker'` não entra na decisão. Um chat de `agent launch` não a recebe sem código novo. [L4 · lido · 95]
+- **`worker-start --spec` sem Run cria um** (`worker-start-authority.ts:58-85`); o chamador precisa de identidade: `ORCA_AGENT_SESSION_ID`, `ORCA_TERMINAL_HANDLE` ou terminal ativo inequívoco no cwd (`terminal-identity.ts:15-115`). [L5 · lido · 85]
+- **A superfície segue `nativeChatProviders[agente]` ou `agentDefaultSurface`** (`structured-native-chat-launch-route.ts:58-64`); não há `--surface` no `worker-start`; o padrão de fábrica é terminal (`default-global-settings.ts:151`); o worker em chat nasce sem foco. Anderson confirmou em R6.3 que os quatro agentes estão em Chat. [L6 · lido · 95]
+- **O `--spec` vira a Task**, e o preâmbulo do Orca, com o `worker_done` a enviar, chega como turno do coordenador (`relation: 'coordinator'`). [L7 · lido · 85]
+- **A coordenação espera por `orchestration check --wait [--types …]`** e lê com `worker-show` e `worker-read`. [L8 · rodado · 90]
+- **`--display-name` e `--name` só nomeiam worktree novo** e são recusados em worktree existente: o chat do worker não tem título pelo `worker-start`; o `brza sessions` segue dono do nome no mapa. [L9 · lido · 90]
+- **Dar o ciclo de vida ao `agent launch`** tocaria armazenamento do prazo sem Dispatch, gatilho de fim de turno, scheduler, RPC de keep-open por sessão, o portão do renderer e a flag: cerca de 1 300 linhas, 20 a 40 h, com conflito alto no sync do upstream. [L10 · inferido · 60]
+- **A híbrida** (`agent launch --surface chat` e depois `worker-start --terminal orca_session_id:<chat> --spec …`) daria `worker_done` e mailbox, mas o terminal reusado nunca é fechado pela liberação, e o custódio só se grava para terminal criado (`local-worker-start.ts:198`): provavelmente sem fechamento automático. A sonda decide. [L11 · lido · 75]
+
+#### Como fica, pela R6
+
+| Verbo | Antes (R3) | Agora (R5 e R6) |
+| :---- | :--------- | :-------------- |
+| `open` | `agent launch --surface chat --model --effort` | **P4a.0, a sonda:** a híbrida; se o `autoReleaseAt` não valer para terminal reusado, **a via A**: `worker-start --spec <prompt> --agent <runtime> --model <m> --effort <e> --worktree path:<checkout>`, como o `cycle.py:136-167` do MCP. O mapa grava `dispatch`, `orca_session_id`, `model`, `effort`. A identidade do chamador vem do `ORCA_AGENT_SESSION_ID` da sessão de coordenação (no chat do Studio existe; fora dele, a sonda diz). O nome da persona segue no mapa do `brza sessions`, porque o worker não ganha título |
+| `send` | `agentSession.send` com recibo e `--operation` pelo `rpc` (R3.1) | igual para texto livre; **a rodada pode ir por `brza orchestration send --to <dispatch>`**, que chega como "Task from coordinator" e resolve a mensagem como turno da pessoa (F38); a sonda diz qual chega melhor ao chat do worker |
+| `wait` | polling de `listAll` por estado, fila e `updatedAt` (R3.2) | **`brza orchestration check --wait --types message,worker_done`** sobre a mailbox da coordenação (R6.2): cada persona envia `brza orchestration send` ao fechar a rodada e `worker_done` só no encerramento. O `wait` por estado e fila fica como fallback para chat sem Dispatch e para expor `blocked` e `failed` |
+| `read --last` | `agentSession.history` | igual; `worker-read` como alternativa para o worker |
+| `close` | `agentSession.close` por nome ou `--prefix` | **o encerramento é a mensagem final da coordenação pedindo `worker_done`**; o host arma os 2 min e o botão "manter aberta" é do app. `close` vira `worker-release` para quem não respondeu e `worker-keep-open` para manter por comando |
+| `list` | agente, modelo, esforço, último turno | mais `dispatch` e `auto_release_at`, do `worker-show` |
+| `model`, `usage` | como desenhado | iguais; o `usage` do Codex acha o rollout pelo `provider_session` do worker |
+
+#### O que isso muda no resto
+
+- **A alternativa B3 de (b), o `check --wait`, passa a ser a escolhida**, e B1 vira fallback; a estimativa do `wait` (2,5 h) se redistribui para a sonda e a abertura.
+- **O MCP e o `brza sessions` convergem**: os dois abrem por `worker-start`; o embrulho MCP (R1.2) fica mais barato.
+- **O risco do nome:** a persona não tem título no chat; o `brza sessions title` só vale no Codex (issue do PLN-013). O painel do D3 mostra o nome pelo mapa.
+- **O risco do preâmbulo:** o prompt da persona chega depois do preâmbulo do Orca, como turno do coordenador; o briefing da skill passa a contar com isso (o `worker_done` que o preâmbulo pede é o do encerramento, não o de cada rodada).
+- **Remoto (`--on`) é só terminal:** a reunião com persona em outra máquina fica fora da v1.
+
+#### Estimado revisto (P4a)
+
+| Item | Horas |
+| :--- | ----: |
+| P4a.0, a sonda da híbrida e da superfície por agente | 1 a 2 |
+| `open` pela via decidida, com o mapa | 2 |
+| `send` com recibo e `--operation`, e o envio pela mailbox | 2 |
+| `wait` sobre `check --wait`, com o fallback | 1,5 |
+| `read --last` | 1 |
+| `close` por `worker-release` e `worker-keep-open` | 1 |
+| Revisão e merge | 1 |
+| **P4a** | **10 (teto)** [C34 · inferido · 60]; a base é a tabela anterior mais os 6 a 12 h da via A estimados pelo `collector` |
+
 ### O que as rodadas decidiram
 
-R3, 2026-11-08: o recibo, a `--operation` e o `read --last` pelo `rpc`, como transição até o `brza chat` (exceção à R1.4 do PLN-010, a escrever lá); o `wait` por estado, fila e `updatedAt`; a latência no mapa e o `usage` com o Codex pelo rollout. As perguntas, como foram feitas, ficam abaixo; o texto das respostas está na Entrevista do plano.
+R3, 2026-11-08: o recibo, a `--operation` e o `read --last` pelo `rpc`, como transição até o `brza chat` (exceção à R1.4 do PLN-010, a escrever lá); o `wait` por estado, fila e `updatedAt`; a latência no mapa e o `usage` com o Codex pelo rollout. **R5 e R6, 2026-11-08:** as personas abrem com o ciclo de vida dos workers do Orca (a sonda da híbrida decide entre ela e o `worker-start` puro); o fim de rodada é uma mensagem de mailbox da persona e o `worker_done` vai só no encerramento, então o `wait` vira `check --wait`; os quatro agentes estão em Chat. As perguntas, como foram feitas, ficam abaixo; o texto das respostas está na Entrevista do plano.
 
 ### Como foi perguntado (R3)
 

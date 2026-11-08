@@ -10,6 +10,7 @@
 - **R1.4:** a coordenação narra quem respondeu e quem falta, a posição e a confiança por persona e rodada, e as medições na hora; a argumentação integral fica para a fase do painel.
 - **R2:** a skill nasce na branch do `playground`, com oito references e quatro scripts; o revisor é o número da confiança; a contraprova é por gatilho; a rodada final leva o voto e o argumento mais forte a favor e contra por persona.
 - **R3:** recibo, `--operation` e `read --last` pelo `rpc` como transição; `wait` por estado, fila e `updatedAt`; latência no mapa e `usage` do Codex; um painel por rodada, republicado durante ela.
+- **R5 e R6:** as sessões que a coordenação abre têm o ciclo de vida dos workers do Orca (fechamento ~2 min depois do `worker_done`, botão "manter aberta"); a sonda da híbrida decide entre ela e o `worker-start` puro; o fim de rodada é uma mensagem de mailbox da persona e o `worker_done` vai só no encerramento, então o `wait` vira `check --wait`; os quatro agentes estão em Chat.
 
 ### Os itens D
 
@@ -18,7 +19,7 @@ Cada frente num arquivo, pelo teto de linhas do molde; as alternativas e o "Em a
 | Item | O quê | Arquivo | Estimado |
 | :--- | :---- | :------ | :------- |
 | D1 | a skill `meeting-runner`: protocolo, moldes, scripts e as regras de narração | [PLN-017 — Desenho: a skill (D1)](PLN-017-design-skill.md) | ~10,5 h |
-| D2 | os verbos do `brza sessions` (`open --model`, `send` a N com recibo, `wait`, `model`, `usage`, `close --prefix`), a medição por runtime e o `brza shot` | [PLN-017 — Desenho: as primitivas do `brza sessions` (D2)](PLN-017-design-cli.md) | 12,5 h |
+| D2 | os verbos do `brza sessions` (`open --model`, `send` a N com recibo, `wait`, `model`, `usage`, `close --prefix`), a medição por runtime e o `brza shot` | [PLN-017 — Desenho: as primitivas do `brza sessions` (D2)](PLN-017-design-cli.md) | 14,5 h, com a sonda e a via A (P4a 10 h, P4b 3,5 h, `brza shot` 1 h) |
 | D3 | o painel da rodada como `::orca-visual`, o `estado-rN.json` e o gerador | [PLN-017 — Desenho: o painel da rodada (D3)](PLN-017-design-painel.md) | 6 a 6,5 h |
 
 ### Terreno

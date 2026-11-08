@@ -1,0 +1,1 @@
+- [Scripts do meeting-runner](meeting-runner-scripts.md) — comando de teste, dados reais que divergem do esperado e armadilhas de fuso e de import

@@ -4,10 +4,10 @@ phase: execution
 origin: issue
 origin_ref: reuniao-multiagente-com-personas-pelo-brza-sessions
 description: Levantamento e desenho, em três frentes, do que falta para a reunião multiagente com personas rodar sem improviso em qualquer client: a skill, as primitivas do brza sessions e o painel da rodada no chat do Studio.
-ready: sim
-estimate_h: 32.75
+ready: "não — a sonda da híbrida (P4a.0) decide a via de abertura das personas; P1 e P2 seguem com a via como variável do lançador"
+estimate_h: 34.75
 executed_h: 1
-remaining_h: 31.75
+remaining_h: 33.75
 priority: high
 scope:
   - workspace
@@ -22,7 +22,7 @@ tags:
 
 # PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat
 
-- **Retomar:** plano aceito em R4 (2026-11-08), com o P4 dividido. P3 feito: as duas issues, ao `tools-kit` e ao `studio`. Próximo: P1 e P2 na sessão `pln-017-skill`, aberta pelo `brza sessions` com a `skill-creator` carregada; P4a, P4b, P5 e P6 pelos workstreams donos, a partir da issue; P7 depois de P1 e P2.
+- **Retomar:** plano aceito em R4 (2026-11-08); P3 feito. R5 e R6 (2026-11-08) acrescentaram o ciclo de vida das personas: D2 e D1 revistos (seção "Revisão pela R5 e R6" em cada um); P4a ganhou a sonda da híbrida (P4a.0) e passou a 10 h; a sessão `pln-017-skill` (P1 e P2) foi avisada para reler. Próximo: P4a.0 pela sessão do `tools-kit`, a partir da issue; P1 e P2 seguem; P7 depois de P1, P2 e P4a.
 - **Dividido:** [PLN-017 — Desenho](PLN-017-design.md) · [D1, a skill](PLN-017-design-skill.md) · [D2, o `brza sessions`](PLN-017-design-cli.md) · [D3, o painel](PLN-017-design-painel.md)
 
 ## Pedido
@@ -197,6 +197,42 @@ Respondida em 2026-11-08, na sessão `workflow-improvements`.
 
    **Decidido — P3 agora e abrir a sessão de P1+P2.**
 
+### Rodada 5 — o ciclo de vida das sessões abertas pela coordenação (enviada 2026-11-08)
+
+**Apresentado antes:** nada; o requisito veio de Anderson, na sessão `workflow-improvements`, depois de o plano ter sido aceito em R4 e com P1 e P2 em execução na sessão `pln-017-skill`.
+
+Respondida em 2026-11-08, na sessão `workflow-improvements`.
+
+1. **O ciclo de vida das personas.** **Resposta:** "as sessões abertas pelo coordenador devem abrir como o `orca-orchestrator` faz, fechando sozinho 2min após não ser mais necessário, com o botão de `manter aberta` acima do input de conversa do chat". **Decidido — requisito do fluxo**: toda sessão que a coordenação abre tem o ciclo de vida dos workers do orquestrador do Orca (fechamento automático cerca de 2 min depois de deixar de ser necessária, com o botão "manter aberta" no chat). O "como" é desenho: o D2 (a abertura pelo `brza sessions`) e o D1 (a abertura e o encerramento na skill) são reescritos a partir do mecanismo do Studio (`worker-start --keep-open`, `autoReleaseAt`, `orchestration.worker-auto-release.v1`), e a via escolhida vai a rodada se houver mais de um caminho defensável.
+
+### Rodada 6 — o ciclo de vida das personas: a via, o fim e a superfície (enviada 2026-11-08)
+
+**Apresentado antes:** o mapa do mecanismo no `brza-studio`, lido por um `collector`: o prazo de 2 min é a constante `WORKER_TERMINAL_AUTO_RELEASE_GRACE_MS` (`src/main/runtime/orchestration/db/worker-terminal/worker-terminal-auto-release.ts:10`), armada só por um `worker_done` aceito (`worker-report-settlement.ts:280-281`); o fim de turno de um chat sem `worker_done` não arma nada, o host só avisa "Worker stopped without reporting" (`worker-turn-stop-report.ts:74-130`); o worker em trabalho suspende a contagem, que recomeça com mais 2 min ao repousar (`worker-auto-release-activity.ts:32-55`); a faixa com o botão "Keep open" (`NativeChatStructuredWorkerLifetimeStrip.tsx`) só aparece em aba com Dispatch de orquestração (`renderer/src/lib/worker-auto-close.ts:85-125`); um chat aberto por `agent launch` não recebe nada disso sem 20 a 40 h de código no fork, com conflito de merge alto; o `worker-start --spec` não precisa de `run-create`, exige identidade do chamador (`ORCA_AGENT_SESSION_ID` ou terminal ativo), segue o ajuste Chat|CLI por agente (sem `--surface`; o padrão de fábrica é terminal), entrega o `--spec` com o preâmbulo do Orca como turno do coordenador, não nomeia o chat em worktree existente, e o worker precisa enviar `worker_done`; a variante híbrida (chat por `agent launch --surface chat` tornado worker por `worker-start --terminal orca_session_id:<chat>`) não foi testada e, pelo código, provavelmente não fecha sozinha (terminal reusado não é fechado). O MCP do `brza-workflow` já abre workers por esse caminho (`cycle.py:136-167`).
+
+Respondida em 2026-11-08, na sessão `workflow-improvements`.
+
+1. **A via.**
+   - testar a híbrida em 1 a 2 h e, se o fechamento automático não valer, a via A pura: o `brza sessions open` passa a chamar `worker-start --spec --agent --model --effort --worktree path:` (recomendada) — custo: 1 a 2 h de sonda e 6 a 12 h no `brza-workflow`; se paga: na próxima reunião, com botão nativo e zero código no Studio;
+   - `worker-start` puro, sem a sonda — custo: 6 a 12 h; a superfície segue o ajuste por agente e o nome visível se perde; se paga: na próxima reunião;
+   - o ciclo de vida no `agent launch`, no Studio — custo: 20 a 40 h no fork, com conflito de merge alto; se paga: só se a via A falhar em "chat garantido" e "nome visível";
+   - o `brza sessions` fechando por CLI, sem botão — custo: 3 a 6 h; não cumpre o requisito; se paga: nunca como substituto.
+
+   **Decidido — testar a híbrida; se falhar, `worker-start` puro.**
+
+2. **O fim de cada rodada e o "não ser mais necessário".** O `worker_done` arma os 2 min; entre rodadas a coordenação leva de 2 a 7 min para sintetizar:
+   - o marcador no worklog segue por rodada e o `worker_done` vai só no encerramento, quando a coordenação manda a mensagem final (recomendada) — custo: uma linha no pedido de encerramento; se paga: já, a persona não fecha no meio da síntese;
+   - `worker_done` a cada rodada, com `worker-keep-open` da coordenação depois de cada um e `worker-release` no fim — custo: dois comandos por persona por rodada, e a persona fecha se a coordenação atrasar 2 min; se paga: só se o `worker_done` virar o recibo da rodada;
+   - mensagem de mailbox por rodada (`brza orchestration send`) e `worker_done` no encerramento; o `check --wait` substitui o `grep` do marcador — custo: um comando por persona por rodada, e o `wait` do D2 muda para `check --wait`; se paga: quando a espera virar nativa, sem polling de arquivo.
+
+   **Resposta:** "Mensagem de mailbox por rodada; worker_done no fim". **Decidido — a persona envia `brza orchestration send` à coordenação ao fechar cada rodada e o `worker_done` só no encerramento**; o `wait` do D2 vira `check --wait`; o marcador no worklog fica como registro escrito, não como sinal.
+
+3. **A superfície dos agentes no app.** O `worker-start` abre como chat só se o ajuste Chat|CLI do agente for Chat:
+   - Claude, Codex, Grok e Antigravity em Chat — custo: 0; se paga: já;
+   - não sei; a sonda confere — custo: incluído no teste;
+   - algum em CLI — custo: a troca do ajuste no app, uma vez.
+
+   **Decidido — os quatro em Chat**: a via A abre chats sem mexer no ajuste.
+
 ## Passos
 
 ### P1 — A skill `meeting-runner` v1
@@ -236,15 +272,16 @@ Estimado: 1 h · Executado: 1 h
 
 **Evidência:** `brza-workspace@cea9595`, os dois arquivos em `work/issues/`; `python3 .claude/skills/notes-checker/scripts/check_notes.py` → erros: 0, avisos: 0
 
-### P4a — Os verbos de envio e espera do `brza sessions`
+### P4a — A abertura com ciclo de vida, o envio e a espera do `brza sessions`
 
-Executa D2 · executor: sessão do `tools-kit`, no `brza-workflow`, a partir da issue de P3
+Executa D2 (revisto pela R5 e R6) · executor: sessão do `tools-kit`, no `brza-workflow`, a partir da issue de P3
 
-Estimado: 8 h · Executado: — h
+Estimado: 10 h · Executado: — h
 
-- [ ] **1. A sonda** com chats reais: `setOption`, reenvio com a mesma `operation`, `updatedAt` ao entrar em `working`, `state` do Grok e do Antigravity
-- [ ] **2. Testes que falham antes**, em `tests/cli/test_brza_sessions.py`, um por verbo: `open --model --effort`, `send` com recibo e `--operation`, `wait` (fila, `updatedAt`, `--any`, timeout, falha de cota, marcador), `read --last`, `close --prefix`
-- [ ] **3. Implementar** pela menor mudança do D2; o `launch.py` sai
+- [ ] **0. A sonda da híbrida (1 a 2 h):** abrir um chat por `agent launch --surface chat --model --effort` e torná-lo worker por `worker-start --terminal orca_session_id:<chat> --spec …`; conferir se o `autoReleaseAt` vale depois do `worker_done`, se a faixa "Keep open" aparece e se o `brza orchestration send` da persona chega à coordenação; anotar a superfície que cada um dos quatro agentes abre pelo `worker-start --spec`. O resultado decide entre a híbrida e a via A pura
+- [ ] **1. A sonda do resto** com chats reais: `setOption`, reenvio com a mesma `operation`, `updatedAt` ao entrar em `working`, identidade do chamador fora do chat do Studio
+- [ ] **2. Testes que falham antes**, em `tests/cli/test_brza_sessions.py`, um por verbo: `open` pela via decidida (grava `dispatch` e `model`/`effort` no mapa), `send` com recibo e `--operation`, `wait` sobre `check --wait` (mensagem de fim de rodada por persona, `worker_done`, timeout, `blocked`/`failed` pelo estado), `read --last`, `close` por `worker-release` e `worker-keep-open`
+- [ ] **3. Implementar** pela menor mudança do D2; o `launch.py` sai; o `wait` por estado e fila fica como fallback para chat sem Dispatch
 - [ ] **4. `python3 -m unittest discover -s tests/cli -p test_brza_sessions.py`** com `env -u BRZA_WORKSPACE`, revisão e merge na `master` do `brza-workflow`
 
 **Evidência:** —

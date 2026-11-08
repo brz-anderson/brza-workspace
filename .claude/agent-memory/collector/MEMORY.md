@@ -1,1 +1,4 @@
 - [Mapa das fontes das reuniões](meeting-sources-map.md) — onde estão sessions/measurements/rollouts das reuniões de 2026-11-07 e o que enganou
+- [Levantar memórias de outros workstreams](memory-survey-tips.md) — dump por git show, caminhos do brza-studio que mudaram, AGENTS.md do studio é upstream
+- [Atalhos para levantar memórias entre branches](memory-survey-shortcuts.md) — git show por branch, nomes ocultos no scratch, normas que colidem
+- [Mapa da orquestração do Studio](studio-orchestration-map.md) — onde mora auto-release/Keep open/worker-start no brza-studio e o grep que quebra no zsh

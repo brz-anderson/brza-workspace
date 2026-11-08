@@ -9,6 +9,8 @@ tags:
   - tooling
 refs:
   - issue:agente-kiro-no-native-chat-janela-flutuante-e-enderecamento-de-workspaces
+  - issue:barra-flutuante-de-acoes-de-chat-retencao-de-foco-e-recents-no-native-chat
+  - issue:bifurcacao-de-conversas-no-chat-ui-e-resiliencia-de-inicializacao-do-claude
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
   - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
@@ -21,7 +23,7 @@ refs:
   - issue:validacao-de-conclusao-em-automacoes-cli-de-extensoes-e-destravamento-de-rate-limit
 ---
 
-# Radar de issues e PRs do upstream e automação de 6h (00h, 06h e 12h BRT)
+# Radar de issues e PRs do upstream e automação de 6h (00h, 06h, 12h e 18h BRT)
 
 ## O que foi feito
 
@@ -102,4 +104,26 @@ refs:
      incorporados os detalhes do PR `#39501` (resolve Issue `#39499`, descartando linhas obsoletas de agentes no estado "Done" na sidebar via `retireConfirmedShellAgent`).
    - [Segurança de hooks em worktrees e integridade de setup em automações](../issues/seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes.md):
      incorporados os detalhes do PR `#37848` (resolve Issue `#37799`, `#39609`), adicionando a guarda `cwdInsideOtherTabbedWorktree` para recusar registros de resume com `cwd` pertencente a outros worktrees abertos.
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-08)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues criados ou
+   atualizados entre `2026-11-08T15:00:00Z` e `2026-11-08T21:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Barra flutuante de ações de chat, retenção de foco e recents no Native Chat](../issues/barra-flutuante-de-acoes-de-chat-retencao-de-foco-e-recents-no-native-chat.md):
+     rastreia o PR `#39882` (resolve Issue `#39872`, agrupando ações de cabeçalho do chat em uma floating toolbar opaca com ícones de 16px e padding de 42px),
+     a Issue `#39841` (preservação de `lastFocusedAt` em abas de chat nativo durante snapshots do host para correta ordenação cronológica na jump palette `Cmd+J`),
+     a Issue `#39844` (correção de retorno antecipado em `focusMountedNativeChatEditor` permitindo que "Add to chat" coloque o cursor dentro do composer),
+     a Issue `#39856` (exposição e persistência de anotações do navegador embutido para leitura por agentes via CLI) e
+     a Issue `#39830` (delimitação de caminhos de terminal envolvidos por parênteses sem capturar pontuações ou sufixos de texto subsequentes).
+3. **Atualização de 3 issues existentes em `work/issues/`:**
+   - [Bifurcação de conversas no Chat UI e resiliência de inicialização do Claude](../issues/bifurcacao-de-conversas-no-chat-ui-e-resiliencia-de-inicializacao-do-claude.md):
+     adicionado o PR `#39823` (atendendo à Issue `#38326`, implementando a bifurcação de respostas copiadas a partir do chat original raiz inclusive em fork de fork, e ocultando rewinds acima do divisor de fork).
+   - [Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent](../issues/subagentes-nativos-limpeza-de-correio-de-orquestracao-e-superficie-de-super-agent.md):
+     incorporados o PR `#39804` (liveness honesto para workers em modo chat via `session-worker-liveness.ts`, reportando `activity=working|idle` sem falsos alertas de `unverifiable`) e
+     o PR `#39802` (recusa de `orchestration reply` em relatórios concluídos `worker_done` e orientação explícita do comando `send --to dispatch:<id>`).
+   - [Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório](../issues/seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio.md):
+     adicionado o PR `#39779` (resolve Issue `#39777`, introduzindo o matcher compartilhado `project-host-query` para busca combinada de projetos e hosts nos novos workspace pickers desktop e mobile).
+
 

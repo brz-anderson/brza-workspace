@@ -50,6 +50,16 @@ A coordenação renderizou o símbolo de hoje, A, B, C e duas variantes da B a 1
   fase 0, o símbolo de hoje fica inteiro, em todos os tamanhos, e a brasa muda só a interface.
 - **A contraprova** (seis sessões novas, em outros modelos) leu a medida e votou seis de seis pelo rescaldo largo.
 
+## A borda corta no Dock
+
+Anderson viu, no Dock, a borda do símbolo cortada. A causa está no gerador: o traço da borda tem 24 de largura, centrado
+na aresta do tile (`x=100 y=100 width=824 rx=185`), e o `clipPath` do tile usa essa mesma aresta, então a metade de fora
+do traço (12 de 1024) é cortada. A correção é o traço inteiro dentro do tile: `x=112 y=112 width=800 rx=173`, mesma
+largura de 24. Vale para o `brza-symbol.svg`, o `brza-app-icon.svg` e as variantes; a borda fica com o dobro da
+espessura visível de hoje, e a largura se ajusta no render nativo (`iconutil`). O comparativo está em
+`.sessions/reuniao-brasa/entregas/simbolo/` (`*-borda-inteira.svg`), no worktree do `playground`. A correção entra no
+`config/scripts/brza-brand-build.mjs`, na fase 4, e não se edita o SVG à mão.
+
 ## O que a reunião levantou
 
 - Fole e Faísca votaram pela C (a única que "conta o nome"): Fole com a C a partir de 64 px e o núcleo da B abaixo; a

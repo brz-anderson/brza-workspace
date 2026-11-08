@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39599, #39564, #39283 e as issues #39631, #39598, #39517 trazem controle de auto-release de workers, background workers no chat e desobstrução de status reply.
+description: Os PRs #39599, #39564, #39283 e as issues #39807, #39694, #39631, #39598, #39517 trazem controle de auto-release de workers, retenção de worker-list e background workers no chat.
 scope:
   - brza-studio
   - brza-workflow
@@ -58,6 +58,8 @@ além da issue [`stablyai/orca#39631`](https://github.com/stablyai/orca/issues/3
 [`stablyai/orca#37891`](https://github.com/stablyai/orca/pull/37891),
 [`stablyai/orca#37850`](https://github.com/stablyai/orca/pull/37850) e
 [`stablyai/orca#11279`](https://github.com/stablyai/orca/pull/11279), além das issues
+[`stablyai/orca#39807`](https://github.com/stablyai/orca/issues/39807),
+[`stablyai/orca#39694`](https://github.com/stablyai/orca/issues/39694),
 [`stablyai/orca#39517`](https://github.com/stablyai/orca/issues/39517),
 [`stablyai/orca#39499`](https://github.com/stablyai/orca/issues/39499),
 [`stablyai/orca#39300`](https://github.com/stablyai/orca/issues/39300),
@@ -168,9 +170,20 @@ além da issue [`stablyai/orca#39631`](https://github.com/stablyai/orca/issues/3
       incorretamente acusando `run_home_unreachable` e citando um Dispatch inexistente no banco local (`ctx_...`);
     - Ocorre porque a rota de resposta a mensagens que não são perguntas aciona indevidamente a verificação de Run remoto quando há
       registros remotos residuais.
+22. **Sobrecarga crítica em `worker-list` por retenção indefinida de registros (`#39807`):**
+    - Registros de workers finalizados nunca são purgados ou arquivados da tabela de workers (`worker-list`), acumulando um volume
+      massivo de linhas ao longo do tempo. Como resultado, uma leitura completa da lista de workers passa a demorar até 35 minutos,
+      degradando severamente a inicialização e a responsividade de orquestração;
+    - É necessária uma estratégia de retenção/purgador periódico (TTL/tombstone pruning) para workers concluídos há mais de um intervalo configurado.
+23. **Rejeição espúria `worker_identity_changed` ao finalizar workers reabertos (`#39694`):**
+    - Quando um worker em chat que foi auto-liberado (*auto-released*) por inatividade é reaberto pelo usuário ou pelo coordenador,
+      chamadas posteriores a `worker_done` são rejeitadas de forma intermitente com o erro `worker_identity_changed`;
+    - Isso decorre de uma discrepância entre o token de identidade/sessão recriado na interface e o registro original retido no banco de orquestração.
 
 ## O que fazer
 
+- Implementar política de expurgo periódico (*pruning*) para registros antigos de workers em `worker-list` (`#39807`).
+- Corrigir a sincronização de identidade de workers auto-released e reabertos ao processar `worker_done` (`#39694`).
 - Suportar as variáveis de ambiente de auto-release (`ORCA_WORKER_AUTO_RELEASE` e `ORCA_WORKER_AUTO_RELEASE_GRACE_SECONDS`)
   em daemons e servidores de background (`#39599`).
 - Corrigir a validação de Run local em `orchestration reply` para mensagens de status (`#39631`).

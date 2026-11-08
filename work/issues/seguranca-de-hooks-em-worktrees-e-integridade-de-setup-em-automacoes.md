@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39229, #38558, #38648 e as issues #39609, #39617, #38566 tratam de ignorar recusas internas do Claude, segurança em resume e hooks.
+description: Os PRs #39229, #38558 e as issues #39771, #39736, #39714, #39609, #39617 tratam de hooks com symlink/permissão, recusas do Claude e segurança.
 scope:
   - brza-studio
   - brza-workflow
@@ -27,6 +27,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39229`](https://github.com
 [`stablyai/orca#33492`](https://github.com/stablyai/orca/pull/33492),
 [`stablyai/orca#37941`](https://github.com/stablyai/orca/pull/37941) e
 [`stablyai/orca#37931`](https://github.com/stablyai/orca/pull/37931), além das issues
+[`stablyai/orca#39771`](https://github.com/stablyai/orca/issues/39771),
+[`stablyai/orca#39736`](https://github.com/stablyai/orca/issues/39736),
+[`stablyai/orca#39714`](https://github.com/stablyai/orca/issues/39714),
 [`stablyai/orca#39609`](https://github.com/stablyai/orca/issues/39609) e
 [`stablyai/orca#38566`](https://github.com/stablyai/orca/issues/38566).
 
@@ -73,6 +76,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39229`](https://github.com
     Após atualizações do app, abas que retinham identificadores numéricos de PTY legados (ex.: `"6"`, `"8"`, `"9"`) compartilhados
     com abas de outros projetos foram relançadas no diretório (`cwd`) de outro worktree. O Claude continuou a sessão original
     usando as regras (`CLAUDE.md`), hooks de segurança e skills do repositório alheio, quebrando o isolamento de segurança.
+12. **Perda de status do agente quando `claude` no PATH é um symlink para wrapper launcher (`#39771`):**
+    Quando o executável `claude` no PATH do host aponta para um script wrapper customizado via symlink, a inspeção de processos
+    do gancho gerenciado não consegue casar a linha de comando com binários conhecidos, marcando o remetente como `unknown`
+    e deixando a interface sem atualização de estado (thinking/tool/idle).
+13. **Falha no SessionStart hook do Claude Code com `printf: write error: Permission denied` (`#39714`):**
+    O hook de início de sessão falha acusando que o output não é um JSON válido após um erro de permissão de escrita no `printf`,
+    interrompendo a inicialização do agente sob certos ambientes com pipes de automação ou descritores fechados.
+14. **Exceção `FileNotFoundError` no hook do Hermes após limpeza de tarefas de Kanban (`#39736`):**
+    Quando automações de Kanban removem o diretório de trabalho de um lote concluído, o gancho de status do Hermes falha
+    no ciclo `pre_tool_call` ao tentar acessar o `cwd` inexistente, travando todas as invocações de ferramentas subsequentes.
 
 ## O que o upstream propõe e implementa
 
@@ -113,6 +126,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39229`](https://github.com
 
 ## O que fazer
 
+- Resolver symlinks de executáveis na inspeção de remetentes de hooks para preservar o status de agentes sob wrappers (`#39771`).
+- Tratar descritores restritivos e falhas de escrita no `printf` do SessionStart hook do Claude (`#39714`).
+- Adicionar verificação defensiva de existência do `cwd` no hook do Hermes para evitar quebras em limpezas de Kanban (`#39736`).
 - Adotar a opção de dispensa de recusas do Claude Code (`agentPermissionGuardSkip`, `#39229`) para agentes sob Full access.
 - Validar se o diretório de execução (`cwd`) pertence estritamente ao worktree da aba ao relançar `claude --resume`, migrando identificadores numéricos de PTY (`#39609`).
 - Implementar ganchos de suspensão e restauração (`scripts.sleep` / `scripts.wake`, `#38566`) no orquestrador de worktrees do `brza-studio`.

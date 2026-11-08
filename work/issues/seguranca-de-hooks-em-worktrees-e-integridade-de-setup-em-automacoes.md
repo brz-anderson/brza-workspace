@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38558, #38648, #38585, #38128 e #37977 e a issue #38566 tratam de hooks sleep/wake, sandbox read-only, integridade de setup e teardown seguro.
+description: Os PRs #39229, #38558, #38648 e as issues #39609, #39617, #38566 tratam de ignorar recusas internas do Claude, segurança em resume e hooks.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,8 @@ tags:
 
 # Segurança de hooks em worktrees e integridade de setup em automações
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38558`](https://github.com/stablyai/orca/pull/38558),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39229`](https://github.com/stablyai/orca/pull/39229) (resolve Issue [`#39617`](https://github.com/stablyai/orca/issues/39617)),
+[`stablyai/orca#38558`](https://github.com/stablyai/orca/pull/38558),
 [`stablyai/orca#38648`](https://github.com/stablyai/orca/pull/38648),
 [`stablyai/orca#38585`](https://github.com/stablyai/orca/pull/38585),
 [`stablyai/orca#38128`](https://github.com/stablyai/orca/pull/38128) (Issue [`#37902`](https://github.com/stablyai/orca/issues/37902)),
@@ -25,7 +26,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38558`](https://github.com
 [`stablyai/orca#38029`](https://github.com/stablyai/orca/pull/38029),
 [`stablyai/orca#33492`](https://github.com/stablyai/orca/pull/33492),
 [`stablyai/orca#37941`](https://github.com/stablyai/orca/pull/37941) e
-[`stablyai/orca#37931`](https://github.com/stablyai/orca/pull/37931), além da issue
+[`stablyai/orca#37931`](https://github.com/stablyai/orca/pull/37931), além das issues
+[`stablyai/orca#39609`](https://github.com/stablyai/orca/issues/39609) e
 [`stablyai/orca#38566`](https://github.com/stablyai/orca/issues/38566).
 
 ## O problema
@@ -63,6 +65,14 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38558`](https://github.com
    o disparo falhava se a verificação da ferramenta de fonte do GitHub estivesse indisponível ou desconectada.
 9. **Vazamento e retenção de agentes completados em automações (`#33492`):** agentes de automações anteriores mantidos
    abertos apenas para monitoramento de término não eram reutilizados eficientemente, gerando processos órfãos.
+10. **Conflito entre hooks gerenciados do Orca e recusas internas do Claude Code 2.1.319+ (`#39229`, `#39617`):**
+    No Claude Code 2.1.319+, a checagem interna para pular recusas/checagens de segurança embutidas (ex.: `rm`) exige que nenhum hook
+    `PermissionRequest` esteja configurado no ambiente. Como o Orca instalava incondicionalmente um hook `PermissionRequest` gerenciado
+    (com matcher `*`), a flag de ignorar recusas era ineficaz mesmo em modo Full access.
+11. **Relaunch de `claude --resume` no worktree errado por colisão de IDs numéricos legados (`#39609`):**
+    Após atualizações do app, abas que retinham identificadores numéricos de PTY legados (ex.: `"6"`, `"8"`, `"9"`) compartilhados
+    com abas de outros projetos foram relançadas no diretório (`cwd`) de outro worktree. O Claude continuou a sessão original
+    usando as regras (`CLAUDE.md`), hooks de segurança e skills do repositório alheio, quebrando o isolamento de segurança.
 
 ## O que o upstream propõe e implementa
 
@@ -96,9 +106,15 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38558`](https://github.com
   - Unifica a escolha de modelo, reasoning effort, permissões e argumentos em todas as superfícies operadas por IA.
 - **Confirmação antes de rodar `.orca/issue-command` (`#37931`):** solicita aprovação interativa antes de executar
   qualquer script comitado na pasta `.orca/`.
+- **Dispensa opt-in de recusas embutidas no Claude Code sob Full Access (`#39229`, resolve `#39617`):**
+  - Adiciona o campo `agentPermissionGuardSkip` nas configurações por agente;
+  - Quando ativado em modo Full access, remove o hook `PermissionRequest` gerenciado pelo Orca em `~/.claude/settings.json`,
+    permitindo que as checagens e recusas embutidas do Claude Code sejam dispensadas sem emitir avisos bloqueantes.
 
 ## O que fazer
 
+- Adotar a opção de dispensa de recusas do Claude Code (`agentPermissionGuardSkip`, `#39229`) para agentes sob Full access.
+- Validar se o diretório de execução (`cwd`) pertence estritamente ao worktree da aba ao relançar `claude --resume`, migrando identificadores numéricos de PTY (`#39609`).
 - Implementar ganchos de suspensão e restauração (`scripts.sleep` / `scripts.wake`, `#38566`) no orquestrador de worktrees do `brza-studio`.
 - Incorporar o fix de descarte de espera de permissões do Claude (`#38648`).
 - Aplicar a restrição read-only para geradores de texto em background (`#38558`) no `brza-studio` e `brza-workflow`.

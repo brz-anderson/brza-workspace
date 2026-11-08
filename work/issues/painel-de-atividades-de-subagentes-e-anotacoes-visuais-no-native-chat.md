@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39276, #39082, #39079, #38995, #38963 trazem subagentes OpenCode no Chat UI, preview no Dashboard e notificações de perguntas.
+description: Os PRs #39606, #39276, #39082 e as issues #39619, #39074 trazem limpeza de títulos após /clear, isolamento de sessões irmãs e subagentes OpenCode.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,9 +13,11 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39276`](https://github.com/stablyai/orca/pull/39276) (Issue [`#39275`](https://github.com/stablyai/orca/issues/39275)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39606`](https://github.com/stablyai/orca/pull/39606) (resolve Issue [`#37379`](https://github.com/stablyai/orca/issues/37379)),
+[`stablyai/orca#39276`](https://github.com/stablyai/orca/pull/39276) (Issue [`#39275`](https://github.com/stablyai/orca/issues/39275)),
 [`stablyai/orca#39082`](https://github.com/stablyai/orca/pull/39082) (Issue [`#39074`](https://github.com/stablyai/orca/issues/39074)),
 [`stablyai/orca#39079`](https://github.com/stablyai/orca/pull/39079) (Issue [`#39073`](https://github.com/stablyai/orca/issues/39073)),
+além da issue [`stablyai/orca#39619`](https://github.com/stablyai/orca/issues/39619),
 [`stablyai/orca#38995`](https://github.com/stablyai/orca/pull/38995) (Issue [`#38994`](https://github.com/stablyai/orca/issues/38994)),
 [`stablyai/orca#38963`](https://github.com/stablyai/orca/pull/38963),
 [`stablyai/orca#38945`](https://github.com/stablyai/orca/pull/38945),
@@ -58,6 +60,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39276`](https://github.com
    Quando um agente OpenCode delegava tarefas a subagentes auxiliares (`subagent` no 2.x ou `task` no 1.x), as ações do filho
    apareciam como ferramentas genéricas na conversa principal, sem identificação do subagente, sem cartão dedicado de estado
    (running/done/stopped) e sem presença na faixa de agentes ativos acima do composer.
+9. **Sessões irmãs do OpenCode em serviço compartilhado tratadas como subagentes (`#39619`):**
+   Ao conectar múltiplos terminais ao mesmo serviço `opencode serve --service`, o hook do OpenCode considerava qualquer sessão ativa
+   no fluxo de eventos como subagente da pane observada. Isso fazia com que abas ociosas exibissem o spinner `working` continuamente
+   enquanto uma sessão irmã trabalhava.
+10. **Poluição de títulos de abas do Claude Code com texto de aviso após `/clear` (`#39606`, resolve `#37379`):**
+    Após rodar `/clear`, o título da aba no Orca assumia o texto bruto `<local-command-caveat>The command below was run directly in Claude Code...`
+    em vez de preservar o título ao vivo (`✳ Claude Code`), permanecendo ilegível até o envio do próximo prompt real.
 
 ## O que o upstream implementa
 
@@ -83,9 +92,14 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39276`](https://github.com
   - Lê as tags de ambiente `ORCA_WORKTREE_ID` e `ORCA_PANE_KEY` para rastrear processos desanexados, computando como `outsideTerminals`.
 - **Barra de atividade e visualizador de subagentes no Native Chat (`#38632`, `#38633`, `#38640`):**
   - Barra de atividade no desktop e folha expansível (*sheet*) no mobile listando todos os subagentes da conversa com estado vivo.
+- **Supressão de textos de harness do Claude nos títulos de abas (`#39606`, resolve `#37379`):**
+  - Impede que marcações de meta/harness (como `<local-command-caveat>`) sejam promovidas a título de sessão de fallback,
+    preservando o título ao vivo (`✳ Claude Code`) após execuções de `/clear`.
 
 ## O que fazer
 
+- Adotar a supressão de textos de harness em títulos de abas do Claude (`#39606`).
+- Isolar sessões irmãs do OpenCode no mesmo serviço (`#39619`), computando `working` apenas para a sessão da pane e seus filhos reais.
 - Adotar a pré-visualização read-only de chats no Agent Dashboard (`#39082`) e o filtro de notificações de perguntas (`#39079`).
 - Adotar o suporte nativo a subagentes OpenCode no Chat UI (`#39276`).
 - Adotar o agrupamento visual de subagentes na sidebar (`#38995`) e a ação de backgrounding de ferramentas (`#38963`) no `brza-studio`.

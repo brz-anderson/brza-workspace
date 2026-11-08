@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39564, #39283, #38901, #38899 e as issues #39517, #39300, #39263 trazem background workers no chat, papéis salvos e backoff em relays.
+description: Os PRs #39599, #39564, #39283 e as issues #39631, #39598, #39517 trazem controle de auto-release de workers, background workers no chat e desobstrução de status reply.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39564`](https://github.com/stablyai/orca/pull/39564),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39599`](https://github.com/stablyai/orca/pull/39599) (resolve Issue [`#39598`](https://github.com/stablyai/orca/issues/39598)),
+[`stablyai/orca#39564`](https://github.com/stablyai/orca/pull/39564),
 [`stablyai/orca#39283`](https://github.com/stablyai/orca/pull/39283),
 [`stablyai/orca#38901`](https://github.com/stablyai/orca/pull/38901),
 [`stablyai/orca#38899`](https://github.com/stablyai/orca/pull/38899),
@@ -24,6 +25,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39564`](https://github.com
 [`stablyai/orca#38461`](https://github.com/stablyai/orca/pull/38461),
 [`stablyai/orca#38460`](https://github.com/stablyai/orca/pull/38460) (Issue [`#38446`](https://github.com/stablyai/orca/issues/38446)),
 [`stablyai/orca#38494`](https://github.com/stablyai/orca/pull/38494),
+além da issue [`stablyai/orca#39631`](https://github.com/stablyai/orca/issues/39631),
 [`stablyai/orca#38529`](https://github.com/stablyai/orca/pull/38529) (Issue [`#38539`](https://github.com/stablyai/orca/issues/38539)),
 [`stablyai/orca#38445`](https://github.com/stablyai/orca/pull/38445),
 [`stablyai/orca#38416`](https://github.com/stablyai/orca/pull/38416),
@@ -156,9 +158,22 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39564`](https://github.com
     - O PR `#39564` adiciona suporte a workers nativos em background na interface do chat com Pi (pacote `pi-subagents`),
       oferecendo indicador compacto/expandido, status assíncrono em tempo real e recuperação de IDs de workers através de recarregamentos
       do renderer sem poluir a lista de workspaces ou criar abas redundantes.
+20. **Configuração de auto-release de workers em tempo de execução headless (`#39599`, resolve `#39598`):**
+    - Em servidores headless (`orca serve`), workers consolidados eram automaticamente liberados após um tempo rígido de 2 minutos (`WORKER_TERMINAL_AUTO_RELEASE_GRACE_MS`),
+      fechando terminais antes que serviços externos registrassem o desfecho;
+    - O PR `#39599` adiciona suporte a variáveis de ambiente `ORCA_WORKER_AUTO_RELEASE=on|off` e `ORCA_WORKER_AUTO_RELEASE_GRACE_SECONDS=<n>`
+      lidas pelo banco de terminais (`bindWorkerTerminalAutoRelease`), permitindo desligar a liberação automática ou estender a carência.
+21. **Falha `run_home_unreachable` em `orchestration reply` para mensagens de status (`#39631`):**
+    - Ao responder com `orchestration reply --id <msg>` a uma mensagem do tipo `status` a partir de um worker local, o comando falha
+      incorretamente acusando `run_home_unreachable` e citando um Dispatch inexistente no banco local (`ctx_...`);
+    - Ocorre porque a rota de resposta a mensagens que não são perguntas aciona indevidamente a verificação de Run remoto quando há
+      registros remotos residuais.
 
 ## O que fazer
 
+- Suportar as variáveis de ambiente de auto-release (`ORCA_WORKER_AUTO_RELEASE` e `ORCA_WORKER_AUTO_RELEASE_GRACE_SECONDS`)
+  em daemons e servidores de background (`#39599`).
+- Corrigir a validação de Run local em `orchestration reply` para mensagens de status (`#39631`).
 - Integrar o suporte a native background workers no chat para agentes Pi (`#39564`), permitindo acompanhar subagentes em segundo plano.
 - Bloquear a injeção cega de `Enter` em terminais OMP quando houver turnos em execução ou steers enfileirados (`#39042`).
 - Adicionar `statusMessage` legíveis aos hooks do Codex (`#39021`) para clareza na auditoria de segurança.

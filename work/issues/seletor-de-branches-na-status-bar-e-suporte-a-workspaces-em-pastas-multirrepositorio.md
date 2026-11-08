@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39575, #39572, #39018, #39000, #38955 e as issues #39545, #38931 trazem criação de worktree em pastas, sanitização de caminhos e status bar.
+description: Os PRs #39637, #39575, #39572, #39018, #39000 trazem seletores path: e name: para pastas, criação de worktree e status bar.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,8 @@ tags:
 
 # Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39575`](https://github.com/stablyai/orca/pull/39575),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39637`](https://github.com/stablyai/orca/pull/39637),
+[`stablyai/orca#39575`](https://github.com/stablyai/orca/pull/39575),
 [`stablyai/orca#39572`](https://github.com/stablyai/orca/pull/39572) (resolve Issue [`#39545`](https://github.com/stablyai/orca/issues/39545)),
 [`stablyai/orca#39018`](https://github.com/stablyai/orca/pull/39018),
 [`stablyai/orca#39000`](https://github.com/stablyai/orca/pull/39000) (resolve [`#38931`](https://github.com/stablyai/orca/issues/38931)),
@@ -58,9 +59,19 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39575`](https://github.com
    Ao colar um caminho com espaço inicial (ex.: `" /Users/user/dev"`) nas configurações de Workspace Directory, o caminho não era
    sanitizado antes da validação. Como o Node `posix.isAbsolute` retorna `false` para caminhos iniciados por espaço, o Orca tratava a
    rota como relativa e criava pastas `" <repo>/ /Users/user/dev"` em todos os repositórios registrados.
+10. **Incompatibilidade de seletores `path:` e `name:` com Folder Workspaces na CLI (`#39637`):**
+    Agentes e comandos da CLI podiam referenciar folder workspaces apenas pelo identificador literal `folder:<id>`, pois seletores
+    como `path:` e `name:` buscavam exclusivamente Git worktrees em repositórios. Além disso, o comando `worktree ps` unificava
+    indevidamente linhas de workspaces com mesmo ID em hosts distintos (ex.: `local` e `ssh:server`).
 
 ## O que o upstream implementa e corrige
 
+- **Resolução unificada de seletores para Worktrees e Folder Workspaces (`#39637`):**
+  - Implementa `resolveWorkspaceCandidate` suportando `path:` e `name:` para pastas de trabalho, sob o opt-in `matchFolderWorkspaces`
+    (capability `workspace-selector.folder-match.v1`) em `worktree.show`, `worktree.set` e `worktree.create`;
+  - Trata colisões com `selector_ambiguous` discriminando tipo, host, caminho e seletor inequívoco (`identity:` para repositórios ou `folder:<id>`);
+  - Diferencia checkouts em múltiplos hosts no `worktree ps`, compondo chaves por host + ID e mantendo atividades de PTY vinculadas ao host comprovado;
+  - Traduz caminhos Linux de distribuições chamadoras no WSL para caminhos UNC armazenados para folder workspaces.
 - **Criação rápida de worktrees em pastas vazias (`#39575`):**
   - Nos painéis de Source Control, Attached Worktrees e PR Checks de pastas sem worktrees anexados, lista os repositórios Git da pasta
     com botões diretos "Create worktree", criando o checkout nomeado com base na pasta sem sair do contexto;
@@ -93,3 +104,4 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39575`](https://github.com
 3. Integrar o `BranchStatusSegment` na barra de status do `brza-studio` (`#38869`).
 4. Adotar o botão "Create worktree" nos painéis vazios de pastas multirrepositório (`#39575`).
 5. Aplicar sanitização e `.trim()` em todos os campos de diretório de workspace para evitar criação de pastas acidentais (`#39572`).
+6. Suportar seletores unificados `path:` e `name:` para folder workspaces na CLI e separar instâncias por host no `worktree ps` (`#39637`).

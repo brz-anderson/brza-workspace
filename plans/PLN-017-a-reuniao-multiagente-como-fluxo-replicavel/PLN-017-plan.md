@@ -234,7 +234,7 @@ Estimado: 1 h · Executado: 1 h
 - [x] **1. Ao `tools-kit`**: [O `brza sessions` ganha os verbos da reunião multiagente: modelo na abertura, recibo, `wait`, `read --last`, `model`, `usage` e `close --prefix`](../../work/issues/o-brza-sessions-para-a-reuniao-multiagente.md), com P4a, P4b, P5, P6 e a exceção à R1.4 do PLN-010
 - [x] **2. Ao `studio`**: [A fase do painel da reunião no BrzA Studio: argumentação por persona, abrir o chat, gate de decisão e atualização ao vivo](../../work/issues/a-fase-do-painel-da-reuniao-no-brza-studio.md), com o `orchestration-crew` fora
 
-**Evidência:** os dois arquivos em `work/issues/`, no commit do worklog de 2026-11-08 (ver `## Worklogs`)
+**Evidência:** `brza-workspace@cea9595`, os dois arquivos em `work/issues/`; `python3 .claude/skills/notes-checker/scripts/check_notes.py` → erros: 0, avisos: 0
 
 ### P4a — Os verbos de envio e espera do `brza sessions`
 
@@ -308,7 +308,7 @@ Estimado: 0,5 h · Executado: — h
 
 ## Worklogs
 
-- 2026-11-08 — R1 a R4: destino, primitiva, UI, narração, a skill, o CLI, o painel e o corte; D1 a D3 gravados; P3 feito. Parou antes de abrir a sessão de P1 e P2.
+- 2026-11-08 — R1 a R4: destino, primitiva, UI, narração, a skill, o CLI, o painel e o corte; D1 a D3 gravados; P3 feito (`cea9595`). Parou ao abrir a sessão `pln-017-skill` para P1 e P2.
   [O fluxo de reunião multiagente vai a plano: as duas reuniões medidas e a rodada 1](../../work/worklogs/2026-11-08-o-fluxo-de-reuniao-multiagente-vai-a-plano.md)
 
 ## Pendências conhecidas

@@ -110,5 +110,34 @@ class NumeroEntreCrases(unittest.TestCase):
         self.assertEqual(roda(SECAO.format(itens="- Levou `12 min`."))[0], 1)
 
 
+class NumeroComUnidadeEntreCrases(unittest.TestCase):
+    """A1 da conferência de d12ed91: dentro das crases passava todo número com unidade longa, acento, moeda, razão ou
+    diff, que fora delas é acusado. O `b2.md` só cobria `` `1.352` `` com a unidade fora da crase."""
+
+    FATOS = (("`1.352 commits`", "1.352"), ("`1.352 mudanças`", "1.352"), ("`163 arquivos`", "163"),
+             ("`US$ 0,25`", "0,25"), ("`R$ 1.200`", "1.200"), ("`+19.165/−6.137`", "19.165"),
+             ("`1352 de 2000`", "1352"), ("`12 min`", "12"), ("`~40%`", "40"))
+
+    def test_o_mesmo_fato_dentro_e_fora_das_crases_tem_o_mesmo_veredito(self):
+        for dentro, num in self.FATOS:
+            fora = dentro.strip("`")
+            for texto in (dentro, fora):
+                rc, out, _ = roda(SECAO.format(itens=f"- O PR tem {texto}."))
+                self.assertEqual(rc, 1, texto)
+                self.assertIn(num, out, texto)
+
+    def test_comandos_caminhos_ids_e_hashes_entre_crases_continuam_ignorados(self):
+        for item in ("- Rode `brza sessions list --json`.", "- Rode `git log --oneline | wc -l`.",
+                     "- Rode `wc -l scripts/tally.py`.", "- Em `~/Projects/brza-workflow`.",
+                     "- Em `.sessions/reuniao-x/briefing.md`.", "- O Dispatch `ctx_80fad49a44fd` e o Run `run_fe70b351bc36`.",
+                     "- A tag `v1.4.255` e o plano `PLN-017` (`R6`).", "- O commit `fd334f1e99a3` e o PR `#39020`.",
+                     "- Em `brza-sessions:564`."):
+            self.assertEqual(roda(SECAO.format(itens=item))[0], 0, item)
+
+    def test_a_fonte_explicita_libera_o_numero_entre_crases(self):
+        item = "- O PR tem `1.352 commits` — conferido às 13:10: `git rev-list --count a..b` → 1352."
+        self.assertEqual(roda(SECAO.format(itens=item))[0], 0)
+
+
 if __name__ == "__main__":
     unittest.main()

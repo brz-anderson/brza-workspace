@@ -20,10 +20,28 @@ SECAO = re.compile(r"^##\s+O que existe hoje\b")
 OUTRA_SECAO = re.compile(r"^##\s")
 ITEM = re.compile(r"^(\s*)(?:[-*+]|\d+[.)])\s+(.*)$")
 # número de fato: algarismos soltos ("163", "1.352"); não vale id/linha/rótulo (`R6`, `PLN-017`, `#39020`, `arq.py:120`,
-# data) nem o que está entre crases
+# data)
 NUMERO = re.compile(r"(?<![\w#.:/~-])\d+(?:[.,]\d+)*(?![\w-])|(?<=~)\d+(?:[.,]\d+)*(?![\w-])")
-# o que está entre crases só conta quando é número ou medida (`1.352`, `12 min`); caminho, id, hash e comando saem
-MEDIDA = re.compile(r"^[~≈]?\d+(?:[.,]\d+)*(?:\s*[A-Za-z%]{1,6})?$")
+# entre crases, só sai o que é código: comando, caminho, id, hash ou ref. O resto (`1.352 commits`, `US$ 0,25`,
+# `+19.165/−6.137`, `1352 de 2000`) é fato como fora das crases e passa pelo NUMERO (A1 da conferência de d12ed91).
+COMANDOS = {"brza", "orca", "git", "gh", "grep", "rg", "ls", "wc", "find", "cat", "sed", "awk", "jq", "python3", "python",
+            "node", "npm", "pnpm", "curl", "du", "head", "tail", "date", "sqlite3", "claude", "codex", "grok", "agy"}
+SINAL_DE_COMANDO = re.compile(r"\s--?\w|\||\$\(|\s[<>]|\s=|=\S")
+CAMINHO = re.compile(r"^[~.]?/|^\.{1,2}[\w-]|[\w-]/[\w.-]|\.\w{1,5}(?::\d+)?$|:\d+(?:-\d+)?$")
+REF = re.compile(r"^#\d+$|^[A-Za-z][\w.-]*\d[\w.:-]*$|^\d*[a-f]\w*$")  # #39020, PLN-017, R6, ctx_…, v1.4.255, hash
+
+
+def eh_codigo(conteudo):
+    """O conteúdo da crase é comando, caminho, id, hash ou ref (e não um fato com número)?"""
+    c = conteudo.strip()
+    if not re.search(r"[A-Za-z]", c):
+        return c.startswith("#")                     # só número e símbolo: fato; `#39020` é ref
+    primeiro = c.split()[0]
+    if primeiro in COMANDOS or SINAL_DE_COMANDO.search(c):
+        return True
+    if " " not in c and (CAMINHO.search(c) or REF.match(c)):
+        return True
+    return False
 MARCA = re.compile(r"conferido\b.*?`[^`]+`.*?→\s*\S", re.S)
 
 
@@ -51,7 +69,7 @@ def itens_da_secao(texto):
 
 def numeros(texto):
     """Os números de fato do item, sem o que está entre crases; a detecção e a exibição usam ESTA função."""
-    return NUMERO.findall(re.sub(r"`([^`]*)`", lambda m: m.group(1) if MEDIDA.match(m.group(1)) else "", texto))
+    return NUMERO.findall(re.sub(r"`([^`]*)`", lambda m: "" if eh_codigo(m.group(1)) else m.group(1), texto))
 
 
 def sem_marca(texto):

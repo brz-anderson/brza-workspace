@@ -121,6 +121,37 @@ avaliação.
   verde, avaliações, visores e a revisão). **Risco:** espaço em disco; apagar antes da conferência perde a evidência.
   **Estado:** ativo. **Como desfazer:** `rm` dos três links e da pasta do scratch depois de a coordenação fechar a P8.
 
+## Correção posterior: a conferência independente de `d12ed91`
+
+A conferência independente da sessão principal (Dispatch `ctx_9c4702bb2c23`) confirmou a dedupe dos eventos, o `failed`
+liberado, o voto por proposta, o subconjunto e a R8/R9, e achou quatro pontos, voltados a esta tarefa no Dispatch
+`ctx_4cffc4ff5523`.
+
+- **Ressalva ao que está acima:** a frase "`b2.md` acusa o `1.352` entre crases" vale só para o número **sem unidade**
+  dentro da crase. O `b2.md` usa `` `1.352` arquivos ``, com a unidade fora, e não cobria o A1: dentro das crases
+  passavam `` `1.352 commits` ``, `` `163 arquivos` ``, `` `US$ 0,25` ``, `` `R$ 1.200` ``, `` `+19.165/−6.137` `` e
+  `` `1352 de 2000` ``, que fora delas eram acusados. O texto acima fica como estava, por histórico.
+- **A1, corrigido:** o `check_briefing.py` tira da crase só o que é comando, caminho, id, hash ou ref (`eh_codigo`) e
+  passa o resto pela mesma regra de número de fora. Regressão `NumeroComUnidadeEntreCrases`: o mesmo fato tem o mesmo
+  veredito dentro e fora das crases (nove formas, entre elas unidade longa, acento, moeda, razão e diff); comandos,
+  caminhos, Dispatch, Run, tag, plano, `R6`, hash, `#39020` e `arquivo:linha` seguem ignorados; e a marca
+  "conferido às HH:MM: `comando` → resultado" libera o item.
+- **A2, só documentado:** o `--status` sem `--wait-settled` é consulta informativa e sai 0 quando leu todas as personas,
+  com o `falhou` explícito na linha. O código de saída não mudou; o `SKILL.md` e o `closing.md` dizem que a decisão por
+  rc é do `--wait-settled` (0, 1 ou 75).
+- **A3, corrigido no texto:** o título da rodada extra no `SKILL.md` e no tipo 5 do `round-request.md` deixou de dizer
+  "parte da sala" e passou a dizer "com os participantes que a coordenação escolhe", como a R9.
+- **A4, corrigido:** o cartão do painel só cita o Codex quando há Codex entre os participantes (`CodexForaDaRodada`), e a
+  tabela do chat só diz "Custo e latência dos Claude: total da sessão" com algum Claude na rodada
+  (`NotaDosClaudeSoComClaudeNaRodada`); no painel, o cabeçalho "Custo (total da sessão)" segue a mesma regra
+  (`CabecalhoSemClaude`, achado ao conferir o PNG). O `custo_rotulo` do estado e os números não mudaram.
+- **Visto no PNG e fora do escopo:** sem `custos_coordenacao` no `sintese-N.json`, o cartão da coordenação mostra
+  "US$ 0 … até —", embora o `synthesis.md` diga que o cartão some. É anterior a esta tarefa; fica como pendência.
+- **Verificação:** as quatro regressões falharam no código de `d12ed91` e passam agora; a suíte foi de 292 a 300 testes
+  OK. As sondas da conferência (`b.md` e `b2.md`, os mesmos fatos dentro e fora das crases) e as do revisor rodaram de
+  novo: dentro e fora dão o mesmo veredito; o `b.md` do revisor segue 0, e o briefing da P7 segue 1, com o `1.352` na
+  linha 22. A reverificação independente deste delta fica com a sessão principal.
+
 ## Medida
 
-Corrido 57 min — agente 21 min, quem pediu 36 min, pausa 0 s · US$ 33,73 (turnos 12,12, subagentes 21,61) · CPU 74,24 s do `claude` e 582,38 s dos comandos, RSS até 533 MB · 17 turnos, 1 sessão · até 19:47 de 2026-11-09, pelo `brza note commit`
+Corrido 1 h 1 min — agente 26 min, quem pediu 36 min, pausa 0 s · US$ 37,41 (turnos 15,80, subagentes 21,61) · CPU 84,19 s do `claude` e 608,74 s dos comandos, RSS até 534 MB · 18 turnos, 1 sessão · até 19:56 de 2026-11-09, pelo `brza note commit`

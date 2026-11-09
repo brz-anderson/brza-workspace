@@ -408,5 +408,18 @@ class VotoNaTabelaDoChat(Base):
         self.assertIn("| 0/1/1 |", tally.render_md(e))
 
 
+class NotaDosClaudeSoComClaudeNaRodada(Base):
+    """A4: o render_md dizia "Custo e latência dos Claude: total da sessão" sem nenhum Claude entre os participantes."""
+
+    def test_sem_claude_entre_os_participantes_a_nota_nao_sai(self):
+        e = self.estado(participantes=["Trava", "Relance"])
+        self.assertEqual(e["rodada"]["custo_rotulo"], "total da sessão")   # o contrato fica como estava
+        self.assertNotIn("Custo e latência dos Claude", tally.render_md(e))
+
+    def test_com_o_prumo_na_rodada_a_nota_continua(self):
+        e = self.estado()
+        self.assertIn("Custo e latência dos Claude: total da sessão", tally.render_md(e))
+
+
 if __name__ == "__main__":
     unittest.main()

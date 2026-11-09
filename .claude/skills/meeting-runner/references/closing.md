@@ -54,6 +54,8 @@ Para cada decisão:
      (`succeeded`/`settled`, `taskId`, `autoReleaseAt`). Só então a narração diz "encerrada": o host arma ~2 min e o chat
      mostra "manter aberta", e Anderson guarda a persona que quiser consultar (`--keep-open <persona>` faz o mesmo por
      comando).
+   - O `--status` sem `--wait-settled` só informa: sai 0 quando leu todas as personas, mesmo com `falhou` na linha. O
+     veredito vem da linha, e a decisão por código de saída, do `--wait-settled` (0 aceitas/liberadas, 1 falha, 75 prazo).
    - Quem não respondeu: `launch_persona.py $R --stop <persona>` (parada guardada: o CLI confirma `stopped` e o
      settlement antes de liberar). `stop_unknown`, `release_unknown` e `retained` não são fechados e não autorizam repetir
      o comando: confira com `--status` e relate a incerteza no worklog.

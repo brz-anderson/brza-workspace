@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #35220, #36897 e #19680 do upstream aceleram a leitura de pastas de skills em 3x a 6x, preservam a descoberta no arranque e mantêm o prefixo plugin:skill no seletor /.
+description: Os PRs #40214, #35220, #36897 e #19680 aceleram leitura de skills, preservam descoberta no arranque e corrigem classificação com sidecars.
 scope:
   - brza-studio
 priority: high
@@ -11,7 +11,8 @@ tags:
 
 # Leitura antecipada e preservação de skills no arranque e nos plugins
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#35220`](https://github.com/stablyai/orca/pull/35220),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40214`](https://github.com/stablyai/orca/pull/40214) (resolve Issue [`#40181`](https://github.com/stablyai/orca/issues/40181)),
+[`stablyai/orca#35220`](https://github.com/stablyai/orca/pull/35220),
 [`stablyai/orca#36897`](https://github.com/stablyai/orca/pull/36897),
 [`stablyai/orca#37659`](https://github.com/stablyai/orca/pull/37659) e
 [`stablyai/orca#19680`](https://github.com/stablyai/orca/pull/19680), além das issues
@@ -33,9 +34,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#35220`](https://github.com
    (ex.: ecossistemas de Claude Code e Cursor) empacotam definições de subagentes (`agents/*.md`) junto às suas skills,
    disparando-os pelo nome de tipo do subagente. No runtime do app, `contributes` não aceitava subagentes nem entregava
    skills completas, quebrando plugins que delegam tarefas a subagentes específicos.
+5. **Classificação falsa de bundled skills como editadas na presença de arquivos sidecar (`#40214`, resolve `#40181`):**
+   Skills empacotadas distribuem apenas `SKILL.md`. O algoritmo de classificação em `bundled-skill-classification.ts` tratava
+   o arquivo como atual ou lançado apenas quando `SKILL.md` era a única entrada na pasta. Como ferramentas como Codex geram
+   arquivos auxiliares no mesmo diretório (ex.: `agents/openai.yaml` ou scripts locais), o digest do diretório não batia e um
+   `SKILL.md` idêntico em bytes passava a ser classificado como `edited`, impedindo atualizações silenciosas automáticas.
 
 ## O que os PRs fazem
 
+- **PR `#40214` (resolve `#40181`):** compara o digest atual e os digests lançados especificamente para o arquivo `SKILL.md`,
+  mesmo quando a pasta contém entradas adicionais. Um `SKILL.md` cujo digest não coincida com nenhum continua sendo classificado
+  como `edited` apenas se o nome no frontmatter bater com a skill bundled.
 - **PR `#35220`:** introduz `src/main/skills/skill-directory-read-ahead.ts`, disparando a leitura das próximas pastas
   enquanto a atual é processada e mantendo a ordem determinística; reduz o tempo de varredura de 3x a 6x.
 - **PR `#36897`:** preserva a lista de skills descobertas no arranque após a confirmação de status.
@@ -47,6 +56,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#35220`](https://github.com
 
 ## O que fazer
 
-Aplicar primeiro o [`stablyai/orca#35220`](https://github.com/stablyai/orca/pull/35220) (4 arquivos autocontidos em
-`src/main/skills/`) no `brza-studio`, incorporar o `#37659` e preparar o sistema de plugins para registrar subagentes
-nativos entregues por pacotes de terceiros.
+1. Adotar a correção de classificação de bundled skills do [`stablyai/orca#40214`](https://github.com/stablyai/orca/pull/40214) para não bloquear atualizações por presença de arquivos sidecar (`agents/openai.yaml`).
+2. Aplicar o [`stablyai/orca#35220`](https://github.com/stablyai/orca/pull/35220) (4 arquivos autocontidos em
+   `src/main/skills/`) no `brza-studio`, incorporar o `#37659` e preparar o sistema de plugins para registrar subagentes
+   nativos entregues por pacotes de terceiros.

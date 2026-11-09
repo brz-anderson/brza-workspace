@@ -7,6 +7,7 @@ refs:
   - PLN-012
   - PLN-013
   - PLN-017
+  - PLN-018
 sessions:
   - 508e76c8-5e4d-4f7f-9e83-7d94df55b2f8
 ---
@@ -72,10 +73,11 @@ a sessão anterior está em [O PLN-004: o Grok entra no plano](2026-11-06-pln-00
   - a R21 preparada e não enviada, com nove pontos e a lista do que se corrige na gravação sem rodada.
 
 - **A segunda atualização**, a pedido de Anderson ("atualize o plano"), com o que nasceu depois do levantamento: o
-  PLN-018 do `tools-kit` (aberto na mesma tarde, prioridade alta, ainda sem commit na branch), que grava a linha
+  [PLN-018: O turno do Grok e do Codex entra no log, e a tarefa carimba o id dessa sessão](../../plans/PLN-018-o-grok-e-o-codex-na-medicao/PLN-018-plan.md), do `tools-kit` (aberto na mesma tarde, prioridade alta, commitado lá
+  e ainda sem sessão dona), que grava a linha
   `turn` do Grok e do Codex, o terreno do `D9` e da R18.4; e a issue do `playground` sobre o custo do Grok no `brza
   sessions usage`. O `Retomar` os cita, a issue entrou em `## Pendências conhecidas`, e a R21 ganhou o ponto 10, sobre
-  quem grava a linha. O PLN-018 entra no plano por link quando chegar à branch do `tools-kit`.
+  quem grava a linha. Depois do commit dele no `tools-kit`, o PLN-018 entrou por link no `Retomar` do PLN-004.
 
 ## O que ficou
 
@@ -88,4 +90,4 @@ a sessão anterior está em [O PLN-004: o Grok entra no plano](2026-11-06-pln-00
 
 ## Medida
 
-Corrido 12 min — agente 6 min, quem pediu 6 min, pausa 0 s · US$ 2,55 (turnos 2,55, subagentes 0,00) · CPU 13,29 s do `claude` e 206,31 s dos comandos, RSS até 500 MB · 4 turnos, 1 sessão · até 19:45 de 2026-11-09, pelo `brza note commit`
+Corrido 25 min — agente 8 min, quem pediu 16 min, pausa 0 s · US$ 10,42 (turnos 5,45, subagentes 4,97) · CPU 29,25 s do `claude` e 492,30 s dos comandos, RSS até 514 MB · 8 turnos, 1 sessão · até 19:47 de 2026-11-09, pelo `brza note commit`

@@ -220,9 +220,9 @@ corrido  = agente + anderson + pausa
 ociosa   = do fim do último turno do segmento anterior ao começo do primeiro deste (da sessão)
 ```
 
-## D3 — A seção `## Medida` no worklog — `bin/brza-note` (P3)
+## D3 — A seção `## Custo da tarefa` no worklog — `bin/brza-note` (P3, P7)
 
-- **Origem:** R1.4, R3.1, R3.2
+- **Origem:** R1.4, R3.1, R3.2; o título, R6.1
 - **Contexto:** o worklog leva a medida da tarefa ao git, para sobreviver à troca de máquina; o turno do commit é a
   maior parte dela [F15].
 
@@ -236,7 +236,7 @@ O `brza note commit` escreve a seção como a última do worklog, e a reescreve 
 tarefa — todas as sessões e todos os segmentos até agora:
 
 ```markdown
-## Medida
+## Custo da tarefa
 
 Corrido 18 min — agente 7 min, Anderson 10 min, pausa 0 · US$ 2,35 (turnos 2,35, subagentes 0,00) · CPU 0,8 s do
 `claude` e 6,1 s dos comandos, RSS até 357 MB · 1 turno, 1 sessão · até 22:16 de 2026-11-03, pelo `brza note commit`
@@ -251,10 +251,12 @@ Corrido 18 min — agente 7 min, Anderson 10 min, pausa 0 · US$ 2,35 (turnos 2,
 - **Acréscimos na linha:** com `brza run` na tarefa, "· `brza run`: 2 comandos, CPU 14 min, pico 1,8 GB"; dividida,
   "· dividida com 1 outro worklog do commit".
 - **Sem sessão**, a seção não é escrita.
+- **O título antigo (R6.1):** até o P7 a seção se chamava `## Medida`. O comando reconhece os dois títulos ao
+  reescrever e grava sempre o novo, e o worklog com `## Medida` troca no próximo commit dele, sem migração.
 - **As datas (R3.2):** o frontmatter não ganha `opened` nem hora em `completed`; a hora do fim é a do "até".
 - **A norma** (`core/work/README.md`): a linha `sessions` na tabela de propriedades — "lista dos ids das sessões que
   commitaram o worklog, mantida pelo `brza note commit`" —, e, na seção `work/worklogs/`, o `sessions:` no frontmatter
-  e a `## Medida` como última seção, escrita pelo comando e não à mão.
+  e a `## Custo da tarefa` como última seção, escrita pelo comando e não à mão.
 
 ## D4 — `summarize_measurements.py --by-task` — `core/scripts/summarize_measurements.py` (P2)
 
@@ -274,7 +276,7 @@ python3 scripts/summarize_measurements.py --by-task --pending --session <id>
 - **Começa no primeiro evento `task` do log** (R4.1); o `--since` só pode adiantar.
 - **O turno da auditoria (`fact_audit: true`) fica de fora**, como no `--by-workstream`.
 - **As funções** `task_segments(rows)` e `task_measure(rows_of_segment)` ficam no módulo, e o `brza-note` as usa por
-  `runpy` (como o `sessions_module`, `brza-note:222-225`), para a `## Medida` e a tabela darem o mesmo número.
+  `runpy` (como o `sessions_module`, `brza-note:222-225`), para a `## Custo da tarefa` e a tabela darem o mesmo número.
 - **Atribuição:** o turno vai ao segmento pelo começo (D1). O `subagent` e o `run` vão ao turno da mesma sessão que
   contém o começo deles (`timestamp − duration_s`) [F6]; fora de turno, ao segmento cujos marcos o contêm; sem sessão
   casada, a "sem tarefa".

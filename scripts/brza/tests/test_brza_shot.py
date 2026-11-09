@@ -136,6 +136,40 @@ class ThemeTest(unittest.TestCase):
 
 
 class ShellTest(unittest.TestCase):
+    def test_base_css_is_read_from_the_visual_base_css_call(self):
+        visual = VISUAL[:VISUAL.index('const BASE_CSS')] + """
+function visualBaseCss(fitFrame: boolean): string {
+  const scrollbars = fitFrame ? ';scrollbar-width:none}html::-webkit-scrollbar{display:none}' : '}'
+  return `html{background:var(--background);color:var(--foreground);font-family:var(--font-sans);font-size:14px;line-height:1.5${scrollbars}body{margin:0}code,pre,kbd,samp{font-family:var(--font-mono)}`
+}
+const BASE_CSS = visualBaseCss(true)
+"""
+        for fit_frame, scrollbars in (
+            ('true', ';scrollbar-width:none}html::-webkit-scrollbar{display:none}'),
+            ('false', '}'),
+        ):
+            with self.subTest(fit_frame=fit_frame), tempfile.TemporaryDirectory() as tmp:
+                studio = fake_studio(Path(tmp))
+                (studio / SHOT['VISUAL_SHELL']).write_text(visual.replace('visualBaseCss(true)',
+                                                                          f'visualBaseCss({fit_frame})'))
+                parts = SHOT['shell_parts'](studio)
+                self.assertEqual(parts['base_css'],
+                                 'html{background:var(--background);color:var(--foreground);'
+                                 'font-family:var(--font-sans);font-size:14px;line-height:1.5' + scrollbars +
+                                 'body{margin:0}code,pre,kbd,samp{font-family:var(--font-mono)}')
+        for changed in (
+            visual.replace('visualBaseCss(true)', 'visualBaseCss(fitFrame)'),
+            visual.replace('fitFrame ?', '!fitFrame ?'),
+            visual.replace('${scrollbars}', '${other}'),
+            visual.replace('${scrollbars}body', '${scrollbars}${extra}body'),
+            visual.replace('return `html', 'return prefix + `html'),
+        ):
+            with self.subTest(changed=changed), tempfile.TemporaryDirectory() as tmp:
+                studio = fake_studio(Path(tmp))
+                (studio / SHOT['VISUAL_SHELL']).write_text(changed)
+                with self.assertRaisesRegex(ShotError, 'BASE_CSS.*native-chat-visual-shell'):
+                    SHOT['shell_parts'](studio)
+
     def test_parts_come_from_the_studio_code(self):
         with tempfile.TemporaryDirectory() as tmp:
             parts = SHOT['shell_parts'](fake_studio(Path(tmp)))

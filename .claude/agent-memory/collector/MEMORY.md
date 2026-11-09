@@ -5,3 +5,6 @@
 - [Sondar symlink de agents/skills/memória (Claude, Codex, agy)](reference_symlink-claude-codex-agy-sondas-sem-modelo.md) — sondas a US$ 0,002, memória do subagente por link negada, sync e link
 - [Onde mora cada peça depois do PLN-006 (brza-workflow)](reference_brza-workflow-depois-da-migracao.md) — mapa BW/BZ, o que o sync toca, citações velhas e atalhos
 - [Sondar o Grok Build CLI 1.0.70 (PLN-004)](reference_grok-build-cli-sondas-atalhos.md) — docs locais, `grok inspect`, env limpo, custo por turno, hooks de ~/.claude que entram
+- [O brza-studio que o PLN-004 cruza: onde mora cada peça](reference_brza-studio-app-atalhos-pln004.md) — override, trust, hooks do app, caminhos movidos, o que o app não tem
+- [Levantar vizinhos do PLN-004 em todas as branches](reference_pln004-levantar-vizinhos-todas-as-branches.md) — índice por id, greps por branch, vizinhos e fontes velhas (2026-11-09)
+- [Cruzar o Desenho do PLN-004 com o brza-workflow vigente](reference_brza-workflow-estado-pln004-atalhos.md) — greps de ausência, linhas deslocadas, testes (env a limpar), quem entregou o quê

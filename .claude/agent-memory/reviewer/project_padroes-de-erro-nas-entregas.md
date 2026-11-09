@@ -68,6 +68,10 @@ Padrões vistos nas revisões do PLN-005 (2026-10-31), do PLN-006 (P1–P7 e P8,
   procurar o caso "nota fora da forma nova" no checador e no `note_kind`. Confiança dada: 95.
 - **Teste que só cobre a forma escalar de um campo que a norma escreve em lista** (o `blocks` no P2 do PLN-008).
   Rodar o `note_state`/parser com a forma de lista do molde em cada commit (`git show <sha>:bin/...`).
+- **Guarda composta (`a and b`) cujo teste de recusa só derruba a primeira cláusula** (PLN-017/P5, `brza-shot`: o
+  caso `${other}` tira o `${scrollbars}` e nunca chega à guarda de interpolação extra). Remover cada cláusula numa
+  cópia em `/private/tmp` e rodar o teste. Confiança dada: 95, por mutação.
+- **Os `tests/notes-checker` não rodam por `unittest discover`** (`Ran 0`): o runner é `python3 tests/notes-checker/run.py`.
 - **Commit de outra tarefa que conserta em silêncio o que o plano revisado deixou** (o `7a18392` do PLN-003 consertou o
   `blocks`). Ao revisar os commits alheios, diferenciar "quebra" de "altera para cumprir".
 

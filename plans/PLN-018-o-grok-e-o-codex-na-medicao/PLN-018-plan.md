@@ -16,8 +16,9 @@ tags:
 # PLN-018: O turno do Grok e do Codex entra no log, e a tarefa carimba o id dessa sessão
 
 - **Retomar:** Sonda fechada e Desenho escrito em 2026-11-09. A R21.10 do PLN-004, já respondida na sessão
-  `workspace` ("siga a recomendação"), cede a este plano a linha `turn` do Grok e do Codex; o arquivo de hook que a
-  chama fica lá. O corte dos passos ainda espera decisão. Hora de escritor continua zero.
+  `workspace` ("siga a recomendação"), faz deste plano o único escritor da linha `turn` do Grok e do Codex. O arquivo
+  de hook que a chama fica lá, e o `D8` e o `D9` de lá se reescrevem contra este Desenho. O corte dos passos ainda
+  espera decisão. Hora de escritor continua zero.
 
 ## Pedido
 
@@ -71,8 +72,9 @@ E, na volta da frase livre:
   caminho chegar sem `--trust`. Continua fora.
 - **O que a R21.10 deixou no PLN-004.** O pacote `packages/runtimes`, o `brza delegate`, o `grok-brza`, a saída cedo
   dos hooks do núcleo quando há `GROK_HOOK_EVENT`, o arquivo `.grok/hooks/runtime.json` e o hook do Codex, o `agy`, a
-  linha do filho fora da soma, o `guardian_review` e o `metadata.runtime`. O `measure_runtimes.py` não é o escritor
-  desta linha. O painel da reunião continua na issue do `playground`.
+  linha do filho fora da soma, o `guardian_review` e o `metadata.runtime` da memória. O `measure_runtimes.py` não
+  grava esta linha: este plano é o único escritor dela. A reescrita do `D8` e do `D9` contra este Desenho é da sessão
+  de lá. O painel da reunião continua na issue do `playground`.
 - **Reabrir o PLN-012.** O P6.2 e o P6.3 seguem lá. Este plano estende o carimbo que o P3 já grava.
 - **CPU e RSS destes runtimes.** `machine` continua null. O `proc_pid_rusage` do PLN-012 lê o executável `claude`.
 
@@ -184,9 +186,11 @@ registro de lá é o `f4e90e3`.
 
 1. **Quem grava a linha `turn` do Grok e do Codex?** As três opções estão no ponto 10 da R21 do PLN-004.
 
-   **Decidido — a recomendada de lá.** O `D9` cede a este plano a linha `turn` do Grok e do Codex. Ficam no PLN-004 o
-   `agy`, o filho fora da soma, o `guardian_review` e o `metadata.runtime`. O `.grok/hooks/runtime.json` da R18.4 chama
-   o escritor deste plano. Os leitores do `usage.json` partilham uma função.
+   **Decidido — a recomendada de lá.** Este plano é o único escritor da linha `turn` do Grok e do Codex. O `D9` cede
+   essa linha e fica com o `agy`, o filho fora da soma do pai, o `guardian_review` do Codex e o `metadata.runtime` da
+   memória. O `.grok/hooks/runtime.json` da R18.4 chama o escritor que este plano entregar. O `D8` e o `D9` se
+   reescrevem contra este Desenho; a reescrita é do PLN-004. Os leitores do `usage.json` do Grok partilham uma função:
+   este plano, o `D9` e o `brza sessions usage` da issue do `playground`.
 
 ## Desenho
 
@@ -196,8 +200,10 @@ registro de lá é o `f4e90e3`.
   sessão, não há linha. `machine` fica null. Sem backfill.
 - **R1.2, R2.1:** Grok e Codex nesta entrega. O Antigravity fica na sonda, sem escritor.
 - **R1.3:** o código do hook só começa depois da sonda. A sonda rodou. O launch do Studio não muda.
-- **PLN-004, R21.10:** este plano grava a linha `turn`. O arquivo que chama o escritor, o `agy`, o filho fora da soma,
-  o `guardian_review` e o `metadata.runtime` ficam lá. Uma função só lê o `usage.json`.
+- **PLN-004, R21.10:** este plano é o único escritor da linha `turn` do Grok e do Codex. O arquivo que chama o
+  escritor, o `agy`, o filho fora da soma, o `guardian_review` e o `metadata.runtime` da memória ficam lá. O `D8` e o
+  `D9` se reescrevem contra este Desenho, na sessão de lá. A leitura do `usage.json` do Grok é uma função, chamada por
+  este plano, pelo `D9` e pelo `brza sessions usage`.
 - **O carimbo de hoje fica** quando não há `CLAUDE_CODE_SESSION_ID` nem `GROK_SESSION_ID`. Conferência:
   `tests/cli/test_brza_note.py:1138`.
 
@@ -296,8 +302,9 @@ O tradutor é um script novo em `core/.claude/hooks/`, com modo próprio. Não �
 `measure_runtimes.py`. O `brza sync` o entrega porque copia `core/`. Quem o chama é o `.grok/hooks/runtime.json` da
 R18.4 do PLN-004. Este plano não grava esse json, nem outro em `~/.grok/hooks/`.
 
-A leitura do `usage.json` é uma função desse script. O `brza sessions usage` chama a mesma função. O painel da reunião,
-na issue do `playground`, não ganha um terceiro parser. Este plano não edita a skill.
+A leitura do `usage.json` é uma função desse script. Este escritor, o `D9` do PLN-004 e o `brza sessions usage` da
+issue do `playground` chamam a mesma função. A linha `turn` sai só deste script. O painel da reunião fica na issue.
+Este plano não edita a skill nem o PLN-004.
 
 No `Stop`, a função lê o `usage.json` cujo `sessionId` é o `session_id` do payload. Grava uma linha por
 `turns[].turnNumber` que ainda não tenha linha. `Stop` com `reason: shutdown`, sem turno novo, não grava. Não soma o
@@ -367,7 +374,8 @@ sonda, e o processo do hook não tem nenhuma das duas. Sem a igualdade com o `se
   Codex.
   [PLN-018: a sonda do stdin e o Desenho](../../work/worklogs/2026-11-09-pln-018-a-sonda-do-stdin.md)
 - 2026-11-09 — Aviso do PLN-004 registrado. A R21.10 já estava decidida; o D1 e o D2 passam a entregar o escritor, e o
-  arquivo de hook fica lá. O corte dos passos continua esperando.
+  arquivo de hook fica lá. O complemento do mesmo dia nomeou este plano como único escritor, os três leitores da
+  função e a reescrita do D8 e do D9 contra este Desenho. O corte dos passos continua esperando.
   [PLN-018: o aviso do PLN-004](../../work/worklogs/2026-11-09-pln-018-o-aviso-do-pln-004.md)
 
 ## Pendências conhecidas
@@ -376,4 +384,4 @@ sonda, e o processo do hook não tem nenhuma das duas. Sem a igualdade com o `se
   a issue segue aberta até a linha existir.
 - [Codex e Antigravity ficam sem medida por tarefa](../../work/issues/codex-e-antigravity-sem-medida-por-tarefa.md) —
   o escritor do Antigravity continua nela; a sonda está no Terreno. A issue do `playground` sobre o custo do Grok na
-  reunião lê o mesmo `usage.json` pela função do D1; o painel dela não é deste plano.
+  reunião e o `D9` do PLN-004 leem o mesmo `usage.json` pela função do D1. O painel dela não é deste plano.

@@ -20,14 +20,13 @@ pela regra da R1.3 do PLN-012: "sempre abra issue para lacunas deixadas".
 
 ## O que se sabe
 
-- **Ainda não pesa.** O Grok entrou em 2026-11-03 (o cask `grok-build` 1.0.70), sem login: `orca account list --json` →
-  `rateLimits.grok.error` "Not signed in to Grok — run grok login".
-- **Há por onde ler.** A CLI grava o estado em `~/.grok` (ou no `GROK_HOME` da conta, pelo `GROK_LAUNCH_SPEC` do app
-  em `brza-studio/src/main/acp/acp-launch-specs.ts:163`), tem id de sessão (`grok -s`), e o modo sem interface sai em
-  JSON (`--output-format`). O app lê a cota dele (`rateLimits.grok`, em janelas `session` e `weekly`).
+- **O [PLN-018](../../plans/PLN-018-o-grok-e-o-codex-na-medicao/PLN-018-plan.md) mede o turno e o carimbo.** A R1.1
+  decidiu a entrega. O plano está em desenho, sem passos. O escritor ainda não entrou no `brza-workflow`.
+- **Onde o Grok grava o turno.** Sonda de 2026-11-09: `usage.json` da sessão, com `turns[].turnNumber` e o
+  `costUsdTicks` daquele turno. O objeto `session` acumula e não se soma. O shell de ferramenta tem `GROK_SESSION_ID`
+  e não tem `CLAUDE_CODE_SESSION_ID`.
+- **O "sem login" de 2026-11-03 não descreve o disco de hoje.** Um `grok agent stdio` completou um turno.
 
 ## O que falta
 
-1. Saber onde o Grok grava a sessão, os tokens e o modelo, e se há um id de sessão no ambiente, como o
-   `CLAUDE_CODE_SESSION_ID`, para o `brza note commit` carimbar no worklog.
-2. Decidir se vale medir, quando o Grok pesar no gasto.
+1. A linha e o carimbo, no PLN-018. O corte dos passos espera decisão.

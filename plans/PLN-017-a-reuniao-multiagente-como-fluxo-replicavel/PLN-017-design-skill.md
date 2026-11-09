@@ -464,3 +464,26 @@ R2, 2026-11-08: A1 (protótipo na branch do `playground`), B1 (`SKILL.md`, oito 
 - O timeout de 2× a mediana, mínimo 3 min, é chute; a Carvão teve o Grok a 4–7 min contra 1–2 min dos outros
   (`PROC:101`). [F26 · inferido · 55]
 - A régua 0–100 copia a faixa da marca de fato (F23).
+
+### Os desvios da reunião de verificação (P7, 2026-11-09)
+
+A primeira reunião pela skill, contra o Studio real, teve três personas (Claude, Grok e Antigravity) pela via
+`worker-start`. Ela rodou do gate ao encerramento, mas teve 19 desvios e **não conta** para as duas reuniões sem desvio do
+critério de promoção. A lista inteira, com a hora de cada um, está em
+[Reunião CI no chat: a coordenação da reunião de verificação do PLN-017](../../work/worklogs/2026-11-09-reuniao-ci-no-chat-coordenacao.md).
+Os que pedem mudança na skill antes da próxima reunião:
+
+| X | Onde | O desvio | A correção que ele pede |
+| :-- | :-- | :-- | :-- |
+| X19 | `briefing.md`, `launch_persona.py` (molde), SKILL.md Passo 7 | o `worker_done` sem `--task-id`/`--dispatch-id` é rejeitado ("worker_done requires taskId") | o prompt de abertura leva os ids do recibo, ou o briefing manda copiar os do preâmbulo do Orca |
+| X1 | `launch_persona.py`, `tally.py` | o recibo do `worker-start` não traz a sessão do provedor; o Claude fica "sem medição" | achar o transcript pelo prompt da persona, ou esperar o `brza sessions open` da v2 |
+| X10 | Passo 3, rodadas-tipo | o fato decisivo de uma persona chegou na última rodada; as outras votaram sem ele | a última rodada só depois de uma síntese que traga os fatos da anterior, ou uma rodada de voto curta de praxe |
+| X8 | Passo 1, `briefing.md` | o "O que existe hoje" do briefing levou um número errado (1.352 em vez de 163), e duas personas o herdaram | conferir os números do briefing por comando antes de abrir |
+| X12, X18 | `panel.py` | `decisoes[].quem` sai como "recomendam"; a rodada para parte da sala não fecha e esconde a síntese | renomear o rótulo; aceitar o subconjunto de personas na rodada |
+| X17 | `round-request.md` | o molde da rodada extra foi improvisado e o `tally.py` não leu o voto | um tipo "rodada extra" no molde |
+| X3, X9 | `narration.md`, `launch_persona.py --send` | a escalação "Worker stopped without reporting" a cada rodada e o "Re: rodada" | dizer que se ignoram; enviar com `--type status` e outro assunto |
+| X5, X6, X4, X11 | `wait_round.py`, Passo 4, briefing | "caixa vazia" com Run ligado; timeout × duração anunciada; medição chega no `Stop`; hora errada no worklog | ler o Run antes da caixa; o timeout respeita a duração anunciada; esperar o `Stop`; pedir `date` no worklog |
+
+O que a reunião **verificou**: o `worker-start` em três agentes num Run único; o sinal `fim-rodada-N` por mailbox; o
+ciclo da R5 (5 h parada sem fechar, `autoReleaseAt` ~2 min depois do `worker_done` aceito); o `tally.py`; o painel por
+rodada conferido por PNG; o isolamento da R1; o revisor independente achando o fato que corrigiu a proposta.

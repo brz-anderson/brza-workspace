@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39658, #39020 e #38950 trazem cards unificados de CI no desktop/mobile, resultados no chat e follow-up automático em falhas de PR.
+description: Os PRs #39020 e #39658 (mesclados) trazem linhas e cartões de CI no chat e chegam pelo próximo merge de tag; o #38950 (fechado sem merge), o follow-up automático em falha de PR, espera o gatilho de uso.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,9 +13,36 @@ tags:
 
 # Resultados de CI no chat e disparo automático de agentes em falhas de PR
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39658`](https://github.com/stablyai/orca/pull/39658),
+Rastreado dos PRs do upstream [`stablyai/orca#39658`](https://github.com/stablyai/orca/pull/39658),
 [`stablyai/orca#39020`](https://github.com/stablyai/orca/pull/39020) e
-[`stablyai/orca#38950`](https://github.com/stablyai/orca/pull/38950).
+[`stablyai/orca#38950`](https://github.com/stablyai/orca/pull/38950), abertos quando a issue nasceu.
+
+## O destino (reunião de 2026-11-09)
+
+A reunião de verificação do [PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat](../../plans/PLN-017-a-reuniao-multiagente-como-fluxo-replicavel/PLN-017-plan.md) (P7) decidiu o destino de cada PR. As personas foram Prumo, Trava e Relance, e houve revisor independente. Anderson decidiu em 2026-11-09: "2, 3 e 4 decididos" e "1A decidido". O registro está em [Reunião CI no chat: a coordenação](../worklogs/2026-11-09-reuniao-ci-no-chat-coordenacao.md).
+
+**Os fatos que mudaram** (conferidos por comando em 2026-11-09):
+
+- O `#39020` e o `#39658` foram **mesclados** em 2026-11-08 e estão na tag `v1.4.255`, junto com o `#38750`, o cartão
+  "Opened PR" de que o `#39658` depende e que o fork não tem.
+- O `#38950` foi **fechado sem merge**. A head real (`ed402736`) tem **163 arquivos**, +12.696. Os "1.352 arquivos" que
+  o `gh pr view` mostra vêm da base empilhada na branch do `#39020`.
+- O fluxo de hoje tem **0 PRs** no `brza-studio`, no `brza-workflow` e no `brza-workspace`, e o push na `master` não gera
+  run. As linhas de CI e o disparo automático só têm evento quando um PR existe, como os 7 PRs do `fixfy-claude` no
+  `orca-fixfy` em 24 a 27/10.
+
+**O destino de cada item de "O que fazer no BrzA Studio":**
+
+1. **Linhas de CI no chat (`#39020`)** e **3. cartões de uma linha (`#39658`)**: sem porte e sem cherry-pick. Chegam no
+   próximo merge de tag do upstream (≥ `v1.4.255`). O aceite é `NativeChatPullRequestEventLine` em `src/` e os testes dos
+   arquivos que o fork tocou, uma linha no checklist do sync, sem issue própria (decisão 2).
+2. **Follow-up automático (`#38950`)**: não se porta nem se constrói agora, nem em modo sombra. O desenho de contenção
+   e o gatilho de uso estão em [O follow-up automático de CI espera o gatilho de uso, com a contenção já desenhada](o-follow-up-automatico-de-ci-espera-o-gatilho-de-uso.md) (decisão 1, alternativa A).
+
+**Achado à parte:** o CI agendado do fork falha em 20 de 100 runs sem ninguém ver, em
+[O CI agendado do `brza-studio` falha sem ninguém ver](o-ci-agendado-do-brza-studio-falha-sem-ninguem-ver.md) (decisão 4).
+
+Esta issue fica aberta (decisão 3) até o merge de tag trazer o visual e o aceite passar.
 
 ## O problema
 

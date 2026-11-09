@@ -97,8 +97,8 @@ a sessão anterior está em [O PLN-004: o Grok entra no plano](2026-11-06-pln-00
 
 ## O que ficou
 
-- **A R21, menos o ponto 10**, quando Anderson retomar as rodadas, e depois o v3 com a R20 e a R21, a aprovação e a gravação do Desenho. O
-  `Retomar` do plano diz de onde se parte.
+- **A R21, menos o ponto 10**, quando Anderson retomar as rodadas, e depois o v3 com a R20 e a R21, a aprovação e a
+  gravação do Desenho. O `Retomar` do plano diz de onde se parte.
 - **O scratch** (`/private/tmp/pln004/`, com o v3 e os agregados de hoje) não vai ao git, e some se a máquina
   reiniciar.
 - **As 2 falhas do `tests/cli` do `brza-workflow`** dependem do `CLAUDE_CODE_SESSION_ID` herdado. Não são deste plano,
@@ -106,4 +106,4 @@ a sessão anterior está em [O PLN-004: o Grok entra no plano](2026-11-06-pln-00
 
 ## Medida
 
-Corrido 28 min — agente 11 min, quem pediu 16 min, pausa 0 s · US$ 12,00 (turnos 7,03, subagentes 4,97) · CPU 37,06 s do `claude` e 498,61 s dos comandos, RSS até 528 MB · 10 turnos, 1 sessão · até 20:02 de 2026-11-09, pelo `brza note commit`
+Corrido 28 min — agente 11 min, quem pediu 16 min, pausa 0 s · US$ 12,09 (turnos 7,12, subagentes 4,97) · CPU 37,42 s do `claude` e 499,93 s dos comandos, RSS até 529 MB · 10 turnos, 1 sessão · até 20:02 de 2026-11-09, pelo `brza note commit`

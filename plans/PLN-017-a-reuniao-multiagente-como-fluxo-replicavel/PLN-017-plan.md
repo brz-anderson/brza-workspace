@@ -4,10 +4,10 @@ phase: execution
 origin: issue
 origin_ref: reuniao-multiagente-com-personas-pelo-brza-sessions
 description: Levantamento e desenho, em três frentes, do que falta para a reunião multiagente com personas rodar sem improviso em qualquer client: a skill, as primitivas do brza sessions e o painel da rodada no chat do Studio.
-ready: "P4a/P4b, P5 e P6 concluídos; próximo P7, com integração da skill ao contrato real antes da reunião"
+ready: "P1 a P7 concluídos; próximo P8 e as correções da skill (X19, X1, X10) antes da próxima reunião"
 estimate_h: 34.75
-executed_h: 8.283
-remaining_h: 12.75
+executed_h: 8.983
+remaining_h: 11.5
 priority: high
 scope:
   - workspace
@@ -22,7 +22,7 @@ tags:
 
 # PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat
 
-- **Retomar:** P1 a P6 concluídos. P4a/P4b publicados na `master` do `brza-workflow` em `3d3d2bb`/`db6bd28`; P6 e REV-022 publicados no `tools-kit` em `ff8def8`/`0cbeb26`; P5 na `master` do workspace em `b24de7c`. Revisão independente sem bloqueios; 100 testes específicos e 580 da CLI ampla, sem mudança posterior de produção. Próximo P7, em sessão própria deste worktree: conferir integração da skill com Run único, mapa de sessões e mailbox por `status`/`round_id`/Dispatch, usando leitura sem consumo e recuperação de eventos já entregues. `send` com `pending` sai 75: seguir ao `wait` ou repetir a mesma `operation` e texto, nunca fazer novo disparo cego. Preservar pendências menores da skill registradas no worklog de P1/P2. P7/P8 não executados nesta coordenação.
+- **Retomar:** P1 a P7 concluídos. P7 rodou a reunião de verificação "CI no chat" pela skill (Prumo Claude Opus xhigh, Trava Grok 4.7 medium, Relance Antigravity), via `worker-start` num Run único, com R1, R2 e uma R3 extra escolhida por Anderson; decisões aplicadas em três issues; 19 desvios, que **não** contam como reunião sem desvio. A reunião usou os scripts v1 da skill (`launch_persona.py`, `wait_round.py`), não os verbos v2 do `brza sessions` publicados em P4a/P4b. Próximo: as correções da skill que os desvios pedem, em [D1, os desvios do P7](PLN-017-design-skill.md) — primeiro o `worker_done` sem `--task-id` (X19), a sessão do provedor no recibo (X1) e o fato que chega tarde (X10) —, a troca para os verbos v2, e P8. Pendências menores da skill seguem no worklog de P1/P2.
 - **Dividido:** [PLN-017 — Desenho](PLN-017-design.md) · [D1, a skill](PLN-017-design-skill.md) · [D2, o `brza sessions`](PLN-017-design-cli.md) · [D3, o painel](PLN-017-design-painel.md)
 
 ## Pedido
@@ -334,14 +334,14 @@ Estimado: 0,5 h · Executado: incluído nas 1,109 h agregadas de P4a/P4b/P6, sem
 
 ### P7 — A reunião de verificação
 
-Executa D1, D3 · executor: sessão nova deste worktree
+Executa D1, D3 · executor: a sessão de coordenação da reunião, neste worktree
 
-Estimado: 1,25 h · Executado: — h
+Estimado: 1,25 h · Executado: ~0,7 h (estimativa de relógio ativo, 13:13–13:36 e 18:36–18:50; a sessão mediu US$ 13,64 com a pausa de ~5 h)
 
-- [ ] **1. Três personas, duas rodadas**, pela skill e com o painel republicado por rodada, sobre um tema pequeno do `playground`
-- [ ] **2. O que desviar** do fluxo volta a D1 como desvio `X`; a primeira das duas reuniões sem desvio que o critério de promoção pede
+- [x] **1. Três personas, duas rodadas**, pela skill e com o painel republicado por rodada, sobre um tema pequeno do `playground` — três personas (Claude, Grok, Antigravity), R1 e R2 e uma R3 extra para duas personas, por escolha de Anderson (alternativa C)
+- [x] **2. O que desviar** do fluxo volta a D1 como desvio `X`; a primeira das duas reuniões sem desvio que o critério de promoção pede — 19 desvios em D1; esta reunião **não conta** como sem desvio
 
-**Evidência:** —
+**Evidência:** [Reunião CI no chat: a coordenação da reunião de verificação do PLN-017](../../work/worklogs/2026-11-09-reuniao-ci-no-chat-coordenacao.md), com a proposta v2 copiada, as tabelas por persona do `tally.py`, os custos e os 19 desvios; os worklogs das personas [Prumo](../../work/worklogs/2026-11-09-reuniao-ci-no-chat-prumo.md), [Trava](../../work/worklogs/2026-11-09-reuniao-ci-no-chat-trava.md) e [Relance](../../work/worklogs/2026-11-09-reuniao-ci-no-chat-relance.md). Verificado contra o Studio: `worker-start` em três agentes no Run `run_fe70b351bc36`; o `fim-rodada-N` por mailbox de todas; o ciclo da R5 (5 h parada sem fechar, `autoReleaseAt` ~2 min depois do `worker_done` aceito); o painel por rodada conferido por PNG; o revisor independente (78). Não verificado: os verbos v2 do `brza sessions` (a reunião usou os scripts v1). As decisões de Anderson ("2, 3 e 4 decididos"; "1A decidido") estão na issue de origem emendada e em [O follow-up automático de CI espera o gatilho de uso, com a contenção já desenhada](../../work/issues/o-follow-up-automatico-de-ci-espera-o-gatilho-de-uso.md) e [O CI agendado do `brza-studio` falha sem ninguém ver](../../work/issues/o-ci-agendado-do-brza-studio-falha-sem-ninguem-ver.md).
 
 ### P8 — O fechamento
 
@@ -356,6 +356,9 @@ Estimado: 0,5 h · Executado: — h
 **Evidência:** —
 
 ## Worklogs
+
+- 2026-11-09 — P7: a reunião de verificação "CI no chat" pela skill, três personas em três runtimes via `worker-start`, R1, R2 e R3 extra; Anderson decidiu os quatro pontos; três issues; 19 desvios a D1, a reunião não conta como sem desvio.
+  [Reunião CI no chat: a coordenação da reunião de verificação do PLN-017](../../work/worklogs/2026-11-09-reuniao-ci-no-chat-coordenacao.md)
 
 - 2026-11-09 — P4a/P4b/P6 concluídos e publicados; sondas reais, 100 testes específicos, 580 CLI ampla e REV-022; 1,109 h medidas da executora, sem intervalo suspenso nem rateio inventado.
   [O `brza sessions` recebe as primitivas da reunião e o PLN-010 registra a transição pelo `rpc`](../../../tools-kit/work/worklogs/2026-11-09-pln-017-sessions-e-excecao-ao-pln-010.md)
@@ -382,3 +385,6 @@ Estimado: 0,5 h · Executado: — h
 
 - [O `brza sessions` ganha os verbos da reunião multiagente: modelo na abertura, recibo, `wait`, `read --last`, `model`, `usage` e `close --prefix`](../../work/issues/o-brza-sessions-para-a-reuniao-multiagente.md) — de P3; P4a/P4b/P5/P6 concluídos, com evidências nos passos; a integração na reunião fica para P7.
 - [A fase do painel da reunião no BrzA Studio: argumentação por persona, abrir o chat, gate de decisão e atualização ao vivo](../../work/issues/a-fase-do-painel-da-reuniao-no-brza-studio.md) — de P3; registro para o `studio`, sem pedido de execução.
+- [Resultados de CI no chat e disparo automático de agentes em falhas de PR](../../work/issues/resultados-de-ci-no-chat-e-disparo-automatico-de-agentes-em-falhas-de-pr.md) — o tema da reunião de P7; emendada com o destino de cada PR e aberta até o merge de tag trazer o visual.
+- [O follow-up automático de CI espera o gatilho de uso, com a contenção já desenhada](../../work/issues/o-follow-up-automatico-de-ci-espera-o-gatilho-de-uso.md) — de P7, ao `tools-kit`, `low`; decisão 1A de Anderson.
+- [O CI agendado do `brza-studio` falha sem ninguém ver](../../work/issues/o-ci-agendado-do-brza-studio-falha-sem-ninguem-ver.md) — de P7, ao `studio`, `low`; decisão 4 de Anderson.

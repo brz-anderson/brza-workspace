@@ -4,10 +4,10 @@ phase: execution
 origin: issue
 origin_ref: reuniao-multiagente-com-personas-pelo-brza-sessions
 description: Levantamento e desenho, em três frentes, do que falta para a reunião multiagente com personas rodar sem improviso em qualquer client: a skill, as primitivas do brza sessions e o painel da rodada no chat do Studio.
-ready: "não — P4a/P4b e P6 em execução no tools-kit; P5 concluído; P7 aguarda P4a"
+ready: "P4a/P4b, P5 e P6 concluídos; próximo P7, com integração da skill ao contrato real antes da reunião"
 estimate_h: 34.75
-executed_h: 7.174
-remaining_h: 26.75
+executed_h: 8.283
+remaining_h: 12.75
 priority: high
 scope:
   - workspace
@@ -22,7 +22,7 @@ tags:
 
 # PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat
 
-- **Retomar:** P1/P2 concluídos com 149 testes; P3 concluído; P5 concluído e publicado em `b24de7c` (99 testes, revisão independente). P4a/P4b/P6 em execução no `tools-kit`, Dispatch `ctx_f0b0d3dbd714`, Run principal `run_2287f933d683`. A sonda reportou a híbrida sem fechamento automático e segue pela via pura de R6; D2 usa `status` no contrato instalado. R7.1 escolheu `close` por pedido de encerramento (`closing`) e `--force` por parada guardada confirmada. Próximo: receber entrega e revisão de P4/P6, registrar evidências e horas; P7 aguarda P4a. Antes de P7, conferir integração da skill com o contrato real (Run único, mailbox já entregue e mapa das sessões). Pendências menores da skill permanecem no worklog de P1/P2.
+- **Retomar:** P1 a P6 concluídos. P4a/P4b publicados na `master` do `brza-workflow` em `3d3d2bb`/`db6bd28`; P6 e REV-022 publicados no `tools-kit` em `ff8def8`/`0cbeb26`; P5 na `master` do workspace em `b24de7c`. Revisão independente sem bloqueios; 100 testes específicos e 580 da CLI ampla, sem mudança posterior de produção. Próximo P7, em sessão própria deste worktree: conferir integração da skill com Run único, mapa de sessões e mailbox por `status`/`round_id`/Dispatch, usando leitura sem consumo e recuperação de eventos já entregues. `send` com `pending` sai 75: seguir ao `wait` ou repetir a mesma `operation` e texto, nunca fazer novo disparo cego. Preservar pendências menores da skill registradas no worklog de P1/P2. P7/P8 não executados nesta coordenação.
 - **Dividido:** [PLN-017 — Desenho](PLN-017-design.md) · [D1, a skill](PLN-017-design-skill.md) · [D2, o `brza sessions`](PLN-017-design-cli.md) · [D3, o painel](PLN-017-design-painel.md)
 
 ## Pedido
@@ -288,27 +288,27 @@ Estimado: 1 h · Executado: 1 h
 
 Executa D2 (revisto pela R5 e R6) · executor: sessão do `tools-kit`, no `brza-workflow`, a partir da issue de P3
 
-Estimado: 10 h · Executado: — h
+Estimado: 10 h · Executado: incluído nas 1,109 h agregadas de P4a/P4b/P6, sem rateio por passo
 
-- [ ] **0. A sonda da híbrida (1 a 2 h):** abrir um chat por `agent launch --surface chat --model --effort` e torná-lo worker por `worker-start --terminal orca_session_id:<chat> --spec …`; conferir se o `autoReleaseAt` vale depois do `worker_done`, se a faixa "Keep open" aparece e se o `brza orchestration send` da persona chega à coordenação; anotar a superfície que cada um dos quatro agentes abre pelo `worker-start --spec`. O resultado decide entre a híbrida e a via A pura
-- [ ] **1. A sonda do resto** com chats reais: `setOption`, reenvio com a mesma `operation`, `updatedAt` ao entrar em `working`, identidade do chamador fora do chat do Studio
-- [ ] **2. Testes que falham antes**, em `tests/cli/test_brza_sessions.py`, um por verbo: `open` pela via decidida (grava `dispatch` e `model`/`effort` no mapa), `send` com recibo e `--operation`, `wait` sobre `check --wait` (mensagem de fim de rodada por persona, `worker_done`, timeout, `blocked`/`failed` pelo estado), `read --last`, `close` por `worker-release` e `worker-keep-open`
-- [ ] **3. Implementar** pela menor mudança do D2; o `launch.py` sai; o `wait` por estado e fila fica como fallback para chat sem Dispatch
-- [ ] **4. `python3 -m unittest discover -s tests/cli -p test_brza_sessions.py`** com `env -u BRZA_WORKSPACE`, revisão e merge na `master` do `brza-workflow`
+- [x] **0. A sonda da híbrida (1 a 2 h):** abrir um chat por `agent launch --surface chat --model --effort` e torná-lo worker por `worker-start --terminal orca_session_id:<chat> --spec …`; conferir se o `autoReleaseAt` vale depois do `worker_done`, se a faixa "Keep open" aparece e se o `brza orchestration send` da persona chega à coordenação; anotar a superfície que cada um dos quatro agentes abre pelo `worker-start --spec`. O resultado decide entre a híbrida e a via A pura
+- [x] **1. A sonda do resto** com chats reais: `setOption`, reenvio com a mesma `operation`, `updatedAt` ao entrar em `working`, identidade do chamador fora do chat do Studio
+- [x] **2. Testes que falham antes**, em `tests/cli/test_brza_sessions.py`, um por verbo: `open` pela via decidida (grava `dispatch` e `model`/`effort` no mapa), `send` com recibo e `--operation`, `wait` sobre `check --wait` (mensagem de fim de rodada por persona, `worker_done`, timeout, `blocked`/`failed` pelo estado), `read --last`, `close` por `worker-release` e `worker-keep-open`
+- [x] **3. Implementar** pela menor mudança do D2; o `launch.py` sai; o `wait` por estado e fila fica como fallback para chat sem Dispatch
+- [x] **4. `python3 -m unittest discover -s tests/cli -p test_brza_sessions.py`** com `env -u BRZA_WORKSPACE`, revisão e merge na `master` do `brza-workflow`
 
-**Evidência:** —
+**Evidência:** `brza-workflow@3d3d2bb`, publicado na `master`; snapshot de 90 testes verdes, sondas reais dos quatro runtimes e revisão independente REV-022. Híbrida sem auto-release selecionou a via pura de R6; encerramento conforme R7.1.
 
 ### P4b — Os verbos de medição do `brza sessions`
 
 Executa D2 · executor: sessão do `tools-kit`, no `brza-workflow`
 
-Estimado: 3,5 h · Executado: — h
+Estimado: 3,5 h · Executado: incluído nas 1,109 h agregadas de P4a/P4b/P6, sem rateio por passo
 
-- [ ] **1. Testes que falham antes**: `list` com modelo, esforço e último turno; `model` com `model` e depois `effort`; `usage` com o Claude pelo hook, o Codex pelo rollout (fixture com `info: null`) e Grok/Antigravity `unmeasured`
-- [ ] **2. Implementar**, sem tocar o `measure.py`
-- [ ] **3. Rodar, revisar e mesclar**
+- [x] **1. Testes que falham antes**: `list` com modelo, esforço e último turno; `model` com `model` e depois `effort`; `usage` com o Claude pelo hook, o Codex pelo rollout (fixture com `info: null`) e Grok/Antigravity `unmeasured`
+- [x] **2. Implementar**, sem tocar o `measure.py`
+- [x] **3. Rodar, revisar e mesclar**
 
-**Evidência:** —
+**Evidência:** `brza-workflow@db6bd28`, publicado na `master`; 100 testes específicos verdes (dez sobre o snapshot de P4a), 580 na CLI ampla antes do último teste somente de regressão, sem mudança posterior de produção; REV-022 sem bloqueios.
 
 ### P5 — O `brza shot` lê o CSS atual do Studio
 
@@ -326,11 +326,11 @@ Estimado: 1 h · Executado: 0,174 h (janela da sessão executora, incluindo fech
 
 Executa D2 · executor: sessão do `tools-kit`
 
-Estimado: 0,5 h · Executado: — h
+Estimado: 0,5 h · Executado: incluído nas 1,109 h agregadas de P4a/P4b/P6, sem rateio por passo
 
-- [ ] **1. Registrar no PLN-010** a exceção à R1.4, citando PLN-017/R3.1 ("Recibo, --operation e read --last pelo rpc", 2026-11-08, sessão `workflow-improvements`), e o que a troca de transporte custa quando o `brza chat` chegar
+- [x] **1. Registrar no PLN-010** a exceção à R1.4, citando PLN-017/R3.1 ("Recibo, --operation e read --last pelo rpc", 2026-11-08, sessão `workflow-improvements`), e o que a troca de transporte custa quando o `brza chat` chegar
 
-**Evidência:** —
+**Evidência:** `brza-workspace@ff8def8` e `0cbeb26`, publicados em `workstream/tools-kit`; exceção à R1.4 registrada no PLN-010 com resposta literal, data, sessão e estimativa de 0,5 h para a troca futura do transporte; REV-022 sem bloqueios.
 
 ### P7 — A reunião de verificação
 
@@ -357,7 +357,10 @@ Estimado: 0,5 h · Executado: — h
 
 ## Worklogs
 
-- 2026-11-09 — coordenação de P4/P5/P6; R7 escolhe o encerramento e a parada guardada; P5 concluído, revisado e publicado. P4/P6 seguem no `tools-kit`.
+- 2026-11-09 — P4a/P4b/P6 concluídos e publicados; sondas reais, 100 testes específicos, 580 CLI ampla e REV-022; 1,109 h medidas da executora, sem intervalo suspenso nem rateio inventado.
+  [O `brza sessions` recebe as primitivas da reunião e o PLN-010 registra a transição pelo `rpc`](../../../tools-kit/work/worklogs/2026-11-09-pln-017-sessions-e-excecao-ao-pln-010.md)
+
+- 2026-11-09 — coordenação de P4/P5/P6; R7 escolhe o encerramento e a parada guardada; P4/P5/P6 concluídos, revisados e publicados; P7 fica para a próxima execução.
   [PLN-017: coordenação de P4, P5 e P6 e encerramento de workers](../../work/worklogs/2026-11-09-pln-017-coordenacao-p4-p5-p6.md)
 - 2026-11-09 — P5 executado na `master`, 99 testes e revisão independente; commit `b24de7c` publicado.
   [PLN-017/P5: o brza shot lê visualBaseCss e mantém o literal antigo](../../../workspace/work/worklogs/2026-11-09-pln-017-p5-brza-shot.md)
@@ -371,7 +374,11 @@ Estimado: 0,5 h · Executado: — h
 - 2026-11-08 — R1 a R4: destino, primitiva, UI, narração, a skill, o CLI, o painel e o corte; D1 a D3 gravados; P3 feito (`cea9595`). Parou ao abrir a sessão `pln-017-skill` para P1 e P2.
   [O fluxo de reunião multiagente vai a plano: as duas reuniões medidas e a rodada 1](../../work/worklogs/2026-11-08-o-fluxo-de-reuniao-multiagente-vai-a-plano.md)
 
+## Revisões
+
+- [REV-022: As primitivas do brza sessions e a exceção transitória do PLN-010](../../../tools-kit/work/reviews/REV-022-pln-017-sessions-e-transicao-rpc.md) — concluída, achados corrigidos e hipóteses falsas documentadas; P4a/P4b/P6 sem bloqueios.
+
 ## Pendências conhecidas
 
-- [O `brza sessions` ganha os verbos da reunião multiagente: modelo na abertura, recibo, `wait`, `read --last`, `model`, `usage` e `close --prefix`](../../work/issues/o-brza-sessions-para-a-reuniao-multiagente.md) — de P3; P4a, P4b, P5 e P6 ficam pendentes nos workstreams donos.
+- [O `brza sessions` ganha os verbos da reunião multiagente: modelo na abertura, recibo, `wait`, `read --last`, `model`, `usage` e `close --prefix`](../../work/issues/o-brza-sessions-para-a-reuniao-multiagente.md) — de P3; P4a/P4b/P5/P6 concluídos, com evidências nos passos; a integração na reunião fica para P7.
 - [A fase do painel da reunião no BrzA Studio: argumentação por persona, abrir o chat, gate de decisão e atualização ao vivo](../../work/issues/a-fase-do-painel-da-reuniao-no-brza-studio.md) — de P3; registro para o `studio`, sem pedido de execução.

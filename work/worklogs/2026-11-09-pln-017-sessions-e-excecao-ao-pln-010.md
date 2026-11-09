@@ -137,6 +137,11 @@ base `d38e7b4`, não foram corrigidas nesta tarefa; o comando exigido sem `BRZA_
   temporárias remanescentes. **Estado:** workers puros encerram pelo ciclo de vida; chats híbridos ficam retidos
   como recursos externos, sem declarar liberação inexistente. **Como desfazer:** fechar apenas as abas da sonda
   identificadas no scratch, preservando as sessões de trabalho.
+- **O quê e onde:** scripts, logs, relatórios, capturas e snapshots temporários em `/private/tmp/pln017-*`,
+  `/private/tmp/pln017-review/` e na pasta `pln-017-sonda` do scratch desta sessão. **Risco:** espaço temporário
+  ocupado e perda de evidência se apagado antes da conferência. **Estado:** preservados para a entrega, com 38 logs
+  copiados para o scratch e a mutação final registrada separadamente. **Como desfazer:** depois de guardar a entrega,
+  remover somente esses artefatos identificados da sonda, sem tocar outros temporários ou configurações de usuário.
 
 
 ## Fechamento e publicação
@@ -150,6 +155,9 @@ base `d38e7b4`, não foram corrigidas nesta tarefa; o comando exigido sem `BRZA_
 - **P6:** concluído na emenda do PLN-010; notas, REV-022 e memória são publicados pelo `brza note commit`
   na branch `workstream/tools-kit`, no próprio commit que versiona este registro. O SHA fica no recibo final
   da entrega à coordenação; não se cria uma referência circular ao hash dentro do próprio commit.
+- **Publicação inicial das notas:** `ff8def88423d9c16249cd7b6d3aca710f13e3143`, enviada à
+  `origin/workstream/tools-kit`; a atualização final deste registro acrescenta o rastro dos artefatos temporários.
+  O índice confirmou `REV-022 changed` na `origin/master`, exclusivamente pelo `brza note`.
 - **Revisão:** três rodadas independentes de código, sem bloqueio final; a última lacuna de teste foi corrigida
   com o centésimo caso e mutação comprovadamente vermelha, sem mudar código de produção.
 - **Validação final:** 100 específicos, 580 na CLI ampla antes do último teste somente de regressão, 348 hooks,

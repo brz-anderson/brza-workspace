@@ -259,6 +259,20 @@ Respondida em 2026-11-08, na sessão `workflow-improvements`.
 
 **Escolhida a opção 2:** sintetizar e compartilhar o fato novo e executar voto informado extra quando o gatilho ocorrer, sem nova autorização para essa extensão. Sem gatilho, não acrescentar rodada. A decisão final continua com Anderson. D1 atualizado e resposta transmitida à execução em `msg_23b96f508744`.
 
+### Rodada 9 — participantes da rodada extra automática (2026-11-09)
+
+**Apresentado antes:** R8 autoriza a extensão automática, mas não define participantes. P7 teve R3 para duas das três personas (worklog da coordenação, linha 52). O alcance "só as afetadas" tinha sido inferido pela execução e foi marcado como pendente pela revisão. Custo financeiro não medido; 3–5 min são estimativa de duração com respostas em paralelo.
+
+**Pergunta:** quem deve participar da rodada extra automática quando um fato novo contradisser a premissa de algum voto?
+
+1. Só as personas cujos votos forem afetados (Recomendado). Custo: cerca de 3–5 min por gatilho e execução dessas personas. Se paga: quando evita repetir votos que o fato não afeta.
+2. Toda a sala. Custo: cerca de 3–5 min por gatilho, sujeito à persona mais lenta, e execução de todas. Se paga: quando o fato também pode mudar votos sem contradição direta.
+3. A coordenação escolhe e registra o motivo. Custo: um julgamento sobre participantes em cada gatilho, além da rodada. Se paga: quando o alcance do fato varia entre reuniões.
+
+**Resposta literal de Anderson**, em 2026-11-09, sessão `Retomar PLN-017`: "A coordenação escolhe e registra o motivo. Custo: um julgamento sobre participantes em cada gatilho, além da rodada. Se paga: quando o alcance do fato varia entre reuniões."
+
+**Escolhida a opção 3:** a coordenação seleciona os participantes caso a caso e registra o motivo antes do disparo. Não há composição fixa; R8 continua governando o gatilho automático e Anderson conserva a decisão final. D1 atualizado; resposta enviada à execução em `msg_067ef1a3938d`.
+
 ## Passos
 
 ### P1 — A skill `meeting-runner` v1

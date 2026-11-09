@@ -22,7 +22,7 @@ tags:
 
 # PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat
 
-- **Retomar:** plano aceito em R4 (2026-11-08); P3 feito. R5 e R6 (2026-11-08) acrescentaram o ciclo de vida das personas: D2 e D1 revistos (seção "Revisão pela R5 e R6" em cada um); P4a ganhou a sonda da híbrida (P4a.0) e passou a 10 h; a sessão `pln-017-skill` (P1 e P2) foi avisada para reler. Próximo: P4a.0 pela sessão do `tools-kit`, a partir da issue; P1 e P2 seguem; P7 depois de P1, P2 e P4a.
+- **Retomar:** conferido em 2026-11-09: P3 feito; P1/P2 têm protótipo em `.claude/skills/meeting-runner/`, ainda sem commit. A suíte atual roda 102 testes: 94 passam, 7 falham e 1 termina com erro (mailbox em `wait_round`, Codex sem janela em `tally`, PNG em `panel`). Próximo em P1/P2: investigar essas falhas e completar as avaliações e a revisão exigidas, sem tomar a memória do revisor como aceite. P4a.0 continua a cargo do `tools-kit`, pela issue; sem evidência nova conferida nesta retomada. R5/R6 continuam vigentes em D1/D2. P7 espera P1, P2 e P4a.
 - **Dividido:** [PLN-017 — Desenho](PLN-017-design.md) · [D1, a skill](PLN-017-design-skill.md) · [D2, o `brza sessions`](PLN-017-design-cli.md) · [D3, o painel](PLN-017-design-painel.md)
 
 ## Pedido
@@ -344,6 +344,9 @@ Estimado: 0,5 h · Executado: — h
 **Evidência:** —
 
 ## Worklogs
+
+- 2026-11-09 — retomada: protótipo de P1/P2 sem commit; 102 testes, 7 falhas e 1 erro; checador de notas sem erros nem avisos. Nenhum passo fechado.
+  [PLN-017: retomada e conferência do protótipo da skill](../../work/worklogs/2026-11-09-pln-017-retomada.md)
 
 - 2026-11-08 — R1 a R4: destino, primitiva, UI, narração, a skill, o CLI, o painel e o corte; D1 a D3 gravados; P3 feito (`cea9595`). Parou ao abrir a sessão `pln-017-skill` para P1 e P2.
   [O fluxo de reunião multiagente vai a plano: as duas reuniões medidas e a rodada 1](../../work/worklogs/2026-11-08-o-fluxo-de-reuniao-multiagente-vai-a-plano.md)

@@ -1057,6 +1057,19 @@ no disco. Ao enviar, a rodada se divide em grupos de até quatro, com a data do 
    paga: antes do D5; declarar que o worker não passa pelo wrapper — custo: a memória do Grok ligada nesses workers;
    passar as duas variáveis pelo `dispatch` — custo: o MCP passa a conhecer o pacote `runtimes`.
 
+10. **Quem grava a linha `turn` do Grok e do Codex: o `D9` ou o PLN-018?** (D8, D9, R18.4; acrescentado em 2026-11-09,
+   depois do levantamento) O PLN-018 do `tools-kit`, aberto em 2026-11-09 com prioridade alta, grava a linha `turn` do
+   Grok (`costUsdTicks` / 1e10) e do Codex (o `usage` do registro) e o mesmo id no carimbo da tarefa, e põe fora de
+   escopo o pacote do PLN-004 e o `measure_runtimes.py`, mas a entrega dele é a linha que o `D9` e a R18.4 dão ao
+   `measure_runtimes.py grok|codex`. A issue do `playground` sobre o custo do Grok põe um terceiro leitor do mesmo
+   `usage.json`, no `brza sessions usage`. Opções: o `D9` cede ao PLN-018 a linha `turn` do Grok e do Codex, e fica com
+   o que o PLN-018 não cobre — o `agy`, o filho fora da soma, o `guardian_review` do Codex, o `metadata.runtime` da
+   memória —; o `.grok/hooks/runtime.json` da R18.4 chama o escritor que o PLN-018 entregar, e os três leitores
+   partilham uma função (recomendada) — custo: reescrever o `D8` e o `D9` contra o Desenho do PLN-018, quando houver;
+   se paga: agora, porque o PLN-018 anda com prioridade alta e o PLN-004 está parado; o PLN-018 adota o
+   `measure_runtimes.py` do PLN-004 — custo: o PLN-018 espera um pacote sem Desenho aprovado; se paga: só se o
+   PLN-004 voltar antes da sonda do PLN-018; os dois escrevem — custo: a linha `turn` em dobro; se paga: nunca.
+
 **A conferir e corrigir na gravação do Desenho, sem rodada** (não decidem nada; alinham o texto ao disco e à norma):
 - o v3 escreve o nome do outro workspace 12 vezes e cita o slug antigo de uma nota de lá, contra a
   `.claude/rules/workspace.md`; sai na gravação;

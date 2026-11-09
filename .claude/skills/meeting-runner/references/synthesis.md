@@ -23,7 +23,8 @@ que a Carvão tinha.
 
 ## Fatos novos da rodada N
 
-- ‹M#: o fato, quem o trouxe, **conferido** pela coordenação por ‹comando› → ‹resultado›, ou "não conferi"›.
+- ‹M#: o fato, quem o trouxe, **conferido** pela coordenação por ‹comando› → ‹resultado›, ou "não conferi"›. **Marque os
+  novos desta rodada**: a próxima rodada com voto os cita no pedido, e a persona os declara em `**Fatos lidos:**` (X10).
 - ‹Número de persona que NÃO bate com a conferência: diga o valor da persona e o da coordenação›.
 
 ## Convergências
@@ -63,13 +64,21 @@ A coordenação grava `.sessions/<reuniao>/sintese-N.json` ao fechar a rodada; `
     {"pergunta": "O primeiro aceite pode ser parcial?", "quem": ["Régua", "Atalho"],
      "recomendacao": "Sim, chamado de piloto parcial.", "votos": null}
   ],
-  "custos_coordenacao": {"coordenacao_usd": 4.74, "revisor_usd": 1.02, "ate": "21:32:39"}
+  "custos_coordenacao": {"coordenacao_usd": 4.74, "revisor_usd": 1.02, "ate": "21:32:39"},
+  "rodada_extra": {"gatilho": "M6 contradiz a premissa do voto B", "participantes": ["Trava", "Relance"],
+                   "motivo": "o voto A do Prumo não depende de M6"}
 }
 ```
 
 - `posicoes` **sobrepõe** a `**Posição:**` da persona só quando a dela não serve (longa, genérica, em outra língua).
 - `medicoes[].tipo`: `medido` (a coordenação rodou), `lido` (arquivo ou doc), `conferido` (a coordenação conferiu o número
   de uma persona). Medição sem fonte não entra: `texto` termina com a fonte ou o comando.
-- `decisoes` é o que vai à rodada com Anderson; o painel só mostra, e a pergunta com opções vai ao chat.
+- `decisoes` é o que vai à rodada com Anderson; o painel só mostra, e a pergunta com opções vai ao chat. `quem` é **quem
+  levantou** a decisão, e o painel o mostra como "levantada por"; voto vai só em `votos` (na P7 o painel leu `quem` como
+  "recomendam" e atribuiu A a quem votou B, X12).
+- Rodada para parte da sala: o `estado-rN.json` traz `rodada.participantes` (do `--participantes`); a síntese diz quem
+  ficou fora e por quê, e o `posicoes` não precisa de texto para quem não participou (X18).
 - `custos_coordenacao` vem do `measurements.jsonl` da sessão de coordenação e dos subagentes dela (`agrega.py` do
   PLN-017 mostra a conta); sem ele o cartão some.
+- `rodada_extra` só existe quando o gatilho da R8 valeu: o fato, quem participa e o motivo da escolha (R9), gravados
+  **antes** do envio da rodada extra. O painel não o lê; é o registro da escolha da coordenação.

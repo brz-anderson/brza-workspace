@@ -43,7 +43,10 @@ cota (a do Codex acabou no meio da MCP e tirou duas personas de duas rodadas).
 
 ## O manifesto `reuniao.json`
 
-Fonte do lançamento, do `tally.py`, do `wait_round.py` e do `panel.py`. O schema completo, com os campos obrigatórios, está
+Fonte da abertura (`launch_persona.py`), do `tally.py`, do `wait_round.py` e do `panel.py`. O `sessao` de cada persona é o
+nome dela no `brza sessions` e no mapa `.sessions/sessions.jsonl`; os ids (Dispatch, Run, sessão do provedor) vêm do
+mapa, gravados na abertura, e `claude_session`/`provider_session`/`dispatch_id` no manifesto só servem de sobrescrita
+explícita. O schema completo, com os campos obrigatórios, está
 no docstring de `scripts/tally.py`. Forma:
 
 ```json
@@ -57,11 +60,14 @@ no docstring de `scripts/tally.py`. Forma:
 
 ## O prompt de abertura
 
-Uma linha por persona, guardada em `prompt-<slug>.txt` (a Carvão não guardou e perdeu o registro):
+Uma linha por persona, guardada em `prompt-<slug>.txt` (a Carvão não guardou e perdeu o registro). O
+`launch_persona.py` a gera quando o arquivo não existe e nunca sobrescreve o que a coordenação escreveu:
 
 ```text
-Você é uma persona numa reunião multiagente. Leia `‹dir›/briefing.md`, a sua persona em `‹dir›/personas/‹slug›.md` e faça a rodada 1 conforme `‹dir›/rodada-1.md`. O seu worklog é `‹worklog›`. Prazo: ‹duração›. Ao fechar cada rodada, avise a coordenação com `brza orchestration send --subject "fim-rodada-N" --body "persona:‹slug›"`; o `worker_done` do preâmbulo do Orca é só do encerramento, quando a coordenação mandar. Responda em português do Brasil.
+Você é uma persona numa reunião multiagente: ‹Nome›, ‹papel›. Tema: ‹tema›. Leia o briefing (‹dir›/briefing.md) e a sua persona (‹dir›/personas/‹slug›.md) e faça a rodada 1 conforme ‹dir›/rodada-1.md; o seu worklog é ‹worklog›; prazo ‹duração›; responda em português do Brasil. Ao fechar cada rodada, grave a seção e o marcador no worklog e envie só o status do protocolo que a coordenação anexa a cada pedido (round_id e dispatchId no payload); não responda por mensagem, não envie outro aviso. O worker_done é só do encerramento, quando a coordenação pedir: use exatamente o comando worker_done do seu preâmbulo do Orca, com o --task-id e o --dispatch-id dele, uma vez. Hora no worklog só a de `date '+%H:%M'`, rodado na hora.
 ```
 
 "Você é uma persona" no começo é deliberado: as personas Claude rodam no mesmo checkout e veriam esta skill na lista; o
-gatilho negativo da descrição lê esse prefixo.
+gatilho negativo da descrição lê esse prefixo. O prompt não traz comando `brza orchestration` próprio: o `brza sessions`
+anexa o protocolo da rodada inicial (o `round_id` da abertura) e o de cada envio, e o `worker_done` com os ids vem do
+preâmbulo. Na P7 o prompt trazia os dois comandos sem os ids, e o `worker_done` foi recusado (X19).

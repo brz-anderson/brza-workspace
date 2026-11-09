@@ -11,13 +11,16 @@ fica para a fase do painel.
 
 | Quando | O quê | Forma | Por quê |
 | :-- | :-- | :-- | :-- |
-| As sessões abrem | quem é quem | tabela "Persona · papel · runtime · modelo · esforço" em uma mensagem | a persona é o sujeito; a Carvão abriu assim |
-| Cada chegada (mensagem de fim de rodada, `wait_round.py`) | quem respondeu e quem falta, com o tempo da mais lenta | uma linha: "R2 · 4/6 — entregaram Lenha, Cinza, Tição, Fole; faltam Faísca (Grok, 5 min) e Fogareiro" | R1.4 (2) |
+| As sessões abrem | quem é quem | tabela "Persona · papel · runtime · modelo · esforço" em uma mensagem, a que o `launch_persona.py` imprime | a persona é o sujeito; a Carvão abriu assim |
+| Cada chegada (o status da rodada, pelo `wait_round.py`) | quem respondeu e quem falta, com o tempo da mais lenta | uma linha: "R2 · 4/6 — entregaram Lenha, Cinza, Tição, Fole; faltam Faísca (Grok, 5 min) e Fogareiro" | R1.4 (2) |
+| O host escala "Worker stopped without reporting" | nada por evento; uma linha no fechamento, se houver | "ruído previsto: 3 avisos de fim de turno sem `worker_done`" | é o fim de turno normal entre rodadas (R6); a P7 recebeu um [HIGH] por persona por rodada (X3) |
+| Pergunta, `blocked`, `failed` ou `worker_done` antes da hora | o que aconteceu e com quem | uma linha com ⚠ ou ✗, e a ação ("leio com `brza sessions read <sessão> --last`") | é a atenção real, que o ruído não pode esconder |
 | Rodada aberta, sem chegada há 3 min | o mesmo status, com o que a coordenação está fazendo | uma linha | a espera longa sem texto é onde Anderson abre o chat da filha |
 | Rodada fecha | a posição e a confiança de cada persona | a tabela do `tally.py --md`: Persona · posição · confiança (Δ R1) · mudou? · voto; abaixo, a sala (média, mediana, n), o revisor quando houver, as viradas nomeadas | R1.4 (1) |
 | Rodada fecha | os números conferidos | lista curta "confere / diverge: ‹afirmação› — ‹comando ou fonte› → ‹resultado›" | R1.4 (3) |
 | Rodada fecha | o painel | o `::orca-visual` abaixo, conferido por PNG, **depois** da tabela; o texto não depende dele | R1.3 |
 | Prova da coordenação | o resultado que muda a sala | no máximo duas linhas; o erro de shell da própria coordenação não vai ao chat | ruído |
+| Encerramento | quem fechou de fato | `closing` = pedido enviado; "encerrada" só depois do `--status` com `succeeded`/`settled`; `stop_unknown` e `retained` ditos como incertos | R7: pedir encerramento não é fechar |
 | Fechamento | o registro | o worklog da coordenação em `<details>`; os das personas por link | `AGENTS.md` |
 | Rodada de decisão | as decisões de Anderson | em texto, abaixo da proposta inteira, `Custo: … Se paga: …`, e o voto das personas por opção (`closing.md`) | R2.4 |
 
@@ -30,7 +33,9 @@ fica para a fase do painel.
 - Fechamento: tabela do `tally.py` e "Sala 57,2 (5/6, Antigravity à parte: 85); revisor 45. Viradas: Muralha C → A+D
   (M1/M2), Salto F → G."
 
-**O que não vai ao chat:** a argumentação integral das personas (R1.4). Ela fica no worklog e, depois, no painel por
+**A hora:** toda linha com hora sai de `date '+%H:%M:%S'`, rodado na hora (X11).
+
+**O que não vai ao chat:** a argumentação integral das personas (R1.4) e o ruído previsto do host, um por evento (X3). Ela fica no worklog e, depois, no painel por
 plugin (issue ao `studio`).
 
 ## O painel
@@ -49,7 +54,8 @@ arquivo não atualiza um frame já montado.
 1. **Abertura da rodada:** gere o estado com todos "falta" e publique, com uma linha de texto.
 2. **A cada chegada que o `wait_round.py` imprimir (com o aviso ⚠ se faltar o marcador):** gere de novo e publique, com uma linha ("4 de 6; falta
    Régua e Cartógrafo").
-3. **No fechamento:** gere com as medições, a síntese e as decisões (`sintese-N.json`) e publique.
+3. **No fechamento:** gere com as medições, a síntese e as decisões (`sintese-N.json`) e publique. Rodada para parte da
+   sala: `collect N --participantes …`; quem está fora aparece "fora da rodada" e não segura o fechamento (X18).
 4. A rodada seguinte ganha **nome novo**. No fim da reunião, um visual de síntese, também com nome novo.
 
 Os comandos (da raiz do worktree; `$S` e `$R` como no SKILL.md):
@@ -65,11 +71,11 @@ que vai numa linha própria da mensagem. Cada mensagem leva um visual; o limite 
 ### Confira por PNG antes de publicar
 
 A coordenação não vê o chat. Com o `ORCA_CHAT_SCRATCH_DIR` ausente (fora do chat do Studio), o HTML vai ao scratch da
-sessão e a rodada leva o caminho. A conferência usa o Chrome headless; o `brza shot` está quebrado até o P5 do PLN-017:
+sessão e a rodada leva o caminho. A conferência usa o `brza shot` (o P5 do PLN-017 o fez ler o CSS atual do Studio) ou,
+sem ele, o `render --png`, que chama o Chrome headless:
 
 ```bash
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --force-device-scale-factor=1 \
-  --window-size=736,2000 --screenshot="$TMPDIR/painel-r3.png" "file://<caminho do .html>"
+brza shot "<caminho do .html>" "$TMPDIR/painel-r3.png" --width 736
 ```
 
 Leia a imagem. Coluna estourada, corte ou texto sobreposto se corrige no gerador, não no HTML solto. Verifique também:

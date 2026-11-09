@@ -104,7 +104,7 @@ class Estados(unittest.TestCase):
         S['rodada']['tem_voto'] = True
         persona(S, 'Muralha')['voto'] = {'apoio': 3, 'ressalva': 2, 'contra': 1}
         h = panel.render_html(S)
-        self.assertIn('voto A 3 · R 2 · C 1', h)
+        self.assertIn('voto: apoio 3 · ressalva 2 · contra 1', h)
         self.assertNotIn('Rodada sem voto.', h)
 
     def test_sem_prazo_ninguem_atrasa(self):

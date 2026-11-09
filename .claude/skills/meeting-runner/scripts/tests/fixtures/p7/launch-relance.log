@@ -1,0 +1,7 @@
+$ brza orchestration worker-start --spec-file /Users/andepb/Projects/brza-workspace/.worktrees/playground/.sessions/reuniao-ci-no-chat/prompt-relance.txt --agent antigravity --worktree path:/Users/andepb/Projects/brza-workspace/.worktrees/playground --json
+rc=0
+--- stdout
+{"ok":true,"result":{"dispatchId":"ctx_b079c8a8d319","taskId":"task_73ff0d036394","runId":"run_fe70b351bc36","runCreated":true,"state":"ready","agent":"antigravity","mode":"structured","terminal":"structworker_ef0b8374-7611-4e9e-bcd5-c55fdd0ca082","workspace":"15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/playground","next":"Orca wakes you when workers report; end your turn when you're done."}}
+
+--- stderr
+

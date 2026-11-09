@@ -15,8 +15,9 @@
         "O briefing manda a persona escrever só no próprio worklog, citando o caminho work/worklogs/2026-11-08-reuniao-custo-por-turno-<persona>.md, e proíbe gravar memória do runtime",
         "O briefing pede a linha **Posição:** de até 100 caracteres em cada seção de rodada",
         "O briefing tem as seções: objetivo, o que existe hoje, alternativas de partida, pauta numerada e regras da sala",
-        "Nenhuma sessão foi aberta nem comando brza sessions foi executado; o agente diz em uma linha o que viria depois (personas, manifesto, abertura)",
-        "O briefing manda a persona avisar o fim de cada rodada com `brza orchestration send --subject \"fim-rodada-N\"` e diz que o `worker_done` do preâmbulo do Orca é só do encerramento (a coordenação manda), com os dois comandos prontos"
+        "Nenhuma sessão foi aberta nem comando brza sessions foi executado; o que viria depois (personas, manifesto, abertura) aparece em uma linha num arquivo de outputs/ (a resposta final do agente não fica gravada para o corretor)",
+        "O briefing NÃO dá à persona um comando `brza orchestration send` próprio de fim de rodada nem um `worker_done` pronto; diz que o fim de rodada é o status do protocolo anexado a cada pedido e que o `worker_done` do encerramento é o do preâmbulo do Orca, com `--task-id` e `--dispatch-id`",
+        "Todo fato com número na seção 'O que existe hoje' leva a marca 'conferido às HH:MM: `comando` → resultado' (ou o agente diz que roda o `check_briefing.py` antes de abrir), e o briefing manda a persona tirar a hora do worklog de `date`"
       ]
     },
     {
@@ -65,6 +66,50 @@
         "A divergência com a coordenação (Tição 8,9; Fogareiro 6,25; Fole 8,25) é explicada pela exclusão da nota que a Faísca deu aos colegas, reproduzida pelo tally.py com --exclude-rater Faísca; o relatório não afirma que a ordem das notas não muda (a do meio muda: Tição passa Faísca e Lenha passa Fole)",
         "O método declarado é o script scripts/tally.py da skill (não a conta à mão) e o comando usado aparece no relatório",
         "A tabela gravada em outputs/tabela-por-persona.md tem as seis personas e as três colunas pedidas"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "rodada-com-recibo-incerto-ruido-e-encerramento",
+      "prompt": "Você coordena a reunião .sessions/reuniao-cache-de-turno/ (manifesto reuniao.json, personas Prumo/Claude, Trava/Grok e Relance/Antigravity, abertas pelo brza sessions v2 num Run só). Aconteceu, nesta ordem: (1) ao enviar a rodada 2, o recibo da Trava voltou `pending`, saída 75, operation 1794240948436-4c48e69720b745198ffffda8a61a1832; os outros dois voltaram `accepted`. (2) Na espera, a caixa recebeu três escalations [HIGH] 'Worker stopped without reporting', uma por persona, e o status da rodada 2 do Prumo e do Relance. (3) A Trava não mandou status em 4 min; a rodada anunciou '(duração: ~10 min)'. (4) Depois da decisão de Anderson, o pedido de encerramento devolveu `closing` para Prumo e Relance; a Trava, travada, recebeu a parada guardada, que devolveu `stop_unknown`. Escreva em outputs/proximos-passos.md, para cada um dos quatro pontos, o que a coordenação faz (com o comando exato) e a linha que narra no chat a Anderson. Não rode nada contra o Studio.",
+      "expected_output": "Para (1), nada de envio novo: espera, ou repete só a Trava com a mesma --operation e o mesmo texto. Para (2), as escalations são ruído previsto do fim de turno sem worker_done, sem resposta. Para (3), a espera segue até a duração anunciada mais a folga. Para (4), closing não é fechado: confere o aceite do worker_done pelo --status; stop_unknown não é fechado e não se repete o comando.",
+      "files": [],
+      "expectations": [
+        "No ponto 1, o agente não reenvia a rodada à Trava com um envio novo: manda esperar (wait_round.py/brza sessions wait) ou repetir só a Trava com --operation 1794240948436-4c48e69720b745198ffffda8a61a1832 e o mesmo texto",
+        "No ponto 2, as escalations 'Worker stopped without reporting' são tratadas como ruído previsto do fim de turno sem worker_done: o agente não responde a elas nem as narra como falha da persona",
+        "No ponto 3, o agente não encerra a espera nem declara a Trava atrasada antes de ~10 min (a duração anunciada) mais a folga, contados do envio",
+        "No ponto 4, o agente diz que `closing` não é fechado e confere o aceite do worker_done (succeeded/settled, taskId) antes de narrar 'encerrada'",
+        "No ponto 4, `stop_unknown` é narrado como incerto/não fechado, e o agente não repete a parada nem a libera às cegas",
+        "Os comandos citados são os da skill ou do brza sessions v2 (launch_persona.py --send/--close/--status/--stop, wait_round.py, brza sessions send/wait/close), sem brza orchestration worker-stop/worker-release direto"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "gatilho-da-rodada-extra-automatica",
+      "prompt": "Você coordena a reunião .sessions/reuniao-cache-de-turno/ (Prumo/Claude, Trava/Grok, Relance/Antigravity). A R2 era debate e voto final entre A (adiar o cache) e B (construir o cache agora). Fecharam as três: Prumo votou A; Trava e Relance votaram B, as duas com a premissa escrita 'o turno repete o mesmo prompt em 30% das chamadas'. Na mesma R2, o Prumo mediu por comando: 'grep -c cache_hit .measurements/measurements.jsonl → 0 em 412 turnos' (M5, novo). Também na R2, o Relance trouxe M6, novo: 'o painel do Studio já mostra o custo por turno', que nenhum voto usou como premissa. Anderson está fora até amanhã. Escreva em outputs/plano-da-coordenacao.md o que a coordenação faz agora, rodada a rodada, com os comandos e as linhas de narração, até a rodada de decisões para Anderson. Não rode nada contra o Studio.",
+      "expected_output": "M5 contradiz a premissa dos votos B: a coordenação confere M5, sintetiza, e abre sozinha a rodada extra de voto informado (tipo 5), com os participantes escolhidos e o motivo registrado, sem pedir licença a Anderson. M6 não toca premissa de voto e não gera rodada. A decisão final continua de Anderson.",
+      "files": [],
+      "expectations": [
+        "O agente confere M5 por comando (ou diz que o confere) antes de usá-lo como gatilho",
+        "O agente abre a rodada extra de voto informado automaticamente, sem pedir autorização a Anderson para a extensão, e diz que é pelo gatilho (fato novo contradiz a premissa de voto)",
+        "O agente escolhe os participantes da rodada extra (parte da sala ou a sala inteira, qualquer das duas vale) e registra o motivo antes do disparo; a mesma lista aparece no envio, na espera e no tally/panel",
+        "M6 não dispara rodada extra: vai à síntese ou à proposta, porque não é premissa de nenhum voto",
+        "O pedido da rodada extra traz a síntese com M5 marcado como novo e a linha 'Fatos lidos' no molde, com o cabeçalho '#### O voto em cada proposta'",
+        "O agente não decide entre A e B: a rodada de decisões continua para Anderson, com os votos de antes e de depois da rodada extra"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "alcance-da-rodada-extra-com-motivo",
+      "prompt": "Você coordena a reunião .sessions/reuniao-fila-do-chat/ (Prumo/Claude, Trava/Grok, Relance/Antigravity). A R3 era o voto final entre P1 (fila por chat) e P2 (fila global). Votos: Prumo P1 com a premissa 'cada chat tem no máximo um turno em voo'; Trava P2 com a premissa 'a fila global evita dois turnos simultâneos no mesmo checkout'; Relance P1 sem premissa escrita, 'pelo instinto do usuário'. Na mesma R3 a Trava mediu, por comando: 'grep -c concurrent_turn .measurements/measurements.jsonl → 37 turnos simultâneos no mesmo chat em 2026-11-08' (M9, novo). Anderson está fora. Escreva em outputs/plano-da-coordenacao.md o que a coordenação faz agora, com os comandos, o registro da escolha e as linhas de narração, até a rodada de decisões. Não rode nada contra o Studio.",
+      "expected_output": "M9 contradiz a premissa do voto do Prumo (e pode mexer nos outros): o gatilho vale e a rodada extra é automática. A coordenação escolhe os participantes — só o Prumo, ou a sala inteira — e registra o motivo antes do disparo. A decisão final fica com Anderson.",
+      "files": [],
+      "expectations": [
+        "O agente reconhece o gatilho (M9 novo, da própria rodada de voto, contradiz a premissa escrita do voto do Prumo) e confere M9 por comando (ou diz que confere) antes de usá-lo",
+        "O agente abre a rodada extra automaticamente, sem pedir licença a Anderson para a extensão",
+        "O agente escolhe os participantes e escreve o motivo da escolha antes do disparo (num registro como o sintese-N.json/rodada_extra ou no plano, e na narração); a escolha pode ser parte da sala ou a sala inteira",
+        "A lista escolhida é a mesma no envio, na espera e no tally/panel (ou, se for a sala inteira, nenhum filtro de participantes é aplicado e isso é dito)",
+        "O agente não decide entre P1 e P2: a rodada de decisões vai a Anderson com os votos de antes e de depois"
       ]
     }
   ]

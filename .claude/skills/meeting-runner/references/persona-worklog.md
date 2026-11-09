@@ -27,3 +27,6 @@ só pediam a regra do marcador dentro ou fora delas. O frontmatter e o H1 seguem
 O arquivo termina, em toda rodada, na linha `<!-- fim-rodada-N -->`. Se o esqueleto tivesse uma seção depois de
 `## O que se fez`, a "última linha do arquivo" seria dela e o marcador cairia no meio: por isso a rodada é acrescentada
 no **fim** e o esqueleto acaba em `## O que se fez`.
+
+A hora que a persona escreve (o início de uma prova, a hora de um comando) sai de `date '+%H:%M'`, rodado na hora: na P7 o
+Prumo escreveu horários que não aconteceram (X11). O briefing e o pedido de rodada repetem a regra.

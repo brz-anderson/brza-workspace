@@ -1,56 +1,47 @@
 #!/usr/bin/env python3
-r"""wait_round.py: espera as personas entregarem a rodada N e narra cada chegada em uma linha.
+r"""wait_round.py: espera as personas entregarem a rodada N e narra cada chegada, sobre o `brza sessions wait`.
 
 Uso:
-    wait_round.py <N> --reuniao reuniao.json [--root DIR] [--timeout SEG] [--poll SEG] [--source {mailbox,marker}]
-                  [--sessions ARQUIVO] [--sessions-state "cmd" | --no-state | --list-json arquivo] [--once]
+    wait_round.py <N> --reuniao reuniao.json [--root DIR] [--timeout SEG] [--source {sessions,marker}]
+                  [--sessions ARQUIVO] [--once] [--personas NOME ...]
+                  [--poll SEG] [--sessions-state "cmd" | --no-state | --list-json arquivo]     # estes dois, só no marker
 
-Sinal de fim (`--source`, padrão `mailbox`): a MENSAGEM da persona, `brza orchestration send --subject "fim-rodada-N"`,
-com M >= N. O marcador `<!-- fim-rodada-M -->` como última linha não vazia do worklog continua como registro que o
-`tally.py` lê, e vale como fallback silencioso: a persona chega por mensagem OU pelo marcador. `--source marker` é o
-comportamento antigo (só o marcador): o fallback para chat sem Dispatch (`--via agent-launch` do `launch_persona.py`).
+`--source sessions` (padrão; `mailbox` é alias): a espera é do `brza sessions wait <sessoes…> --any --timeout <t> --json`
+(PLN-017 R6/R7), que lê o Run do mapa com `--all` e `--peek --wait`, sem consumir a caixa da coordenação. O fim de rodada é
+a mensagem `status` da persona com `round_id` e `dispatchId` do envio, que o v2 já converte em `done`. O worklog continua
+sendo o registro: chegada pelo v2 sem o marcador `<!-- fim-rodada-N -->` na última linha sai como
+`⚠ <nome> avisou o fim da rodada N mas o worklog não termina no marcador`. `--source marker` mantém o modo de arquivo
+(só o marcador), para chat sem Dispatch.
 
-Mailbox: em laço, `brza orchestration check --wait --peek --timeout-ms <poll*1000> --json` (`--poll` padrão 15 s; `--peek`
-não consome a caixa da coordenação; sem shell). Cada registro novo (dedupe pelo `id` PRÓPRIO da mensagem, ou, sem ele, pelo
-hash do JSON da mensagem individual; o `delivery_id` é do lote e não vale) é atribuído à persona SÓ por duas vias exatas:
-(1) o `dispatch_id` do registro (ou o remetente `dispatch:<id>`) igual ao do mapa de sessões (`--sessions`, padrão
-`.sessions/sessions.jsonl` da raiz comum do git) ou ao `dispatch_id` da persona no manifesto (que sobrescreve o mapa);
-(2) o token exato `persona:<slug>` (palavra inteira, o slug em maiúscula/minúscula exatas) no `body` ou no `subject`. NENHUMA
-busca pelo nome ou pela sessão em texto livre. Mensagem sem atribuição sai como `mensagem sem remetente reconhecido:
-<assunto>` e não conta. O padrão `fim-rodada-(\\d+)` se procura em qualquer string do registro; vale o maior M. A chegada por
-mensagem CRUZA o worklog: sem o marcador N no fim dele, sai `⚠ <nome> avisou fim-rodada-N mas o worklog não termina no
-marcador` (o `tally.py` precisa dele); a chegada só pelo marcador diz `(pelo marcador)`. Mensagem `worker_done`, `blocked`,
-`question` ou `escalation` de uma persona imprime `<nome> enviou <tipo>: <assunto>` e não conta como chegada. `brza`
-ausente, erro ou JSON ruim: aviso e queda para `marker`, sem derrubar. `check` que volta `ok` com a lista vazia por 5
-chamadas seguidas, sem nenhuma mensagem na espera inteira, avisa UMA vez: "caixa vazia: confira se a coordenação tem um Run
-ligado".
+O RELÓGIO é o do mapa: a rodada começa no `at` do `last_send` de cada sessão (para a R1, o `at` do `open`, cujo
+`operation` é o `round_id` inicial), e não no início do script. O PRAZO: lê `(duração: ~M min)` da primeira linha de
+`rodada-N.md`; sem `--timeout`, o limite é `max(M min + 120 s, 180 s)` contado do início da rodada (nunca encerra antes da
+duração anunciada); sem duração anunciada, o de antes (180 s até a primeira chegada; depois 2 x a mediana das latências,
+mínimo 180 s). `--timeout` explícito conta do início do script. Cada chamada do `wait` leva `min(180, o que falta)`; sem
+chegada em 180 s, a linha de status se repete (a narração de 3 min). `--once`: uma chamada com `--timeout 0`.
+`--personas` restringe a espera ao subconjunto da rodada. O `state` de quem falta (o campo `pending[].state` do v2) entra
+na linha final; `--no-state` o tira.
 
-O marcador só vale como a última linha não vazia SEM recuo (`<!-- fim-rodada-M -->`); o `tally.py` recusa o recuado do mesmo
-jeito. `--root` padrão: o topo do repositório git do cwd; sem nenhum worklog sob ele, avisa em stderr.
+Saída, uma linha por chegada:
+    R2 · 2/3 — entregaram Prumo, Trava; faltam Relance (Antigravity, 5 min)
 
-FORMATO DO JSON DO `check` NÃO SONDADO (só um Run vivo mostra; a P4a.0 confirma). A leitura assume só isto: o JSON, em
-qualquer profundidade, tem objetos com a chave `subject` (o registro da mensagem). Por registro, lê de forma tolerante:
-`type`|`kind`|`message_type`|`messageType` (tipo, com `-` virando `_`); `subject`|`title` (assunto); `from`|`sender`|
-`from_handle`|`fromHandle`|`source` (remetente); `id`|`message_id`|`messageId` (dedupe); `dispatch_id`|`dispatchId`
-(atribuição). O resto (corpo, payload, aninhados) entra pela busca de `body` e `subject` em qualquer profundidade.
+OS EVENTOS que o `wait` devolve (o Run INTEIRO, sem `createdAt`; os ids já narrados ficam em `<dir da reunião>/eventos-vistos.json`,
+lido e gravado a cada invocação, e só o evento novo é classificado e narrado; dedupe pelo `id`): contam para a persona quando `from` é o `sender` do mapa ou o
+`payload.dispatchId|dispatch_id` é o `dispatch` do mapa; evento de outro Dispatch do mesmo Run é ignorado.
+`escalation` "Worker stopped without reporting" (ou `payload.stopReason == "finished"`) é ruído previsto do fim de turno
+sem `worker_done`: não imprime por evento, e o fim leva UMA linha com a contagem. `question`, `blocked`,
+`decision_gate` e outro `escalation` viram `⚠ <nome> enviou <tipo>: <assunto>`; `worker_done` de persona antes do
+encerramento vira `⚠ <nome> enviou worker_done antes do encerramento`; `status` não imprime nada. Desfecho `failed`
+(`✗ <nome> falhou (<latency_source>)`) e `blocked` (`⚠ <nome> está blocked: leia com brza sessions read <sessao> --last`)
+contam como fim da persona e levam o rc a 1. Erro do v2 (`{"error": …}`, como "nenhum send registrado") imprime
+`erro do brza sessions wait: …` e sai 1: não cai para o marcador em silêncio.
 
-O `state` de cada persona (o campo `state` de `brza sessions list --json`, que é o `chatStatus` da aba) vem de
-`--sessions-state` (padrão `brza sessions list --json`), de `--list-json arquivo` (para teste) ou fica de fora com
-`--no-state`; `brza` ausente ou JSON ruim não derruba a espera. Ele só aparece na linha final do timeout.
-
-Saída, uma linha por chegada e, a cada 3 min sem chegada, a mesma linha de status:
-    R2 · 4/6 — entregaram Lenha, Cinza, Tição, Fole; faltam Faísca (Grok, 5 min) e Fogareiro (Antigravity, 5 min)
-
-Termina quando todos chegaram (código 0) ou no timeout (código 2), imprimindo quem falta e o `state`. Sem `--timeout`,
-o teto é: 180 s até a primeira chegada; depois, 2 vezes a mediana das latências das chegadas, no mínimo 180 s.
-`--once` olha uma vez, imprime a linha e sai com 0 (todos) ou 2.
-
-Funções puras para teste: `scan`, `status_line`, `compute_timeout`, `extract_messages`, `attribute`, `run` (que recebe
-`check_fn(timeout_ms) -> lista de registros`).
-MORRE quando o `brza sessions wait` existir.
+Termina com 0 (todas chegaram), 2 no limite (quem falta, com o `state` do v2) ou 1 (erro ou desfecho failed/blocked,
+também quando o limite chega com uma delas já registrada).
+Funções puras para teste: `scan`, `status_line`, `compute_timeout`, `calc_limite`, `classifica_evento`, `run` (que recebe
+`wait_fn(sessoes, timeout_s) -> (rc, dict)`).
 """
 import argparse
-import hashlib
 import json
 import os
 import re
@@ -60,29 +51,25 @@ import subprocess
 import sys
 import time
 
+AQUI = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, AQUI)
+import common  # noqa: E402
+import sessions_map  # noqa: E402
+
+BRZA = os.environ.get("BRZA_BIN", "brza")
 MARCADOR = re.compile(r"^<!-- fim-rodada-(\d+) -->$")
 RUNTIME_NOME = {"claude": "Claude", "codex": "Codex", "grok": "Grok", "antigravity": "Antigravity"}
 STATUS_A_CADA = 180
-FIM = re.compile(r"fim-rodada-(\d+)")
-TIPOS_AVISO = {"worker_done", "blocked", "question", "escalation"}
-K_TIPO = ("type", "kind", "message_type", "messageType")
-K_ASSUNTO = ("subject", "title")
-K_REMETENTE = ("from", "sender", "from_handle", "fromHandle", "source")
-K_ID = ("id", "message_id", "messageId")  # id PRÓPRIO da mensagem; o `delivery_id` é do lote e não vale
-K_DISPATCH = ("dispatch_id", "dispatchId", "from_dispatch", "fromDispatch", "from_dispatch_id")
-K_REMETENTE_ID = ("from", "sender", "from_handle", "fromHandle", "source")
-CAIXA_VAZIA_APOS = 5  # chamadas seguidas ok com lista vazia, sem nenhuma mensagem na espera inteira
-
-
-class CheckIndisponivel(Exception):
-    """O `brza orchestration check` não rodou ou não devolveu JSON."""
+ATENCAO = {"question", "blocked", "decision_gate", "escalation"}
+RUIDO_ASSUNTO = "worker stopped without reporting"
 
 
 def last_marker(path):
     """N do marcador que é a última linha não vazia do arquivo; None se não for ou se o arquivo não existe."""
     try:
         with open(path, encoding="utf-8") as f:
-            linhas = [l.rstrip() for l in f if l.strip()]  # marcador recuado não vale (o `tally.py` também recusa)
+            texto = common.corta_medida(f.read())  # a `## Medida` do `brza note commit` vem depois do marcador e não invalida
+        linhas = [l.rstrip() for l in texto.split("\n") if l.strip()]  # marcador recuado não vale (o `tally.py` também recusa)
     except OSError:
         return None
     m = MARCADOR.match(linhas[-1]) if linhas else None
@@ -134,14 +121,22 @@ def compute_timeout(latencias):
     return max(180.0, 2 * statistics.median(latencias))
 
 
+def calc_limite(duracao_min, latencias):
+    """O limite (s) contado do início da rodada, sem `--timeout`: com duração anunciada, `max(duração + 120 s, 180 s)`;
+    sem ela, `compute_timeout`."""
+    if duracao_min:
+        return max(duracao_min * 60 + 120.0, 180.0)
+    return compute_timeout(latencias)
+
+
 def fetch_states(reuniao, list_json=None, cmd=None):
-    """{sessao: state} de `brza sessions list --json`; {} se o comando ou o JSON falhar."""
+    """{sessao: state} de `brza sessions list --json`; {} se o comando ou o JSON falhar (só o modo marker)."""
     try:
         if list_json:
             with open(list_json, encoding="utf-8") as f:
                 data = json.load(f)
         else:
-            r = subprocess.run(shlex.split(cmd or "brza sessions list --json"), capture_output=True, text=True,
+            r = subprocess.run(shlex.split(cmd or f"{BRZA} sessions list --json"), capture_output=True, text=True,
                                timeout=20)
             data = json.loads(r.stdout)
     except (OSError, ValueError, subprocess.SubprocessError):
@@ -157,208 +152,208 @@ def fetch_states(reuniao, list_json=None, cmd=None):
     return out
 
 
-def _shallow(rec, chaves):
-    for k in chaves:
-        v = rec.get(k)
-        if isinstance(v, (str, int)) and not isinstance(v, bool) and str(v):
-            return str(v)
-    return None
+raiz_padrao = common.raiz_padrao
 
 
-def extract_messages(data):
-    """Os objetos com a chave `subject`, em qualquer profundidade do JSON do `check`."""
-    achados = []
-    if isinstance(data, dict):
-        if "subject" in data:
-            return [data]
-        for v in data.values():
-            achados += extract_messages(v)
-    elif isinstance(data, list):
-        for v in data:
-            achados += extract_messages(v)
-    return achados
+def wait_argv(sessoes, timeout_s):
+    """O argv (sem o `brza sessions`) do `wait`: `wait <sessoes…> --any --timeout <t> --json`."""
+    return ["wait", *sessoes, "--any", "--timeout", f"{max(0.0, timeout_s):g}", "--json"]
 
 
-def _strings(obj):
-    if isinstance(obj, str):
-        yield obj
-    elif isinstance(obj, dict):
-        for v in obj.values():
-            yield from _strings(v)
-    elif isinstance(obj, list):
-        for v in obj:
-            yield from _strings(v)
+def wait_brza(sessoes, timeout_s):
+    """O padrão do `wait_fn`: `brza sessions wait <sessoes…> --any --timeout <t> --json`; (rc, dict).
+    `brza` ausente ou saída que não é JSON vira rc 127 e `{"error": …}`."""
+    argv = [BRZA, "sessions", *wait_argv(sessoes, timeout_s)]
+    try:
+        r = subprocess.run(argv, capture_output=True, text=True, timeout=timeout_s + 60)
+    except (OSError, subprocess.SubprocessError) as e:
+        return 127, {"error": str(e)}
+    try:
+        dado = json.loads(r.stdout)
+    except ValueError:
+        return r.returncode or 1, {"error": f"saída sem JSON (rc {r.returncode}): {(r.stderr or r.stdout).strip()[:200]}"}
+    return r.returncode, dado if isinstance(dado, dict) else {"error": "JSON inesperado"}
 
 
-def _valores(obj, chaves):
-    """Os valores escalares das `chaves`, em qualquer profundidade do registro."""
-    if isinstance(obj, dict):
-        for k, v in obj.items():
-            if k in chaves and isinstance(v, (str, int)) and not isinstance(v, bool) and str(v):
-                yield str(v)
-            else:
-                yield from _valores(v, chaves)
-    elif isinstance(obj, list):
-        for v in obj:
-            yield from _valores(v, chaves)
+def _dispatch_do_evento(ev):
+    pl = ev.get("payload") if isinstance(ev.get("payload"), dict) else {}
+    return pl.get("dispatchId") or pl.get("dispatch_id")
 
 
-def fim_numero(rec):
-    """Maior M de `fim-rodada-M` em qualquer string do registro; None se não houver."""
-    ms = [int(m) for t in _strings(rec) for m in FIM.findall(t)]
-    return max(ms) if ms else None
-
-
-def slug_de(p):
-    return p.get("slug") or p["nome"].lower()
-
-
-def token_persona(slug):
-    """`persona:<slug>` como palavra inteira, com o slug em maiúscula/minúscula exatas."""
-    return re.compile(r"(?<![\w:-])persona:" + re.escape(slug) + r"(?![\w-])")
-
-
-def attribute(reuniao, rec, dispatch_map=None):
-    """A persona dona do registro, e só por duas vias exatas (nunca por nome ou sessão em texto livre):
-    1. o `dispatch_id` do registro (ou o remetente `dispatch:<id>`) IGUAL ao do mapa ou do manifesto;
-    2. o token `persona:<slug>` no `body` ou no `subject`.
-    Sem uma das duas, None: a mensagem não conta."""
-    dispatch_map = dispatch_map or {}
-    ids = set(_valores(rec, K_DISPATCH))
-    ids |= {v[len("dispatch:"):] if v.startswith("dispatch:") else v for v in _valores(rec, K_REMETENTE_ID)}
-    for p in reuniao["personas"]:
-        d = p.get("dispatch_id") or dispatch_map.get(p.get("sessao"))
-        if d and str(d) in ids:
-            return p
-    textos = list(_valores(rec, ("body", "subject")))
-    for p in reuniao["personas"]:
-        rx = token_persona(slug_de(p))
-        if any(rx.search(t) for t in textos):
+def dono_do_evento(ev, personas, entradas):
+    """A persona dona do evento: `from` igual ao `sender` do mapa ou o dispatch do payload igual ao `dispatch` do mapa."""
+    remetente = ev.get("from") or ev.get("from_handle")
+    d = _dispatch_do_evento(ev)
+    for p in personas:
+        e = entradas.get(p.get("sessao")) or {}
+        disp = sessions_map.dispatch_of(p, entradas)
+        if (remetente and e.get("sender") and remetente == e["sender"]) or (d and disp and d == disp):
             return p
     return None
 
 
-def check_brza(timeout_ms, brza="brza"):
-    """Os registros novos do `brza orchestration check --wait --peek --json`; `CheckIndisponivel` se falhar."""
-    argv = [brza, "orchestration", "check", "--peek", "--json"]
-    if timeout_ms:
-        argv += ["--wait", "--timeout-ms", str(int(timeout_ms))]
-    try:
-        r = subprocess.run(argv, capture_output=True, text=True, timeout=timeout_ms / 1000 + 30)
-        if r.returncode != 0:
-            raise CheckIndisponivel(f"rc {r.returncode}: {(r.stderr or r.stdout).strip()[:200]}")
-        return extract_messages(json.loads(r.stdout or "[]"))
-    except (OSError, ValueError, subprocess.SubprocessError) as e:
-        raise CheckIndisponivel(str(e)) from e
+def classifica_evento(ev):
+    """'ruido' | 'atencao' | 'worker_done' | 'status' | 'outro' para um evento do `wait`."""
+    tipo = str(ev.get("type") or "").lower().replace("-", "_")
+    pl = ev.get("payload") if isinstance(ev.get("payload"), dict) else {}
+    if tipo == "escalation" and (str(ev.get("subject") or "").strip().lower() == RUIDO_ASSUNTO
+                                 or pl.get("stopReason") == "finished"):
+        return "ruido"
+    if tipo in ATENCAO:
+        return "atencao"
+    if tipo == "worker_done":
+        return "worker_done"
+    if tipo == "status":
+        return "status"
+    return "outro"
 
 
-def raiz_padrao():
-    """O topo do repositório git do cwd (`git rev-parse --show-toplevel`); sem git, o cwd."""
-    try:
-        r = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, timeout=10)
-        if r.returncode == 0 and r.stdout.strip():
-            return r.stdout.strip()
-    except (OSError, subprocess.SubprocessError):
-        pass
-    return os.getcwd()
-
-
-def sessions_file(root):
-    r = subprocess.run(["git", "-C", root, "rev-parse", "--git-common-dir"], capture_output=True, text=True)
-    base = os.path.dirname(os.path.abspath(os.path.join(root, r.stdout.strip()))) if r.returncode == 0 and \
-        r.stdout.strip() else os.path.abspath(root)
-    return os.path.join(base, ".sessions", "sessions.jsonl")
-
-
-def dispatch_map(path):
-    """{sessao: dispatch_id} da última linha `open` de cada sessão no mapa; {} se o mapa não existe.
-    O `dispatch_id` da persona no manifesto sobrescreve o mapa (em `attribute`)."""
-    out = {}
+def carrega_vistos(path):
+    """Os ids de evento já narrados em invocações anteriores (`eventos-vistos.json`); vazio sem arquivo ou com JSON ruim."""
+    if not path:
+        return set()
     try:
         with open(path, encoding="utf-8") as f:
-            for line in f:
-                try:
-                    row = json.loads(line)
-                except ValueError:
-                    continue
-                if isinstance(row, dict) and row.get("event") == "open" and row.get("name"):
-                    out[row["name"]] = row.get("dispatch_id")
-    except OSError:
-        pass
-    return {k: v for k, v in out.items() if v}
+            dado = json.load(f)
+    except (OSError, ValueError):
+        return set()
+    return {str(x) for x in dado} if isinstance(dado, list) else set()
 
 
-def run(reuniao, n, root, *, timeout=None, poll=5.0, once=False, state_fn=None, clock=time.monotonic,
-        sleep=time.sleep, out=None, source="marker", check_fn=None, dispatches=None):
-    """O laço da espera. `clock`, `sleep`, `out` e `check_fn` se injetam nos testes. Devolve o código de saída (0 ou 2).
+def grava_vistos(path, vistos):
+    """Grava os ids vistos de forma atômica (arquivo temporário e `os.replace`)."""
+    if not path:
+        return
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    tmp = f"{path}.{os.getpid()}.tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(sorted(vistos), f, ensure_ascii=False)
+    os.replace(tmp, path)
 
-    `source="marker"` é o comportamento antigo; `mailbox` lê `check_fn(timeout_ms)` (padrão `check_brza`), com o marcador
-    do worklog como fallback."""
+
+def inicio_da_rodada(personas, entradas):
+    """O `at` do `last_send` mais recente das personas (epoch), ou None sem nenhum; o relógio é o do mapa."""
+    ts = [sessions_map.epoch(((entradas.get(p.get("sessao")) or {}).get("last_send") or {}).get("at")) for p in personas]
+    ts = [t for t in ts if t is not None]
+    return max(ts) if ts else None
+
+
+def run(reuniao, n, root, *, timeout=None, poll=5.0, once=False, state_fn=None, clock=None, sleep=None,
+        out=None, source="marker", wait_fn=None, entradas=None, personas=None, duracao=None, com_state=True,
+        vistos_path=None):
+    """O laço da espera. `clock` (epoch), `sleep`, `out` e `wait_fn` se injetam nos testes. Devolve 0, 2 ou 1.
+
+    `source="marker"` (o padrão da biblioteca; o da linha de comando é `sessions`) é o modo de arquivo; `sessions` usa `wait_fn(sessoes, timeout_s) -> (rc, dict)` (padrão
+    `wait_brza`). `personas` restringe a espera ao subconjunto; `duracao` é a duração anunciada, em minutos."""
     out = out or (lambda s: print(s, flush=True))
-    check_fn = check_fn or check_brza
+    clock, sleep = clock or time.time, sleep or time.sleep
+    todas = [p for p in reuniao["personas"] if not personas or p["nome"] in personas or p.get("sessao") in personas]
+    rsub = {**reuniao, "personas": todas}
+    if source == "marker":
+        return _run_marker(rsub, n, root, timeout, poll, once, state_fn, clock, sleep, out)
+    wait_fn = wait_fn or wait_brza
+    entradas = entradas if entradas is not None else {}
     t0 = clock()
-    chegaram, latencias, ultima_linha, vistos = [], [], t0, set()
-    caixa = {"vazias": 0, "recebidas": 0, "avisou": False}
-    pessoas = {p["nome"]: p for p in reuniao["personas"]}
+    ini = inicio_da_rodada(todas, entradas)
+    ini = ini if ini is not None else t0
+    vistos = carrega_vistos(vistos_path)
+    chegaram, latencias, ruido = [], [], 0
+    falhou = False
+    states = {}
+    pessoas = {p["nome"]: p for p in todas}
+    por_sessao = {p["sessao"]: p for p in todas}
 
-    def chegou(nome, agora, sufixo=""):
-        nonlocal ultima_linha
-        chegaram.append(nome)
-        latencias.append(agora - t0)
-        out(status_line(n, reuniao, chegaram, agora - t0) + sufixo)
-        ultima_linha = agora
+    def fim(rc):
+        if ruido:
+            out(f'ruído previsto: {ruido} avisos "Worker stopped without reporting" '
+                '(fim de turno sem worker_done entre rodadas); não responda')
+        return rc
 
-    def le_mensagens(agora, espera_s):
-        try:
-            registros = check_fn(espera_s * 1000)
-        except (CheckIndisponivel, OSError) as e:
-            out(f"aviso: brza orchestration check indisponível ({e}); sigo pelo marcador do worklog")
-            return False
-        if registros:
-            caixa["vazias"], caixa["recebidas"] = 0, caixa["recebidas"] + len(registros)
-        else:
-            caixa["vazias"] += 1
-            if caixa["vazias"] >= CAIXA_VAZIA_APOS and not caixa["recebidas"] and not caixa["avisou"]:
-                caixa["avisou"] = True
-                out("aviso: caixa vazia: confira se a coordenação tem um Run ligado "
-                    "(`brza orchestration run-current`); sigo pelo marcador do worklog")
-        for rec in registros:
-            chave = _shallow(rec, K_ID) or "sha1:" + hashlib.sha1(
-                json.dumps(rec, sort_keys=True, ensure_ascii=False, default=str).encode()).hexdigest()
+    while True:
+        pendentes = [p for p in todas if p["nome"] not in chegaram]
+        agora = clock()
+        limite_abs = (t0 + timeout) if timeout is not None else (ini + calc_limite(duracao, latencias))
+        espera = 0 if once else max(0.0, min(float(STATUS_A_CADA), limite_abs - agora))
+        rc, dado = wait_fn([p["sessao"] for p in pendentes], espera)
+        if "error" in dado and "done" not in dado:
+            out(f"erro do brza sessions wait: {dado['error']}")
+            return fim(1)
+        agora = clock()
+        nova, novos_vistos = False, False
+        for ev in dado.get("events") or []:
+            chave = ev.get("id") or json.dumps(ev, sort_keys=True, ensure_ascii=False)
             if chave in vistos:
                 continue
+            dono = dono_do_evento(ev, reuniao["personas"], entradas)
+            if dono is not None and dono not in todas:
+                continue   # persona da reunião FORA desta rodada: fica para a próxima invocação que a inclua
             vistos.add(chave)
-            p = attribute(reuniao, rec, dispatches)
+            novos_vistos = True
+            p = dono
             if p is None:
-                out(f"mensagem sem remetente reconhecido: {_shallow(rec, K_ASSUNTO) or ''}")
                 continue
-            tipo = (_shallow(rec, K_TIPO) or "").lower().replace("-", "_")
-            if tipo in TIPOS_AVISO:
-                out(f"{p['nome']} enviou {tipo}: {_shallow(rec, K_ASSUNTO) or ''}")
+            classe = classifica_evento(ev)
+            tipo = str(ev.get("type") or "").lower().replace("-", "_")
+            if classe == "ruido":
+                ruido += 1
+            elif classe == "atencao":
+                out(f"⚠ {p['nome']} enviou {tipo}: {ev.get('subject') or ''}")
+            elif classe == "worker_done":
+                out(f"⚠ {p['nome']} enviou worker_done antes do encerramento")
+        if novos_vistos:
+            grava_vistos(vistos_path, vistos)
+            novos_vistos = False
+        for row in dado.get("done") or []:
+            p = por_sessao.get(row.get("name"))
+            if p is None or p["nome"] in chegaram:
                 continue
-            m = fim_numero(rec)
-            if m is None or m < n or p["nome"] in chegaram:
-                continue
-            chegou(p["nome"], agora, " (pela mensagem)")
-            if (last_marker(os.path.join(root, worklog_path(reuniao, p))) or 0) < n:
-                out(f"⚠ {p['nome']} avisou fim-rodada-{n} mas o worklog não termina no marcador")
-        return True
+            desfecho = row.get("outcome")
+            chegaram.append(p["nome"])
+            if isinstance(row.get("latency_s"), (int, float)):
+                latencias.append(float(row["latency_s"]))
+            nova = True
+            lat = f" ({p['nome']}: {int(round(row['latency_s']))} s)" if isinstance(row.get("latency_s"), (int, float)) else ""
+            if desfecho == "failed":
+                out(f"✗ {p['nome']} falhou ({row.get('latency_source') or '?'})")
+                falhou = True
+            elif desfecho == "blocked":
+                out(f"⚠ {p['nome']} está blocked: leia com brza sessions read {p['sessao']} --last")
+                falhou = True
+            elif desfecho != "done":
+                out(f"⚠ {p['nome']} terminou com {desfecho}: leia com brza sessions read {p['sessao']} --last")
+                falhou = True
+            else:
+                m = last_marker(os.path.join(root, worklog_path(reuniao, p)))
+                if (m or 0) < n:
+                    out(f"⚠ {p['nome']} avisou o fim da rodada {n} mas o worklog não termina no marcador")
+            out(status_line(n, rsub, chegaram, agora - ini) + lat)
+        for q in dado.get("pending") or []:
+            if q.get("name") in por_sessao:
+                states[q["name"]] = q.get("state")
+        if len(chegaram) == len(todas):
+            return fim(1 if falhou else 0)
+        limite_abs = (t0 + timeout) if timeout is not None else (ini + calc_limite(duracao, latencias))
+        if once or agora >= limite_abs:
+            out(status_line(n, rsub, chegaram, agora - ini, (states or None) if com_state else None))
+            return fim(1 if falhou else 2)
+        if not nova:
+            out(status_line(n, rsub, chegaram, agora - ini))
 
-    mailbox = source == "mailbox"
+
+def _run_marker(reuniao, n, root, timeout, poll, once, state_fn, clock, sleep, out):
+    """O modo de arquivo: o marcador `<!-- fim-rodada-N -->` como última linha do worklog."""
+    t0 = clock()
+    chegaram, latencias, ultima_linha = [], [], t0
     while True:
         agora = clock()
-        espera = 0 if once else poll
-        if mailbox:
-            inicio = clock()
-            mailbox = le_mensagens(agora, espera)
-            if mailbox and not once and clock() - inicio < min(1.0, poll) and len(chegaram) < len(pessoas):
-                sleep(1.0)  # `check --wait` que volta na hora sem registro não vira laço quente
-            agora = clock()
         atual = scan(reuniao, n, root)
         for p in reuniao["personas"]:
             nome = p["nome"]
             if atual.get(nome) and nome not in chegaram:
-                chegou(nome, agora, " (pelo marcador)" if source == "mailbox" else "")
+                chegaram.append(nome)
+                latencias.append(agora - t0)
+                out(status_line(n, reuniao, chegaram, agora - t0))
+                ultima_linha = agora
         if len(chegaram) == len(reuniao["personas"]):
             return 0
         if once:
@@ -371,23 +366,24 @@ def run(reuniao, n, root, *, timeout=None, poll=5.0, once=False, state_fn=None, 
         if agora - ultima_linha >= STATUS_A_CADA:
             out(status_line(n, reuniao, chegaram, agora - t0))
             ultima_linha = agora
-        if not mailbox:
-            sleep(poll)
+        sleep(poll)
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Espera o fim da rodada: a mensagem da persona (mailbox) ou o marcador do worklog.")
+    ap = argparse.ArgumentParser(description="Espera o fim da rodada pelo brza sessions wait (ou pelo marcador do worklog).")
     ap.add_argument("n", type=int)
     ap.add_argument("--reuniao", required=True)
     ap.add_argument("--root", help="padrão: o topo do repositório git do cwd")
     ap.add_argument("--timeout", type=float)
-    ap.add_argument("--poll", type=float, help="segundos entre leituras (padrão 15 no mailbox, 5 no marker)")
-    ap.add_argument("--source", choices=("mailbox", "marker"), default="mailbox")
+    ap.add_argument("--poll", type=float, help="segundos entre leituras do marcador (padrão 5; só no --source marker)")
+    ap.add_argument("--source", choices=("sessions", "mailbox", "marker"), default="sessions",
+                    help="`mailbox` é alias de `sessions`")
     ap.add_argument("--sessions", help="mapa de sessões (padrão: .sessions/sessions.jsonl da raiz comum do git)")
-    ap.add_argument("--sessions-state", help="comando que imprime o JSON do `brza sessions list --json`")
+    ap.add_argument("--sessions-state", help="comando que imprime o JSON do `brza sessions list --json` (marker)")
     ap.add_argument("--no-state", action="store_true")
     ap.add_argument("--list-json", help="arquivo com o JSON do list (para teste)")
     ap.add_argument("--once", action="store_true")
+    ap.add_argument("--personas", nargs="+", metavar="NOME", help="só estas personas (nome, slug ou sessão)")
     a = ap.parse_args(argv)
     a.root = os.path.abspath(a.root) if a.root else raiz_padrao()
     path = a.reuniao if os.path.isabs(a.reuniao) or not os.path.isfile(os.path.join(a.root, a.reuniao)) \
@@ -397,11 +393,20 @@ def main(argv=None):
     if not any(os.path.isfile(os.path.join(a.root, worklog_path(reuniao, p))) for p in reuniao["personas"]):
         print(f"aviso: nenhum worklog existe ainda sob {a.root}; se a raiz está certa, as personas ainda não gravaram",
               file=sys.stderr)
-    state_fn = None if a.no_state else (lambda: fetch_states(reuniao, a.list_json, a.sessions_state))
-    poll = a.poll or (15.0 if a.source == "mailbox" else 5.0)
-    disp = dispatch_map(a.sessions or sessions_file(a.root)) if a.source == "mailbox" else None
-    return run(reuniao, a.n, a.root, timeout=a.timeout, poll=poll, once=a.once, state_fn=state_fn, source=a.source,
-               dispatches=disp)
+    nomes = None
+    if a.personas:
+        try:
+            nomes = {p["nome"] for p in common.resolver_personas(reuniao, a.personas)}
+        except ValueError as e:
+            print(str(e), file=sys.stderr)
+            return 2
+    source = "sessions" if a.source == "mailbox" else a.source
+    state_fn = None if a.no_state or source == "sessions" else (lambda: fetch_states(reuniao, a.list_json, a.sessions_state))
+    entradas = sessions_map.load_map(a.root, a.sessions) if source == "sessions" else {}
+    _, _, duracao = common.cabecalho_rodada(os.path.join(a.root, reuniao.get("dir", "."), f"rodada-{a.n}.md"))
+    return run(reuniao, a.n, a.root, timeout=a.timeout, poll=a.poll or 5.0, once=a.once, state_fn=state_fn,
+               source=source, entradas=entradas, personas=nomes, duracao=duracao, com_state=not a.no_state,
+               vistos_path=os.path.join(a.root, reuniao.get("dir", "."), "eventos-vistos.json"))
 
 
 if __name__ == "__main__":

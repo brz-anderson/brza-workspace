@@ -1,1 +1,1 @@
-- [Scripts do meeting-runner](meeting-runner-scripts.md) — comando de teste, dados reais que divergem do esperado e armadilhas de fuso e de import
+- [Scripts do meeting-runner sobre o brza sessions v2](meeting-runner-scripts.md) — mapa v2, armadilhas do teste integrado e do relógio falso, comando que valida

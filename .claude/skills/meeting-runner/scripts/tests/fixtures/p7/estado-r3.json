@@ -1,0 +1,164 @@
+{
+  "reuniao": {
+    "id": "reuniao-ci-no-chat",
+    "tema": "Resultados de CI no chat e disparo automático de agentes em falhas de PR: o porte e a ordem",
+    "decisor": "Anderson",
+    "fim": "14h20"
+  },
+  "rodada": {
+    "n": 3,
+    "total_previsto": null,
+    "titulo": "o voto informado entre A e B",
+    "aberta": "18:37:02",
+    "prazo": "18:42",
+    "fechada": null,
+    "gerado": "18:38:50",
+    "tem_voto": false,
+    "custo_rotulo": "da rodada"
+  },
+  "personas": [
+    {
+      "nome": "Prumo",
+      "papel": "Cético medidor",
+      "sessao": "ci-prumo",
+      "runtime": "Claude",
+      "modelo": "claude-opus-5-5",
+      "esforco": "xhigh",
+      "estado": "falta",
+      "respondeu_as": null,
+      "latencia_s": null,
+      "latencia_fonte": null,
+      "confianca": null,
+      "confianca_fonte": null,
+      "confianca_r1": 76.3,
+      "posicao": "(fora da R3) A desde a R2: 0 PRs, não se constrói nem a sombra.",
+      "posicao_fonte": null,
+      "voto": null,
+      "virada": null,
+      "virada_antes": "R2: virou",
+      "nota_colegas": 8.5,
+      "nota_rodada": 2,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": true,
+      "medicao_aviso": null,
+      "worklog": "work/worklogs/2026-11-09-reuniao-ci-no-chat-prumo.md",
+      "linha": null
+    },
+    {
+      "nome": "Trava",
+      "papel": "Guardião de contenção",
+      "sessao": "ci-trava",
+      "runtime": "Grok",
+      "modelo": "grok-4.7",
+      "esforco": "medium",
+      "estado": "respondeu",
+      "respondeu_as": "18:38:26",
+      "latencia_s": 85,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 84.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 84.0,
+      "posicao": "Voto A. A sombra mede zero; o desenho fica e o código espera.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "virada": null,
+      "virada_antes": "R2: virou",
+      "nota_colegas": 8.75,
+      "nota_rodada": 2,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao_aviso": null,
+      "worklog": "work/worklogs/2026-11-09-reuniao-ci-no-chat-trava.md",
+      "linha": 117
+    },
+    {
+      "nome": "Relance",
+      "papel": "Voz do mantenedor com pouco tempo",
+      "sessao": "ci-relance",
+      "runtime": "Antigravity",
+      "modelo": null,
+      "esforco": null,
+      "estado": "respondeu",
+      "respondeu_as": "18:37:57",
+      "latencia_s": 56,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 88.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 90.0,
+      "posicao": "Apoio A com ressalva no gatilho; contra B porque vigiar zero PRs não poupa clique de ninguém.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "virada": null,
+      "virada_antes": "R2: ajustou",
+      "nota_colegas": 6.5,
+      "nota_rodada": 2,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao_aviso": null,
+      "worklog": "work/worklogs/2026-11-09-reuniao-ci-no-chat-relance.md",
+      "linha": 124
+    }
+  ],
+  "sala": {
+    "media": 84.0,
+    "mediana": 84.0,
+    "n": 1,
+    "faixa": [
+      84.0,
+      84.0
+    ],
+    "total": 3,
+    "media_todas": 86.0,
+    "mediana_todas": 86.0,
+    "n_todas": 2,
+    "antigravity": {
+      "media": 88.0,
+      "n": 1,
+      "nomes": [
+        "Relance"
+      ],
+      "fora_da_media": true
+    },
+    "revisor": null,
+    "revisor_nota": "—",
+    "diferenca_revisor": null
+  },
+  "avisos": [],
+  "medicoes": [
+    {
+      "tipo": "conferido",
+      "quem": "coordenação",
+      "texto": "Trava refez M6/M6b: gh pr list brza-studio → []; --owner=anderson-fixfy → 8 PRs, 7 do fixfy-claude"
+    },
+    {
+      "tipo": "conferido",
+      "quem": "coordenação",
+      "texto": "Revisor F1 confere: --author=@me esconde a conta de agente — gh search prs --owner"
+    }
+  ],
+  "sintese": [
+    "3/3 votam A: o visual chega no merge de tag; o automático vira desenho low com gatilho por dono e conta.",
+    "Trava e Relance viraram de B para A ao ler M6/M6b; B (sombra) contra nas duas: mediria zero.",
+    "Ressalvas: gatilho por --owner em todas as contas (Trava); um comando só no sync (Relance)."
+  ],
+  "decisoes": [
+    {
+      "pergunta": "O automático: A, com o gatilho por dono e conta conferido a cada sync?",
+      "quem": [
+        "Prumo",
+        "Trava",
+        "Relance"
+      ],
+      "recomendacao": "A (3/3)",
+      "votos": null
+    }
+  ],
+  "custos_coordenacao": {
+    "coordenacao_usd": null,
+    "revisor_usd": null,
+    "ate": null
+  }
+}

@@ -4,21 +4,28 @@
 Uso:
     tally.py <N> --reuniao reuniao.json [--root DIR] [--measurements PATH] [--sessions PATH]
              [--codex-dir DIR] [--out PATH|-] [--exclude-rater NOME ...] [--md|--json]
-             [--opened HH:MM:SS] [--closed HH:MM:SS]
+             [--opened HH:MM:SS] [--closed HH:MM:SS] [--at HH:MM:SS] [--participantes NOME ...] [--settle SEG]
 
 `--root` padrão: o topo do repositório git do cwd (`git rev-parse --show-toplevel`; sem git, o cwd); o manifesto relativo
 resolve contra ele. Sem nenhum worklog sob a raiz, sai com rc 2 e erro explícito (nunca "falta" em silêncio). Sem
 `--opened`/`--closed` o custo e a latência dos Claude são o TOTAL DA SESSÃO: o aviso vai a stderr, o JSON traz
 `rodada.custo_rotulo: "total da sessão"` (com a janela, "da rodada") e a lista `avisos`; o turno do Codex só se mede com a
 janela (por posição erraria com um turno a mais). Por persona, o manifesto aceita `claude_session`, `provider_session`
-(sobrescrevem o `sessions.jsonl`, que o `worker-start` não preenche) e `dispatch_id`; sem nenhum id, `medicao_aviso`.
+(sobrescrevem o mapa) e `dispatch_id`; sem nenhum id, `medicao_aviso`. Os ids vêm do mapa do `brza sessions` v2
+(`sessions_map.fold_map`: `open` + `session` do mesmo nome, também depois do `close`); NADA aqui lê transcript.
+
+MEDIÇÃO PENDENTE (X4): o hook grava o turno do Claude no Stop. Persona Claude que respondeu, com id, sem turno na janela e
+com o fim da rodada (`--closed`, ou a hora da resposta) a menos de 120 s de `--at`/agora fica `medicao: "pendente"`,
+`custo_usd: None` e o aviso "medição pendente: … rode de novo em ~1 min"; nunca 0 e nunca "sem medição". `--settle SEG`
+relê o `measurements.jsonl` a cada 5 s até as pendentes ganharem a linha. Fora dos 120 s, é "sem medição".
+`--participantes` (X18): quem está fora fica `estado: "fora da rodada"`, sem medição, fora da sala e do "x/n".
 
 Só biblioteca padrão. Grava `<root>/<dir>/estado-r<N>.json` (ou `--out`; `--out -` não grava) e imprime a tabela
 Markdown do chat da coordenação (`--md`, padrão) ou o JSON (`--json`).
 
 Como biblioteca (o `panel.py` faz `sys.path.insert` e `import tally`):
     build_estado(reuniao, n, root, *, measurements=None, sessions=None, codex_dir=None,
-                 exclude_raters=(), opened=None, closed=None, at=None) -> dict
+                 exclude_raters=(), opened=None, closed=None, at=None, participantes=None, settle=0) -> dict
     render_md(estado) -> str
     parse_worklog(text, names=()) -> dict
     measure_claude(...), measure_codex(...), stats(valores)   # auxiliares públicos
@@ -88,7 +95,13 @@ import re
 import statistics
 import subprocess
 import sys
+import time as _time
 from datetime import date, datetime, time, timedelta, timezone
+
+AQUI = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, AQUI)
+import common  # noqa: E402  (a leitura do marcador de fim de rodada é a mesma do `wait_round.py`)
+import sessions_map  # noqa: E402  (a identidade da persona vem do mapa do `brza sessions` v2, em um lugar só)
 
 RUNTIME_NOME = {"claude": "Claude", "codex": "Codex", "grok": "Grok", "antigravity": "Antigravity"}
 NUM_CELL = re.compile(r"^\**\s*(\d+(?:[.,]\d+)?)\s*\**\s*(?:/\s*\**\s*(?:10|100)\s*\**|%)?\s*$")
@@ -207,6 +220,9 @@ def split_rounds(text):
     return out
 
 
+VOTO_PALAVRA = {"apoio": "apoio", "ressalva": "apoio com ressalva", "contra": "contra"}
+
+
 def classify_vote(cell):
     c = cell.replace("*", "").strip().lower()
     if c.startswith("contra"):
@@ -272,7 +288,7 @@ def parse_round(lines, names=()):
     """Extrai de uma seção de rodada: placar, voto, plano, confiança, posição e notas."""
     r = {"placar_conf": None, "virada": None, "voto": None, "plano": None, "plano_porque": None,
          "confianca": None, "confianca_fonte": None, "posicao": None, "posicao_fonte": None, "notas": None,
-         "avisos": []}
+         "fatos_lidos": None, "voto_por_proposta": None, "avisos": []}
     # placar
     i = find_line(lines, r"^####\s+Placar da rodada")
     if i is not None:
@@ -290,13 +306,14 @@ def parse_round(lines, names=()):
             elif vals:
                 r["virada"] = "não"
     # voto
-    i = find_line(lines, r"^####\s+O voto em cada proposta")
+    i = find_line(lines, r"^####\s+O voto(?:\s+em cada proposta)?\s*$")
     voto_conf = None
     if i is not None:
         header, rows = parse_table(lines, i + 1)
         vi, ci = col(header, "voto"), col(header, "confian", last=True)
         if vi is not None:
-            props = [x for x in rows if re.match(r"^\**P\d+", x[0]) and len(x) > vi]
+            # a proposta tem qualquer rótulo (`P1`, `A`, `B`), desde que a célula de voto se classifique
+            props = [x for x in rows if len(x) > vi and classify_vote(x[vi])]
             cont = {"apoio": 0, "ressalva": 0, "contra": 0}
             for x in props:
                 k = classify_vote(x[vi])
@@ -304,6 +321,7 @@ def parse_round(lines, names=()):
                     cont[k] += 1
             if props:
                 r["voto"] = cont
+                r["voto_por_proposta"] = {x[0].replace("*", "").strip(): VOTO_PALAVRA[classify_vote(x[vi])] for x in props}
                 if ci is not None:
                     voto_conf = mean([to_num(x[ci]) for x in props if len(x) > ci])
     # o plano inteiro
@@ -343,6 +361,10 @@ def parse_round(lines, names=()):
         r["posicao"], r["posicao_fonte"] = truncate(clean_md(" ".join(corpo))), "posicao"
     elif r["plano_porque"]:
         r["posicao"], r["posicao_fonte"] = truncate(r["plano_porque"]), "plano"
+    # os fatos que a persona declara ter lido (`- **Fatos lidos:** M1, M6`)
+    m_fatos = re.search(r"^\s*(?:[-*]\s*)?\*\*Fatos lidos:?\*\*:?[ \t]*(.*)$", txt, re.M)
+    if m_fatos:
+        r["fatos_lidos"] = re.findall(r"\bM\d+\w*", m_fatos.group(1))
     # notas aos colegas
     r["notas"] = parse_notes_table(lines, r["avisos"]) or parse_notes_prose(lines, names, r["avisos"])
     return r
@@ -355,7 +377,7 @@ def parse_worklog(text, names=()):
     Cada rodada: linha, titulo, confianca, confianca_fonte, placar_conf, virada, voto, posicao, posicao_fonte, notas.
     Seção ou tabela que falta vira None; nada é inventado.
     """
-    text = text or ""
+    text = common.corta_medida(text or "")
     nao_vazias = [l.rstrip() for l in text.split("\n") if l.strip()]
     ultima = nao_vazias[-1] if nao_vazias else None
     m = MARCADOR.match(ultima) if ultima else None
@@ -435,15 +457,17 @@ def default_file(root, rel):
 # ---------------------------------------------------------------- medição
 
 def session_ids(sessions_rows, sessao, persona=None):
-    """Os ids do `sessions.jsonl` para a `sessao`; `claude_session`/`provider_session` da persona no manifesto
-    SOBRESCREVEM o mapa (o `worker-start` não grava esses campos)."""
+    """Os ids do mapa do `brza sessions` v2 para a `sessao` (`sessions_map.fold_map`: o `open` e o `session` do mesmo
+    nome, também depois do `close`); `claude_session`/`provider_session` da persona no manifesto SOBRESCREVEM o mapa.
+    Nada aqui procura transcript: o id vem do mapa ou da sobrescrita explícita."""
+    e = sessions_map.fold_map(sessions_rows).get(sessao) or {}
     claude, provider = set(), set()
-    for d in sessions_rows:
-        if d.get("name") == sessao:
-            if d.get("claude_session"):
-                claude.add(d["claude_session"])
-            if d.get("provider_session"):
-                provider.add(d["provider_session"])
+    if e.get("claude_session"):
+        claude.add(e["claude_session"])
+    if e.get("provider_session"):
+        provider.add(e["provider_session"])
+        if (e.get("agent") or "claude") == "claude" and not claude:
+            claude.add(e["provider_session"])  # no Claude o id do provedor é a sessão do transcript
     persona = persona or {}
     if persona.get("claude_session"):
         claude = {persona["claude_session"]}
@@ -557,7 +581,7 @@ def calc_sala(personas):
     s = stats([x["confianca"] for x in resp if not eh_antigravity(x.get("runtime"))])
     st = stats([x["confianca"] for x in resp])
     sala = {"media": s["media"], "mediana": s["mediana"], "n": s["n"], "faixa": s["faixa"],
-            "total": len(personas), "media_todas": st["media"], "mediana_todas": st["mediana"], "n_todas": st["n"]}
+            "total": len([x for x in personas if x.get("estado") != FORA]), "media_todas": st["media"], "mediana_todas": st["mediana"], "n_todas": st["n"]}
     ag = [x for x in resp if eh_antigravity(x.get("runtime"))]
     if ag:
         sala["antigravity"] = {"media": mean([x["confianca"] for x in ag]), "n": len(ag),
@@ -586,31 +610,50 @@ def aplica_revisor(sala):
         sala["diferenca_revisor"] = None
 
 
+FORA = "fora da rodada"
+PENDENTE_S = 120  # o hook grava o turno no Stop; até 120 s depois do fim da rodada a medição pode não ter chegado
 SEM_MEDICAO = "sem medição: persona sem claude_session/provider_session no mapa"
 
 
 def build_estado(reuniao, n, root, *, measurements=None, sessions=None, codex_dir=None, exclude_raters=(),
-                 opened=None, closed=None, at=None):
+                 opened=None, closed=None, at=None, participantes=None, settle=0, sleep=_time.sleep,
+                 clock=_time.time):
     """Monta o estado da rodada `n`. `measurements`/`sessions` são caminhos; `opened`/`closed`/`at` aceitam
     'HH:MM:SS' (no dia `reuniao['data']`, padrão hoje), ISO ou datetime. Atravessar a meia-noite vale: `closed` e `at`
-    em HH:MM:SS antes de `opened` caem no dia seguinte."""
+    em HH:MM:SS antes de `opened` caem no dia seguinte.
+
+    `participantes` (nomes) restringe a rodada: quem está fora fica `fora da rodada`, sem medição e fora da sala e do
+    "x/n". `settle` (s): a medição de uma persona Claude que respondeu e ainda não tem o turno do hook (`pendente`) se
+    relê a cada 5 s até chegar ou o prazo acabar."""
     day = date.fromisoformat(reuniao["data"]) if reuniao.get("data") else None
     opened_dt, closed_dt = parse_when(opened, day), parse_when(closed, day)
-    at_dt = parse_when(at, day) or datetime.now().astimezone()
     if opened_dt and closed_dt and closed_dt < opened_dt and isinstance(closed, str) and ":" in closed[:3]:
         closed_dt += timedelta(days=1)
+    win = win_bounds(opened_dt, closed_dt)
+    measurements = measurements or default_file(root, ".measurements/measurements.jsonl")
+    sessions = sessions or sessions_map.map_file(root)  # o mesmo mapa do launch_persona e do wait_round
+    codex_dir = codex_dir or os.path.expanduser("~/.codex/sessions")
+    fim_settle = clock() + settle
+    while True:
+        estado = _montar(reuniao, n, root, load_jsonl(measurements), load_jsonl(sessions), codex_dir, exclude_raters,
+                         opened, closed, at, day, opened_dt, closed_dt, win, participantes)
+        if (not settle or clock() >= fim_settle
+                or not any(p.get("medicao") == "pendente" for p in estado["personas"])):
+            return estado
+        sleep(5)
+
+
+def _montar(reuniao, n, root, mrows, srows, codex_dir, exclude_raters, opened, closed, at, day, opened_dt, closed_dt,
+            win, participantes):
+    at_dt = parse_when(at, day) or datetime.now().astimezone()
     if opened_dt and at and at_dt < opened_dt and isinstance(at, str) and ":" in at[:3]:
         at_dt += timedelta(days=1)
-    win = win_bounds(opened_dt, closed_dt)
     avisos = []
     if not win:
         avisos.append("sem a janela da rodada (--opened e --closed): o custo e a latência dos Claude são o TOTAL DA SESSÃO, "
                       "não os da rodada, e o turno do Codex não é medido")
-    measurements = measurements or default_file(root, ".measurements/measurements.jsonl")
-    sessions = sessions or default_file(root, ".sessions/sessions.jsonl")
-    codex_dir = codex_dir or os.path.expanduser("~/.codex/sessions")
-    mrows, srows = load_jsonl(measurements), load_jsonl(sessions)
     names = [p["nome"] for p in reuniao["personas"]]
+    dentro = {p["nome"] for p in common.resolver_personas(reuniao, participantes)} if participantes else None
 
     parsed, mtimes = {}, {}
     for p in reuniao["personas"]:
@@ -644,6 +687,21 @@ def build_estado(reuniao, n, root, *, measurements=None, sessions=None, codex_di
         r1 = (w or {}).get("rodadas", {}).get(1) or {}
         ant = (w or {}).get("rodadas", {}).get(n - 1) or {}
         mk = (w or {}).get("marcador_final")
+        base = {"nome": nome, "papel": p.get("papel"), "sessao": p.get("sessao"),
+                "runtime": RUNTIME_NOME.get(runtime, p.get("runtime")),
+                "modelo": none_if_dash(p.get("modelo")), "esforco": none_if_dash(p.get("esforco")),
+                "worklog": worklog_path(reuniao, p)}
+        if dentro is not None and nome not in dentro:
+            recs = recebidas.get(nome)
+            personas.append({**base, "estado": FORA, "respondeu_as": None, "latencia_s": None, "latencia_fonte": None,
+                             "confianca": None, "confianca_fonte": None, "confianca_r1": r1.get("placar_conf"),
+                             "posicao": None, "posicao_fonte": None, "voto": None, "voto_por_proposta": None,
+                             "virada": None, "virada_antes": f"R{n - 1}: {ant['virada']}" if n > 1 and ant.get("virada") else None,
+                             "nota_colegas": round(sum(recs) / len(recs), 2) if recs else None,
+                             "nota_rodada": nota_rodada if recs else None, "custo_usd": None, "tokens": None,
+                             "janela": None, "medicao": None, "medicao_aviso": None, "fatos_lidos": None,
+                             "linha": None})
+            continue
         ids_claude, ids_prov = session_ids(srows, p.get("sessao"), p)
         med, aviso_med = None, None
         if runtime == "claude":
@@ -671,26 +729,36 @@ def build_estado(reuniao, n, root, *, measurements=None, sessions=None, codex_di
                 latencia, fonte = int(round((fim - opened_dt).total_seconds())), "≈ mtime"
         tokens = med.get("tokens") if med and runtime == "codex" else None
         recs = recebidas.get(nome)
+        # X4: o hook grava o turno no Stop; persona Claude que respondeu, com id, sem turno na janela e com o fim da
+        # rodada a menos de 120 s de `at` está `pendente`: nunca custo 0 e nunca "sem medição"
+        medicao = None
+        if runtime in ("claude", "codex"):
+            medicao = "medida" if med else "sem medição"
+        if runtime == "claude" and not med and estado == "respondeu" and (ids_claude or ids_prov):
+            ref = closed_dt or fim
+            if ref is not None and 0 <= (at_dt - ref).total_seconds() < PENDENTE_S:
+                medicao = "pendente"
+                avisos.append(f"{nome}: medição pendente: o hook grava no Stop do turno; rode de novo em ~1 min")
         if aviso_med:
             avisos.append(f"{nome}: {aviso_med}")
         for a in rd.get("avisos") or []:
             avisos.append(f"{nome}: {a}")
+        if estado == "respondeu" and rd.get("voto") and rd.get("fatos_lidos") is None:  # [] = "nenhum novo", declarado
+            avisos.append(f"{nome}: votou sem declarar os fatos lidos")
         personas.append({
-            "nome": nome, "papel": p.get("papel"), "sessao": p.get("sessao"),
-            "runtime": RUNTIME_NOME.get(runtime, p.get("runtime")),
-            "modelo": none_if_dash(p.get("modelo")), "esforco": none_if_dash(p.get("esforco")),
+            **base,
             "estado": estado, "respondeu_as": hms(fim) if estado == "respondeu" else None,
             "latencia_s": latencia, "latencia_fonte": fonte,
             "confianca": rd.get("confianca"), "confianca_fonte": rd.get("confianca_fonte"),
             "confianca_r1": r1.get("placar_conf"),
             "posicao": rd.get("posicao"), "posicao_fonte": rd.get("posicao_fonte"),
-            "voto": rd.get("voto"), "virada": rd.get("virada"),
+            "voto": rd.get("voto"), "voto_por_proposta": rd.get("voto_por_proposta"), "virada": rd.get("virada"),
             "virada_antes": f"R{n - 1}: {ant['virada']}" if n > 1 and ant.get("virada") else None,
             "nota_colegas": round(sum(recs) / len(recs), 2) if recs else None, "nota_rodada": nota_rodada if recs else None,
             "custo_usd": med.get("custo_usd") if med and runtime == "claude" else None,
             "tokens": tokens, "janela": bool(win) if runtime in ("claude", "codex") else None,
-            "medicao_aviso": aviso_med,
-            "worklog": worklog_path(reuniao, p), "linha": rd.get("linha"),
+            "medicao": medicao, "medicao_aviso": aviso_med, "fatos_lidos": rd.get("fatos_lidos"),
+            "linha": rd.get("linha"),
         })
 
     sala = calc_sala(personas)
@@ -706,7 +774,8 @@ def build_estado(reuniao, n, root, *, measurements=None, sessions=None, codex_di
         "rodada": {"n": n, "total_previsto": reuniao.get("rodadas_previstas"), "titulo": titulo,
                    "aberta": hms(opened_dt), "prazo": None, "fechada": hms(closed_dt), "gerado": hms(at_dt),
                    "tem_voto": any(x["voto"] for x in personas),
-                   "custo_rotulo": "da rodada" if win else "total da sessão"},
+                   "custo_rotulo": "da rodada" if win else "total da sessão",
+                   "participantes": [x["nome"] for x in personas if x["estado"] != FORA]},
         "personas": personas,
         "sala": sala,
         "avisos": avisos,
@@ -735,15 +804,27 @@ def cell(s):
 def render_md(estado):
     """A tabela Markdown do chat: Persona · posição em uma linha · confiança · mudou? · voto, e a linha da sala."""
     n = estado["rodada"]["n"]
-    linhas = ["| Persona | Posição em uma linha | Confiança | Mudou? | Voto |", "| :-- | :-- | --: | :-- | :-- |"]
+    # X7: a coluna de custo só entra quando há custo (ou medição pendente) a mostrar, com o rótulo no cabeçalho
+    custo = any(isinstance(p.get("custo_usd"), (int, float)) or p.get("medicao") == "pendente"
+                for p in estado["personas"])
+    rotulo = "total da sessão" if (estado.get("rodada") or {}).get("custo_rotulo") == "total da sessão" else "rodada"
+    linhas = ["| Persona | Posição em uma linha | Confiança | Mudou? | Voto |" + (f" Custo ({rotulo}) |" if custo else ""),
+              "| :-- | :-- | --: | :-- | :-- |" + (" --: |" if custo else "")]
     for p in estado["personas"]:
         conf = fnum(p.get("confianca"))
         if p.get("confianca") is not None and n > 1 and p.get("confianca_r1") is not None:
             conf += f" ({fdelta(p['confianca'] - p['confianca_r1'])})"
         pos = p.get("posicao") if p["estado"] == "respondeu" else f"— ({p['estado']})"
         v = p.get("voto")
-        voto = f"{v['apoio']}/{v['ressalva']}/{v['contra']}" if v else "—"
-        linhas.append(f"| {cell(p['nome'])} | {cell(pos)} | {conf} | {cell(p.get('virada'))} | {voto} |")
+        vp = p.get("voto_por_proposta")
+        voto = (" · ".join(f"{k}: {x.replace('apoio com', 'apoio c/')}" for k, x in vp.items()) if vp else
+                f"{v['apoio']}/{v['ressalva']}/{v['contra']}" if v else "—")
+        celula = ""
+        if custo:
+            c = p.get("custo_usd")
+            celula = " pendente |" if p.get("medicao") == "pendente" else \
+                (f" US$ {fnum(round(c, 2))} |" if isinstance(c, (int, float)) else " — |")
+        linhas.append(f"| {cell(p['nome'])} | {cell(pos)} | {conf} | {cell(p.get('virada'))} | {voto} |{celula}")
     s = estado["sala"]
     partes = [f"Sala: média {fnum(s['media'])} ({s['n']}/{s.get('total', len(estado['personas']))}), "
               f"mediana {fnum(s['mediana'])}, faixa {fnum(s['faixa'][0]) if s['faixa'] else '—'}–"
@@ -755,12 +836,15 @@ def render_md(estado):
     if s.get("antigravity"):
         partes.append(f"Antigravity à parte: {fnum(s['antigravity']['media'])}")
     saida = "\n".join(linhas) + "\n\n" + " · ".join(partes)
-    sem = [f"{p['nome']} ({p['runtime']})" for p in estado["personas"] if p["runtime"] in ("Grok", "Antigravity")]
+    sem = [f"{p['nome']} ({p['runtime']})" for p in estado["personas"]
+           if p["runtime"] in ("Grok", "Antigravity") and p["estado"] != FORA]
     if sem:
         saida += "\nSem medição de custo: " + ", ".join(sem) + "."
     for p in estado["personas"]:
         if p.get("medicao_aviso"):
             saida += f"\n{p['nome']}: {p['medicao_aviso']}."
+        if p.get("medicao") == "pendente":
+            saida += f"\n{p['nome']}: medição pendente: o hook grava no Stop do turno; rode de novo em ~1 min."
     if (estado.get("rodada") or {}).get("custo_rotulo") == "total da sessão":
         saida += "\nCusto e latência dos Claude: total da sessão (sem a janela da rodada)."
     return saida
@@ -780,6 +864,11 @@ def main(argv=None):
     ap.add_argument("--exclude-rater", action="append", default=[])
     ap.add_argument("--opened")
     ap.add_argument("--closed")
+    ap.add_argument("--at", help="o instante do estado (HH:MM:SS ou ISO); padrão agora; decide a medição pendente")
+    ap.add_argument("--participantes", nargs="+", metavar="NOME",
+                    help="só estes nomes estão na rodada; os outros ficam `fora da rodada`")
+    ap.add_argument("--settle", type=float, default=0, metavar="SEG",
+                    help="relê o measurements.jsonl a cada 5 s até as medições pendentes chegarem, por até SEG")
     fmt = ap.add_mutually_exclusive_group()
     fmt.add_argument("--md", action="store_true")
     fmt.add_argument("--json", action="store_true")
@@ -792,9 +881,14 @@ def main(argv=None):
         print(f"tally: nenhum worklog existe sob {root} (padrão {reuniao.get('worklog')}); confira --root e o manifesto",
               file=sys.stderr)
         return 2
-    estado = build_estado(reuniao, a.n, root, measurements=a.measurements, sessions=a.sessions,
-                          codex_dir=a.codex_dir, exclude_raters=tuple(a.exclude_rater),
-                          opened=a.opened, closed=a.closed)
+    try:
+        estado = build_estado(reuniao, a.n, root, measurements=a.measurements, sessions=a.sessions,
+                              codex_dir=a.codex_dir, exclude_raters=tuple(a.exclude_rater),
+                              opened=a.opened, closed=a.closed, at=a.at, participantes=a.participantes,
+                              settle=a.settle)
+    except ValueError as e:
+        print(f"tally: {e}", file=sys.stderr)
+        return 2
     for av in estado.get("avisos") or []:
         print(f"aviso: {av}", file=sys.stderr)
     out = a.out or os.path.join(root, reuniao.get("dir", "."), f"estado-r{a.n}.json")

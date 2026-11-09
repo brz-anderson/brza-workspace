@@ -22,6 +22,9 @@ tags:
 - **Retomar:** R1 e R2 respondidas em 2026-11-03; os requisitos do contrato foram por correio à sessão do
   `studio` (R2.4). Espera a R5 do `PLN-011` fixar o contrato do `brza chat`; então o Desenho da fase 1,
   com um ponto aberto: se o `brza-run` mantém o código de saída do comando e só mostra o recibo na linha dele.
+  A exceção transitória à R1.4, confirmada no PLN-017/R3.1, permite o recibo, `--operation` e `read --last` pelo
+  `rpc` até o `brza chat` chegar ao app alvo; a troca posterior de transporte permanece neste plano, sem antecipar
+  seus passos bloqueados.
 
 ## Pedido
 
@@ -67,7 +70,7 @@ Rascunho da abertura; o critério de aceite de cada linha é proposta até a rod
 | `Pedido 5` | o envio feito de dentro de um chat chega ao destino como tarefa do coordenador, não como a mensagem da pessoa          | —     | `test_brza_sessions` (unidade); conferência no app (manual) |
 | `R1.2`     | o `open` com `--rename` e `--prompt` e o `brza-run` mostram o recibo do envio, pelo mesmo transporte do `send`          | —     | `test_brza_sessions`, `test_brza_run` (unidade) |
 | `R1.3`     | `read <nome> --since <cursor>` devolve o cursor seguinte; sem `--since`, as últimas N; nada de cursor guardado no mapa | —     | `test_brza_sessions` (unidade)        |
-| `R1.4`     | sem o `brza chat` no app alvo, os comandos saem com erro que pede o build com ele, sem cair no `rpc` antigo            | —     | `test_brza_sessions` (unidade)        |
+| `R1.4`     | sem o `brza chat` no app alvo, os comandos saem com erro que pede o build com ele, sem cair no `rpc` antigo, salvo o recibo, `--operation` e `read --last` durante a exceção transitória PLN-017/R3.1 | — | `test_brza_sessions` (unidade) |
 | `R2.1`     | `send` sai com 0 para enfileirada ou `accepted`, 1 para `rejected` e erro, 75 para `pending` ou `unknown`             | —     | `test_brza_sessions` (unidade)        |
 | `R2.2`     | o recibo traz a `operation`, e `send <nome> --operation <id> <texto>` repete sem novo disparo                         | —     | `test_brza_sessions` (unidade)        |
 | `R2.3`     | `read` com cursor inválido sai com 65 e a dica de omitir o `--since`, sem reler sozinho                                | —     | `test_brza_sessions` (unidade)        |
@@ -83,6 +86,23 @@ Rascunho da abertura; o critério de aceite de cada linha é proposta até a rod
   (`#37467`)** no `brza-studio`. Do mesmo `PLN-011`, por prioridade; o lado do `brza-workflow` de três delas são as
   fases 2 a 4, pela R1.1.
 - **A barra lateral, a Jump Palette e o journal do `#37802`.** Não têm lado no `brza-workflow`; ficam só no `PLN-011`.
+
+## Exceção transitória à R1.4 — PLN-017/R3.1
+
+Anderson respondeu literalmente **"Recibo, --operation e read --last pelo rpc"**, em **2026-11-08**, na sessão
+**`workflow-improvements`**, na R3.1 do
+[PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat](../../plans/PLN-017-a-reuniao-multiagente-como-fluxo-replicavel/PLN-017-plan.md).
+O registro desta exceção é o P6 daquele plano, autorizado para execução em 2026-11-09 pelo pedido
+"coordene a execução do P4, P5 e P6".
+
+Até o `brza chat` existir no app alvo, o `brza sessions` pode devolver o recibo real e aceitar `--operation` no
+`send`, e oferecer o `read --last` mínimo, pelo `rpc` existente. A exceção se limita a esses três recursos:
+o `read` completo com cursor, as demais fases e os passos bloqueados deste plano e do PLN-011 continuam aguardando
+seus pré-requisitos. A R1.4 segue como regra fora desse recorte transitório.
+
+Quando o `brza chat` chegar ao app alvo, este plano troca **somente o transporte** desses recursos pelo `brza chat`,
+preservando o contrato público, a operação e os códigos de saída. O custo estimado dessa troca é **0,5 h**, transmitido
+no pedido de P6 do PLN-017 à sessão executora em 2026-11-09; nesse momento a exceção deixa de valer.
 
 ## Pré-requisitos
 
@@ -168,7 +188,8 @@ Respondida em 2026-11-03, nesta sessão, pela pergunta com opções.
    - reserva pelo `rpc` de hoje — custo: ~3 h, dois transportes e testes em dobro; se paga: se o Orca precisar do
      `brza sessions` antes do `#33115`.
 
-   **Decidido — falha com aviso (Recomendado).**
+   **Decidido — falha com aviso (Recomendado).** **→ exceção transitória em PLN-017/R3.1**, limitada ao recibo,
+   à `--operation` e ao `read --last`, conforme a seção [Exceção transitória à R1.4 — PLN-017/R3.1](#exceção-transitória-à-r14--pln-017r31).
 
 ### Rodada 2 — o código de saída, o retry, o cursor inválido e o pedido ao `PLN-011` (enviada 2026-11-03)
 
@@ -225,6 +246,9 @@ As fases 2 a 4, abertas na R1.1, cada uma esperando a frente correspondente do `
 
 ## Worklogs
 
+- 2026-11-09 — P6 do PLN-017: exceção transitória à R1.4 com resposta literal, data, sessão e troca posterior
+  somente do transporte, estimada em 0,5 h; os passos bloqueados não foram executados.
+  [O `brza sessions` recebe as primitivas da reunião e o PLN-010 registra a transição pelo `rpc`](../../work/worklogs/2026-11-09-pln-017-sessions-e-excecao-ao-pln-010.md)
 - 2026-11-03 — abertura: a issue da frente, o `PLN-010` e a R0 transcrita; R1 e R2 respondidas, com as issues das fases 2
   a 4 e o correio dos Pré-requisitos à sessão do `studio`. Parou na espera da R5 do `PLN-011`.
   [O PLN-010: a abertura do `brza sessions` sobre o `brza chat`](../../work/worklogs/2026-11-03-pln-010-abertura-do-brza-sessions-sobre-o-brza-chat.md)

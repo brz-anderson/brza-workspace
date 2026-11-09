@@ -31,3 +31,19 @@ Padrões que apareceram na revisão do P8 do PLN-009 (2026-11-03, `stop` que apa
 **How to apply:** em diff do `packages/mcp`, rodar o cronômetro e a mutação antes da leitura fina; confiança 85 para o
 timeout real do launchd, com a premissa (o `print` acha o serviço até o processo sair) tirada do caso manual.
 Relacionado: [[achados-que-costumam-cair]].
+
+Padrões confirmados no PLN-017/P4 (2026-11-09), também nos wrappers de sessões:
+
+- **A inspeção depois de uma mutação incerta apaga o recibo anterior.** Se o `worker-stop` retornou `stop_unknown`,
+  falhar no `worker-show` seguinte não o transforma em recusa. Conservar recibo e incerteza, com erro da observação
+  separado. Confiança 90, reproduzido por sonda e mutação.
+- **O fake inventa um envelope melhor que o CLI real.** `ok: false` pode conservar o fato em `result.state`, sem
+  objeto `error`; conferir a projeção do CLI além do RPC. Confiança 90, fonte e teste dos dois formatos.
+- **O stub aceita qualquer id e esconde que falta o id do provedor.** `lambda sid: ...` não testa o casamento com o
+  rollout. Usar o leitor real com fixture e provar Claude/Codex medidos depois de a aba e o histórico sumirem;
+  Grok `unmeasured` não prova esse caso. Confiança 88, regressão derrubada por mutação.
+- **Erro por alvo vira erro do lote e perde efeitos já executados.** Conservar `closed`/`refused` no fechamento e
+  `done`/`pending`/`events` na espera, mesmo se a observação de outro alvo falhar. Confiança 85, sonda de segundo alvo.
+
+Evidência e destinos:
+[REV-022: As primitivas do brza sessions e a exceção transitória do PLN-010](../../../work/reviews/REV-022-pln-017-sessions-e-transicao-rpc.md).

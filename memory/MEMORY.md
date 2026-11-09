@@ -1,2 +1,3 @@
 - [Cada passo revisado pelo agy](cada-passo-revisado-pelo-agy.md) — reviewer pelo agy antes do [x]; corrigido aqui por implementer, até 3 rodadas
 - [Commit ao fechar todo passo](commit-ao-fechar-todo-passo.md) — commitar diretamente ao fechar cada passo, sem parar para pedir confirmação
+- [Contratos do runtime do `brza sessions`](brza-sessions-contratos-do-runtime.md) — mailbox por rodada, identidade do chat, replay e ciclo de vida sondados no PLN-017

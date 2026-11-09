@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #39162 e as issues #39177, #39176 e #39267 trazem navegação de histórico no editor, identificadores inequívocos de workspaces para plugins e acordar silencioso de workspaces.
+description: Os PRs #40345, #39162 e as issues #40343, #39177 trazem autocompletion inline por plugins, navegação no editor e IDs de workspaces.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,8 @@ tags:
 
 # Histórico de navegação no editor e identificação de workspaces por plugins
 
-Rastreado do PR aberto no upstream [`stablyai/orca#39162`](https://github.com/stablyai/orca/pull/39162) e das issues
+Rastreado do PR aberto no upstream [`stablyai/orca#40345`](https://github.com/stablyai/orca/pull/40345) (resolve Issue [`#40343`](https://github.com/stablyai/orca/issues/40343)),
+[`stablyai/orca#39162`](https://github.com/stablyai/orca/pull/39162) e das issues
 [`stablyai/orca#39177`](https://github.com/stablyai/orca/issues/39177),
 [`stablyai/orca#39176`](https://github.com/stablyai/orca/issues/39176) e
 [`stablyai/orca#39267`](https://github.com/stablyai/orca/issues/39267).
@@ -38,9 +39,16 @@ Rastreado do PR aberto no upstream [`stablyai/orca#39162`](https://github.com/st
    Ao clicar em um workspace que estava em repouso (*sleeping workspace*) na barra lateral apenas para consultar um arquivo
    ou verificar o histórico de commits, o runtime acordava todo o ambiente alocando imediatamente uma nova sessão PTY e
    executando o shell padrão, consumindo recursos de CPU/memória e poluindo o painel de terminais sem necessidade.
+5. **Incapacidade de plugins fornecerem sugestões de autocompletar inline (ghost text) no editor (`#40345`, resolve `#40343`):**
+   O editor embutido Monaco suportava autocompletar e snippets via hooks tradicionais de linguagem, mas não expunha ponto
+   de extensão para sugestões inline em texto cinza (*ghost text*) aceitas via `Tab` (estilo Copilot, Supermaven ou modelos locais).
+   Plugins que quisessem oferecer completude assistida por IA precisavam substituir o editor inteiro por um webview customizado.
 
 ## O que o upstream implementa
 
+- **Hook de plugin `editor.inlineCompletion` para sugestões de ghost text (`#40345`):**
+  - Introduz o hook de worker `editor.inlineCompletion` (schema since `1.4.256`), permitindo que plugins injetem o campo mutável `suggestion`;
+  - Conecta um provedor nativo no Monaco (`monaco-inline-completion-provider.ts`) com debounce de digitação de 300ms, enviando contexto delimitado do cursor (até 32 KiB de prefixo e 8 KiB de sufixo) e exibindo a resposta diretamente como texto fantasma inline aceito com `Tab`.
 - **Comandos e atalhos de histórico de navegação no editor (`#39162`):**
   - Implementa as ações globais `editor.navigateBack` e `editor.navigateForward`, mapeadas para os atalhos universais:
     - macOS: `Cmd+[` (voltar) e `Cmd+]` (avançar), além de `Ctrl+-` / `Ctrl+Shift+-`;
@@ -62,6 +70,7 @@ Rastreado do PR aberto no upstream [`stablyai/orca#39162`](https://github.com/st
 
 ## O que fazer
 
+- Adotar o hook `editor.inlineCompletion` para habilitar plugins de completude de código via IA em ghost text no Monaco (`#40345`).
 - Adotar o histórico de navegação (`editor.navigateBack` / `editor.navigateForward`) no editor do `brza-studio` (`#39162`).
 - Incorporar o uso de `workspaceId` único nas APIs de plugins de workspace (`#39177`).
 - Disponibilizar a API programática de criação de workspaces por receita (`#39176`).

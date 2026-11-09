@@ -1,9 +1,9 @@
 ---
 status: open
-phase: interview
+phase: design
 origin: request
 description: Grava a linha de turno do Grok e do Codex no log de medida, com o mesmo id no carimbo da tarefa, e sonda como medir o Antigravity.
-ready: "não — a sonda de stdin não rodou; isso trava o Desenho e o escritor"
+ready: "não — o corte dos passos e a instalação do hook do Codex, que muda o hash de confiança, esperam decisão; isso trava os Passos e o escritor"
 scope:
   - brza-workflow
 opened: 2026-11-09
@@ -15,9 +15,9 @@ tags:
 
 # PLN-018: O turno do Grok e do Codex entra no log, e a tarefa carimba o id dessa sessão
 
-- **Retomar:** R1 e R2 fechadas em 2026-11-09. Próximo: a sonda de stdin, um Stop do `grok agent stdio` e um do
-  Codex, só com as chaves do payload, e a sonda de como medir o Antigravity (CLI e chat ACP, distintos). O Desenho
-  e o escritor esperam essa sonda dizer se o caminho da sessão chega. Hora de escritor: zero até lá.
+- **Retomar:** Sonda fechada em 2026-11-09. O caminho chega no Stop do Grok e do Codex. O Desenho está escrito; o
+  corte dos passos e a instalação do hook do Codex, que muda o hash de confiança, esperam decisão. Hora de escritor
+  continua zero.
 
 ## Pedido
 
@@ -55,19 +55,20 @@ E, na volta da frase livre:
 | `Pedido`, `R1.1` | Um turno de uso do Grok grava uma linha `turn`, com o runtime e com `estimated_cost_usd` igual aos `costUsdTicks` desse turno divididos por 1e10. Sem id de sessão no payload, a linha não é gravada | a planejar | a planejar |
 | `Pedido`, `R1.1` | Um turno do Codex grava uma linha `turn` com o runtime e o delta de `usage`. A soma de `thread_token_usage` e a de `turn_token_usage` não entram. Sem chave de preço, o custo fica nulo | a planejar | a planejar |
 | `Pedido`, `R1.1` | O `brza note commit` grava em `sessions:` e no evento `task` o mesmo id de sessão do runtime que a linha `turn` usa | a planejar | a planejar |
-| `R2.1` | A sonda do Antigravity registra, para a CLI e para o chat ACP, se há token, model e custo. Este plano não ganha escritor do Antigravity | a planejar | a planejar |
-| `R1.3` | Nenhum código de hook destes runtimes entra no `brza-workflow` antes da sonda de stdin mostrar se o caminho da sessão chega no Stop | a planejar | a planejar |
+| `R2.1` | A sonda do Antigravity registra, para a CLI e para o chat ACP, se há token, model e custo. Este plano não ganha escritor do Antigravity | registrada no Terreno | conferência do Terreno |
+| `R1.3` | Nenhum código de hook destes runtimes entra no `brza-workflow` antes da sonda de stdin mostrar se o caminho da sessão chega no Stop | a sonda fechou o portão em 2026-11-09; o código espera o corte | o commit da sonda não altera o `brza-workflow` |
 
 ### Fora de escopo
 
 - **Os outros ids do catálogo de launch do Studio.** A R1.2 ofereceu os 45; a R2.1 ficou em Grok, Codex e na sonda
   do Antigravity.
-- **O escritor do Antigravity.** A sonda é deste plano. O escritor volta numa rodada se ela achar de onde ler token
-  ou custo. Até lá segue em
+- **O escritor do Antigravity.** A sonda é deste plano e está no Terreno. A CLI tem token e não tem model nem custo
+  na linha; o chat ACP não tem os três na transcrição. O escritor não entra aqui. A rodada que o traria de volta não
+  foi feita. Continua em
   [Codex e Antigravity ficam sem medida por tarefa](../../work/issues/codex-e-antigravity-sem-medida-por-tarefa.md).
 - **O backfill de sessões antigas.** A R4.1 do PLN-012 já o recusou. Este plano mede o que o hook vir a partir da entrega.
-- **Mudar o launch do Studio** (`--trust`, ambiente no `grok agent stdio`). Era a opção 3 da R1.3. Volta se a sonda
-  mostrar que o caminho da sessão não chega.
+- **Mudar o launch do Studio** (`--trust`, ambiente no `grok agent stdio`). Era a opção 3 da R1.3. A sonda viu o
+  caminho chegar sem `--trust`. Continua fora.
 - **O pacote de runtimes do PLN-004** — adaptador, papéis, `brza delegate`, `measure_runtimes.py`. Continua naquele
   plano, parado antes da R21. O P17 de lá, ainda não perguntado, aponta estas issues num parágrafo; não absorve esta entrega.
 - **Reabrir o PLN-012.** O P6.2 e o P6.3 seguem lá. Este plano estende o carimbo que o P3 já grava.
@@ -88,9 +89,9 @@ E, na volta da frase livre:
   `turnNumber = turn_started + 1` não segurou além de duas sessões. Não vira desenho.
 - **O carimbo de hoje fica.** Sem `CLAUDE_CODE_SESSION_ID` e sem o id de runtime que este plano ainda vai acrescentar,
   o worklog commitado segue byte-igual ao de hoje. Conferência: `test_brza_note`.
-- **A hora do escritor não fecha aqui.** O rascunho de 8 h para o Grok e 4 h para o Codex não compra a linha enquanto
-  a sonda não mostrar o caminho. `packages/runtimes` e a entrega de `.grok/hooks` e `.codex/hooks.json` pelo `brza sync`
-  se reconferem no Desenho, com o que estiver no disco nessa hora.
+- **A hora do escritor continua zero.** A sonda mostrou o caminho. O `brza sync` copia `core/` e não copia
+  `.grok/hooks` nem `.codex/hooks.json`. Não há `packages/runtimes`. A hora só entra com os Passos, e os Passos esperam
+  o corte.
 
 ## Entrevista
 
@@ -171,7 +172,169 @@ Respondida em 2026-11-09, na sessão `workspace`, com "opção 1".
 
    **Decidido — Grok e Codex na entrega, e uma sonda de como medir o Antigravity.**
 
+## Desenho
+
+### O que este desenho assume
+
+- **R1.1:** a primeira entrega grava o turno e o carimbo. Uma linha `turn` por turno de uso, com `runtime`. Sem id de
+  sessão, não há linha. `machine` fica null. Sem backfill.
+- **R1.2, R2.1:** Grok e Codex nesta entrega. O Antigravity fica na sonda, sem escritor.
+- **R1.3:** o código do hook só começa depois da sonda. A sonda rodou. O launch do Studio não muda.
+- **O carimbo de hoje fica** quando não há `CLAUDE_CODE_SESSION_ID` nem `GROK_SESSION_ID`. Conferência:
+  `tests/cli/test_brza_note.py:1138`.
+
+### Terreno
+
+Sonda de 2026-11-09, nesta sessão. Chaves e booleanos. Nenhum id, custo ou texto de transcrição entrou aqui. Os
+diretórios e as sessões da sonda foram criados e removidos no fim.
+
+#### O Stop do Grok
+
+- **O caminho chega sem `--trust`.** Um `grok agent stdio`, com `--always-approve` e `--reasoning-effort low`, num git
+  novo. `~/.grok/trusted_folders.toml` está vazio e o `config.toml` não tem `folder_trust`. O launch do Studio é esse
+  comando, com `env: {}`, e não passa `--trust`
+  (`brza-studio/src/main/acp/acp-launch-specs.ts:171-180`). Um prompt, `stopReason` `end_turn`, dois Stops.
+- **Os dois Stops trazem o mesmo identificador.** `session_id` e `sessionId` preenchidos e iguais; `transcript_path` e
+  `transcriptPath` preenchidos e iguais, basename `updates.jsonl`; `cwd` e `workspaceRoot` preenchidos e iguais. Há
+  alias em camelCase e em snake_case. `hook_event_name` é `Stop`.
+- **O hook de usuário carregou.** Um json novo em `~/.grok/hooks/` rodou ao lado de `orca-status.json`. O processo do
+  hook tinha `GROK_SESSION_ID`, `CLAUDE_PROJECT_DIR` e `GROK_WORKSPACE_ROOT`, e não tinha `CLAUDE_CODE_SESSION_ID`.
+- **O shell de ferramenta, que é o que o `brza note commit` vê, tem `GROK_SESSION_ID` e não tem
+  `CLAUDE_CODE_SESSION_ID`.** Esse valor é o nome de um diretório de sessão da sonda. O `sessionId` do `usage.json` é o
+  nome do diretório em 6 de 6. A igualdade do `session_id` do stdin com o ambiente, no mesmo Stop, não foi medida: um
+  líder do Grok não recarregou o hook, e `--no-leader` não disparou o hook de usuário.
+- **O custo está no turno.** `usage.json` tem `session`, `sessionId`, `turns` e `updatedAt`. O objeto `session` tem o
+  `costUsdTicks` acumulado. Cada item de `turns` tem `turnNumber`, `endedAt` e o `costUsdTicks` daquele turno. Não se
+  soma o objeto `session`.
+
+#### O Stop do Codex
+
+- **O Stop capturado é o de `codex exec`, não o do chat.** O chat do Studio sobe `app-server`
+  (`brza-studio/src/main/codex/structured/launch/codex-structured-launch-resolution.ts:126`).
+- **Um Stop traz o caminho.** Chaves: `cwd`, `hook_event_name`, `last_assistant_message`, `model`, `permission_mode`,
+  `session_id`, `stop_hook_active`, `transcript_path`, `turn_id`. Sem camelCase. `session_id`, `transcript_path` e
+  `cwd` preenchidos. O basename casa `rollout-*.jsonl`. A chave `model` existe; a sonda não registrou se o valor vinha
+  vazio.
+- **O processo do hook não tem `CODEX_SESSION_ID` nem `CODEX_THREAD_ID`.** Tinha `GROK_SESSION_ID` porque esta sessão,
+  que é Grok, lançou o Codex. É herança, não comportamento do Codex.
+- **O shell de ferramenta tem `CODEX_SESSION_ID` e `CODEX_THREAD_ID`, iguais entre si**, e diferentes do
+  `GROK_SESSION_ID` herdado. Não há medida de igualdade com o `session_id` do stdin.
+- **O comando só rodou dentro de `~/.codex/hooks.json`, com `--dangerously-bypass-hook-trust`.** Um
+  `.codex/hooks.json` novo no projeto não rodou, nem com esse flag. O `config.toml` guarda `trusted_hash` em
+  `[hooks.state."<arquivo>:stop:0:0"]`. Editar o arquivo muda o hash. A sonda devolveu o arquivo ao byte anterior.
+
+#### O carimbo e a entrega
+
+- **O carimbo lê só `CLAUDE_CODE_SESSION_ID`.** `brza-workflow/bin/brza-note:719`. Sem esse id,
+  `prepare_worklog_measure` (`:834-836`) não mexe no worklog, e `write_task_event` (`:850-854`) ainda grava o evento
+  com `session_id` null. `--until` recusa sem sessão Claude (`:727`). `session_name()` devolve None se o agente não é
+  claude (`:254-255`). A norma diz o mesmo em `core/work/README.md:229`.
+- **O `measure()` não serve a estes logs.** `turn()` (`core/.claude/hooks/measure.py:675-686`) volta sem gravar quando
+  não há `transcript_path` ou quando `api_calls` é 0. A tabela `PRICES` (`:56-67`) é de modelos Claude. A linha `turn`
+  (`:694-712`) não tem `runtime`.
+- **O sync não entrega o hook destes runtimes.** `sources_of` (`bin/brza-sync:132-136`) copia `core/` e o `core/` de
+  cada pacote, e tira `settings.hooks.json`. `merge_hooks` (`core/.claude/hooks/brza_root.py:740-751`) só troca a chave
+  `hooks` do `.claude/settings.json`. `core.packages` é `[]` (`brza_root.py:531`). Não há `.grok/hooks` nem
+  `.codex/hooks.json` no `brza-workflow`. O Stop do Claude continua em `core/.claude/settings.hooks.json:19-27`.
+
+#### O Antigravity
+
+- **CLI** (`~/.gemini/antigravity-cli`): 135 de 143 `transcript.jsonl` têm `input_tokens`, `output_tokens` e
+  `cache_read_tokens`. A linha não tem `usage`, `model`, `cost`, `price` nem `usd`. O `model` de `settings.json` é
+  configuração. O id é o nome do arquivo. `trajectory_id` não é esse nome (0 de 159).
+- **Chat ACP** do Studio: 0 de 17 `transcript.jsonl` têm chave de token, model ou custo. `acp_token.json` tem
+  `refresh_token` e `token_uri`: credencial, não uso. `trajectory_id` é o nome do arquivo em 24 de 24.
+- **Fora dessas duas superfícies.** `~/.gemini/antigravity` repete o desenho da CLI, 8 de 8 com o trio de token, sem
+  model e sem custo na linha. `~/.gemini/antigravity-ide` não tem transcrição. No blob do `.db` há JSON embutido em
+  minoria; não é coluna e não é a fonte.
+- **O hook que existe não mede.** `~/.gemini/config/hooks.json` aponta para o `antigravity-hook.sh` do Orca, não para o
+  `measure.py`.
+
+### D1 — A linha do Grok — `core/.claude/hooks/`
+
+- **Origem:** R1.1, R1.3
+- **Contexto:** o Stop traz o id e o `updates.jsonl`, e o dólar está no `usage.json`, por turno. Dois Stops não são
+  dois turnos.
+
+#### Como fica
+
+O tradutor é um script novo em `core/.claude/hooks/`, com modo próprio. Não chama `measure()`. O `brza sync` o entrega
+porque copia `core/`. Quem o dispara é um json novo em `~/.grok/hooks/`, a pasta em que a sonda viu um arquivo novo
+rodar sem `--trust`. O sync não copia esse json. O passo que o copia só nasce com o corte.
+
+No Stop, o tradutor lê o `usage.json` da sessão cujo `sessionId` é o `session_id` do payload. Grava uma linha por
+`turns[].turnNumber` que ainda não tenha linha. O segundo Stop do mesmo turno não grava outra. Não soma o objeto
+`session`.
+
+A linha leva `event` `turn`, `runtime` `grok`, o `session_id` do payload e `estimated_cost_usd` igual ao
+`costUsdTicks` daquele turno dividido por 1e10. `machine` é null. Sem `session_id`, não grava. Não há backfill.
+`current_turn` no `brza-note` continua lendo só o transcript do Claude: a `## Medida` soma as linhas já gravadas dessa
+sessão, e o turno em curso entra no Stop seguinte.
+
+O teste que falha antes de o código existir: dois turnos no `usage.json` e dois Stops do mesmo fim gravam duas linhas,
+com o custo de cada turno e não o do objeto `session`.
+
+### D2 — A linha do Codex — `core/.claude/hooks/`
+
+- **Origem:** R1.1, R1.3
+- **Contexto:** o Stop de `codex exec` traz `session_id` e `transcript_path`. O delta que a restrição já fixou é o
+  `usage` do registro. Não há chave de preço.
+
+#### Como fica
+
+O tradutor lê o rollout em `transcript_path`. Uma linha por turno de uso, com o delta `usage`. `thread_token_usage` e
+`turn_token_usage` não entram. Sem chave de preço, `estimated_cost_usd` é null. `runtime` é `codex`. `machine` é null.
+Sem `session_id`, não grava.
+
+O Stop do `app-server`, que é o launch do chat, não foi capturado. Se esse Stop não trouxer `transcript_path`, a linha
+não sai. Isso não se preenche por hipótese.
+
+**Descartada — um `.codex/hooks.json` novo no projeto.** A sonda o instalou e o Stop não o executou, nem com
+`--dangerously-bypass-hook-trust`. O flag só segue com hook já habilitado.
+
+**Descartada — entregar com `--dangerously-bypass-hook-trust`.** É flag da sonda, não da entrega.
+
+#### Em aberto
+
+1. **Editar o `~/.codex/hooks.json` do usuário e pedir a confiança do hash novo** (recomendada) — custo: um gesto de
+   confiança; até lá, o comando novo não é o que a sonda viu rodar, e um hash diferente pode deixar o hook que já está
+   no arquivo sem executar; se paga: no primeiro Stop do Codex que gravar a linha sem o flag de bypass.
+2. **Deixar o Codex sem hook nesta entrega e seguir só com o Grok** — custo: a R1.1 deixa de cobrir o Codex neste
+   corte; se paga: nunca para o Codex aqui; reabre a R1.2, que pôs os dois na mesma entrega.
+
+Não se experimenta a edição sem o bypass. A sonda devolveu o arquivo ao byte anterior para não desligar o hook que o
+usuário já confia.
+
+### D3 — O carimbo lê o id do runtime — `bin/brza-note`
+
+- **Origem:** R1.1
+- **Contexto:** hoje o `sessions:` e o `task.session_id` saem só de `CLAUDE_CODE_SESSION_ID`. No Grok essa variável
+  não está no shell de ferramenta. `GROK_SESSION_ID` está, e é o `sessionId` do `usage.json`.
+
+#### Como fica
+
+`task_context` lê `CLAUDE_CODE_SESSION_ID` e, na ausência, `GROK_SESSION_ID`. `sessions:` e `task.session_id` recebem
+esse valor. O teste de `test_brza_note.py:1138` continua verde quando nenhuma das duas está presente: o worklog
+commitado fica byte-igual ao de hoje, e o evento sai com `session_id` null.
+
+O teste do escritor afirma que o `session_id` da linha do Grok é o `GROK_SESSION_ID` do processo. A sonda não comparou
+os dois no mesmo Stop. Se o teste falhar, o lado não se escolhe no código.
+
+O carimbo do Codex não lê `CODEX_SESSION_ID`. O shell de ferramenta tem essa variável, igual a `CODEX_THREAD_ID` na
+sonda, e o processo do hook não tem nenhuma das duas. Sem a igualdade com o `session_id` do Stop, o carimbo não a usa.
+`--until` continua a exigir sessão Claude. `session_name()` continua None fora do Claude.
+
 ## Worklogs
 
 - 2026-11-09 — R1 e R2 fechadas; PLN-018 reservado. Parou na sonda de stdin, antes do Desenho.
   [PLN-018: a abertura da medida do Grok e do Codex](../../work/worklogs/2026-11-09-pln-018-a-abertura-da-medida-do-grok-e-do-codex.md)
+- 2026-11-09 — Sonda de stdin e do Antigravity; D1–D3 escritos. Parou no corte dos passos e na instalação do hook do
+  Codex.
+  [PLN-018: a sonda do stdin e o Desenho](../../work/worklogs/2026-11-09-pln-018-a-sonda-do-stdin.md)
+
+## Pendências conhecidas
+
+- [O Grok fica sem medida por tarefa](../../work/issues/o-grok-fica-sem-medida-por-tarefa.md) — a medida é este plano;
+  a issue segue aberta até a linha existir.
+- [Codex e Antigravity ficam sem medida por tarefa](../../work/issues/codex-e-antigravity-sem-medida-por-tarefa.md) —
+  o escritor do Antigravity continua nela; a sonda está no Terreno.

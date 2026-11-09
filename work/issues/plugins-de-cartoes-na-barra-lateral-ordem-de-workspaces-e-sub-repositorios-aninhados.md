@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39542, #39538, #39532, #39490, #39588, #39582 e as issues #39541, #18401 trazem indentação por host, deduplicação offline e filtros de sidebar.
+description: Os PRs #40023, #40004, #39542, #39538 trazem menus de app em popouts, estilo de sidebar e agrupamento por host.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,9 @@ tags:
 
 # Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39542`](https://github.com/stablyai/orca/pull/39542) (resolve Issue [`#39541`](https://github.com/stablyai/orca/issues/39541)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40023`](https://github.com/stablyai/orca/pull/40023),
+[`stablyai/orca#40004`](https://github.com/stablyai/orca/pull/40004),
+[`stablyai/orca#39542`](https://github.com/stablyai/orca/pull/39542) (resolve Issue [`#39541`](https://github.com/stablyai/orca/issues/39541)),
 [`stablyai/orca#39538`](https://github.com/stablyai/orca/pull/39538) (Issue [`#39537`](https://github.com/stablyai/orca/issues/39537)),
 [`stablyai/orca#39532`](https://github.com/stablyai/orca/pull/39532) (resolve Issue [`#39531`](https://github.com/stablyai/orca/issues/39531)),
 [`stablyai/orca#39490`](https://github.com/stablyai/orca/pull/39490),
@@ -137,6 +139,11 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39542`](https://github.com
 29. **Ocultação indevida de worktrees remotos por filtro local de repo-id (`#18401`):**
     - O filtro `filterRepoIds` aplicava checagens restritas ao catálogo local, ocultando todos os worktrees situados em hosts remotos pareados
       e corrompendo a reordenação por arrasto quando grupos de worktrees fixados estavam ativos.
+30. **Menus de app nos popouts da barra de trilho e configuração de estilo de barra lateral (`#40004`):**
+    - Popouts abertos a partir da barra de trilho (*rail popouts*) passam a renderizar menus nativos da aplicação;
+    - Introduz configuração de estilo visual da barra lateral (`sidebarStyle`), permitindo customizar densidade e aparência da árvore.
+31. **Agrupamento explícito por host na barra lateral (`#40023`):**
+    - Adiciona a opção "Group by: Host" nos controles da barra lateral, permitindo alternar entre agrupamento explícito por máquina e visão de lista única.
 
 ## O que fazer
 
@@ -149,3 +156,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39542`](https://github.com
 - Implementar as opções de ocultar projetos vazios (`#39080`) e o menu contextual de ações de agentes na sidebar (`#38588`).
 - Adicionar os controles de colapso e expansão em massa de projetos (`#38634`).
 - Incorporar o botão de novo item "+" nos cartões de workspace (`#38561`) e a resolução de títulos (`#38518`).
+- Adotar a configuração de estilo de barra lateral (`sidebarStyle`) e menus nativos em popouts do rail (`#40004`).
+- Integrar a opção de agrupamento explícito por host ("Group by: Host") na barra lateral (`#40023`).

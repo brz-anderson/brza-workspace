@@ -1001,3 +1001,70 @@ Respondida em 2026-11-06, na sessão `workspace`: as quatro recomendadas.
    cópia pode envelhecer; `--rules` no `grok-brza` — custo: o chat fica sem o adaptador; sem adaptador lá.
 
    **Decidido — a recomendada.**
+
+### Rodada 21 — preparada em 2026-11-09, não enviada
+
+**Por que não foi enviada:** em 2026-11-06 Anderson parou as rodadas ("sem mais rodadas por ora, apenas registre no
+plano"); em 2026-11-09 pediu o levantamento dos três repositórios e a atualização do plano. Os pontos 1, 2, 3 e 5 vêm
+do Desenho v3 (`/private/tmp/pln004/pln-004-design-v3.md`, P7, P15, P19 e P18); os outros, dos levantamentos de
+2026-11-09 (`/private/tmp/pln004/estado-2026-11-09/workflow.md`, `workspace.md` e `studio.md`), conferidos pela sessão
+no disco. Ao enviar, a rodada se divide em grupos de até quatro, com a data do envio.
+
+1. **Onde mora o texto dos três focos de revisão?** (D11; a 15.3, aberta desde 2026-11-03) Opções:
+   `core/.brzAgents/review-focus.md`, apontado pela linha do `reviewer` no `core/AGENTS.md:139` (recomendada) — custo:
+   ~30 linhas, uma no núcleo e uma no ouro; se paga: na próxima revisão de entrega; `core/.claude/review-focus.md` —
+   custo: o mesmo, fora da pasta neutra; uma skill `review-focus` — custo: ~35 linhas e a skill em toda sessão.
+2. **O que a norma comum diz do `.brzAgents/`?** (D4) Opções: só onde mora — a lista da `master`, o glossário, o
+   vocabulário do `CLAUDE.md` e a tabela da `agent-instructions-writer`, ~7 linhas (recomendada); as ~45 linhas que
+   citam `.claude/skills/…` e `.claude/agents/…` — se paga: nunca para funcionar; nenhuma linha — se paga: nunca.
+3. **O scratch do Grok.** (D3) Opções: `$TMPDIR/grok-scratch/<id da sessão>`, no molde da R8.2 (recomendada) — custo:
+   uma linha, e o id pode não aparecer ao modelo; `$TMPDIR/grok-scratch/<workstream>-<data e hora>` — custo: duas
+   sessões no mesmo minuto dividem a pasta.
+4. **O que o PLN-013 já entregou, e as issues de medida do `tools-kit`.** (Cobertura, D9, D13) O `brza sessions` já
+   abre o Codex e o `agy` (`f0f1171`, `c91847c`), e o `brza sessions usage` já lê o rollout do Codex
+   (`brza-sessions:792`). As duas issues de medida por tarefa seguem abertas, e a medida por tarefa liga a sessão pelo
+   `CLAUDE_CODE_SESSION_ID` (`bin/brza-note:719`), que outro runtime não tem. Opções: a Cobertura marca as linhas como
+   entregues pelo PLN-013 e fica com o override e o Grok; o `measure_runtimes.py` reaproveita o leitor do rollout; e
+   cada issue ganha, no pedido do D13, um parágrafo com o que o D9 cobre e segue aberta pelo carimbo (recomendada) —
+   custo: ~1 h de edição; manter como está — custo: o `reviewer` acha linha duplicada; fundir as issues no PLN-004 —
+   custo: pedido ao `tools-kit`, e o D9 não fecha o carimbo.
+5. **O `agy` no `brza sessions`, sem `--surface`.** (D12; o P18 do v3 envelheceu) O `brza sessions` abre pelo
+   `orchestration worker-start --agent`, só no chat (`brza-sessions:926`), e o chat do Antigravity ignora o override e
+   não mede (`acp-launch-specs.ts:296`). Opções: documentar sem flag — o `agy` abre como o app decide, e a norma diz que
+   ali o override não vale (recomendada) — custo: ~1 h no D12; abrir o `agy` por `--terminal <handle>` — custo: ~3 h e
+   a aba criada à mão; tirar o `agy` do D12, deixando-o só no `brza delegate` — custo: o `agy` sem aba nomeada.
+6. **A conferência do override no `brza sessions`.** (D12, R17.4) O `chat_blocker(checkout)` não recebe o agente e
+   devolve `None` dentro do workspace (`brza-sessions:168-172`). Opções: `chat_blocker(checkout, agent)`, mantendo o
+   `None` dentro do workspace (recomendada) — custo: ~1 h e o teste que só simula a chave `claude`
+   (`test_brza_sessions.py:66-68`); conferir também dentro do workspace — custo: muda o contrato do Claude, ~2 h; não
+   conferir fora do Claude — custo: o chat do Grok sem o `grok-brza` sobe sem a confiança e sem as `GIT_*`.
+7. **O filho do Grok e o `measure_runtimes` no resumo de hoje.** (D9, D10) Depois do PLN-012, o resumo tem três
+   caminhos que somam `subagent` (`aggregate`, `aggregate_by_workstream`, `task_measure`), o custo se chama
+   `estimated_cost_usd`, e não há `in_parent`. Opções: um helper `counts_in_total(row)` nos três caminhos, e o
+   `measure_runtimes.py` grava `estimated_cost_usd` (recomendada) — custo: ~80 linhas em vez de ~40, e 3 testes; só a
+   tabela "Por runtime" ignora `in_parent` — custo: o US$ do Grok duplicado no `--by-workstream` e no `--by-task`;
+   gravar o filho como evento próprio — custo: um evento novo, que o `fact_audit` também lê.
+8. **A ordem do `D4` e do `D15` com o `playground`.** A skill `meeting-runner` é um diretório real em
+   `workstream/playground:.claude/skills/`, fora do lock, e a transição para link a recusaria; e a issue das memórias
+   que sobem à norma edita as mesmas linhas do `core/AGENTS.md`. Opções: o `D4` e o `D15` executam depois de a skill
+   sair de `.claude/skills/` do `playground` e depois da issue das memórias, como pré-requisitos do plano (recomendada)
+   — custo: o `D4` espera duas frentes de fora; o `D15` move a skill local sozinho — custo: o sync passa a mexer em
+   arquivo fora do lock; um commit só com a issue e o `D4` — custo: duas frentes num commit.
+9. **A memória e a confiança do Grok nos workers do MCP e nas personas.** O `dispatch` (PLN-013) e as personas
+   (PLN-017) abrem o Grok pelo `worker-start --agent grok`, no chat, e não se mediu se esse caminho passa pelo
+   `agentCmdOverrides.grok`, o `grok-brza` com `GROK_FOLDER_TRUST=0` e `GROK_MEMORY=0`. Opções: medir antes, com um
+   `worker-start --agent grok` e o override ligado, olhando o ambiente (recomendada) — custo: um turno e uma aba; se
+   paga: antes do D5; declarar que o worker não passa pelo wrapper — custo: a memória do Grok ligada nesses workers;
+   passar as duas variáveis pelo `dispatch` — custo: o MCP passa a conhecer o pacote `runtimes`.
+
+**A conferir e corrigir na gravação do Desenho, sem rodada** (não decidem nada; alinham o texto ao disco e à norma):
+- o v3 escreve o nome do outro workspace 12 vezes e cita o slug antigo de uma nota de lá, contra a
+  `.claude/rules/workspace.md`; sai na gravação;
+- as linhas que o v3 cita e que mudaram depois de `brza-workflow@d1fa1d7` (`measure.py`, `brza-sessions`,
+  `test_brza_scripts.py`) e de `brza-studio@cb573ba`, listadas nos agregados;
+- o `D8` cita o `~/.grok/hooks/orca-status.json`, o hook global do app, que só age em painel de terminal
+  (`grok-hook-script.ts:19-26`) e se mescla ao de projeto, para o teste da R18.4 não o confundir;
+- o pedido do `D14` leva os três caminhos da issue do `studio` que mudaram;
+- antes do `D5`, conferir que as sondas de cota e catálogo do app (`-s read-only -a never app-server`) passam pelo
+  `codex-brza` sem quebrar;
+- o `D11` cita que os modelos do `brza delegate` divergem dos do `policy.py:29-41` do `dispatch`, como a R20.1 aceitou.

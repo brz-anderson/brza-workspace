@@ -14,35 +14,21 @@ tags:
 
 # PLN-004: Os runtimes Codex, `agy` e Grok trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** a Entrevista vai da R1 à R20, e a R21 não foi enviada. A 12.2 saiu decidida pela medição (o Claude
-  padrão nos três focos; o `agy` e o Codex como segundo passe, por `--runtime`); a R13 e a R14 fixaram a norma do
-  pacote, o render do `.toml`, o `tomllib` e os modelos (Codex: `gpt-6-astra` em `high`, sem a medição do `high`); a
-  R15 decidiu o papel no `brza delegate` e o `--runtime` obrigatório; a R16 e a 16.5 puseram `agents` e `skills` em
-  `.brzAgents/`, com `.claude/agents` e `.claude/skills` como links, o D15 emendado, e a memória dos subagentes real
-  em `.claude/agent-memory/`, com `.brzAgents/memory` como link para ela. A R18 (2026-11-06) trouxe o Grok ao plano,
-  pelo pedido de 2026-11-03: um wrapper `grok-brza` com `GROK_FOLDER_TRUST=0`, o adaptador em
-  `.grok/rules/runtime.md`, e os hooks do núcleo saindo cedo com `GROK_HOOK_EVENT`, com um `.grok/hooks/runtime.json`
-  do pacote chamando o `measure_runtimes.py grok`. A R19 decidiu o `GROK_MEMORY=0` no wrapper, os papéis herdando o
-  modelo do pai e o Grok no D12; a 19.3, depois da medição que Anderson pediu
-  (`/private/tmp/pln004/bench/out/pontuacao-grok.md`), pôs o `brza delegate --runtime grok` em `--permission-mode plan
-  --sandbox read-only`, com `grok-4.6` em `medium`. A R17, de volta com o Grok, pôs a captura de fatos num
-  `fact_audit_runtimes.py` do pacote, a tabela "Por runtime" no resumo do núcleo, o override conferido só por não
-  estar vazio e, contra a recomendada, a sessão aplicando o `~/.zshrc` e o `brza install` depois do "pode aplicar" de
-  Anderson. O `designer` rascunhou o Desenho v3 (`/private/tmp/pln004/pln-004-design-v3.md`, 1059 linhas, com as R16 a
-  R19 aplicadas e a revisão do Codex no D11 em `high`), e a R20 respondeu os pontos do Grok nele: o `brza delegate`
-  fica ao lado do `dispatch` do MCP que o PLN-013 do `tools-kit` entregou, com papéis distintos, citando-o no D1 e no
-  D11; o papel chega ao Grok por `--agent <papel>`, com um turno de prova; o Grok comita como o Claude; e o `brza
-  tree` copia o `.grok/rules/runtime.md` para o worktree do `brza-studio`. **Parou em 2026-11-06, a pedido de Anderson
-  ("sem mais rodadas por ora"), antes da R21**, com cinco pontos do v3 por perguntar, nas opções que o arquivo dá: o
-  P7 (onde mora o texto dos três focos, a 15.3 reaberta; recomendado `core/.brzAgents/review-focus.md`), o P15 (o que
-  o núcleo diz do `.brzAgents/`; recomendado só onde mora, ~7 linhas), o P18 (o `agy` no `brza sessions`; recomendado
-  `--surface terminal`, porque o chat do Antigravity ignora o override e não mede), o P19 (o scratch do Grok;
-  recomendado `$TMPDIR/grok-scratch/<id da sessão>`) e o P17 (as duas issues de medida por tarefa do `tools-kit`;
-  recomendado um parágrafo no pedido do D13). Depois da R21: aplicar a R20 e a R21 no v3, a aprovação do Desenho na
-  mensagem, em partes, e a gravação em `PLN-004-design.md`, com o "Fora de escopo" (ainda manda o código ao
-  `tools-kit`) e a Cobertura ("um foco por runtime") corrigidos no `-plan`. O scratch em `/private/tmp/pln004/` não
-  vai ao git, e some se a máquina reiniciar. O código passa ao `brza-workflow`, com o pacote `packages/runtimes`,
-  executado pela sessão `workspace`.
+- **Retomar:** a Entrevista vai da R1 à R20; a R21 está preparada e não foi enviada. Em 2026-11-09, a pedido de
+  Anderson, três `collector`s levantaram o que já existe no `brza-studio` (`8abbde720ce`), no `brza-workflow`
+  (`db6bd28`, o CLI e o MCP) e nos seis workstreams do workspace (agregados em
+  `/private/tmp/pln004/estado-2026-11-09/`; os fatos com fonte, no worklog do dia). Nada do pacote `packages/runtimes`
+  existe ainda: os `D1` a `D6`, `D8`, `D15` e `D16` estão intactos, e o `D7` é parcial. Mas o terreno andou. O PLN-013
+  do `tools-kit` (fechado) e o PLN-017 do `playground` (em execução) mudaram o `brza sessions`: ele abre os quatro
+  agentes pelo `worker-start`, só no chat e sem `--surface`, e ganhou personas e `usage`. Com isso, o `D12` do v3 e o
+  P18 envelheceram. O PLN-012 (medida por tarefa) mudou o `measure.py` e o resumo sob o `D9` e o `D10`. A skill
+  `meeting-runner` do `playground` e a issue das memórias que sobem à norma tocam o `D4` e o `D15`. No app, as seis
+  suposições do plano valem, e o app instala um hook próprio do Grok em `~/.grok/hooks/orca-status.json`, que coexiste
+  com o do `D8`. A R21 junta os cinco pontos do v3 ainda abertos e os quatro que o levantamento abriu, com a lista do
+  que se corrige na gravação sem rodada. Depois dela: aplicar a R20 e a R21 no v3, a aprovação do Desenho na mensagem,
+  em partes, e a gravação em `PLN-004-design.md`. O código vai ao pacote `packages/runtimes` do `brza-workflow`,
+  executado pela sessão `workspace` com `implementer` (R10.2). O scratch em `/private/tmp/pln004/` não vai ao git, e
+  some se a máquina reiniciar.
 - **Dividido:** [PLN-004 — Entrevista](PLN-004-interview.md)
 
 ## Pedido
@@ -79,7 +65,7 @@ As frentes do pedido, pela R1.2, numeradas para a Cobertura:
 | Origem   | Critério de aceite                                                                                                                  | Passo | Teste (nível) |
 | :------- | :---------------------------------------------------------------------------------------------------------------------------------- | :---- | :------------ |
 | `R1.2` 1 | o `codex` e o `agy` abertos no brza-workspace, no brza-studio e nos worktrees deles leem a norma do `AGENTS.md` pelo adaptador próprio | —     | —             |
-| `R1.2` 1 | o commit feito numa sessão Codex, no worktree, sai com o noreply do `brz-anderson`, e o push vai pela chave `personal` com a aprovação de Anderson (R1.4, R5.3); o `agy` não comita (R5.1) | —     | —             |
+| `R1.2` 1 | o commit feito numa sessão Codex, no worktree, sai com a identidade do `env` do `.claude/settings.json` da `master` (hoje o Gmail do `brz-anderson`, desde 2026-11-03; era o noreply quando a R5 a mediu), e o push vai pela chave `personal` com a aprovação de Anderson (R1.4, R5.3); o `agy` não comita (R5.1) | —     | —             |
 | `R3.3`   | a medição do Codex grava o `guardian_review` numa linha própria, ligada ao pai e fora da soma dele (R5.2)                           | —     | —             |
 | `R3.1`   | a memória gravada fora do Claude leva `metadata.runtime`, e o evento `memory` o carrega (R4.1)                                      | —     | —             |
 | `R18.2`  | o `grok` aberto pelo `grok-brza` — no terminal e no chat do app, pelo `agentCmdOverrides.grok` — carrega a norma, as skills, os papéis e o `env` do projeto no brza-workspace, no brza-studio e nos worktrees | —     | —             |
@@ -89,16 +75,19 @@ As frentes do pedido, pela R1.2, numeradas para a Cobertura:
 | `R1.2` 2 | o papel rodado no Codex ou no `agy` grava na memória do workstream da sessão                                                         | —     | —             |
 | `R1.2` 3 | a sessão Codex e a `agy` geram linhas em `.measurements/measurements.jsonl`, com o `runtime` e o `workstream`                        | —     | —             |
 | `R1.2` 4 | a sessão Claude pede revisão e levantamento ao Codex e ao `agy` sem que eles gravem no repositório                                   | —     | —             |
-| `R1.2` 4 | o `brza sessions` abre uma sessão Codex ou `agy` no worktree do workstream                                                           | —     | —             |
+| `R1.2` 4 | o `brza sessions` abre uma sessão Codex ou `agy` no worktree do workstream — já entregue pelo PLN-013 (`f0f1171`, `c91847c`, pelo `worker-start`, só no chat); fica deste plano a conferência do override (R17.4) e o Grok (R19.4), e a R21 decide o resto | PLN-013 | —             |
 | `R1.2` 4 | a revisão delegada roda com um foco por runtime: simplicidade, defeito ou convenção                                                  | —     | —             |
 
 ### Fora de escopo
 
 - **O que é só do workspace de origem** — as contas de lá, o plugin de lá, a guarda —, pela R1.3. Fica no plano de chats de lá.
-- **O código do `brza`** — o `brza sessions`, o `claude-brza` —, pela R1.1. Vai como pedido ao `tools-kit`, que o
-  executa numa sessão dele.
+- ~~**O código do `brza`**, pela R1.1, como pedido ao `tools-kit`~~ → substituído pela R10.2: o código vai ao pacote
+  `packages/runtimes` do `brza-workflow`, executado pela sessão `workspace`, com `implementer`. Fica fora o que o
+  [PLN-013: O Grok, o Codex e o Antigravity abrem pelo `brza sessions` e recebem tarefas do MCP](../PLN-013-grok-codex-e-agy-no-brza-sessions-e-no-mcp/PLN-013-plan.md)
+  já entregou: o `--agent` dos quatro no `brza sessions` e o `dispatch` do MCP, ao lado do qual o `brza delegate` fica
+  (R20.1).
 - **O chat Antigravity do BrzA Studio.** É um servidor ACP gerenciado pelo app, que não é o `agy` e ignora o
-  `agentCmdOverrides` (`brza-studio/src/main/acp/acp-launch-specs.ts:261-265`); o `agy` deste plano é o do terminal e o
+  `agentCmdOverrides` (`brza-studio/src/main/acp/acp-launch-specs.ts:296`, no `8abbde720ce`); o `agy` deste plano é o do terminal e o
   do `brza sessions`.
 - **O Codex como cartão de subagente no chat do BrzA Studio.** Fica na issue do `studio`, ligada a este plano pela R1.2.
 
@@ -127,3 +116,17 @@ As rodadas R1–R19 estão em [PLN-004 — Entrevista](PLN-004-interview.md), po
   plano renomeado, a R19 e a medição da 19.3 no banco da R12.2 (o `grok-4.6` em `medium`, em `plan` com `--sandbox
   read-only`); a R17 com o Grok, o Desenho v3 pelo `designer` e a R20. Parou antes da R21, a pedido de Anderson.
   [O PLN-004: o Grok entra no plano](../../work/worklogs/2026-11-06-pln-004-o-grok-entra-no-plano.md)
+- 2026-11-09 — o levantamento dos três repositórios e dos seis workstreams, pelos `collector`s; o plano atualizado
+  (`Retomar`, Cobertura, "Fora de escopo", `## Pendências conhecidas`) e a R21 preparada, sem envio.
+  [O PLN-004: o estado dos três repositórios](../../work/worklogs/2026-11-09-pln-004-o-estado-dos-tres-repositorios.md)
+
+## Pendências conhecidas
+
+- [O Codex chamado pela sessão Claude aparece como subagente no chat do BrzA Studio](../../work/issues/codex-como-subagente-no-chat-do-claude.md)
+  — do `studio`, ligada pela R1.2 (D14); três caminhos que ela cita mudaram no `brza-studio@8abbde720ce`.
+- [O Grok fica sem medida por tarefa](../../work/issues/o-grok-fica-sem-medida-por-tarefa.md) e
+  [Codex e Antigravity ficam sem medida por tarefa](../../work/issues/codex-e-antigravity-sem-medida-por-tarefa.md) —
+  do `tools-kit`, abertas; o `D9` dá a linha da sessão, não o carimbo da tarefa (R21, ponto 4).
+- [As memórias dos workstreams que valem para todos sobem à norma, com o texto pronto por arquivo](../../work/issues/memorias-dos-workstreams-sobem-a-norma.md)
+  — do `playground`, aberta, executada pela sessão `workspace`; edita as mesmas linhas do `core/AGENTS.md` que o `D4` e
+  o `D15` (R21, ponto 8).

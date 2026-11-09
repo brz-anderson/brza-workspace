@@ -2,3 +2,4 @@
 - [Modelo por papel na reunião](meeting-model-per-role.md) — cada persona no modelo/esforço do papel, diversificado; o `brza sessions` não passa `--model`
 - [Narração da coordenação no chat](coordination-narration-in-chat.md) — quem respondeu e quem falta, posição e confiança por rodada, medição na hora; argumentação integral fica para o painel
 - [Skills pelo skill-creator](skills-via-skill-creator.md) — toda skill do playground se cria e se revisa pela skill-creator, habilitada no settings.json da branch
+- [Evals precisam de regra que o repo não tem](skill-evals-need-rules-the-repo-lacks.md) — o baseline lê os precedentes e empata; expectativa só discrimina com regra nova

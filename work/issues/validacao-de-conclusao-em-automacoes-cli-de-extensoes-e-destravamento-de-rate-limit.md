@@ -1,6 +1,6 @@
 ---
 status: open
-description: A issue #39563 e os PRs #39613, #39581, #39540, #39555 e #39530 trazem validação de objetivos em automações, comandos CLI de extensões, desobstrução de rate limit e resiliência de chat.
+description: Os PRs #40411, #39613, #39581 e as issues #40401, #39563 trazem status real de hooks na CLI, validação de automações e desobstrução de rate limit.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,8 @@ tags:
 
 # Validação de conclusão em automações, CLI de extensões e destravamento de rate limit
 
-Rastreado da issue aberta no upstream [`stablyai/orca#39563`](https://github.com/stablyai/orca/issues/39563),
+Rastreado do PR aberto no upstream [`stablyai/orca#40411`](https://github.com/stablyai/orca/pull/40411) (resolve Issue [`#40401`](https://github.com/stablyai/orca/issues/40401)),
+da issue aberta [`stablyai/orca#39563`](https://github.com/stablyai/orca/issues/39563),
 do PR [`stablyai/orca#39613`](https://github.com/stablyai/orca/pull/39613) (resolve Issue [`#39578`](https://github.com/stablyai/orca/issues/39578)),
 do PR [`stablyai/orca#39581`](https://github.com/stablyai/orca/pull/39581),
 dos PRs [`stablyai/orca#39540`](https://github.com/stablyai/orca/pull/39540),
@@ -56,9 +57,16 @@ dos PRs [`stablyai/orca#39540`](https://github.com/stablyai/orca/pull/39540),
    sequências de escape OSC 10 e OSC 11 na inicialização para ajustar seu tema. Quando a pane de terminal não possuía cores
    explícitas definidas no tema (`terminal.options.theme`), as consultas ficavam sem resposta, forçando essas ferramentas
    a assumirem um tema escuro padrão com fontes escuras sobre fundo claro, tornando os campos de texto invisíveis.
+7. **Status incorreto `appliedBy: offline` e caminho JSON inexistente em `orca agent hooks status` (`#40411`, resolve `#40401`):**
+   O comando `orca agent hooks status` sempre informava `appliedBy: offline` e apontava para `orca-data.json`, mesmo quando
+   o runtime do app estava plenamente conectado e as configurações eram gerenciadas pelo banco SQLite `profile-state.db`,
+   gerando confusão no diagnóstico de hooks.
 
 ## O que o upstream propõe e implementa
 
+- **Correção no reporte de status de hooks na CLI (`#40411`):**
+  - Verifica a conectividade real do runtime: reporta `appliedBy: runtime` quando o app estiver conectado e `offline` caso contrário;
+  - Aponta `settingsPath` para `profile-state.db` quando o estado SQLite estiver presente, preservando a referência a `orca-data.json` apenas em perfis legados.
 - **Contrato de validação e recuperação em automações autônomas (`#39563`):**
   - Desacoplamento estrito entre o ciclo de vida da sessão/turno (`end_turn`) e o sucesso do objetivo do negócio;
   - Normalização e classificação estruturada de falhas de transporte, limites de cota, sobrecarga e recusas explícitas;
@@ -100,3 +108,5 @@ dos PRs [`stablyai/orca#39540`](https://github.com/stablyai/orca/pull/39540),
    desktop trave em carregamentos de painéis de pull request e verificação de status.
 4. **Fidelidade visual no Native Chat e terminais:** miniaturas de imagens duráveis e compatibilidade plena com temas claros
    em ferramentas TUI (`cursor-agent`, OpenCode) evitam frustrações diárias de ergonomia visual.
+5. **Precisão diagnóstica em comandos de status de hooks (`#40411`):** o comando CLI passa a refletir fielmente o runtime
+   ativo e o armazenamento SQLite `profile-state.db`.

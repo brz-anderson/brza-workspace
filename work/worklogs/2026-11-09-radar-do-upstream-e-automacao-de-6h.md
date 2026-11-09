@@ -10,14 +10,17 @@ tags:
 refs:
   - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
   - issue:cofre-de-chaves-de-api-esforco-no-antigravity-e-resiliencia-de-automacoes
+  - issue:comandos-shell-no-chat-recibos-de-perguntas-e-foco-espacial-em-terminais
+  - issue:historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins
   - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
   - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
   - issue:preservar-o-dono-do-painel-do-antigravity-em-subagentes-aninhados
   - issue:scripts-de-setup-em-pastas-landing-vazia-e-remote-control-no-claude
   - issue:seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio
+  - issue:validacao-de-conclusao-em-automacoes-cli-de-extensoes-e-destravamento-de-rate-limit
 ---
 
-# Radar de issues e PRs do upstream e automação de 6h (00h, 06h e 12h BRT)
+# Radar de issues e PRs do upstream e automação de 6h (00h, 06h, 12h e 18h BRT)
 
 ## O que foi feito
 
@@ -94,4 +97,29 @@ refs:
      em ordenação manual e recent, e ordenação manual intercalada entre subgrupos e projetos dentro de grupos) e
      PR `#40323` / issue `#40322` (criação direta de grupos e subgrupos na sidebar via `NewProjectGroupButton`, menu hierárquico `Move to group`
      e drag-and-drop de reparenting transversal com cálculo geométrico de drop lines).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-09)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-09T15:00:00Z` e `2026-11-09T21:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Comandos shell no chat, recibos de perguntas e foco espacial em terminais](../issues/comandos-shell-no-chat-recibos-de-perguntas-e-foco-espacial-em-terminais.md):
+     rastreia o PR `#40432` / issue `#32165` (execução direta de comandos shell iniciados por `!` no composer do Native Chat
+     em aba de terminal dedicada do workspace, sem enviar prompts à LLM nem vazar saídas/tokens no transcript),
+     PR `#40424` (recibos expansíveis de perguntas interativas `ask_question`, exibindo todas as alternativas ofertadas com
+     marcação da resposta escolhida via disclosure inline),
+     PR `#40420` / issue `#40408` (atalho configurável `workspace.sleep` em Settings → Shortcuts para suspender workspaces
+     ativos ou cartões sob o cursor sem depender do menu de contexto),
+     PR `#40404` (foco direcional espacial entre divisões de terminal `terminal.focusPaneLeft/Right/Up/Down` via `Cmd+Option+Setas`),
+     PR `#40412` / issue `#39864` (retenção de auto-continue em Native Chat até que a conta recupere cota em janelas de 5h, semanal e mensal),
+     PR `#40405` / issue `#40402` (propagação imediata de troca de modelo em sessões estruturadas ociosas do Claude via `canSetOptionWhileIdle`) e
+     PR `#40398` / issue `#12572` (upload transparente de arquivos arrastados para sessões de chat em servidores pareados via `fs:uploadPathsToRuntimeTempFiles`).
+3. **Atualização de 2 issues existentes em `work/issues/`:**
+   - [Histórico de navegação no editor e identificação de workspaces por plugins](../issues/historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins.md):
+     adicionados o PR `#40345` / issue `#40343` (novo hook de worker `editor.inlineCompletion` permitindo que plugins forneçam
+     sugestões inline em texto fantasma cinza aceitas via `Tab` no editor Monaco).
+   - [Validação de conclusão em automações, CLI de extensões e destravamento de rate limit](../issues/validacao-de-conclusao-em-automacoes-cli-de-extensoes-e-destravamento-de-rate-limit.md):
+     adicionados o PR `#40411` / issue `#40401` (correção em `orca agent hooks status` para checar conectividade real do runtime,
+     reportar `appliedBy: runtime` e apontar o caminho SQLite `profile-state.db`).
 

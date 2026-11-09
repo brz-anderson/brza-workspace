@@ -1,19 +1,20 @@
 ---
-status: in_progress
-phase: execution
+status: done
+phase: closed
 origin: issue
 origin_ref: reuniao-multiagente-com-personas-pelo-brza-sessions
 description: Levantamento e desenho, em três frentes, do que falta para a reunião multiagente com personas rodar sem improviso em qualquer client: a skill, as primitivas do brza sessions e o painel da rodada no chat do Studio.
-ready: "P1 a P7 concluídos; próximo P8 e as correções da skill (X19, X1, X10) antes da próxima reunião"
+ready: "concluído — P1 a P8 e correções após P7; promoção e resíduos registrados em issues"
 estimate_h: 34.75
-executed_h: 8.983
-remaining_h: 11.5
+executed_h: 9.516
+remaining_h: 0
 priority: high
 scope:
   - workspace
   - brza-workflow
   - brza-studio
 opened: 2026-11-08
+completed: 2026-11-09
 owner: Anderson
 tags:
   - tooling
@@ -22,7 +23,7 @@ tags:
 
 # PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat
 
-- **Retomar:** P1 a P7 concluídos. P7 rodou a reunião de verificação "CI no chat" pela skill (Prumo Claude Opus xhigh, Trava Grok 4.7 medium, Relance Antigravity), via `worker-start` num Run único, com R1, R2 e uma R3 extra escolhida por Anderson; decisões aplicadas em três issues; 19 desvios, que **não** contam como reunião sem desvio. A reunião usou os scripts v1 da skill (`launch_persona.py`, `wait_round.py`), não os verbos v2 do `brza sessions` publicados em P4a/P4b. Próximo: as correções da skill que os desvios pedem, em [D1, os desvios do P7](PLN-017-design-skill.md) — primeiro o `worker_done` sem `--task-id` (X19), a sessão do provedor no recibo (X1) e o fato que chega tarde (X10) —, a troca para os verbos v2, e P8. Pendências menores da skill seguem no worklog de P1/P2.
+- **Retomar:** plano concluído. Skill protótipo e integração v2 publicadas em `d12ed91`/`db619ac`, 300 testes e REV-023; CLI e painel entregues, P7 executado com 19 desvios. R8 autoriza rodada extra automática pelo gatilho; R9 deixa participantes e motivo com a coordenação. Promoção ao `core/` não realizada: zero das duas reuniões sem desvio, com destino na issue de promoção. O estado do worker no CLI, fallback, limites do verificador/painel, avaliações e leitor do Grok têm destinos em Pendências conhecidas. Nenhuma reunião completa rodou pela integração v2.
 - **Dividido:** [PLN-017 — Desenho](PLN-017-design.md) · [D1, a skill](PLN-017-design-skill.md) · [D2, o `brza sessions`](PLN-017-design-cli.md) · [D3, o painel](PLN-017-design-painel.md)
 
 ## Pedido
@@ -375,17 +376,20 @@ Estimado: 1,25 h · Executado: ~0,7 h (estimativa de relógio ativo, 13:13–13:
 
 Executor: a sessão que conduz
 
-Estimado: 0,5 h · Executado: — h
+Estimado: 0,5 h · Executado: ~0,1 h (estimativa da coordenação para o registro final, sem medição)
 
-- [ ] **1. A issue de origem** ganha o destino (este plano) e fecha quando P1, P2 e P7 fecharem
-- [ ] **2. O critério de promoção ao `core/`** (duas reuniões sem desvio) registrado numa issue ao `workspace` quando a primeira reunião fechar
-- [ ] **3. O worklog** e o `Retomar`
+- [x] **1. A issue de origem** ganha o destino (este plano) e fecha quando P1, P2 e P7 fecharem
+- [x] **2. O critério de promoção ao `core/`** (duas reuniões sem desvio) registrado numa issue ao `workspace` quando a primeira reunião fechar
+- [x] **3. O worklog** e o `Retomar`
 
-**Evidência:** —
+**Evidência:** issue de origem encerrada; issue de promoção aberta ao `workspace`, com zero de duas reuniões sem desvio; REV-023, worklog e Retomar atualizados. Correções da skill em `d12ed91`/`db619ac`: 26 min de agente (~0,433 h) conforme worklog executor, contabilizados uma vez no frontmatter; soma registrada aproximada, sem incluir novamente tempos de revisores.
 
 ## Worklogs
 
-- 2026-11-09 — correções após P7 em execução; R8 escolhe rodada extra automática somente quando fato novo da própria rodada contradiz premissa de voto.
+- 2026-11-09 — correções após P7 publicadas em `d12ed91`/`db619ac`, 300 testes; R8/R9 aplicadas; revisão independente final e limites registrados.
+  [PLN-017: a skill `meeting-runner` corrige os 19 desvios da P7 e passa a usar o `brza sessions` v2](../../work/worklogs/2026-11-09-pln-017-meeting-runner-sobre-o-brza-sessions-v2.md)
+
+- 2026-11-09 — correções após P7 concluídas; R8/R9 registradas, REV-023 e P8 fechados; pendências com destino explícito.
   [PLN-017: correções após P7 e rodada de voto informado](../../work/worklogs/2026-11-09-pln-017-correcoes-apos-p7.md)
 
 - 2026-11-09 — P7: a reunião de verificação "CI no chat" pela skill, três personas em três runtimes via `worker-start`, R1, R2 e R3 extra; Anderson decidiu os quatro pontos; três issues; 19 desvios a D1, a reunião não conta como sem desvio.
@@ -410,14 +414,27 @@ Estimado: 0,5 h · Executado: — h
 
 ## Revisões
 
+- [REV-023: A revisão final da meeting-runner v2 e os limites antes da promoção](../../work/reviews/REV-023-pln-017-meeting-runner-v2-final.md) — 300 testes; A1-A4 corrigidos/documentados; resíduos não bloqueantes encaminhados à issue de promoção.
+
 - [REV-022: As primitivas do brza sessions e a exceção transitória do PLN-010](../../../tools-kit/work/reviews/REV-022-pln-017-sessions-e-transicao-rpc.md) — concluída, achados corrigidos e hipóteses falsas documentadas; P4a/P4b/P6 sem bloqueios.
 
 ## Pendências conhecidas
 
+- [A meeting-runner chega ao core depois de duas reuniões sem desvio](../../work/issues/promocao-da-meeting-runner-apos-duas-reunioes-sem-desvio.md) — ao `workspace`; zero de duas, primeira reunião v2 pendente; fallback, limites do verificador/painel e isolamento das avaliações.
+- [O brza sessions distingue o estado do worker do estado do Dispatch](../../work/issues/estado-do-worker-e-eventos-no-brza-sessions.md) — ao `tools-kit`; defeito reproduzido e contorno documentado, correção não incluída na entrega da skill.
+
 - [O custo e os tokens do Grok entram nas medições da reunião](../../work/issues/custo-e-tokens-do-grok-nas-medicoes-da-reuniao.md) — F19/F20 e F29 corrigidos; leitura de `usage.json` no CLI e na skill fica para entrega própria, sem ampliar as correções após P7.
 
-- [O `brza sessions` ganha os verbos da reunião multiagente: modelo na abertura, recibo, `wait`, `read --last`, `model`, `usage` e `close --prefix`](../../work/issues/o-brza-sessions-para-a-reuniao-multiagente.md) — de P3; P4a/P4b/P5/P6 concluídos, com evidências nos passos; a integração na reunião fica para P7.
+- [O `brza sessions` ganha os verbos da reunião multiagente: modelo na abertura, recibo, `wait`, `read --last`, `model`, `usage` e `close --prefix`](../../work/issues/o-brza-sessions-para-a-reuniao-multiagente.md) — de P3; P4a/P4b/P5/P6 concluídos, com evidências nos passos; P7 rodou com scripts v1; a primeira reunião v2 e os defeitos residuais têm destino nas issues acima.
 - [A fase do painel da reunião no BrzA Studio: argumentação por persona, abrir o chat, gate de decisão e atualização ao vivo](../../work/issues/a-fase-do-painel-da-reuniao-no-brza-studio.md) — de P3; registro para o `studio`, sem pedido de execução.
 - [Resultados de CI no chat e disparo automático de agentes em falhas de PR](../../work/issues/resultados-de-ci-no-chat-e-disparo-automatico-de-agentes-em-falhas-de-pr.md) — o tema da reunião de P7; emendada com o destino de cada PR e aberta até o merge de tag trazer o visual.
 - [O follow-up automático de CI espera o gatilho de uso, com a contenção já desenhada](../../work/issues/o-follow-up-automatico-de-ci-espera-o-gatilho-de-uso.md) — de P7, ao `tools-kit`, `low`; decisão 1A de Anderson.
 - [O CI agendado do `brza-studio` falha sem ninguém ver](../../work/issues/o-ci-agendado-do-brza-studio-falha-sem-ninguem-ver.md) — de P7, ao `studio`, `low`; decisão 4 de Anderson.
+
+## Fechamento
+
+- [x] P1 a P8 com evidências, incluindo a reunião P7 com seus desvios declarados.
+- [x] Correções pós-P7 publicadas, 300 testes e conferência independente REV-023.
+- [x] Todos os resíduos com destino em issue, sem alegar correção inexistente.
+- [x] Issue de origem encerrada; promoção ao core aguardando duas reuniões sem desvio.
+- [x] Worklogs e Retomar atualizados; estado concluído, sem promover o protótipo.

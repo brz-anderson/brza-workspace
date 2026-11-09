@@ -471,18 +471,25 @@ A primeira reunião pela skill, contra o Studio real, teve três personas (Claud
 `worker-start`. Ela rodou do gate ao encerramento, mas teve 19 desvios e **não conta** para as duas reuniões sem desvio do
 critério de promoção. A lista inteira, com a hora de cada um, está em
 [Reunião CI no chat: a coordenação da reunião de verificação do PLN-017](../../work/worklogs/2026-11-09-reuniao-ci-no-chat-coordenacao.md).
-Os que pedem mudança na skill antes da próxima reunião:
+Correções entregues em `d12ed91` e `db619ac`, com 300 testes e
+[REV-023: A revisão final da meeting-runner v2 e os limites antes da promoção](../../work/reviews/REV-023-pln-017-meeting-runner-v2-final.md).
+A matriz X1–X19 com destino e evidência está em
+[PLN-017: a skill `meeting-runner` corrige os 19 desvios da P7 e passa a usar o `brza sessions` v2](../../work/worklogs/2026-11-09-pln-017-meeting-runner-sobre-o-brza-sessions-v2.md).
+X15/X16 são comportamentos permitidos; os demais foram corrigidos ou rotulados com seu limite.
+A tabela abaixo registra o vínculo entre desvio e correção; o código publicado é a referência executável.
+Resíduos do verificador, painel, fallback e avaliações ficam na
+[A meeting-runner chega ao core depois de duas reuniões sem desvio](../../work/issues/promocao-da-meeting-runner-apos-duas-reunioes-sem-desvio.md).
 
 | X | Onde | O desvio | A correção que ele pede |
 | :-- | :-- | :-- | :-- |
-| X19 | `briefing.md`, `launch_persona.py` (molde), SKILL.md Passo 7 | o `worker_done` sem `--task-id`/`--dispatch-id` é rejeitado ("worker_done requires taskId") | o prompt de abertura leva os ids do recibo, ou o briefing manda copiar os do preâmbulo do Orca |
-| X1 | `launch_persona.py`, `tally.py` | o recibo do `worker-start` não traz a sessão do provedor; o Claude fica "sem medição" | achar o transcript pelo prompt da persona, ou esperar o `brza sessions open` da v2 |
+| X19 | `briefing.md`, `launch_persona.py` (molde), SKILL.md Passo 7 | o `worker_done` sem `--task-id`/`--dispatch-id` é rejeitado ("worker_done requires taskId") | o briefing manda usar task/dispatch do preâmbulo do Orca no worker_done; encerramento pelo CLI v2 e inspeção de settlement |
+| X1 | `launch_persona.py`, `tally.py` | o recibo do `worker-start` não traz a sessão do provedor; o Claude fica "sem medição" | `sessions_map.py` lê os ids persistidos pelo `brza sessions` v2; não depende de busca frouxa por prompt |
 | X10 | Passo 3, rodadas-tipo | o fato decisivo de uma persona chegou na última rodada; as outras votaram sem ele | R8.1, opção 2: sintetizar os fatos anteriores antes do voto; se um fato novo da própria rodada de voto contradizer a premissa de algum voto, compartilhar o fato e executar automaticamente rodada extra de voto informado. R9.1, opção 3: a coordenação escolhe participantes caso a caso e registra o motivo antes do disparo, sem composição fixa. Sem gatilho, nenhuma rodada adicional. Decisão final continua com Anderson; 3–5 min são estimativa e custo financeiro não foi medido |
 | X8 | Passo 1, `briefing.md` | o "O que existe hoje" do briefing levou um número errado (1.352 em vez de 163), e duas personas o herdaram | conferir os números do briefing por comando antes de abrir |
 | X12, X18 | `panel.py` | `decisoes[].quem` sai como "recomendam"; a rodada para parte da sala não fecha e esconde a síntese | renomear o rótulo; aceitar o subconjunto de personas na rodada |
 | X17 | `round-request.md` | o molde da rodada extra foi improvisado e o `tally.py` não leu o voto | um tipo "rodada extra" no molde |
-| X3, X9 | `narration.md`, `launch_persona.py --send` | a escalação "Worker stopped without reporting" a cada rodada e o "Re: rodada" | dizer que se ignoram; enviar com `--type status` e outro assunto |
-| X5, X6, X4, X11 | `wait_round.py`, Passo 4, briefing | "caixa vazia" com Run ligado; timeout × duração anunciada; medição chega no `Stop`; hora errada no worklog | ler o Run antes da caixa; o timeout respeita a duração anunciada; esperar o `Stop`; pedir `date` no worklog |
+| X3, X9 | `narration.md`, `launch_persona.py --send` | a escalação "Worker stopped without reporting" a cada rodada e o "Re: rodada" | distinguir pausa esperada de falha real; envio pelos verbos v2 com protocolo e assunto da rodada |
+| X5, X6, X4, X11 | `wait_round.py`, Passo 4, briefing | "caixa vazia" com Run ligado; timeout × duração anunciada; medição chega no `Stop`; hora errada no worklog | espera delegada ao CLI v2, eventos deduplicados sem perder quem está fora; prazo respeita duração; aguardar medição e obter hora por `date` |
 
 O que a reunião **verificou**: o `worker-start` em três agentes num Run único; o sinal `fim-rodada-N` por mailbox; o
 ciclo da R5 (5 h parada sem fechar, `autoReleaseAt` ~2 min depois do `worker_done` aceito); o `tally.py`; o painel por

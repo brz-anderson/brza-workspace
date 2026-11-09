@@ -4,9 +4,9 @@ phase: execution
 origin: request
 description: Liga a medição às tarefas, para que cada uma mostre o tempo corrido, o custo de API e o recurso de máquina, e o fluxo se afine por dado.
 ready: sim
-estimate_h: 16
+estimate_h: 17.25
 executed_h: 4.8
-remaining_h: 1
+remaining_h: 2.25
 scope:
   - brza-workflow
 opened: 2026-11-03
@@ -18,10 +18,9 @@ tags:
 
 # PLN-012: Cada tarefa sai com o tempo corrido, o custo e a máquina que gastou
 
-- **Retomar:** em 2026-11-09, P1–P5 concluídos e P6.1 feito: o `brza sync` levou o `.brza/core.lock` a
-  `brza-workflow@db6bd28` (core igual ao `d38e7b4`). Próximo: P6.2, num turno novo depois do marco do P6.1, com a
-  tarefa escolhida: a pasta `brza-workspace/` não rastreada e o atraso do checkout da `master`. Depois, o P6.3;
-  não fechar o plano antes dessa validação.
+- **Retomar:** em 2026-11-09, P1–P5, P6.1 e P6.2 feitos. Próximo: P6.3, a conferência da `## Medida` do worklog do
+  P6.2 contra o `--by-task` e o transcript, dentro de 5%; depois, o P7, o título `## Custo da tarefa` (R6.1) e a suíte
+  que não escreve no log real (X9). Não fechar o plano antes disso.
 - **Dividido:** [PLN-012 — Desenho](PLN-012-design.md)
 
 ## Pedido
@@ -261,6 +260,29 @@ Respondida em 2026-11-06, na sessão `tools-kit-produtividade`.
 
    **Decidido — "aceito o corte"**: P1 a P6, 16 h. É o aceite do plano.
 
+### Rodada 6 — o título da seção do worklog (enviada 2026-11-09)
+
+> **Origem:** Anderson pediu em 2026-11-09, no meio do P6.2: "precisamos de um nome que descreva melhor o intuito da
+> seção `# Medida`". O levantamento antes da rodada achou o título em `bin/brza-note:845-846`, em 3 linhas do
+> `close-task`, em 3 do `core/work/README.md`, no D3, em 9 linhas de teste e nas fixtures golden, e em 5 worklogs de
+> 2026-11-09 (4 no `playground`, 1 no `tools-kit`).
+
+Respondida em 2026-11-09, na sessão `c3083ec5` do `tools-kit`.
+
+1. **O título.** Opções:
+   - `## O que a tarefa gastou` (recomendada) — diz o intuito e cobre tempo, dinheiro e máquina; custo: ~30–45 min de
+     troca, com testes, revisão e um `brza sync`; se paga: a cada worklog lido;
+   - `## Custo da tarefa` — curto; custo: o mesmo; se paga: só se "custo" for lido como tempo e máquina, e não só como
+     os US$ que a linha também chama de custo;
+   - `## Tempo, custo e máquina` — enumera a linha; custo: o mesmo, e envelhece se outra medida entrar.
+
+   **Respondida — "Custo da tarefa"**: o título passa a `## Custo da tarefa`. O comando aceita os dois títulos ao
+   reescrever a seção, para os 5 worklogs com `## Medida` trocarem no próximo commit deles sem migração.
+2. **Quando.** Opções: P7 do PLN-012, depois da tarefa do `brza run` (recomendada); junto do conserto do `brza run`;
+   issue para depois.
+
+   **Respondida — "P7 do PLN-012, depois desta tarefa (Recomendado)"**.
+
 ## Passos
 
 > O código é do `brza-workflow`. P1 a P4 e a parte de código do P5 são de uma sessão aberta no
@@ -387,14 +409,38 @@ Estimado: 1.0 h · Executado: — h
 - [x] **1. `brza sync`** no workspace, e conferir que o `.brza/core.lock` aponta o merge do P5. — `brza sync` →
   `brza-workspace@015fe77`, `core.lock` em `brza-workflow@db6bd28`, 5 arquivos escritos e os seis workstreams
   mesclados; `git diff --quiet d38e7b4 db6bd28 -- core` → sem diferença, então o core é o do merge do P5.
-- [ ] **2. Uma tarefa real** com rodada, subagente e `brza run`, fechada pelo `close-task`: o aviso aparece, e o
-  worklog sai com `sessions:` e `## Medida`.
+- [x] **2. Uma tarefa real** com rodada, subagente e `brza run`, fechada pelo `close-task`: o aviso aparece, e o
+  worklog sai com `sessions:` e `## Medida`. — a tarefa da pasta solta na `master` e do conserto do `brza run`
+  (`brza-workflow@ffa29fe`), com três rodadas, um `collector`, três rodadas do `reviewer` e três `brza run`; o
+  `--pending` deu "2 turnos desde 19:06 (corrido 36 min, US$ 2,33 dos turnos e US$ 1,79 de 4 subagentes)" depois do
+  X9, e o worklog saiu com `sessions:` e `## Medida`:
+  [PLN-012: o P6.2, a pasta solta na master e o brza run que perdia as aspas](../../work/worklogs/2026-11-09-pln-012-p6-2-pasta-solta-e-brza-run.md).
 - [ ] **3. Conferir** — a `## Medida` e a linha do `python3 scripts/summarize_measurements.py --by-task` batem entre si,
   e com o transcript (as esperas lidas à mão), dentro de 5%.
 
 **Evidência:** o worklog da tarefa · a saída do `--by-task`
 
-**Total estimado:** 16 h (P1 3,5 + P2 4 + P3 4 + P4 1,5 + P5 2 + P6 1) contra ~12,5 h somadas
+### P7 — O título `## Custo da tarefa` e a suíte que não escreve no log real
+
+Executa o D3 reescrito (R6.1) e o conserto do X9 · executor: a sessão que conduz, no `brza-workflow`
+
+Estimado: 1.25 h · Executado: — h
+
+- [ ] **1. Teste que falha** — `tests/cli/test_brza_note.py`: o commit grava `## Custo da tarefa`, e o worklog com
+  `## Medida` sai com uma seção só, com o título novo; um teste de guarda roda o `brza note commit` com
+  `BRZA_WORKSPACE` e `CLAUDE_CODE_SESSION_ID` de mentira no ambiente e confere que nada se escreve fora do temp.
+- [ ] **2. Implementar** — `bin/brza-note` (o `re.split` aceita os dois títulos e grava o novo); o isolamento do
+  ambiente nos testes do `brza note`; a skill `close-task`, o `core/work/README.md`, as fixtures golden e o
+  `tests/notes-checker/run.py`.
+- [ ] **3. Rodar e ver passar** — `tests/cli`, `tests/hooks` e `tests/notes-checker`, com a mesma lista de falhas de
+  antes do passo (as 22 que a `master` já tinha em 2026-11-09, de `note` e `sessions`) ou menor.
+- [ ] **4. Revisão** pelo `reviewer` e **commit**; depois, `brza sync`.
+
+**Evidência:** o commit no `brza-workflow` · a lista de falhas antes e depois · o `measurements.jsonl` sem `task` novo
+depois de rodar a suíte numa sessão
+
+**Total estimado:** 17,25 h (o P7 somado em 2026-11-09, pela R6) contra os 16 h do corte; antes:
+16 h (P1 3,5 + P2 4 + P3 4 + P4 1,5 + P5 2 + P6 1) contra ~12,5 h somadas
 nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e as issues (+0,5 h).
 
 ## Regressão
@@ -444,6 +490,16 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   "Usar somente um subagente interno nesta execução". O `reviewer` independente aprovou P3 e P5.6 após duas correções
   (REV-021). O comando de teste usa `PYTHONPATH=tests/cli` para importar os módulos de teste. Não altera os contratos
   do Desenho nem a preferência durável de revisão.
+
+- **X8 — O contrato do `brza run` mudou no P6.2.** O primeiro `brza run` da tarefa, `bash -c '…'`, rodou partido:
+  o `brza-run` juntava os argumentos com espaço, "como no ssh" (contrato documentado e testado desde o D5). Anderson
+  escolheu "Consertar aqui" e depois "Trocar o contrato (Recomendado)": um argumento só segue como linha de shell, e
+  vários chegam inteiros, citados também quando começam com `=` (`brza-workflow@ffa29fe`). Afeta o D5 e o P4.
+- **X9 — A suíte de CLI do `brza-workflow`, rodada dentro de uma sessão, grava `task` no log real.** Os testes do
+  `brza note commit` herdam `BRZA_WORKSPACE` e `CLAUDE_CODE_SESSION_ID`: em 2026-11-09, três rodadas da suíte gravaram
+  56 marcos falsos desta sessão e 28 da `508e76c8`, que partiram a tarefa do P6.2. Anderson escolheu "Remover, com
+  backup (Recomendado)" e "Corrigir no P7 (Recomendado)". Saíram 84 linhas `task` (`cwd` no temp do macOS ou no
+  `brza-workflow`), com o backup em `.measurements/measurements.jsonl.bak-2026-11-09`. Afeta o P3 e cria o P7.
 
 ## Pendências conhecidas
 
@@ -499,3 +555,6 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
 - 2026-11-09 — P6.1 feito: `brza sync` → `brza-workspace@015fe77`, lock em `brza-workflow@db6bd28`; a tarefa do P6.2
   é a investigação da `master` atrasada.
   [PLN-012: o P6.1, o brza sync que instala a medida por tarefa](../../work/worklogs/2026-11-09-pln-012-p6-1-brza-sync.md)
+- 2026-11-09 — P6.2 feito: a pasta solta apagada, o `brza run` com cada argumento inteiro (`brza-workflow@ffa29fe`,
+  X8), o log limpo dos `task` de teste (X9), R6.1 respondida e o P7 aberto.
+  [PLN-012: o P6.2, a pasta solta na master e o brza run que perdia as aspas](../../work/worklogs/2026-11-09-pln-012-p6-2-pasta-solta-e-brza-run.md)

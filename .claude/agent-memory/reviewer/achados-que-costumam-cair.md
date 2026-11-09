@@ -90,6 +90,13 @@ Hipóteses que caíram na rodada final do PLN-012/P2 (2026-11-06, Opus):
 - **"O relatório padrão, o `--by-workstream` ou o `--facts` mudam com `task` e `run` no log"** (~75): a saída do CLI,
   menos o cabeçalho, sai igual nas três visões.
 
+Hipóteses que caíram na revisão do `fix/brza-run-argv` (2026-11-09):
+
+- **"O `argparse` com `nargs=REMAINDER` come o `--` de dentro do comando"** (~70): no 3.9 e no 3.15, só o primeiro
+  `--` fica no começo da lista, e o `git log -- f` chega inteiro. Sondar o parser com a lista antes de afirmar.
+- **"Algum chamador conta com o contrato antigo de juntar com espaço"** (~70): o ▶ digita o bloco no zsh da aba e o
+  despacho do `brza` passa o argv intacto; as linhas `run` da medição e os transcripts só mostram um argumento citado.
+
 **Why:** cada um teria entrado como achado importante e sido refutado pela sessão principal em um comando.
 **How to apply:** nesses três formatos, rodar o cheque antes de pôr confiança; o que cair vai como `→ falso`.
 Relacionado: [[padroes-de-erro-em-planos-extraidos]].

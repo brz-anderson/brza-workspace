@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40023, #40004, #39542, #39538 trazem menus de app em popouts, estilo de sidebar e agrupamento por host.
+description: Os PRs #40334, #40323, #40023, #40004 trazem fixação e drag-and-drop de grupos, menus de reparenting e ordenação intercalada.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,9 @@ tags:
 
 # Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40023`](https://github.com/stablyai/orca/pull/40023),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40334`](https://github.com/stablyai/orca/pull/40334) (resolve Issue [`#40333`](https://github.com/stablyai/orca/issues/40333)),
+[`stablyai/orca#40323`](https://github.com/stablyai/orca/pull/40323) (resolve Issue [`#40322`](https://github.com/stablyai/orca/issues/40322)),
+[`stablyai/orca#40023`](https://github.com/stablyai/orca/pull/40023),
 [`stablyai/orca#40004`](https://github.com/stablyai/orca/pull/40004),
 [`stablyai/orca#39542`](https://github.com/stablyai/orca/pull/39542) (resolve Issue [`#39541`](https://github.com/stablyai/orca/issues/39541)),
 [`stablyai/orca#39538`](https://github.com/stablyai/orca/pull/39538) (Issue [`#39537`](https://github.com/stablyai/orca/issues/39537)),
@@ -144,6 +146,14 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40023`](https://github.com
     - Introduz configuração de estilo visual da barra lateral (`sidebarStyle`), permitindo customizar densidade e aparência da árvore.
 31. **Agrupamento explícito por host na barra lateral (`#40023`):**
     - Adiciona a opção "Group by: Host" nos controles da barra lateral, permitindo alternar entre agrupamento explícito por máquina e visão de lista única.
+32. **Fixação persistente de projetos e grupos (`isPinned`) e ordenação intercalada (`#40334`, resolve `#40333`):**
+    - Adiciona a propriedade persistida `isPinned` em `Repo` e `ProjectGroup`, permitindo fixar projetos, grupos e subgrupos no topo do seu respectivo nível na sidebar;
+    - Mantém os itens fixados ancorados no topo tanto no modo de ordenação manual quanto por atividade recente (*Recent*);
+    - Permite intercalar livremente a ordenação manual entre subgrupos e projetos irmãos dentro de um grupo expandido, sem travar subgrupos rigidamente no topo.
+33. **Criação direta de grupos/subgrupos, menu hierárquico de reparenting e drag-and-drop transversal (`#40323`, resolve `#40322`):**
+    - Adiciona botão `NewProjectGroupButton` na barra de ferramentas da sidebar para criar grupos raiz vazios;
+    - Adiciona opção `New subgroup` e menu de reparenting hierárquico indentado `Move to group` com filtro anti-ciclo;
+    - Permite arrastar e soltar projetos e grupos entre diferentes grupos, subgrupos e nível raiz, com cálculo geométrico real de linhas indicadoras de soltura (*drop indicators*).
 
 ## O que fazer
 
@@ -158,3 +168,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40023`](https://github.com
 - Incorporar o botão de novo item "+" nos cartões de workspace (`#38561`) e a resolução de títulos (`#38518`).
 - Adotar a configuração de estilo de barra lateral (`sidebarStyle`) e menus nativos em popouts do rail (`#40004`).
 - Integrar a opção de agrupamento explícito por host ("Group by: Host") na barra lateral (`#40023`).
+- Adotar a fixação de projetos e grupos (`isPinned`) com ordenação intercalada de subgrupos e projetos (`#40334`).
+- Integrar a criação direta de grupos/subgrupos na sidebar e arrasto reparenting transversal (`#40323`).

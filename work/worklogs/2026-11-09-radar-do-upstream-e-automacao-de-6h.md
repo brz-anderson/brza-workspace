@@ -9,6 +9,7 @@ tags:
   - tooling
 refs:
   - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
+  - issue:cofre-de-chaves-de-api-esforco-no-antigravity-e-resiliencia-de-automacoes
   - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
   - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
   - issue:preservar-o-dono-do-painel-do-antigravity-em-subagentes-aninhados
@@ -16,7 +17,7 @@ refs:
   - issue:seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio
 ---
 
-# Radar de issues e PRs do upstream e automação de 6h (00h e 06h BRT)
+# Radar de issues e PRs do upstream e automação de 6h (00h, 06h e 12h BRT)
 
 ## O que foi feito
 
@@ -70,4 +71,27 @@ refs:
    - [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):
      adicionado o PR `#40214` (resolve issue `#40181`), corrigindo o algoritmo de classificação de bundled skills para ignorar
      arquivos sidecar como `agents/openai.yaml` ou scripts locais, evitando falsa classificação como `edited` e destravar auto-updates.
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-09)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-09T09:00:00Z` e `2026-11-09T15:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Cofre de chaves de API, esforço no Antigravity e resiliência de automações](../issues/cofre-de-chaves-de-api-esforco-no-antigravity-e-resiliencia-de-automacoes.md):
+     rastreia o PR `#40303` (cofre local de chaves de API com injeção per-processo em agentes locais, SSH e pareados via
+     capability `agent-session.key-env.v1`, sem persistir credenciais em disco remoto nem em perfis de shell),
+     PR `#40308` / issue `#39556` (seleção de esforço no Antigravity CLI via ID do modelo em vez de flag `--effort` conflitante,
+     prevenindo regressão silenciosa para o modelo padrão),
+     PR `#40311` / issue `#39905` (flag `--on-no-reusable-session skip` em automações coordenadas, registrando `skipped_unavailable`
+     em vez de abrir sessões concorrentes duplicadas),
+     PR `#40331` (escopamento de parking de terminais e output watchers por workspace, mantendo integridade de títulos e sino em splits secundários),
+     PR `#40298` / issue `#40165` (renomeação de servidores Orca remotos salvos nas configurações) e
+     PR `#40295` / issue `#40204` (ignorar `AppData`, staging de instaladores e arquivos `.asar` em observadores de filesystem).
+3. **Atualização de 1 issue existente em `work/issues/`:**
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados o PR `#40334` / issue `#40333` (fixação de projetos, grupos e subgrupos via `isPinned` mantendo ancoragem no topo
+     em ordenação manual e recent, e ordenação manual intercalada entre subgrupos e projetos dentro de grupos) e
+     PR `#40323` / issue `#40322` (criação direta de grupos e subgrupos na sidebar via `NewProjectGroupButton`, menu hierárquico `Move to group`
+     e drag-and-drop de reparenting transversal com cálculo geométrico de drop lines).
 

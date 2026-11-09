@@ -845,7 +845,9 @@ def render_md(estado):
             saida += f"\n{p['nome']}: {p['medicao_aviso']}."
         if p.get("medicao") == "pendente":
             saida += f"\n{p['nome']}: medição pendente: o hook grava no Stop do turno; rode de novo em ~1 min."
-    if (estado.get("rodada") or {}).get("custo_rotulo") == "total da sessão":
+    # A4: a nota só sai com algum Claude entre os participantes; o rótulo do estado (o contrato) não muda
+    tem_claude = any(p.get("runtime") == "Claude" and p.get("estado") != FORA for p in estado["personas"])
+    if (estado.get("rodada") or {}).get("custo_rotulo") == "total da sessão" and tem_claude:
         saida += "\nCusto e latência dos Claude: total da sessão (sem a janela da rodada)."
     return saida
 

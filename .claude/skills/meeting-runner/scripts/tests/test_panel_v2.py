@@ -195,5 +195,33 @@ class CartaoSemClaude(Base):
         self.assertNotIn("personas Claude na rodada", html)
 
 
+class CodexForaDaRodada(unittest.TestCase):
+    """A4 (X2): o cartão falava do Codex quando a persona Codex estava fora da rodada."""
+
+    def test_codex_fora_da_rodada_nao_aparece_no_cartao(self):
+        with open(fixture("estado-r3.json"), encoding="utf-8") as f:
+            S = json.load(f)
+        nomes = [p["nome"] for p in S["personas"] if str(p["runtime"]).lower() != "codex"]
+        for p in S["personas"]:
+            if str(p["runtime"]).lower() == "codex":
+                p["estado"] = "fora da rodada"
+        S["rodada"]["participantes"] = nomes
+        html = panel.render_html(S)
+        self.assertNotIn("Codex 0", html)
+        self.assertNotIn("M tokens", html)
+
+
+class CabecalhoSemClaude(Base):
+    """A4 no painel: o cabeçalho "Custo (total da sessão)" só cabe com algum Claude entre os participantes."""
+
+    def test_sem_claude_na_rodada_o_cabecalho_nao_fala_do_total(self):
+        S = self.collect(participantes=["Trava", "Relance"])
+        self.assertEqual(S["rodada"]["custo_rotulo"], "total da sessão")
+        self.assertNotIn("Custo (total da sessão)", panel.render_html(S))
+
+    def test_com_o_prumo_na_rodada_o_cabecalho_continua(self):
+        self.assertIn("Custo (total da sessão)", panel.render_html(self.collect()))
+
+
 if __name__ == "__main__":
     unittest.main()

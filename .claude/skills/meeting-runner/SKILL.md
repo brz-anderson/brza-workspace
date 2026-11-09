@@ -121,8 +121,8 @@ Por isso nenhuma sessão abre antes da confirmação:
   cruza a chegada com o marcador, avisa `blocked`, `failed` e pergunta real, e conta à parte o ruído previsto (X3): o host
   escala "Worker stopped without reporting" a cada fim de turno sem `worker_done`, que é o normal entre rodadas — não se
   responde nem se narra como falha. Falha real é o desfecho `failed`/`blocked` do `wait` ou o worker `failed`/`stopped`.
-- **A rodada para parte da sala** (uma rodada extra, só para quem votou sem um fato): os nomes no `--send` (`--send
-  Trava Relance --round 3`), `--personas` no `wait_round.py` e `--participantes` no `tally.py` e no `panel.py collect`;
+- **A rodada com participantes escolhidos** (a rodada extra da R8, com a lista que a coordenação escolheu pela R9: parte
+  da sala ou a sala inteira): os nomes no `--send` (`--send Trava Relance --round 3`), `--personas` no `wait_round.py` e `--participantes` no `tally.py` e no `panel.py collect`;
   os outros ficam "fora da rodada" e não seguram o fechamento nem a síntese do painel (X18).
 - Rodadas-tipo: R1 independente; R2 debate (disputas D#, ataques, concessão, placar com "Mudou?"); R3 voto e notas; a
   última, confiança final e autoavaliação; e a rodada extra de voto informado, com o molde do tipo 5 (X17: a improvisada
@@ -205,6 +205,10 @@ Por isso nenhuma sessão abre antes da confirmação:
   2. `$S/launch_persona.py $R --status --wait-settled 180` confere, no `worker-show`, que o host aceitou o `worker_done`
      (`succeeded`/`settled`, com o `taskId` e o `autoReleaseAt`). Só então a narração diz "encerrada". Quem não
      respondeu aparece com o comando que o preâmbulo dela deveria ter usado, com os ids reais, para a coordenação decidir.
+     O `--status` **sem** `--wait-settled` é consulta informativa: imprime o veredito de cada persona e sai 0 sempre que
+     leu todas (1 só quando falta Dispatch ou o `worker-show` falha), também com `falhou` ou `liberada (falhou)` na linha.
+     Quem decide pelo código de saída usa o `--wait-settled`, que sai 0 só com todas aceitas ou liberadas, 1 com falha e
+     75 no prazo; a falha nunca se lê pelo rc 0 da consulta.
   3. Persona travada: `$S/launch_persona.py $R --stop <persona>` (parada guardada: confirma `stopped` e o settlement
      antes de liberar). `stop_unknown` e `retained` **não** são fechados e **não** autorizam repetir o comando: confira
      com `--status` e relate a incerteza.

@@ -177,7 +177,7 @@ ler: "Leia antes `.sessions/<reuniao>/sintese-‹N−1›.md`, os fatos M‹…�
 declara a linha `**Fatos lidos:**`; o `tally.py` avisa quem votou sem ela. Na P7 o fato decisivo (0 PRs, medido pelo
 Prumo) nasceu na rodada do voto, e duas personas votaram sem ele (X10).
 
-## Tipo 5 — voto informado (rodada extra, para parte da sala)
+## Tipo 5 — voto informado (rodada extra, com os participantes que a coordenação escolhe)
 
 A rodada extra é **automática quando o gatilho vale** (R8 de Anderson, 2026-11-09): um fato novo, nascido na própria
 rodada de voto e conferido pela coordenação, contradiz a premissa de algum voto. A coordenação sintetiza o fato, publica a

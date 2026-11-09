@@ -281,13 +281,13 @@ def render_html(S, at=None, dark=False):
     semmed = _e(', '.join(map(str, st['semmed']))) or '—'
     total = R.get('custo_rotulo') not in (None, 'da rodada')
     rotulo_custo = 'no total da sessão (sem a janela da rodada)' if total else 'na rodada'
-    # X2: o cartão só fala do Codex quando há persona Codex
-    tem_codex = any(str(p.get('runtime') or '').strip().lower() == 'codex' for p in P)
+    # X2/A4: o cartão só fala do Codex quando há persona Codex entre os participantes da rodada
+    tem_codex = any(str(p.get('runtime') or '').strip().lower() == 'codex' for p in PP)
     codex = f' · Codex {_num(st["tok"] / 1e6, 2)} M tokens' if tem_codex else ''
     tem_claude = any(str(p.get('runtime') or '').strip().lower() == 'claude' for p in PP)
     cartao_usd = f'US$ {_num(st["usd"], 2)}' if tem_claude else '—'
     cartao_txt = f'personas Claude {rotulo_custo}{codex}' if tem_claude else f'sem persona Claude na rodada{codex}'
-    cab_custo = 'Custo (total da sessão)' if total else 'Custo'
+    cab_custo = 'Custo (total da sessão)' if total and tem_claude else 'Custo'  # A4: o total é o dos Claude
     pend = f' Medição pendente: {_e(", ".join(map(str, st["pendentes"])))} (o hook grava no Stop do turno).' if st['pendentes'] else ''
     body = f'''<header>
 <div class="eyebrow">Reunião · {_e(reu.get("tema"))}</div>

@@ -5,8 +5,8 @@ origin: request
 description: Liga a medição às tarefas, para que cada uma mostre o tempo corrido, o custo de API e o recurso de máquina, e o fluxo se afine por dado.
 ready: sim
 estimate_h: 16
-executed_h: 3.5
-remaining_h: 7
+executed_h: 4.8
+remaining_h: 1
 scope:
   - brza-workflow
 opened: 2026-11-03
@@ -18,9 +18,9 @@ tags:
 
 # PLN-012: Cada tarefa sai com o tempo corrido, o custo e a máquina que gastou
 
-- **Retomar:** em 2026-11-06, P1, P2 e P4 fecharam e estão na integração `feat/pln-012-medida-por-tarefa`, com o P5
-  (`0a6f181`, as três suítes verdes); as sessões dos passos foram fechadas e as branches deles apagadas. Próximo: o P3,
-  a pedido de Anderson, num worktree saído da integração, com o P5.6 junto; depois o merge na `master` (P5.4) e o P6.
+- **Retomar:** em 2026-11-09, P1–P5 concluídos, revisados e enviados à `master` do `brza-workflow` em `d38e7b4`.
+  Só resta o P6, excluído desta execução por Anderson: `brza sync` e uma tarefa real medida de ponta a ponta.
+  O `.brza/core.lock` do workspace permanece em `ebb4e7d`; não fechar o plano antes dessa validação.
 - **Dividido:** [PLN-012 — Desenho](PLN-012-design.md)
 
 ## Pedido
@@ -313,19 +313,22 @@ desvios no worklog (X4)
 
 Executa D1, D3 · executor: sessão do `brza-workflow`, na `feat/pln-012-medida-por-tarefa`
 
-Estimado: 4.0 h · Executado: — h
+Estimado: 4.0 h · Executado: 0.3 h
 
-- [ ] **1. Teste que falha** — `tests/cli/test_brza_note.py`: commit com `CLAUDE_CODE_SESSION_ID` → `sessions:` no
+- [x] **1. Teste que falha** — `tests/cli/test_brza_note.py`: commit com `CLAUDE_CODE_SESSION_ID` → `sessions:` no
   frontmatter, sem repetir no segundo commit, e sem `opened`; linha `task` no log da `MEASURE_DIR`, também com
   `--no-push`; sem a variável → sem carimbo, sem `## Medida` e `session_id: null`; commit recusado → sem evento;
   `--until` fora da janela recusa sem tocar o worklog; `## Medida` reescrita no segundo commit, com o turno em curso lido
   de um transcript de fixture, e com "sem o turno do commit" quando o transcript falta; o `state.json` não muda.
-- [ ] **2. Implementar** — `set_frontmatter_list`, `write_task_event`, `--until`, `measure_line` (pelo `runpy` do
+- [x] **2. Implementar** — `set_frontmatter_list`, `write_task_event`, `--until`, `measure_line` (pelo `runpy` do
   resumo e do `measure.py`).
-- [ ] **3. Rodar e ver passar** — `python3 -m unittest tests/cli/test_brza_note.py tests/cli/test_brza_note_index.py`
-- [ ] **4. Commit**
+- [x] **3. Rodar e ver passar** — `PYTHONPATH=tests/cli python3 -m unittest test_brza_note test_brza_note_index`
+- [x] **4. Commit**
 
-**Evidência:** `brza-workflow@<sha>` · `python3 -m unittest tests/cli/test_brza_note.py tests/cli/test_brza_note_index.py` → N passed
+**Evidência:** `brza-workflow@4119ec1` · note e índice → 154 testes OK; classe final `TaskCommitTest` → 22 testes OK ·
+revisão aprovada, com duas regressões corrigidas:
+[REV-021: O P3 e o ajuste do P5.6 do PLN-012](../../work/reviews/REV-021-pln-012-p3-carimbo-e-medida.md).
+O ambiente de teste inclui `PYTHONDONTWRITEBYTECODE=1`; desvio operacional e exceção de revisão no X7.
 
 **Do P1 e do P2, para o P3:** `machine_of(pid, origin, last)` é puro e devolve `(machine, marca)`, para o turno em curso
 sem gravar a marca; `measure(lines)` devolve `waits_s` e `prompt_head` no 2º dicionário. O resumo exporta
@@ -355,23 +358,24 @@ desvios do D5 no worklog (X5)
 
 Executa D6, D7 e a norma do D3 · executor: sessão do `brza-workflow` (skill e norma), e a sessão que conduz (issues)
 
-Estimado: 2.0 h · Executado: — h
+Estimado: 2.0 h · Executado: 1.0 h (0.9 h anteriores e 0.1 h nesta retomada)
 
 - [x] **1. Teste que falha** — `tests/notes-checker`: worklog com `sessions:` e `## Medida` passa sem aviso.
 - [x] **2. Escrever** — o passo "2. O que o commit vai fechar" do `close-task`; a linha `sessions` e a `## Medida` no
   `core/work/README.md`; no `CLAUDE.md` do adaptador, os eventos `task` e `run` na tabela do hook e o `--by-task` no
   resumo.
 - [x] **3. Rodar e ver passar** — `python3 tests/notes-checker/run.py`
-- [ ] **4. Commit** — no `brza-workflow`, e merge da `feat/pln-012-medida-por-tarefa` na `master` dele depois da
-  revisão. Commit feito em `feat/pln-012-p5@22805fb` e juntado na integração em `cbbe0bd`; falta o merge na `master`,
-  que espera o P1 a P4.
+- [x] **4. Commit** — código e norma em `22805fb`, com P3 e P5.6 em `4119ec1`; integração final `fdf266d` e merge
+  revisado na `master` em `d38e7b4`, com push em 2026-11-09. Árvore mesclada: 528 testes de CLI OK.
 - [x] **5. Abrir as issues** das lacunas, pela sessão que conduz, com `brza note new issue` e `brza note commit` —
   as 10 de `## Pendências conhecidas`, em 2026-11-06.
-- [ ] **6. O `--workstream` no `--pending` do `close-task`** — sem ele, a sessão cujo único turno está em curso fica
-  sem a linha das outras sessões paradas (REV-020, A4). Vai junto do P3.
+- [x] **6. O `--workstream` no `--pending` do `close-task`** — corrigido junto do P3 em `4119ec1`; 17 testes golden
+  OK, com diferença textual exata registrada. Cobre a sessão cujo único turno está em curso (REV-020, A4).
 
-**Evidência:** `brza-workflow@<sha>` · `python3 tests/notes-checker/run.py` → N passed · as issues no
-`tools-kit@<sha>` · código e norma em `brza-workflow@22805fb` (`feat/pln-012-p5`); revisão: [REV-018: A revisão do P5 do PLN-012, o close-task e a norma](../../work/reviews/REV-018-pln-012-p5-o-close-task-e-a-norma.md)
+**Evidência:** `brza-workflow@d38e7b4` · `python3 tests/notes-checker/run.py` → 113 verificações OK · issues em
+`tools-kit@c638345` · código e norma em `brza-workflow@22805fb`, complemento em `4119ec1`; revisões:
+[REV-018: A revisão do P5 do PLN-012, o close-task e a norma](../../work/reviews/REV-018-pln-012-p5-o-close-task-e-a-norma.md)
+e [REV-021: O P3 e o ajuste do P5.6 do PLN-012](../../work/reviews/REV-021-pln-012-p3-carimbo-e-medida.md).
 
 ### P6 — Uma tarefa medida de ponta a ponta
 
@@ -431,6 +435,12 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   recusa nome de workspace no que escreve, falhou 43 vezes no `test_brza_init` do conjunto. A chave vira `requester_s`,
   a coluna "quem pediu" (`brza-workflow@0a6f181`). O D2, o D3 e o D4 dizem "Anderson" no texto; o código diz "quem
   pediu". Afeta P3 e a `## Medida`.
+- **X7 — P3 num clone temporário e revisão interna nesta execução.** Para respeitar o sandbox, o P3 foi implementado
+  num clone isolado em `/private/tmp`, saído da integração, e integrado depois. A aprovação automática bloqueou a
+  chamada de revisão ao `agy` por possível envio de código privado; Anderson respondeu em 2026-11-09, nesta sessão,
+  "Usar somente um subagente interno nesta execução". O `reviewer` independente aprovou P3 e P5.6 após duas correções
+  (REV-021). O comando de teste usa `PYTHONPATH=tests/cli` para importar os módulos de teste. Não altera os contratos
+  do Desenho nem a preferência durável de revisão.
 
 ## Pendências conhecidas
 
@@ -457,6 +467,8 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   [REV-020: O P2 do PLN-012, o --by-task e o --pending, revisado pelo agy e pelo Opus](../../work/reviews/REV-020-pln-012-p2-by-task-e-pending.md)
 - 2026-11-06 — P5, o `close-task` e a norma: duas rodadas do agy e a final do reviewer, aprovado com correções aplicadas.
   [REV-018: A revisão do P5 do PLN-012, o close-task e a norma](../../work/reviews/REV-018-pln-012-p5-o-close-task-e-a-norma.md)
+- 2026-11-09 — P3 e P5.6: revisão interna autorizada por Anderson nesta execução, aprovada após duas correções.
+  [REV-021: O P3 e o ajuste do P5.6 do PLN-012](../../work/reviews/REV-021-pln-012-p3-carimbo-e-medida.md)
 
 ## Worklogs
 
@@ -478,3 +490,6 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   [O P2 do PLN-012, o --by-task e o --pending no resumo da medição](../../work/worklogs/2026-11-06-pln-012-p2-by-task-e-pending.md)
 - 2026-11-06 — P4 fechado em `feat/pln-012-p4@aa752e6`, 1,1 h.
   [O P4 do PLN-012, o brza run que mede](../../work/worklogs/2026-11-06-pln-012-p4-o-brza-run-mede.md)
+- 2026-11-09 — P3, P5.6 e P5.4 concluídos, com merge e push em `brza-workflow@d38e7b4`; 528 testes de CLI OK na
+  árvore mesclada. Só o P6 permanece pendente, por pedido de Anderson.
+  [PLN-012: o P3 e a integração da medida por tarefa](../../work/worklogs/2026-11-09-pln-012-p3-e-integracao.md)

@@ -430,6 +430,7 @@ Estimado: 0,5 h · Executado: ~0,1 h (estimativa da coordenação para o registr
 - [Resultados de CI no chat e disparo automático de agentes em falhas de PR](../../work/issues/resultados-de-ci-no-chat-e-disparo-automatico-de-agentes-em-falhas-de-pr.md) — o tema da reunião de P7; emendada com o destino de cada PR e aberta até o merge de tag trazer o visual.
 - [O follow-up automático de CI espera o gatilho de uso, com a contenção já desenhada](../../work/issues/o-follow-up-automatico-de-ci-espera-o-gatilho-de-uso.md) — de P7, ao `tools-kit`, `low`; decisão 1A de Anderson.
 - [O CI agendado do `brza-studio` falha sem ninguém ver](../../work/issues/o-ci-agendado-do-brza-studio-falha-sem-ninguem-ver.md) — de P7, ao `studio`, `low`; decisão 4 de Anderson.
+- 2026-11-09, emenda: [O `tev1` local classifica nos scripts da meeting-runner, depois de calibrado com as três reuniões](../../work/issues/tev1-como-classificador-nos-scripts-da-meeting-runner.md) — proposta pedida na sessão do `tools-kit`, sem pedido de execução; primeiro passo é calibrar com os pares reais de voto × fato.
 
 ## Fechamento
 

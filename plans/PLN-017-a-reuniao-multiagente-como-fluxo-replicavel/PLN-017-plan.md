@@ -400,6 +400,8 @@ Estimado: 0,5 h · Executado: — h
 
 ## Pendências conhecidas
 
+- [O custo e os tokens do Grok entram nas medições da reunião](../../work/issues/custo-e-tokens-do-grok-nas-medicoes-da-reuniao.md) — F19/F20 e F29 corrigidos; leitura de `usage.json` no CLI e na skill fica para entrega própria, sem ampliar as correções após P7.
+
 - [O `brza sessions` ganha os verbos da reunião multiagente: modelo na abertura, recibo, `wait`, `read --last`, `model`, `usage` e `close --prefix`](../../work/issues/o-brza-sessions-para-a-reuniao-multiagente.md) — de P3; P4a/P4b/P5/P6 concluídos, com evidências nos passos; a integração na reunião fica para P7.
 - [A fase do painel da reunião no BrzA Studio: argumentação por persona, abrir o chat, gate de decisão e atualização ao vivo](../../work/issues/a-fase-do-painel-da-reuniao-no-brza-studio.md) — de P3; registro para o `studio`, sem pedido de execução.
 - [Resultados de CI no chat e disparo automático de agentes em falhas de PR](../../work/issues/resultados-de-ci-no-chat-e-disparo-automatico-de-agentes-em-falhas-de-pr.md) — o tema da reunião de P7; emendada com o destino de cada PR e aberta até o merge de tag trazer o visual.

@@ -8,7 +8,8 @@ arranque, junto do `CLAUDE.md`, porque `.claude/rules/*.md` sem `paths` entra no
 
 - **Para todos os workstreams**, no `.claude/settings.json`: o `context7`. Não há `.mcp.json`, nem servidor MCP próprio.
 - **Para um workstream só**, no `.claude/settings.local.json` do worktree dele, fora do git: o `skill-creator`, no
-  `workspace`.
+  `workspace`. **No `playground`, o `skill-creator` está no `.claude/settings.json` da branch**, versionado, por pedido
+  de Anderson em 2026-11-08: toda skill desse workstream se cria e se revisa por ele.
 
 Plugin e servidor novo entram aqui, com o escopo, no mesmo commit que os habilita.
 

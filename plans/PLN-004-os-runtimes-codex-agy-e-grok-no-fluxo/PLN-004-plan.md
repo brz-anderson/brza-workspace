@@ -14,9 +14,9 @@ tags:
 
 # PLN-004: Os runtimes Codex, `agy` e Grok trabalham no fluxo do workspace como o Claude
 
-- **Retomar:** a Entrevista vai da R1 à R20; a R21 está preparada e não foi enviada. Em 2026-11-09, a pedido de
-  Anderson, três `collector`s levantaram o que já existe no `brza-studio` (`8abbde720ce`), no `brza-workflow`
-  (`db6bd28`, o CLI e o MCP) e nos seis workstreams do workspace (agregados em
+- **Retomar:** a Entrevista vai da R1 à R20; a R21 está preparada, e só o ponto 10 foi respondido. Em 2026-11-09, a
+  pedido de Anderson, três `collector`s levantaram o que já existe no `brza-studio` (`8abbde720ce`), no
+  `brza-workflow` (`db6bd28`, o CLI e o MCP) e nos seis workstreams do workspace (agregados em
   `/private/tmp/pln004/estado-2026-11-09/`; os fatos com fonte, no worklog do dia). Nada do pacote `packages/runtimes`
   existe ainda: os `D1` a `D6`, `D8`, `D15` e `D16` estão intactos, e o `D7` é parcial. Mas o terreno andou. O PLN-013
   do `tools-kit` (fechado) e o PLN-017 do `playground` (em execução) mudaram o `brza sessions`: ele abre os quatro
@@ -29,10 +29,13 @@ tags:
   entrevista, conduzido por um chat do Grok no `tools-kit`, "Executar plano PLN-018 via BrzA CLI"; avisado da
   sobreposição em 2026-11-09), que grava a linha `turn` do Grok e do Codex, o terreno do `D9` e da R18.4, e deixa no
   PLN-004 o pacote, o `brza delegate` e o `measure_runtimes.py`; e o `playground` abriu a issue do custo do Grok no
-  `brza sessions usage`. A R21 junta os cinco pontos do v3 ainda abertos, os quatro que o levantamento abriu e o do
-  PLN-018, com a lista do que se corrige na gravação sem rodada. Depois dela: aplicar a R20 e a R21 no v3, a aprovação
-  do Desenho na mensagem, em partes, e a gravação em `PLN-004-design.md`. O código vai ao pacote `packages/runtimes`
-  do `brza-workflow`, executado pela sessão `workspace` com `implementer` (R10.2). O scratch em `/private/tmp/pln004/`
+  `brza sessions usage`. O ponto 10 da R21 já saiu, na recomendada ("siga a recomendação", 2026-11-09): o `D9` cede ao
+  PLN-018 a linha `turn` do Grok e do Codex e fica com o `agy`, o filho fora da soma, o `guardian_review` e o
+  `metadata.runtime`; o `.grok/hooks/runtime.json` da R18.4 chama o escritor do PLN-018; o `D8` e o `D9` se reescrevem
+  contra o Desenho dele. A R21 segue com os cinco pontos do v3 ainda abertos e os quatro que o levantamento abriu, com
+  a lista do que se corrige na gravação sem rodada. Depois dela: aplicar a R20 e a R21 no v3, a aprovação do Desenho
+  na mensagem, em partes, e a gravação em `PLN-004-design.md`. O código vai ao pacote `packages/runtimes` do
+  `brza-workflow`, executado pela sessão `workspace` com `implementer` (R10.2). O scratch em `/private/tmp/pln004/`
   não vai ao git, e some se a máquina reiniciar.
 - **Dividido:** [PLN-004 — Entrevista](PLN-004-interview.md)
 

@@ -89,9 +89,15 @@ a sessão anterior está em [O PLN-004: o Grok entra no plano](2026-11-06-pln-00
   - o que o hook recebe e o que o `usage.json` traz;
   - o terceiro leitor do arquivo, na issue do `playground`.
 
+- **O ponto 10 da R21, decidido na recomendada.** Anderson respondeu "siga a recomendação" ao trecho do aviso que
+  trazia o ponto. O `D9` cede ao PLN-018 a linha `turn` do Grok e do Codex, e fica com o `agy`, o filho fora da soma,
+  o `guardian_review` e o `metadata.runtime`. O `.grok/hooks/runtime.json` da R18.4 chama o escritor do PLN-018, e os
+  leitores do `usage.json` partilham uma função. A decisão está na Entrevista e no `Retomar`. Foi também ao chat do
+  PLN-018, pelo mesmo `send_to_chat`, e o recibo deu `queued`, posição 2.
+
 ## O que ficou
 
-- **A R21**, quando Anderson retomar as rodadas, e depois o v3 com a R20 e a R21, a aprovação e a gravação do Desenho. O
+- **A R21, menos o ponto 10**, quando Anderson retomar as rodadas, e depois o v3 com a R20 e a R21, a aprovação e a gravação do Desenho. O
   `Retomar` do plano diz de onde se parte.
 - **O scratch** (`/private/tmp/pln004/`, com o v3 e os agregados de hoje) não vai ao git, e some se a máquina
   reiniciar.
@@ -100,4 +106,4 @@ a sessão anterior está em [O PLN-004: o Grok entra no plano](2026-11-06-pln-00
 
 ## Medida
 
-Corrido 27 min — agente 10 min, quem pediu 16 min, pausa 0 s · US$ 11,44 (turnos 6,47, subagentes 4,97) · CPU 34,94 s do `claude` e 496,27 s dos comandos, RSS até 518 MB · 9 turnos, 1 sessão · até 19:59 de 2026-11-09, pelo `brza note commit`
+Corrido 28 min — agente 11 min, quem pediu 16 min, pausa 0 s · US$ 12,00 (turnos 7,03, subagentes 4,97) · CPU 37,06 s do `claude` e 498,61 s dos comandos, RSS até 528 MB · 10 turnos, 1 sessão · até 20:02 de 2026-11-09, pelo `brza note commit`

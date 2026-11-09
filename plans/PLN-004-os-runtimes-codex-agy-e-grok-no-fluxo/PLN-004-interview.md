@@ -1002,7 +1002,7 @@ Respondida em 2026-11-06, na sessão `workspace`: as quatro recomendadas.
 
    **Decidido — a recomendada.**
 
-### Rodada 21 — preparada em 2026-11-09, não enviada
+### Rodada 21 — preparada em 2026-11-09, não enviada; o ponto 10 respondido no mesmo dia
 
 **Por que não foi enviada:** em 2026-11-06 Anderson parou as rodadas ("sem mais rodadas por ora, apenas registre no
 plano"); em 2026-11-09 pediu o levantamento dos três repositórios e a atualização do plano. Os pontos 1, 2, 3 e 5 vêm
@@ -1069,6 +1069,13 @@ no disco. Ao enviar, a rodada se divide em grupos de até quatro, com a data do 
    se paga: agora, porque o PLN-018 anda com prioridade alta e o PLN-004 está parado; o PLN-018 adota o
    `measure_runtimes.py` do PLN-004 — custo: o PLN-018 espera um pacote sem Desenho aprovado; se paga: só se o
    PLN-004 voltar antes da sonda do PLN-018; os dois escrevem — custo: a linha `turn` em dobro; se paga: nunca.
+
+   **Decidido em 2026-11-09, na sessão `workspace` — a recomendada.** Anderson respondeu "siga a recomendação" ao
+   trecho do aviso ao PLN-018 que trazia o ponto ("A R21 do PLN-004 recomenda ceder essa linha ao PLN-018, mas isso
+   ainda não foi decidido"). O `D9` cede ao PLN-018 a linha `turn` do Grok e do Codex e fica com o `agy`, o filho fora
+   da soma, o `guardian_review` do Codex e o `metadata.runtime` da memória; o `.grok/hooks/runtime.json` da R18.4
+   chama o escritor do PLN-018; os leitores do `usage.json` partilham uma função. Os outros nove pontos seguem sem
+   envio.
 
 **A conferir e corrigir na gravação do Desenho, sem rodada** (não decidem nada; alinham o texto ao disco e à norma):
 - o v3 escreve o nome do outro workspace 12 vezes e cita o slug antigo de uma nota de lá, contra a

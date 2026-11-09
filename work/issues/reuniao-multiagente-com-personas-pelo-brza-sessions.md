@@ -1,5 +1,6 @@
 ---
-status: open
+status: done
+completed: 2026-11-09
 description: A reunião de seis personas em quatro runtimes pelo `brza sessions` funcionou, e deixou o que corrigir para virar fluxo: marcador de fim, medição fora do Claude e personas calibradas.
 scope:
   - brza-workflow
@@ -11,6 +12,10 @@ tags:
 ---
 
 # A reunião multiagente com personas pelo `brza sessions`
+
+## O destino
+
+Atendida pelo [PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat](../../plans/PLN-017-a-reuniao-multiagente-como-fluxo-replicavel/PLN-017-plan.md): skill protótipo, CLI, painel e reunião de verificação P7 executados; correções após P7 publicadas em `d12ed91`/`db619ac`, 300 testes e revisão independente. A pendência [A meeting-runner chega ao core depois de duas reuniões sem desvio](promocao-da-meeting-runner-apos-duas-reunioes-sem-desvio.md) guarda o critério ainda não cumprido e as pendências. O relato abaixo é o levantamento histórico, não o estado atual do CLI.
 
 Levantado na [Reunião Carvão em Brasa: a coordenação e a proposta de plano](../worklogs/2026-11-07-reuniao-carvao-em-brasa-coordenacao.md). A reunião de mini-rebranding testou, no `playground`, um fluxo novo: seis personas em seis
 sessões de chat (dois Claude, dois Codex, um Grok, um Antigravity), coordenadas pelo `brza sessions` e

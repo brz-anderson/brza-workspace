@@ -18,9 +18,10 @@ tags:
 
 # PLN-012: Cada tarefa sai com o tempo corrido, o custo e a máquina que gastou
 
-- **Retomar:** em 2026-11-09, P1–P5 concluídos, revisados e enviados à `master` do `brza-workflow` em `d38e7b4`.
-  Só resta o P6, excluído desta execução por Anderson: `brza sync` e uma tarefa real medida de ponta a ponta.
-  O `.brza/core.lock` do workspace permanece em `ebb4e7d`; não fechar o plano antes dessa validação.
+- **Retomar:** em 2026-11-09, P1–P5 concluídos e P6.1 feito: o `brza sync` levou o `.brza/core.lock` a
+  `brza-workflow@db6bd28` (core igual ao `d38e7b4`). Próximo: P6.2, num turno novo depois do marco do P6.1, com a
+  tarefa escolhida: a pasta `brza-workspace/` não rastreada e o atraso do checkout da `master`. Depois, o P6.3;
+  não fechar o plano antes dessa validação.
 - **Dividido:** [PLN-012 — Desenho](PLN-012-design.md)
 
 ## Pedido
@@ -383,7 +384,9 @@ Executa a conferência de D1–D6 · executor: sessão que conduz, com Anderson
 
 Estimado: 1.0 h · Executado: — h
 
-- [ ] **1. `brza sync`** no workspace, e conferir que o `.brza/core.lock` aponta o merge do P5.
+- [x] **1. `brza sync`** no workspace, e conferir que o `.brza/core.lock` aponta o merge do P5. — `brza sync` →
+  `brza-workspace@015fe77`, `core.lock` em `brza-workflow@db6bd28`, 5 arquivos escritos e os seis workstreams
+  mesclados; `git diff --quiet d38e7b4 db6bd28 -- core` → sem diferença, então o core é o do merge do P5.
 - [ ] **2. Uma tarefa real** com rodada, subagente e `brza run`, fechada pelo `close-task`: o aviso aparece, e o
   worklog sai com `sessions:` e `## Medida`.
 - [ ] **3. Conferir** — a `## Medida` e a linha do `python3 scripts/summarize_measurements.py --by-task` batem entre si,
@@ -493,3 +496,6 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
 - 2026-11-09 — P3, P5.6 e P5.4 concluídos, com merge e push em `brza-workflow@d38e7b4`; 528 testes de CLI OK na
   árvore mesclada. Só o P6 permanece pendente, por pedido de Anderson.
   [PLN-012: o P3 e a integração da medida por tarefa](../../work/worklogs/2026-11-09-pln-012-p3-e-integracao.md)
+- 2026-11-09 — P6.1 feito: `brza sync` → `brza-workspace@015fe77`, lock em `brza-workflow@db6bd28`; a tarefa do P6.2
+  é a investigação da `master` atrasada.
+  [PLN-012: o P6.1, o brza sync que instala a medida por tarefa](../../work/worklogs/2026-11-09-pln-012-p6-1-brza-sync.md)

@@ -1,0 +1,71 @@
+{
+  "skill_name": "meeting-runner",
+  "evals": [
+    {
+      "id": 1,
+      "name": "briefing-do-gate-do-tema",
+      "prompt": "Você é a sessão de coordenação de uma reunião multiagente com personas, no repositório brza-workspace (worktree playground). Anderson acabou de responder ao gate do tema: \"Objeto: o painel de custo por turno que o chat do BrzA Studio poderia mostrar ao lado de cada resposta. Fora: o custo dos runtimes que não são Claude (Codex, Grok, Antigravity) e qualquer cobrança. Saída: uma proposta com três alternativas e a recomendada. Fim: 18h30.\" A reunião é de hoje (2026-11-08), a pasta dela é .sessions/custo-por-turno/ e o worklog de cada persona é work/worklogs/2026-11-08-reuniao-custo-por-turno-<persona>.md. Não abra nenhuma sessão agora: escreva só o briefing da reunião, em outputs/briefing.md, e diga em uma linha o que viria depois.",
+      "expected_output": "Um briefing.md com a resposta literal de Anderson no topo, objeto/fora/saída separados, seções fixas (o que existe hoje, alternativas de partida, pauta numerada, regras da sala), a regra única do marcador, a régua 0-100, a escala medido/lido/suposto e a ordem de não gravar memória do runtime; sem abrir sessão.",
+      "files": [],
+      "expectations": [
+        "O briefing.md existe em outputs/ e a resposta literal de Anderson ao gate aparece, palavra por palavra, antes da pauta (citação em bloco)",
+        "O briefing separa 'Fora do tema' e nomeia explicitamente o custo de Codex, Grok e Antigravity (e cobrança) como fora",
+        "O briefing contém a regra única do marcador: a última linha do arquivo é a linha exata <!-- fim-rodada-N -->, acrescentada no fim do worklog",
+        "O briefing contém a régua da confiança 0-100 com as faixas 90, 70 a 89, 50 a 69 e abaixo de 50, e a escala medido/lido/suposto",
+        "O briefing manda a persona escrever só no próprio worklog, citando o caminho work/worklogs/2026-11-08-reuniao-custo-por-turno-<persona>.md, e proíbe gravar memória do runtime",
+        "O briefing pede a linha **Posição:** de até 100 caracteres em cada seção de rodada",
+        "O briefing tem as seções: objetivo, o que existe hoje, alternativas de partida, pauta numerada e regras da sala",
+        "Nenhuma sessão foi aberta nem comando brza sessions foi executado; o agente diz em uma linha o que viria depois (personas, manifesto, abertura)",
+        "O briefing manda a persona avisar o fim de cada rodada com `brza orchestration send --subject \"fim-rodada-N\"` e diz que o `worker_done` do preâmbulo do Orca é só do encerramento (a coordenação manda), com os dois comandos prontos"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "sintese-da-rodada-3-da-reuniao-mcp",
+      "prompt": "Você coordena uma reunião multiagente. A rodada 3 da reunião 'MCP remoto e sessões Cloud' (2026-11-07) fechou: os seis worklogs das personas estão em work/worklogs/2026-11-07-reuniao-mcp-remoto-{muralha,regua,atalho,salto,plantao,cartografo}.md (leia a seção '### Rodada 3: a confiança no plano' de cada um). O revisor independente deu 45 à proposta v1, fora da sala. Os papéis e runtimes: Muralha (Arquiteta de Rede e Segurança, Claude Opus 5.5 high), Régua (Cético que mede, Codex gpt-6-astra xhigh), Atalho (Engenheiro Pragmático, Codex gpt-6.1-terra medium), Salto (Provocador, Grok grok-4.7-build-fast low), Plantão (Usuário cansado, Claude Haiku 5.5 low), Cartógrafo (Especialista em Runtimes, Antigravity, modelo padrão). Escreva em outputs/: sintese-3.md (a síntese da rodada) e sintese-3.json (o arquivo que alimenta o painel da rodada). Leve em conta tudo o que a coordenação deve conferir antes de escrever e registrar.",
+      "expected_output": "Uma síntese com a tabela por persona (posição, confiança, quem faltou), a sala com média, mediana, n e faixa com o Antigravity fora da conta e à parte, o revisor como a confiança do plano e a diferença sala x revisor; e o sintese-3.json com medicoes (cada uma com fonte), sintese em até 5 linhas e decisoes.",
+      "files": [
+        "work/worklogs/2026-11-07-reuniao-mcp-remoto-muralha.md",
+        "work/worklogs/2026-11-07-reuniao-mcp-remoto-regua.md",
+        "work/worklogs/2026-11-07-reuniao-mcp-remoto-atalho.md",
+        "work/worklogs/2026-11-07-reuniao-mcp-remoto-salto.md",
+        "work/worklogs/2026-11-07-reuniao-mcp-remoto-plantao.md",
+        "work/worklogs/2026-11-07-reuniao-mcp-remoto-cartografo.md"
+      ],
+      "expectations": [
+        "A tabela por persona traz as seis confianças no plano inteiro: Muralha 58, Régua 68, Atalho 55, Salto 55, Plantão 50, Cartógrafo 85",
+        "A média da sala é calculada com o Antigravity fora (57,2 sobre 5 de 6) e o Cartógrafo (85) aparece à parte; a média com as seis (61,8) pode aparecer só como comparação rotulada",
+        "A mediana, o n e a faixa da sala (50 a 68 sem o Antigravity) estão presentes",
+        "O revisor (45) é apresentado como a confiança do plano e a diferença sala menos revisor (12,2 sem o Antigravity, ou 16,8 com a média de 61,8) é registrada",
+        "A síntese nomeia as personas ao comparar posições (pelo menos quatro das seis nomeadas) em vez de só dar o agregado",
+        "A síntese confere números por comando ou diz explicitamente 'não conferi' com a razão; nenhum número aparece sem fonte (worklog, comando ou tally)",
+        "O sintese-3.json é JSON válido com as chaves medicoes, sintese (no máximo 5 itens), decisoes e sala.revisor igual a 45",
+        "Cada item de medicoes tem tipo medido, lido ou conferido e um texto que termina com a fonte ou o comando",
+        "As decisões para Anderson aparecem como proposta, sem declarar nada decidido",
+        "A tabela por persona e a média da sala citam o `tally.py` como fonte (o agente rodou o script em vez de somar à mão) e o `sintese-3.json` traz o campo `posicoes` ou a posição de cada persona"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "tally-refaz-as-tabelas-por-persona",
+      "prompt": "A reunião 'Carvão em Brasa' (2026-11-07) tem os worklogs das seis personas em work/worklogs/2026-11-07-reuniao-carvao-em-brasa-{ticao,faisca,cinza,lenha,fogareiro,fole}.md. Refaça, a partir deles, a tabela por persona: a confiança média da rodada 1 (a média do placar da rodada 1), o voto da rodada 3 (apoio, apoio com ressalva, contra, contados) e a nota média que cada persona recebeu dos colegas (tabela '#### Os colegas' da rodada 3). A coordenação original publicou notas diferentes das que você deve recalcular para alguns (Tição 8,9; Fogareiro 6,25; Fole 8,25): explique de onde vem a diferença. Grave a tabela em outputs/tabela-por-persona.md e diga qual método usou (script ou conta à mão).",
+      "expected_output": "A tabela por persona refeita por script, com R1 média (Tição 73,0, Faísca 70,4, Cinza 79,4, Lenha 86,6, Fogareiro 89,0, Fole 68,0), votos R3 (Tição 8/7/0, Faísca 2/11/2, Cinza 2/7/6, Lenha 3/11/1, Fogareiro 12/3/0, Fole 10/5/0) e notas dos colegas (Tição 8,5; Faísca 8,8; Cinza 9,1; Lenha 8,3; Fogareiro 6,6; Fole 8,4), com a divergência explicada: a coordenação excluiu a nota que a Faísca deu aos colegas (a ordem do meio muda com a exclusão).",
+      "files": [
+        "work/worklogs/2026-11-07-reuniao-carvao-em-brasa-ticao.md",
+        "work/worklogs/2026-11-07-reuniao-carvao-em-brasa-faisca.md",
+        "work/worklogs/2026-11-07-reuniao-carvao-em-brasa-cinza.md",
+        "work/worklogs/2026-11-07-reuniao-carvao-em-brasa-lenha.md",
+        "work/worklogs/2026-11-07-reuniao-carvao-em-brasa-fogareiro.md",
+        "work/worklogs/2026-11-07-reuniao-carvao-em-brasa-fole.md"
+      ],
+      "expectations": [
+        "A confiança média da R1 por persona bate com: Tição 73,0, Faísca 70,4, Cinza 79,4, Lenha 86,6, Fogareiro 89,0, Fole 68,0",
+        "O voto da R3 por persona bate com: Tição 8/7/0, Faísca 2/11/2, Cinza 2/7/6, Lenha 3/11/1, Fogareiro 12/3/0, Fole 10/5/0",
+        "A nota média dos colegas recalculada bate com: Tição 8,5, Faísca 8,8, Cinza 9,1, Lenha 8,3, Fogareiro 6,6, Fole 8,4",
+        "A divergência com a coordenação (Tição 8,9; Fogareiro 6,25; Fole 8,25) é explicada pela exclusão da nota que a Faísca deu aos colegas, reproduzida pelo tally.py com --exclude-rater Faísca; o relatório não afirma que a ordem das notas não muda (a do meio muda: Tição passa Faísca e Lenha passa Fole)",
+        "O método declarado é o script scripts/tally.py da skill (não a conta à mão) e o comando usado aparece no relatório",
+        "A tabela gravada em outputs/tabela-por-persona.md tem as seis personas e as três colunas pedidas"
+      ]
+    }
+  ]
+}

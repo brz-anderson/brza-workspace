@@ -1,0 +1,105 @@
+{
+  "_fonte": "Coletado à mão por designer em 2026-11-08 para o protótipo; cada campo traz a fonte no desenho D3-painel.md",
+  "reuniao": {
+    "id": "reuniao-mcp-remoto",
+    "tema": "MCP remoto e sessões Cloud",
+    "decisor": "Anderson",
+    "fim": "22h15"
+  },
+  "rodada": {
+    "n": 3,
+    "total_previsto": null,
+    "titulo": "a confiança no plano v1",
+    "aberta": "21:28:13",
+    "prazo": "21:40",
+    "fechada": "21:30:48",
+    "gerado": "21:32:40",
+    "tem_voto": false
+  },
+  "personas": [
+    {
+      "nome": "Muralha", "papel": "Arquiteta de Rede e Segurança", "sessao": "mcp-muralha",
+      "runtime": "Claude", "modelo": "Opus 5.5", "esforco": "high",
+      "estado": "respondeu", "respondeu_as": "21:28:55", "latencia_s": 41, "latencia_fonte": "turno",
+      "confianca": 58, "confianca_r1": 72.5,
+      "posicao": "Sem a evidência de coordenador, a mensagem remota vira turno de Anderson; só caixa de correio.",
+      "voto": null, "virada": null, "virada_antes": "R2: C → A+D (M1/M2)",
+      "custo_usd": 0.22, "tokens": null,
+      "worklog": "work/worklogs/2026-11-07-reuniao-mcp-remoto-muralha.md", "linha": 176
+    },
+    {
+      "nome": "Régua", "papel": "Cético que mede", "sessao": "mcp-regua",
+      "runtime": "Codex", "modelo": "gpt-6-astra", "esforco": "xhigh",
+      "estado": "respondeu", "respondeu_as": "21:30:48", "latencia_s": 155, "latencia_fonte": "turno",
+      "confianca": 68, "confianca_r1": 78.8,
+      "posicao": "Reenvio gera clientOperationId novo e duplica (medido); contrato com operation_id na fase 0.",
+      "voto": null, "virada": null, "virada_antes": null,
+      "custo_usd": null, "tokens": {"entrada": 661376, "cache": 654976, "saida": 6629},
+      "worklog": "work/worklogs/2026-11-07-reuniao-mcp-remoto-regua.md", "linha": 188
+    },
+    {
+      "nome": "Atalho", "papel": "Engenheiro Pragmático", "sessao": "mcp-atalho",
+      "runtime": "Codex", "modelo": "gpt-6.1-terra", "esforco": "medium",
+      "estado": "respondeu", "respondeu_as": "21:28:48", "latencia_s": 35, "latencia_fonte": "turno",
+      "confianca": 55, "confianca_r1": 77.5,
+      "posicao": "A+D deixa o brza-quota de fora; fase zero numa Cloud real antes de prometer 1–2 dias.",
+      "voto": null, "virada": null, "virada_antes": null,
+      "custo_usd": null, "tokens": {"entrada": 244547, "cache": 239488, "saida": 1698},
+      "worklog": "work/worklogs/2026-11-07-reuniao-mcp-remoto-atalho.md", "linha": 108
+    },
+    {
+      "nome": "Salto", "papel": "Provocador", "sessao": "mcp-salto",
+      "runtime": "Grok", "modelo": "grok-4.7-build-fast", "esforco": "low",
+      "estado": "respondeu", "respondeu_as": "21:28:39", "latencia_s": 26, "latencia_fonte": "coordenação",
+      "confianca": 55, "confianca_r1": 63.8,
+      "posicao": "Ordem errada: o modo G, sem porta, antes do túnel; falta o teste negativo de autoridade.",
+      "voto": null, "virada": null, "virada_antes": "R2: F → G (M2/M5)",
+      "custo_usd": null, "tokens": null,
+      "worklog": "work/worklogs/2026-11-07-reuniao-mcp-remoto-salto.md", "linha": 118
+    },
+    {
+      "nome": "Plantão", "papel": "Usuário cansado", "sessao": "mcp-plantao",
+      "runtime": "Claude", "modelo": "Haiku 5.5", "esforco": "low",
+      "estado": "respondeu", "respondeu_as": "21:28:38", "latencia_s": 24, "latencia_fonte": "turno",
+      "confianca": 50, "confianca_r1": 55,
+      "posicao": "Mac dormindo: erro em vez de silêncio ainda é reenvio à mão; medir a perda na fase 1.",
+      "voto": null, "virada": null, "virada_antes": null,
+      "custo_usd": 0.03, "tokens": null,
+      "worklog": "work/worklogs/2026-11-07-reuniao-mcp-remoto-plantao.md", "linha": 130
+    },
+    {
+      "nome": "Cartógrafo", "papel": "Especialista em Runtimes", "sessao": "mcp-cartografo",
+      "runtime": "Antigravity", "modelo": "padrão", "esforco": null,
+      "estado": "respondeu", "respondeu_as": "21:29:00", "latencia_s": 47, "latencia_fonte": "coordenação",
+      "confianca": 85, "confianca_r1": 83.8,
+      "posicao": "Network secret dispensa a rede Custom (doc); promover o modo G a fase 0.5.",
+      "voto": null, "virada": null, "virada_antes": null,
+      "custo_usd": null, "tokens": null,
+      "worklog": "work/worklogs/2026-11-07-reuniao-mcp-remoto-cartografo.md", "linha": 122
+    }
+  ],
+  "sala": {"revisor": 45, "revisor_nota": "revisor independente na v1, fora da sala"},
+  "medicoes": [
+    {"tipo": "medido", "quem": "coordenação", "texto": "Cloud na rede padrão recusa o túnel e o context7: 403 connect_rejected; a VM sobe em ~2 s (M7)."},
+    {"tipo": "medido", "quem": "coordenação", "texto": "Volta Mac → Cloud por claude --cloud: fila em 1,5 s, resposta ~2,6 s depois, sem túnel (M8)."},
+    {"tipo": "medido", "quem": "coordenação", "texto": "Túnel: 401 sem token; ping autenticado 121–129 ms (5×). Derrubado às 21h28, porta 8765 fechada."},
+    {"tipo": "medido", "quem": "Régua", "texto": "send_to_chat gera clientOperationId novo a cada chamada: o reenvio não se deduplica sozinho."},
+    {"tipo": "lido", "quem": "Muralha · conferido", "texto": "Sem orchestrationCompatibilityEvidence, o app mostra a mensagem como a da pessoa (brza_runtime.py:87-97)."},
+    {"tipo": "conferido", "quem": "coordenação", "texto": "6 de 6 marcadores fim-rodada-3 na última linha; média 61,8 recalculada das seis tabelas."}
+  ],
+  "sintese": [
+    "A sala foi de 71,9 (R1, média dos assuntos) a 61,8 no plano v1; o revisor, de fora, deu 45.",
+    "Dois furos mudam a v2: a mensagem remota vira turno de Anderson (Muralha) e o reenvio duplica (Régua, medido).",
+    "Atalho e Régua pedem uma fase 0 numa Cloud real; Salto e Cartógrafo, o modo G antes do túnel.",
+    "Cartógrafo (Antigravity) deu 85, 17 pontos acima da segunda maior; sem ele, a sala fica em 57,2.",
+    "Plantão (Haiku, US$ 0,03) é o único a levantar o Mac dormindo."
+  ],
+  "decisoes": [
+    {"pergunta": "O primeiro aceite pode ser parcial, só o correio?", "quem": ["Régua", "Atalho"], "recomendacao": "Sim, chamado de piloto parcial; o requisito completo fica aberto."},
+    {"pergunta": "A mensagem da Cloud dispara turno no Mac, ou aguarda na caixa?", "quem": ["Muralha"], "recomendacao": "Só aguarda na caixa nas fases 1 e 2."},
+    {"pergunta": "Mac dormindo: reenvio à mão na fase 1, ou a fila já?", "quem": ["Plantão"], "recomendacao": "Reenvio, com a perda medida como critério de pronto."},
+    {"pergunta": "A sessão que importa roda fora do Mac, ou basta o celular com a ferramenta no Mac?", "quem": ["Salto"], "recomendacao": "Medir o modo G antes de comprar domínio e Access."},
+    {"pergunta": "Que autonomia o modo G dá ao agente Cloud no Mac?", "quem": ["Cartógrafo"], "recomendacao": "Só branches autorizadas; tarefa autônoma no modo 2."}
+  ],
+  "custos_coordenacao": {"coordenacao_usd": 4.74, "revisor_usd": 1.02, "ate": "21:32:39"}
+}

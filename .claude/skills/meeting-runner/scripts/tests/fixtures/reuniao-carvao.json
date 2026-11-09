@@ -1,0 +1,11 @@
+{"id": "reuniao-carvao-em-brasa", "tema": "Carvão em Brasa: a paleta e o símbolo do BrzA Studio", "decisor": "Anderson", "fim": "22h00",
+ "data": "2026-11-07", "checkout": ".worktrees/playground", "dir": ".sessions/reuniao-brasa",
+ "worklog": "work/worklogs/2026-11-07-reuniao-carvao-em-brasa-{slug}.md",
+ "personas": [
+  {"nome": "Tição", "slug": "ticao", "papel": "Guardião", "sessao": "reuniao-brasa-ticao", "runtime": "claude", "modelo": "opus-5.5", "esforco": "high"},
+  {"nome": "Faísca", "slug": "faisca", "papel": "Provocadora", "sessao": "reuniao-brasa-faisca", "runtime": "grok", "modelo": "grok-4.7", "esforco": "xhigh"},
+  {"nome": "Cinza", "slug": "cinza", "papel": "Medidora", "sessao": "reuniao-brasa-cinza", "runtime": "codex", "modelo": "gpt-6.1-sol", "esforco": "medium"},
+  {"nome": "Lenha", "slug": "lenha", "papel": "Engenheira", "sessao": "reuniao-brasa-lenha", "runtime": "codex", "modelo": "gpt-6.1-sol", "esforco": "medium"},
+  {"nome": "Fogareiro", "slug": "fogareiro", "papel": "Usuário", "sessao": "reuniao-brasa-fogareiro", "runtime": "antigravity", "modelo": "-", "esforco": "-"},
+  {"nome": "Fole", "slug": "fole", "papel": "Estrategista", "sessao": "reuniao-brasa-fole", "runtime": "claude", "modelo": "opus-5.5", "esforco": "high"}
+ ]}

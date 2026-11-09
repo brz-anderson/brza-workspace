@@ -6,8 +6,8 @@ origin_ref: reuniao-multiagente-com-personas-pelo-brza-sessions
 description: Levantamento e desenho, em três frentes, do que falta para a reunião multiagente com personas rodar sem improviso em qualquer client: a skill, as primitivas do brza sessions e o painel da rodada no chat do Studio.
 ready: "não — a sonda da híbrida (P4a.0) decide a via de abertura das personas; P1 e P2 seguem com a via como variável do lançador"
 estimate_h: 34.75
-executed_h: 1
-remaining_h: 33.75
+executed_h: 7
+remaining_h: 27.75
 priority: high
 scope:
   - workspace
@@ -22,7 +22,7 @@ tags:
 
 # PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat
 
-- **Retomar:** conferido em 2026-11-09: P3 feito; P1/P2 têm protótipo em `.claude/skills/meeting-runner/`, ainda sem commit. A suíte atual roda 102 testes: 94 passam, 7 falham e 1 termina com erro (mailbox em `wait_round`, Codex sem janela em `tally`, PNG em `panel`). Próximo em P1/P2: investigar essas falhas e completar as avaliações e a revisão exigidas, sem tomar a memória do revisor como aceite. P4a.0 continua a cargo do `tools-kit`, pela issue; sem evidência nova conferida nesta retomada. R5/R6 continuam vigentes em D1/D2. P7 espera P1, P2 e P4a.
+- **Retomar:** P1 e P2 feitos em 2026-11-09 (skill `meeting-runner` v1 e `panel.py`, 149 testes verdes, avaliada com e sem a skill em duas iterações e revista pelo `reviewer`). **Nada do ciclo de vida das personas foi testado contra o Studio**: o `launch_persona.py` e o `wait_round.py` seguem a R5/R6, mas só rodaram em `--dry-run` e com fakes, e o formato do JSON do `worker-start` e do `check` não foi visto. Próximo: a sonda P4a.0 (`tools-kit`), que decide a via, confirma o formato e responde três pontos que a revisão levantou: **quem cria o Run das personas** (a abertura em paralelo pode criar um por `worker-start`; se preciso, `run-create` antes), **se o `check --peek --wait` volta na hora** com a caixa nunca consumida (a coordenação chamaria o `brza` uma vez por segundo) e **se o chat do worker entra no mapa do `brza sessions`** (sem isso `send`/`list`/a medição não acham a persona; o `launch_persona.py` avisa e aceita os ids no manifesto). Depois P7, a primeira reunião pela skill. Pendências menores da skill: o custo da coordenação do painel é conta à mão (`agrega.py` fora do git), o cartão de custo ignora o `--at` e o denominador da sala conta o Antigravity. A descrição da skill não foi otimizada (depois da primeira reunião).
 - **Dividido:** [PLN-017 — Desenho](PLN-017-design.md) · [D1, a skill](PLN-017-design-skill.md) · [D2, o `brza sessions`](PLN-017-design-cli.md) · [D3, o painel](PLN-017-design-painel.md)
 
 ## Pedido
@@ -239,27 +239,27 @@ Respondida em 2026-11-08, na sessão `workflow-improvements`.
 
 Executa D1 · executor: sessão nova deste worktree (`pln-017-skill`), com o plugin `skill-creator` carregado
 
-Estimado: 10,5 h · Executado: — h
+Estimado: 10,5 h · Executado: ~4 h (estimativa de relógio ativo; sem medição)
 
-- [ ] **1. `/skill-creator`**: capturar a intenção a partir do D1 e escrever `.claude/skills/meeting-runner/SKILL.md` (abaixo de 500 linhas, descrição com o gatilho negativo "não use se você é uma persona"), as oito `references/` e os quatro `scripts/` (`launch_persona.py`, `wait_round.py`, `tally.py`, `runtime_memory_check.py`)
-- [ ] **2. Os casos de teste** em `evals/evals.json`: o briefing a partir do gate do tema; a síntese da rodada 3 da reunião MCP a partir dos seis worklogs de 2026-11-07; o `tally.py` refazendo as tabelas por persona do levantamento; as rodadas com e sem a skill, a nota e o visor, no scratch da sessão
-- [ ] **3. A revisão** pelo laço da `skill-creator` e pelo `reviewer`; o teste de aceite do `tally.py` contra as tabelas das coordenações (com as duas divergências conhecidas)
-- [ ] **4. `brza note commit`** da skill e do worklog da sessão
+- [x] **1. `/skill-creator`**: capturar a intenção a partir do D1 e escrever `.claude/skills/meeting-runner/SKILL.md` (abaixo de 500 linhas, descrição com o gatilho negativo "não use se você é uma persona"), as oito `references/` e os quatro `scripts/` (`launch_persona.py`, `wait_round.py`, `tally.py`, `runtime_memory_check.py`)
+- [x] **2. Os casos de teste** em `evals/evals.json`: o briefing a partir do gate do tema; a síntese da rodada 3 da reunião MCP a partir dos seis worklogs de 2026-11-07; o `tally.py` refazendo as tabelas por persona do levantamento; as rodadas com e sem a skill, a nota e o visor, no scratch da sessão
+- [x] **3. A revisão** pelo laço da `skill-creator` e pelo `reviewer`; o teste de aceite do `tally.py` contra as tabelas das coordenações (com as duas divergências conhecidas)
+- [x] **4. `brza note commit`** da skill e do worklog da sessão
 
-**Evidência:** —
+**Evidência:** `.claude/skills/meeting-runner/` (`SKILL.md` com 199 linhas, 8 `references/`, 5 scripts, `evals/evals.json` com 3 casos); `cd .claude/skills/meeting-runner && python3 -I -m unittest discover -s scripts/tests -p 'test_*.py'` → 149 testes, OK; aceite do `tally.py` contra `levantamento-processo.md` 3.1 e 3.2 (confiança R1, voto R3, nota dos colegas com as duas variantes, sala 61,8/56,5/57,2, latência e custo de Muralha, Régua e da R7 da Carvão), sem divergência numérica; avaliação com e sem a skill: iteração 1, 100% × 88,9%; iteração 2, 100% × 81,8% (+22 s e +16 mil tokens por tarefa); revisão do `reviewer`: 2 bloqueiam, 15 a corrigir e 8 de melhoria, todos corrigidos salvo M5 e M7, **sem nova revisão das correções**. Fica de fora: a abertura e o encerramento pelo ciclo de vida dos workers e o `wait_round --source mailbox`, nunca rodados contra o Studio ([worklog](../../work/worklogs/2026-11-09-pln-017-p1-p2-a-skill-meeting-runner.md)).
 
 ### P2 — O gerador do painel da rodada
 
 Executa D3 · executor: a sessão de P1
 
-Estimado: 6,5 h · Executado: — h
+Estimado: 6,5 h · Executado: ~2 h (estimativa de relógio ativo; sem medição)
 
-- [ ] **1. `scripts/panel.py`** com `collect` (mapa, `brza sessions list --json`, marcadores, blocos do molde, `measurements.jsonl`, rollouts do Codex, `sintese-N.json` → `estado-rN.json`) e `render` (JSON → HTML na forma da `orca-chat-visuals`), a partir do protótipo do scratch
-- [ ] **2. Os moldes**: a linha `**Posição:**` no pedido de rodada, o `sintese-N.json`, o ciclo de publicação (abertura, cada resposta, fechamento; nome novo por rodada) e a conferência por PNG na skill
-- [ ] **3. Testes `unittest`** com o estado da rodada 3 (fechada e às 21h29) e uma persona sem medição
-- [ ] **4. Commit** junto de P1
+- [x] **1. `scripts/panel.py`** com `collect` (mapa, `brza sessions list --json`, marcadores, blocos do molde, `measurements.jsonl`, rollouts do Codex, `sintese-N.json` → `estado-rN.json`) e `render` (JSON → HTML na forma da `orca-chat-visuals`), a partir do protótipo do scratch
+- [x] **2. Os moldes**: a linha `**Posição:**` no pedido de rodada, o `sintese-N.json`, o ciclo de publicação (abertura, cada resposta, fechamento; nome novo por rodada) e a conferência por PNG na skill
+- [x] **3. Testes `unittest`** com o estado da rodada 3 (fechada e às 21h29) e uma persona sem medição
+- [x] **4. Commit** junto de P1
 
-**Evidência:** —
+**Evidência:** `scripts/panel.py` (`collect`, `render --publish-dir`, `--png`) e os testes de `panel`, com a R3 da reunião MCP fechada e às 21:29:30, persona sem medição, `sem cota`, `erro`, voto e a integração com o `tally.py` sobre os worklogs reais; o PNG a 736 px conferido nas duas situações depois das correções da revisão, com os defeitos cosméticos registrados no worklog (cartão de custo ignora o `--at`; denominador da sala). A média da sala exclui o Antigravity (57,2 em 5 de 6, "Antigravity à parte: 85"), pela E-1 do D1.
 
 ### P3 — As duas issues
 
@@ -344,6 +344,9 @@ Estimado: 0,5 h · Executado: — h
 **Evidência:** —
 
 ## Worklogs
+
+- 2026-11-09 — P1 e P2: a skill `meeting-runner` v1, o `panel.py`, 149 testes, a avaliação com e sem a skill (100% × 81,8%), a revisão (25 achados, corrigidos salvo 2) e a R5/R6 aplicada nos scripts, só em `--dry-run`. Nada testado contra o Studio.
+  [PLN-017 P1 e P2: a skill `meeting-runner` e o gerador do painel](../../work/worklogs/2026-11-09-pln-017-p1-p2-a-skill-meeting-runner.md)
 
 - 2026-11-09 — retomada: protótipo de P1/P2 sem commit; 102 testes, 7 falhas e 1 erro; checador de notas sem erros nem avisos. Nenhum passo fechado.
   [PLN-017: retomada e conferência do protótipo da skill](../../work/worklogs/2026-11-09-pln-017-retomada.md)

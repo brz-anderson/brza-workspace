@@ -73,11 +73,21 @@ a sessão anterior está em [O PLN-004: o Grok entra no plano](2026-11-06-pln-00
   - a R21 preparada e não enviada, com nove pontos e a lista do que se corrige na gravação sem rodada.
 
 - **A segunda atualização**, a pedido de Anderson ("atualize o plano"), com o que nasceu depois do levantamento: o
-  [PLN-018: O turno do Grok e do Codex entra no log, e a tarefa carimba o id dessa sessão](../../plans/PLN-018-o-grok-e-o-codex-na-medicao/PLN-018-plan.md), do `tools-kit` (aberto na mesma tarde, prioridade alta, commitado lá
-  e ainda sem sessão dona), que grava a linha
+  [PLN-018: O turno do Grok e do Codex entra no log, e a tarefa carimba o id dessa sessão](../../plans/PLN-018-o-grok-e-o-codex-na-medicao/PLN-018-plan.md), do `tools-kit` (aberto na mesma tarde, prioridade alta, commitado lá), que grava a linha
   `turn` do Grok e do Codex, o terreno do `D9` e da R18.4; e a issue do `playground` sobre o custo do Grok no `brza
   sessions usage`. O `Retomar` os cita, a issue entrou em `## Pendências conhecidas`, e a R21 ganhou o ponto 10, sobre
   quem grava a linha. Depois do commit dele no `tools-kit`, o PLN-018 entrou por link no `Retomar` do PLN-004.
+
+- **O aviso ao dono do PLN-018.** Anderson indicou a sessão dona: o chat do Grok
+  `grok_05652ec5_a97a_4159_9280_a5550ba0f910`, no `tools-kit`, "Executar plano PLN-018 via BrzA CLI". Ela não tem nome
+  no mapa do `brza sessions`, e o `send` resolve pelo nome. Por isso o aviso foi pelo `send_to_chat` do
+  `brza_runtime`, o mesmo do `brza run`, com entrega `queue-if-active`. O recibo deu `queued`, posição 1. O aviso
+  levou quatro coisas, sem pedir resposta:
+  - a sobreposição com o `D9` e a R18.4, e o ponto 10 da R21, ainda não decidido;
+  - que o Grok só roda hook de projeto com a pasta confiada, e que o app não a confia — o que pesa na sonda de stdin
+    deles;
+  - o que o hook recebe e o que o `usage.json` traz;
+  - o terceiro leitor do arquivo, na issue do `playground`.
 
 ## O que ficou
 
@@ -90,4 +100,4 @@ a sessão anterior está em [O PLN-004: o Grok entra no plano](2026-11-06-pln-00
 
 ## Medida
 
-Corrido 25 min — agente 8 min, quem pediu 16 min, pausa 0 s · US$ 10,42 (turnos 5,45, subagentes 4,97) · CPU 29,25 s do `claude` e 492,30 s dos comandos, RSS até 514 MB · 8 turnos, 1 sessão · até 19:47 de 2026-11-09, pelo `brza note commit`
+Corrido 27 min — agente 10 min, quem pediu 16 min, pausa 0 s · US$ 11,44 (turnos 6,47, subagentes 4,97) · CPU 34,94 s do `claude` e 496,27 s dos comandos, RSS até 518 MB · 9 turnos, 1 sessão · até 19:59 de 2026-11-09, pelo `brza note commit`

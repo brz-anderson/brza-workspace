@@ -166,6 +166,22 @@ def string_concat(source: str, name: str, path: str) -> str:
     return ''.join(re.findall(r"'([^']*)'", m.group(1)))
 
 
+def base_css_call(source: str, path: str) -> str:
+    """O BASE_CSS literal antigo ou a chamada de visualBaseCss, sem executar JavaScript."""
+    call = re.search(r'\bconst BASE_CSS\s*=\s*visualBaseCss\((true|false)\)[ \t]*;?[ \t]*(?:\n|$)', source)
+    if not call:
+        return string_concat(source, 'BASE_CSS', path)
+    function = re.search(
+        r'\bfunction visualBaseCss\(fitFrame:\s*boolean\):\s*string\s*\{\s*'
+        r"const scrollbars\s*=\s*fitFrame\s*\?\s*'([^'\\]*)'\s*:\s*'([^'\\]*)'\s*;?\s*"
+        r'return `([^`\\]*)`\s*;?\s*\}', source)
+    if function:
+        yes, no, template = function.groups()
+        if '${scrollbars}' in template and '${' not in template.replace('${scrollbars}', ''):
+            return template.replace('${scrollbars}', yes if call.group(1) == 'true' else no)
+    raise ShotError(f'não achei BASE_CSS em {path}; o brza-studio mudou, e o brza-shot precisa acompanhar')
+
+
 def module_candidates(base: Path, spec: str) -> list[Path]:
     """Os arquivos que o import relativo `spec`, feito de um arquivo em `base`, pode nomear."""
     target = base / spec
@@ -221,7 +237,7 @@ def shell_parts(studio: Path) -> dict:
     return {
         'tokens': find_token_list(studio, visual, visual_src) + extras,
         'cdns': array_literal(visual_src, 'NATIVE_CHAT_VISUAL_CDN_ORIGINS', VISUAL_SHELL),
-        'base_css': string_concat(visual_src, 'BASE_CSS', VISUAL_SHELL),
+        'base_css': base_css_call(visual_src, VISUAL_SHELL),
     }
 
 

@@ -4,10 +4,10 @@ phase: execution
 origin: issue
 origin_ref: reuniao-multiagente-com-personas-pelo-brza-sessions
 description: Levantamento e desenho, em três frentes, do que falta para a reunião multiagente com personas rodar sem improviso em qualquer client: a skill, as primitivas do brza sessions e o painel da rodada no chat do Studio.
-ready: "não — a sonda da híbrida (P4a.0) decide a via de abertura das personas; P1 e P2 seguem com a via como variável do lançador"
+ready: "não — P4a/P4b e P6 em execução no tools-kit; P5 concluído; P7 aguarda P4a"
 estimate_h: 34.75
-executed_h: 7
-remaining_h: 27.75
+executed_h: 7.174
+remaining_h: 26.75
 priority: high
 scope:
   - workspace
@@ -22,7 +22,7 @@ tags:
 
 # PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat
 
-- **Retomar:** P1 e P2 feitos em 2026-11-09 (skill `meeting-runner` v1 e `panel.py`, 149 testes verdes, avaliada com e sem a skill em duas iterações e revista pelo `reviewer`). **Nada do ciclo de vida das personas foi testado contra o Studio**: o `launch_persona.py` e o `wait_round.py` seguem a R5/R6, mas só rodaram em `--dry-run` e com fakes, e o formato do JSON do `worker-start` e do `check` não foi visto. Próximo: a sonda P4a.0 (`tools-kit`), que decide a via, confirma o formato e responde três pontos que a revisão levantou: **quem cria o Run das personas** (a abertura em paralelo pode criar um por `worker-start`; se preciso, `run-create` antes), **se o `check --peek --wait` volta na hora** com a caixa nunca consumida (a coordenação chamaria o `brza` uma vez por segundo) e **se o chat do worker entra no mapa do `brza sessions`** (sem isso `send`/`list`/a medição não acham a persona; o `launch_persona.py` avisa e aceita os ids no manifesto). Depois P7, a primeira reunião pela skill. Pendências menores da skill: o custo da coordenação do painel é conta à mão (`agrega.py` fora do git), o cartão de custo ignora o `--at` e o denominador da sala conta o Antigravity. A descrição da skill não foi otimizada (depois da primeira reunião).
+- **Retomar:** P1/P2 concluídos com 149 testes; P3 concluído; P5 concluído e publicado em `b24de7c` (99 testes, revisão independente). P4a/P4b/P6 em execução no `tools-kit`, Dispatch `ctx_f0b0d3dbd714`, Run principal `run_2287f933d683`. A sonda reportou a híbrida sem fechamento automático e segue pela via pura de R6; D2 usa `status` no contrato instalado. R7.1 escolheu `close` por pedido de encerramento (`closing`) e `--force` por parada guardada confirmada. Próximo: receber entrega e revisão de P4/P6, registrar evidências e horas; P7 aguarda P4a. Antes de P7, conferir integração da skill com o contrato real (Run único, mailbox já entregue e mapa das sessões). Pendências menores da skill permanecem no worklog de P1/P2.
 - **Dividido:** [PLN-017 — Desenho](PLN-017-design.md) · [D1, a skill](PLN-017-design-skill.md) · [D2, o `brza sessions`](PLN-017-design-cli.md) · [D3, o painel](PLN-017-design-painel.md)
 
 ## Pedido
@@ -233,6 +233,18 @@ Respondida em 2026-11-08, na sessão `workflow-improvements`.
 
    **Decidido — os quatro em Chat**: a via A abre chats sem mexer no ajuste.
 
+### Rodada 7 — `close` com Dispatch ativo (2026-11-09)
+
+**Apresentado antes:** D2:447 previa `worker-release` para quem não respondeu; o `worker-release --help` instalado só libera workers settled. A sonda de P4 confirmou essa restrição. O guia `recovery-and-cleanup.md` exige parada confirmada e preservação de identidade, custódia e Keep open.
+
+1. **Como `close` trata um worker ainda ativo?**
+   - Pedir encerramento; `--force` usa parada guardada (Recomendado). Custo: implementar e testar pedido por mailbox, estado `closing` e protocolo de parada com confirmação; `--force` pode interromper trabalho ativo. Se paga: ao encerrar uma persona travada, preservando a função do `--force`.
+   - Recusar worker ativo, mesmo com `--force`. Custo: uma etapa manual para encerrar personas travadas; implementação menor agora. Se paga: nesta entrega, mantendo apenas a liberação de workers já encerrados.
+
+**Resposta literal de Anderson**, em 2026-11-09, sessão `Retomar PLN-017`: "Pedir encerramento; --force usa parada guardada (Recomendado). Custo: implementar e testar pedido por mailbox, estado closing e protocolo de parada com confirmação; --force pode interromper trabalho ativo. Se paga: ao encerrar uma persona travada, preservando a função do --force."
+
+**Escolhida a primeira opção:** D2 atualizado; instrução enviada ao Dispatch `ctx_f0b0d3dbd714`. Parada incerta não conta como fechamento e não autoriza repetição cega ou abandono.
+
 ## Passos
 
 ### P1 — A skill `meeting-runner` v1
@@ -302,13 +314,13 @@ Estimado: 3,5 h · Executado: — h
 
 Executa D2 · executor: sessão da `master` do `brza-workspace`
 
-Estimado: 1 h · Executado: — h
+Estimado: 1 h · Executado: 0,174 h (janela da sessão executora, incluindo fechamento)
 
-- [ ] **1. Teste que falha antes** em `scripts/brza/tests/test_brza_shot.py`, com a fixture na forma `visualBaseCss(true)`
-- [ ] **2. `base_css_call`** ao lado do `string_concat` em `scripts/brza/brza-shot:162-166`
-- [ ] **3. `python3 -m unittest discover -s scripts/brza/tests`** e commit na `master`
+- [x] **1. Teste que falha antes** em `scripts/brza/tests/test_brza_shot.py`, com a fixture na forma `visualBaseCss(true)`
+- [x] **2. `base_css_call`** ao lado do `string_concat` em `scripts/brza/brza-shot:162-166`
+- [x] **3. `python3 -m unittest discover -s scripts/brza/tests`** e commit na `master`
 
-**Evidência:** —
+**Evidência:** `brza-workspace@b24de7c1f1324b2ea85df061b57765ea500ff0bc`, publicado na `master`; vermelho com 2 `ShotError BASE_CSS`, verde com 99 testes. Reviewer independente Claude `opus`, Dispatch `ctx_7153fa486731`: cli 492, hooks 291 e notes-checker 26/26; captura real 1472×108; A1 de cobertura corrigido e verificado por mutação. [PLN-017/P5: o brza shot lê visualBaseCss e mantém o literal antigo](../../../workspace/work/worklogs/2026-11-09-pln-017-p5-brza-shot.md), publicado no `workstream/workspace` em `8f6846f`.
 
 ### P6 — A emenda ao PLN-010
 
@@ -344,6 +356,11 @@ Estimado: 0,5 h · Executado: — h
 **Evidência:** —
 
 ## Worklogs
+
+- 2026-11-09 — coordenação de P4/P5/P6; R7 escolhe o encerramento e a parada guardada; P5 concluído, revisado e publicado. P4/P6 seguem no `tools-kit`.
+  [PLN-017: coordenação de P4, P5 e P6 e encerramento de workers](../../work/worklogs/2026-11-09-pln-017-coordenacao-p4-p5-p6.md)
+- 2026-11-09 — P5 executado na `master`, 99 testes e revisão independente; commit `b24de7c` publicado.
+  [PLN-017/P5: o brza shot lê visualBaseCss e mantém o literal antigo](../../../workspace/work/worklogs/2026-11-09-pln-017-p5-brza-shot.md)
 
 - 2026-11-09 — P1 e P2: a skill `meeting-runner` v1, o `panel.py`, 149 testes, a avaliação com e sem a skill (100% × 81,8%), a revisão (25 achados, corrigidos salvo 2) e a R5/R6 aplicada nos scripts, só em `--dry-run`. Nada testado contra o Studio.
   [PLN-017 P1 e P2: a skill `meeting-runner` e o gerador do painel](../../work/worklogs/2026-11-09-pln-017-p1-p2-a-skill-meeting-runner.md)

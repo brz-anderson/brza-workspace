@@ -80,8 +80,7 @@ O que está marcado **[ponto para rodada]** é escolha sem lastro, que vai à ro
 - A issue `codex-e-antigravity-sem-medida-por-tarefa` (tools-kit, `low`) estima medir o Codex no hook em "6 h ou mais",
   com "outro formato e outra tabela de preço", e pede primeiro "saber onde o Codex e o `agy` gravam a sessão, os tokens"
   (`workstream/tools-kit:work/issues/codex-e-antigravity-sem-medida-por-tarefa.md:27-33`). [F28 · lido · 95]
-- Grok e Antigravity não gravam tokens em disco. [F29 · lido · 80] (premissa: a busca do `collector` em `~/.grok` e
-  `~/.gemini/antigravity-cli/log`, `processo/levantamento.md` F43, foi completa)
+- Grok grava tokens e `costUsdTicks` por sessão e turno em `~/.grok/sessions/<cwd URL-encoded>/<UUID>/usage.json`, conferidos no F20 do Desenho em 2026-11-09. A busca anterior era incompleta; Antigravity não foi reconferido. O contrato implementado de `usage` ainda retorna Grok como `unmeasured`; a integração fica na [O custo e os tokens do Grok entram nas medições da reunião](../../work/issues/custo-e-tokens-do-grok-nas-medicoes-da-reuniao.md). [F29 · corrigido · rodado · 95 para presença dos campos]
 - O `brza-shot` só junta literais `'…'` (`WS/scripts/brza/brza-shot:162-166`), e o Studio passou a
   `function visualBaseCss(fitFrame)`, com template `${scrollbars}`, e `const BASE_CSS = visualBaseCss(true)`
   (`BS/src/shared/native-chat/native-chat-visual-shell.ts:101-106`). [F30 · lido · 97]
@@ -345,7 +344,7 @@ marker`); e `model` (`name, chat, model, effort`).
   - **Codex:** acha `~/.codex/sessions/**/rollout-*-<provider_session>.jsonl` [F26] e devolve o último
     `token_count.info.total_token_usage` (entrada, cache, saída, raciocínio), as durações por turno e o erro do
     último `task_complete`. Só tokens, sem US$.
-  - **Grok e Antigravity:** `{"measured": false, "reason": "unmeasured"}` [F29].
+  - **Grok e Antigravity:** `{"measured": false, "reason": "unmeasured"}` no contrato desta entrega. Para Grok, é limitação da implementação, não ausência de dados em disco (F29 corrigido); integração registrada como pendência.
   - **O `--json`:** dá ao painel `custo_usd` ou `tokens` por persona [F34].
 - **Teste que falha antes:** `test_usage_sums_claude_turns_by_session`, `test_usage_reads_the_last_codex_token_count`
   (rollout de fixture com `info: null` antes do último) e `test_usage_marks_grok_and_antigravity_unmeasured`.

@@ -24,7 +24,11 @@ tags:
   P18 envelheceram. O PLN-012 (medida por tarefa) mudou o `measure.py` e o resumo sob o `D9` e o `D10`. A skill
   `meeting-runner` do `playground` e a issue das memórias que sobem à norma tocam o `D4` e o `D15`. No app, as seis
   suposições do plano valem, e o app instala um hook próprio do Grok em `~/.grok/hooks/orca-status.json`, que coexiste
-  com o do `D8`. A R21 junta os cinco pontos do v3 ainda abertos e os quatro que o levantamento abriu, com a lista do
+  com o do `D8`. Ainda em 2026-11-09 o `tools-kit` abriu o PLN-018 ("O turno do Grok e do Codex entra no log, e a
+  tarefa carimba o id dessa sessão", prioridade alta, na entrevista; sem commit na branch quando este `Retomar` foi
+  escrito), que grava a linha `turn` do Grok e do Codex, o terreno do `D9` e da R18.4, e deixa no PLN-004 o pacote, o
+  `brza delegate` e o `measure_runtimes.py`; e o `playground` abriu a issue do custo do Grok no `brza sessions usage`.
+  A R21 junta os cinco pontos do v3 ainda abertos, os quatro que o levantamento abriu e o do PLN-018, com a lista do
   que se corrige na gravação sem rodada. Depois dela: aplicar a R20 e a R21 no v3, a aprovação do Desenho na mensagem,
   em partes, e a gravação em `PLN-004-design.md`. O código vai ao pacote `packages/runtimes` do `brza-workflow`,
   executado pela sessão `workspace` com `implementer` (R10.2). O scratch em `/private/tmp/pln004/` não vai ao git, e
@@ -130,3 +134,6 @@ As rodadas R1–R19 estão em [PLN-004 — Entrevista](PLN-004-interview.md), po
 - [As memórias dos workstreams que valem para todos sobem à norma, com o texto pronto por arquivo](../../work/issues/memorias-dos-workstreams-sobem-a-norma.md)
   — do `playground`, aberta, executada pela sessão `workspace`; edita as mesmas linhas do `core/AGENTS.md` que o `D4` e
   o `D15` (R21, ponto 8).
+- [O custo e os tokens do Grok entram nas medições da reunião](../../work/issues/custo-e-tokens-do-grok-nas-medicoes-da-reuniao.md)
+  — do `playground`, aberta em 2026-11-09: o `brza sessions usage` passa a ler o `usage.json` do Grok, o mesmo arquivo
+  que o `D9` lê (R21, ponto 10).

@@ -71,6 +71,12 @@ a sessão anterior está em [O PLN-004: o Grok entra no plano](2026-11-06-pln-00
   - a seção `## Pendências conhecidas`, com as quatro issues vizinhas;
   - a R21 preparada e não enviada, com nove pontos e a lista do que se corrige na gravação sem rodada.
 
+- **A segunda atualização**, a pedido de Anderson ("atualize o plano"), com o que nasceu depois do levantamento: o
+  PLN-018 do `tools-kit` (aberto na mesma tarde, prioridade alta, ainda sem commit na branch), que grava a linha
+  `turn` do Grok e do Codex, o terreno do `D9` e da R18.4; e a issue do `playground` sobre o custo do Grok no `brza
+  sessions usage`. O `Retomar` os cita, a issue entrou em `## Pendências conhecidas`, e a R21 ganhou o ponto 10, sobre
+  quem grava a linha. O PLN-018 entra no plano por link quando chegar à branch do `tools-kit`.
+
 ## O que ficou
 
 - **A R21**, quando Anderson retomar as rodadas, e depois o v3 com a R20 e a R21, a aprovação e a gravação do Desenho. O
@@ -82,4 +88,4 @@ a sessão anterior está em [O PLN-004: o Grok entra no plano](2026-11-06-pln-00
 
 ## Medida
 
-Corrido 9 min — agente 3 min, quem pediu 6 min, pausa 0 s · US$ 1,49 (turnos 1,49, subagentes 0,00) · CPU 10,09 s do `claude` e 202,66 s dos comandos, RSS até 493 MB · 3 turnos, 1 sessão · até 19:40 de 2026-11-09, pelo `brza note commit`
+Corrido 12 min — agente 6 min, quem pediu 6 min, pausa 0 s · US$ 2,55 (turnos 2,55, subagentes 0,00) · CPU 13,29 s do `claude` e 206,31 s dos comandos, RSS até 500 MB · 4 turnos, 1 sessão · até 19:45 de 2026-11-09, pelo `brza note commit`

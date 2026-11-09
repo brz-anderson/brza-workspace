@@ -11,7 +11,8 @@ O workspace pessoal de Anderson para o **BrzA Studio** (`~/Projects/brza-studio`
 As pastas de notas não moram na `master`, que guarda só a norma: cada frente de trabalho é uma branch
 `workstream/<nome>`, com worktree em `.worktrees/<nome>`. Os de agora são o `studio` (o app), o `tools-kit` (o `brza`,
 os scripts e os plugins), o `workspace` (a própria norma), o `brand` (a identidade visual da marca) e o `playground`
-(onde se testam fluxos de trabalho antes de entrarem na norma ou no ferramental).
+(onde se testam fluxos de trabalho antes de entrarem na norma ou no ferramental) e o `logi-options` (a configuração do
+Logi Options+ da Logitech: atalhos e Ring Actions do mouse MX Master 4).
 
 | Pasta | O que guarda |
 | :---- | :----------- |

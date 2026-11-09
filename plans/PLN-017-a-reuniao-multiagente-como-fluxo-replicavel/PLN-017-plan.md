@@ -245,6 +245,20 @@ Respondida em 2026-11-08, na sessão `workflow-improvements`.
 
 **Escolhida a primeira opção:** D2 atualizado; instrução enviada ao Dispatch `ctx_f0b0d3dbd714`. Parada incerta não conta como fechamento e não autoriza repetição cega ou abandono.
 
+### Rodada 8 — fato novo na própria rodada de voto (X10, 2026-11-09)
+
+**Apresentado antes:** em P7, o Prumo mediu 0 PRs na R2 e Trava/Relance votaram sem esse fato; a R3 extra mudou os votos. Fonte: worklog da coordenação de P7, linhas 49, 52 e 98. A duração de 3–5 min é estimativa de planejamento; o custo financeiro da rodada extra não foi medido (US$ 0,42 era Prumo na R2).
+
+**Pergunta:** quando surgir, na própria rodada de voto, um fato novo que contradiga a premissa de algum voto, como a skill deve agir?
+
+1. Oferecer rodada extra para minha escolha (Recomendado). Custo: nenhum sem o gatilho; uma pergunta e cerca de 3–5 min se eu autorizar a extensão. Se paga: quando um fato chega tarde, preservando minha escolha sobre prolongar a reunião.
+2. Executar rodada extra automaticamente. Custo: cerca de 3–5 min quando o gatilho ocorrer, com a coordenação prolongando a reunião sem perguntar. Se paga: quando eu estiver indisponível e o voto precisar considerar o fato novo.
+3. Fazer rodada curta de voto em toda reunião. Custo: cerca de 3–5 min adicionais sempre. Se paga: nas reuniões com fatos novos; nas demais, a rodada acrescenta custo sem esse ganho.
+
+**Resposta literal de Anderson**, em 2026-11-09, sessão `Retomar PLN-017`: "Executar rodada extra automaticamente. Custo: cerca de 3–5 min quando o gatilho ocorrer, com a coordenação prolongando a reunião sem perguntar. Se paga: quando eu estiver indisponível e o voto precisar considerar o fato novo."
+
+**Escolhida a opção 2:** sintetizar e compartilhar o fato novo e executar voto informado extra quando o gatilho ocorrer, sem nova autorização para essa extensão. Sem gatilho, não acrescentar rodada. A decisão final continua com Anderson. D1 atualizado e resposta transmitida à execução em `msg_23b96f508744`.
+
 ## Passos
 
 ### P1 — A skill `meeting-runner` v1
@@ -356,6 +370,9 @@ Estimado: 0,5 h · Executado: — h
 **Evidência:** —
 
 ## Worklogs
+
+- 2026-11-09 — correções após P7 em execução; R8 escolhe rodada extra automática somente quando fato novo da própria rodada contradiz premissa de voto.
+  [PLN-017: correções após P7 e rodada de voto informado](../../work/worklogs/2026-11-09-pln-017-correcoes-apos-p7.md)
 
 - 2026-11-09 — P7: a reunião de verificação "CI no chat" pela skill, três personas em três runtimes via `worker-start`, R1, R2 e R3 extra; Anderson decidiu os quatro pontos; três issues; 19 desvios a D1, a reunião não conta como sem desvio.
   [Reunião CI no chat: a coordenação da reunião de verificação do PLN-017](../../work/worklogs/2026-11-09-reuniao-ci-no-chat-coordenacao.md)

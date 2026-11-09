@@ -17,12 +17,13 @@ Duas reuniões de 2026-11-07 (Carvão em Brasa, MCP remoto) provaram que persona
 decisões mais maduras a Anderson, mas deixaram 15 de 32 itens do protocolo implícitos e custaram quatro rodadas no tema
 errado, duas personas na cota do Codex e a conta de médias errada. Esta skill fixa o fluxo e os números, para a próxima
 reunião rodar sem improviso. Estado: **v1, protótipo** — vive na branch `workstream/playground` e vai ao `core/` do
-`brza-workflow` depois de duas reuniões sem desvio de fluxo (PLN-017/R2.1).
+`brza-workflow` depois de duas reuniões sem desvio de fluxo (PLN-017/R2.1). A primeira reunião pela skill (P7,
+2026-11-09) teve 19 desvios e não conta; as correções deles estão nos passos abaixo, marcadas `(X…)`.
 
 ## Quem é quem
 
 - **A coordenação** é a sessão principal: pergunta a Anderson, abre as sessões, sintetiza, confere números, grava.
-- **As personas** são chats do Studio que escrevem só no worklog delas; nunca perguntam, nunca commitam.
+- **As personas** são workers do Orca em chat, que escrevem só no worklog delas; nunca perguntam, nunca commitam.
 - **Anderson decide.** A coordenação não decide: a rodada de decisões leva as opções, e decisão só vale com a frase
   explícita ("decidido", "fechado", "pode aplicar"). A norma de rodadas é a do `AGENTS.md`; esta skill não a repete.
 
@@ -30,25 +31,34 @@ reunião rodar sem improviso. Estado: **v1, protótipo** — vive na branch `wor
 
 | Preciso de… | Leia / rode |
 | :--- | :--- |
-| o briefing da reunião | `references/briefing.md` |
+| o briefing da reunião, e conferir os números dele | `references/briefing.md`; `$S/check_briefing.py <dir>/briefing.md` |
 | uma persona (arquétipo, papel → modelo, régua da confiança) | `references/persona.md` |
 | o esqueleto do worklog de uma persona | `references/persona-worklog.md` |
-| o pedido de uma rodada (os quatro tipos, a linha `**Posição:**`) | `references/round-request.md` |
+| o pedido de uma rodada (os cinco tipos, a linha `**Posição:**`) | `references/round-request.md` |
 | a síntese, o `sintese-N.json` do painel | `references/synthesis.md` |
 | a proposta, a confiança do plano, o revisor, a contraprova | `references/proposal.md` |
 | a rodada de decisão, o worklog da coordenação, o encerramento | `references/closing.md` |
-| o que dizer no chat e o ciclo do painel | `references/narration.md` |
-| abrir, enviar, liberar ou parar as sessões | `$S/launch_persona.py $R [--via …] [--send …] [--release …] [--stop …]` |
-| esperar o fim da rodada | `$S/wait_round.py N --reuniao $R` |
-| a tabela por persona, sem conta à mão | `$S/tally.py N --reuniao $R --opened HH:MM:SS --closed HH:MM:SS` (sem a janela, o custo é o da sessão inteira) |
+| o que dizer no chat, o ruído do host e o ciclo do painel | `references/narration.md` |
+| abrir as personas | `$S/launch_persona.py $R` |
+| enviar a rodada N | `$S/launch_persona.py $R --send todas --round N` |
+| esperar o fim da rodada | `$S/wait_round.py N --reuniao $R [--personas …]` |
+| pedir o encerramento, conferir o aceite, forçar | `$S/launch_persona.py $R --close`, `--status --wait-settled 180`, `--stop <persona>` |
+| a tabela por persona, sem conta à mão | `$S/tally.py N --reuniao $R --opened HH:MM:SS --closed HH:MM:SS --settle 60` |
 | o painel da rodada | `$S/panel.py collect N --reuniao $R --opened … [--closed …]` e `$S/panel.py render …` |
 | a memória de runtime fora do repositório | `$S/runtime_memory_check.py <início>` |
 
-**Convenção dos comandos:** rodam da raiz do worktree, com `python3 -I .claude/skills/meeting-runner/scripts/<script>.py` (abaixo, `$S`); a raiz padrão dos
-scripts é a do git, e o manifesto é `.sessions/<reuniao>/reuniao.json` (`$R`). Os caminhos relativos do manifesto resolvem contra essa raiz.
+**Convenção dos comandos:** rodam da raiz do worktree, com `python3 -I .claude/skills/meeting-runner/scripts/<script>.py`
+(abaixo, `$S`); a raiz padrão dos scripts é a do git, e o manifesto é `.sessions/<reuniao>/reuniao.json` (`$R`). Os
+caminhos relativos do manifesto resolvem contra essa raiz.
+
+**O transporte é o `brza sessions` v2** (PLN-017 P4a/P4b, `brza-workflow@db6bd28`): o `launch_persona.py` e o
+`wait_round.py` só traduzem o manifesto para os verbos dele (`open`, `send`, `wait`, `close`) e narram a saída. Quem abre o
+worker, anexa o protocolo da rodada, lê a mailbox do Run sem consumi-la e decide o que é fechado é o CLI. O mapa
+`.sessions/sessions.jsonl` da raiz comum do git guarda, por nome, o Dispatch, o Run, o remetente, a coordenação, o modelo
+e o id do provedor; a medição e a espera leem dele, também depois do fechamento automático.
 
 O **manifesto** `reuniao.json` (nome, slug, papel, runtime, modelo, esforço, sessão, fallback de cada persona, mais o
-tema, a pasta da reunião e o molde do caminho dos worklogs) é a fonte única do lançamento, das tabelas e do painel; o
+tema, a pasta da reunião e o molde do caminho dos worklogs) é a fonte única da abertura, das tabelas e do painel; o
 schema está no docstring de `scripts/tally.py`. Crie-o no Passo 1, na pasta da reunião (`.sessions/<reuniao>/`).
 
 ## Passo 0 — o gate do tema, antes de qualquer arquivo
@@ -66,6 +76,9 @@ Por isso nenhuma sessão abre antes da confirmação:
 - Levantamento longo vai ao `collector`, em paralelo; a R1 não espera por ele.
 - Briefing pelo molde (`references/briefing.md`). A restrição do tema (segurança da sala, por exemplo) é um slot do
   molde, não improviso.
+- **Os números do briefing se conferem antes de abrir (X8).** Na P7, o "O que existe hoje" levou 1.352 arquivos em vez de
+  163, e duas personas herdaram o erro. Cada item com número leva `conferido às HH:MM: \`comando\` → resultado`, rodado
+  pela coordenação agora, e `$S/check_briefing.py <dir>/briefing.md` sai 0 antes do Passo 2.
 - Personas pelo molde (`references/persona.md`). **Modelo e esforço pelo papel, e nunca dois papéis no mesmo modelo e
   esforço** (memória `meeting-model-per-role`): é o que fez a posição ser da persona e a confiança ser do modelo.
 - Cota: `brza quota --json` antes de abrir. Runtime acima de 55% na janela de sessão não hospeda papel crítico. O
@@ -78,45 +91,73 @@ Por isso nenhuma sessão abre antes da confirmação:
 
 ## Passo 2 — abrir as sessões
 
-- **As personas abrem com o ciclo de vida dos workers do Orca** (R5 de Anderson): depois que a coordenação manda o
-  encerramento, a sessão fecha sozinha ~2 min depois, e o chat mostra o botão "manter aberta" para Anderson guardar a que
-  quiser consultar. O `launch_persona.py reuniao.json` abre pela via que a sonda P4a.0 do PLN-017 decidir: `--via
-  worker-start` (padrão: `brza orchestration worker-start --spec-file … --agent … --model … --effort …`), `--via hybrid`
-  (chat por `agent launch --surface chat` e depois `worker-start --terminal`) ou `--via agent-launch` (abre como antes,
-  **sem** ciclo de vida: só para testar o resto da skill). Ele grava `dispatch_id` e `orca_session_id` no mapa. v2:
-  `brza sessions open --model --effort` pela mesma via.
-- **A sonda P4a.0 ainda não rodou**: nenhuma das duas vias com ciclo de vida foi verificada contra o Studio, e o formato
-  do recibo do `worker-start` não foi visto. Antes da primeira reunião real, abra uma persona de teste e confira o que o
-  script gravou no mapa e se o `autoReleaseAt` aparece (`brza orchestration worker-show`).
-- O prompt de abertura é de uma linha por persona e é guardado em `prompt-<slug>.txt`. Ele começa com "Você é uma
-  persona numa reunião multiagente": é o que impede a persona de acionar esta skill. Chega depois do preâmbulo do Orca,
-  como turno do coordenador, e diz à persona que o `worker_done` que o preâmbulo pede é o do **encerramento**.
-- Codex `exec` roda com `< /dev/null` (esperou o stdin e custou 3 minutos). Narre a abertura (`narration.md`).
+- **`$S/launch_persona.py $R`** abre cada persona por `brza sessions <sessao> --agent … --model … --effort …
+  --prompt-file … --wait`, **uma de cada vez**: a primeira abertura cria o Run e as outras entram nele. No fim ele imprime
+  a tabela da narração (persona, papel, runtime, modelo, esforço, Dispatch, Run, id do provedor) e sai 1 se as personas
+  ficaram em mais de um Run. Não relance persona que "abriu sem o id do provedor": o `wait` grava o id depois (X1). Não
+  relance a que "não abriu" antes de ler o `pending-*.json` que o CLI cita.
+- **O ciclo de vida é o dos workers do Orca** (R5 de Anderson): depois do `worker_done` aceito, a sessão fecha sozinha ~2
+  min depois, e o chat mostra "manter aberta" para Anderson guardar a que quiser consultar. Uma pausa longa entre rodadas
+  não fecha ninguém: o prazo só arma no `worker_done` (P7: 5 h de pausa, X15).
+- **O prompt de abertura** é de uma linha por persona, guardado em `prompt-<slug>.txt`, e é a rodada 1. Começa com "Você
+  é uma persona numa reunião multiagente": é o que impede a persona de acionar esta skill. Não traz comando
+  `brza orchestration` próprio: o CLI anexa a cada pedido o protocolo do status da rodada, com o `round_id` e o Dispatch
+  reais. O `worker_done` é só do encerramento e sai **do preâmbulo do Orca, com o `--task-id` e o `--dispatch-id` dele**
+  (X19: o comando que a skill dava sem os ids foi recusado, "worker_done requires taskId").
+- Narre a abertura (`narration.md`).
 
 ## Passo 3 — conduzir uma rodada
 
 - O pedido sai do molde (`references/round-request.md`), com **duração** ("~5 min"), não hora: os prazos das duas
   reuniões não eram monotônicos e ninguém os cobrou.
-- **O sinal de fim** é uma mensagem: ao fechar a rodada, a persona roda `brza orchestration send --subject
-  "fim-rodada-N"` para a coordenação (R6.2). O **marcador** continua, como registro escrito que o `tally.py` lê: "acrescente
-  a sua seção no fim do worklog; a última linha do arquivo é `<!-- fim-rodada-N -->`", regra única. O `worker_done` NÃO vai
-  por rodada: arma os 2 min de fechamento e a persona sumiria no meio da síntese.
-- Envio: uma linha que aponta o arquivo da rodada, só para persona com `state` fora de `working` — a fila entrega na
-  virada do turno (~12 min medidos), e o "sent" do `brza sessions` não diz quando chega. Persona aberta como worker (a
-  via padrão) não está no mapa do `brza sessions` até a sonda P4a.0: envie por `python3 -I $S/launch_persona.py $R
-  --send <persona|todas> --message "Faça a rodada N: .sessions/<reuniao>/rodada-N.md"` (`brza orchestration send --to
-  dispatch:<id>`). Com `--via agent-launch`, `brza sessions send <sessão> "…"` como antes.
-- Espera: `python3 -I $S/wait_round.py N --reuniao $R` (embrulha `brza orchestration check --wait`; v2:
-  `brza sessions wait`). Ele cruza a mensagem com o marcador e avisa a persona que mandou o fim sem fechar o worklog.
-  Para chat aberto com `--via agent-launch` (sem Dispatch), `--source marker` espera só pelo marcador. Narre cada chegada.
+- **Enviar:** `$S/launch_persona.py $R --send todas --round N` chama `brza sessions send … --text "Faça a rodada N:
+  <dir>/rodada-N.md"` e mostra o recibo por persona. O CLI anexa o protocolo da rodada; a mensagem chega como turno do
+  coordenador, e não como mensagem de mailbox, por isso não há "Re: rodada" (X9). **`pending` ou `unknown` (saída 75)
+  não é falha nem sucesso** (R2.1): vá ao `wait`, ou repita só aquela persona com `--operation <a mesma>` e o mesmo
+  texto. Nunca um envio novo às cegas.
+- **O sinal de fim** é o status da persona, com o `round_id` e o Dispatch daquele envio, do remetente certo; o
+  **marcador** `<!-- fim-rodada-N -->` na última linha do worklog continua como o registro que o `tally.py` lê.
+- **Esperar:** `$S/wait_round.py N --reuniao $R` chama `brza sessions wait --any` e imprime uma linha por chegada. Ele
+  cruza a chegada com o marcador, avisa `blocked`, `failed` e pergunta real, e conta à parte o ruído previsto (X3): o host
+  escala "Worker stopped without reporting" a cada fim de turno sem `worker_done`, que é o normal entre rodadas — não se
+  responde nem se narra como falha. Falha real é o desfecho `failed`/`blocked` do `wait` ou o worker `failed`/`stopped`.
+- **A rodada para parte da sala** (uma rodada extra, só para quem votou sem um fato): os nomes no `--send` (`--send
+  Trava Relance --round 3`), `--personas` no `wait_round.py` e `--participantes` no `tally.py` e no `panel.py collect`;
+  os outros ficam "fora da rodada" e não seguram o fechamento nem a síntese do painel (X18).
 - Rodadas-tipo: R1 independente; R2 debate (disputas D#, ataques, concessão, placar com "Mudou?"); R3 voto e notas; a
-  última, confiança final e autoavaliação. Toda seção traz a linha `**Posição:**` (alimenta o painel).
+  última, confiança final e autoavaliação; e a rodada extra de voto informado, com o molde do tipo 5 (X17: a improvisada
+  da P7 não foi lida pelo `tally.py`). Toda seção traz a linha `**Posição:**` (alimenta o painel).
+- **O voto final só depois da síntese que traz os fatos da rodada anterior (X10).** O pedido de rodada com voto aponta a
+  `sintese-(N-1).md`, lista os M# novos, e a persona declara `**Fatos lidos:**` antes de votar; o `tally.py` avisa quem
+  votou sem a linha. Na P7, o fato decisivo (0 PRs) nasceu na mesma rodada do voto, e duas personas votaram sem ele.
+- **A rodada extra de voto informado é automática quando o gatilho vale (R8 de Anderson, 2026-11-09:** "Executar rodada
+  extra automaticamente. Custo: cerca de 3–5 min quando o gatilho ocorrer, com a coordenação prolongando a reunião sem
+  perguntar. Se paga: quando eu estiver indisponível e o voto precisar considerar o fato novo."**).**
+  - **O gatilho:** um fato novo (M#), nascido na própria rodada de voto, contradiz a premissa de algum voto dela. A
+    coordenação confere o fato por comando antes de usá-lo.
+  - **O que a coordenação faz, sem pedir licença para a extensão:** sintetiza o fato, publica a síntese com o M# marcado
+    como novo, escolhe os participantes e envia a rodada do tipo 5. Narra uma linha: "Rodada extra automática (R8): M6
+    contradiz a premissa do voto B de Trava e Relance; vai a Trava e Relance, porque o voto A do Prumo não depende de M6
+    (R9)".
+  - **A quem vai: a coordenação escolhe e registra o motivo (R9 de Anderson, 2026-11-09:** "A coordenação escolhe e
+    registra o motivo. Custo: um julgamento sobre participantes em cada gatilho, além da rodada. Se paga: quando o alcance
+    do fato varia entre reuniões."**).** Antes do disparo, o motivo vai ao `sintese-N.json` (`rodada_extra`) e à linha da
+    narração: parte da sala (por exemplo, só quem votou com a premissa contradita) ou a sala inteira (o fato mexe em
+    votos que não contradiz de frente). Não há composição fixa. A lista escolhida é a mesma no `--send`, no
+    `--personas` e no `--participantes`.
+  - **Sem gatilho, não há rodada extra**: ela não é praxe nem obrigatória. Fato novo que não toca premissa de voto vai à
+    síntese e à proposta, sem rodada.
+  - **O limite:** a extensão é a única coisa automática. A decisão final continua de Anderson, na rodada de decisões, e
+    nem as personas nem a coordenação decidem por ele. A duração é ~3–5 min, estimativa, sujeita à persona mais lenta
+    (as personas rodam em paralelo); o custo em US$ da rodada extra não foi medido na P7.
 - **Isolamento da R1:** o pedido proíbe ler os worklogs dos colegas, e a coordenação confere por `grep` do nome das
   outras personas na seção R1 de cada uma. Só há instrução, não mecanismo.
 
 ## Passo 4 — o atrasado e a queda de runtime
 
-- Timeout da rodada: 2× a mediana das que entregaram, no mínimo 3 min. A síntese fecha sem quem falta e **o diz**.
+- **O prazo da espera respeita a duração anunciada (X6):** o `wait_round.py` só encerra depois da duração do
+  `rodada-N.md` mais 2 min, contados do envio (o mapa guarda a hora). Sem duração anunciada, 2× a mediana das chegadas, no
+  mínimo 3 min. A síntese fecha sem quem falta e **o diz**.
 - O atrasado entra pela rodada anterior, rotulado, e pode juntar duas rodadas numa seção.
 - Duas rodadas perdidas, ou erro de cota: a persona reabre no `fallback` do manifesto, com o worklog dela como contexto.
 - A contraprova e a rodada a mais, se as decisões pedirem, acontecem **antes** do encerramento: depois do `worker_done` a
@@ -124,13 +165,16 @@ Por isso nenhuma sessão abre antes da confirmação:
 
 ## Passo 5 — sintetizar
 
-1. Rode `python3 -I $S/tally.py N --reuniao $R --opened <hora do envio> --closed <hora do último fim>` **antes** de escrever: o `estado-rN.json` traz status,
-   posição, confiança, voto, nota e medição por persona. A média da conta à mão errou nas duas reuniões.
+1. Rode `$S/tally.py N --reuniao $R --opened <hora do envio> --closed <hora do último fim> --settle 60` **antes** de
+   escrever: o `estado-rN.json` traz status, posição, confiança, voto, nota e medição por persona. A média da conta à mão
+   errou nas duas reuniões. A medição do Claude só chega no `Stop` do turno, segundos depois do status (X4): o
+   `--settle` espera por ela, e a persona ainda sem linha sai "medição pendente", nunca zero nem "sem medição". Sem
+   `--opened`/`--closed`, o custo é o total da sessão, e a tabela e o painel o dizem no rótulo (X7).
 2. A síntese segue o molde (`references/synthesis.md`): convergências C#, fatos medidos M#, disputas D#, propostas P#.
 3. A coordenação **confere por comando** os números das personas e mede o que a sala não mediu.
 4. Disputa técnica ou visual: prova de conceito ou evidência renderizada antes do voto. Nada exposto sem autenticação;
    derrube o que subir. O erro de shell da própria coordenação não vai ao chat.
-5. Escreva o `sintese-N.json` (medições, síntese em até 5 linhas, decisões) e **publique o painel**
+5. Escreva o `sintese-N.json` (medições, síntese em até 5 linhas, decisões com quem as levantou) e **publique o painel**
    (`narration.md`, "O painel").
 
 ## Passo 6 — a proposta, o revisor e a contraprova
@@ -153,13 +197,25 @@ Por isso nenhuma sessão abre antes da confirmação:
   não aqui: o integral fica no worklog e, depois, no painel.
 - Issues para o que sobra. O worklog da coordenação leva a **proposta final copiada**, porque `.sessions/` não vai ao
   git.
-- Memória de runtime: `python3 -I $S/runtime_memory_check.py <hora de abertura>`; o que listar entra em `## Fora do
-  workspace` (as personas Grok gravaram memória em `~/.grok/memory-v2/` contra a ordem do briefing).
-- **Encerramento (R6):** mande a cada persona "a reunião acabou; envie `worker_done`". O host arma os 2 min e o botão
-  "manter aberta" aparece no chat; Anderson guarda a que quiser. Quem não responder, libere com
-  `python3 -I $S/launch_persona.py $R --stop <persona>` (`worker-stop`: o `worker-release` só vale para worker que já
-  enviou `worker_done`); `--keep-open <persona>` mantém por comando. O `brza sessions close` de cada persona saiu do passo. Persona aberta por `--via agent-launch` não
-  tem esse ciclo e continua a fechar por `brza sessions close`.
+- Memória de runtime: `$S/runtime_memory_check.py <hora de abertura>`; o que listar entra em `## Fora do workspace`
+  (as personas Grok gravaram memória em `~/.grok/memory-v2/` contra a ordem do briefing, também na P7).
+- **Encerramento (R7 de Anderson):**
+  1. `$S/launch_persona.py $R --close` pede a cada persona o `worker_done` do preâmbulo, e o CLI devolve `closing`.
+     **`closing` não é fechado.**
+  2. `$S/launch_persona.py $R --status --wait-settled 180` confere, no `worker-show`, que o host aceitou o `worker_done`
+     (`succeeded`/`settled`, com o `taskId` e o `autoReleaseAt`). Só então a narração diz "encerrada". Quem não
+     respondeu aparece com o comando que o preâmbulo dela deveria ter usado, com os ids reais, para a coordenação decidir.
+  3. Persona travada: `$S/launch_persona.py $R --stop <persona>` (parada guardada: confirma `stopped` e o settlement
+     antes de liberar). `stop_unknown` e `retained` **não** são fechados e **não** autorizam repetir o comando: confira
+     com `--status` e relate a incerteza.
+  4. `--keep-open <persona>` mantém por comando; o botão "manter aberta" do chat faz o mesmo.
+  5. **Depois de "encerrada e aceita", não chame `--close` de novo:** o fechamento automático libera em ~2 min. O `close`
+     do v2 hoje lê o `dispatch.status` (`completed`) antes do `worker.state` (`succeeded`), não reconhece o worker
+     encerrado e mandaria outro pedido de encerramento em vez de liberar (`brza-sessions:564`; a correção é do
+     `brza-workflow`). **"Encerrada, retida"** é diferente: o terminal ficou com outro dono ou sem identidade provada e não
+     fecha sozinho; diga-o no chat e no worklog, e Anderson decide se fecha a aba.
+     O mesmo defeito do `worker_state` faz o `wait` do v2 não concluir rodada por `worker_done`; a rodada conclui pelo
+     status, como deve.
 - `brza note commit` dos worklogs e issues.
 
 ## A narração e o painel
@@ -168,28 +224,28 @@ A tabela de regras está em `references/narration.md`; leia-a antes da abertura.
 chat da coordenação, e **o porquê**: ele acompanhou a Carvão pelo chat e a MCP pelos chats das filhas, e a diferença não
 foi silêncio, foi conteúdo (personas nomeadas em 11 de 57 blocos contra 4 de 47).
 
-- **Abertura:** a tabela Persona · papel · runtime · modelo · esforço.
-- **Cada chegada (mensagem de fim de rodada):** uma linha "R2 · 4/6 — entregaram … ; faltam …", e a mesma linha a cada 3 min sem chegada.
+- **Abertura:** a tabela Persona · papel · runtime · modelo · esforço, que o `launch_persona.py` imprime.
+- **Cada chegada:** uma linha "R2 · 4/6 — entregaram … ; faltam …", e a mesma linha a cada 3 min sem chegada.
 - **Fechamento de rodada:** a tabela do `tally.py` (posição, confiança, mudou?, voto), a sala e o revisor, os números
   conferidos ("confere/diverge: … — fonte → resultado") e o painel `::orca-visual`.
-- **Não vai ao chat:** a argumentação integral das personas (R1.4); ela fica no worklog e na fase do painel.
+- **Não vai ao chat:** a argumentação integral das personas (R1.4) e o ruído previsto do host (X3), contado numa linha.
 - **O painel:** um arquivo por rodada (`<reuniao>-rN-<hash>.html`), republicado na abertura, a cada resposta nova e no
   fechamento; a rodada seguinte ganha nome novo. Conferido por PNG antes de aparecer (`narration.md`).
+- **A hora** de toda linha da narração e do worklog sai de `date '+%H:%M:%S'`, rodado na hora, nunca de cabeça (X11).
 
-## v1 × v2 (o CLI que vem)
+## Os verbos por passo
 
-| Passo | v1 (hoje) | v2 (verbos do D2) |
+| Passo | Comando da skill | O verbo do `brza sessions` por baixo |
 | :-- | :-- | :-- |
-| Abrir com modelo e ciclo de vida | `launch_persona.py` | `brza sessions open` pela via de worker |
-| Enviar a N | laço de `brza sessions send`, depois do `wait` | `send` a N com recibo |
-| Esperar | `wait_round.py` (`check --wait`) | `brza sessions wait` |
-| Ler | o worklog; o chat, só abrindo a aba | `brza sessions read --last` |
-| Trocar modelo | fechar e reabrir no `fallback` | `brza sessions model` |
-| Medir | `tally.py` (Claude + Codex) | `tally.py` sobre `brza sessions usage` |
-| Fechar | `worker_done` das personas + `--stop` | `close` por `worker-release` |
+| Abrir com modelo e ciclo de vida | `launch_persona.py $R` | `brza sessions <nome> --agent --model --effort --prompt-file --wait` |
+| Enviar a N | `launch_persona.py $R --send … --round N` | `send <nomes…> --text`, com recibo e `--operation` |
+| Esperar | `wait_round.py N` | `wait <nomes…> --any --timeout` |
+| Ler a persona travada | — | `read <nome> --last` |
+| Trocar modelo | — | `model <nome> <modelo> --effort` |
+| Medir | `tally.py --opened … --closed …` (a janela vem dos horários que a coordenação passa) | — (o `usage` dá o total da sessão; a skill não o chama) |
+| Fechar | `launch_persona.py $R --close`, `--status`, `--stop`, `--keep-open` | `close`, `close --force`, `close --keep-open`; `worker-show` só leitura |
 
-Quando o CLI chegar, `launch_persona.py` e `wait_round.py` saem e esta tabela troca "v1" por "v2". O `tally.py` e o
-`panel.py` ficam.
+O `tally.py`, o `panel.py`, o `check_briefing.py` e o `runtime_memory_check.py` não têm verbo correspondente e ficam.
 
 ## Invariantes
 
@@ -197,3 +253,5 @@ Quando o CLI chegar, `launch_persona.py` e `wait_round.py` saem e esta tabela tr
 - Nenhum número entra no chat sem a fonte (`tally.py`, comando ou worklog).
 - Sem a frase explícita de Anderson, nada vira decisão: o registro nasce como proposta.
 - A conta de médias, mediana, soma de custo e a lista "sem medição" saem dos scripts, nunca da coordenação.
+- Nada se reenvia, se fecha de novo ou se relança às cegas: `pending`, `unknown`, `closing`, `stop_unknown` e `retained`
+  se conferem antes da próxima ação.

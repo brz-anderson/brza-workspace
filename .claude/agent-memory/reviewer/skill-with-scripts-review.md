@@ -1,6 +1,6 @@
 ---
 name: skill-with-scripts-review
-description: Onde erram as skills do playground que trazem scripts com contrato JSON entre si (meeting-runner, 2026-11-08), e quais hipóteses de revisão costumam cair
+description: Onde erram as skills do playground que trazem scripts com contrato JSON entre si (meeting-runner, 2026-11-08 e 11-09), e quais hipóteses de revisão costumam cair
 metadata:
   type: project
 ---
@@ -25,13 +25,40 @@ morou em cinco lugares, todos achados por comando e não por leitura:
   já contradiz o script: `worker-release` só vale para worker settled; `--terminal` pede `--worktree`; `worker_done`
   sem `--to`.
 
+**Na 3ª revisão (transporte v2 do `brza sessions`, 2026-11-09), o erro voltou nos mesmos lugares, com três formas novas:**
+
+- **A mesma flag de subconjunto com regra de casamento diferente em cada script.** `--send`/`--personas` aceitavam
+  slug sem caixa; `--participantes` só o nome exato, e o slug deixava todos "fora da rodada" com rc 0 e "0 de 0". Rode
+  cada flag de subconjunto com o slug em minúsculas e com um nome que não existe.
+- **Vazio declarado × ausente.** O molde permitia "nenhum novo"; o parser dava `[]`, e o `not` tratava como ausente
+  (aviso falso). Procure `not x` onde o molde tem uma resposta "vazia" legítima.
+- **Histórico sem data devolvido inteiro.** O `wait` do v2 devolve todos os eventos do Run, sem `createdAt`; a dedupe
+  por processo repete a pergunta da R1 em toda rodada seguinte. Confira se o evento traz hora e se a dedupe sobrevive
+  à próxima invocação.
+- **Abreviação que colide com rótulo novo:** o painel abreviava apoio/ressalva/contra como A/R/C, e o molde novo passou
+  a aceitar propostas A/B ("voto A 0" de quem votou A). Leia o PNG, não só o HTML.
+
+Mutação barata para medir os testes: copie `scripts/`, troque uma linha por `sed`/Python e conte as falhas contra a
+linha de base da cópia (a cópia já perde 2 testes de raiz git). Na 3ª revisão, as dez mutações caíram.
+
+**Na reverificação, a correção abre um buraco vizinho.** Isso aconteceu três vezes na mesma rodada:
+- A dedupe persistida marcava como visto o evento de quem estava fora do subconjunto, que nunca era narrado.
+- O "ignorar o que está em crase" deixou passar o número escrito entre crases.
+- O "liberada vence falhou" escondeu o worker `failed` que o host libera sozinho.
+
+Em cada correção, pergunte o que ela passa a dar como tratado sem ter tratado, e rode o caso de borda que a exclusão
+nova cria.
+
 **Nos testes:** procure `except Exception: skipTest` e teste cujo invariante outra linha do código já garante (o teste
 de dedupe passava sem a dedupe). O aceite "contra o gabarito" costuma conferir só as colunas fáceis; confira se a
 medição (latência, custo) entra.
 
 **Hipóteses que caíram (não gastar confiança alta):** XSS no HTML gerado (escapava tudo), `shell=True`, o teto de
 512 KB, `:root` no tema, laço infinito, a mensagem de rodada antiga contando na nova (havia o `m < n`), a corrida
-entre a escrita parcial e o marcador na última linha.
+entre a escrita parcial e o marcador na última linha. Na 3ª: "o teste integrado não roda o v2 real" (roda, por
+`SourceFileLoader`); "`reclaimable` deixa o veredito ativo" (é `terminalState`, não `stage`); "o `--operation` muda
+o texto" (o v2 anexa o mesmo protocolo); laço quente no limite (sai com 2). Deram 85–90 de partida e caíram por
+leitura direta do código do CLI e do studio.
 
 **Why:** a skill nasce de protótipos de scratch, e cada script é endurecido em separado; o contrato entre eles e os
 moldes das references é o que ninguém roda junto.

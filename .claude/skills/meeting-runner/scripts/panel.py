@@ -21,9 +21,11 @@ from datetime import datetime, timedelta
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
 import tally as _tally  # noqa: E402  (a conta da sala e a raiz padrão moram lá, em um lugar só)
+import common as _common  # noqa: E402  (o prazo e a duração anunciada da rodada também: a espera lê o mesmo)
 LIMITE_HTML = 512 * 1024
 CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 A_PARTE = 'antigravity'  # runtime que fica fora da média da sala (decisão E-1 do D1)
+FORA = 'fora da rodada'  # persona fora do subconjunto da rodada (X18)
 
 
 # ---------------------------------------------------------------- utilidades
@@ -42,7 +44,8 @@ def _t(s):
 
 
 def _e(s):
-    return H.escape(str(s)) if s is not None else ''
+    """Escapa para HTML; o `∥` (que o visual do chat não desenha) vira `||` só aqui, nunca no JSON do estado."""
+    return H.escape(str(s)).replace('∥', '||') if s is not None else ''
 
 
 def _hm(s):
@@ -111,7 +114,7 @@ def recortar(S, at=None):
         if est == 'falta' and tn and tp and _seg(tp, tn) > 0:
             est = 'atrasado'
         p['estado'] = est or 'falta'
-        if p['estado'] != 'respondeu' and p.get('trabalhando_s') is None and tn and ta:
+        if p['estado'] not in ('respondeu', FORA) and p.get('trabalhando_s') is None and tn and ta:
             p['trabalhando_s'] = max(0, int(_seg(ta, tn)))
     fech = _t(R.get('fechada'))
     if at and fech and tn and _seg(fech, tn) < 0:
@@ -124,6 +127,8 @@ def _estado_cel(p):
         base = '' if p.get('latencia_fonte') == 'turno' or p.get('latencia_s') is None else '≈'
         return (f'<span class="st ok">respondeu</span><span class="sm">{_e(_hm(p.get("respondeu_as")))}'
                 f' · {base}{_dur(p.get("latencia_s"))}</span>')
+    if p['estado'] == FORA:
+        return '<span class="st wait">fora da rodada</span>'
     cls = 'late' if p['estado'] in ('atrasado', 'erro', 'sem cota') else 'wait'
     ha = f'<span class="sm">há {_dur(p["trabalhando_s"])}</span>' if _isnum(p.get('trabalhando_s')) else ''
     return f'<span class="st {cls}">{_e(p["estado"])}</span>{ha}'
@@ -145,6 +150,10 @@ def _conf_cel(p):
 
 
 def _custo_cel(p):
+    if p.get('medicao') == 'pendente':
+        return '<span class="mut" title="o hook grava o turno no Stop; gere o estado de novo em ~1 min">medição pendente</span>'
+    if p.get('estado') == FORA:
+        return '<span class="mut">—</span>'
     if _isnum(p.get('custo_usd')):
         return f'US$ {_num(p["custo_usd"], 2)}'
     tk = p.get('tokens')
@@ -158,11 +167,17 @@ def _custo_cel(p):
 def _tags(p, tem_voto):
     out = []
     v = p.get('voto')
-    if tem_voto and isinstance(v, dict):
-        out.append(f'<span class="tg">voto A {_e(v.get("apoio", 0))} · R {_e(v.get("ressalva", 0))}'
-                   f' · C {_e(v.get("contra", 0))}</span>')
+    vp = p.get('voto_por_proposta')
+    if tem_voto and isinstance(vp, dict) and vp:
+        # o voto por proposta (A, B, P1…): as palavras inteiras, sem a letra do voto colidir com a da proposta
+        txt = ' · '.join(f'{k}: {str(x).replace("apoio com", "apoio c/")}' for k, x in vp.items())
+        out.append(f'<span class="tg">voto {_e(txt)}</span>')
+    elif tem_voto and isinstance(v, dict):
+        out.append(f'<span class="tg">voto: apoio {_e(v.get("apoio", 0))} · ressalva {_e(v.get("ressalva", 0))}'
+                   f' · contra {_e(v.get("contra", 0))}</span>')
     if p.get('virada'):
-        out.append(f'<span class="tg vir">virou: {_e(p["virada"])}</span>')
+        rotulo = 'manteve' if p['virada'] == 'não' else p['virada']  # a etiqueta é a própria palavra, sem "virou: virou"
+        out.append(f'<span class="tg vir">{_e(rotulo)}</span>')
     elif p.get('virada_antes'):
         out.append(f'<span class="tg">{_e(p["virada_antes"])}</span>')
     if p.get('worklog'):
@@ -173,7 +188,8 @@ def _tags(p, tem_voto):
 
 def _linha(p, tem_voto):
     sub = ' · '.join(_e(x) for x in (p.get('runtime'), p.get('modelo'), p.get('esforco')) if x)
-    pos = _e(p['posicao']) if p.get('posicao') else '<span class="mut">aguardando a seção da rodada</span>'
+    pos = (_e(p['posicao']) if p.get('posicao') else '<span class="mut">fora desta rodada</span>' if p.get('estado') == FORA
+           else '<span class="mut">aguardando a seção da rodada</span>')
     return (f'<div class="row"><div class="who"><b>{_e(p.get("nome"))}</b><span class="sm">{sub}</span></div>'
             f'<div>{_estado_cel(p)}</div><div>{_conf_cel(p)}</div><div class="ct">{_custo_cel(p)}</div>'
             f'<div class="pos">{pos}<div class="tgs">{_tags(p, tem_voto)}</div></div></div>')
@@ -209,7 +225,9 @@ def estatisticas(P):
         'usd': sum(p['custo_usd'] for p in done if _isnum(p.get('custo_usd'))),
         'tok': sum(p['tokens']['entrada'] for p in done
                    if isinstance(p.get('tokens'), dict) and _isnum(p['tokens'].get('entrada'))),
-        'semmed': [p.get('nome') for p in done if not _isnum(p.get('custo_usd')) and not p.get('tokens')],
+        'semmed': [p.get('nome') for p in done if not _isnum(p.get('custo_usd')) and not p.get('tokens')
+                   and p.get('medicao') != 'pendente'],
+        'pendentes': [p.get('nome') for p in done if p.get('medicao') == 'pendente'],
     }
 
 
@@ -223,16 +241,17 @@ def render_html(S, at=None, dark=False):
     fechada = R.get('fechada')
     tem_voto = bool(R.get('tem_voto'))
     st = estatisticas(P)
-    falta = [p.get('nome') for p in P if p['estado'] != 'respondeu']
+    PP = [p for p in P if p['estado'] != FORA]  # o "n de m" é dos participantes; quem está fora não segura a rodada
+    falta = [p.get('nome') for p in PP if p['estado'] != 'respondeu']
     n = R.get('n', '?')
     titulo = R.get('titulo') or ''
 
     if fechada:
-        status = f'{len(st["done"])} de {len(P)} responderam · fechada às {_e(_hm(fechada))}'
+        status = f'{len(st["done"])} de {len(PP)} responderam · fechada às {_e(_hm(fechada))}'
     elif falta:
-        status = f'{len(st["done"])} de {len(P)} responderam · falta {_e(", ".join(map(str, falta)))}'
+        status = f'{len(st["done"])} de {len(PP)} responderam · falta {_e(", ".join(map(str, falta)))}'
     else:
-        status = f'{len(st["done"])} de {len(P)} responderam'
+        status = f'{len(st["done"])} de {len(PP)} responderam'
     prazo = f' · prazo {_e(_hm(R["prazo"]))}' if R.get('prazo') else ''
     meta = f'aberta {_e(_hm(R.get("aberta")))}{prazo} · {status} · estado das {_e(_hm(now))}'
 
@@ -247,11 +266,12 @@ def render_html(S, at=None, dark=False):
     sin = ''.join(f'<li>{_e(x)}</li>' for x in sintese) if fechada else ''
 
     def _dec(d):
+        # `quem` é quem LEVANTOU a decisão (o molde da síntese), não quem a recomenda; voto só sai do campo `votos`
         quem = [str(x) for x in (d.get('quem') or [])]
-        verbo = 'recomendam' if len(quem) > 1 else 'recomenda'
-        rec = f'<span class="sm">{_e(" e ".join(quem))} {verbo}: {_e(d.get("recomendacao"))}</span>' if quem or d.get('recomendacao') else ''
+        lev = f'<span class="sm">levantada por {_e(", ".join(quem[:-1]) + " e " + quem[-1] if len(quem) > 1 else quem[0])}</span>' if quem else ''
+        rec = f'<span class="sm">recomendação: {_e(d.get("recomendacao"))}</span>' if d.get('recomendacao') else ''
         votos = f'<span class="sm">{_e(d["votos"])}</span>' if d.get('votos') else ''
-        return f'<li><b>{_e(d.get("pergunta"))}</b>{rec}{votos}</li>'
+        return f'<li><b>{_e(d.get("pergunta"))}</b>{lev}{rec}{votos}</li>'
     dec = ''.join(_dec(d) for d in decisoes) if fechada else ''
 
     coord = (cc.get('coordenacao_usd') or 0) + (cc.get('revisor_usd') or 0)
@@ -259,7 +279,16 @@ def render_html(S, at=None, dark=False):
     late_open = '' if fechada else '<p class="sm mut">Medições, síntese e decisões entram quando a rodada fecha.</p>'
     sem_voto = '' if tem_voto else ' Rodada sem voto.'
     semmed = _e(', '.join(map(str, st['semmed']))) or '—'
-    rotulo_custo = 'na rodada' if R.get('custo_rotulo') in (None, 'da rodada') else 'no total da sessão (sem a janela da rodada)'
+    total = R.get('custo_rotulo') not in (None, 'da rodada')
+    rotulo_custo = 'no total da sessão (sem a janela da rodada)' if total else 'na rodada'
+    # X2: o cartão só fala do Codex quando há persona Codex
+    tem_codex = any(str(p.get('runtime') or '').strip().lower() == 'codex' for p in P)
+    codex = f' · Codex {_num(st["tok"] / 1e6, 2)} M tokens' if tem_codex else ''
+    tem_claude = any(str(p.get('runtime') or '').strip().lower() == 'claude' for p in PP)
+    cartao_usd = f'US$ {_num(st["usd"], 2)}' if tem_claude else '—'
+    cartao_txt = f'personas Claude {rotulo_custo}{codex}' if tem_claude else f'sem persona Claude na rodada{codex}'
+    cab_custo = 'Custo (total da sessão)' if total else 'Custo'
+    pend = f' Medição pendente: {_e(", ".join(map(str, st["pendentes"])))} (o hook grava no Stop do turno).' if st['pendentes'] else ''
     body = f'''<header>
 <div class="eyebrow">Reunião · {_e(reu.get("tema"))}</div>
 <h1>Rodada {_e(n)} — {_e(titulo)}</h1>
@@ -267,14 +296,14 @@ def render_html(S, at=None, dark=False):
 {_faixa(S, P)}
 </header>
 <section class="tiles">
-<div class="tile"><b>{_num(st["media"])}</b><span>média da sala ({st["n_media"]}/{len(P)}) · mediana {_num(st["mediana"])}{aparte}</span></div>
+<div class="tile"><b>{_num(st["media"])}</b><span>média da sala ({st["n_media"]}/{len(PP)}) · mediana {_num(st["mediana"])}{aparte}</span></div>
 <div class="tile"><b>{revisor}</b><span>{_e(sala.get("revisor_nota"))}</span></div>
-<div class="tile"><b>US$ {_num(st["usd"], 2)}</b><span>personas Claude {rotulo_custo} · Codex {_num(st["tok"] / 1e6, 2)} M tokens</span></div>
+<div class="tile"><b>{cartao_usd}</b><span>{cartao_txt}</span></div>
 <div class="tile"><b>US$ {_num(coord, 2)}</b><span>coordenação e revisor até {_e(_hm(cc.get("ate")))}</span></div>
 </section>
 <h2>As personas</h2>
-<div class="tbl"><div class="row hd"><div>Persona</div><div>Estado</div><div>Confiança</div><div class="ct">Custo</div></div>{rows}</div>
-<p class="sm mut">Latência com ≈: do envio ao marcador, pela coordenação (Grok e Antigravity não gravam turno). Sem medição: {semmed}.{sem_voto}</p>
+<div class="tbl"><div class="row hd"><div>Persona</div><div>Estado</div><div>Confiança</div><div class="ct">{cab_custo}</div></div>{rows}</div>
+<p class="sm mut">Latência com ≈: do envio ao marcador, pela coordenação (Grok e Antigravity não gravam turno). Sem medição: {semmed}.{pend}{sem_voto}</p>
 {late_open}
 {"<h2>As medições da coordenação</h2><ul class='med'>" + med + "</ul>" if med else ""}
 {"<h2>A síntese</h2><ol class='sin'>" + sin + "</ol>" if sin else ""}
@@ -286,28 +315,7 @@ def render_html(S, at=None, dark=False):
 
 # ---------------------------------------------------------------- collect
 
-def _cabecalho_rodada(path):
-    """Primeira linha do rodada-N.md -> (titulo, prazo 'HH:MM', duracao_min). O título não leva o "(prazo…)" nem o
-    "(duração…)"; `(prazo: 21h40)` vale como horário, `(duração: ~5 min)` vira minutos (o prazo é a abertura + eles)."""
-    try:
-        with open(path, encoding='utf-8') as f:
-            linha = f.readline().strip()
-    except OSError:
-        return None, None, None
-    m = re.match(r'^#\s*Rodada\s+\d+\s*[—–-]\s*(.*)$', linha)
-    if not m:
-        return None, None, None
-    resto = m.group(1)
-    prazo = duracao = None
-    pm = re.search(r'\(\s*prazo:\s*(\d{1,2})\s*[h:]\s*(\d{2})\s*\)', resto)
-    if pm:
-        prazo = f'{int(pm.group(1)):02d}:{pm.group(2)}'
-        resto = (resto[:pm.start()] + resto[pm.end():]).strip()
-    dm = re.search(r'\(\s*dura[çc][ãa]o:\s*~?\s*(\d+)\s*min(?:utos?)?\s*\)', resto, re.IGNORECASE)
-    if dm:
-        duracao = int(dm.group(1))
-        resto = (resto[:dm.start()] + resto[dm.end():]).strip()
-    return resto.strip() or None, prazo, duracao
+_cabecalho_rodada = _common.cabecalho_rodada  # (titulo, prazo 'HH:MM', duracao_min): o mesmo que o wait_round.py lê
 
 
 def _estado_da_sessao(state):
@@ -340,7 +348,7 @@ class ErroManifesto(Exception):
 
 
 def collect(reuniao, n, root, *, opened=None, closed=None, list_json=None, at=None, measurements=None,
-            sessions=None, codex_dir=None, tally_mod=None):
+            sessions=None, codex_dir=None, tally_mod=None, participantes=None, settle=0):
     for k in ('id', 'tema', 'fim'):
         if not reuniao.get(k):
             raise ErroManifesto(f'manifesto sem "{k}" (obrigatório: id, tema, fim)')
@@ -348,7 +356,8 @@ def collect(reuniao, n, root, *, opened=None, closed=None, list_json=None, at=No
         sys.path.insert(0, AQUI)
         import tally as tally_mod
     kw = {k: v for k, v in (('measurements', measurements), ('sessions', sessions), ('codex_dir', codex_dir),
-                            ('opened', opened), ('closed', closed), ('at', at)) if v is not None}
+                            ('opened', opened), ('closed', closed), ('at', at), ('participantes', participantes),
+                            ('settle', settle or None)) if v is not None}
     S = tally_mod.build_estado(reuniao, n, root, **kw)
     R = S.setdefault('rodada', {})
     R.setdefault('n', n)
@@ -378,9 +387,10 @@ def collect(reuniao, n, root, *, opened=None, closed=None, list_json=None, at=No
     R['gerado'] = at or datetime.now().strftime('%H:%M:%S')
 
     P = S.get('personas') or []
+    PP = [p for p in P if p.get('estado') != FORA]  # X18: a rodada fecha quando TODOS OS PARTICIPANTES responderam
     R['fechada'] = None
-    if P and all(p.get('estado') == 'respondeu' for p in P):
-        horas = [p['respondeu_as'] for p in P if _t(p.get('respondeu_as'))]
+    if PP and all(p.get('estado') == 'respondeu' for p in PP):
+        horas = [p['respondeu_as'] for p in PP if _t(p.get('respondeu_as'))]
         if horas:
             ab = _t(R.get('aberta'))
             R['fechada'] = max(horas, key=(lambda h: _seg(ab, _t(h))) if ab else _t)
@@ -438,7 +448,8 @@ def _cmd_collect(a):
                   f'confira --root e o manifesto', file=sys.stderr)
             return 2
         S = collect(reuniao, a.n, root, opened=a.opened, closed=a.closed, list_json=a.list_json, at=a.at,
-                    measurements=a.measurements, sessions=a.sessions, codex_dir=a.codex_dir)
+                    measurements=a.measurements, sessions=a.sessions, codex_dir=a.codex_dir,
+                    participantes=a.participantes, settle=a.settle)
     except (ErroManifesto, OSError, ValueError) as ex:
         print(f'panel collect: {ex}', file=sys.stderr)
         return 2
@@ -516,6 +527,10 @@ def main(argv=None):
     c.add_argument('--measurements')
     c.add_argument('--sessions')
     c.add_argument('--codex-dir')
+    c.add_argument('--participantes', nargs='+', metavar='NOME',
+                   help='só estes nomes estão na rodada; os outros ficam "fora da rodada" e não seguram o fechamento')
+    c.add_argument('--settle', type=float, default=0, metavar='SEG',
+                   help='relê as medições a cada 5 s até as pendentes chegarem, por até SEG')
     c.set_defaults(fn=_cmd_collect)
     r = sub.add_parser('render', help='estado -> HTML do ::orca-visual')
     r.add_argument('estado')

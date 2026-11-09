@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39779, #39637, #39575, #39572, #39018 trazem busca de projetos e hosts, seletores para pastas e status bar.
+description: Os PRs #39999, #39977, #39779, #39637, #39575 trazem source control mobile em pastas, renomeação e seletores de projetos.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,9 @@ tags:
 
 # Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39779`](https://github.com/stablyai/orca/pull/39779) (resolve Issue [`#39777`](https://github.com/stablyai/orca/issues/39777)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#39999`](https://github.com/stablyai/orca/pull/39999),
+[`stablyai/orca#39977`](https://github.com/stablyai/orca/pull/39977),
+[`stablyai/orca#39779`](https://github.com/stablyai/orca/pull/39779) (resolve Issue [`#39777`](https://github.com/stablyai/orca/issues/39777)),
 [`stablyai/orca#39637`](https://github.com/stablyai/orca/pull/39637),
 [`stablyai/orca#39575`](https://github.com/stablyai/orca/pull/39575),
 [`stablyai/orca#39572`](https://github.com/stablyai/orca/pull/39572) (resolve Issue [`#39545`](https://github.com/stablyai/orca/issues/39545)),
@@ -64,6 +66,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39779`](https://github.com
     Agentes e comandos da CLI podiam referenciar folder workspaces apenas pelo identificador literal `folder:<id>`, pois seletores
     como `path:` e `name:` buscavam exclusivamente Git worktrees em repositórios. Além disso, o comando `worktree ps` unificava
     indevidamente linhas de workspaces com mesmo ID em hosts distintos (ex.: `local` e `ssh:server`).
+11. **Ausência de Source Control de pastas multirrepositório no app mobile (`#39999`):**
+    O cliente mobile não conseguia inspecionar status de controle de versão nem branches alterados em folder workspaces,
+    restringindo a visualização de diffs e commits pendentes a repositórios Git isolados.
+12. **Incapacidade de renomear projetos pelo menu da barra lateral (`#39977`):**
+    Não havia ação rápida no cabeçalho de projetos na barra lateral para renomear projetos/workspaces de forma intuitiva,
+    exigindo edições manuais em arquivos de configuração ou recadastramento.
 
 ## O que o upstream implementa e corrige
 
@@ -101,6 +109,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39779`](https://github.com
   - Introduz o matcher compartilhado `project-host-query`, permitindo digitar `<host> <projeto>` (ex.: `box orca`) nos drawers
     de seleção de projetos e no quick-pick do cliente móvel, além do combobox de projetos no desktop;
   - Atualiza simultaneamente o projeto e o host de execução (*Run on*) em uma única seleção rápida.
+- **Source Control de folder workspaces no cliente móvel (`#39999`):**
+  - Expõe as alterações, diffs e arquivos modificados de projetos de pasta multirrepositório no aplicativo móvel;
+  - Permite inspecionar o status de cada repositório Git vinculado diretamente pelo celular sem necessidade de acessar sessões de terminal.
+- **Renomeação de projeto no menu do cabeçalho da barra lateral (`#39977`):**
+  - Inclui a opção "Rename project" no menu de opções do cabeçalho de projeto da barra lateral;
+  - Abre modal direto para atualizar o nome amigável do projeto/workspace e propaga a alteração para a lista de projetos e histórico.
 
 ## O que fazer no BrzA Studio
 
@@ -111,3 +125,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39779`](https://github.com
 5. Aplicar sanitização e `.trim()` em todos os campos de diretório de workspace para evitar criação de pastas acidentais (`#39572`).
 6. Suportar seletores unificados `path:` e `name:` para folder workspaces na CLI e separar instâncias por host no `worktree ps` (`#39637`).
 7. Integrar a busca combinada de projetos e hosts (`project-host-query`, `#39779`) nos modais de criação de workspace.
+8. Expor a visão de Source Control para folder workspaces no cliente móvel (`#39999`).
+9. Incluir a ação "Rename project" no menu de contexto de projeto da sidebar (`#39977`).

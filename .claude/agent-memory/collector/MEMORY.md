@@ -2,3 +2,4 @@
 - [Levantar memórias de outros workstreams](memory-survey-tips.md) — dump por git show, caminhos do brza-studio que mudaram, AGENTS.md do studio é upstream
 - [Atalhos para levantar memórias entre branches](memory-survey-shortcuts.md) — git show por branch, nomes ocultos no scratch, normas que colidem
 - [Mapa da orquestração do Studio](studio-orchestration-map.md) — onde mora auto-release/Keep open/worker-start no brza-studio e o grep que quebra no zsh
+- [Mapa dos candidatos a tev1](tev1-candidates-map.md) — onde mora cada decisão fechada (resolver, tally, plan-runner, hooks, Studio) e como medir

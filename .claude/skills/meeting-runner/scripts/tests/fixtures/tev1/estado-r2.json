@@ -1,0 +1,307 @@
+{
+  "reuniao": {
+    "id": "reuniao-tev1",
+    "tema": "Onde o tev1 local entra nos fluxos: CLI, Studio, MCP, meeting-runner, plan-runner e migration-runner",
+    "decisor": "Anderson",
+    "fim": "00h00"
+  },
+  "rodada": {
+    "n": 2,
+    "total_previsto": null,
+    "titulo": "debate",
+    "aberta": "21:35:42",
+    "prazo": "21:45",
+    "fechada": "21:38:52",
+    "gerado": "21:40:22",
+    "tem_voto": false,
+    "custo_rotulo": "da rodada",
+    "participantes": [
+      "Balança",
+      "Ferrolho",
+      "Bitola",
+      "Fagulha",
+      "Faro",
+      "Lida"
+    ]
+  },
+  "personas": [
+    {
+      "nome": "Balança",
+      "papel": "Cética medidora",
+      "sessao": "tev1-balanca",
+      "runtime": "Grok",
+      "modelo": "grok-4.7",
+      "esforco": "xhigh",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-balanca.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:38:52",
+      "latencia_s": 191,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 79.4,
+      "confianca_fonte": "placar",
+      "confianca_r1": 76.0,
+      "posicao": "Virei: nada liga. M12 mata o evento, M5 o None, M11 o alarme.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": "virou",
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 91
+    },
+    {
+      "nome": "Ferrolho",
+      "papel": "Guardião da falha silenciosa",
+      "sessao": "tev1-ferrolho",
+      "runtime": "Codex",
+      "modelo": "gpt-6.1-terra",
+      "esforco": "medium",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-ferrolho.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:36:19",
+      "latencia_s": 36,
+      "latencia_fonte": "turno",
+      "confianca": 85.4,
+      "confianca_fonte": "placar",
+      "confianca_r1": 80.0,
+      "posicao": "Rebaixo voto e gatilho; sombra primeiro, com negativos revisados e evidência preservada.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": "virou",
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": null,
+      "tokens": {
+        "entrada": 371047,
+        "cache": 356736,
+        "saida": 1648
+      },
+      "janela": true,
+      "medicao": "medida",
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 84
+    },
+    {
+      "nome": "Bitola",
+      "papel": "Arquiteta de integração",
+      "sessao": "tev1-bitola",
+      "runtime": "Grok",
+      "modelo": "grok-4.6",
+      "esforco": "high",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-bitola.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:37:09",
+      "latencia_s": 88,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 86.0,
+      "confianca_fonte": "placar",
+      "confianca_r1": null,
+      "posicao": "Sombra no Classifier; voto None cai (M5); envelope é módulo+verbo fino.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": "virou",
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 102
+    },
+    {
+      "nome": "Fagulha",
+      "papel": "Provocadora",
+      "sessao": "tev1-fagulha",
+      "runtime": "Grok",
+      "modelo": "grok-4.7-build-fast",
+      "esforco": "low",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-fagulha.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:36:20",
+      "latencia_s": 39,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 80.8,
+      "confianca_fonte": "placar",
+      "confianca_r1": 75.8,
+      "posicao": "Larga o filtro e o voto: a sombra guarda o que a auditoria apaga.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": "virou",
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 102
+    },
+    {
+      "nome": "Faro",
+      "papel": "Pesquisador",
+      "sessao": "tev1-faro",
+      "runtime": "Antigravity",
+      "modelo": null,
+      "esforco": null,
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-faro.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:38:06",
+      "latencia_s": 145,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 89.4,
+      "confianca_fonte": "placar",
+      "confianca_r1": 88.8,
+      "posicao": "Sombra e log primeiro: M8 zera corpus de fatos, M5 esvazia voto e M11 barra gatilho direto.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": "ajustou",
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 107
+    },
+    {
+      "nome": "Lida",
+      "papel": "Voz do mantenedor com pouco tempo",
+      "sessao": "tev1-lida",
+      "runtime": "Claude",
+      "modelo": "claude-haiku-5-5",
+      "esforco": "low",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-lida.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:36:32",
+      "latencia_s": 48,
+      "latencia_fonte": "turno",
+      "confianca": 59.8,
+      "confianca_fonte": "placar",
+      "confianca_r1": 60.2,
+      "posicao": "Lida recua do alarme que cala e do limiar do `layer`; fica com a sombra e com o cliente único.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": "virou",
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": 0.01,
+      "tokens": null,
+      "janela": true,
+      "medicao": "medida",
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 160
+    }
+  ],
+  "sala": {
+    "media": 78.3,
+    "mediana": 80.8,
+    "n": 5,
+    "faixa": [
+      59.8,
+      86.0
+    ],
+    "total": 6,
+    "media_todas": 80.1,
+    "mediana_todas": 83.1,
+    "n_todas": 6,
+    "antigravity": {
+      "media": 89.4,
+      "n": 1,
+      "nomes": [
+        "Faro"
+      ],
+      "fora_da_media": true
+    },
+    "revisor": null,
+    "revisor_nota": "revisor independente só na proposta",
+    "diferenca_revisor": null
+  },
+  "avisos": [],
+  "medicoes": [
+    {
+      "tipo": "medido",
+      "quem": "coordenação",
+      "texto": "layer do resolver em 252 tarefas reais, sem o papel: 39% de acerto; general-purpose 22%; diz 'alta' em 216/252 — material/coord/layer2.out"
+    },
+    {
+      "tipo": "medido",
+      "quem": "coordenação",
+      "texto": "ordem invertida: layer segue em 'alta' (229/252); evento com 'nao' primeiro acerta 7/17 'não' (era 0) — material/coord/ordem.out"
+    },
+    {
+      "tipo": "medido",
+      "quem": "coordenação",
+      "texto": "corte de tarefa sem corpus: 39 turnos com prompt_head, 28 marcos task — measurements.jsonl"
+    },
+    {
+      "tipo": "conferido",
+      "quem": "coordenação",
+      "texto": "Balança: pasta fact-audit vazia às 21:38 — confere com fact_audit.py:430"
+    }
+  ],
+  "sintese": [
+    "6/6: módulo Classifier.ask extraído do _tev1 + verbo fino brza classify (D1c).",
+    "6/6: nada liga antes da tabela por pergunta; o plano começa gravando (D2e).",
+    "A fase 0 guarda o que a auditoria apaga, e o tally grava os pares voto × M# como candidatos.",
+    "O layer do resolver diz 'alta' em 86% das tarefas curtas (M13); toda pergunta nova passa por probe (P6).",
+    "Dissenso: Faro quer régua conformal (n ≥ 50) e o Studio já; Lida não quer retreino."
+  ],
+  "decisoes": [
+    {
+      "pergunta": "A fase 0 grava o texto do state (com retenção) ou só o hash?",
+      "quem": [
+        "Ferrolho",
+        "Faro"
+      ],
+      "recomendacao": null,
+      "votos": null
+    },
+    {
+      "pergunta": "A régua é FN 0 com n ≥ 30 na classe cara, ou conformal com n ≥ 50?",
+      "quem": [
+        "Balança",
+        "Faro"
+      ],
+      "recomendacao": null,
+      "votos": null
+    },
+    {
+      "pergunta": "O retreino fica como evolução aberta ou sai do plano?",
+      "quem": [
+        "Lida",
+        "Faro"
+      ],
+      "recomendacao": null,
+      "votos": null
+    }
+  ],
+  "custos_coordenacao": {
+    "coordenacao_usd": null,
+    "revisor_usd": null,
+    "ate": null
+  }
+}

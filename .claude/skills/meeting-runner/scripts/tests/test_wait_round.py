@@ -492,7 +492,8 @@ class CorredorEMain(Base):
                 agora[0] = BASE
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                     rc = wait_round.main(["2", "--reuniao", "reuniao.json", "--root", self.tmp, "--sessions",
-                                          os.path.join(self.tmp, "m.jsonl"), "--source", fonte, "--personas", "trava"])
+                                          os.path.join(self.tmp, "m.jsonl"), "--source", fonte, "--personas", "trava",
+                                          "--no-panel"])
                 self.assertEqual(rc, 2)
                 self.assertEqual(visto[0][0], ["ci-trava"])
                 self.assertEqual(visto[0][1], 175.0)   # duração ~1 min: limite 180 s; o envio foi 5 s antes
@@ -575,7 +576,8 @@ class EventosVistos(Base):
                                                               "subject": "x", "payload": {}}]})
         try:
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                wait_round.main(["3", "--reuniao", "reuniao.json", "--root", self.tmp, "--sessions", mapa])
+                wait_round.main(["3", "--reuniao", "reuniao.json", "--root", self.tmp, "--sessions", mapa,
+                                      "--no-panel"])
         finally:
             wait_round.wait_brza = original
         self.assertEqual(json.loads(Path(self.tmp, "dir", "eventos-vistos.json").read_text()), ["q9"])

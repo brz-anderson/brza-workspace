@@ -221,7 +221,7 @@ class Base(unittest.TestCase):
         try:
             with contextlib.redirect_stdout(saida), contextlib.redirect_stderr(io.StringIO()):
                 rc = wait_round.main(["2", "--reuniao", self.manifesto, "--root", str(self.ws), "--sessions", str(self.mapa),
-                                      "--no-state", *args])
+                                      "--no-state", "--no-panel", *args])
         finally:
             wait_round.wait_brza, wait_round.time = original, relogio
         return rc, saida.getvalue()

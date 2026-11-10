@@ -1,0 +1,31 @@
+{
+ "id": "reuniao-tev1",
+ "tema": "Onde o tev1 local entra nos fluxos: CLI, Studio, MCP, meeting-runner, plan-runner e migration-runner",
+ "decisor": "Anderson",
+ "fim": "00h00",
+ "data": "2026-11-09",
+ "checkout": ".worktrees/playground",
+ "dir": ".sessions/reuniao-tev1",
+ "worklog": "work/worklogs/2026-11-09-reuniao-tev1-{slug}.md",
+ "briefing": "briefing.md",
+ "personas": [
+  {"nome": "Balança", "slug": "balanca", "papel": "Cética medidora", "sessao": "tev1-balanca",
+   "runtime": "grok", "modelo": "grok-4.7", "esforco": "xhigh", "prompt": "prompt-balanca.txt",
+   "fallback": {"runtime": "codex", "modelo": "gpt-6-astra", "esforco": "xhigh"}},
+  {"nome": "Ferrolho", "slug": "ferrolho", "papel": "Guardião da falha silenciosa", "sessao": "tev1-ferrolho",
+   "runtime": "codex", "modelo": "gpt-6.1-terra", "esforco": "medium", "prompt": "prompt-ferrolho.txt",
+   "fallback": {"runtime": "claude", "modelo": "claude-sonnet-5-5", "esforco": "medium"}},
+  {"nome": "Bitola", "slug": "bitola", "papel": "Arquiteta de integração", "sessao": "tev1-bitola",
+   "runtime": "grok", "modelo": "grok-4.6", "esforco": "high", "prompt": "prompt-bitola.txt",
+   "fallback": {"runtime": "claude", "modelo": "claude-sonnet-5-5", "esforco": "high"}},
+  {"nome": "Fagulha", "slug": "fagulha", "papel": "Provocadora", "sessao": "tev1-fagulha",
+   "runtime": "grok", "modelo": "grok-4.7-build-fast", "esforco": "low", "prompt": "prompt-fagulha.txt",
+   "fallback": {"runtime": "codex", "modelo": "gpt-6-luna", "esforco": "low"}},
+  {"nome": "Faro", "slug": "faro", "papel": "Pesquisador", "sessao": "tev1-faro",
+   "runtime": "antigravity", "modelo": "-", "esforco": "-", "prompt": "prompt-faro.txt",
+   "fallback": {"runtime": "grok", "modelo": "grok-4.5", "esforco": "high"}},
+  {"nome": "Lida", "slug": "lida", "papel": "Voz do mantenedor com pouco tempo", "sessao": "tev1-lida",
+   "runtime": "claude", "modelo": "claude-haiku-5-5", "esforco": "low", "prompt": "prompt-lida.txt",
+   "fallback": {"runtime": "codex", "modelo": "gpt-6-luna", "esforco": "low"}}
+ ]
+}

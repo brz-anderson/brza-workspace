@@ -1,0 +1,412 @@
+{
+  "reuniao": {
+    "id": "reuniao-tev1",
+    "tema": "Onde o tev1 local entra nos fluxos: CLI, Studio, MCP, meeting-runner, plan-runner e migration-runner",
+    "decisor": "Anderson",
+    "fim": "00h00"
+  },
+  "rodada": {
+    "n": 3,
+    "total_previsto": null,
+    "titulo": "voto nas propostas",
+    "aberta": "21:40:40",
+    "prazo": "21:48",
+    "fechada": "21:45:22",
+    "gerado": "21:47:25",
+    "tem_voto": true,
+    "custo_rotulo": "da rodada",
+    "participantes": [
+      "Balança",
+      "Ferrolho",
+      "Bitola",
+      "Fagulha",
+      "Faro",
+      "Lida"
+    ]
+  },
+  "personas": [
+    {
+      "nome": "Balança",
+      "papel": "Cética medidora",
+      "sessao": "tev1-balanca",
+      "runtime": "Grok",
+      "modelo": "grok-4.7",
+      "esforco": "xhigh",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-balanca.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:45:22",
+      "latencia_s": 283,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 81.9,
+      "confianca_fonte": "voto",
+      "confianca_r1": 76.0,
+      "posicao": "Apoio gravar já; nada decide. O layer medido não é o texto do request.",
+      "posicao_fonte": "posicao",
+      "voto": {
+        "apoio": 3,
+        "ressalva": 5,
+        "contra": 0
+      },
+      "voto_por_proposta": {
+        "P1": "apoio com ressalva",
+        "P2": "apoio",
+        "P3": "apoio",
+        "P4": "apoio com ressalva",
+        "P5": "apoio com ressalva",
+        "P6": "apoio com ressalva",
+        "P7": "apoio",
+        "P8": "apoio com ressalva"
+      },
+      "virada": null,
+      "virada_antes": "R2: virou",
+      "nota_colegas": 9.5,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M13",
+        "M14",
+        "M15",
+        "M5"
+      ],
+      "linha": 128
+    },
+    {
+      "nome": "Ferrolho",
+      "papel": "Guardião da falha silenciosa",
+      "sessao": "tev1-ferrolho",
+      "runtime": "Codex",
+      "modelo": "gpt-6.1-terra",
+      "esforco": "medium",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-ferrolho.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:41:20",
+      "latencia_s": 39,
+      "latencia_fonte": "turno",
+      "confianca": 89.6,
+      "confianca_fonte": "voto",
+      "confianca_r1": 80.0,
+      "posicao": "Apoio a sombra auditável, com rótulo independente, privacidade e falhas visíveis.",
+      "posicao_fonte": "posicao",
+      "voto": {
+        "apoio": 1,
+        "ressalva": 7,
+        "contra": 0
+      },
+      "voto_por_proposta": {
+        "P1": "apoio com ressalva",
+        "P2": "apoio com ressalva",
+        "P3": "apoio com ressalva",
+        "P4": "apoio com ressalva",
+        "P5": "apoio com ressalva",
+        "P6": "apoio com ressalva",
+        "P7": "apoio",
+        "P8": "apoio com ressalva"
+      },
+      "virada": null,
+      "virada_antes": "R2: virou",
+      "nota_colegas": 8.3,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": {
+        "entrada": 415047,
+        "cache": 411136,
+        "saida": 1549
+      },
+      "janela": true,
+      "medicao": "medida",
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M13",
+        "M14",
+        "M15",
+        "M5",
+        "M8",
+        "M11",
+        "M12"
+      ],
+      "linha": 121
+    },
+    {
+      "nome": "Bitola",
+      "papel": "Arquiteta de integração",
+      "sessao": "tev1-bitola",
+      "runtime": "Grok",
+      "modelo": "grok-4.6",
+      "esforco": "high",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-bitola.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:42:16",
+      "latencia_s": 96,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 87.1,
+      "confianca_fonte": "voto",
+      "confianca_r1": null,
+      "posicao": "P1+P6: cliente folha e portão; sugestão no painel sem mudar rota.",
+      "posicao_fonte": "posicao",
+      "voto": {
+        "apoio": 5,
+        "ressalva": 3,
+        "contra": 0
+      },
+      "voto_por_proposta": {
+        "P1": "apoio com ressalva",
+        "P2": "apoio",
+        "P3": "apoio",
+        "P4": "apoio com ressalva",
+        "P5": "apoio",
+        "P6": "apoio",
+        "P7": "apoio",
+        "P8": "apoio com ressalva"
+      },
+      "virada": null,
+      "virada_antes": "R2: virou",
+      "nota_colegas": 8.8,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M13",
+        "M14",
+        "M15",
+        "M5"
+      ],
+      "linha": 139
+    },
+    {
+      "nome": "Fagulha",
+      "papel": "Provocadora",
+      "sessao": "tev1-fagulha",
+      "runtime": "Grok",
+      "modelo": "grok-4.7-build-fast",
+      "esforco": "low",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-fagulha.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:41:27",
+      "latencia_s": 47,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 83.0,
+      "confianca_fonte": "voto",
+      "confianca_r1": 75.8,
+      "posicao": "Apoio cliente e corpus; o valor cedo é o lote noturno, sem mudar a rota.",
+      "posicao_fonte": "posicao",
+      "voto": {
+        "apoio": 5,
+        "ressalva": 3,
+        "contra": 0
+      },
+      "voto_por_proposta": {
+        "P1": "apoio",
+        "P2": "apoio",
+        "P3": "apoio",
+        "P4": "apoio com ressalva",
+        "P5": "apoio",
+        "P6": "apoio com ressalva",
+        "P7": "apoio",
+        "P8": "apoio com ressalva"
+      },
+      "virada": null,
+      "virada_antes": "R2: virou",
+      "nota_colegas": 8.5,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M13",
+        "M14",
+        "M15",
+        "M5"
+      ],
+      "linha": 141
+    },
+    {
+      "nome": "Faro",
+      "papel": "Pesquisador",
+      "sessao": "tev1-faro",
+      "runtime": "Antigravity",
+      "modelo": null,
+      "esforco": null,
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-faro.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:42:30",
+      "latencia_s": 110,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 92.0,
+      "confianca_fonte": "voto",
+      "confianca_r1": 88.8,
+      "posicao": "Apoio P1-P8 com ressalva metodológica em P4/P5; sugestão assistida acelera o corpus.",
+      "posicao_fonte": "posicao",
+      "voto": {
+        "apoio": 6,
+        "ressalva": 2,
+        "contra": 0
+      },
+      "voto_por_proposta": {
+        "P1": "apoio",
+        "P2": "apoio",
+        "P3": "apoio",
+        "P4": "apoio com ressalva",
+        "P5": "apoio com ressalva",
+        "P6": "apoio",
+        "P7": "apoio",
+        "P8": "apoio"
+      },
+      "virada": null,
+      "virada_antes": "R2: ajustou",
+      "nota_colegas": 7.0,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M13",
+        "M14",
+        "M15",
+        "M5"
+      ],
+      "linha": 147
+    },
+    {
+      "nome": "Lida",
+      "papel": "Voz do mantenedor com pouco tempo",
+      "sessao": "tev1-lida",
+      "runtime": "Claude",
+      "modelo": "claude-haiku-5-5",
+      "esforco": "low",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-lida.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:41:13",
+      "latencia_s": 32,
+      "latencia_fonte": "turno",
+      "confianca": 71.6,
+      "confianca_fonte": "voto",
+      "confianca_r1": 60.2,
+      "posicao": "Voto de apoio com ressalvas em quase tudo; contra só a manutenção que cai em Lida (retenção sem job…",
+      "posicao_fonte": "posicao",
+      "voto": {
+        "apoio": 3,
+        "ressalva": 5,
+        "contra": 0
+      },
+      "voto_por_proposta": {
+        "P1": "apoio com ressalva",
+        "P2": "apoio com ressalva",
+        "P3": "apoio",
+        "P4": "apoio com ressalva",
+        "P5": "apoio",
+        "P6": "apoio com ressalva",
+        "P7": "apoio",
+        "P8": "apoio com ressalva"
+      },
+      "virada": null,
+      "virada_antes": "R2: virou",
+      "nota_colegas": 7.8,
+      "nota_rodada": 3,
+      "custo_usd": 0.04,
+      "tokens": null,
+      "janela": true,
+      "medicao": "medida",
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M13",
+        "M14",
+        "M15",
+        "M13"
+      ],
+      "linha": 223
+    }
+  ],
+  "sala": {
+    "media": 82.6,
+    "mediana": 83.0,
+    "n": 5,
+    "faixa": [
+      71.6,
+      89.6
+    ],
+    "total": 6,
+    "media_todas": 84.2,
+    "mediana_todas": 85.0,
+    "n_todas": 6,
+    "antigravity": {
+      "media": 92.0,
+      "n": 1,
+      "nomes": [
+        "Faro"
+      ],
+      "fora_da_media": true
+    },
+    "revisor": null,
+    "revisor_nota": "revisor independente na v2, em curso",
+    "diferenca_revisor": null
+  },
+  "avisos": [],
+  "medicoes": [
+    {
+      "tipo": "medido",
+      "quem": "coordenação",
+      "texto": "tev1 como ordenador do gatilho: os 6 sim nas posições 1, 2, 3, 11, 15, 16 de 23; AUC 0,74 — material/coord/ranking.out"
+    },
+    {
+      "tipo": "medido",
+      "quem": "coordenação",
+      "texto": "auditoria de fatos: US$ 7,16 em 10 dias (~US$ 0,72/dia), 2,0 h em segundo plano — measurements.jsonl, fact_audit"
+    },
+    {
+      "tipo": "lido",
+      "quem": "Balança",
+      "texto": "o resolver já manda o task ao tev1 e descarta o texto — resolver.py:92, policy.py:251"
+    },
+    {
+      "tipo": "conferido",
+      "quem": "coordenação",
+      "texto": "48 votos, 0 contra, 23 apoio e 25 com ressalva; 6/6 com Fatos lidos — tally.py 3"
+    }
+  ],
+  "sintese": [
+    "48 votos, nenhum contra: a sala apoia P1–P8, com 25 ressalvas que entraram na v2.",
+    "O valor cedo é sugestão e ordem visíveis, sem tirar nada da lista (M17: o topo acerta, a cauda não).",
+    "Linha zero: gravar o task que o resolver já manda ao tev1 (M18), antes do módulo novo.",
+    "Sem rodada extra: M16 e M17 não contradizem premissa de voto.",
+    "Dissenso: Faro quer conformal α ≤ 5%; Lida quer limpeza sem job e rotulagem única."
+  ],
+  "decisoes": [
+    {
+      "pergunta": "O texto do state vai a disco, e por quanto tempo?",
+      "quem": [
+        "Ferrolho",
+        "Balança",
+        "Lida",
+        "Fagulha"
+      ],
+      "recomendacao": null,
+      "votos": null
+    },
+    {
+      "pergunta": "A primeira entrega visível é a sugestão de gatilho no painel?",
+      "quem": [
+        "Bitola",
+        "Ferrolho",
+        "Lida"
+      ],
+      "recomendacao": null,
+      "votos": null
+    }
+  ],
+  "custos_coordenacao": {
+    "coordenacao_usd": null,
+    "revisor_usd": null,
+    "ate": null
+  }
+}

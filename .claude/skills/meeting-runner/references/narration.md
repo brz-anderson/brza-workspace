@@ -51,18 +51,26 @@ vivo são da fase do painel.
 **Um arquivo por rodada, republicado durante ela.** O app relê o visual só quando uma mensagem nova o monta; reescrever o
 arquivo não atualiza um frame já montado.
 
-1. **Abertura da rodada:** gere o estado com todos "falta" e publique, com uma linha de texto.
-2. **A cada chegada que o `wait_round.py` imprimir (com o aviso ⚠ se faltar o marcador):** gere de novo e publique, com uma linha ("4 de 6; falta
-   Régua e Cartógrafo").
-3. **No fechamento:** gere com as medições, a síntese e as decisões (`sintese-N.json`) e publique. Rodada para parte da
-   sala: `collect N --participantes …`; quem está fora aparece "fora da rodada" e não segura o fechamento (X18).
-4. A rodada seguinte ganha **nome novo**. No fim da reunião, um visual de síntese, também com nome novo.
+**Os três primeiros passos são do `wait_round.py`** (PLN-017/R10.1): na reunião do `tev1` a regra estava escrita e
+faltaram 3 aberturas, todas as chegadas, o fechamento da R5 e a síntese final. A coordenação não roda o painel à mão
+durante a rodada; cola a linha que o script imprime.
 
-Os comandos (da raiz do worktree; `$S` e `$R` como no SKILL.md):
+1. **Abertura da rodada:** o `wait_round.py` gera o estado com todos "falta", imprime o `::orca-visual` e o `png:`. A
+   coordenação confere o PNG e cola a linha com uma linha de texto.
+2. **A cada chegada:** a linha de narração ("4 de 6; falta Régua e Cartógrafo") sai seguida da linha `::orca-visual`; as
+   duas vão na mesma mensagem. Sem PNG nas chegadas (R10.3).
+3. **No fechamento:** o `wait_round.py` gera com o `--closed` da última chegada e imprime o `png:`. Depois da síntese, a
+   coordenação republica com as medições, a síntese e as decisões (`sintese-N.json`) por **`panel.py publish N`**, um
+   comando só. Rodada para parte da sala: `--personas` no `wait_round.py`, `--participantes` no `publish`; quem está fora
+   aparece "fora da rodada" e não segura o fechamento (X18).
+4. A rodada seguinte ganha **nome novo**. No fim da reunião, o **visual de síntese** do `panel.py sintese` (R10.2), com
+   nome novo, antes do encerramento das personas.
+
+Os comandos manuais, para republicar fora do `wait_round.py` (da raiz do worktree; `$S` e `$R` como no SKILL.md):
 
 ```bash
-python3 -I .claude/skills/meeting-runner/scripts/panel.py collect 3 --reuniao .sessions/<reuniao>/reuniao.json --opened 21:28:13 --closed 21:30:48
-python3 -I .claude/skills/meeting-runner/scripts/panel.py render .sessions/<reuniao>/estado-r3.json --publish-dir "$ORCA_CHAT_SCRATCH_DIR" --png /tmp/painel-r3.png
+python3 -I .claude/skills/meeting-runner/scripts/panel.py publish 3 --reuniao .sessions/<reuniao>/reuniao.json --opened 2026-11-09T21:28:13-03:00 --closed 2026-11-09T21:30:48-03:00   # a janela: do wait_round.py
+python3 -I .claude/skills/meeting-runner/scripts/panel.py sintese --reuniao .sessions/<reuniao>/reuniao.json
 ```
 
 O `render --publish-dir` grava `<reuniao>-r3-<hash>.html` (nome fixo na rodada) e **imprime a linha `::orca-visual{…}`**
@@ -70,9 +78,10 @@ que vai numa linha própria da mensagem. Cada mensagem leva um visual; o limite 
 
 ### Confira por PNG antes de publicar
 
-A coordenação não vê o chat. Com o `ORCA_CHAT_SCRATCH_DIR` ausente (fora do chat do Studio), o HTML vai ao scratch da
-sessão e a rodada leva o caminho. A conferência usa o `brza shot` (o P5 do PLN-017 o fez ler o CSS atual do Studio) ou,
-sem ele, o `render --png`, que chama o Chrome headless:
+A coordenação não vê o chat. O destino é `--publish-dir`, depois o `ORCA_CHAT_SCRATCH_DIR`; sem os dois (fora do chat
+do Studio), o HTML vai à pasta da reunião, com um `⚠ painel:` uma vez, e a rodada leva o caminho. O `wait_round.py`, o
+`panel.py publish` e o `panel.py sintese` já gravam o PNG (na abertura e no fim, no caso do `wait_round.py`) e imprimem o
+`png:`; leia a imagem. Para conferir à parte, o `brza shot` (o P5 do PLN-017 o fez ler o CSS atual do Studio):
 
 ```bash
 brza shot "<caminho do .html>" "$TMPDIR/painel-r3.png" --width 736

@@ -5,6 +5,7 @@ Uso:
     wait_round.py <N> --reuniao reuniao.json [--root DIR] [--timeout SEG] [--source {sessions,marker}]
                   [--sessions ARQUIVO] [--once] [--personas NOME ...]
                   [--poll SEG] [--sessions-state "cmd" | --no-state | --list-json arquivo]     # estes dois, só no marker
+                  [--publish-dir DIR] [--no-panel]                                              # o painel, só no sessions
 
 `--source sessions` (padrão; `mailbox` é alias): a espera é do `brza sessions wait <sessoes…> --any --timeout <t> --json`
 (PLN-017 R6/R7), que lê o Run do mapa com `--all` e `--peek --wait`, sem consumir a caixa da coordenação. O fim de rodada é
@@ -38,6 +39,25 @@ contam como fim da persona e levam o rc a 1. Erro do v2 (`{"error": …}`, como 
 
 Termina com 0 (todas chegaram), 2 no limite (quem falta, com o `state` do v2) ou 1 (erro ou desfecho failed/blocked,
 também quando o limite chega com uma delas já registrada).
+O PAINEL sai daqui, e não da memória da coordenação (`--source sessions`): o script roda, EM PROCESSO (importa o
+`panel.py`), o equivalente a `panel.py collect N` + `panel.py render` e imprime a linha `::orca-visual{file="…" title="…"}`
+numa linha própria, logo depois da linha de narração do momento:
+  - na ABERTURA, antes da primeira espera (imprime antes a linha de status `R2 · 0/3`); não com `--once`;
+  - a cada lote de chegadas narradas (uma publicação por chamada do `wait`, depois da última linha do lote), sem PNG;
+  - no FIM — todas chegaram ou o limite —, no lugar do painel de chegada daquele momento, com o `--closed` na hora da
+    última chegada (sem chegada, a do limite). Com `--once` o fim é só o painel de chegada, sem PNG.
+`--opened` é o início da rodada que o script já calcula pelo mapa (o `at` do `last_send`/`open`), em ISO com fuso. Depois do
+painel do fim sai `janela: --opened <ISO> --closed <ISO>`, pronta para colar no `panel.py publish N` da republicação com a
+síntese (o `publish` aceita ISO nos dois). Os painéis de abertura e
+de chegada levam `--closed` na hora do momento, para o custo ser o da janela e não o total da sessão.
+O PNG só na abertura e no fim, em `<pasta da reunião>/painel-rN.png` (o mesmo caminho nas duas; o do fim vence), e o
+caminho sai numa linha `png: <caminho>` para a coordenação conferir pela imagem; falha do Chrome vira `⚠ painel: …`.
+Destino: `--publish-dir`, padrão `$ORCA_CHAT_SCRATCH_DIR`; sem os dois, o HTML vai para a pasta da reunião e uma linha
+`⚠ painel: …` avisa UMA vez (o chat não abre arquivo ali). O nome do arquivo é fixo na rodada (`<id>-rN-<hash>.html`), e a
+republicação cai no mesmo arquivo. O `estado-rN.json` também é regravado na pasta da reunião. `--personas` vira os
+`participantes` do painel. `--no-panel` desliga tudo. O painel NUNCA derruba a espera nem muda o rc: qualquer erro vira
+`⚠ painel: <erro>` e a espera segue. Depois de escrever o `sintese-N.json`, republique com `panel.py publish N`.
+
 Funções puras para teste: `scan`, `status_line`, `compute_timeout`, `calc_limite`, `classifica_evento`, `run` (que recebe
 `wait_fn(sessoes, timeout_s) -> (rc, dict)`).
 """
@@ -50,6 +70,7 @@ import statistics
 import subprocess
 import sys
 import time
+from datetime import datetime
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
@@ -68,7 +89,7 @@ def last_marker(path):
     """N do marcador que é a última linha não vazia do arquivo; None se não for ou se o arquivo não existe."""
     try:
         with open(path, encoding="utf-8") as f:
-            texto = common.corta_medida(f.read())  # a `## Medida` do `brza note commit` vem depois do marcador e não invalida
+            texto = common.corta_medida(f.read())  # o anexo do `brza note commit` (`## Medida`, `## Custo da tarefa`) vem depois do marcador e não invalida
         linhas = [l.rstrip() for l in texto.split("\n") if l.strip()]  # marcador recuado não vale (o `tally.py` também recusa)
     except OSError:
         return None
@@ -238,13 +259,23 @@ def inicio_da_rodada(personas, entradas):
     return max(ts) if ts else None
 
 
+def iso_local(epoch):
+    """ISO com fuso local de um epoch (`2026-11-09T21:20:22-03:00`): o `--opened` e o `--closed` do `panel.py`. Leva a data,
+    para a rodada que atravessa a meia-noite não medir 24 h para trás."""
+    return datetime.fromtimestamp(epoch).astimezone().isoformat(timespec="seconds")
+
+
 def run(reuniao, n, root, *, timeout=None, poll=5.0, once=False, state_fn=None, clock=None, sleep=None,
         out=None, source="marker", wait_fn=None, entradas=None, personas=None, duracao=None, com_state=True,
-        vistos_path=None):
+        vistos_path=None, painel_fn=None):
     """O laço da espera. `clock` (epoch), `sleep`, `out` e `wait_fn` se injetam nos testes. Devolve 0, 2 ou 1.
 
     `source="marker"` (o padrão da biblioteca; o da linha de comando é `sessions`) é o modo de arquivo; `sessions` usa `wait_fn(sessoes, timeout_s) -> (rc, dict)` (padrão
-    `wait_brza`). `personas` restringe a espera ao subconjunto; `duracao` é a duração anunciada, em minutos."""
+    `wait_brza`). `personas` restringe a espera ao subconjunto; `duracao` é a duração anunciada, em minutos.
+
+    `painel_fn(fase, opened, closed) -> [linhas]` (só no `sessions`) publica o painel: `fase` é `abertura`, `chegada` ou
+    `fim`; `opened` e `closed` são ISO com fuso. As linhas que ele devolve saem depois da linha de narração; exceção dele
+    vira `⚠ painel: <erro>` e a espera segue, com o mesmo rc."""
     out = out or (lambda s: print(s, flush=True))
     clock, sleep = clock or time.time, sleep or time.sleep
     todas = [p for p in reuniao["personas"] if not personas or p["nome"] in personas or p.get("sessao") in personas]
@@ -263,12 +294,30 @@ def run(reuniao, n, root, *, timeout=None, poll=5.0, once=False, state_fn=None, 
     pessoas = {p["nome"]: p for p in todas}
     por_sessao = {p["sessao"]: p for p in todas}
 
+    ultima_chegada = [None]
+
+    def painel(fase):
+        if painel_fn is None:
+            return
+        agora_p = clock()
+        closed = ultima_chegada[0] if fase == "fim" and ultima_chegada[0] is not None else agora_p
+        try:
+            for linha in painel_fn(fase, iso_local(ini), iso_local(closed)) or []:
+                out(linha)
+            if fase == "fim":
+                out(f"janela: --opened {iso_local(ini)} --closed {iso_local(closed)}")
+        except Exception as e:  # o painel nunca derruba a espera nem muda o rc
+            out(f"⚠ painel: {e}")
+
     def fim(rc):
         if ruido:
             out(f'ruído previsto: {ruido} avisos "Worker stopped without reporting" '
                 '(fim de turno sem worker_done entre rodadas); não responda')
         return rc
 
+    if painel_fn is not None and not once:
+        out(status_line(n, rsub, chegaram, clock() - ini))
+        painel("abertura")
     while True:
         pendentes = [p for p in todas if p["nome"] not in chegaram]
         agora = clock()
@@ -309,6 +358,7 @@ def run(reuniao, n, root, *, timeout=None, poll=5.0, once=False, state_fn=None, 
                 continue
             desfecho = row.get("outcome")
             chegaram.append(p["nome"])
+            ultima_chegada[0] = agora
             if isinstance(row.get("latency_s"), (int, float)):
                 latencias.append(float(row["latency_s"]))
             nova = True
@@ -331,13 +381,17 @@ def run(reuniao, n, root, *, timeout=None, poll=5.0, once=False, state_fn=None, 
             if q.get("name") in por_sessao:
                 states[q["name"]] = q.get("state")
         if len(chegaram) == len(todas):
+            painel("chegada" if once else "fim")
             return fim(1 if falhou else 0)
         limite_abs = (t0 + timeout) if timeout is not None else (ini + calc_limite(duracao, latencias))
         if once or agora >= limite_abs:
             out(status_line(n, rsub, chegaram, agora - ini, (states or None) if com_state else None))
+            painel("chegada" if once else "fim")
             return fim(1 if falhou else 2)
         if not nova:
             out(status_line(n, rsub, chegaram, agora - ini))
+        else:
+            painel("chegada")
 
 
 def _run_marker(reuniao, n, root, timeout, poll, once, state_fn, clock, sleep, out):
@@ -369,6 +423,33 @@ def _run_marker(reuniao, n, root, timeout, poll, once, state_fn, clock, sleep, o
         sleep(poll)
 
 
+def monta_painel_fn(reuniao, n, root, *, publish_dir=None, participantes=None, sessions=None, panel_mod=None):
+    """O `painel_fn` da linha de comando: publica o painel pelo `panel.py`, em processo. Devolve as linhas a imprimir
+    (`::orca-visual…` e, na abertura e no fim, `png: …`); o aviso de destino sai uma vez."""
+    avisado = [False]
+
+    def painel_fn(fase, opened, closed):
+        pm = panel_mod
+        if pm is None:
+            import panel as pm  # noqa: E402  (importa aqui: o import que falha vira `⚠ painel`, e não derruba o script)
+        pasta = pm.pasta_da_reuniao(reuniao, root)
+        destino, padrao = pm.resolve_publish_dir(publish_dir, pasta)
+        linhas = []
+        if padrao and not avisado[0]:
+            avisado[0] = True
+            linhas.append(f"⚠ painel: sem --publish-dir nem ORCA_CHAT_SCRATCH_DIR; o HTML fica em {destino} e o chat não o abre")
+        png = os.path.join(pasta, f"painel-r{n}.png") if fase in ("abertura", "fim") else None
+        r = pm.publica_rodada(reuniao, n, root, publish_dir=destino, png=png, opened=opened, closed=closed,
+                              participantes=participantes, sessions=sessions)
+        linhas.append(r["linha"])
+        if r["png"]:
+            linhas.append(f"png: {r['png']}")
+        elif r["png_erro"]:
+            linhas.append(f"⚠ painel: {r['png_erro']}")
+        return linhas
+    return painel_fn
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Espera o fim da rodada pelo brza sessions wait (ou pelo marcador do worklog).")
     ap.add_argument("n", type=int)
@@ -384,6 +465,8 @@ def main(argv=None):
     ap.add_argument("--list-json", help="arquivo com o JSON do list (para teste)")
     ap.add_argument("--once", action="store_true")
     ap.add_argument("--personas", nargs="+", metavar="NOME", help="só estas personas (nome, slug ou sessão)")
+    ap.add_argument("--publish-dir", help="onde publicar o painel (padrão: $ORCA_CHAT_SCRATCH_DIR; sem ele, a pasta da reunião)")
+    ap.add_argument("--no-panel", action="store_true", help="não publica o painel (só no --source sessions)")
     a = ap.parse_args(argv)
     a.root = os.path.abspath(a.root) if a.root else raiz_padrao()
     path = a.reuniao if os.path.isabs(a.reuniao) or not os.path.isfile(os.path.join(a.root, a.reuniao)) \
@@ -404,9 +487,14 @@ def main(argv=None):
     state_fn = None if a.no_state or source == "sessions" else (lambda: fetch_states(reuniao, a.list_json, a.sessions_state))
     entradas = sessions_map.load_map(a.root, a.sessions) if source == "sessions" else {}
     _, _, duracao = common.cabecalho_rodada(os.path.join(a.root, reuniao.get("dir", "."), f"rodada-{a.n}.md"))
+    painel_fn = None
+    if source == "sessions" and not a.no_panel:
+        painel_fn = monta_painel_fn(reuniao, a.n, a.root, publish_dir=a.publish_dir, sessions=a.sessions,
+                                    participantes=sorted(nomes, key=[p["nome"] for p in reuniao["personas"]].index)
+                                    if nomes else None)
     return run(reuniao, a.n, a.root, timeout=a.timeout, poll=a.poll or 5.0, once=a.once, state_fn=state_fn,
                source=source, entradas=entradas, personas=nomes, duracao=duracao, com_state=not a.no_state,
-               vistos_path=os.path.join(a.root, reuniao.get("dir", "."), "eventos-vistos.json"))
+               painel_fn=painel_fn, vistos_path=os.path.join(a.root, reuniao.get("dir", "."), "eventos-vistos.json"))
 
 
 if __name__ == "__main__":

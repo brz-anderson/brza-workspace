@@ -45,6 +45,10 @@ Para cada decisão:
 
 ## 3. O encerramento
 
+0. **O visual de síntese da reunião** (PLN-017/R10.2): `python3 -I .claude/skills/meeting-runner/scripts/panel.py sintese
+   --reuniao $R` (publica no scratch do chat e grava o PNG), com o `sintese-final.json` opcional (conclusão, classificação, barras medidas, fases, próxima rodada; o
+   esquema está no docstring do `panel.py`). Confira pelo PNG e publique na mensagem do fechamento, com nome novo. Na
+   reunião do `tev1` ele só saiu porque Anderson pediu.
 1. `python3 -I .claude/skills/meeting-runner/scripts/runtime_memory_check.py <hora da abertura>`; o que listar vai a `## Fora do workspace`.
 2. **O encerramento das personas (R6 e R7):**
    - `python3 -I .claude/skills/meeting-runner/scripts/launch_persona.py $R --close` pede a cada persona o

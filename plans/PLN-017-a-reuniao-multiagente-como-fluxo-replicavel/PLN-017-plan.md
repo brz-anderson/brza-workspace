@@ -274,6 +274,31 @@ Respondida em 2026-11-08, na sessão `workflow-improvements`.
 
 **Escolhida a opção 3:** a coordenação seleciona os participantes caso a caso e registra o motivo antes do disparo. Não há composição fixa; R8 continua governando o gatilho automático e Anderson conserva a decisão final. D1 atualizado; resposta enviada à execução em `msg_067ef1a3938d`.
 
+### Rodada 10 — o painel automático (2026-11-09)
+
+**Apresentado antes:** na reunião "tev1 nos fluxos" (worklog `2026-11-09-reuniao-tev1-coordenacao.md`), Anderson pediu os
+artboards e disse: "esses artboards deveriam estar sendo gerados ao final de toda rodada, mas não está acontecendo,
+temos que corrigir a skill nesse sentido". A coordenação mostrou o que saiu: abertura em R1 e R2 só, nenhuma chegada,
+fechamento de R1 a R4, a R5 e a síntese final só a pedido. Cada publicação dependia de quatro passos manuais
+(`sintese-N.json`, `panel.py collect`, `panel.py render`, PNG); o `wait_round.py` não chamava o painel. E o `brza note
+commit` acrescentou `## Custo da tarefa` depois do marcador nos worklogs das personas, o que derrubou o painel da R5.
+
+Respondida em 2026-11-09, sessão da meeting-runner (`f497c2b6`).
+
+1. **O mecanismo.** Opções: o `wait_round.py` gera sozinho na abertura, a cada chegada e no fechamento (recomendada) —
+   custo: ~3 h de código e testes, ~1 s por chegada; se paga: na próxima reunião · um comando único de fechamento — custo:
+   ~1,5 h; se paga: só no fechamento · só reforçar a regra — custo: ~15 min; se paga: nunca, a regra já falhou.
+   **Decidido — "wait_round.py gera sozinho (Recomendado)".**
+2. **O visual de síntese.** Opções: o `panel.py` gera, como passo do encerramento (recomendada) — custo: ~2 h; se paga:
+   na próxima reunião · manual a cada reunião — custo: ~15 min por reunião, e depende de lembrar. **Decidido — "panel.py
+   gera, passo do encerramento (Recomendado)".**
+3. **O PNG.** Opções: só na abertura e no fechamento (recomendada) — custo: um layout quebrado numa chegada passa até o
+   fechamento; se paga: agora · em toda republicação — custo: ~3 s por chegada. **Decidido — "Só na abertura e no
+   fechamento (Recomendado)".**
+4. **O `## Custo da tarefa` depois do marcador.** Opções: o `tally.py` tolera e uma issue vai ao `tools-kit`
+   (recomendada) — custo: ~30 min e a issue; se paga: agora · só a issue · só o `tally` tolera. **Decidido — "tally
+   tolera + issue ao tools-kit (Recomendado)".**
+
 ## Passos
 
 ### P1 — A skill `meeting-runner` v1

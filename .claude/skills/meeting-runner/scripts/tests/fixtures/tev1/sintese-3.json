@@ -1,0 +1,20 @@
+{
+ "sala": {"revisor": null, "revisor_nota": "revisor independente na v2, em curso"},
+ "medicoes": [
+  {"tipo": "medido", "quem": "coordenação", "texto": "tev1 como ordenador do gatilho: os 6 sim nas posições 1, 2, 3, 11, 15, 16 de 23; AUC 0,74 — material/coord/ranking.out"},
+  {"tipo": "medido", "quem": "coordenação", "texto": "auditoria de fatos: US$ 7,16 em 10 dias (~US$ 0,72/dia), 2,0 h em segundo plano — measurements.jsonl, fact_audit"},
+  {"tipo": "lido", "quem": "Balança", "texto": "o resolver já manda o task ao tev1 e descarta o texto — resolver.py:92, policy.py:251"},
+  {"tipo": "conferido", "quem": "coordenação", "texto": "48 votos, 0 contra, 23 apoio e 25 com ressalva; 6/6 com Fatos lidos — tally.py 3"}
+ ],
+ "sintese": [
+  "48 votos, nenhum contra: a sala apoia P1–P8, com 25 ressalvas que entraram na v2.",
+  "O valor cedo é sugestão e ordem visíveis, sem tirar nada da lista (M17: o topo acerta, a cauda não).",
+  "Linha zero: gravar o task que o resolver já manda ao tev1 (M18), antes do módulo novo.",
+  "Sem rodada extra: M16 e M17 não contradizem premissa de voto.",
+  "Dissenso: Faro quer conformal α ≤ 5%; Lida quer limpeza sem job e rotulagem única."
+ ],
+ "decisoes": [
+  {"pergunta": "O texto do state vai a disco, e por quanto tempo?", "quem": ["Ferrolho", "Balança", "Lida", "Fagulha"], "recomendacao": null, "votos": null},
+  {"pergunta": "A primeira entrega visível é a sugestão de gatilho no painel?", "quem": ["Bitola", "Ferrolho", "Lida"], "recomendacao": null, "votos": null}
+ ]
+}

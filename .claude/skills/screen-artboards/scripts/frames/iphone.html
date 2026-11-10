@@ -1,0 +1,33 @@
+<!-- iPhone: tela de 393 x 852, corpo arredondado, Dynamic Island, barra de status e indicador de home. -->
+<style>
+.sa-iphone { padding: 11px; border-radius: 62px; background: #0b0b0d;
+  box-shadow: 0 0 0 2px #3a3a3f, 0 0 0 3.5px #121214, 0 22px 44px -10px rgba(0,0,0,.45); }
+.sa-iphone .sa-dev { border-radius: 51px; overflow: hidden; position: relative; display: flex; flex-direction: column;
+  background: var(--sa-m-bg-base, var(--sa-background)); }
+.sa-iphone .sa-status { height: 54px; flex: none; display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 34px 10px 40px; font: 600 16px/1 -apple-system, system-ui, sans-serif; letter-spacing: -.2px;
+  color: var(--sa-foreground); position: relative; }
+.sa-iphone .sa-status .sa-sys { display: flex; gap: 6px; align-items: center; }
+.sa-iphone .sa-status svg { height: 12px; width: auto; fill: currentColor; display: block; }
+.sa-iphone .sa-island { position: absolute; top: 11px; left: 50%; width: 124px; height: 36px; margin-left: -62px;
+  border-radius: 20px; background: #000; z-index: 3; }
+.sa-iphone .sa-screen { flex: 1 1 auto; min-height: 0; position: relative; }
+.sa-iphone .sa-home { height: 30px; flex: none; position: relative; }
+.sa-iphone .sa-home::after { content: ''; position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px;
+  margin-left: -67px; border-radius: 3px; background: var(--sa-foreground); opacity: .9; }
+</style>
+<div class="sa-frame sa-iphone" data-w="{{OUTERW}}" style="width:{{OUTERW}}px">
+  <div class="sa-dev" style="width:{{W}}px;height:{{H}}px">
+    <div class="sa-island"></div>
+    <div class="sa-status">
+      <span>9:41</span>
+      <span class="sa-sys">
+        <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg>
+        <svg viewBox="0 0 17 12"><path d="M8.5 2.4c2.3 0 4.4.9 6 2.4l1.1-1.2A10.4 10.4 0 0 0 8.5.7C5.7.7 3.2 1.800 1.400 3.600l1.100 1.200a8.700 8.700 0 0 1 6-2.400zm0 3.400c1.400 0 2.700.5 3.700 1.400l1.100-1.200a7.400 7.400 0 0 0-9.600 0l1.100 1.200c1-.9 2.300-1.400 3.700-1.400zm0 3.300c-.7 0-1.300.3-1.800.700L8.500 12l1.800-2.200c-.5-.4-1.100-.7-1.800-.7z"/></svg>
+        <svg viewBox="0 0 27 12" style="height:12px"><rect x=".5" y=".5" width="22" height="11" rx="3.200" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="19" height="8" rx="2"/><rect x="24" y="4" width="2" height="4" rx="1" opacity=".45"/></svg>
+      </span>
+    </div>
+    <div class="sa-screen">{{SCREEN}}</div>
+    <div class="sa-home"></div>
+  </div>
+</div>

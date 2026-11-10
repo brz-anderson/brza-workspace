@@ -1,0 +1,36 @@
+{
+  "skill_name": "screen-artboards",
+  "evals": [
+    {
+      "id": 1,
+      "name": "duas-alternativas-desktop-do-studio",
+      "prompt": "mostra duas alternativas para a tela de configurações do BrzA Studio no desktop: A com abas no topo, B com uma barra lateral de seções. quero escolher olhando",
+      "expected_output": "Dois artboards em moldura de janela de desktop, com os tokens do brza-studio escopados no mockup, conferidos pelo PNG a 736 sem corte, com a letra da opção no título da linha ::orca-visual.",
+      "files": [],
+      "expectations": [
+        "Há exatamente dois .html de artboard no diretório de publicação, um por alternativa",
+        "Cada artboard desenha uma moldura de janela de desktop (barra de título com os controles da janela)",
+        "Nenhum dos .html redefine tokens do chat no :root (não há `:root {` seguido de `--background`, `--primary` ou `--foreground`)",
+        "Os .html usam pelo menos uma cor do tema real do brza-studio (um valor que aparece no main.css do brza-studio), e não só uma paleta inventada",
+        "Existe um PNG de cada artboard tirado na largura do chat, e a resposta diz que o PNG foi conferido",
+        "A resposta traz duas linhas ::orca-visual com a letra da opção no title (A — …, B — …)",
+        "Nenhum .html usa 100vh"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "mobile-e-web-nas-tres-larguras",
+      "prompt": "faz o protótipo da lista de sessões do app mobile do BrzA (iPhone e Android) e da página de download do site, que precisa funcionar em celular, tablet e desktop",
+      "expected_output": "Um artboard de iPhone e um de Android com os tokens do mobile do brza-studio, e um artboard de navegador com as larguras 375, 768 e 1280 empilhadas, cada uma inteira na largura do chat; um PNG por largura; no máximo 8 visuais.",
+      "files": [],
+      "expectations": [
+        "Há um artboard em moldura de iPhone e um em moldura de Android",
+        "A página de download está num artboard só, com as três larguras (375, 768 e 1280) empilhadas, e não em três artboards separados",
+        "Existe um PNG por largura do navegador (três PNGs, ou um PNG em que as três aparecem inteiras), conferido pelo agente",
+        "A largura de 1280 aparece inteira no PNG a 736, sem corte à direita (o agente diz que conferiu ou a imagem mostra)",
+        "A resposta tem no máximo 8 linhas ::orca-visual",
+        "Nenhum .html redefine tokens do chat no :root nem usa 100vh"
+      ]
+    }
+  ]
+}

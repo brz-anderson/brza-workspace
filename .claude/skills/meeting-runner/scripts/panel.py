@@ -26,7 +26,6 @@ O `sintese-final.json` (todas as chaves opcionais) é escrito pela coordenação
 Só biblioteca padrão; roda com `python3 -I`.
 """
 import argparse
-import hashlib
 import html as H
 import json
 import os
@@ -38,10 +37,11 @@ from datetime import datetime, timedelta
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
+import _kit  # noqa: E402,F401
 import tally as _tally  # noqa: E402  (a conta da sala e a raiz padrão moram lá, em um lugar só)
 import common as _common  # noqa: E402  (o prazo e a duração anunciada da rodada também: a espera lê o mesmo)
-LIMITE_HTML = 512 * 1024
-CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+from skillkit import visual as _visual  # noqa: E402
+from skillkit.visual import CHROME, ErroPublicacao, LIMITE_HTML  # noqa: E402,F401  (o PNG e o visual moram no kit)
 A_PARTE = 'antigravity'  # runtime que fica fora da média da sala (decisão E-1 do D1)
 FORA = 'fora da rodada'  # persona fora do subconjunto da rodada (X18)
 
@@ -486,24 +486,9 @@ def _cmd_collect(a):
     return 0
 
 
-class ErroPublicacao(Exception):
-    """Falha ao gravar o visual; `rc` é o código de saída do subcomando."""
-    def __init__(self, msg, rc=1):
-        super().__init__(msg)
-        self.rc = rc
-
-
 def gera_png(html_path, png, width, altura=2000):
-    """Tira o PNG do HTML pelo Chrome headless. Devolve None se deu certo, ou a mensagem de erro."""
-    if not os.path.exists(CHROME):
-        return 'Chrome não encontrado; sem PNG'
-    try:
-        subprocess.run([CHROME, '--headless=new', f'--screenshot={png}', f'--window-size={width},{altura}',
-                        '--force-device-scale-factor=1', 'file://' + os.path.abspath(html_path)],
-                       capture_output=True, timeout=60)
-    except (OSError, subprocess.SubprocessError) as ex:
-        return f'o Chrome falhou: {ex}'
-    return None if os.path.exists(png) else 'o Chrome não gerou o PNG'
+    """Tira o PNG do HTML (`brza shot`, com o Chrome de reserva). Devolve None se deu certo, ou a mensagem de erro."""
+    return _visual.gera_png(html_path, png, width, altura)
 
 
 def _png(html_path, png, width, altura=2000):
@@ -511,32 +496,12 @@ def _png(html_path, png, width, altura=2000):
     print(f'panel render: {erro}' if erro else f'png: {png}', file=sys.stderr)
 
 
-def _titulo_seguro(tit):
-    tit = re.sub(r'[\x00-\x1f\x7f"{}]+', ' ', str(tit or '')).replace('\\', ' ')
-    return ' '.join(tit.split())
+_titulo_seguro = _visual.titulo_seguro
 
 
 def salva_visual(doc, reu_id, meio, chave, titulo, *, publish_dir=None, alvo_padrao=None):
-    """Grava `doc`. Com `publish_dir`, o arquivo é `<id>-<meio>-<hash>.html` (nome fixo para a mesma `chave`, para
-    republicar no mesmo arquivo) e a linha `::orca-visual` volta; senão grava em `alvo_padrao` e a linha é None.
-    Devolve (caminho, linha). Levanta ErroPublicacao."""
-    if len(doc.encode('utf-8')) >= LIMITE_HTML:
-        raise ErroPublicacao('HTML >= 512 KB, o visual não aceita', 1)
-    if publish_dir:
-        rid = str(reu_id or 'reuniao')
-        if '/' in rid or '\\' in rid or '..' in rid:
-            raise ErroPublicacao(f'reuniao.id "{rid}" tem caminho; recuso gravar fora de --publish-dir', 1)
-        rid = re.sub(r'[^\w.-]+', '-', rid).strip('.-') or 'reuniao'
-        h = hashlib.sha1(f'{reu_id}|{chave}'.encode()).hexdigest()[:4]
-        nome = f'{rid}-{meio}-{h}.html'
-        os.makedirs(publish_dir, exist_ok=True)
-        alvo = os.path.join(publish_dir, nome)
-        linha = f'::orca-visual{{file="{nome}" title="{_titulo_seguro(titulo)}"}}'
-    else:
-        alvo, linha = alvo_padrao, None
-    with open(alvo, 'w', encoding='utf-8') as f:
-        f.write(doc)
-    return alvo, linha
+    """Grava `doc` (ver `skillkit.visual.salva_visual`); devolve (caminho, linha). Levanta ErroPublicacao."""
+    return _visual.salva_visual(doc, reu_id, meio, chave, titulo, publish_dir=publish_dir, alvo_padrao=alvo_padrao)
 
 
 def _cmd_render(a):

@@ -197,12 +197,13 @@ Respondida em AAAA-MM-DD.
 > planejar, e fica em parágrafo próprio, logo abaixo da linha `Executa`. `Executado` é preenchido ao fechar o passo,
 > junto da evidência. Passo de rodada ou "a pedido" não leva a linha.
 >
-> **O executor** é a sessão que conduz, a sessão do `brza-studio`, um subagente ou Anderson. Cada passo só executa a
-> pedido explícito de Anderson.
+> **O executor** é a coordenação, uma sessão executora aberta pelo `executor.py` (código no `brza-studio`, protótipo,
+> passo longo), um subagente ou Anderson. Cada passo só executa a pedido explícito de Anderson. O passo executado por
+> sessão ganha, na evidência, o worklog do executor, e o `Executado` é a janela medida da abertura ao marcador.
 
 ### P1 — Título do passo
 
-Executa D1 · executor: sessão do `brza-studio`
+Executa D1 · executor: sessão (executor.py), no `brza-studio`
 
 Estimado: 3 h · Executado: — h
 
@@ -240,7 +241,7 @@ Estimado: 3 h · Executado: — h
 
 > **Gatilho:** houve revisão da entrega. O parecer é uma nota `work/reviews/REV-NNN-<assunto>.md`, reservada pelo
 > `brza note review-open`, com H1 `# REV-NNN: …`, e achados `### A<n>` com `**Evidência:**` (a forma está na
-> `references/conduct.md`); aqui fica uma linha por parecer.
+> `references/review.md`); aqui fica uma linha por parecer.
 
 - [REV-NNN: título do parecer](../../work/reviews/REV-NNN-assunto.md) — AAAA-MM-DD, N achados, todos com destino.
 

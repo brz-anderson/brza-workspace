@@ -1,0 +1,49 @@
+{
+  "skill_name": "plan-runner",
+  "evals": [
+    {
+      "id": 1,
+      "name": "retomar-plano-com-passo-sem-prova",
+      "prompt": "retoma o PLN-901, onde isso parou? quero saber o que falta antes de seguir",
+      "expected_output": "A situação do plano dita a partir do estado conferido: o P2 marcado sem evidência volta a pendente, as horas do frontmatter não batem com a soma dos passos (estimado 14 contra 10; restante 9 contra 8), o próximo passo nomeado, e nenhuma escrita silenciosa no plano.",
+      "files": ["plans/PLN-901-o-chat-exporta-a-conversa/PLN-901-plan.md"],
+      "expectations": [
+        "A resposta diz que o P2 está marcado [x] sem a linha de evidência e que por isso não conta como feito",
+        "A resposta aponta que as horas do frontmatter não batem com a soma dos passos e dá os números certos: estimado 14 (e não 10) e restante 9 (e não 8)",
+        "A resposta nomeia o próximo passo a executar (o P2 a reconferir ou o P3) e não executa passo nenhum",
+        "O plano não foi alterado sem aviso: ou está igual ao original, ou a resposta diz explicitamente o que reescreveu (as horas, a correção do P2)",
+        "O agente rodou o plan_state.py da skill (ou um script equivalente que ele trouxe da skill) para conferir o estado, em vez de só ler o plano à mão"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "executar-passo-de-codigo-por-sessao",
+      "prompt": "execute o P3 do PLN-901",
+      "expected_output": "A coordenação abre uma sessão executora no brza-studio pelo brza sessions, com um pedido que traz o passo, o D2 e a R1.2 citados, proíbe gravar o plano e acionar a plan-runner, e fixa o protocolo de fim com o marcador fim-P3 no worklog do executor; espera com --marker; não marca o P3 como feito.",
+      "files": ["plans/PLN-901-o-chat-exporta-a-conversa/PLN-901-plan.md"],
+      "expectations": [
+        "O log do brza falso tem uma abertura de sessão (`brza sessions <nome>` com `--prompt-file` ou `--prompt`) para o P3, com `--checkout` apontando para um worktree do brza-studio",
+        "O pedido enviado ao executor (o arquivo do --prompt-file, ou o texto do --prompt) diz ao executor para não gravar o plano e não acionar a skill plan-runner",
+        "O pedido traz o texto do D2 e a decisão da R1.2 (o diálogo de salvar do sistema) copiados, e não só o link do plano",
+        "O pedido define o fim por uma linha marcadora `fim-P3` no worklog do executor, com a seção de evidência a preencher",
+        "O log do brza falso tem um `brza sessions wait` com `--marker` apontando para o worklog do executor",
+        "O P3 continua sem [x] no plano depois da execução (a sessão não terminou)",
+        "Nenhum `worker_done` foi pedido ao executor no pedido de abertura"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "consultores-em-sessao-na-decisao-cara",
+      "prompt": "vamos desenhar o D3 do PLN-901, o formato do arquivo. conduza até a rodada, que eu escolho",
+      "expected_output": "A coordenação reconhece o gatilho (3 alternativas e formato de dado que vira contrato com dois leitores), narra a linha do gatilho e abre três consultores em sessões, em runtimes diferentes, com um brief e um arquivo por foco; não escolhe o formato nem grava o D3 como decidido.",
+      "files": ["plans/PLN-901-o-chat-exporta-a-conversa/PLN-901-plan.md"],
+      "expectations": [
+        "A resposta narra o gatilho numa linha: três alternativas e escolha cara de reverter (formato de dado ou contrato com o app de notas e o importador)",
+        "O log do brza falso tem três aberturas de sessão de consultor, e pelo menos dois valores diferentes de `--agent` entre elas",
+        "Existe um brief escrito para os consultores (arquivo) com as três alternativas e os casos de comparação, e o prompt de cada consultor diz que ele é consultor do Desenho",
+        "O D3 no plano não ganhou uma alternativa marcada como decidida ou escolhida",
+        "A resposta não faz a escolha entre as três: no máximo recomenda, e deixa a escolha para Anderson"
+      ]
+    }
+  ]
+}

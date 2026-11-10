@@ -7,6 +7,12 @@ não descrito no Desenho.
 
 ## A conferência
 
+**Rode `python3 -I .claude/skills/plan-runner/scripts/close_check.py PLN-NNN` antes da rodada.** Ele confere os itens 1, 2,
+4 e 6 por máquina (`ok` / `falta` / `n/a`) e lista os candidatos dos itens 3 e 5 como `manual` — o `R` decidido sem `D`
+nem link em `## Decisões`, o commit do `brza-studio` sem resumo —, que você lê e leva à rodada. Saída 1 com algum
+`falta`: o fechamento trava, e a resposta é dizer o que falta e onde. O que ele não sabe julgar, você julga: o script
+não decide se uma rodada é durável, só aponta onde olhar.
+
 Uma rodada só, com os itens do `## Fechamento` do molde, mais o resumo (item 5) e o fecho da Janela (item 6). **Qualquer
 um que falte trava o fechamento**, e a resposta é dizer o que falta e onde:
 
@@ -43,4 +49,4 @@ marcados, `status: done`, `phase: closed` e `completed` no frontmatter, o `Retom
 - **Plano de worklog** não tem `status`, porque o worklog não tem: fecha com o registro da execução completo abaixo do
   plano aceito e a mesma conferência. Plano aceito e nunca executado ganha a linha que diz que não foi executado e por
   quê.
-- Rode o `notes-checker` depois: o plano `done` ou `dropped` fica como fechou, mas os links dele continuam conferidos.
+- Rode o `notes-checker` e o `plan_state.py` depois: o plano `done` ou `dropped` fica como fechou, mas os links dele continuam conferidos.

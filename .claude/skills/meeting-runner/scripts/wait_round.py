@@ -74,8 +74,10 @@ from datetime import datetime
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
+import _kit  # noqa: E402,F401
 import common  # noqa: E402
 import sessions_map  # noqa: E402
+from skillkit import sessions_cli  # noqa: E402
 
 BRZA = os.environ.get("BRZA_BIN", "brza")
 MARCADOR = re.compile(r"^<!-- fim-rodada-(\d+) -->$")
@@ -151,26 +153,11 @@ def calc_limite(duracao_min, latencias):
 
 
 def fetch_states(reuniao, list_json=None, cmd=None):
-    """{sessao: state} de `brza sessions list --json`; {} se o comando ou o JSON falhar (só o modo marker)."""
-    try:
-        if list_json:
-            with open(list_json, encoding="utf-8") as f:
-                data = json.load(f)
-        else:
-            r = subprocess.run(shlex.split(cmd or f"{BRZA} sessions list --json"), capture_output=True, text=True,
-                               timeout=20)
-            data = json.loads(r.stdout)
-    except (OSError, ValueError, subprocess.SubprocessError):
-        return {}
-    sess = data.get("sessions", []) if isinstance(data, dict) else []
-    nomes = {p.get("sessao") for p in reuniao["personas"]}
-    out = {s.get("name"): s.get("state") for s in sess if s.get("name") in nomes}
-    for p in reuniao["personas"]:  # sobrescrita do manifesto: a linha do list que traz a sessão da persona
-        ids = {p.get("claude_session"), p.get("provider_session")} - {None, ""}
-        for s in sess:
-            if ids & {s.get("claude_session"), s.get("provider_session")}:
-                out[p.get("sessao")] = s.get("state")
-    return out
+    """{sessao: state} de `brza sessions list --json`; {} se o comando ou o JSON falhar (só o modo marker). A sobrescrita
+    do manifesto (`claude_session`/`provider_session` da persona) acha a sessão pela linha do `list` que traz o id."""
+    ps = reuniao["personas"]
+    ids = {p.get("sessao"): {p.get("claude_session"), p.get("provider_session")} for p in ps}
+    return sessions_cli.list_states([p.get("sessao") for p in ps], list_json=list_json, cmd=cmd, ids=ids)
 
 
 raiz_padrao = common.raiz_padrao
@@ -178,22 +165,13 @@ raiz_padrao = common.raiz_padrao
 
 def wait_argv(sessoes, timeout_s):
     """O argv (sem o `brza sessions`) do `wait`: `wait <sessoes…> --any --timeout <t> --json`."""
-    return ["wait", *sessoes, "--any", "--timeout", f"{max(0.0, timeout_s):g}", "--json"]
+    return sessions_cli.wait_argv(sessoes, timeout_s)
 
 
 def wait_brza(sessoes, timeout_s):
     """O padrão do `wait_fn`: `brza sessions wait <sessoes…> --any --timeout <t> --json`; (rc, dict).
     `brza` ausente ou saída que não é JSON vira rc 127 e `{"error": …}`."""
-    argv = [BRZA, "sessions", *wait_argv(sessoes, timeout_s)]
-    try:
-        r = subprocess.run(argv, capture_output=True, text=True, timeout=timeout_s + 60)
-    except (OSError, subprocess.SubprocessError) as e:
-        return 127, {"error": str(e)}
-    try:
-        dado = json.loads(r.stdout)
-    except ValueError:
-        return r.returncode or 1, {"error": f"saída sem JSON (rc {r.returncode}): {(r.stderr or r.stdout).strip()[:200]}"}
-    return r.returncode, dado if isinstance(dado, dict) else {"error": "JSON inesperado"}
+    return sessions_cli.wait_brza(sessoes, timeout_s)
 
 
 def _dispatch_do_evento(ev):

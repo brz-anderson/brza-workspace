@@ -1,26 +1,19 @@
 """Pedaços que os scripts da skill dividem: a raiz padrão e o cabeçalho de `rodada-N.md`.
 
-Só biblioteca padrão. O `panel.py`, o `wait_round.py` e o `launch_persona.py` importam daqui (fonte única do prazo e da
+Só biblioteca padrão; a raiz padrão e o `corta_medida` vêm do `skillkit`. O `panel.py`, o `wait_round.py` e o `launch_persona.py` importam daqui (fonte única do prazo e da
 duração anunciada da rodada, para o painel e a espera nunca divergirem).
 """
-import re
-import subprocess
 import os
+import re
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _kit  # noqa: E402,F401
+from skillkit.paths import FIM_RODADA_RE, MEDIDA_RE, TITULO_N12_RE, corta_medida, raiz_padrao  # noqa: E402,F401
 
 PRAZO_RE = re.compile(r'\(\s*prazo:\s*(\d{1,2})\s*[h:]\s*(\d{2})\s*\)')
 DURACAO_RE = re.compile(r'\(\s*dura[çc][ãa]o:\s*~?\s*(\d+)\s*min(?:utos?)?\s*\)', re.IGNORECASE)
 TITULO_RE = re.compile(r'^#\s*Rodada\s+\d+\s*[—–-]\s*(.*)$')
-
-
-def raiz_padrao():
-    """O topo do repositório git do cwd (`git rev-parse --show-toplevel`); sem git, o cwd."""
-    try:
-        r = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, timeout=10)
-        if r.returncode == 0 and r.stdout.strip():
-            return r.stdout.strip()
-    except (OSError, subprocess.SubprocessError):
-        pass
-    return os.getcwd()
 
 
 def cabecalho_rodada(path):
@@ -60,30 +53,6 @@ def resolver_personas(reuniao, nomes):
             raise ValueError(f"persona desconhecida: {q}")
         chosen += achou
     return chosen
-
-
-MEDIDA_RE = re.compile(r"^## (?:Medida|Custo da tarefa)\s*$")
-TITULO_N12_RE = re.compile(r"^#{1,2}\s")
-FIM_RODADA_RE = re.compile(r"^<!-- fim-rodada-\d+ -->$")
-
-
-def corta_medida(text):
-    """O texto sem o anexo que o `brza note commit` acrescenta DEPOIS do marcador de fim de rodada: a seção `## Medida`
-    (versão antiga) ou `## Custo da tarefa` (cabeçalho e um parágrafo, versão atual).
-
-    Só vale o anexo que vai até o fim do arquivo e que começa DEPOIS do último marcador: outra seção de nível 1 ou 2
-    depois dele, ou qualquer seção como `## O que ficou` entre o marcador e o anexo, deixa o texto como está (o marcador
-    continua não valendo). Sem nenhum marcador, o anexo se corta do mesmo jeito."""
-    linhas = (text or "").split("\n")
-    idx = [i for i, l in enumerate(linhas) if MEDIDA_RE.match(l)]
-    if not idx:
-        return text or ""
-    i = idx[-1]
-    if any(TITULO_N12_RE.match(l) for l in linhas[i + 1:]):
-        return text
-    if any(FIM_RODADA_RE.match(l.rstrip()) for l in linhas[i + 1:]):
-        return text   # o marcador vem depois do cabeçalho: não é anexo
-    return "\n".join(linhas[:i])
 
 
 def duracao_anunciada(path):

@@ -1,0 +1,23 @@
+<!-- Janela macOS: 1280 x 800 de conteúdo, semáforos à esquerda, cantos de 10 px. Só HTML e CSS, sem imagem. -->
+<style>
+.sa-macos { border-radius: 10px; overflow: hidden; background: var(--sa-background);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.22), 0 18px 40px -8px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.18); }
+.sa-macos .sa-mac-bar { height: 38px; display: flex; align-items: center; position: relative; padding: 0 14px;
+  background: var(--sa-sidebar, var(--sa-muted)); border-bottom: 1px solid var(--sa-border); }
+.sa-macos .sa-lights { display: flex; gap: 8px; }
+.sa-macos .sa-lights i { width: 12px; height: 12px; border-radius: 50%; display: block;
+  box-shadow: inset 0 0 0 .5px rgba(0,0,0,.28); }
+.sa-macos .sa-lights i:nth-child(1) { background: #ff5f57; }
+.sa-macos .sa-lights i:nth-child(2) { background: #febc2e; }
+.sa-macos .sa-lights i:nth-child(3) { background: #28c840; }
+.sa-macos .sa-mac-name { position: absolute; left: 0; right: 0; text-align: center; font-size: 13px; font-weight: 600;
+  color: var(--sa-muted-foreground); pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  padding: 0 90px; }
+</style>
+<div class="sa-frame sa-macos" data-w="{{W}}" style="width:{{W}}px">
+  <div class="sa-mac-bar">
+    <span class="sa-lights"><i></i><i></i><i></i></span>
+    <span class="sa-mac-name">{{TITLE}}</span>
+  </div>
+  <div class="sa-screen" style="height:{{H}}px">{{SCREEN}}</div>
+</div>

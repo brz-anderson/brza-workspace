@@ -95,8 +95,8 @@ scripts e dos plugins; o `playground` testa fluxos antes de entrarem no ferramen
 
 **R4.1. A cópia do parágrafo e o `task` do resolver: quando?** (revisor, achado 1; Lida e Bitola, R4)
 
-1. **Fase 0, antes do cliente, logo depois da política de texto (R2.2) (Recomendado).** Custo: ~2 h no hook, no resolver
-   e no módulo de gravação (inferido). Se paga: no primeiro dia — cada auditoria apaga um parágrafo (52 em 9,4 dias).
+1. **Fase 0, antes do cliente, logo depois da política de texto (R2.2) (Recomendado).** Custo: ~3 h no hook, no resolver,
+   no módulo de gravação e no `brza sync` (inferido). Se paga: no primeiro dia — cada auditoria apaga um parágrafo (52 em 9,4 dias).
    - A favor: "a linha zero no resolver começa esta semana, antes de extrair `classify.py`" — Bitola, R4.
 2. **Na fase 3, como na v2.** Custo: ~5 parágrafos perdidos por dia nas fases 1 e 2 (revisor). Se paga: só se o
    cliente mudar o formato do que se grava.
@@ -104,8 +104,9 @@ scripts e dos plugins; o `playground` testa fluxos antes de entrarem no ferramen
 **R4.2. O catálogo segue o portão P6?** (revisor, achado 2)
 
 1. **Sim: os quatro probes rodam na fase 2 e só as aprovadas entram; o `layer` está reprovado hoje (86% "alta")
-   (Recomendado).** Custo: ~23 chamadas por probe, menos de 1 min cada (revisor). Se paga: na fase 4 — a tabela não
-   mistura pergunta enviesada.
+   (Recomendado).** Custo: rotular à mão ≥ 20 pares por pergunta (a máquina leva menos de 1 min); o probe do `layer`
+   espera a fase 3, por falta de `task` (revisor v4, achados C e D). Se paga: na fase 4 — a tabela não mistura pergunta
+   enviesada.
 2. **As quatro entram como provisórias.** Custo: o P6 vira letra morta. Se paga: nunca.
 
 **R4.3. A ordem do gatilho no painel?** (Bitola, Fagulha, Ferrolho, Lida; revisor, achado 3)

@@ -1,1 +1,5 @@
 - [Scripts do meeting-runner sobre o brza sessions v2](meeting-runner-scripts.md) — mapa v2, painel automático, armadilhas do teste e do relógio falso, comando que valida
+- [Scripts do plan-runner (PLN-021 P2)](plan-runner-scripts.md) — formas reais dos planos que o parser tolera, armadilhas, comando que valida
+- [skillkit extraído da meeting-runner](skillkit-extraido-da-meeting-runner.md) — .claude/scripts/skillkit, o import por _kit, nomes trocáveis, comandos que validam
+- [Scripts da screen-artboards](screen-artboards-scripts.md) — artboard.py/tokens.py, blocos do main.css, meta sa-art, comando que valida
+- [executor, consult e plan_panel (PLN-021 P3-P5)](plan-runner-executor-consult-panel.md) — marker do wait vale p/ todas as sessões, testes, prova com brza falso

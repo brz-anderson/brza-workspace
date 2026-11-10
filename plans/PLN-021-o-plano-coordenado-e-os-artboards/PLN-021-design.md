@@ -3,7 +3,7 @@
 Rascunho do `designer` de 2026-11-09, registrado como está. Os pontos marcados **[sem lastro → Pn]** e
 **[sem lastro, menor]** estão na rodada 4 do [PLN-021: O plano roda por uma sessão coordenadora, com scripts de apoio e artboards de tela](PLN-021-plan.md),
 ainda sem resposta. A pedido de Anderson ("siga direto para escrever as skills"), a execução segue as opções
-recomendadas, a confirmar na R4. As marcas `[F…]`/`[C…]` seguem a regra de evidência do papel. Caminhos relativos ao
+recomendadas, confirmadas na R5 (menos a R4.6, que a R5.6 trocou pela opção 2). As marcas `[F…]`/`[C…]` seguem a regra de evidência do papel. Caminhos relativos ao
 worktree do playground.
 
 ## O que este desenho assume
@@ -262,12 +262,12 @@ e os números, e o texto integral vai por caminho:
 | cada evento do `wait` | uma linha "P3 · feito em 18 min; P5 · em curso 6 min", e o painel atualizado |
 | evidência | a linha `**Evidência:**` proposta, o que a coordenação conferiu por comando ("confere: `git -C … cat-file -e a1b2c3d` → ok; `<testes>` → 42 passed") e o `Executado` medido |
 | desvio | o `X` proposto, uma linha, e a rodada se ele muda um `D` |
-| consultores | ver D4 e o ponto 4 da rodada |
+| consultores | ver D4 e o R5.4 |
 | hora | `date '+%H:%M:%S'`, rodado na hora |
 
 #### Em aberto
 
-- Quando a versão nova passa a conduzir o próprio PLN-021: ver o ponto 7 da rodada.
+- Quando a versão nova passa a conduzir o próprio PLN-021: ver o R5.7.
 
 ---
 
@@ -367,7 +367,7 @@ conduz o plano, executa um passo dele.
 - Não grave o plano, não commite nada no brza-workspace, não pergunte a Anderson.
 - Desvio local: registre no worklog como `X` proposto e siga. Desvio que muda o contrato do D: pare, registre e feche
   com `parado`.
-- <o commit: pela resposta ao ponto 1 da rodada>
+- <o commit: pela resposta ao R5.1>
 
 ## O fim
 1. Preencha `## Evidência` no worklog, uma linha por item:
@@ -379,7 +379,7 @@ conduz o plano, executa um passo dele.
 3. Envie o status do protocolo que vem abaixo deste pedido. Não envie `worker_done`: a coordenação pede o encerramento.
 ```
 
-#### As alternativas — onde o executor devolve a evidência (ponto 2 da rodada)
+#### As alternativas — onde o executor devolve a evidência (R5.2)
 
 ##### A1 — No worklog do executor, no workstream, com o marcador (recomendada)
 
@@ -400,7 +400,7 @@ conduz o plano, executa um passo dele.
 
 #### Em aberto
 
-- O commit do executor: ponto 1 da rodada.
+- O commit do executor: R5.1.
 
 ---
 
@@ -433,11 +433,11 @@ consult.py close PLN-NNN D<n>
 - **`table`** junta os três arquivos numa tabela lado a lado (linhas: custo, se paga, reabre, risco; colunas: os focos),
   em Markdown para a mensagem e em `::orca-visual` pelo `visual.salva_visual`.
 - **O roster padrão:** três focos da SKILL.md de hoje (mudança mínima, arquitetura limpa, equilíbrio,
-  `SKILL.md:159-161`), cada um num runtime: ponto 3 da rodada.
+  `SKILL.md:159-161`), cada um num runtime: R5.3.
 
 #### Em aberto
 
-- O que vai ao chat: ponto 4 da rodada.
+- O que vai ao chat: R5.4.
 
 ---
 
@@ -622,7 +622,7 @@ tokens.py list
   375/768/1280) e um script inline aplica `zoom = min(1, largura do contêiner / nominal)`. Sem ele, 1280 px sai cortado a
   736 (F8).
 - **As larguras:** um artboard por alternativa, com as larguras empilhadas; para o PNG, o `shot` gera uma variante por
-  largura no scratch e tira um PNG de cada, com `--width` = a nominal + a margem da moldura (ponto 5 da rodada).
+  largura no scratch e tira um PNG de cada, com `--width` = a nominal + a margem da moldura (R5.5).
 - **`shot`:** `brza shot` por largura e por tema (F7), `~1,2 s` cada (F8), e imprime os caminhos para a leitura.
 - **`promote`:** `brza shot <artboard> plans/PLN-NNN-…/PLN-NNN-<assunto>.png --width <nominal>`, ou
   `work/issues/<nome>.png`, pela regra de `open-and-plan.md:62-65`, e imprime o link Markdown para o item `D`.
@@ -665,7 +665,10 @@ substitui o parágrafo de `open-and-plan.md:57-65`.
 
 #### Em aberto
 
-- O tema do artboard: ponto 6 da rodada.
+- ~~O tema do artboard: R5.6.~~ Decidido em R4.6 (Rodada 5): o desktop do `brza-studio` usa os tokens vivos do
+  chat (`.sa-art[data-live]` mapeia `--sa-*` para `var(--…)`, sem `--scheme`; o `shot` injeta o fallback só no PNG); o
+  mobile, o navegador, o `neutral` e os outros projetos seguem com o pacote escopado. **Descartada:** o pacote em todo o
+  desktop — o mockup não seguia o tema do chat, que Anderson quer ver.
 
 ---
 

@@ -1,4 +1,4 @@
 - [Planos de reunião de personas](meeting-plan-review-patterns.md) — confiança × regra, valor trocado, plano que viola a própria regra, ressalva que some
 - [Contraste no brza-studio](brza-studio-contrast-review.md) — HEX cru ≠ render (color-mix, contraste do usuário, inline); WCAG × APCA na 07
-- [Skill com scripts e contrato JSON](skill-with-scripts-review.md) — dois leitores, molde × parser, subcomando irmão sem o padrão, vazio × ausente, data perdida
+- [Skill com scripts e contrato JSON](skill-with-scripts-review.md) — molde × parser, fixture × brza real (--dry-run), rc tolerado que gira, reabrir com estado velho
 - [Correio/MCP remoto](remote-mcp-correio-review.md) — sem evidência a mensagem chega como a pessoa; [medido] confundido; poll não acorda

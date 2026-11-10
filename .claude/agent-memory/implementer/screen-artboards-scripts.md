@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-**Valida (2026-11-10):** `python3 -I -m unittest discover -s ".claude/skills/screen-artboards/scripts/tests"` (48 OK, brza shot trocado
+**Valida (2026-11-10):** `python3 -I -m unittest discover -s ".claude/skills/screen-artboards/scripts/tests"` (55 OK desde o R4.6, brza shot trocado
 por atribuição em `artboard.gera_png`). `tokens.py check brza-studio` contra o disco real; apague os `__pycache__`.
 
 - O `main.css` do brza-studio tem `--destructive` num 2º bloco `:root,\n.native-chat-appearance[...]` (e no `.dark,`): o
@@ -16,3 +16,6 @@ por atribuição em `artboard.gera_png`). `tokens.py check brza-studio` contra o
   escondendo as outras `.sa-cell` por CSS, sem reconstruir. Largura do PNG = moldura externa + 2*12 (o iPhone é 415+24, não 393+24).
 - `python3 -I` não põe a pasta do script no `sys.path`: `artboard.py` faz `sys.path.insert(0, AQUI)` antes de `import _kit, tokens`.
 - `rm -rf $D/*.html` com variável é barrado pelo hook de segurança: use pasta de saída nova (`v2`, `v3`) em vez de apagar.
+- R4.6: desktop do brza-studio (macos/windows) é "vivo": `.sa-art[data-live]` com `--sa-X:var(--X)`, meta `vivo:true`, uma célula
+  (esquema interno 'light'); o fallback `:root` do pacote só entra no HTML temporário do shot/promote (`--packs-dir`, `--theme`).
+  Os testes que usavam macos+brza-studio para o escopo/both passaram a usar browser/iphone.

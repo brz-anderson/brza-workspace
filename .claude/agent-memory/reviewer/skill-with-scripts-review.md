@@ -72,6 +72,28 @@ nada chama `sys.exit`, e o `subprocess.run` com timeout, no POSIX, só espera o 
 texto a mais" (os 9 casos saíram certos) e "chave do JSON sem documentação" (o docstring lista todas). Deram 85–90 de partida e caíram por
 leitura direta do código do CLI e do studio.
 
+**Na 5ª revisão (P8 do PLN-021, plan-runner v2 e screen-artboards, 2026-11-10), o erro morou de novo no contrato com o
+`brza` real. Os testes passam porque o `brza` é falso e a fixture inventa a forma:**
+
+- **A forma do JSON:** o `brza quota --json` é `accounts[].windows[]`, e o script lia `{runtime: {session_pct}}`.
+- **A combinação de flags:** o `--effort` exige o `--model`.
+- **A conferência barata:** o `brza sessions <nome> … --dry-run` valida as flags sem abrir nada, e o `wait` num nome que
+  não existe sai rc 1 com `error`. Rode os dois antes de ler o código.
+- **O ramo de erro que não dorme:** o `if error and rc not in (0, 1, 75)` deixa o rc 1 girar o laço a ~0,3 s por
+  chamada. Procure o rc que o filtro "tolera" e veja se o ramo de espera cobre esse caso.
+- **O estado que sobrevive à reabertura:** o worklog com o marcador velho fazia o `wait` devolver na hora. Toda vez que
+  um verbo "reabre", confira o arquivo que o detector lê.
+- **O verbo que muda estado antes da validação:** o `brza tree` rodava antes da recusa do pedido.
+- **A conferência que executa:** o comando do worklog rodava já na proposta.
+
+No plano, a resposta da rodada nova (R5 respondendo a R4) não chegou aos `D`, e a `Origem` não a cita. O gerador de
+pedido copiava o "Em aberto" velho ao executor. Teste: rode o `step_request` do passo e leia o que sai. A Evidência do
+`[x]` era anterior ao retrabalho que estava no diff. Teste: compare o mtime do código com o do plano e conte os testes de
+HEAD contra os do disco.
+
+Caíram de novo, deram 95 de partida: as contagens de teste da Evidência (bateram), os testes novos que não discriminariam
+(5 falharam no código de HEAD) e o `:root` vazado no artboard publicado. Rodar a mutação é o que derruba ou confirma.
+
 **Why:** a skill nasce de protótipos de scratch, e cada script é endurecido em separado; o contrato entre eles e os
 moldes das references é o que ninguém roda junto.
 **How to apply:** em toda revisão de skill com `scripts/`, rode os comandos do SKILL.md como estão escritos, passe o

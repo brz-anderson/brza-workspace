@@ -3,10 +3,10 @@ status: in_progress
 phase: execution
 origin: request
 description: Protótipo no playground de um plan-runner com sessão coordenadora (executores dos passos, consultores em sessões, painel de andamento), scripts e references como os da meeting-runner, e uma skill própria de artboards para protótipos de tela web, mobile e desktop.
-ready: "não — a R4 está sem resposta; P1, P2 e P7 executam com as recomendadas, a pedido de Anderson"
-estimate_h: 41
-executed_h: 0.79
-remaining_h: 4
+ready: "não — o P11 (os defeitos do P8 e o código em inglês) espera o pedido de Anderson; o P9 depende dele"
+estimate_h: 47
+executed_h: 0.99
+remaining_h: 8
 priority: medium
 scope:
   - workspace
@@ -19,7 +19,7 @@ tags:
 
 # PLN-021: O plano roda por uma sessão coordenadora, com scripts de apoio e artboards de tela
 
-- **Retomar:** P1 a P7 escritos em 2026-11-10 com as recomendadas da R4 (sem resposta), e os evals da iteração 1 rodados (plan-runner +0,44; screen-artboards +0,08), sem commit do código. Próximo: Anderson responde a R4, confere-se o escrito contra as respostas e o visualizador dos evals, e então o P8 (revisão).
+- **Retomar:** a R4 foi respondida na Rodada 5 (todas as recomendadas, menos a R4.6.2) e o P8 rodou: [REV-026](../../work/reviews/REV-026-pln-021-p1-a-p7.md), com 12 achados importantes, 6 sugestões e 5 falsos, e o destino de cada um na Rodada 6. A coordenação corrigiu o plano e as skills (A6–A9, A16–A18); o código vai ao **P11**, que espera o pedido de Anderson, e o P9 só depois. O ajuste R4.6.2 do P7 está no disco e sem commit. Próximo: Anderson pede o P11.
 - **Dividido:** [PLN-021 — Desenho](PLN-021-design.md)
 
 ## Pedido
@@ -255,10 +255,111 @@ as recomendadas, que ficam a confirmar nesta rodada; nenhuma delas é decisão.
    `executor.py open` com Claude Sonnet por padrão; um painel por plano e dia; os prefixos `--sa-` e `--sa-m-`; rodar de
    novo só o teste marcado `(≤ 2 min)`.
 
+### Rodada 5 — as respostas da R4 (4a, 4b e 4c) (enviada 2026-11-10)
+
+> **Apresentado antes:** Os oito pontos e as seis escolhas menores da Rodada 4, reapresentados em duas rodadas (4a: R4.1–R4.4; 4b: R4.5–R4.8) e a 4c (escolhas menores). Respostas de Anderson em 2026-11-10: 4a "todos recomendado"; 4b "4.6.2 / restante recomendado"; 4c coberta pelo "restante recomendado". A Rodada 4 acima segue sem a linha de resposta; vale esta.
+
+Respondida em 2026-11-10, 273fc24b-adde-4de7-a0f1-a5849fcac429.
+
+1. **R4.1 — O commit do executor.** Opções:
+   - O pedido do passo autoriza o commit na branch do passo, com testes verdes; merge e push pedem confirmação (recomendada) — custo: muda a regra de hoje; pode sair commit não visto, desfeito por git reset na branch; se paga: em todo passo de código;
+   - O executor para antes do commit e a coordenação leva a rodada — custo: rodada de 1–2 min por passo, sessão parada; se paga: agora, se a regra de hoje vale sem exceção;
+   - O executor pergunta no próprio chat — custo: a pergunta fica fora do chat da coordenação; se paga: nunca.
+
+   **Decidido — O pedido do passo autoriza o commit na branch do passo, com testes verdes; merge e push pedem confirmação.**
+
+2. **R4.2 — Onde o executor devolve a evidência.** Opções:
+   - `## Evidência` do worklog do executor, com o marcador `<!-- fim-Pn: feito|parado -->` (recomendada) — custo: a coordenação cria o worklog antes de abrir e o commita com o plano; se paga: no primeiro passo;
+   - `.sessions/pln-nnn/Pn/evidencia.md`, fora do git — custo: arquivo que some com o `.sessions/`; se paga: só sem o worklog do executor.
+
+   **Decidido — `## Evidência` do worklog do executor, com o marcador `<!-- fim-Pn: feito|parado -->`.**
+
+3. **R4.3 — Os runtimes padrão dos consultores.** Opções:
+   - Claude Opus high, Codex no maior esforço e Grok, um foco cada (recomendada) — custo: ~US$ 2,8–4,4 no Claude; cota sem valor em US$ no Codex e no Grok; se paga: quando a diversidade muda a recomendação numa decisão cara;
+   - Claude e Codex em sessão, mais um designer por Agent — custo: ~US$ 2,8 a mais no Agent e um runtime a menos; se paga: com o Grok sem cota.
+
+   **Decidido — Claude Opus high, Codex no maior esforço e Grok, um foco cada.**
+
+4. **R4.4 — O que vai ao chat na rodada dos consultores.** Opções:
+   - A tabela lado a lado e a argumentação integral de cada um (recomendada) — custo: ~três telas por rodada, rara pelo gatilho da R2.3; se paga: na primeira, pela memória consultant-debate-shown-in-full;
+   - A tabela e uma linha a favor e contra por consultor, com o caminho do integral — custo: o integral fica fora do chat; se paga: só se três consultores pesarem como uma reunião.
+
+   **Decidido — A tabela lado a lado e a argumentação integral de cada um.**
+
+5. **R4.5 — As larguras do navegador no chat.** Opções:
+   - Um artboard por alternativa, larguras empilhadas com zoom, e um PNG por largura no scratch (recomendada) — custo: artboard de ~três telas por alternativa; se paga: a partir de 3 alternativas (3 × 3 passa de 8 visuais);
+   - Um artboard por largura — custo: só 2 alternativas por resposta; se paga: só com 2.
+
+   **Decidido — Um artboard por alternativa, larguras empilhadas com zoom, e um PNG por largura no scratch.**
+
+6. **R4.6 — O tema do mockup.** Opções:
+   - O tema vem do pacote, escopado no mockup (`--scheme light|dark|both`) (recomendada) — custo: não segue o tema do chat; o both dobra a altura; se paga: na primeira tela do brza-studio;
+   - O desktop do brza-studio usa os tokens vivos do Orca; só o mobile e os outros projetos usam o pacote — custo: dois caminhos de CSS, ~1 h a mais; se paga: se Anderson quer a tela no tema em que está.
+
+   **Resposta:** "4.6.2" Lida como: O desktop do brza-studio usa os tokens vivos do Orca; só o mobile e os outros projetos usam o pacote.
+
+7. **R4.7 — Quando o plan-runner novo passa a conduzir o PLN-021.** Opções:
+   - Ao fechar o P6; o P7 ao P10 rodam por ele, com o P9 como aceite (recomendada) — custo: o plano troca de fluxo no meio; se paga: no P9, sem outro plano;
+   - Escrever em plan-runner-next/ e trocar no fechamento — custo: o nome muda durante o plano, contra a R3.1; se paga: só se alguém precisar do fluxo velho estável.
+
+   **Decidido — Ao fechar o P6; o P7 ao P10 rodam por ele, com o P9 como aceite.**
+
+8. **R4.8 — A base das horas.** Opções:
+   - As faixas das rodadas (41 h), com a nota da calibração e o executado medido (recomendada) — custo: remaining_h alto no painel até os primeiros passos; se paga: no fechamento;
+   - Calibrado a ~40%, ~16 h — custo: troca o preço das rodadas por duas medições; se paga: se o PLN-021 executar perto do PLN-017.
+
+   **Decidido — As faixas das rodadas (41 h), com a nota da calibração e o executado medido.**
+
+9. **R4.9 — As escolhas menores (seleção múltipla)** (seleção múltipla). Opções:
+   - o nome `skillkit` (recomendada) — custo: —; se paga: —;
+   - o `gera_png` com `--scale 1` (recomendada) — custo: —; se paga: —;
+   - o `executor.py open` com Claude Sonnet por padrão (recomendada) — custo: —; se paga: —;
+   - um painel por plano e dia (recomendada) — custo: —; se paga: —;
+   - os prefixos `--sa-` e `--sa-m-` (recomendada) — custo: —; se paga: —;
+   - rodar de novo só o teste marcado `(≤ 2 min)` (recomendada) — custo: —; se paga: —.
+
+   **Resposta:** "restante recomendado" Lida como: o nome `skillkit`; o `gera_png` com `--scale 1`; o `executor.py open` com Claude Sonnet por padrão; um painel por plano e dia; os prefixos `--sa-` e `--sa-m-`; rodar de novo só o teste marcado `(≤ 2 min)`.
+
+### Rodada 6 — o destino dos achados do P8 e a língua do código (enviada 2026-11-10)
+
+> **Apresentado antes:** O parecer do reviewer sobre P1–P7 (12 achados importantes, 6 sugestões, 5 hipóteses que caíram), em `work/reviews/` (REV do P8), com a conferência dos achados A1, A2, A3 e A10 refeita pela coordenação.
+
+Respondida em 2026-11-10, 273fc24b-adde-4de7-a0f1-a5849fcac429.
+
+1. **R6.1.** Opções:
+   - Corrigido aqui, com o P11 novo: os defeitos do P8 (A1–A5, A10, A11, A13–A15) (recomendada) — custo: ~3–4 h, pelo implementer, com teste que falha antes; se paga: antes do P9;
+   - Corrigir só A1–A5 e mandar o resto a uma issue — custo: ~2 h; a issue fica para depois; se paga: se o P9 precisa começar logo;
+   - Tudo para uma issue — custo: nenhum agora; se paga: nunca para A1–A3.
+
+   **Decidido — Corrigido aqui, com o P11 novo: os defeitos do P8 (A1–A5, A10, A11, A13–A15).**
+
+2. **R6.2.** Opções:
+   - Corrigido aqui, pela coordenação, antes do P9 (A6–A9, A12, A16–A18) (recomendada) — custo: ~1 h; se paga: agora, porque o P9 lê esses textos;
+   - Corrigir A6, A8, A16–A18 e registrar A7, A9, A12 como desvios sem refazer — custo: ~0,5 h; se paga: se evals e sonda do P3 não valem refazer.
+
+   **Decidido — Corrigido aqui, pela coordenação, antes do P9 (A6–A9, A12, A16–A18).**
+
+3. **R6.3.** Opções:
+   - A12 descartado, com o porquê no parecer (recomendada) — custo: nenhum; se paga: agora;
+   - Refazer com os 5 e 3 casos do Desenho e 3 execuções — custo: ~1,5 h; se paga: só se o +0,08 do screen-artboards virar argumento.
+
+   **Decidido — A12 descartado, com o porquê no parecer.**
+
+4. **R6.4.** Opções:
+   - Registrar o ajuste no X1 e na Evidência do P7, manter o navegador com o pacote e medir o Executado pelo --by-task no P10 (recomendada) — custo: ~0,5 h agora e 15 min no P10; se paga: agora e no P10;
+   - Refazer o ajuste pelo executor.py, como primeira prova real dele — custo: ~45 min e uma sessão; se paga: no P9.
+
+   **Decidido — Registrar o ajuste no X1 e na Evidência do P7, manter o navegador com o pacote e medir o Executado pelo --by-task no P10.**
+
+5. **R6.5 — A língua do código (ajuste de Anderson à resposta).** Opções:
+   - Todo o código em inglês — arquivos, métodos, classes, variáveis —; pt-BR só em docstrings e no texto que volta ao usuário (recomendada) — custo: reescrever o código do PLN-021 que hoje tem nomes em português; se paga: no P11, junto dos defeitos.
+
+   **Resposta:** "todos na primeira opção + um ajuste: todo o código deve ser em inglês, incluindo nomes de arquivos, métodos, classes e variáveis, em pt-BR somente docstrings e conteúdo que retorne ao usuário, como um retorno de texto, por exemplo"
+
 ## Passos
 
-Do Desenho, com as horas do `designer` (R4.8 a confirmar). A ordem: P1 ∥ P2 → P3 → P4, P5 → P6; o P7 depois do P1; P8 →
-P9 → P10. Executam a pedido de Anderson de 2026-11-09, com as recomendadas da R4.
+Do Desenho, com as horas do `designer` (R4.8 confirmada na Rodada 5). A ordem: P1 ∥ P2 → P3 → P4, P5 → P6; o P7 depois do P1; P8 →
+P9 → P10. Executam a pedido de Anderson de 2026-11-09, com as recomendadas da R4, confirmadas na Rodada 5 (menos a R4.6.2).
 
 ### P1 — O `skillkit` e a migração da `meeting-runner`
 
@@ -349,21 +450,38 @@ Estimado: 7 h · Executado: 0.13 h
 - [x] **2. `artboard.py`, `tokens.py`, as cinco molduras e os pacotes `brza-studio` e `neutral`**
 - [x] **3. Os evals, iteração 1**, com e sem a skill, em cópias isoladas
 
-**Evidência:** `python3 -I -m unittest discover -s .claude/skills/screen-artboards/scripts/tests` → 48 OK · 14 PNGs das
-cinco molduras lidos (`/private/tmp/pln021/artboards-p7/v2/png/`) · evals: com a skill 13/13, sem 12/13, delta +0,08; o
+**Evidência:** `python3 -I -m unittest discover -s .claude/skills/screen-artboards/scripts/tests` → 55 OK (48 mais 7 do ajuste R4.6.2, X6) · 14 PNGs das
+cinco molduras lidos (`/private/tmp/pln021/artboards-p7/v2/png/`) e o desktop do `brza-studio` com tokens vivos em `/private/tmp/pln021/artboards-p7/v3/png/` · evals: com a skill 13/13, sem 12/13, delta +0,08; o
 caso de desktop empata em 7/7, e o que discrimina é a página web num artboard só (R4.5) · `Executado`: os scripts, 464
-s do subagente; a SKILL.md e os evals pela coordenação, sem medição · desvios em X5
+s do subagente; a SKILL.md e os evals pela coordenação, sem medição · desvios em X5 e X6
 
 ### P8 — A revisão da entrega
 
 Executa a revisão · executor: `reviewer` · depende de P1 a P7
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0.2 h
+
+- [x] **1. A revisão adversária de P1 a P7**, pelo `reviewer` (Opus), e a conferência dos achados A1, A2, A3 e A10 pela coordenação
+- [x] **2. O destino de cada achado**, pela Rodada 6
+
+**Evidência:** [REV-026](../../work/reviews/REV-026-pln-021-p1-a-p7.md) · `python3 -I -m unittest discover` nos quatro conjuntos → 55 (kit), 151 (plan-runner), 55 (screen-artboards), 323 (meeting-runner) OK · `brza sessions … --effort xhigh --dry-run` → "--effort exige --model" (A1) · `brza quota --json` → `accounts[].windows[]` (A2) · `Executado` pela duração do subagente (~700 s) e a conferência
+
+### P11 — Os defeitos do P8 e o código em inglês
+
+Executa D2, D3, D4, D5, D6 e D7, a partir de [REV-026](../../work/reviews/REV-026-pln-021-p1-a-p7.md) e da R6 · executor: `implementer`, pela coordenação, por sessão aberta pelo `executor.py` quando Anderson mandar · depende de P8
+
+Estimado: 6 h · Executado: — h
+
+- [ ] **1. Os defeitos de código do REV-026** (A1–A5, A10, A11, A13–A15), cada um com o teste que falha antes e, onde der, a prova pelo `brza` real em `--dry-run`
+- [ ] **2. O código em inglês** (R6.5): nomes de arquivo, função, classe e variável de `.claude/scripts/skillkit/`, `plan-runner/scripts/` e `screen-artboards/scripts/` em inglês, com a `meeting-runner` importando do kit sem mudar um teste; pt-BR só em docstring e no texto que volta ao usuário
+- [ ] **3. As skills e o Desenho acompanham** os nomes novos (SKILL.md, references, D1–D7)
+
+Faz-se antes do P9: o aceite manual roda sobre o roster e o `wait` corrigidos.
 
 ### P9 — O aceite manual
 
 Executa os `C`: um passo real de um plano aberto pelo `executor.py` e um Desenho com artboards · executor: a sessão que
-conduz e Anderson · depende de P6 a P8
+conduz e Anderson · depende de P6 a P8 e P11
 
 Estimado: 1.5 h · Executado: — h
 
@@ -392,18 +510,31 @@ Estimado: 0.5 h · Executado: — h
 - **X3 — Os scripts do D6 classificam e localizam**: cada problema tem `nivel` (`erro`/`aviso`) e `linha`;
   `deviation-not-cited` e `hours-unreadable` são aviso; o desvio que nomeia o passo conta como citado; `step-without-design`
   isenta rodada, revisão, aceite e fechamento; `round_log --next` imprime só o número. Afeta P2 e D6; a classificação
-  aviso × erro vai à R4.
+  aviso × erro: aceita na Rodada 5, com as recomendadas.
 - **X4 — O executor e os consultores saíram com escolhas que o D3 e o D4 não fixavam**: o `--marker` só vai ao `brza
   sessions wait` com um passo (com vários, o script confere o marcador sozinho); o rc com eventos juntos prioriza falha,
   depois bloqueado; o `veredito` ficou copiado no `executor.py`, fora do `skillkit`; o marcador só vale como última linha;
-  o `--apply` marca todos os subpassos pendentes; os fallbacks do roster (Opus → Grok; Codex e Grok → Sonnet `high`) são
-  do executor, e o `--effort xhigh` do Codex não foi conferido no `brza sessions` real; sem `--checkout` nem `--tree`, o
+  o `--apply` marca todos os subpassos pendentes (contra o D3, que diz os cobertos: corrigido no P11); os fallbacks do roster (Opus → Grok; Codex e Grok → Sonnet `high`) são
+  do executor, e o `--effort xhigh` do Codex não foi conferido no `brza sessions` real (o REV-026 A1 mostrou que falha sem `--model`); sem `--checkout` nem `--tree`, o
   executor abre no worktree do workspace, o que conflita com a regra "não commite no brza-workspace" do pedido. Afeta P3
-  a P5, D3 e D4; os fallbacks e o checkout padrão vão à R4.
+  a P5, D3 e D4; os fallbacks e o checkout padrão: o checkout padrão é o defeito A5 do REV-026, corrigido no P11.
 - **X5 — A `screen-artboards` corrigiu as references em seis pontos**: o `xmlns` do SVG passa no filtro de rede; a deriva
   só sai 4 quando um token muda; todos os tokens do mobile entram com `--sa-m-` e sobrescrevem os do desktop nas molduras
   de celular; o PNG de issue é `<nome>-<assunto>.png`; o fragmento responsivo usa `@container`, e não `@media` (achado do
   eval); telas que não são alternativas saem sem letra. Afeta P7 e D7.
+- **X6 — O ajuste R4.6.2 do P7 saiu por subagente, depois do P6**: o desktop do `brza-studio` (`macos`/`windows` com
+  `--pack brza-studio`) usa os tokens vivos do chat (`.sa-art[data-live]`, 27 tokens, com `ALIAS_VIVO` para os que o chat
+  não injeta); `--scheme` ali é erro (código 2); o `shot` injeta o esquema do pacote só no HTML temporário; o navegador com
+  `--pack brza-studio` segue o pacote (R6.4). Os 55 testes passam e os PNGs estão em `v3`. Afeta P7 e D7.
+- **X7 — A sonda de permissão do P3 não rodou**: o `brza` dos testes era falso, e o executor do `brza-studio` grava o
+  worklog fora do checkout. Roda no P9, com o `brza` real. Afeta P3 e D3.
+- **X8 — Os evals saíram com 3 e 2 casos, contra os 5 e 3 do Desenho**: faltam o caso negativo do gatilho R2.3, o do
+  `round_log` com `reabre` e o da deriva de tokens, e cada configuração rodou uma vez. Descartado como achado (R6.3): o
+  delta de +0,44 já discrimina. Afeta P6, P7 e D2.
+
+## Revisões
+
+- 2026-11-10 — [REV-026: PLN-021 P1 a P7, a entrega do plan-runner coordenado e da screen-artboards](../../work/reviews/REV-026-pln-021-p1-a-p7.md): 12 achados importantes, 6 sugestões e 5 falsos; o código vai ao P11, o plano e as skills foram corrigidos na coordenação, o A12 foi descartado.
 
 ## Worklogs
 

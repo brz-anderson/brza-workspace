@@ -19,7 +19,7 @@ tags:
 
 # PLN-021: O plano roda por uma sessão coordenadora, com scripts de apoio e artboards de tela
 
-- **Retomar:** a R4 foi respondida na Rodada 5 (todas as recomendadas, menos a R4.6.2) e o P8 rodou: [REV-026](../../work/reviews/REV-026-pln-021-p1-a-p7.md), com 12 achados importantes, 6 sugestões e 5 falsos, e o destino de cada um na Rodada 6. A coordenação corrigiu o plano e as skills (A6–A9, A16–A18); o código vai ao **P11**, que espera o pedido de Anderson, e o P9 só depois. O ajuste R4.6.2 do P7 está no disco e sem commit. Próximo: Anderson pede o P11.
+- **Retomar:** a R4 foi respondida na Rodada 5 (todas as recomendadas, menos a R4.6.2) e o P8 rodou: [REV-026](../../work/reviews/REV-026-pln-021-p1-a-p7.md), com 12 achados importantes, 6 sugestões e 5 falsos, e o destino de cada um na Rodada 6. A coordenação corrigiu o plano e as skills (A6–A9, A16–A18); o código vai ao **P11**, que espera o pedido de Anderson, e o P9 só depois. O ajuste R4.6.2 do P7 está no disco e sem commit. P11.1 e o subpasso 3 feitos e commitados em 2026-11-10, com três rodadas de revisão (X9). Próximo: o subpasso 2 do P11, o código em inglês, e o subpasso 4; o P9 depois.
 - **Dividido:** [PLN-021 — Desenho](PLN-021-design.md)
 
 ## Pedido
@@ -354,7 +354,7 @@ Respondida em 2026-11-10, 273fc24b-adde-4de7-a0f1-a5849fcac429.
 5. **R6.5 — A língua do código (ajuste de Anderson à resposta).** Opções:
    - Todo o código em inglês — arquivos, métodos, classes, variáveis —; pt-BR só em docstrings e no texto que volta ao usuário (recomendada) — custo: reescrever o código do PLN-021 que hoje tem nomes em português; se paga: no P11, junto dos defeitos.
 
-   **Resposta:** "todos na primeira opção + um ajuste: todo o código deve ser em inglês, incluindo nomes de arquivos, métodos, classes e variáveis, em pt-BR somente docstrings e conteúdo que retorne ao usuário, como um retorno de texto, por exemplo"
+   **Resposta:** "todos na primeira opção + um ajuste: todo o código deve ser em inglês, incluindo nomes de arquivos, métodos, classes e variáveis, em pt-BR somente docstrings e conteúdo que retorne ao usuário, como um retorno de texto, por exemplo" Lida como: todo o código em inglês, com o pt-BR só em docstring e no texto que volta ao usuário; a regra subiu à norma do ecossistema.
 
 ## Passos
 
@@ -474,9 +474,17 @@ Estimado: 6 h · Executado: — h
 
 - [ ] **1. Os defeitos de código do REV-026** (A1–A5, A10, A11, A13–A15), cada um com o teste que falha antes e, onde der, a prova pelo `brza` real em `--dry-run`
 - [ ] **2. O código em inglês** (R6.5): nomes de arquivo, função, classe e variável de `.claude/scripts/skillkit/`, `plan-runner/scripts/` e `screen-artboards/scripts/` em inglês, com a `meeting-runner` importando do kit sem mudar um teste; pt-BR só em docstring e no texto que volta ao usuário
-- [ ] **3. As skills e o Desenho acompanham** os nomes novos (SKILL.md, references, D1–D7)
+- [ ] **3. O `--apply` do `executor.py` marca só os subpassos que a evidência cobre** (D3), e não todos os pendentes (X4; REV-026 A9)
+- [ ] **4. As skills e o Desenho acompanham** os nomes novos (SKILL.md, references, D1–D7)
 
 Faz-se antes do P9: o aceite manual roda sobre o roster e o `wait` corrigidos.
+
+**Andamento (2026-11-10):** os subpassos 1 e 3 estão no disco e commitados, com três rodadas de revisão do `reviewer` e o
+`implementer` (pareceres `/private/tmp/pln021/p11-review-r1.md` a `r3.md`: 4+0+1 importantes corrigidos, as sugestões
+corrigidas menos o nome em português): `python3 -I -m unittest discover` → 56 (kit), 193 (plan-runner), 55
+(screen-artboards), 323 (meeting-runner) OK. Faltam o subpasso 2 (o código em inglês, que inclui `neutraliza_marcador`,
+`respondida_com_leitura`, `achados`, `erros`, `ultima_batida`, `contas` e os métodos de teste novos) e o 4. As correções da
+última rodada (C1 e C2) não passaram por uma 4ª revisão: o limite de três rodadas foi o pedido de Anderson.
 
 ### P9 — O aceite manual
 
@@ -514,7 +522,7 @@ Estimado: 0.5 h · Executado: — h
 - **X4 — O executor e os consultores saíram com escolhas que o D3 e o D4 não fixavam**: o `--marker` só vai ao `brza
   sessions wait` com um passo (com vários, o script confere o marcador sozinho); o rc com eventos juntos prioriza falha,
   depois bloqueado; o `veredito` ficou copiado no `executor.py`, fora do `skillkit`; o marcador só vale como última linha;
-  o `--apply` marca todos os subpassos pendentes (contra o D3, que diz os cobertos: corrigido no P11); os fallbacks do roster (Opus → Grok; Codex e Grok → Sonnet `high`) são
+  o `--apply` marca todos os subpassos pendentes (contra o D3, que diz os cobertos: subpasso 3 do P11); os fallbacks do roster (Opus → Grok; Codex e Grok → Sonnet `high`) são
   do executor, e o `--effort xhigh` do Codex não foi conferido no `brza sessions` real (o REV-026 A1 mostrou que falha sem `--model`); sem `--checkout` nem `--tree`, o
   executor abre no worktree do workspace, o que conflita com a regra "não commite no brza-workspace" do pedido. Afeta P3
   a P5, D3 e D4; os fallbacks e o checkout padrão: o checkout padrão é o defeito A5 do REV-026, corrigido no P11.
@@ -531,6 +539,14 @@ Estimado: 0.5 h · Executado: — h
 - **X8 — Os evals saíram com 3 e 2 casos, contra os 5 e 3 do Desenho**: faltam o caso negativo do gatilho R2.3, o do
   `round_log` com `reabre` e o da deriva de tokens, e cada configuração rodou uma vez. Descartado como achado (R6.3): o
   delta de +0,44 já discrimina. Afeta P6, P7 e D2.
+
+- **X9 — O P11.1 saiu por `implementer` e revisor em laço, e não pelo `executor.py`**, porque os defeitos A3, A4, A5 e A11
+  estão no próprio `executor.py`. Os X propostos pelo `implementer` entram aqui: o `CODEX_MODEL` `gpt-6.1-sol` (do
+  `~/.codex/config.toml`, sem prova com sessão real: roda no P9); a cota pela conta ativa e a janela `session` (ou
+  `weekly` no Grok); `**Resposta:**` com "lida como" conta como decidida, exceto contraproposta e esclarecimento; `open`
+  sem `--checkout` nem `--tree` recusa (rc 2); `running:` recusa, também na primeira abertura; o `--apply` marca só os
+  subpassos que a linha `cobre:` declara (`todos` vence; sem ela, marca todos e avisa); o passo coberto em parte volta
+  pelo `send` ou pelo `open`. Afeta P3 a P5, D3 e D4.
 
 ## Revisões
 

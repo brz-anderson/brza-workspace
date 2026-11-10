@@ -18,9 +18,10 @@ tags:
 
 # PLN-018: O turno do Grok e do Codex entra no log, e a tarefa carimba o id dessa sessão
 
-- **Retomar:** P1–P4 fechados em 2026-11-09, `brza-workflow@5098439`, ainda só na `master` local. Próximo: a revisão
-  da entrega. O `.grok/hooks/runtime.json` e o hook do Codex ficam no PLN-004 e chamam esse script. Este plano não
-  instala outro json.
+- **Retomar:** P1–P4 fechados e a entrega revisada sem achado no REV-025, contra `brza-workflow@5098439`. O commit
+  segue só na `master` local e divergiu de `origin/master` em `b2b497d` (PLN-012/P8); os dois tocam `bin/brza-note`
+  e `tests/cli/test_brza_note.py`. O fechamento espera a integração, que é decisão de Anderson. O
+  `.grok/hooks/runtime.json` e o hook do Codex ficam no PLN-004. Este plano não instala outro json.
 - **Dividido:** [PLN-018 — Entrevista](PLN-018-interview.md)
 
 ## Pedido
@@ -344,14 +345,40 @@ Estimado: 1 h · Executado: 0.2 h
   arquivo de hook fica lá. O complemento do mesmo dia nomeou este plano como único escritor, os três leitores da
   função e a reescrita do D8 e do D9 contra este Desenho. O corte dos passos continua esperando.
   [PLN-018: o aviso do PLN-004](../../work/worklogs/2026-11-09-pln-018-o-aviso-do-pln-004.md)
-- 2026-11-09 — R4: executar o escritor aqui. P1–P4 fechados em `brza-workflow@5098439`, na `master` local. A revisão
-  da entrega é o próximo. Nenhum json de hook foi instalado.
+- 2026-11-09 — R4: executar o escritor aqui. P1–P4 fechados em `brza-workflow@5098439`, na `master` local. A entrega
+  foi revisada sem achado. O fechamento espera integrar esse commit com `origin/master` em `b2b497d`. Nenhum json
+  de hook foi instalado.
   [PLN-018: o escritor da linha](../../work/worklogs/2026-11-09-pln-018-o-escritor-da-linha.md)
+
+## Revisões
+
+- 2026-11-09 — a entrega de P1 a P4, sem achado.
+  [REV-025: A revisão da entrega do PLN-018, a linha turn](../../work/reviews/REV-025-pln-018-a-linha-turn.md)
 
 ## Pendências conhecidas
 
-- [O Grok fica sem medida por tarefa](../../work/issues/o-grok-fica-sem-medida-por-tarefa.md) — a medida é este plano;
-  a issue segue aberta até a linha existir.
+- [O Grok fica sem medida por tarefa](../../work/issues/o-grok-fica-sem-medida-por-tarefa.md) — o escritor está em
+  `brza-workflow@5098439`, só na `master` local. A issue segue aberta: o hook que chama o script é do PLN-004, e o
+  commit não está no `origin`.
 - [Codex e Antigravity ficam sem medida por tarefa](../../work/issues/codex-e-antigravity-sem-medida-por-tarefa.md) —
-  o escritor do Antigravity continua nela; a sonda está no Terreno. A issue do `playground` sobre o custo do Grok na
-  reunião e o `D9` do PLN-004 leem o mesmo `usage.json` pela função do D1. O painel dela não é deste plano.
+  o escritor do Codex está no mesmo commit; o do Antigravity continua na issue. A sonda está no Terreno. A issue do
+  `playground` sobre o custo do Grok na reunião e o `D9` do PLN-004 leem o mesmo `usage.json` pela função do D1. O
+  painel dela não é deste plano.
+
+## Documentação
+
+- `brza-workflow/README.md`, a frase do `usage` — P4, em `5098439`, ainda só na `master` local.
+- `brza-workflow/core/.claude/hooks/runtime_turn.py` — P1 e P2, no mesmo commit.
+
+## Fechamento
+
+- [x] Todo passo `[x]` com evidência, ou `[-]` com motivo.
+- [x] Todo achado com destino que existe. O REV-025 não tem achado.
+- [x] Um resumo por commit ou PR do `brza-studio` da entrega: não se aplica. A entrega é o commit direto
+      `brza-workflow@5098439`, e o plano é o registro.
+- [ ] O durável saiu para a casa dona. O script e a frase do `README.md` estão no `5098439`, que não está no
+      `origin/master` (`b2b497d`). Integrar os dois é decisão de Anderson: os dois commits alteram `bin/brza-note` e
+      `tests/cli/test_brza_note.py`.
+- [x] As decisões que o plano respondeu estão `done`, citando a rodada: não há nota de `work/decisions/`. As rodadas
+      decidiram o contrato da linha, que mora no script e no Desenho.
+- [ ] `status: done`, `phase: closed` e `completed` no frontmatter. Falta o item de cima.

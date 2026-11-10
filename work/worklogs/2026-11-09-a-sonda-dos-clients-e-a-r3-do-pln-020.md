@@ -54,6 +54,15 @@ Respondida por Anderson, pela pergunta com opções:
 
 O texto das opções, com custo e quando se paga, está na Entrevista do PLN-020.
 
+### A R4
+
+Respondida logo depois, pela pergunta com opções:
+- os verbos de plano e migração e os MCP prompts saem do plano, o que reabre a R1.2: os fluxos longos ficam nas
+  skills distribuídas;
+- a prioridade é `medium`.
+
+O plano passa ao Desenho de D1 a D6.
+
 ## Fora do workspace
 
 - **Sessões do Codex** — o quê e onde: cinco rollouts de `codex exec` em `~/.codex/sessions/2026/11/09/`, de 22:51 a
@@ -68,9 +77,8 @@ O texto das opções, com custo e quando se paga, está na Entrevista do PLN-020
 
 ## Retomar
 
-O próximo passo está no `Retomar` do PLN-020: a R4, que decide os verbos de plano e de migração e os MCP prompts da
-R1.2, e o Desenho de D1 a D6.
+O próximo passo está no `Retomar` do PLN-020: o Desenho de D1 a D6.
 
 ## Custo da tarefa
 
-Corrido 13 min — agente 12 min, quem pediu 1 min, pausa 0 s · US$ 2,19 (turnos 2,19, subagentes 0,00) · CPU 14 s do `claude` e 36 s dos comandos, RSS até 524 MB · 1 turno, 1 sessão · até 23:03 de 2026-11-09, pelo `brza note commit`
+Corrido 16 min — agente 13 min, quem pediu 3 min, pausa 0 s · US$ 2,52 (turnos 2,52, subagentes 0,00) · CPU 16 s do `claude` e 39 s dos comandos, RSS até 526 MB · 1 turno, 1 sessão · até 23:05 de 2026-11-09, pelo `brza note commit`

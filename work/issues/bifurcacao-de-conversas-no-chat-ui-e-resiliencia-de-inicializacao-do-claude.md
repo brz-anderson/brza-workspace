@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39823, #38326, #39168, #38381 trazem bifurcação fiel de chats, fork de respostas copiadas e resiliência de startup.
+description: Os PRs #40548, #40558, #39823, #38326, #39168, #38001 e #38381 trazem identidade nativa, persistência de contas, fork de chats e resiliência de startup.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,10 @@ tags:
 
 # Bifurcação de conversas no Chat UI e resiliência de inicialização do Claude
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39823`](https://github.com/stablyai/orca/pull/39823) (atendendo à Issue [`#38326`](https://github.com/stablyai/orca/issues/38326)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40548`](https://github.com/stablyai/orca/pull/40548),
+[`stablyai/orca#40558`](https://github.com/stablyai/orca/pull/40558),
+[`stablyai/orca#39823`](https://github.com/stablyai/orca/pull/39823) (atendendo à Issue [`#38326`](https://github.com/stablyai/orca/issues/38326)),
+[`stablyai/orca#38001`](https://github.com/stablyai/orca/pull/38001) (resolve Issue [`#37707`](https://github.com/stablyai/orca/issues/37707)),
 [`stablyai/orca#38326`](https://github.com/stablyai/orca/pull/38326),
 [`stablyai/orca#39168`](https://github.com/stablyai/orca/pull/39168),
 [`stablyai/orca#38381`](https://github.com/stablyai/orca/pull/38381) (Issue [`#38369`](https://github.com/stablyai/orca/issues/38369)),
@@ -52,9 +55,28 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39823`](https://github.com
    partir do histórico semântico do agente em vez de duplicar a transcrição nativa da UI. Isso resultava na perda de formatação
    rica, eliminação de timestamps originais e reexecução espúria de turnos de terminal ou ferramentas herdadas devido à falta
    de recibos imutáveis de identidade nativa.
+8. **Vazamento e colisão de identidade em subprocessos do Claude (`#40548`):**
+   Ao gerar títulos em segundo plano ou executar comandos auxiliares do Claude, o runtime mesclava a identidade do chat
+   interativo nativo com as credenciais do processo cliente, provocando substituições indevidas de conta e inconsistência de sessão.
+9. **Perda de estado de contas Claude durante atualização em segundo plano (`#40558`):**
+   Durante ciclos de renovação de credenciais ou refresh em background, o estado de runtime e as tabelas de mapeamento de
+   sessões das contas ativas do Claude eram sobrescritos ou descartados, desestabilizando conversas em andamento.
+10. **Aba inoperante ao retomar conversa de CLI com transcript inexistente (`#38001`, resolve `#37707`):**
+   Ao tentar retomar uma sessão de histórico do Claude CLI cuja transcrição em disco estivesse corrompida, vazia ou ausente,
+   a interface do Native Chat congelava aguardando mensagens inexistentes, criando uma aba morta sem recuperação automática.
 
 ## O que o upstream implementa
 
+- **Identidade nativa estrita e delimitação de lançamento para o Claude (`#40548`):**
+  - Restringe a identidade de chat do Claude estritamente ao ambiente nativo interativo do Studio/Orca;
+  - Isola a geração de títulos e execuções em segundo plano sob identidades separadas de cliente e impõe limites rígidos
+    de lançamento no SDK para evitar vazamento em overrides de conta.
+- **Preservação de estado de runtime por conta Claude no refresh (`#40558`):**
+  - Mantém o estado de execução e os mapas de sessão individuais de cada conta Claude durante ciclos de atualização em background,
+    prevenindo desconexões e perda de contexto de autenticação.
+- **Inicialização limpa ao retomar conversas sem transcript salvo (`#38001`, resolve `#37707`):**
+  - Identifica proativamente quando uma conversa de CLI a ser retomada não possui arquivo de transcrição válido no disco;
+  - Inicializa imediatamente uma sessão limpa e funcional notificando o desenvolvedor, eliminando abas travadas.
 - **Ação "Fork from this response" no Chat UI (`#38326`):**
   - Adiciona botão com ícone de ramificação ao lado de respostas concluídas no Chat UI do desktop e nas ações de mensagem no app mobile;
   - Cria uma nova aba de chat no mesmo worktree e configurações (modelo, permissões), preservando o histórico completo
@@ -82,6 +104,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39823`](https://github.com
 
 ## O que fazer
 
+- Adotar a contenção de identidade nativa e fronteira de lançamento do Claude (`#40548`).
+- Incorporar a preservação de estado de runtime por conta no refresh do Claude (`#40558`).
+- Implementar o fallback seguro para nova sessão ao retomar conversas sem transcript salvo (`#38001`).
 - Adotar o recurso de fork de mensagens (`#38326`) e a resolução de forks a partir do chat original raiz (`#39823`) no `brza-studio`.
 - Adotar a replicação fiel de transcrições nativas e recibos de identidade na bifurcação de chats (`#39168`).
 - Incorporar o aumento de timeout de inicialização do Claude CLI para 180s (`#38381`) para estabilizar o carregamento de

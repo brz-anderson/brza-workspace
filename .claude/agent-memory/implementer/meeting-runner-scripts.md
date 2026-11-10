@@ -34,3 +34,13 @@ transcript (o hook mede por ele).
   `wait` nunca vira `settled`. Os testes do v2 usam fakes com `dispatch.status='succeeded'`, por isso passam.
 - O marcador `<!-- fim-rodada-N -->` só vale como última linha; o `brza note commit` acrescenta `## Medida` depois dele, e o
   `tally`/`wait_round` leem o worklog commitado como `falta`.
+
+**Painel automático (2026-11-09, PLN-017)**
+- Valida: `cd <worktree>/.claude/skills/meeting-runner && PYTHONDONTWRITEBYTECODE=1 python3 -I -m unittest discover -s scripts/tests -p 'test_*.py'`
+  (317 OK). Teste novo do painel: `tests/test_painel_automatico.py`; fixtures reais em `tests/fixtures/tev1/`.
+- O `wait_round.main` agora publica painel por padrão (chama o Chrome): todo teste que chama `main` sem querer o painel passa
+  `--no-panel`, ou troca `panel.gera_png` por um fake; senão a suíte fica lenta e depende do Chrome.
+- `corta_medida` (common.py) corta `## Medida` e `## Custo da tarefa`, só se o cabeçalho vier DEPOIS do último marcador e
+  nada de nível 1-2 vier depois dele; parágrafo extra dentro do bloco do anexo é cortado junto (é parte do bloco).
+- `panel.py` tem `publica_rodada` (collect+grava estado+render+PNG, em processo), `salva_visual` e `gera_png(…, altura)`; o
+  `brza shot` confere o PNG (devolve 2x a largura pedida). PNG da síntese pede janela alta (4200), a do painel é 2000.

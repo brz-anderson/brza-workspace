@@ -1,1 +1,1 @@
-- [Scripts do meeting-runner sobre o brza sessions v2](meeting-runner-scripts.md) — mapa v2, armadilhas do teste integrado e do relógio falso, comando que valida
+- [Scripts do meeting-runner sobre o brza sessions v2](meeting-runner-scripts.md) — mapa v2, painel automático, armadilhas do teste e do relógio falso, comando que valida

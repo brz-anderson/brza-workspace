@@ -44,7 +44,8 @@ reunião rodar sem improviso. Estado: **v1, protótipo** — vive na branch `wor
 | esperar o fim da rodada | `$S/wait_round.py N --reuniao $R [--personas …]` |
 | pedir o encerramento, conferir o aceite, forçar | `$S/launch_persona.py $R --close`, `--status --wait-settled 180`, `--stop <persona>` |
 | a tabela por persona, sem conta à mão | `$S/tally.py N --reuniao $R --opened HH:MM:SS --closed HH:MM:SS --settle 60` |
-| o painel da rodada | `$S/panel.py collect N --reuniao $R --opened … [--closed …]` e `$S/panel.py render …` |
+| o painel da rodada | sai sozinho do `wait_round.py` (abertura, cada chegada, fechamento); depois do `sintese-N.json`, `$S/panel.py publish N --reuniao $R` com a `janela:` que o `wait_round.py` imprimiu |
+| o visual de síntese da reunião | `$S/panel.py sintese --reuniao $R`, com o `sintese-final.json` opcional (`references/narration.md`) |
 | a memória de runtime fora do repositório | `$S/runtime_memory_check.py <início>` |
 
 **Convenção dos comandos:** rodam da raiz do worktree, com `python3 -I .claude/skills/meeting-runner/scripts/<script>.py`
@@ -121,6 +122,12 @@ Por isso nenhuma sessão abre antes da confirmação:
   cruza a chegada com o marcador, avisa `blocked`, `failed` e pergunta real, e conta à parte o ruído previsto (X3): o host
   escala "Worker stopped without reporting" a cada fim de turno sem `worker_done`, que é o normal entre rodadas — não se
   responde nem se narra como falha. Falha real é o desfecho `failed`/`blocked` do `wait` ou o worker `failed`/`stopped`.
+- **O painel sai do `wait_round.py`, não da memória (PLN-017/R10.1, 2026-11-09:** "wait_round.py gera sozinho
+  (Recomendado)"**).** Na abertura, a cada chegada e no fim, ele gera o painel e imprime a linha `::orca-visual{…}` logo
+  abaixo da linha de narração daquele momento; na abertura e no fim, também o `png:` para conferir (PNG só nesses dois,
+  R10.3). A coordenação cola as duas linhas juntas na mesma mensagem: a chegada e o painel são uma narração só. O porquê: na
+  reunião do `tev1` a regra estava escrita e faltaram 3 aberturas, todas as chegadas, o fechamento da R5 e a síntese
+  final. `--no-panel` só quando o chat não mostra visual; `⚠ painel: …` não muda o rc e não para a espera.
 - **A rodada com participantes escolhidos** (a rodada extra da R8, com a lista que a coordenação escolheu pela R9: parte
   da sala ou a sala inteira): os nomes no `--send` (`--send Trava Relance --round 3`), `--personas` no `wait_round.py` e `--participantes` no `tally.py` e no `panel.py collect`;
   os outros ficam "fora da rodada" e não seguram o fechamento nem a síntese do painel (X18).
@@ -174,8 +181,11 @@ Por isso nenhuma sessão abre antes da confirmação:
 3. A coordenação **confere por comando** os números das personas e mede o que a sala não mediu.
 4. Disputa técnica ou visual: prova de conceito ou evidência renderizada antes do voto. Nada exposto sem autenticação;
    derrube o que subir. O erro de shell da própria coordenação não vai ao chat.
-5. Escreva o `sintese-N.json` (medições, síntese em até 5 linhas, decisões com quem as levantou) e **publique o painel**
-   (`narration.md`, "O painel").
+5. Escreva o `sintese-N.json` (medições, síntese em até 5 linhas, decisões com quem as levantou) e **republique o
+   painel** com `$S/panel.py publish N --reuniao $R` mais a linha `janela: --opened … --closed …` que o
+   `wait_round.py` imprimiu no fim, colada como está: um comando faz o collect, o render e o PNG, e imprime a linha
+   `::orca-visual`. Janela de cabeça sobrescreve o `estado-rN.json` com outros números. O painel do fim que o `wait_round.py` já publicou tem as tabelas; este traz as
+   medições, a síntese e as decisões.
 
 ## Passo 6 — a proposta, o revisor e a contraprova
 
@@ -197,6 +207,11 @@ Por isso nenhuma sessão abre antes da confirmação:
   não aqui: o integral fica no worklog e, depois, no painel.
 - Issues para o que sobra. O worklog da coordenação leva a **proposta final copiada**, porque `.sessions/` não vai ao
   git.
+- **O visual de síntese da reunião, antes do encerramento (PLN-017/R10.2, 2026-11-09:** "panel.py gera, passo do
+  encerramento (Recomendado)"**).** `$S/panel.py sintese --reuniao $R` publica no scratch do chat, grava o PNG e lê todos os `estado-rN.json` e
+  `sintese-N.json` e monta a trajetória sala × revisor, a tabela por persona e as decisões; o `sintese-final.json`
+  opcional acrescenta a conclusão, a classificação, as barras medidas, as fases e a próxima rodada (o esquema está no
+  docstring do `panel.py`). Confira pelo PNG e publique na mensagem do fechamento, com nome novo.
 - Memória de runtime: `$S/runtime_memory_check.py <hora de abertura>`; o que listar entra em `## Fora do workspace`
   (as personas Grok gravaram memória em `~/.grok/memory-v2/` contra a ordem do briefing, também na P7).
 - **Encerramento (R7 de Anderson):**
@@ -233,8 +248,10 @@ foi silêncio, foi conteúdo (personas nomeadas em 11 de 57 blocos contra 4 de 4
 - **Fechamento de rodada:** a tabela do `tally.py` (posição, confiança, mudou?, voto), a sala e o revisor, os números
   conferidos ("confere/diverge: … — fonte → resultado") e o painel `::orca-visual`.
 - **Não vai ao chat:** a argumentação integral das personas (R1.4) e o ruído previsto do host (X3), contado numa linha.
-- **O painel:** um arquivo por rodada (`<reuniao>-rN-<hash>.html`), republicado na abertura, a cada resposta nova e no
-  fechamento; a rodada seguinte ganha nome novo. Conferido por PNG antes de aparecer (`narration.md`).
+- **O painel:** um arquivo por rodada (`<reuniao>-rN-<hash>.html`), que o `wait_round.py` gera na abertura, a cada
+  resposta nova e no fechamento, e o `panel.py publish` regenera depois da síntese; a rodada seguinte ganha nome novo. A
+  coordenação cola a linha que o script imprime e confere o PNG da abertura e do fechamento (`narration.md`). No fim da
+  reunião, o visual de síntese do `panel.py sintese`.
 - **A hora** de toda linha da narração e do worklog sai de `date '+%H:%M:%S'`, rodado na hora, nunca de cabeça (X11).
 
 ## Os verbos por passo
@@ -243,7 +260,7 @@ foi silêncio, foi conteúdo (personas nomeadas em 11 de 57 blocos contra 4 de 4
 | :-- | :-- | :-- |
 | Abrir com modelo e ciclo de vida | `launch_persona.py $R` | `brza sessions <nome> --agent --model --effort --prompt-file --wait` |
 | Enviar a N | `launch_persona.py $R --send … --round N` | `send <nomes…> --text`, com recibo e `--operation` |
-| Esperar | `wait_round.py N` | `wait <nomes…> --any --timeout` |
+| Esperar e publicar o painel | `wait_round.py N` | `wait <nomes…> --any --timeout` |
 | Ler a persona travada | — | `read <nome> --last` |
 | Trocar modelo | — | `model <nome> <modelo> --effort` |
 | Medir | `tally.py --opened … --closed …` (a janela vem dos horários que a coordenação passa) | — (o `usage` dá o total da sessão; a skill não o chama) |

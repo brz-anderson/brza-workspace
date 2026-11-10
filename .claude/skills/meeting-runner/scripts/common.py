@@ -62,15 +62,18 @@ def resolver_personas(reuniao, nomes):
     return chosen
 
 
-MEDIDA_RE = re.compile(r"^## Medida\s*$")
+MEDIDA_RE = re.compile(r"^## (?:Medida|Custo da tarefa)\s*$")
 TITULO_N12_RE = re.compile(r"^#{1,2}\s")
+FIM_RODADA_RE = re.compile(r"^<!-- fim-rodada-\d+ -->$")
 
 
 def corta_medida(text):
-    """O texto sem a seção `## Medida` que o `brza note commit` acrescenta DEPOIS do marcador de fim de rodada.
+    """O texto sem o anexo que o `brza note commit` acrescenta DEPOIS do marcador de fim de rodada: a seção `## Medida`
+    (versão antiga) ou `## Custo da tarefa` (cabeçalho e um parágrafo, versão atual).
 
-    Só vale a `## Medida` (com o texto dela) que vai até o fim do arquivo: outra seção de nível 1 ou 2 depois dela, ou
-    qualquer seção como `## O que ficou` depois do marcador, deixa o texto como está (o marcador continua não valendo)."""
+    Só vale o anexo que vai até o fim do arquivo e que começa DEPOIS do último marcador: outra seção de nível 1 ou 2
+    depois dele, ou qualquer seção como `## O que ficou` entre o marcador e o anexo, deixa o texto como está (o marcador
+    continua não valendo). Sem nenhum marcador, o anexo se corta do mesmo jeito."""
     linhas = (text or "").split("\n")
     idx = [i for i, l in enumerate(linhas) if MEDIDA_RE.match(l)]
     if not idx:
@@ -78,6 +81,8 @@ def corta_medida(text):
     i = idx[-1]
     if any(TITULO_N12_RE.match(l) for l in linhas[i + 1:]):
         return text
+    if any(FIM_RODADA_RE.match(l.rstrip()) for l in linhas[i + 1:]):
+        return text   # o marcador vem depois do cabeçalho: não é anexo
     return "\n".join(linhas[:i])
 
 

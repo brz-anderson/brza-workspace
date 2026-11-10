@@ -1,9 +1,27 @@
 #!/usr/bin/env python3
 """Gerador do painel da rodada da skill meeting-runner.
 
-Dois estágios, com o JSON `estado-rN.json` como contrato:
+Dois estágios, com o JSON `estado-rN.json` como contrato, e dois atalhos:
   collect N --reuniao reuniao.json   monta (pelo tally.build_estado) e enriquece o estado da rodada
   render ESTADO.json                 estado -> HTML do ::orca-visual (tema do Orca, reserva clara e escura)
+  publish N --reuniao reuniao.json   collect + render + PNG de uma vez; imprime a linha `::orca-visual` e `png: <caminho>`
+                                     (o mesmo que o `wait_round.py` faz sozinho; use depois de gravar o `sintese-N.json`).
+                                     `--publish-dir` padrão `$ORCA_CHAT_SCRATCH_DIR`, senão a pasta da reunião (avisa);
+                                     PNG padrão `<pasta da reunião>/painel-rN.png`, `--png ARQ` troca, `--no-png` tira.
+                                     Aceita os argumentos do `collect` (`--opened`, `--closed`, `--participantes`,
+                                     `--root`, `--sessions`, `--measurements`, `--at`, `--settle`…).
+  sintese --reuniao reuniao.json     o visual da reunião inteira: lê da pasta da reunião todos os `estado-rN.json` e
+                                     `sintese-N.json` e o `sintese-final.json` opcional; arquivo `<id>-sintese-<hash>.html`,
+                                     `--publish-dir` (padrão `$ORCA_CHAT_SCRATCH_DIR`, senão a pasta da reunião com aviso, como no `publish`), `--out` (grava
+                                     ali e imprime a linha com o nome do arquivo); imprime SEMPRE a linha `::orca-visual`; PNG por
+                                     padrão em `<pasta da reunião>/sintese.png` (`--png ARQ`, `--no-png`), com `png: …`. Mostra cabeçalho, cartões
+                                     (revisor, sala, votos, custo), o gráfico da média da sala e do revisor por rodada, a
+                                     tabela por persona, a síntese e as decisões do último `sintese-N.json`.
+
+O `sintese-final.json` (todas as chaves opcionais) é escrito pela coordenação: `titulo`, `conclusao` (texto),
+`classificacao` [{uso, frente, hoje, fato, hoje_tipo?}] (`hoje` vira selo; `hoje_tipo` = go|wait|sh|evo|out força a cor),
+`barras` [{rotulo, detalhe, valor, maximo, texto, tom?}] (`tom` = ok|ruim|alerta|neutro), `fases` [{nome, estimado, rotulo?}],
+`proxima_rodada` [{pergunta, recomendacao}], `rodape` (texto).
 
 Só biblioteca padrão; roda com `python3 -I`.
 """
@@ -374,7 +392,10 @@ def collect(reuniao, n, root, *, opened=None, closed=None, list_json=None, at=No
 
     if not R.get('aberta'):
         if opened:
-            R['aberta'] = opened
+            try:
+                R['aberta'] = _tally.hms(_tally.parse_when(opened))
+            except ValueError:
+                R['aberta'] = opened
         else:
             try:
                 R['aberta'] = datetime.fromtimestamp(os.path.getmtime(rodada_md)).strftime('%H:%M:%S')
@@ -465,14 +486,57 @@ def _cmd_collect(a):
     return 0
 
 
-def _png(html_path, png, width):
+class ErroPublicacao(Exception):
+    """Falha ao gravar o visual; `rc` é o código de saída do subcomando."""
+    def __init__(self, msg, rc=1):
+        super().__init__(msg)
+        self.rc = rc
+
+
+def gera_png(html_path, png, width, altura=2000):
+    """Tira o PNG do HTML pelo Chrome headless. Devolve None se deu certo, ou a mensagem de erro."""
     if not os.path.exists(CHROME):
-        print('panel render: Chrome não encontrado; sem PNG', file=sys.stderr)
-        return
-    subprocess.run([CHROME, '--headless=new', f'--screenshot={png}', f'--window-size={width},2000',
-                    '--force-device-scale-factor=1', 'file://' + os.path.abspath(html_path)],
-                   capture_output=True, timeout=60)
-    print(f'png: {png}' if os.path.exists(png) else 'panel render: o Chrome não gerou o PNG', file=sys.stderr)
+        return 'Chrome não encontrado; sem PNG'
+    try:
+        subprocess.run([CHROME, '--headless=new', f'--screenshot={png}', f'--window-size={width},{altura}',
+                        '--force-device-scale-factor=1', 'file://' + os.path.abspath(html_path)],
+                       capture_output=True, timeout=60)
+    except (OSError, subprocess.SubprocessError) as ex:
+        return f'o Chrome falhou: {ex}'
+    return None if os.path.exists(png) else 'o Chrome não gerou o PNG'
+
+
+def _png(html_path, png, width, altura=2000):
+    erro = gera_png(html_path, png, width, altura)
+    print(f'panel render: {erro}' if erro else f'png: {png}', file=sys.stderr)
+
+
+def _titulo_seguro(tit):
+    tit = re.sub(r'[\x00-\x1f\x7f"{}]+', ' ', str(tit or '')).replace('\\', ' ')
+    return ' '.join(tit.split())
+
+
+def salva_visual(doc, reu_id, meio, chave, titulo, *, publish_dir=None, alvo_padrao=None):
+    """Grava `doc`. Com `publish_dir`, o arquivo é `<id>-<meio>-<hash>.html` (nome fixo para a mesma `chave`, para
+    republicar no mesmo arquivo) e a linha `::orca-visual` volta; senão grava em `alvo_padrao` e a linha é None.
+    Devolve (caminho, linha). Levanta ErroPublicacao."""
+    if len(doc.encode('utf-8')) >= LIMITE_HTML:
+        raise ErroPublicacao('HTML >= 512 KB, o visual não aceita', 1)
+    if publish_dir:
+        rid = str(reu_id or 'reuniao')
+        if '/' in rid or '\\' in rid or '..' in rid:
+            raise ErroPublicacao(f'reuniao.id "{rid}" tem caminho; recuso gravar fora de --publish-dir', 1)
+        rid = re.sub(r'[^\w.-]+', '-', rid).strip('.-') or 'reuniao'
+        h = hashlib.sha1(f'{reu_id}|{chave}'.encode()).hexdigest()[:4]
+        nome = f'{rid}-{meio}-{h}.html'
+        os.makedirs(publish_dir, exist_ok=True)
+        alvo = os.path.join(publish_dir, nome)
+        linha = f'::orca-visual{{file="{nome}" title="{_titulo_seguro(titulo)}"}}'
+    else:
+        alvo, linha = alvo_padrao, None
+    with open(alvo, 'w', encoding='utf-8') as f:
+        f.write(doc)
+    return alvo, linha
 
 
 def _cmd_render(a):
@@ -483,32 +547,400 @@ def _cmd_render(a):
     except (OSError, ValueError, KeyError) as ex:
         print(f'panel render: {ex}', file=sys.stderr)
         return 2
-    if len(doc.encode('utf-8')) >= LIMITE_HTML:
-        print('panel render: HTML >= 512 KB, o visual não aceita', file=sys.stderr)
-        return 1
     R, reu = S.get('rodada') or {}, S.get('reuniao') or {}
-    if a.publish_dir:
-        rid = str(reu.get('id') or 'reuniao')
-        if '/' in rid or '\\' in rid or '..' in rid:
-            print(f'panel render: reuniao.id "{rid}" tem caminho; recuso gravar fora de --publish-dir', file=sys.stderr)
-            return 1
-        rid = re.sub(r'[^\w.-]+', '-', rid).strip('.-') or 'reuniao'
-        h = hashlib.sha1(f'{reu.get("id")}|{R.get("n")}'.encode()).hexdigest()[:4]
-        nome = f'{rid}-r{R.get("n")}-{h}.html'
-        os.makedirs(a.publish_dir, exist_ok=True)
-        alvo = os.path.join(a.publish_dir, nome)
-        tit = f'Rodada {R.get("n")} — {R.get("titulo") or ""}'.strip(' —')
-        tit = re.sub(r'[\x00-\x1f\x7f"{}]+', ' ', tit).replace('\\', ' ')
-        tit = ' '.join(tit.split())
-        linha = f'::orca-visual{{file="{nome}" title="{tit}"}}'
-    else:
-        alvo = a.out or os.path.splitext(a.estado)[0] + '.html'
-        linha = None
-    with open(alvo, 'w', encoding='utf-8') as f:
-        f.write(doc)
+    try:
+        alvo, linha = salva_visual(doc, reu.get('id'), f'r{R.get("n")}', f'{R.get("n")}',
+                                   f'Rodada {R.get("n")} — {R.get("titulo") or ""}'.strip(' —'),
+                                   publish_dir=a.publish_dir, alvo_padrao=a.out or os.path.splitext(a.estado)[0] + '.html')
+    except ErroPublicacao as ex:
+        print(f'panel render: {ex}', file=sys.stderr)
+        return ex.rc
     print(linha if linha else alvo)
     if a.png:
         _png(alvo, a.png, a.width)
+    return 0
+
+
+def pasta_da_reuniao(reuniao, root):
+    pasta = reuniao.get('dir') or '.'
+    return pasta if os.path.isabs(pasta) else os.path.join(root, pasta)
+
+
+def resolve_publish_dir(publish_dir, pasta):
+    """(destino, caiu_no_padrao): `--publish-dir`, senão `$ORCA_CHAT_SCRATCH_DIR`, senão a pasta da reunião (True)."""
+    d = publish_dir or os.environ.get('ORCA_CHAT_SCRATCH_DIR')
+    return (d, False) if d else (pasta, True)
+
+
+def publica_rodada(reuniao, n, root, *, publish_dir, png=None, width=736, estado_out=None, **kw_collect):
+    """collect + grava o `estado-rN.json` + render + PNG opcional, tudo em processo. `kw_collect` vai ao `collect`
+    (`opened`, `closed`, `participantes`, `measurements`, `sessions`, `list_json`, `at`, `settle`…).
+    Devolve {'estado', 'html', 'linha', 'png', 'png_erro', 'avisos'}. Levanta ErroManifesto, OSError, ValueError ou
+    ErroPublicacao; o PNG que falha NÃO levanta: vira `png_erro`."""
+    S = collect(reuniao, n, root, **kw_collect)
+    pasta = pasta_da_reuniao(reuniao, root)
+    est = estado_out or os.path.join(pasta, f'estado-r{n}.json')
+    os.makedirs(os.path.dirname(os.path.abspath(est)), exist_ok=True)
+    with open(est, 'w', encoding='utf-8') as f:
+        json.dump(S, f, ensure_ascii=False, indent=2)
+    doc = render_html(S)
+    R, reu = S.get('rodada') or {}, S.get('reuniao') or {}
+    alvo, linha = salva_visual(doc, reu.get('id'), f'r{n}', f'{n}', f'Rodada {n} — {R.get("titulo") or ""}'.strip(' —'),
+                               publish_dir=publish_dir, alvo_padrao=os.path.splitext(est)[0] + '.html')
+    erro = gera_png(alvo, png, width) if png else None
+    return {'estado': est, 'html': alvo, 'linha': linha, 'png': png if png and not erro else None, 'png_erro': erro,
+            'avisos': list(S.get('avisos') or [])}
+
+
+def _cmd_publish(a):
+    try:
+        root = _raiz(a)
+        with open(_tally.resolve_reuniao(a.reuniao, root), encoding='utf-8') as f:
+            reuniao = json.load(f)
+        if reuniao.get('personas') and not _tally.worklogs_existentes(reuniao, root):
+            print(f'panel publish: nenhum worklog existe sob {root} (padrão {reuniao.get("worklog")}); '
+                  f'confira --root e o manifesto', file=sys.stderr)
+            return 2
+        pasta = pasta_da_reuniao(reuniao, root)
+        destino, padrao = resolve_publish_dir(a.publish_dir, pasta)
+        if padrao:
+            print(f'aviso: sem --publish-dir nem ORCA_CHAT_SCRATCH_DIR: o HTML fica em {destino}, e o chat não o abre',
+                  file=sys.stderr)
+        png = None if a.no_png else (a.png or os.path.join(pasta, f'painel-r{a.n}.png'))
+        r = publica_rodada(reuniao, a.n, root, publish_dir=destino, png=png, width=a.width, opened=a.opened,
+                           closed=a.closed, list_json=a.list_json, at=a.at, measurements=a.measurements,
+                           sessions=a.sessions, codex_dir=a.codex_dir, participantes=a.participantes, settle=a.settle)
+    except (ErroManifesto, OSError, ValueError) as ex:
+        print(f'panel publish: {ex}', file=sys.stderr)
+        return 2
+    except ErroPublicacao as ex:
+        print(f'panel publish: {ex}', file=sys.stderr)
+        return ex.rc
+    for av in r['avisos']:
+        print(f'aviso: {av}', file=sys.stderr)
+    print(r['linha'])
+    if r['png']:
+        print(f'png: {r["png"]}')
+    elif r['png_erro']:
+        print(f'panel publish: {r["png_erro"]}', file=sys.stderr)
+    return 0
+
+
+# ---------------------------------------------------------------- sintese (a reunião inteira)
+
+COR_REVISOR = '#d97706'   # fixa: no tema do Studio `--chart-1` e `--chart-4` saem parecidos, e o revisor tem de se achar
+COR_SALA = 'var(--chart-1,#2563eb)'
+TONS = {'ok': 'var(--chart-2,#16a34a)', 'ruim': 'var(--destructive,#dc2626)', 'alerta': COR_REVISOR,
+        'neutro': 'var(--chart-1,#2563eb)'}
+SELOS = ('go', 'wait', 'sh', 'evo', 'out')
+
+
+def _lista_de(v):
+    return [x for x in v if isinstance(x, dict)] if isinstance(v, list) else []
+
+
+def _ler_json(path):
+    try:
+        with open(path, encoding='utf-8') as f:
+            d = json.load(f)
+        return d if isinstance(d, dict) else None
+    except (OSError, ValueError):
+        return None
+
+
+def _rodadas_da_pasta(pasta):
+    """{N: (estado|None, sintese|None)} dos `estado-rN.json` e `sintese-N.json` da pasta, em ordem de N."""
+    ns = set()
+    for nome in os.listdir(pasta):
+        m = re.fullmatch(r'estado-r(\d+)\.json|sintese-(\d+)\.json', nome)
+        if m:
+            ns.add(int(m.group(1) or m.group(2)))
+    return {n: (_ler_json(os.path.join(pasta, f'estado-r{n}.json')), _ler_json(os.path.join(pasta, f'sintese-{n}.json')))
+            for n in sorted(ns)}
+
+
+def _selo_tipo(hoje, tipo=None):
+    if tipo in SELOS:
+        return tipo
+    h = str(hoje or '').strip().lower()
+    if re.search(r'reprov|fora|nunca|descart', h):
+        return 'out'
+    if re.search(r'evolu', h):
+        return 'evo'
+    if re.search(r'ap[óo]s|depois|aguarda|espera|bloquead', h):
+        return 'wait'
+    if re.search(r'sombra|pend|talvez', h):
+        return 'sh'
+    if re.search(r'^fase\b|^agora|^j[áa]\b|^pronto|^sim\b|^go\b', h):
+        return 'go'
+    return 'sh'
+
+
+def dados_sintese(reuniao, rodadas, final):
+    """Os números da síntese, de funções puras sobre o que está nos arquivos (sem tocar o disco)."""
+    estados = {n: e for n, (e, _) in rodadas.items() if e}
+    sinteses = {n: s for n, (_, s) in rodadas.items() if s}
+    ult = estados[max(estados)] if estados else {}
+    prim = estados[min(estados)] if estados else {}
+    reu = {**(ult.get('reuniao') or {}), **{k: v for k, v in reuniao.items() if k in ('tema', 'id', 'data')}}
+    personas = ult.get('personas') or prim.get('personas') or []
+    nper = len([p for p in personas if p.get('estado') != FORA]) or len(reuniao.get('personas') or [])
+    # janela: da primeira abertura ao último fechamento (cai no `gerado` da última rodada sem fechamento)
+    aberta = (prim.get('rodada') or {}).get('aberta')
+    fim = (ult.get('rodada') or {}).get('fechada') or (ult.get('rodada') or {}).get('gerado')
+    # o revisor: o último `sala.revisor` numérico dos sintese-N
+    revisor = rev_n = None
+    for n in sorted(sinteses):
+        sala = sinteses[n].get('sala') if isinstance(sinteses[n].get('sala'), dict) else {}
+        v = sala.get('revisor', sinteses[n].get('revisor'))
+        if _isnum(v):
+            revisor, rev_n = v, n
+    # a média da sala por rodada e o revisor por rodada (para o gráfico)
+    serie_sala = [(n, e['sala']['media']) for n, e in estados.items()
+                  if isinstance(e.get('sala'), dict) and _isnum(e['sala'].get('media'))]
+    serie_rev = []
+    for n in sorted(sinteses):
+        sala = sinteses[n].get('sala') if isinstance(sinteses[n].get('sala'), dict) else {}
+        v = sala.get('revisor', sinteses[n].get('revisor'))
+        if _isnum(v):
+            serie_rev.append((n, v))
+    # votos: a última rodada que tem voto
+    votos = vot_n = None
+    for n, e in estados.items():
+        if (e.get('rodada') or {}).get('tem_voto'):
+            tot = {'apoio': 0, 'ressalva': 0, 'contra': 0}
+            for p in e.get('personas') or []:
+                v = p.get('voto')
+                if isinstance(v, dict):
+                    for k in tot:
+                        tot[k] += v.get(k) or 0
+            votos, vot_n = tot, n
+    # o custo: custos_coordenacao do último sintese-N que tiver (senão do último estado que tiver)
+    custo = None
+    for n in sorted(sinteses):
+        c = sinteses[n].get('custos_coordenacao')
+        if isinstance(c, dict) and (c.get('coordenacao_usd') is not None or c.get('revisor_usd') is not None):
+            custo = c
+    if custo is None:
+        for n in sorted(estados):
+            c = estados[n].get('custos_coordenacao')
+            if isinstance(c, dict) and (c.get('coordenacao_usd') is not None or c.get('revisor_usd') is not None):
+                custo = c
+    # por persona: R1 -> última, virada, nota dos colegas
+    linhas = []
+    for p in personas:
+        nome = p.get('nome')
+        confs = [(n, (next((q for q in (e.get('personas') or []) if q.get('nome') == nome), {}) or {}))
+                 for n, e in estados.items()]
+        r1 = next((q.get('confianca_r1') for _, q in confs if _isnum(q.get('confianca_r1'))), None)
+        if r1 is None:
+            r1 = next((q.get('confianca') for _, q in confs if _isnum(q.get('confianca'))), None)
+        ultima = next((q.get('confianca') for _, q in reversed(confs) if _isnum(q.get('confianca'))), None)
+        virada = next((q.get('virada') for _, q in reversed(confs) if q.get('virada') and q.get('virada') != 'não'), None)
+        nota = next((q.get('nota_colegas') for _, q in reversed(confs) if _isnum(q.get('nota_colegas'))), None)
+        linhas.append({'nome': nome, 'runtime': p.get('runtime'), 'modelo': p.get('modelo'), 'papel': p.get('papel'),
+                       'r1': r1, 'ultima': ultima, 'virada': virada, 'nota': nota})
+    ult_s = sinteses[max(sinteses)] if sinteses else {}
+    return {'reu': reu, 'nper': nper, 'nrod': len(rodadas), 'aberta': aberta, 'fim': fim, 'revisor': revisor,
+            'rev_n': rev_n, 'sala': (ult.get('sala') or {}), 'sala_n': max(estados) if estados else None,
+            'serie_sala': serie_sala, 'serie_rev': serie_rev, 'votos': votos, 'vot_n': vot_n, 'custo': custo,
+            'linhas': linhas, 'sintese': ult_s.get('sintese') or [], 'decisoes': _lista_de(ult_s.get('decisoes')),
+            'revisor_nota': ((sinteses[rev_n].get('sala') or {}).get('revisor_nota') if rev_n and isinstance(
+                sinteses[rev_n].get('sala'), dict) else None), 'rotulos': sorted(rodadas),
+            'final': final or {}}
+
+
+def _grafico(d):
+    """SVG inline: a média da sala (linha, `--chart-1`) e os pontos do revisor (quadrados na cor fixa)."""
+    sala, rev = d['serie_sala'], d['serie_rev']
+    rot = d['rotulos']
+    if not rot or not (sala or rev):
+        return ''
+    W, H, L, Rr, T, B = 560, 200, 40, 14, 22, 28
+    valores = [v for _, v in sala + rev]
+    lo = max(0, int(min(valores) // 10) * 10 - 10)
+    hi = min(100, int(-(-max(valores) // 10)) * 10 + 10)
+    if hi - lo < 20:
+        lo = max(0, hi - 20)
+    n0, n1 = rot[0], rot[-1]
+
+    def X(n):
+        return L + (W - L - Rr) * (0.5 if n0 == n1 else (n - n0) / (n1 - n0))
+
+    def Y(v):
+        return T + (H - T - B) * (1 - (v - lo) / (hi - lo))
+    g = ['<g font-size="11" fill="var(--muted-foreground,#6b7280)">']
+    passo = 10 if hi - lo <= 40 else 20
+    v = lo
+    while v <= hi:
+        g.append(f'<line x1="{L}" y1="{Y(v):.1f}" x2="{W - Rr}" y2="{Y(v):.1f}" stroke="var(--border,#e5e7eb)"/>'
+                 f'<text x="{L - 6}" y="{Y(v) + 4:.1f}" text-anchor="end">{v}</text>')
+        v += passo
+    for n in rot:
+        g.append(f'<text x="{X(n):.1f}" y="{H - 8}" text-anchor="middle">R{n}</text>')
+    g.append('</g>')
+    if len(sala) > 1:
+        pts = ' '.join(f'{X(n):.1f},{Y(v):.1f}' for n, v in sala)
+        g.append(f'<polyline fill="none" stroke="{COR_SALA}" stroke-width="2.5" points="{pts}"/>')
+    if len(rev) > 1:
+        pts = ' '.join(f'{X(n):.1f},{Y(v):.1f}' for n, v in rev)
+        g.append(f'<polyline fill="none" stroke="{COR_REVISOR}" stroke-width="2" stroke-dasharray="5 4" points="{pts}"/>')
+    for n, v in sala:
+        g.append(f'<circle cx="{X(n):.1f}" cy="{Y(v):.1f}" r="4" fill="{COR_SALA}"/>'
+                 f'<text x="{X(n):.1f}" y="{Y(v) - 8:.1f}" text-anchor="middle" font-size="11" font-weight="600" '
+                 f'fill="var(--foreground,#171717)">{_num(v)}</text>')
+    for n, v in rev:
+        g.append(f'<rect x="{X(n) - 5:.1f}" y="{Y(v) - 5:.1f}" width="10" height="10" rx="2" fill="{COR_REVISOR}"/>'
+                 f'<text x="{X(n):.1f}" y="{Y(v) + 18:.1f}" text-anchor="middle" font-size="11" font-weight="600" '
+                 f'fill="var(--foreground,#171717)">{_num(v)}</text>')
+    legenda = (f'<span><span class="dot" style="background:{COR_SALA}"></span>média da sala</span>'
+               + (f'<span><span class="dot" style="background:{COR_REVISOR};border-radius:2px"></span>revisor independente</span>'
+                  if rev else ''))
+    return (f'<h2>A confiança ao longo das rodadas</h2><div class="chart"><svg viewBox="0 0 {W} {H}" role="img" '
+            f'aria-label="Confiança da sala e do revisor por rodada">{"".join(g)}</svg>'
+            f'<div class="legend">{legenda}</div></div>')
+
+
+def render_sintese(reuniao, rodadas, final=None, dark=False):
+    d = dados_sintese(reuniao, rodadas, final)
+    F = d['final']
+    reu = d['reu']
+    sala = d['sala']
+    janela = f'{_hm(d["aberta"])}–{_hm(d["fim"])}' if d['aberta'] and d['fim'] else ''
+    eyebrow = ' · '.join(x for x in ('Reunião multiagente', reu.get('data'), janela) if x)
+    titulo = F.get('titulo') or f'Síntese — {reu.get("tema") or reu.get("id") or ""}'
+    rt = d['rotulos']
+    meta = f'{d["nper"]} personas · {d["nrod"]} rodadas' + (f' (R{rt[0]}–R{rt[-1]})' if len(rt) > 1 else '')
+    if janela:
+        meta += f' · das {_hm(d["aberta"])} às {_hm(d["fim"])}'
+    # cartões
+    c = d['custo']
+    usd = (c.get('coordenacao_usd') or 0) + (c.get('revisor_usd') or 0) if c else None
+    media = sala.get('media')
+    ap = sala.get('antigravity') if isinstance(sala.get('antigravity'), dict) else None
+    sala_txt = f'rodada R{d["sala_n"]} · mediana {_num(sala.get("mediana"))} · {sala.get("n", "?")}/{sala.get("total", "?")}'
+    if ap and _isnum(ap.get('media')):
+        sala_txt += f' (Antigravity à parte: {_num(ap["media"])})'
+    v = d['votos']
+    cartoes = [
+        (_num(d['revisor']) if d['revisor'] is not None else '—',
+         d['revisor_nota'] or ('revisor independente' if d['revisor'] is not None else 'sem revisor independente')),
+        (_num(media) if _isnum(media) else '—', 'média da sala, ' + sala_txt),
+        (f'{v["apoio"]} · {v["ressalva"]} · {v["contra"]}' if v else '—',
+         f'apoio · ressalva · contra (R{d["vot_n"]})' if v else 'sem voto nas rodadas'),
+        (f'US$ {_num(usd, 2)}' if usd is not None else '—',
+         'coordenação e revisor' + (f' até {_hm(c.get("ate"))}' if c and c.get('ate') else '') if usd is not None
+         else 'custo da coordenação não informado'),
+    ]
+    cards = ''.join(f'<div class="card"><div class="n">{_e(n)}</div><div class="l">{_e(l)}</div></div>' for n, l in cartoes)
+    partes = [f'<div class="eyebrow">{_e(eyebrow)}</div><h1>{_e(titulo)}</h1><div class="meta">{_e(meta)}</div>',
+              f'<div class="cards">{cards}</div>']
+    if F.get('conclusao'):
+        partes.append(f'<div class="lead">{_e(F["conclusao"])}</div>')
+    cls = _lista_de(F.get('classificacao'))
+    if cls:
+        trs = ''.join(
+            f'<tr><td class="uso">{_e(r.get("uso"))}' + (f'<span class="front">{_e(r.get("frente"))}</span>' if r.get('frente') else '')
+            + f'</td><td><span class="b b-{_selo_tipo(r.get("hoje"), r.get("hoje_tipo"))}">{_e(r.get("hoje"))}</span></td>'
+            f'<td>{_e(r.get("fato"))}</td></tr>' for r in cls)
+        partes.append('<h2>A classificação</h2><table class="cl"><colgroup><col style="width:43%"><col style="width:20%">'
+                      '<col style="width:37%"></colgroup><thead><tr><th>Uso</th><th>Hoje</th><th>O fato que decide</th></tr>'
+                      f'</thead><tbody>{trs}</tbody></table>')
+    bars = _lista_de(F.get('barras'))
+    if bars:
+        itens = []
+        for r in bars:
+            val, mx = r.get('valor'), r.get('maximo')
+            pct = max(0, min(100, 100 * val / mx)) if _isnum(val) and _isnum(mx) and mx else 0
+            cor = TONS.get(r.get('tom'), TONS['neutro'])
+            txt = r.get('texto') if r.get('texto') is not None else _num(val)
+            itens.append(f'<div class="hb"><div class="t">{_e(r.get("rotulo"))}'
+                         + (f'<small>{_e(r.get("detalhe"))}</small>' if r.get('detalhe') else '')
+                         + f'</div><div class="trk"><div class="fill" style="width:{pct:.1f}%;background:{cor}"></div></div>'
+                         f'<div class="v">{_e(txt)}</div></div>')
+        partes.append(f'<h2>O que se mediu</h2><div class="bars">{"".join(itens)}</div>')
+    partes.append(_grafico(d))
+    fases = _lista_de(F.get('fases'))
+    if fases:
+        fs = ''.join(f'<div class="ph"><div class="k">{_e(f.get("rotulo") or f"fase {i}")}</div>'
+                     f'<div class="nm">{_e(f.get("nome"))}</div><div class="h">{_e(f.get("estimado"))}</div></div>'
+                     for i, f in enumerate(fases))
+        partes.append(f'<h2>As fases</h2><div class="phases">{fs}</div>')
+    if d['linhas']:
+        trs = ''
+        for p in d['linhas']:
+            sub = ' · '.join(_e(x) for x in (p.get('runtime'), p.get('modelo')) if x)
+            delta = ''
+            if _isnum(p['r1']) and _isnum(p['ultima']):
+                dl = p['ultima'] - p['r1']
+                delta = f' <span class="mut">({"+" if dl > 0 else "−" if dl < 0 else "±"}{_num(abs(dl))})</span>'
+            trs += (f'<tr><td><b>{_e(p["nome"])}</b>' + (f'<span class="front">{sub}</span>' if sub else '') + '</td>'
+                    f'<td>{_num(p["r1"])} → <b>{_num(p["ultima"])}</b>{delta}</td>'
+                    f'<td>{_e(p["virada"]) if p["virada"] else "—"}</td><td>{_num(p["nota"])}</td></tr>')
+        partes.append('<h2>As personas</h2><table class="pe"><colgroup><col style="width:34%"><col style="width:34%">'
+                      '<col style="width:16%"><col style="width:16%"></colgroup><thead><tr><th>Persona</th>'
+                      '<th>Confiança R1 → última</th><th>Virada</th><th>Nota dos colegas</th></tr></thead>'
+                      f'<tbody>{trs}</tbody></table>')
+    if d['sintese']:
+        partes.append('<h2>A síntese</h2><ol class="sin">' + ''.join(f'<li>{_e(x)}</li>' for x in d['sintese']) + '</ol>')
+    if d['decisoes']:
+        dec = ''
+        for x in d['decisoes']:
+            quem = [str(q) for q in (x.get('quem') or [])]
+            lev = (f'<div class="rec">levantada por {_e(", ".join(quem[:-1]) + " e " + quem[-1] if len(quem) > 1 else quem[0])}</div>'
+                   if quem else '')
+            rec = f'<div class="rec"><b>recomendação:</b> {_e(x.get("recomendacao"))}</div>' if x.get('recomendacao') else ''
+            vt = f'<div class="rec">{_e(x["votos"])}</div>' if x.get('votos') else ''
+            dec += f'<div class="q"><div class="qt">{_e(x.get("pergunta"))}</div>{lev}{rec}{vt}</div>'
+        partes.append(f'<h2>Para Anderson decidir</h2>{dec}')
+    prox = _lista_de(F.get('proxima_rodada'))
+    if prox:
+        qs = ''.join(f'<div class="q"><div class="qt">{_e(x.get("pergunta"))}</div>'
+                     + (f'<div class="rec"><b>Recomendado:</b> {_e(x.get("recomendacao"))}</div>' if x.get('recomendacao') else '')
+                     + '</div>' for x in prox)
+        partes.append(f'<h2>A próxima rodada para você</h2>{qs}')
+    if F.get('rodape'):
+        partes.append(f'<div class="foot">{_e(F["rodape"])}</div>')
+    return (f'<!doctype html><html lang="pt-BR"{" class=dark" if dark else ""}><head><meta charset="utf-8">'
+            f'<meta name="viewport" content="width=device-width, initial-scale=1">'
+            f'<title>Síntese — {_e(reu.get("tema") or reu.get("id"))}</title><style>{CSS_SINTESE}</style></head>'
+            f'<body>{"".join(partes)}</body></html>')
+
+
+def _cmd_sintese(a):
+    try:
+        root = _raiz(a)
+        with open(_tally.resolve_reuniao(a.reuniao, root), encoding='utf-8') as f:
+            reuniao = json.load(f)
+        pasta = pasta_da_reuniao(reuniao, root)
+        rodadas = _rodadas_da_pasta(pasta)
+        if not any(e for e, _ in rodadas.values()):
+            print(f'panel sintese: nenhum estado-rN.json em {pasta}; rode `panel.py collect` ou `publish` das rodadas',
+                  file=sys.stderr)
+            return 2
+        doc = render_sintese(reuniao, rodadas, _ler_json(os.path.join(pasta, 'sintese-final.json')), a.dark)
+    except (OSError, ValueError, KeyError) as ex:
+        print(f'panel sintese: {ex}', file=sys.stderr)
+        return 2
+    destino, padrao = (None, False) if a.out else resolve_publish_dir(a.publish_dir, pasta)
+    if padrao:
+        print(f'aviso: sem --publish-dir nem ORCA_CHAT_SCRATCH_DIR: o HTML fica em {destino}, e o chat não o abre',
+              file=sys.stderr)
+    try:
+        alvo, linha = salva_visual(doc, reuniao.get('id'), 'sintese', 'sintese',
+                                   f'Síntese — {reuniao.get("tema") or reuniao.get("id") or ""}',
+                                   publish_dir=destino, alvo_padrao=a.out or os.path.join(pasta, 'sintese.html'))
+    except ErroPublicacao as ex:
+        print(f'panel sintese: {ex}', file=sys.stderr)
+        return ex.rc
+    print(linha or f'::orca-visual{{file="{os.path.basename(alvo)}" title="{_titulo_seguro("Síntese — " + str(reuniao.get("tema") or reuniao.get("id") or ""))}"}}')
+    if not a.no_png:
+        png = a.png or os.path.join(pasta, 'sintese.png')
+        erro = gera_png(alvo, png, a.width, 4200)
+        if erro:
+            print(f'panel sintese: {erro}', file=sys.stderr)
+        else:
+            print(f'png: {png}')
     return 0
 
 
@@ -542,6 +974,37 @@ def main(argv=None):
     r.add_argument('--png')
     r.add_argument('--width', type=int, default=736)
     r.set_defaults(fn=_cmd_render)
+    pu = sub.add_parser('publish', help='collect + render + PNG de uma vez; imprime a linha ::orca-visual e o png:')
+    pu.add_argument('n', type=int)
+    pu.add_argument('--reuniao', required=True)
+    pu.add_argument('--root', help='padrão: o topo do repositório git do cwd')
+    pu.add_argument('--opened')
+    pu.add_argument('--closed')
+    pu.add_argument('--list-json')
+    pu.add_argument('--at')
+    pu.add_argument('--measurements')
+    pu.add_argument('--sessions')
+    pu.add_argument('--codex-dir')
+    pu.add_argument('--participantes', nargs='+', metavar='NOME')
+    pu.add_argument('--settle', type=float, default=0, metavar='SEG')
+    pu.add_argument('--publish-dir', help='padrão: $ORCA_CHAT_SCRATCH_DIR; sem ele, a pasta da reunião (com aviso)')
+    g2 = pu.add_mutually_exclusive_group()
+    g2.add_argument('--png', help='padrão: <pasta da reunião>/painel-rN.png')
+    g2.add_argument('--no-png', action='store_true')
+    pu.add_argument('--width', type=int, default=736)
+    pu.set_defaults(fn=_cmd_publish)
+    sy = sub.add_parser('sintese', help='o visual de síntese da reunião inteira')
+    sy.add_argument('--reuniao', required=True)
+    sy.add_argument('--root', help='padrão: o topo do repositório git do cwd')
+    g3 = sy.add_mutually_exclusive_group()
+    g3.add_argument('--out')
+    g3.add_argument('--publish-dir')
+    sy.add_argument('--dark', action='store_true')
+    g4 = sy.add_mutually_exclusive_group()
+    g4.add_argument('--png', help='padrão: <pasta da reunião>/sintese.png')
+    g4.add_argument('--no-png', action='store_true')
+    sy.add_argument('--width', type=int, default=736)
+    sy.set_defaults(fn=_cmd_sintese)
     a = ap.parse_args(argv)
     return a.fn(a)
 
@@ -585,6 +1048,57 @@ ul,ol{margin:0;padding-left:18px} li{margin:3px 0}
 .dec{list-style:none;padding:0} .dec li{border-left:3px solid var(--chart-1,var(--fb-c1));padding:2px 0 2px 8px;margin:6px 0}
 @media (max-width:520px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
 .row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .row.hd{display:none} .ct{text-align:left} .tg.mono{display:none}}
+'''
+
+CSS_SINTESE = '''
+* { box-sizing: border-box; }
+html{--fb-bg:#fff;--fb-fg:#171717;--fb-card:#fafafa;--fb-mut:#6b7280;--fb-mutbg:#f1f1f3;--fb-bd:#e5e5e5;--fb-c1:#2563eb;--fb-c2:#16a34a;--fb-de:#dc2626}
+html.dark{--fb-bg:#18181b;--fb-fg:#ededed;--fb-card:#232327;--fb-mut:#a1a1aa;--fb-mutbg:#2e2e33;--fb-bd:#3a3a40;--fb-c1:#60a5fa;--fb-c2:#4ade80;--fb-de:#f87171}
+body{margin:0;padding:16px;background:var(--background,var(--fb-bg));color:var(--foreground,var(--fb-fg));font:13px/1.45 var(--font-sans,-apple-system,system-ui,sans-serif)}
+.mut{color:var(--muted-foreground,var(--fb-mut))}
+.eyebrow{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground,var(--fb-mut))}
+h1{font-size:19px;margin:2px 0 4px;line-height:1.25}
+h2{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground,var(--fb-mut));margin:22px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border,var(--fb-bd))}
+.meta{color:var(--muted-foreground,var(--fb-mut));font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.card{background:var(--card,var(--fb-card));color:var(--card-foreground,var(--fb-fg));border:1px solid var(--border,var(--fb-bd));border-radius:var(--radius,10px);padding:10px 12px;min-width:0}
+.card .n{font-size:22px;font-weight:650;line-height:1.1;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.card .l{font-size:11.5px;color:var(--muted-foreground,var(--fb-mut));margin-top:4px;overflow-wrap:anywhere}
+.lead{margin:14px 0 0;padding:10px 12px;border-left:3px solid var(--chart-1,var(--fb-c1));background:var(--muted,var(--fb-mutbg));border-radius:0 var(--radius,8px) var(--radius,8px) 0}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{text-align:left;font-weight:500;font-size:11.5px;color:var(--muted-foreground,var(--fb-mut));padding:4px 6px;border-bottom:1px solid var(--border,var(--fb-bd))}
+td{padding:6px;border-bottom:1px solid var(--border,var(--fb-bd));vertical-align:top;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+td.uso{font-weight:550}
+.front{display:block;font-size:11.5px;color:var(--muted-foreground,var(--fb-mut));font-weight:400}
+.b{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;max-width:100%;overflow-wrap:anywhere}
+.b-go{background:var(--chart-2,var(--fb-c2));color:#fff}
+.b-wait{background:var(--chart-1,var(--fb-c1));color:#fff}
+.b-sh{background:var(--secondary,var(--fb-mutbg));color:var(--secondary-foreground,var(--fb-fg))}
+.b-evo{border:1px dashed var(--border,var(--fb-bd));color:var(--muted-foreground,var(--fb-mut))}
+.b-out{border:1px solid var(--destructive,var(--fb-de));color:var(--destructive,var(--fb-de))}
+.bars{display:grid;grid-template-columns:minmax(0,1fr);gap:9px}
+.hb{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) 54px;gap:10px;align-items:center}
+.hb .t{font-size:12.5px;min-width:0;overflow-wrap:anywhere}
+.hb .t small{display:block;color:var(--muted-foreground,var(--fb-mut));font-size:11px}
+.trk{height:10px;border-radius:6px;background:var(--muted,var(--fb-mutbg));position:relative;overflow:hidden}
+.fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px}
+.hb .v{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;min-width:0;overflow-wrap:anywhere}
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:6px}
+.ph{border:1px solid var(--border,var(--fb-bd));border-radius:var(--radius,8px);padding:8px;min-width:0;background:var(--card,var(--fb-card))}
+.ph .k{font-size:11px;color:var(--muted-foreground,var(--fb-mut))}
+.ph .nm{font-weight:600;font-size:12px;margin:2px 0;line-height:1.25;overflow-wrap:anywhere}
+.ph .h{font-size:11.5px;font-variant-numeric:tabular-nums}
+.chart svg{width:100%;max-width:640px;height:auto;display:block}
+.legend{display:flex;gap:14px;font-size:11.5px;color:var(--muted-foreground,var(--fb-mut));margin-top:4px;flex-wrap:wrap}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.q{border:1px solid var(--border,var(--fb-bd));border-radius:var(--radius,8px);padding:9px 11px;margin-bottom:7px;min-width:0}
+.q .qt{font-weight:600;overflow-wrap:anywhere}
+.q .rec{color:var(--muted-foreground,var(--fb-mut));font-size:12px;margin-top:2px;overflow-wrap:anywhere}
+.q .rec b{color:var(--foreground,var(--fb-fg));font-weight:600}
+.sin{margin:0;padding-left:18px} .sin li{margin:3px 0}
+.foot{margin-top:18px;font-size:11.5px;color:var(--muted-foreground,var(--fb-mut))}
+@media (max-width:560px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+.hb{grid-template-columns:minmax(0,1fr) 46px} .hb .trk{grid-column:1/-1;grid-row:2}}
 '''
 
 if __name__ == '__main__':

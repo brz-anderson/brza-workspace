@@ -38,6 +38,16 @@ morou em cinco lugares, todos achados por comando e não por leitura:
 - **Abreviação que colide com rótulo novo:** o painel abreviava apoio/ressalva/contra como A/R/C, e o molde novo passou
   a aceitar propostas A/B ("voto A 0" de quem votou A). Leia o PNG, não só o HTML.
 
+**Na 4ª revisão (painel automático, R10, 2026-11-09), o padrão voltou no subcomando irmão.** O `publish` ganhou o
+padrão `$ORCA_CHAT_SCRATCH_DIR`; o `sintese`, escrito junto, não ganhou, e o comando da skill imprimia um caminho com
+rc 0 no lugar da linha `::orca-visual`. Quando dois subcomandos nascem juntos, rode os dois com o env do chat, e não só
+com as flags. Outras duas formas novas:
+- **Epoch convertido em HH:MM:SS** perde a data que outro script reconstrói por um campo do manifesto (`data`).
+- **O docstring do `--once` diverge do ramo "todas chegaram"**, que ninguém lê.
+
+Mutantes que sobrevivem: flag repassada a outro script (`participantes`) e o relógio do teste, que não avança entre
+dois momentos que o código distingue (`closed` = última chegada × agora).
+
 Mutação barata para medir os testes: copie `scripts/`, troque uma linha por `sed`/Python e conte as falhas contra a
 linha de base da cópia (a cópia já perde 2 testes de raiz git). Na 3ª revisão, as dez mutações caíram.
 
@@ -57,7 +67,9 @@ medição (latência, custo) entra.
 512 KB, `:root` no tema, laço infinito, a mensagem de rodada antiga contando na nova (havia o `m < n`), a corrida
 entre a escrita parcial e o marcador na última linha. Na 3ª: "o teste integrado não roda o v2 real" (roda, por
 `SourceFileLoader`); "`reclaimable` deixa o veredito ativo" (é `terminalState`, não `stage`); "o `--operation` muda
-o texto" (o v2 anexa o mesmo protocolo); laço quente no limite (sai com 2). Deram 85–90 de partida e caíram por
+o texto" (o v2 anexa o mesmo protocolo); laço quente no limite (sai com 2). Na 4ª caíram: "o painel muda o rc ou trava a espera" (o `except Exception` cobre,
+nada chama `sys.exit`, e o `subprocess.run` com timeout, no POSIX, só espera o processo), "o corte do anexo aceita
+texto a mais" (os 9 casos saíram certos) e "chave do JSON sem documentação" (o docstring lista todas). Deram 85–90 de partida e caíram por
 leitura direta do código do CLI e do studio.
 
 **Why:** a skill nasce de protótipos de scratch, e cada script é endurecido em separado; o contrato entre eles e os

@@ -1,0 +1,18 @@
+{
+ "sala": {"revisor": null, "revisor_nota": "revisor independente na v2, em curso"},
+ "medicoes": [
+  {"tipo": "conferido", "quem": "coordenação", "texto": "6/6 marcadores fim-rodada-4; confiança do plano inteiro pela linha 'O plano inteiro' — tally.py 4"}
+ ],
+ "sintese": [
+  "Sala 80,2 (5/6), mediana 82; Antigravity 93 à parte; Lida 70 pela manutenção que o plano ganhou.",
+  "A tabela de fases da v2 põe o cliente antes da linha zero: corrige-se na v3 (Bitola, Fagulha).",
+  "Retenção: até a pergunta passar ou falhar a régua, não 30 dias (Balança, Fagulha, Faro); política antes (Ferrolho).",
+  "O painel da sugestão: marcar 'não calibrado, n_sim = 6', lista inteira; esperar uma semana de sombra (Lida, Ferrolho).",
+  "Dois escritores no estado-rN.json sem contrato (Bitola): o tally grava num arquivo próprio."
+ ],
+ "decisoes": [
+  {"pergunta": "Retenção do texto do state: até a régua, 90 dias ou 30 dias?", "quem": ["Balança", "Fagulha", "Faro", "Ferrolho"], "recomendacao": null, "votos": null},
+  {"pergunta": "A sugestão no painel entra na próxima reunião ou depois de uma semana de sombra?", "quem": ["Bitola", "Fagulha", "Lida", "Ferrolho"], "recomendacao": null, "votos": null},
+  {"pergunta": "Autoriza a linha zero no resolver antes de extrair o módulo?", "quem": ["Bitola", "Lida"], "recomendacao": null, "votos": null}
+ ]
+}

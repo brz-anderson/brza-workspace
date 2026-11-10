@@ -12,10 +12,13 @@ refs:
   - issue:autenticacao-mcp-no-chat-alerta-de-turnos-ativos-e-cache-de-orquestracao
   - issue:badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes
   - issue:bifurcacao-de-conversas-no-chat-ui-e-resiliencia-de-inicializacao-do-claude
+  - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
   - issue:comandos-shell-no-chat-recibos-de-perguntas-e-foco-espacial-em-terminais
   - issue:historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins
+  - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
   - issue:ler-e-enviar-mensagens-a-chats-pela-cli-e-expor-native-chat-aos-plugins
   - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
+  - issue:progresso-de-revisao-no-diff-backend-de-metricas-e-abertura-de-pastas
   - issue:workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh
 ---
 
@@ -106,3 +109,23 @@ refs:
    - [Histórico de navegação no editor e identificação de workspaces por plugins](../issues/historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins.md):
      adicionado o PR `#40743` / issue `#40742` (extensão da API de plugins Host API 1.7 com `agents.list({ workspaceId? })` para listar agentes de qualquer
      workspace e `terminal.focus({ terminalId })` para trazer aba e painel de terminal para o primeiro plano via plugin).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-10)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-10T15:00:00Z` e `2026-11-10T21:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Progresso de revisão no diff, backend de métricas e abertura de pastas](../issues/progresso-de-revisao-no-diff-backend-de-metricas-e-abertura-de-pastas.md):
+     rastreia o PR `#40776` / issue `#40768` (progresso de revisão no diff com controle `[x] Viewed` por arquivo e no combined diff, atenuamento visual no Source Control e persistência `orca.reviewed-diffs.v1`),
+     PR `#40792` (migração dos serviços locais de uso, telemetria e analytics para processo de backend supervisionado via MessagePort, reduzindo latência do event loop e latência de timers de 1.836ms para 833ms),
+     PR `#40818` / issue `#40675` (links de pastas no chat com rótulo "Open folder" e revelação no file explorer do worktree local ou pareado),
+     PR `#40627` (eliminação de regravações completas de profile no disco em movimentações de janela),
+     PR `#40790` / issue `#40789` (confinamento de Select All ao buffer do editor Markdown),
+     PR `#40816` (reabertura da última aba fechada com Cmd+Shift+T a partir do welcome screen) e
+     issues `#40786` e `#40787` (Personas com governança e segredos; comentários inline em PRs com bulk send to AI).
+3. **Atualização de 2 issues existentes em `work/issues/`:**
+   - [Cartões de Pull Request, feedback de Steer e atalhos no Native Chat](../issues/cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat.md):
+     adicionados o PR `#40823` / issue `#40819` (preservação de respostas a mensagens de Steer visíveis fora do fold "Worked for N" após finalização do turno) e o PR `#40820` (estabilidade dimensional do botão Send em previews de Steer).
+   - [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):
+     adicionados o PR `#40812` (ordenação determinística de caminhos para hash estável de pacotes de skills) e o PR `#40788` / issue `#40785` (exibição de dicas de argumentos `argument-hint` no picker `/` de skills).

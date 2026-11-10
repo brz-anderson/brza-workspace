@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39287, #39309 e as issues #39516, #39520 trazem escolhas mid-turn isoladas, backgrounding de subagentes, retenção de aprovações e atalhos no chat.
+description: Os PRs #40823, #40820, #39287, #39309 trazem visibilidade de respostas a steer, botão send estável, escolhas mid-turn isoladas e atalhos.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,9 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39287`](https://github.com/stablyai/orca/pull/39287) (Issue [`#39286`](https://github.com/stablyai/orca/issues/39286)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40823`](https://github.com/stablyai/orca/pull/40823) (resolve Issue [`#40819`](https://github.com/stablyai/orca/issues/40819)),
+[`stablyai/orca#40820`](https://github.com/stablyai/orca/pull/40820),
+[`stablyai/orca#39287`](https://github.com/stablyai/orca/pull/39287) (Issue [`#39286`](https://github.com/stablyai/orca/issues/39286)),
 [`stablyai/orca#39309`](https://github.com/stablyai/orca/pull/39309),
 [`stablyai/orca#39369`](https://github.com/stablyai/orca/pull/39369),
 [`stablyai/orca#39050`](https://github.com/stablyai/orca/pull/39050) (Issue [`#37855`](https://github.com/stablyai/orca/issues/37855)),
@@ -91,9 +93,22 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39287`](https://github.com
 18. **Falta de controle para despachar comandos Bash e subagentes Claude para segundo plano (`#39520`):**
     Comandos longos de compilação, testes ou execução de subagentes bloqueavam todo o turno no Native Chat sem opção de liberação
     da conversa, enquanto no terminal do Claude Code o atalho <kbd>Ctrl+B</kbd> permite backgrounding nativo imediato.
+19. **Ocultação da resposta a comandos Steer dentro do colapso de turno ("Worked for N") (`#40823`, resolve `#40819`):**
+    Ao injetar uma mensagem via Steer em um turno em andamento, o assistente respondia à instrução intermediária antes de continuar.
+    Porém, ao liquidar o turno (*turn settles*), o transcript preservava visível apenas o último texto final do assistente, dobrando
+    a resposta do steer para dentro do disclosure "Worked for N". O usuário via sua mensagem de steer na tela, mas ficava sem a resposta
+    visível, parecendo que o assistente a ignorou.
+20. **Distorção geométrica do botão Send ao alternar prévia de Steer (`#40820`):**
+    Ao segurar Cmd/Ctrl para inspecionar o estado de Steer no composer, o botão de envio mudava de formato e perdia o dimensionamento
+    circular padronizado, causando tremor visual na barra inferior.
 
 ## O que o upstream implementa
 
+- **Preservação de respostas a mensagens Steer fora do fold de turno (`#40823`, resolve `#40819`):**
+  - Identifica mensagens de usuário cujo ID de turno é herdado de um turno já em execução (steer) e mantém a primeira resposta
+    de prosa do assistente posterior a essa mensagem visível fora do bloco colapsado "Worked for N", além da resposta final do turno.
+- **Manutenção geométrica do botão Send em previews de Steer (`#40820`):**
+  - Mantém o tamanho circular e dimensões padronizadas do botão Send enquanto Cmd/Ctrl alterna entre modos de prévia.
 - **Isolamento de escolhas de modelo mid-turn e entrega direta de respostas (`#39516`):**
   - Rotula os seletores de modelo/esforço durante a execução do agente como "Next turn: ...", aplicando as escolhas
     exclusivamente no envio do próximo turno sem alterar o turno corrente;
@@ -137,6 +152,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39287`](https://github.com
 
 ## O que fazer
 
+- Manter visíveis as respostas a instruções Steer fora do colapso de turno ("Worked for N") (`#40823`).
+- Adotar a estabilidade visual e proporção circular do botão Send em prévias de Steer (`#40820`).
 - Incorporar o auto-shrink de imagens coladas (`#39050`) e a limpeza de cartões de modelo redundantes (`#39141`) no `brza-studio`.
 - Adotar a preservação contínua de cartões de aprovação de permissões do Claude (`#39287`).
 - Incorporar os cartões ricos de PR (`#38750`, `#38892`) e as melhorias de teclado de Steer/Queue (`#38749`, `#38877`, `#38848`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40214, #35220, #36897 e #19680 aceleram leitura de skills, preservam descoberta no arranque e corrigem classificação com sidecars.
+description: Os PRs #40812, #40788, #40214, #35220 trazem hashes estáveis de pacotes, hints de argumentos no picker, leitura antecipada e preservação no arranque.
 scope:
   - brza-studio
 priority: high
@@ -11,7 +11,9 @@ tags:
 
 # Leitura antecipada e preservação de skills no arranque e nos plugins
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40214`](https://github.com/stablyai/orca/pull/40214) (resolve Issue [`#40181`](https://github.com/stablyai/orca/issues/40181)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com/stablyai/orca/pull/40812),
+[`stablyai/orca#40788`](https://github.com/stablyai/orca/pull/40788) (resolve Issue [`#40785`](https://github.com/stablyai/orca/issues/40785)),
+[`stablyai/orca#40214`](https://github.com/stablyai/orca/pull/40214) (resolve Issue [`#40181`](https://github.com/stablyai/orca/issues/40181)),
 [`stablyai/orca#35220`](https://github.com/stablyai/orca/pull/35220),
 [`stablyai/orca#36897`](https://github.com/stablyai/orca/pull/36897),
 [`stablyai/orca#37659`](https://github.com/stablyai/orca/pull/37659) e
@@ -39,9 +41,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40214`](https://github.com
    o arquivo como atual ou lançado apenas quando `SKILL.md` era a única entrada na pasta. Como ferramentas como Codex geram
    arquivos auxiliares no mesmo diretório (ex.: `agents/openai.yaml` ou scripts locais), o digest do diretório não batia e um
    `SKILL.md` idêntico em bytes passava a ser classificado como `edited`, impedindo atualizações silenciosas automáticas.
+6. **Inconsistência no hash de identidade de pacotes de skills por caminhos não ordenados (`#40812`):**
+   O cálculo de identidade de pacotes de skills gerava hashes discrepantes para o mesmo conjunto de arquivos dependendo
+   da ordem em que o sistema de arquivos retornava os manifestos, disparando alertas falsos de "skill out of date" e invalidações espúrias de cache.
+7. **Omissão de dicas de argumentos (argument-hints) de skills no seletor do Native Chat (`#40788`, resolve `#40785`):**
+   Ao abrir o picker `/` no chat para invocar uma skill (ex.: `/review`, `/test`), a interface descartava os metadados de
+   `argument-hint` definidos no Claude Code, deixando o usuário sem saber quais parâmetros a ferramenta esperava.
 
 ## O que os PRs fazem
 
+- **PR `#40812`:** ordena deterministamente os caminhos completos dos manifestos antes de computar o hash de identidade do pacote de skills, evitando discrepâncias entre sistemas de arquivos.
+- **PR `#40788` (resolve `#40785`):** preserva e renderiza `argument-hint` no dropdown de seleção do Native Chat para skills do Claude Code e ferramentas de sessão.
 - **PR `#40214` (resolve `#40181`):** compara o digest atual e os digests lançados especificamente para o arquivo `SKILL.md`,
   mesmo quando a pasta contém entradas adicionais. Um `SKILL.md` cujo digest não coincida com nenhum continua sendo classificado
   como `edited` apenas se o nome no frontmatter bater com a skill bundled.
@@ -60,3 +70,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40214`](https://github.com
 2. Aplicar o [`stablyai/orca#35220`](https://github.com/stablyai/orca/pull/35220) (4 arquivos autocontidos em
    `src/main/skills/`) no `brza-studio`, incorporar o `#37659` e preparar o sistema de plugins para registrar subagentes
    nativos entregues por pacotes de terceiros.
+3. Adotar a ordenação determinística de caminhos no cálculo de identidade de pacotes de skills (`#40812`).
+4. Exibir dicas de argumentos (`argument-hint`) no seletor de comandos/skills do chat (`#40788`).

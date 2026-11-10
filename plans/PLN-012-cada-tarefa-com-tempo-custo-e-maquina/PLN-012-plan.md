@@ -1,15 +1,16 @@
 ---
-status: in_progress
-phase: execution
+status: done
+phase: closed
 origin: request
 description: Liga a medição às tarefas, para que cada uma mostre o tempo corrido, o custo de API e o recurso de máquina, e o fluxo se afine por dado.
 ready: sim
-estimate_h: 17.25
-executed_h: 4.8
-remaining_h: 2.25
+estimate_h: 17.75
+executed_h: 6.9
+remaining_h: 0
 scope:
   - brza-workflow
 opened: 2026-11-03
+completed: 2026-11-09
 owner: Anderson
 priority: medium
 tags:
@@ -18,9 +19,8 @@ tags:
 
 # PLN-012: Cada tarefa sai com o tempo corrido, o custo e a máquina que gastou
 
-- **Retomar:** em 2026-11-09, P1–P5, P6.1 e P6.2 feitos. Próximo: P6.3, a conferência da `## Medida` do worklog do
-  P6.2 contra o `--by-task` e o transcript, dentro de 5%; depois, o P7, o título `## Custo da tarefa` (R6.1) e a suíte
-  que não escreve no log real (X9). Não fechar o plano antes disso.
+- **Retomar:** fechado em 2026-11-09. P1–P8 feitos e a entrega revisada (REV-024). O que ficou para depois está
+  nas 12 issues de `## Pendências conhecidas`.
 - **Dividido:** [PLN-012 — Desenho](PLN-012-design.md)
 
 ## Pedido
@@ -36,15 +36,14 @@ tags:
 ### Cobertura
 
 | Origem | Critério de aceite | Passo | Teste (nível) |
-| Origem | Critério de aceite | Passo | Teste (nível) |
 | :-- | :-- | :-- | :-- |
 | `Pedido 1`, `R1.1`, `R2.1` | O `brza note commit` de um worklog grava `sessions:` nele e um evento `task`, e a tarefa vai do primeiro turno depois do marco anterior da sessão ao commit, com o intervalo entre os dois como ociosa da sessão | P3, P2 | `test_brza_note` e `test_summarize_measurements` (unidade); P6 (manual) |
 | `Pedido 1`, `R2.2`, `R2.3` | Cada tarefa tem o tempo do agente, o de Anderson e a pausa acima de 30 min por espera, com as esperas da rodada e da interrupção lidas no transcript, e o corrido como a soma | P1, P2 | `test_measure` e `test_summarize_measurements` (unidade); P6 contra o transcript (manual) |
 | `Pedido 2` | Cada tarefa tem o custo de API dos turnos e dos subagentes, cada subagente no turno da sessão que contém o começo dele | P2 | `test_summarize_measurements` (unidade) |
 | `Pedido 3`, `R1.2` | Cada turno traz a CPU do `claude` e dos filhos e o RSS, pelo `proc_pid_rusage`, e cada `brza run` grava a CPU, o pico e a duração do comando com a sessão que o chamou | P1, P4 | `test_measure` e `test_brza_scripts` (unidade); P1.4 na sessão real (manual) |
 | `Pedido 4`, `R1.4` | `summarize_measurements.py --by-task` compara as tarefas por workstream e dia | P2 | `test_summarize_measurements` (unidade); P6 (manual) |
-| `R3.1` | A `## Medida` do worklog traz a tarefa até o commit, com o turno em curso lido no transcript, e bate com o `--by-task` | P3, P6 | `test_brza_note` (unidade); P6 (manual) |
-| `R0.3`, `R3.2` | O worklog não ganha `opened` nem hora em `completed`; a hora do fim está na `## Medida` | P3 | `test_brza_note` (unidade) |
+| `R3.1`, `R6.1` | A `## Custo da tarefa` do worklog traz a tarefa até o commit, com o turno em curso lido no transcript, e bate com o `--by-task` | P3, P6 | `test_brza_note` (unidade); P6 (manual) |
+| `R0.3`, `R3.2` | O worklog não ganha `opened` nem hora em `completed`; a hora do fim está na `## Custo da tarefa` | P3, P7 | `test_brza_note` (unidade) |
 | `R1.3`, `R2.4` | A tarefa sem turno medido aparece "não medida", e os turnos depois do último marco de cada sessão, "sem tarefa" | P2 | `test_summarize_measurements` (unidade) |
 | `R3.3` | O `close-task` mostra os turnos que o commit vai fechar e os sem tarefa das outras sessões do workstream | P2, P5 | `test_summarize_measurements` (unidade); P6 (manual) |
 | `R3.4` | `brza note commit --until HH:MM` põe o marco na hora dada, e recusa a hora fora da janela | P3, P2 | `test_brza_note` e `test_summarize_measurements` (unidade) |
@@ -404,7 +403,7 @@ e [REV-021: O P3 e o ajuste do P5.6 do PLN-012](../../work/reviews/REV-021-pln-0
 
 Executa a conferência de D1–D6 · executor: sessão que conduz, com Anderson
 
-Estimado: 1.0 h · Executado: — h
+Estimado: 1.0 h · Executado: 0.9 h (P6.1 8 min, P6.2 42 min, P6.3 5 min)
 
 - [x] **1. `brza sync`** no workspace, e conferir que o `.brza/core.lock` aponta o merge do P5. — `brza sync` →
   `brza-workspace@015fe77`, `core.lock` em `brza-workflow@db6bd28`, 5 arquivos escritos e os seis workstreams
@@ -415,8 +414,16 @@ Estimado: 1.0 h · Executado: — h
   `--pending` deu "2 turnos desde 19:06 (corrido 36 min, US$ 2,33 dos turnos e US$ 1,79 de 4 subagentes)" depois do
   X9, e o worklog saiu com `sessions:` e `## Medida`:
   [PLN-012: o P6.2, a pasta solta na master e o brza run que perdia as aspas](../../work/worklogs/2026-11-09-pln-012-p6-2-pasta-solta-e-brza-run.md).
-- [ ] **3. Conferir** — a `## Medida` e a linha do `python3 scripts/summarize_measurements.py --by-task` batem entre si,
-  e com o transcript (as esperas lidas à mão), dentro de 5%.
+- [x] **3. Conferir** — a `## Medida` e a linha do `python3 scripts/summarize_measurements.py --by-task` batem entre si,
+  e com o transcript (as esperas lidas à mão), dentro de 5%. — tarefa do P6.2, em 2026-11-09:
+  - **Contra o `--by-task`:** a `## Medida` dá 42 min, 33 de agente, 9 de quem pediu e US$ 5,37. O
+    `--by-task --json` dá `elapsed_s` 2543, `agent_s` 2031, `requester_s` 512 e US$ 5,47 (1,9%). A diferença é o
+    resto do turno depois do commit das 19:48:08, que o D3 prevê.
+  - **Contra o transcript:** as quatro esperas de rodada somam 163 + 56 + 121 + 158 = 498 s, contra 512 s
+    (2,8%). Os 14 s a mais são o intervalo entre dois turnos. O corrido, de 19:06:15 a 19:48:38, é 2543 s.
+  - **O P1.4:** nos quatro turnos da sessão, `machine.from: env` e `cpu_children_s` de 7,31 a 1026,71.
+  - **A tarefa do P6.1** passou de 5% no custo (US$ 0,92 contra 0,99), pelo mesmo resto de turno, num turno de
+    8 min.
 
 **Evidência:** o worklog da tarefa · a saída do `--by-task`
 
@@ -424,22 +431,54 @@ Estimado: 1.0 h · Executado: — h
 
 Executa o D3 reescrito (R6.1) e o conserto do X9 · executor: a sessão que conduz, no `brza-workflow`
 
-Estimado: 1.25 h · Executado: — h
+Estimado: 1.25 h · Executado: 0.8 h
 
-- [ ] **1. Teste que falha** — `tests/cli/test_brza_note.py`: o commit grava `## Custo da tarefa`, e o worklog com
+- [x] **1. Teste que falha** — `tests/cli/test_brza_note.py`: o commit grava `## Custo da tarefa`, e o worklog com
   `## Medida` sai com uma seção só, com o título novo; um teste de guarda roda o `brza note commit` com
-  `BRZA_WORKSPACE` e `CLAUDE_CODE_SESSION_ID` de mentira no ambiente e confere que nada se escreve fora do temp.
-- [ ] **2. Implementar** — `bin/brza-note` (o `re.split` aceita os dois títulos e grava o novo); o isolamento do
+  `BRZA_WORKSPACE` e `CLAUDE_CODE_SESSION_ID` de mentira no ambiente e confere que nada se escreve fora do temp. —
+  o `implementer` mostrou 5 falhas antes do código, em `TaskCommitTest` e em `NoteEnvironmentIsolationTest`.
+- [x] **2. Implementar** — `bin/brza-note` (o `re.split` aceita os dois títulos e grava o novo); o isolamento do
   ambiente nos testes do `brza note`; a skill `close-task`, o `core/work/README.md`, as fixtures golden e o
-  `tests/notes-checker/run.py`.
-- [ ] **3. Rodar e ver passar** — `tests/cli`, `tests/hooks` e `tests/notes-checker`, com a mesma lista de falhas de
-  antes do passo (as 22 que a `master` já tinha em 2026-11-09, de `note` e `sessions`) ou menor.
-- [ ] **4. Revisão** pelo `reviewer` e **commit**; depois, `brza sync`.
+  `tests/notes-checker/run.py`. — mais o corte que ignora o título dentro de cerca (`without_cost_section`) e o
+  teste do `--chat` do `brza-run` sem a `BRZA_WORKSPACE`, pela revisão.
+- [x] **3. Rodar e ver passar** — `tests/cli`, `tests/hooks` e `tests/notes-checker`, com a mesma lista de falhas de
+  antes do passo (as 22 que a `master` já tinha em 2026-11-09, de `note` e `sessions`) ou menor. — com o ambiente
+  da sessão, `python3 -m unittest discover -s tests/cli` → 591 testes e 4 FAIL, todos de `test_brza_sessions`
+  (checkout relativo e open), contra os 22 da `master`. Os 18 de `note` vinham do mesmo vazamento de ambiente.
+  As linhas `task` e `run` de teste no log real ficaram em 0 antes e 0 depois. `tests/hooks` → 348 OK.
+  `tests/notes-checker/run.py` → saída 0.
+- [x] **4. Revisão** pelo `reviewer` e **commit**; depois, `brza sync`. — revisão interna em três rodadas: A1 (as
+  linhas `run` do teste do `--chat`), A2 (o título dentro de cerca), B1 e B2 (as regras da cerca) e C1 (o comprimento
+  da cerca), todos corrigidos aqui; C2 descartado, por ser a volta deliberada ao corte de antes do P7. As 3 linhas
+  `run` saíram do log, com backup em `measurements.jsonl.bak-2026-11-09-run`. Commits: `brza-workflow@5642ae8`, com
+  o merge em `7afed94`; `brza sync` → `brza-workspace@75c88b0`, com os seis workstreams mesclados.
 
 **Evidência:** o commit no `brza-workflow` · a lista de falhas antes e depois · o `measurements.jsonl` sem `task` novo
 depois de rodar a suíte numa sessão
 
-**Total estimado:** 17,25 h (o P7 somado em 2026-11-09, pela R6) contra os 16 h do corte; antes:
+### P8 — Os achados da revisão da entrega
+
+Executa os quatro achados `corrigido aqui` do REV-024 (D1, D3 e o `close-task` do P5) · executor: a sessão que conduz,
+no `brza-workflow`
+
+Estimado: 0.5 h · Executado: 0.4 h
+
+- [x] **1. Teste que falha** — `test_the_task_event_carries_the_pid_of_the_session_claude` (A2),
+  `test_the_cpu_follows_the_number_rule_of_the_section` (A3) e o assert de CPU de
+  `test_current_machine_uses_saved_baseline_without_writing_it`: os três falharam no `7afed94`.
+- [x] **2. Implementar** — o `pid` do evento `task` pelo `claude_pid()` do `measure.py` (A2); a CPU da seção pelo
+  `human_duration` (A3); o `close-task` e a fixture golden citam também a `## Medida` (A1); o texto do plano e do
+  Desenho (A4).
+- [x] **3. Rodar e ver passar** — `PYTHONPATH=tests/cli python3 -m unittest test_brza_note test_brza_note_index
+  test_brza_scripts` → 210 OK; `tests/hooks` → 348 OK; `tests/notes-checker/run.py` → saída 0.
+- [x] **4. Revisão e commit** — a segunda rodada do REV-024 aprovou. Commits: `brza-workflow@829527c`, com o merge em
+  `b2b497d`, feito num worktree destacado (X10); `brza sync` → `brza-workspace@ba60bb6`, com os seis workstreams
+  mesclados.
+
+**Evidência:** `brza-workflow@b2b497d` · o REV-024
+
+**Total estimado:** 17,75 h (o P8 somado em 2026-11-09, pelo REV-024) contra os 16 h do corte; antes, 17,25 h
+(o P7 somado em 2026-11-09, pela R6); antes:
 16 h (P1 3,5 + P2 4 + P3 4 + P4 1,5 + P5 2 + P6 1) contra ~12,5 h somadas
 nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e as issues (+0,5 h).
 
@@ -501,6 +540,16 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   backup (Recomendado)" e "Corrigir no P7 (Recomendado)". Saíram 84 linhas `task` (`cwd` no temp do macOS ou no
   `brza-workflow`), com o backup em `.measurements/measurements.jsonl.bak-2026-11-09`. Afeta o P3 e cria o P7.
 
+- **X10 — O merge do P8 não passou pela `master` local do `brza-workflow`.** No checkout principal havia mudanças
+  sem commit de outra sessão (PLN-018: o `GROK_SESSION_ID` no `task_context` do `bin/brza-note`, o
+  `brza-sessions`, o `runtime_turn.py`). O merge foi feito num worktree destacado, sobre a `origin/master`, com push
+  direto (`b2b497d`), e a `master` local ficou 2 commits atrás. Duas consequências:
+  - o `brza note`, que roda daquele checkout, só passa a gravar o pid do `claude` e a CPU nova quando a outra sessão
+    commitar e atualizar;
+  - as mudanças dela vão conflitar com o P8 na linha `'pid'` do evento `task`.
+
+  O plano do PLN-018 também tinha edições sem commit, então o aviso ficou aqui e no worklog.
+
 ## Pendências conhecidas
 
 - [A sessão aberta sem a função do shell fica sem medida por tarefa](../../work/issues/sessao-sem-a-funcao-do-shell-fica-sem-medida-por-tarefa.md) — D7, P5.5.
@@ -528,6 +577,28 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
   [REV-018: A revisão do P5 do PLN-012, o close-task e a norma](../../work/reviews/REV-018-pln-012-p5-o-close-task-e-a-norma.md)
 - 2026-11-09 — P3 e P5.6: revisão interna autorizada por Anderson nesta execução, aprovada após duas correções.
   [REV-021: O P3 e o ajuste do P5.6 do PLN-012](../../work/reviews/REV-021-pln-012-p3-carimbo-e-medida.md)
+- 2026-11-09 — a entrega inteira: duas rodadas do `reviewer`; quatro achados corrigidos no P8 e três falsos.
+  [REV-024: A revisão da entrega do PLN-012, a medida por tarefa](../../work/reviews/REV-024-pln-012-entrega.md)
+
+## Documentação
+
+- `brza-workflow/core/work/README.md`, a tabela de propriedades (`sessions`) e a seção `work/worklogs/` (o
+  `sessions:` e a `## Custo da tarefa`) — P5, P7.
+- `brza-workflow/core/.claude/skills/close-task/SKILL.md`, os passos 2 a 7 — P5, P7, P8.
+- `brza-workflow/core/CLAUDE.md`, a tabela do hook de medição (`task`, `run`) e o `--by-task` — P5.
+- `brza-workflow/packages/client/bin/brza-run`, o docstring com o contrato dos argumentos — P4, X8.
+
+## Fechamento
+
+- [x] Todo passo `[x]` com evidência, ou `[-]` com motivo. O P1.4 foi movido ao P6 e conferido no P6.3.
+- [x] Todo achado com destino que existe: REV-017 a REV-021 e REV-024, com as issues em `## Pendências conhecidas`.
+- [x] Um resumo por commit ou PR do `brza-studio` da entrega: não se aplica, porque a entrega é só do `brza-workflow` e
+      das notas, em commits diretos na `master`.
+- [x] O durável saiu para a casa dona e está em `## Documentação`: a norma do `core/` e o contrato do `brza-run`.
+      O plano não respondeu nem abriu nota de `work/decisions/`, porque as rodadas decidiram o próprio contrato da
+      medida, que mora na norma.
+- [x] As decisões que o plano respondeu estão `done`, citando a rodada: não há nota de decisão.
+- [x] `status: done`, `phase: closed` e `completed` no frontmatter.
 
 ## Worklogs
 
@@ -558,3 +629,6 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
 - 2026-11-09 — P6.2 feito: a pasta solta apagada, o `brza run` com cada argumento inteiro (`brza-workflow@ffa29fe`,
   X8), o log limpo dos `task` de teste (X9), R6.1 respondida e o P7 aberto.
   [PLN-012: o P6.2, a pasta solta na master e o brza run que perdia as aspas](../../work/worklogs/2026-11-09-pln-012-p6-2-pasta-solta-e-brza-run.md)
+- 2026-11-09 — P6.3 conferido (1,9% e 2,8%); P7 (`brza-workflow@7afed94`) e P8 (`b2b497d`, X10) entregues; a
+  entrega revisada no REV-024; o plano fechado.
+  [PLN-012: o P6.3, o P7, o P8 e o fechamento da medida por tarefa](../../work/worklogs/2026-11-09-pln-012-p6-3-p7-p8-e-fechamento.md)

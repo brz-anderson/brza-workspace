@@ -1,6 +1,6 @@
 - [Erros em plano extraído](padroes-de-erro-em-planos-extraidos.md) — itens que caem entre planos, limiar sem rodada, P0 não absorvido, papel trocado, seção gerada sem lugar para o acréscimo, hora de corte que a saída não mostra
 - [Estado muda na revisão](estado-muda-durante-a-revisao.md) — outras sessões commitam no worktree; reconferir git log antes de devolver
-- [Achados que caem](achados-que-costumam-cair.md) — limiar no texto da opção, endpoint que existe, despacho brza que funciona, KeepAlive após bootout, rollover de until, `| None` no 3.9, overhead do zsh -ic
+- [Achados que caem](achados-que-costumam-cair.md) — limiar no texto da opção, endpoint que existe, despacho brza que funciona, KeepAlive após bootout, `| None` no 3.9, teste que herda o setUp
 - [Erros no brza-mcp](padroes-de-erro-em-codigo-brza-mcp.md) — teste sem conferir o código de saída, timeout menor que o shutdown, erro antes do unlink
 - [Erros nos scripts do cliente](padroes-de-erro-em-scripts-do-cliente.md) — shlex.quote não protege do zsh (`=word`), ramo do main() sem teste, sonda expandida pelo zsh do Bash
-- [Erros em scripts de medição](padroes-de-erro-em-scripts-de-medicao.md) — assimetria de contexto entre entidade e pares, símbolo de moeda omitido, regressão parcial, teste cujos dois ramos dão o mesmo, fronteira sem caso exato, saída com resolução menor que a entrada do passo seguinte, argumento da medida fora do try, cópia de helper que diverge
+- [Erros em scripts de medição](padroes-de-erro-em-scripts-de-medicao.md) — assimetria entidade e pares, regressão parcial, argumento fora do try, pid do processo errado, título renomeado sem a skill

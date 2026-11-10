@@ -238,8 +238,8 @@ tarefa — todas as sessões e todos os segmentos até agora:
 ```markdown
 ## Custo da tarefa
 
-Corrido 18 min — agente 7 min, Anderson 10 min, pausa 0 · US$ 2,35 (turnos 2,35, subagentes 0,00) · CPU 0,8 s do
-`claude` e 6,1 s dos comandos, RSS até 357 MB · 1 turno, 1 sessão · até 22:16 de 2026-11-03, pelo `brza note commit`
+Corrido 18 min — agente 7 min, Anderson 10 min, pausa 0 · US$ 2,35 (turnos 2,35, subagentes 0,00) · CPU 1 s do
+`claude` e 6 s dos comandos, RSS até 357 MB · 1 turno, 1 sessão · até 22:16 de 2026-11-03, pelo `brza note commit`
 ```
 
 - **O turno em curso entra até a hora do commit.** O `brza note commit` acha o transcript da sessão
@@ -380,5 +380,5 @@ Desenho do PLN-012. Os passos seguintes da skill renumeram de 3 a 7; o "Commitar
 
 ### Como fica
 
-Uma issue por lacuna da lista final abaixo, aberta pelo `brza note new issue` no `tools-kit`, com `scope:
+Uma issue por lacuna, na lista de `## Pendências conhecidas` do plano, aberta pelo `brza note new issue` no `tools-kit`, com `scope:
 [brza-workflow]`, `priority: low` e o link para este plano no corpo.

@@ -95,6 +95,34 @@ Padrões da rodada final do PLN-012/P2 (2026-11-06, Opus depois de três rodadas
   só aparece quando a lista tem mais de um dia; a lista toda de ontem sai em `HH:MM`, que o `--until` lê como hoje.
   *Cheque:* no conserto de formato de hora, testar a lista inteira de um dia que não é o de `now`.
 
+Padrão da revisão do PLN-012/P7 (2026-11-09, suíte que grava no log real):
+
+- **O teste vaza para o log real quando o stub não pega.** Achar a origem do vazamento pelo próprio log: agrupar as
+  linhas suspeitas por `cwd`, `chat_id` e `worklogs` e procurar o nome do worklog ou o id (`claude_x`) em `tests/` —
+  levou direto ao `test_migrate_pln008` (o `ng['commit']` chamado fora do `chdir`, daí o `cwd` no repositório) e ao
+  teste do `main` do `brza run`. A limpeza do X9 tirou só `task`; as linhas `run` falsas ficaram.
+  *Cheque:* rodar a suíte numa cópia sem `.git` com `BRZA_WORKSPACE` apontando um workspace de mentira, e provar o
+  detector com o mutante sem a limpeza (que gravou 6 `task` lá). Nunca rodar com o ambiente da sessão no log real.
+- **Parser de cerca escrito à mão com as regras de fechamento sondadas só à mão.** O `without_cost_section` fecha a
+  cerca pelo caractere, pelo comprimento e sem info string, mas o teste só tem a cerca simples: o mutante "toda cerca
+  alterna" (o modelo do `check_notes.py`) passou nos 108 e corta o worklog dentro de ```` ```python ```` aninhado.
+  Também: cerca que não fecha, ou ```` ```x``` ```` na linha, esconde a seção e ela duplica a cada commit.
+  *Cheque:* sonda com lista, citação, indentação de 4, aninhada, til em crase e cerca aberta; depois o mutante toggle.
+  Dei 90 ao teste fraco.
+
 **Why:** são defeitos reais que passam em testes unitários quando as fixtures fornecem sempre os dados no cenário ideal.
 **How to apply:** em revisões de scripts de sumarização, rodar testes adversários com linhas parciais (sem workstream nas rows) e inspecionar a saída formatada de cada flag.
 Relacionado: [[achados-que-costumam-cair]].
+
+Padrões da revisão da entrega do PLN-012 (2026-11-09, o plano inteiro):
+
+- **Campo do evento com o processo errado.** O `task` grava `'pid': os.getpid()`, o do `brza-note`, enquanto o
+  exemplo do D1 traz o pid do `claude` (o mesmo da `CLAUDE_PID` no Terreno). Nenhum leitor usa o campo, e por isso
+  nenhum teste caiu. *Cheque:* para cada campo de identidade num evento (`pid`, `session_id`, `cwd`), comparar o valor
+  gravado no log real com o da linha `turn` da mesma sessão. Dei 88.
+- **Duas regras de formato na mesma linha.** A `## Custo da tarefa` formata a CPU do `brza run` pelo `human_duration`
+  ("CPU 2 min") e a do `claude` com `f'{x:.2f} s'` ("1089,43 s"); o D3 manda segundos só abaixo de 1 min. O teste fixa
+  o formato errado (`'CPU 0,80 s'`). *Cheque:* ler a linha gerada no worklog real, com números grandes. Dei 82.
+- **Título renomeado sem a skill citar o antigo.** O comando corta nos dois títulos, mas o `close-task` só manda
+  acrescentar "acima da `## Custo da tarefa`"; nos worklogs do dia com `## Medida`, o acréscimo no fim se perde no
+  próximo commit. *Cheque:* `git grep` do título antigo nas branches `workstream/*` com a data de hoje. Dei 85.

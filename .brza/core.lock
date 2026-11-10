@@ -1,5 +1,5 @@
 # .brza/core.lock — gerado pelo brza sync; não edite
-commit = "7afed94f4f0d3ceab3cce8085a44a391f01b6076"
+commit = "b2b497dacb8f838b93d92ca2533f03cec672ae21"
 ref = "master"
 synced = "2026-11-09"
 
@@ -15,7 +15,7 @@ synced = "2026-11-09"
 ".claude/rules/brza-client.md" = "sha256:50db0057088b46ed88d701cdad2f44466bb7e80ed50a5fd2b4b9c5c79cf93356"
 ".claude/settings.json#hooks" = "sha256:915b09f5b8777c3fcf4a69ec40e6ba60fbdec49001e24f20621b7327e8654a13"
 ".claude/skills/agent-instructions-writer/SKILL.md" = "sha256:78dacc79e3ab3893290b09335f7e185b5f4047d4d8eb30bb25ec953b1a05fffe"
-".claude/skills/close-task/SKILL.md" = "sha256:e85b0c48d5a292ff8eb819293cb57a19b21e237b0972d39a1899edd1ea222832"
+".claude/skills/close-task/SKILL.md" = "sha256:88ce55c91946986286647152b4d26308f56c3aa705b27f78a849d7c109738efa"
 ".claude/skills/migration-runner/SKILL.md" = "sha256:f700462dc0b7daa58a62718c76e0c2c28b0ad059f59d88c2dc93d4d44069deba"
 ".claude/skills/migration-runner/references/migration-template.md" = "sha256:4fef023078a4127f2ac5f0a244e93a7bff60bf446362fffb5386890b486bd62d"
 ".claude/skills/notes-checker/SKILL.md" = "sha256:5c9e2e206ed9afd79d708ed9148adf6a343b3e0f889ad5bf3738225cc2fba1e9"

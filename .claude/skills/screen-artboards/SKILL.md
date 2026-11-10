@@ -52,7 +52,7 @@ o de `.claude/scripts/skillkit/` (o `brza shot` por baixo).
    `100vh`, tokens do Orca redefinidos) e grava no `ORCA_CHAT_SCRATCH_DIR` (fora do chat, no scratch), imprimindo a
    linha `::orca-visual{file="…" title="A — <rótulo>"}`.
 5. **A conferência pelo PNG.** `$A/artboard.py shot <artboard>.html --out-dir <scratch>` tira um PNG por largura (e por
-   tema, com `--scheme both`). **Leia cada imagem** antes de mostrar: corte, coluna estourada, texto sobreposto e
+   tema, com `--scheme both`; no desktop do `brza-studio`, um tema por `--theme`). **Leia cada imagem** antes de mostrar: corte, coluna estourada, texto sobreposto e
    contraste ruim se corrigem no fragmento e se gera de novo, com nome novo.
 6. **Mostrar.** Cole a linha `::orca-visual` na mensagem, uma por alternativa, até 8 por resposta. Fora do chat, dê o
    caminho do `.html` e dos PNGs.
@@ -64,11 +64,14 @@ o de `.claude/scripts/skillkit/` (o `brza shot` por baixo).
 
 - **Tokens escopados no mockup, nunca no `:root`.** O chat injeta os tokens do Orca no `:root`, ao vivo; redefini-los ali
   pinta o chat inteiro com a cor do mockup. O script escopa em `.sa-art[data-pack][data-scheme]`, e o fragmento só lê
-  `var(--sa-*)`.
+  `var(--sa-*)`. **Exceção, o desktop do `brza-studio`** (`--frame macos|windows --pack brza-studio`): o artboard não
+  leva o pacote, e `.sa-art[data-live]` mapeia os `--sa-*` para os tokens vivos do chat (`--sa-background:
+  var(--background)`…), de modo que a tela segue o tema em que o chat está (PLN-021/R4.6.2).
 - **Um artboard por alternativa.** Na web, as três larguras vão empilhadas no mesmo artboard, cada uma com o `zoom` dela;
-  um artboard por largura estoura o limite de 8 visuais com 3 alternativas (PLN-021/R4.5, recomendada, a confirmar).
-- **O tema vem do pacote** (`--scheme light|dark|both`), não do chat: o mockup mostra como o app fica, e não como o chat
-  de Anderson está (PLN-021/R4.6, recomendada, a confirmar). No `brza-studio`, `both` mostra os dois lado a lado.
+  um artboard por largura estoura o limite de 8 visuais com 3 alternativas (PLN-021/R5.5, confirmada).
+- **O tema, por caminho** (PLN-021/R4.6.2): o mobile, o navegador, o pacote `neutral` e os outros projetos vêm do
+  pacote (`--scheme light|dark|both`); `both` mostra os dois lado a lado. O **desktop do `brza-studio` segue o tema do
+  chat**, e `--scheme` ali sai com erro (código 2). No PNG, o tema é o do `shot --theme light|dark`.
 - **Sem rede, sem imagem externa.** Ícone em SVG inline; imagem de conteúdo como bloco cinza com rótulo ou `data:` URL.
 - **Conteúdo plausível, curto.** Nomes, números e textos com a cara do app, sem lorem ipsum: a escolha é pelo layout, e
   texto falso esconde o problema de quebra de linha.

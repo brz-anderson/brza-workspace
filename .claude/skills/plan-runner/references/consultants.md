@@ -48,7 +48,7 @@ python3 -I .claude/skills/plan-runner/scripts/consult.py close PLN-NNN D<n>
   rodadas citadas, o artefato que cada alternativa precisa escrever. O `open` acrescenta o foco de cada consultor, a
   forma do arquivo e o protocolo de fim, e começa o prompt com "Você é consultor do Desenho de …", que impede o
   consultor de acionar esta skill.
-- **O roster padrão** (PLN-021/R4.3, recomendada, a confirmar): Claude Opus `high` na arquitetura limpa, Codex no maior
+- **O roster padrão** (PLN-021/R5.3, confirmada): Claude Opus `high` na arquitetura limpa, Codex no maior
   esforço na mudança mínima, Grok no equilíbrio. `--roster <arquivo.json>` troca; runtime acima de 55% da cota
   (`brza quota --json`) não entra, e o `fallback` do roster o substitui.
 - **Cada consultor grava só** `.sessions/pln-nnn/D<n>/<foco>.md`: a tese, o "Como fica" da alternativa, `Custo:` ·

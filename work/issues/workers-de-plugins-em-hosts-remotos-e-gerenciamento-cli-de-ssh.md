@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #38774 e as issues #37788, #37826, #37949, #38347 e #38673 trazem implementação de orca host rm na CLI, recuperação de portas e correção de EPERM remoto.
+description: Os PRs #40589, #38774 e as issues #37788, #37826, #37949, #38347 e #38673 trazem painéis de plugins no host pareado, orca host rm na CLI e correções remotas.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,8 @@ tags:
 
 # Workers de plugins em hosts remotos e gerenciamento CLI de SSH
 
-Rastreado do PR aberto no upstream [`stablyai/orca#38774`](https://github.com/stablyai/orca/pull/38774) (Issues [`#37826`](https://github.com/stablyai/orca/issues/37826) e [`#37949`](https://github.com/stablyai/orca/issues/37949)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40589`](https://github.com/stablyai/orca/pull/40589) (resolve Issue [`#38342`](https://github.com/stablyai/orca/issues/38342)),
+[`stablyai/orca#38774`](https://github.com/stablyai/orca/pull/38774) (Issues [`#37826`](https://github.com/stablyai/orca/issues/37826) e [`#37949`](https://github.com/stablyai/orca/issues/37949)),
 além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues/38673),
 [`stablyai/orca#38669`](https://github.com/stablyai/orca/issues/38669),
 [`stablyai/orca#38347`](https://github.com/stablyai/orca/issues/38347),
@@ -63,13 +64,18 @@ além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues
     estiver em foco no momento da abertura do composer.
 - **Tratamento de permissões locais em consultas remotas (`#38673`):**
   - Isola a gravação de telemetria local para evitar bloqueios `EPERM` durante consultas somente leitura via CLI.
+- **Execução de painéis de plugins no host pareado do workspace focado (`#40589`, resolve `#38342`):**
+  - Implementa RPC de streaming `plugins.panelSession` (host-admin) com validação de fingerprint de consentimento idêntico em ambas as pontas;
+  - Faz com que chamadas de host e pushes de eventos do painel na barra lateral direita conversem diretamente com a cópia do plugin no computador remoto onde o workspace vive;
+  - Renderiza nota informativa `Running on <host>` no topo do painel e cai de volta em execução local caso o host remoto não tenha o plugin instalado ou seja inalcançável.
 - **Liberação de portas e robustez SSH (`#38347`, `#37926`):**
   - Limpeza de processos zumbis de `orca serve` e aplicação estrita de `IdentitiesOnly`.
-- **Comunicação de plugins host-cliente (`#38342`, `#38343`):**
-  - Relay leve de mensagens e espelhamento de painéis de plugins.
+- **Comunicação de plugins host-cliente (`#38343`):**
+  - Relay leve de mensagens entre o worker no host e o plugin pareado no cliente desktop.
 
 ## O que fazer
 
+- Adotar a sessão remota de painéis de plugins via `plugins.panelSession` (`#40589`) para que painéis de plugins na barra lateral reflitam com fidelidade os dados do host onde o workspace ativo está hospedado.
 - Implementar `brza host rm` (`#38774`) na CLI do `brza`, permitindo ciclo de vida completo de servidores em automações.
 - Adotar o isolamento estrito de host em criação de novos workspaces (`#38782`) no `brza-studio`.
 - Incorporar o fix de permissões `chmod EPERM` (`#38673`) no ferramental de infraestrutura.

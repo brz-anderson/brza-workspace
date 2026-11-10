@@ -8,9 +8,14 @@ completed: 2026-11-10
 tags:
   - tooling
 refs:
+  - issue:autenticacao-mcp-no-chat-alerta-de-turnos-ativos-e-cache-de-orquestracao
   - issue:badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes
   - issue:bifurcacao-de-conversas-no-chat-ui-e-resiliencia-de-inicializacao-do-claude
+  - issue:comandos-shell-no-chat-recibos-de-perguntas-e-foco-espacial-em-terminais
   - issue:historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins
+  - issue:ler-e-enviar-mensagens-a-chats-pela-cli-e-expor-native-chat-aos-plugins
+  - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
+  - issue:workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh
 ---
 
 # Radar de issues e PRs do upstream e automação de 6h (00h, 06h, 12h e 18h BRT)
@@ -46,3 +51,35 @@ refs:
      de conta), o PR `#40558` (preservação do estado de runtime e mapas de sessões de cada conta Claude durante refresh em background) e
      o PR `#38001` / issue `#37707` (fallback seguro para inicializar um novo chat limpo ao retomar conversas de CLI cujo transcript
      esteja ausente ou corrompido no disco, prevenindo abas travadas).
+
+### 2. Ciclo de 6h (06:00 BRT / 09:00 UTC em 2026-11-10)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-10T03:00:00Z` e `2026-11-10T09:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Autenticação MCP no chat, alerta de turnos ativos e cache de orquestração](../issues/autenticacao-mcp-no-chat-alerta-de-turnos-ativos-e-cache-de-orquestracao.md):
+     rastreia o PR `#40616` / issue `#38962` (suporte a comandos comuns do Claude e autenticação interativa de MCP diretamente no Chat UI
+     com `/mcp`, `/config` e `/permissions`, dispondo de barra compacta no desktop e drawer no mobile para login OAuth),
+     PR `#40564` (indexação de despachos e cache com invalidação direcionada para fatos de orquestração e leitura direta de painéis, reduzindo
+     de 102.610 para 8 statements SQL e de ~8,3s para 0,1ms em frotas de 1.000 worktrees),
+     PR `#40550` / issue `#39852` e PR `#40527` (preservação de variáveis de ambiente de clipboard `ORCA_REMOTE_VIEWER_CLIPBOARD` em terminais
+     remotos abertos sem comando inicial por visualizadores pareados),
+     PR `#40612` / issue `#40607` (remoção do hook não suportado `PermissionRequest` no Factory Droid, eliminando advertências do `droid doctor`),
+     issue `#40640` (alerta de confirmação contra fechamento de janela com agentes em turno ativo no Native Chat `mid-turn`) e
+     issue `#40682` (diagnóstico arquitetural do bloqueio do event loop de 20–250s no macOS por re-renderização síncrona do journal).
+3. **Atualização de 4 issues existentes em `work/issues/`:**
+   - [Comandos shell no chat, recibos de perguntas e foco espacial em terminais](../issues/comandos-shell-no-chat-recibos-de-perguntas-e-foco-espacial-em-terminais.md):
+     adicionado o PR `#40620` (execução inline nativa de comandos shell iniciados por `!` diretamente dentro do Chat UI com streaming em tempo
+     real via pipes, botão Stop de cancelamento, ordenação estrita de stderr com cor, persistência de `cd` e cartão opcional "Add to chat"
+     para injetar a saída como contexto do próximo prompt para o agente, além de virtualização com `content-visibility` para saídas de até 100k linhas).
+   - [Ler e enviar mensagens a chats pela CLI e expor Native Chat aos plugins](../issues/ler-e-enviar-mensagens-a-chats-pela-cli-e-expor-native-chat-aos-plugins.md):
+     adicionada a issue `#40664` (demanda por equivalência completa de CLI para chats nativos: `orca chat list`, `orca chat read` e
+     `orca chat send` por session ID, permitindo que automações externas e bots acionem e recebam respostas de agentes estruturados).
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados o PR `#40597` / issue `#39620` (grupos nomeados e colapsáveis para worktrees fixados na seção Pinned com menus de contexto
+     dedicados e qualificação por host), o PR `#40604` / issue `#40392` (ação "Move to top" no menu de opções do cabeçalho de projetos na sidebar) e
+     o PR `#40603` / issue `#40397` (priorização da seção Workspaces à frente de Open Tabs na busca digitada da Jump Palette via Cmd+J).
+   - [Workers de plugins em hosts remotos e gerenciamento CLI de SSH](../issues/workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh.md):
+     adicionado o PR `#40589` / issue `#38342` (execução de painéis de plugins da barra lateral direita no host pareado onde o workspace
+     focado reside, usando RPC de streaming `plugins.panelSession` com validação de fingerprint de consentimento e nota visual informativa `Running on <host>`).

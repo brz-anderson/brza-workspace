@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40345, #39162 e as issues #40343, #39177 trazem autocompletion inline por plugins, navegação no editor e IDs de workspaces.
+description: Os PRs #40345, #39162 e as issues #40492, #40343, #39177 trazem autocompletion inline, IDs/paths de workspaces e histórico de navegação.
 scope:
   - brza-studio
   - workspace
@@ -15,6 +15,7 @@ tags:
 
 Rastreado do PR aberto no upstream [`stablyai/orca#40345`](https://github.com/stablyai/orca/pull/40345) (resolve Issue [`#40343`](https://github.com/stablyai/orca/issues/40343)),
 [`stablyai/orca#39162`](https://github.com/stablyai/orca/pull/39162) e das issues
+[`stablyai/orca#40492`](https://github.com/stablyai/orca/issues/40492),
 [`stablyai/orca#39177`](https://github.com/stablyai/orca/issues/39177),
 [`stablyai/orca#39176`](https://github.com/stablyai/orca/issues/39176) e
 [`stablyai/orca#39267`](https://github.com/stablyai/orca/issues/39267).
@@ -31,15 +32,19 @@ Rastreado do PR aberto no upstream [`stablyai/orca#40345`](https://github.com/st
    baseada em `displayName` e `branch`. Em ambientes com múltiplos projetos abertos onde cada um possui seu workspace padrão
    chamado `primary` apontando para o branch `main`, a chamada retornava dados misturados ou do projeto errado, quebrando
    extensões de auditoria, linters customizados e automações de build.
-3. **Falta de API programática para criação de workspaces a partir de receitas de ambiente (`#39176`):**
+3. **Falta de exposição do ID e path absoluto em eventos e leituras de workspace (`#40492`):**
+   Plugins não conseguiam correlacionar de forma determinística o workspace focado porque `workspace.readContext` e o
+   evento `workspace.changed` omitiam o identificador unívoco e o caminho absoluto do filesystem (`path`), forçando extensões
+   a adivinhar a raiz do projeto ou executar buscas frágeis pelo sistema de arquivos.
+4. **Falta de API programática para criação de workspaces a partir de receitas de ambiente (`#39176`):**
    Plugins que integram ferramentas de provisionamento (ex.: contêineres Devcontainer, Nix ou receitas corporativas) precisavam
    forçar o usuário a digitar comandos manuais no chat/composer para disparar a criação de um novo workspace com o template correto,
    em vez de invocar uma API tipada do Studio (`workspace.createFromRecipe`).
-4. **Spawn indesejado de terminais/PTYs ao inspecionar workspaces em repouso (`#39267`):**
+5. **Spawn indesejado de terminais/PTYs ao inspecionar workspaces em repouso (`#39267`):**
    Ao clicar em um workspace que estava em repouso (*sleeping workspace*) na barra lateral apenas para consultar um arquivo
    ou verificar o histórico de commits, o runtime acordava todo o ambiente alocando imediatamente uma nova sessão PTY e
    executando o shell padrão, consumindo recursos de CPU/memória e poluindo o painel de terminais sem necessidade.
-5. **Incapacidade de plugins fornecerem sugestões de autocompletar inline (ghost text) no editor (`#40345`, resolve `#40343`):**
+6. **Incapacidade de plugins fornecerem sugestões de autocompletar inline (ghost text) no editor (`#40345`, resolve `#40343`):**
    O editor embutido Monaco suportava autocompletar e snippets via hooks tradicionais de linguagem, mas não expunha ponto
    de extensão para sugestões inline em texto cinza (*ghost text*) aceitas via `Tab` (estilo Copilot, Supermaven ou modelos locais).
    Plugins que quisessem oferecer completude assistida por IA precisavam substituir o editor inteiro por um webview customizado.
@@ -49,6 +54,9 @@ Rastreado do PR aberto no upstream [`stablyai/orca#40345`](https://github.com/st
 - **Hook de plugin `editor.inlineCompletion` para sugestões de ghost text (`#40345`):**
   - Introduz o hook de worker `editor.inlineCompletion` (schema since `1.4.256`), permitindo que plugins injetem o campo mutável `suggestion`;
   - Conecta um provedor nativo no Monaco (`monaco-inline-completion-provider.ts`) com debounce de digitação de 300ms, enviando contexto delimitado do cursor (até 32 KiB de prefixo e 8 KiB de sufixo) e exibindo a resposta diretamente como texto fantasma inline aceito com `Tab`.
+- **Exposição de `id` e `path` absoluto do workspace para plugins (`#40492`):**
+  - Estende o payload de `workspace.readContext` e os argumentos do evento `workspace.changed` com os campos `id` e `path` (caminho absoluto do workspace no disco);
+  - Permite que linters, formatadores, observadores de arquivos e ferramentas externas operem com precisão sobre o diretório raiz do workspace ativo.
 - **Comandos e atalhos de histórico de navegação no editor (`#39162`):**
   - Implementa as ações globais `editor.navigateBack` e `editor.navigateForward`, mapeadas para os atalhos universais:
     - macOS: `Cmd+[` (voltar) e `Cmd+]` (avançar), além de `Ctrl+-` / `Ctrl+Shift+-`;
@@ -71,6 +79,7 @@ Rastreado do PR aberto no upstream [`stablyai/orca#40345`](https://github.com/st
 ## O que fazer
 
 - Adotar o hook `editor.inlineCompletion` para habilitar plugins de completude de código via IA em ghost text no Monaco (`#40345`).
+- Expor `id` e `path` absoluto do workspace em `workspace.readContext` e no evento `workspace.changed` (`#40492`).
 - Adotar o histórico de navegação (`editor.navigateBack` / `editor.navigateForward`) no editor do `brza-studio` (`#39162`).
 - Incorporar o uso de `workspaceId` único nas APIs de plugins de workspace (`#39177`).
 - Disponibilizar a API programática de criação de workspaces por receita (`#39176`).

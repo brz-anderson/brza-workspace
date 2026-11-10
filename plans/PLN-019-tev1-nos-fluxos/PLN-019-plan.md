@@ -4,7 +4,7 @@ phase: interview
 origin: issue
 origin_ref: tev1-como-classificador-nos-scripts-da-meeting-runner
 description: Classifica com fatos medidos os usos do tev1:4b nas seis frentes e o liga por um cliente único que grava o corpus em sombra e só decide quando cada pergunta passa a régua
-ready: "não — aguarda as rodadas A a D da entrevista; a fase 0 espera a política de texto (R2.2)"
+ready: "não — aguarda as rodadas 2 a 5 da entrevista; a fase 0 espera a política de texto (R2.2)"
 estimate_h: 14
 executed_h: 0
 remaining_h: 14
@@ -19,7 +19,7 @@ tags:
 
 # PLN-019: O tev1 local entra nos fluxos por um cliente único, em sombra, até cada pergunta passar a régua
 
-- **Retomar:** a reunião de 2026-11-09 entregou o Terreno, a classificação e o desenho; próximo passo, a Rodada 2 (A — o
+- **Retomar:** a reunião de 2026-11-09 entregou o Terreno, a classificação e o desenho; próximo passo, a Rodada 2 (o
   cliente e os dados) da [entrevista](PLN-019-interview.md), em texto.
 - **Dividido:** [PLN-019 — Entrevista](PLN-019-interview.md)
 
@@ -75,7 +75,7 @@ Respondida em 2026-11-09.
 3. **A saída.** **Resposta:** "opção 1 + criar o plano, nesse workstream, mapeando para onde o plano pode evoluir".
 4. **O `tev1` na sala.** **Decidido — as personas chamam só para medir acerto; a latência que entra é a da coordenação.**
 
-As rodadas 2 a 5 (A a D) estão preparadas, sem resposta, no [arquivo da entrevista](PLN-019-interview.md).
+As rodadas 2 a 5 estão preparadas, sem resposta, no [arquivo da entrevista](PLN-019-interview.md).
 
 ## Desenho
 

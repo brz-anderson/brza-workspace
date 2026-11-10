@@ -3,7 +3,8 @@ status: open
 phase: interview
 origin: request
 description: Mede se as skills distribuídas ao Codex bastam e desenha os verbos com invariante e os MCP prompts do brza-orchestrator, para que plano, tarefa, notas e migração rodem igual em Codex, Cursor e Gemini.
-ready: "não — falta a R4 e o Desenho de D1 a D6"
+ready: "não — falta o Desenho de D1 a D6"
+priority: medium
 scope:
   - workspace
   - brza-workflow
@@ -16,7 +17,7 @@ tags:
 
 # PLN-020: Os fluxos do workspace rodam em qualquer client, pelas skills distribuídas e por verbos do brza-orchestrator
 
-- **Retomar:** R1 a R3 respondidas e a sonda no Terreno (M1–M11) em 2026-11-09. Próximo: a R4 (os verbos de plano e migração e os MCP prompts da R1.2, que a sonda enfraqueceu) e o Desenho de D1 (symlink no `core/`), D2 (identidade no `brza doctor`), D3 (`close_task`), D4 (`start_task`), D5 (`index_query`) e D6 (`decision_record`).
+- **Retomar:** R1 a R4 respondidas e a sonda no Terreno (M1–M11) em 2026-11-09. Próximo: o Desenho de D1 (symlink no `core/`), D2 (identidade no `brza doctor`), D3 (`close_task`), D4 (`start_task`), D5 (`index_query`) e D6 (`decision_record`), com o código do `brza-workflow` lido por consultor.
 
 ## Pedido
 
@@ -38,7 +39,7 @@ vamos discutir sobre a ideia, faça críticas nos pontos que você discordar, fa
 | Origem | Critério de aceite | Passo | Teste (nível) |
 | :----- | :----------------- | :---- | :------------ |
 | R1.1 (portabilidade) | A sonda diz, com o comando e a saída, se o Codex carrega as skills do workspace e roda o `notes-checker` e o `close-task` até o `brza note commit`; o resultado decide quanto dos itens abaixo segue | a planejar | a sonda num worktree de teste (manual) |
-| `Pedido 1–3` (`run_plan`, `run_meeting`, `run_migration`) | Cada fluxo longo vira verbos com invariante no servidor e um MCP prompt com o roteiro, sem ferramenta `run_*` que conduza o fluxo inteiro (R1.2); os verbos da reunião esperam a ordem da PLN-017/R1.2 (R2.2) | a planejar | `tests/mcp/` do `brza-workflow` (unidade); um fluxo rodado do Codex (manual) |
+| `Pedido 1–3` (`run_plan`, `run_meeting`, `run_migration`) | Os fluxos longos rodam nos outros clients pelas skills distribuídas, sem verbo nem MCP prompt (R4.1); o `plan-runner` ativa no Codex pelo gatilho natural | a planejar | "vamos planejar X" no Codex, no workspace real, depois do symlink (manual) |
 | `Pedido 4` (`start_task`) | O `start_task` grava o marco de início da tarefa e devolve o briefing: os bloqueios em vigor, o `Retomar` do plano e a memória do workstream; sem ele, o corte implícito do evento `task` continua valendo | a planejar | `tests/mcp/` e `tests/hooks/` (unidade) |
 | `Pedido 5` (`close_task`) | O `close_task` recebe o worklog estruturado, valida contra a norma de `work/worklogs/` e faz o commit, o índice e o evento `task` com a identidade, a sessão e o workstream do chamador, e não do ambiente do daemon; com o daemon fora, a skill cai no CLI | a planejar | `tests/mcp/` (unidade); o `/compact` passando depois do `close_task` (manual) |
 | `Pedido 6` (`check_notes`) | O `notes-checker` roda em Codex, Cursor e Antigravity pela skill distribuída, sem verbo MCP (R3.2) | a planejar | a sonda M7 refeita no workspace real, depois do symlink (manual) |
@@ -58,7 +59,7 @@ vamos discutir sobre a ideia, faça críticas nos pontos que você discordar, fa
 
 ## Restrições
 
-- **Uma fonte só por fluxo.** O CLI `brza note` é o motor, o verbo MCP é um adaptador sobre ele e a skill chama o verbo, com o CLI de reserva (R1.2, "há uma fonte só"); nenhum fluxo ganha uma terceira implementação.
+- **Uma fonte só por fluxo.** O CLI `brza note` é o motor, o verbo MCP (D3–D6) é um adaptador sobre ele e a skill chama o verbo, com o CLI de reserva (R1.2, "há uma fonte só", mantida na R4.1 para os verbos que ficaram); nenhum fluxo ganha uma terceira implementação.
 - **Toda skill deste plano se cria e se revisa pela `skill-creator`**, pela regra do `playground` de 2026-11-08 (PLN-017, Restrições).
 
 ## Entrevista
@@ -92,7 +93,7 @@ Respondida em 2026-11-09, nesta sessão, em texto: "ambos recomendado".
    - um `run_*` monolítico — custo: conflita com "quem pergunta é a sessão principal", e sofre com timeout e com a narração; se paga: nunca, na leitura atual da norma;
    - os fluxos longos ficam só como skills, e o MCP recebe apenas as determinísticas — custo: o fluxo longo fica preso aos clients que leem skill; se paga: logo, pelo escopo menor.
 
-   **Decidido — verbos com invariante e MCP prompts.**
+   **Decidido — verbos com invariante e MCP prompts.** **→ reaberta em R4.1**
 
 ### Rodada 2 — o destino e a ordem (enviada 2026-11-09)
 
@@ -158,12 +159,40 @@ Respondida em 2026-11-09, nesta sessão.
 **O que a R3 não cobriu:** os verbos de plano e de migração e os MCP prompts da R1.2. Com M2, M3, M7 e M8, o roteiro
 já chega aos clients pelas skills, e o prompt pode não ter mais função. Vai à R4.
 
+### Rodada 4 — os fluxos longos e a prioridade (enviada 2026-11-09)
+
+**Apresentado antes:** o fim da R3. O roteiro das skills chega ao Codex, ao Cursor e ao Antigravity com o symlink
+(M2–M4, M7, M8), e o que nenhum deles faz sozinho já está em D3–D6. O `brza note commit` avisa que falta `priority`.
+
+Respondida em 2026-11-09, nesta sessão.
+
+1. **Os verbos de plano e migração e os MCP prompts da R1.2.**
+   - saem do plano: os fluxos longos ficam nas skills distribuídas, e o MCP tem só D3–D6 (recomendada) — custo: zero;
+     reabre se aparecer um client sem skill; se paga: agora, com o plano ~2 dias menor;
+   - só os verbos, sem prompts (`plan_open`, `plan_round_record`, `migration_open`) — custo: estimativa ~1,5 dia no
+     `tools-kit`; se paga: quando o modelo de outro client pular um passo de plano, o que a sonda não viu;
+   - a R1.2 inteira — custo: estimativa ~2,5 dias, e o prompt duplica a skill; se paga: só num client que lê MCP e
+     não lê skill, e nenhum foi medido.
+
+   **Decidido — saem do plano.** Reabre a R1.2: os `Pedido 1–3` ficam cobertos pelas skills distribuídas.
+
+2. **A prioridade.**
+   - `medium` (recomendada) — custo: D1 e D2, de ~1 h cada, esperam atrás dos `high` do `tools-kit`; se paga: quando
+     o Codex for usado no workspace;
+   - `high` — custo: disputa com o P4 do PLN-003; se paga: agora, se o Codex já trabalha no workspace;
+   - `low` — custo: Codex e Antigravity seguem sem as skills até lá; se paga: só se outro client não for usado tão
+     cedo.
+
+   **Decidido — `medium`.**
+
 ## Desenho
 
 ### O que este desenho assume
 
 - **R1.1:** o motor é a portabilidade entre clients, e a sonda vem antes de construir.
-- **R1.2:** os fluxos longos viram verbos com invariante e MCP prompts, sem `run_*`.
+- **R4.1:** os fluxos longos ficam nas skills distribuídas, sem verbo nem MCP prompt; o MCP cobre só o que o client
+  não faz (D3–D6).
+- **R3.1–R3.3:** o symlink no `core/`, os quatro verbos e a identidade pelo `brza doctor`.
 - **R2.2:** os verbos da reunião esperam duas reuniões sem desvio.
 
 ### Terreno
@@ -215,5 +244,5 @@ worktrees dos workstreams, com `BRZA_WORKSPACE` e `MEASURE_DIR` apontando para o
 
 - 2026-11-09 — a discussão da ideia, R1 e R2; o plano aberto. Parou antes da sonda do Codex.
   [As ferramentas MCP dos fluxos vão a plano: a discussão e as rodadas 1 e 2](../../work/worklogs/2026-11-09-as-ferramentas-mcp-dos-fluxos-vao-a-plano.md)
-- 2026-11-09 — a sonda (M1–M11) e a R3. Parou antes da R4.
+- 2026-11-09 — a sonda (M1–M11), a R3 e a R4. Parou antes do Desenho.
   [A sonda dos clients e a R3 do PLN-020: as skills chegam por symlink, e o MCP fica para o que o client não faz](../../work/worklogs/2026-11-09-a-sonda-dos-clients-e-a-r3-do-pln-020.md)

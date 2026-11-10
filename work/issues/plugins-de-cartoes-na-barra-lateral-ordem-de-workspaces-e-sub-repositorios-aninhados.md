@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40334, #40323, #40023, #40004 trazem fixação e drag-and-drop de grupos, menus de reparenting e ordenação intercalada.
+description: Os PRs #40597, #40604, #40603, #40334, #40323 trazem grupos em Pinned, Move to top, Workspaces antes de abas no Cmd+J e fixação de projetos.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,10 @@ tags:
 
 # Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40334`](https://github.com/stablyai/orca/pull/40334) (resolve Issue [`#40333`](https://github.com/stablyai/orca/issues/40333)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40597`](https://github.com/stablyai/orca/pull/40597) (fecha Issue [`#39620`](https://github.com/stablyai/orca/issues/39620)),
+[`stablyai/orca#40604`](https://github.com/stablyai/orca/pull/40604) (resolve Issue [`#40392`](https://github.com/stablyai/orca/issues/40392)),
+[`stablyai/orca#40603`](https://github.com/stablyai/orca/pull/40603) (resolve Issue [`#40397`](https://github.com/stablyai/orca/issues/40397)),
+[`stablyai/orca#40334`](https://github.com/stablyai/orca/pull/40334) (resolve Issue [`#40333`](https://github.com/stablyai/orca/issues/40333)),
 [`stablyai/orca#40323`](https://github.com/stablyai/orca/pull/40323) (resolve Issue [`#40322`](https://github.com/stablyai/orca/issues/40322)),
 [`stablyai/orca#40023`](https://github.com/stablyai/orca/pull/40023),
 [`stablyai/orca#40004`](https://github.com/stablyai/orca/pull/40004),
@@ -154,9 +157,21 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40334`](https://github.com
     - Adiciona botão `NewProjectGroupButton` na barra de ferramentas da sidebar para criar grupos raiz vazios;
     - Adiciona opção `New subgroup` e menu de reparenting hierárquico indentado `Move to group` com filtro anti-ciclo;
     - Permite arrastar e soltar projetos e grupos entre diferentes grupos, subgrupos e nível raiz, com cálculo geométrico real de linhas indicadoras de soltura (*drop indicators*).
+34. **Grupos nomeados e colapsáveis na seção Pinned (`#40597`, fecha `#39620`):**
+    - Permite organizar worktrees fixados em grupos nomeados na seção Pinned (`pinnedGroups`, `pinnedGroupByWorktreeIdentity`);
+    - Menus de contexto de cartões fixados ganham "Add to group → New group…" e movimentação entre grupos ou retorno a pinos avulsos;
+    - Grupos podem ser renomeados, movidos ou removidos sem desafixar seus workspaces, e o estado de colapso é preservado entre sessões com qualificação por host.
+35. **Ação "Move to top" no menu de cabeçalho de projetos (`#40604`, resolve `#40392`):**
+    - Adiciona o item "Move to top" ao menu "…" do cabeçalho de projetos, movendo instantaneamente o projeto para o topo da lista raiz ou do seu grupo sem necessidade de arrasto manual longo;
+    - Desabilitado quando o item já é o primeiro da lista, reutilizando o fluxo consolidado de ordenação e persistência do drag commit.
+36. **Workspaces à frente de abas abertas na busca digitada da Jump Palette (`#40603`, resolve `#40397`):**
+    - Ao digitar qualquer busca no Cmd+J, a seção de Workspaces é sempre posicionada antes de Open Tabs (`!hasQuery`), facilitando o retorno rápido a workspaces (inclusive suspensos) com destaque e navegação por teclado instantâneos.
 
 ## O que fazer
 
+- Adotar grupos nomeados e colapsáveis para workspaces na seção Pinned (`#40597`).
+- Adicionar o atalho/ação "Move to top" no menu de cabeçalho de projetos (`#40604`).
+- Posicionar Workspaces à frente de Open Tabs na busca digitada da Jump Palette (`#40603`).
 - Adotar a deduplicação de repositórios placeholder offline por caminho normalizado (`#39490`).
 - Corrigir o escopo de `filterRepoIds` para preservar worktrees de hosts remotos pareados (`#18401`).
 - Adotar o layout opcional "Compact header" nos cartões de workspace (`#39542`), reduzindo a rolagem vertical na sidebar.

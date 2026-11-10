@@ -5,7 +5,6 @@ tags:
   - tooling
 refs:
   - PLN-004
-  - PLN-012
   - PLN-018
   - REV-025
 sessions:
@@ -32,11 +31,14 @@ Codex ficam no PLN-004 e chamam o escritor daqui, e que este plano não instala 
   total, são a conta desta sessão, não um cronômetro do log.
 - A entrega foi revisada sem achado em
   [REV-025: A revisão da entrega do PLN-018, a linha turn](../reviews/REV-025-pln-018-a-linha-turn.md).
+- O `5098439` foi publicado no `8eb989a`, junto do P8 (`b2b497d`). O único conflito foi a lista `SESSION_ENV`: ficaram
+  `GROK_SESSION_ID` e `CLAUDE_PID`. A suíte do escritor, do carimbo e do `usage`, já com os testes do pid e da CPU do
+  P8, deu 53 passed. O carimbo lê o id do Grok e o pid do evento continua o do `claude`.
 
 ## O que ficou
 
-Integrar o `5098439` com o `origin/master`, que está em `b2b497d` (PLN-012/P8). Os dois alteram `bin/brza-note` e
-`tests/cli/test_brza_note.py`. Isso é decisão de Anderson. O plano continua `in_review`.
+O escritor está no `origin/master` do `brza-workflow`, no `8eb989a`, que junta o `5098439` ao P8 (`b2b497d`). O
+plano fechou. O hook que chama o script continua no PLN-004. As duas issues de medida seguem abertas.
 
 ## Fora do workspace
 
@@ -45,11 +47,10 @@ Integrar o `5098439` com o `origin/master`, que está em `b2b497d` (PLN-012/P8).
 - **O quê e onde:** `core/.claude/hooks/runtime_turn.py`, `tests/hooks/test_runtime_turn.py`, e as emendas em
   `bin/brza-note`, `packages/client/bin/brza-sessions`, `tests/cli/test_brza_note.py`,
   `tests/cli/test_brza_sessions.py` e `README.md`, no checkout `/Users/andepb/Projects/brza-workflow`, branch `master`.
-- **O risco:** o commit está só na `master` local e já divergiu do `origin/master` (`b2b497d`). Um push direto não
-  entra. Os dois lados alteram `bin/brza-note` e `tests/cli/test_brza_note.py`.
-- **Estado:** commitado em `5098439`, sem push e sem rebase.
-- **Como desfazer:** `git revert 5098439` nesse checkout.
+- **O risco:** o `8eb989a` está no `origin`. Quem puxar a `master` recebe o escritor junto do P8.
+- **Estado:** publicado. O `5098439` é pai do `8eb989a`, junto com o `b2b497d`.
+- **Como desfazer:** `git revert 5098439` a partir do `8eb989a` nesse checkout.
 
 ## Custo da tarefa
 
-Não medida — sessão sem turno medido · até 22:10 de 2026-11-09, pelo `brza note commit` · sem o turno do commit
+Não medida — sessão sem turno medido · até 22:51 de 2026-11-09, pelo `brza note commit` · sem o turno do commit

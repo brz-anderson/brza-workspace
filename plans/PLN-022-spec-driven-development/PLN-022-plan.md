@@ -3,7 +3,7 @@ status: open
 phase: interview
 origin: request
 description: O SDD vira o processo de especificar antes de planejar e executar, com a spec no repositório dono.
-ready: "não — a entrevista segue (rodada 2: critério de aceite e fora de escopo)"
+ready: "não — a entrevista segue (rodada 3: critérios de aceite)"
 scope:
   - workspace
 opened: 2026-11-10
@@ -12,7 +12,7 @@ owner: Anderson
 
 # PLN-022: O trabalho do workspace segue Spec Driven Development
 
-- **Retomar:** a rodada 1 fechou; falta a rodada 2 (critérios de aceite, fora de escopo, convivência com `Cobertura`, rodadas e `notes-checker`), antes de qualquer Desenho.
+- **Retomar:** as rodadas 1 e 2 fecharam; falta a rodada 3 (critérios de aceite da Cobertura e como o `specs:` convive com `Cobertura` e com as rodadas), antes de qualquer Desenho.
 
 ## Pedido
 
@@ -22,11 +22,13 @@ owner: Anderson
 
 ### Cobertura
 
-A preencher depois da rodada 2.
+A preencher depois da rodada 3.
 
 ### Fora de escopo
 
-A preencher depois da rodada 2.
+- **A migração das specs que já existem em outros repositórios.** Entra quando um repositório pedir (R2.3).
+- **A sincronização visual, a 4ª etapa do Fixfy.** Só vale para app com design system de tokens; entra quando o `brza-studio` adotar um (R2.3).
+- **A autoria e a revisão por seção** (`Autoria`, `Revisor`, `Revisado`). Fica de fora pela R1.2.
 
 ## Entrevista
 
@@ -54,7 +56,27 @@ A preencher depois da rodada 2.
 
    **Decidido — `origin: request`.** Resposta: "1.3.1".
 
+### Rodada 2 — gate, primeira spec e fronteiras (enviada e respondida 2026-11-10, sessão `sdd-process`)
+
+**Apresentado antes:** inferência da R1.1 — com a spec fora de `plans/`, o plano aponta para ela, e os critérios de aceite vivem na spec, sem cópia no plano.
+
+1. **R2.1 — Quem barra o passo de código sem spec.**
+   - O `notes-checker` barra o plano com passo de código sem spec citada, pelo frontmatter — custo: uma regra no checador, que lê outro repositório; se paga: no primeiro plano de código.
+   - Só a norma, a `plan-runner` conferindo ao planejar — custo: o menor; se paga: agora, mas nada impede o esquecimento.
+
+   **Decidido — o `notes-checker` barra, e o campo do frontmatter é `specs:`, uma lista**, porque um plano pode ter várias specs. Resposta: "1.2.1 mas deve ser `specs:` que espera uma lista, um plano pode ter várias specs" (lida como R2.1, opção 1).
+
+2. **R2.2 — Onde a primeira spec nasce.**
+   - Na própria skill `spec-writer` deste workstream, como piloto — custo: o primeiro uso da norma é sobre ela mesma; se paga: na própria entrega.
+   - Numa feature real do `brza-studio` — custo: abre sessão e branch no app; se paga: quando houver feature de código.
+
+   **Decidido — a skill `spec-writer`, como piloto.** Resposta: "restante recomendado".
+
+3. **R2.3 — Fora de escopo agora** (múltipla): a migração das specs de outros repositórios; a sincronização visual (4ª etapa do Fixfy).
+
+   **Decidido — os dois ficam de fora**, com a autoria por seção da R1.2. Resposta: "restante recomendado".
+
 ## Worklogs
 
-- 2026-11-10 — R1 fechada; plano aberto. Parou antes da R2.
+- 2026-11-10 — R1 e R2 fechadas; plano aberto. Parou antes da R3.
   [Entrevista do SDD: a rodada 1 decide onde a spec mora](../../work/worklogs/2026-11-10-sdd-entrevista-rodada-1.md)

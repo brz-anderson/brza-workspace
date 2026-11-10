@@ -24,11 +24,14 @@ Abertura do [PLN-022: O trabalho do workspace segue Spec Driven Development](../
 - **R1.1:** a spec mora junto do que especifica, no repositório dono; o plano a cita pelo ID. A proposta inicial, `PLN-NNN-spec.md` na pasta do plano, caiu.
 - **R1.2:** entram a ordem das etapas com o gate e a skill `spec-writer`; fica de fora a autoria por seção.
 - **R1.3:** `origin: request`.
+- **R2.1:** o `notes-checker` barra o plano com passo de código sem spec; o campo é `specs:`, uma lista, porque um plano pode ter várias specs.
+- **R2.2:** a primeira spec nasce na skill `spec-writer`, como piloto.
+- **R2.3:** ficam de fora a migração das specs de outros repositórios e a sincronização visual.
 
 ## Pendente
 
-- Rodada 2: critérios de aceite, fora de escopo, convivência com `Cobertura`, rodadas e `notes-checker`. Está no `Retomar` do plano.
+- Rodada 3: critérios de aceite da Cobertura e como o `specs:` convive com `Cobertura` e com as rodadas. Está no `Retomar` do plano.
 
 ## Custo da tarefa
 
-Corrido 10 min — agente 2 min, quem pediu 8 min, pausa 0 s · US$ 0,74 (turnos 0,74, subagentes 0,00) · CPU 8 s do `claude` e 10 s dos comandos, RSS até 446 MB · 3 turnos, 1 sessão · até 00:14 de 2026-11-10, pelo `brza note commit`
+Corrido 11 min — agente 2 min, quem pediu 8 min, pausa 0 s · US$ 0,83 (turnos 0,83, subagentes 0,00) · CPU 9 s do `claude` e 11 s dos comandos, RSS até 447 MB · 4 turnos, 1 sessão · até 00:16 de 2026-11-10, pelo `brza note commit`

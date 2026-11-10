@@ -1,9 +1,12 @@
 ---
-status: open
-phase: interview
+status: in_progress
+phase: execution
 origin: request
 description: Protótipo no playground de um plan-runner com sessão coordenadora (executores dos passos, consultores em sessões, painel de andamento), scripts e references como os da meeting-runner, e uma skill própria de artboards para protótipos de tela web, mobile e desktop.
-ready: "não — falta o Desenho de D1 a D7"
+ready: "não — a R4 está sem resposta; P1, P2 e P7 executam com as recomendadas, a pedido de Anderson"
+estimate_h: 41
+executed_h: 0.79
+remaining_h: 4
 priority: medium
 scope:
   - workspace
@@ -16,7 +19,8 @@ tags:
 
 # PLN-021: O plano roda por uma sessão coordenadora, com scripts de apoio e artboards de tela
 
-- **Retomar:** R1 a R3 respondidas em 2026-11-09, com o Terreno em `/private/tmp/pln021/terreno.md` (scratch da sessão). Próximo: o Desenho de D1 (`.claude/scripts/`) a D7 (`screen-artboards`), com o rascunho do `designer` em `/private/tmp/pln021/design-draft.md` levado a rodada; as skills se escrevem pela `skill-creator`.
+- **Retomar:** P1 a P7 escritos em 2026-11-10 com as recomendadas da R4 (sem resposta), e os evals da iteração 1 rodados (plan-runner +0,44; screen-artboards +0,08), sem commit do código. Próximo: Anderson responde a R4, confere-se o escrito contra as respostas e o visualizador dos evals, e então o P8 (revisão).
+- **Dividido:** [PLN-021 — Desenho](PLN-021-design.md)
 
 ## Pedido
 
@@ -195,9 +199,217 @@ Respondida em 2026-11-09, na sessão do workstream `playground`.
 
    **Decidido — sim, neste plano.**
 
+### Rodada 4 — o executor, os consultores, os artboards, o corte (enviada 2026-11-09)
+
+> **Apresentado antes:** o rascunho do Desenho do `designer`, em [PLN-021 — Desenho](PLN-021-design.md), com os itens
+> D1 a D7, os evals e a proposta de passos (41 h). Os oito pontos abaixo são os dele, com as recomendações e os custos;
+> as seis escolhas menores estão no fim do Desenho.
+
+Sem resposta. Anderson, em 2026-11-09: "registres as opções em Desenho e as rodadas em Entrevista, retomaremos o plano
+amanhã, siga direto para escrever as skills", e depois "em seguida, já roda os evals". Lida como ordem de executar com
+as recomendadas, que ficam a confirmar nesta rodada; nenhuma delas é decisão.
+
+1. **O commit do executor** (hoje, só com confirmação: `conduct.md:47-48`). Opções:
+   - o pedido do passo autoriza o commit na branch do passo, com os testes verdes; merge e push pedem confirmação
+     (recomendada) — custo: muda a regra de hoje, e pode sair commit que Anderson não viu, desfeito por `git reset` na
+     branch; se paga: em todo passo de código, sem a sessão parada esperando;
+   - o executor para antes do commit, com `commit: aguarda confirmação`, e a coordenação leva a rodada — custo: uma
+     rodada de 1–2 min por passo, com a sessão parada; se paga: agora, se a regra de hoje vale sem exceção;
+   - o executor pergunta no próprio chat — custo: a pergunta fica fora do chat da coordenação; se paga: nunca.
+2. **Onde o executor devolve a evidência.** Opções:
+   - na seção `## Evidência` do worklog do executor, com o marcador `<!-- fim-Pn: feito|parado -->` que o `wait
+     --marker` lê (recomendada) — custo: a coordenação cria o worklog antes de abrir e o commita com o plano; se paga: no
+     primeiro passo;
+   - em `.sessions/pln-nnn/Pn/evidencia.md`, fora do git — custo: um arquivo que some com o `.sessions/`; se paga: só sem
+     o worklog do executor.
+3. **Os runtimes padrão dos três consultores.** Opções:
+   - Claude Opus `high`, Codex no maior esforço e Grok, um foco cada (recomendada) — custo: ~US$ 2,8–4,4 no Claude, e
+     cota sem valor em US$ no Codex e no Grok; se paga: quando a diversidade muda a recomendação numa decisão cara;
+   - Claude e Codex em sessão, mais um `designer` por `Agent` — custo: ~US$ 2,8 a mais no `Agent`, e um runtime a menos;
+     se paga: com o Grok sem cota.
+4. **O que vai ao chat na rodada dos consultores em sessão.** Opções:
+   - a tabela lado a lado e a argumentação integral de cada um (recomendada) — custo: ~três telas por rodada, rara pelo
+     gatilho da R2.3; se paga: na primeira, pela memória `consultant-debate-shown-in-full`;
+   - a tabela e uma linha a favor e contra por consultor, com o caminho do integral — custo: o integral fica fora do
+     chat; se paga: só se três consultores pesarem como uma reunião.
+5. **As larguras do navegador no chat.** Opções:
+   - um artboard por alternativa, larguras empilhadas com `zoom`, e um PNG por largura no scratch (recomendada) — custo:
+     um artboard de ~três telas por alternativa; se paga: a partir de 3 alternativas (3 × 3 passa de 8 visuais);
+   - um artboard por largura — custo: só 2 alternativas por resposta; se paga: só com 2.
+6. **O tema do mockup.** Opções:
+   - o tema vem do pacote, escopado no mockup (`--scheme light|dark|both`, `both` no `brza-studio`) (recomendada) —
+     custo: não segue o tema do chat, e o `both` dobra a altura; se paga: na primeira tela do `brza-studio`;
+   - o desktop do `brza-studio` usa os tokens vivos do Orca; só o mobile e os outros projetos usam o pacote — custo: dois
+     caminhos de CSS, ~1 h a mais; se paga: se Anderson quer a tela no tema em que está.
+7. **Quando o `plan-runner` novo passa a conduzir o PLN-021.** Opções:
+   - ao fechar o P6, e o P7 ao P10 rodam por ele, com o P9 como aceite (recomendada) — custo: o plano troca de fluxo no
+     meio; se paga: no P9, sem precisar de outro plano;
+   - escrever em `plan-runner-next/` e trocar no fechamento — custo: o nome muda durante o plano, contra a R3.1; se
+     paga: só se alguém precisar do fluxo velho estável.
+8. **A base das horas** (o PLN-017 executou ~35% do estimado nos passos de skill). Opções:
+   - as faixas das rodadas (41 h), com a nota da calibração e o executado medido (recomendada) — custo: o `remaining_h`
+     alto no painel até os primeiros passos; se paga: no fechamento;
+   - calibrado a ~40%, ~16 h — custo: troca o preço das rodadas por duas medições; se paga: se o PLN-021 executar perto
+     do PLN-017.
+9. **As escolhas menores** (seleção múltipla, para confirmar): o nome `skillkit`; o `gera_png` com `--scale 1`; o
+   `executor.py open` com Claude Sonnet por padrão; um painel por plano e dia; os prefixos `--sa-` e `--sa-m-`; rodar de
+   novo só o teste marcado `(≤ 2 min)`.
+
+## Passos
+
+Do Desenho, com as horas do `designer` (R4.8 a confirmar). A ordem: P1 ∥ P2 → P3 → P4, P5 → P6; o P7 depois do P1; P8 →
+P9 → P10. Executam a pedido de Anderson de 2026-11-09, com as recomendadas da R4.
+
+### P1 — O `skillkit` e a migração da `meeting-runner`
+
+Executa D1 · executor: `implementer`, pela coordenação
+
+Estimado: 3 h · Executado: 0.08 h
+
+- [x] **1. `.claude/scripts/skillkit/`** (`paths`, `sessions_map`, `sessions_cli`, `measure`, `visual`) e os testes
+- [x] **2. A `meeting-runner` importa do kit** pelo `_kit.py`, sem mudar teste
+
+**Evidência:** `python3 -I -m unittest discover -s .claude/scripts/tests` → 55 OK ·
+`python3 -I -m unittest discover -s .claude/skills/meeting-runner/scripts/tests` → 323 OK · o `panel.py render` da
+fixture `estado-r3.json` saiu pelo `brza shot` (736×1659, lido inteiro) · `Executado` pela duração do subagente (272 s) ·
+desvios em X2
+
+### P2 — Os quatro scripts de R2.2 e o `plan_md.py`
+
+Executa D6 · executor: `implementer`, pela coordenação; em paralelo com o P1
+
+Estimado: 11.5 h · Executado: 0.18 h
+
+- [x] **1. `plan_md.py`**, o leitor do plano dividido
+- [x] **2. `plan_state.py`, `step_request.py`, `round_log.py`, `close_check.py`**, com testes por código de problema
+
+**Evidência:** `python3 -I -m unittest discover -s .claude/skills/plan-runner/scripts/tests` → 84 OK · `plan_state.py
+PLN-021` → limpo, 41 h conferem · `plan_state.py PLN-017` → 2 erros reais (P7 sem evidência que se refaça;
+`executed_h` 9.516 × 7.974 somado) · `Executado` pela duração do subagente (660 s) · desvios em X3
+
+### P3 — O executor: `executor.py`, o molde do pedido e a sonda de permissão
+
+Executa D3 · executor: `implementer`, pela coordenação · depende de P1 e P2
+
+Estimado: 4 h · Executado: 0.06 h
+
+- [x] **1. `executor.py`** (`open|send|wait|evidence|close|status`), o manifesto e o worklog do executor
+
+**Evidência:** `python3 -I -m unittest discover -s .claude/skills/plan-runner/scripts/tests` → 151 OK (39 do executor) ·
+a prova com o `brza` falso no PLN-901: `open` (tabela e `brza tree` + `brza sessions … --prompt-file`), `wait` → rc 75
+e, com o marcador, `P3 · feito`; `evidence` conferiu o commit e o comando, e o `--apply` gravou o `### P3` ·
+`Executado`: o P3–P5 foi um subagente só, 357 s medidos na retomada (a parte anterior ao limite de uso não foi medida),
+dividido pelo peso · a sonda de permissão de gravar fora do checkout não rodou, porque o `brza` era falso · desvios em X4
+
+### P4 — O painel do plano
+
+Executa D5 · executor: `implementer`, pela coordenação · depende de P1 a P3
+
+Estimado: 2.5 h · Executado: 0.02 h
+
+- [x] **1. `plan_panel.py`** (`publish|render`), chamado pelo `executor.py`, `round_log.py` e `plan_state.py --fix`
+
+**Evidência:** `python3 -I -m unittest discover -s .claude/skills/plan-runner/scripts/tests -p test_plan_panel.py` → 12 OK · `/private/tmp/pln021/p3-panel/painel.png` a 736 lido, sem corte,
+com as horas, os passos e os consultores · `Executado` no P3
+
+### P5 — Os consultores em sessão
+
+Executa D4 · executor: `implementer`, pela coordenação · depende de P3
+
+Estimado: 3 h · Executado: 0.02 h
+
+- [x] **1. `consult.py`** (`open|wait|table|close`), o roster com o corte de cota e a tabela lado a lado
+
+**Evidência:** `python3 -I -m unittest discover -s .claude/skills/plan-runner/scripts/tests -p test_consult.py` → 16 OK · a prova no PLN-901 abriu Claude, Codex e Grok pelo `brza`
+falso, com os prompts "Você é consultor do Desenho de D3 do PLN-901", e o `table` montou a tabela com quem não entregou ·
+`Executado` no P3
+
+### P6 — A SKILL.md e as references do `plan-runner`, pela `skill-creator`, com os evals
+
+Executa D2 · executor: a sessão que conduz · depende de P2 a P5
+
+Estimado: 6 h · Executado: 0.3 h
+
+- [x] **1. A `SKILL.md` e as references**, pela `skill-creator`: `design.md`, `consultants.md`, `step-request.md`,
+      `review.md`, `narration.md` novas; `open-and-plan.md`, `conduct.md`, `close.md` e o molde reescritos
+- [x] **2. Os evals, iteração 1**, contra a versão antiga, em cópias isoladas com o `brza` falso
+
+**Evidência:** `/private/tmp/pln021/plan-runner-workspace/iteration-1/benchmark.md` → versão nova 17/17, antiga 9/17
+(+0,44); o caso que separa é o do executor (7/7 × 2/7) e o dos consultores em sessão (5/5 × 3/5); o de retomar empata no
+diagnóstico e só difere no script (5/5 × 4/5) · `python3 -I -m unittest discover -s .claude/skills/plan-runner/scripts/tests`
+→ 151 OK · `Executado`: a escrita e a correção pela coordenação, estimadas pelas horas do turno, sem medição por passo
+
+### P7 — A `screen-artboards`, pela `skill-creator`, com os evals
+
+Executa D7 · executor: `implementer` para os scripts, e a sessão que conduz para a SKILL.md e os evals · depende de P1
+
+Estimado: 7 h · Executado: 0.13 h
+
+- [x] **1. A `SKILL.md` e as quatro references**, pela coordenação, com a `skill-creator`
+- [x] **2. `artboard.py`, `tokens.py`, as cinco molduras e os pacotes `brza-studio` e `neutral`**
+- [x] **3. Os evals, iteração 1**, com e sem a skill, em cópias isoladas
+
+**Evidência:** `python3 -I -m unittest discover -s .claude/skills/screen-artboards/scripts/tests` → 48 OK · 14 PNGs das
+cinco molduras lidos (`/private/tmp/pln021/artboards-p7/v2/png/`) · evals: com a skill 13/13, sem 12/13, delta +0,08; o
+caso de desktop empata em 7/7, e o que discrimina é a página web num artboard só (R4.5) · `Executado`: os scripts, 464
+s do subagente; a SKILL.md e os evals pela coordenação, sem medição · desvios em X5
+
+### P8 — A revisão da entrega
+
+Executa a revisão · executor: `reviewer` · depende de P1 a P7
+
+Estimado: 2 h · Executado: — h
+
+### P9 — O aceite manual
+
+Executa os `C`: um passo real de um plano aberto pelo `executor.py` e um Desenho com artboards · executor: a sessão que
+conduz e Anderson · depende de P6 a P8
+
+Estimado: 1.5 h · Executado: — h
+
+### P10 — O fechamento
+
+Executa o fechamento, pelo `close_check.py` · executor: a sessão que conduz
+
+Estimado: 0.5 h · Executado: — h
+
+## Regressão
+
+- **A `meeting-runner` faz o mesmo com o `skillkit`.** Como se confere: os 323 testes dela e um `panel.py publish` sobre a
+  fixture `estado-r3.json`, com o PNG conferido.
+- **O `plan-runner` novo segue o molde e o `check_notes.py`.** Como se confere: o `check_notes.py` limpo nos planos do
+  playground depois do P6, e os planos fechados intocados.
+
+## Desvios
+
+- **X1 — Os passos rodam por `implementer`, e não por sessão nova aberta pelo `brza sessions`.** O `executor.py` ainda não
+  existe, e Anderson pediu para seguir direto; afeta P1 a P5 e P7.
+- **X2 — O `skillkit` saiu com oito ajustes de assinatura** para a `meeting-runner` não mudar de comportamento:
+  `wait_brza` devolve `(rc, dict)`; `list_states` ganha `cmd` e `ids`; `send_argv` recusa corpo vazio ou duplo; `--rename`
+  só com `rename=True`; `salva_visual(doc, prefixo, …)`; o `gera_png` cai no Chrome também quando o `brza shot` não grava;
+  os pontos de troca em teste são `visual._run` e `visual._chrome`; `measure` leva `find_rollout` e `codex_turns`. Afeta
+  P1 e D1.
+- **X3 — Os scripts do D6 classificam e localizam**: cada problema tem `nivel` (`erro`/`aviso`) e `linha`;
+  `deviation-not-cited` e `hours-unreadable` são aviso; o desvio que nomeia o passo conta como citado; `step-without-design`
+  isenta rodada, revisão, aceite e fechamento; `round_log --next` imprime só o número. Afeta P2 e D6; a classificação
+  aviso × erro vai à R4.
+- **X4 — O executor e os consultores saíram com escolhas que o D3 e o D4 não fixavam**: o `--marker` só vai ao `brza
+  sessions wait` com um passo (com vários, o script confere o marcador sozinho); o rc com eventos juntos prioriza falha,
+  depois bloqueado; o `veredito` ficou copiado no `executor.py`, fora do `skillkit`; o marcador só vale como última linha;
+  o `--apply` marca todos os subpassos pendentes; os fallbacks do roster (Opus → Grok; Codex e Grok → Sonnet `high`) são
+  do executor, e o `--effort xhigh` do Codex não foi conferido no `brza sessions` real; sem `--checkout` nem `--tree`, o
+  executor abre no worktree do workspace, o que conflita com a regra "não commite no brza-workspace" do pedido. Afeta P3
+  a P5, D3 e D4; os fallbacks e o checkout padrão vão à R4.
+- **X5 — A `screen-artboards` corrigiu as references em seis pontos**: o `xmlns` do SVG passa no filtro de rede; a deriva
+  só sai 4 quando um token muda; todos os tokens do mobile entram com `--sa-m-` e sobrescrevem os do desktop nas molduras
+  de celular; o PNG de issue é `<nome>-<assunto>.png`; o fragmento responsivo usa `@container`, e não `@media` (achado do
+  eval); telas que não são alternativas saem sem letra. Afeta P7 e D7.
+
 ## Worklogs
 
 - 2026-11-09 — aberto; R1 respondida (destino, protótipo no playground, as três frentes de coordenação, skill própria
   de artboards); Terreno do `collector`; R2 (os quatro scripts, consultores só em decisão cara, pacote de tokens por
   projeto) e R3 (o nome `plan-runner` na branch, `.claude/scripts/`, a `meeting-runner` migra).
   [A entrevista do PLN-021: o plan-runner com sessão coordenadora e a skill de artboards](../../work/worklogs/2026-11-09-a-entrevista-do-pln-021.md)
+- 2026-11-10 — Desenho D1–D7 registrado e R4 enviada sem resposta; P1 a P7 executados com as recomendadas, a pedido;
+  evals da iteração 1 das duas skills. Travou na R4. [As skills do PLN-021 escritas e os evals da iteração 1](../../work/worklogs/2026-11-10-as-skills-do-pln-021-e-os-evals.md)

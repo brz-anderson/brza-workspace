@@ -58,7 +58,7 @@ conduz o plano, executa um passo dele.
 - **O passo, os `D` e as rodadas copiados, não linkados** — o executor que segue link lê o plano inteiro e decide pelo que
   achou, inclusive o que ainda está em aberto. A cópia é o recorte que vale.
 - **O commit na branch do passo** — sem ele, o executor para esperando confirmação e a sessão fica parada; o ponto
-  irreversível é o merge, e esse continua com Anderson (PLN-021/R4.1, recomendada, a confirmar).
+  irreversível é o merge, e esse continua com Anderson (PLN-021/R5.1, confirmada).
 - **A evidência no worklog do executor, e não no plano** — a coordenação é a única que grava o plano; o worklog é o
   registro que a norma já pede a toda sessão, e o marcador no fim dele é o que o `wait --marker` lê (PLN-021/R4.2).
 - **`(≤ 2 min)`** — marca o comando que a coordenação roda de novo para conferir; teste longo fica pela palavra do

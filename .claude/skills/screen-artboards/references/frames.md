@@ -15,14 +15,16 @@
   chat sem corte. Sem o `zoom`, um bloco de 1280 px tirado a 736 sai cortado no meio (sonda do PLN-021, F8).
 - **A altura** do desktop é a da janela; o fragmento que passa dela rola dentro da janela, como no app. No mobile, a
   altura é a da tela do aparelho. Nunca `100vh`: o chat ajusta o quadro ao conteúdo, e `100vh` cresce sem fim.
-- **`--scheme both`** desenha a mesma moldura duas vezes, clara e escura, lado a lado no mobile e empilhadas no desktop.
+- **`--scheme both`** desenha a mesma moldura duas vezes, clara e escura, lado a lado no mobile e empilhadas no desktop —
+  menos no desktop do `brza-studio` (`macos`/`windows` com `--pack brza-studio`): ali o artboard usa os tokens vivos do
+  chat, tem uma célula só e `--scheme` é erro. O que não tem par vivo (`brand-*`, `agent-*`) leva o valor claro do pacote.
 
 ## O fragmento
 
 O fragmento é o conteúdo da tela, sem moldura. Regras:
 
 - **Cores, raios, fontes e espaços só por `var(--sa-*)`** — a lista está em `references/tokens.md`. Cor fixa quebra o
-  `--scheme both` e a troca de pacote.
+  `--scheme both` e a troca de pacote (no desktop do `brza-studio`, a troca de tema do chat).
 - **Layout com flex e grid**, com `min-width: 0` nos itens e `minmax(0, 1fr)` nas colunas, para o texto longo quebrar em
   vez de estourar. É o defeito mais comum no PNG.
 - **Um elemento raiz** (`<div class="tela">…</div>`) com `height: 100%` quando a tela ocupa a janela inteira; o script

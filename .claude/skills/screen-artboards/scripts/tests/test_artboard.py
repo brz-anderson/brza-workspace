@@ -94,7 +94,7 @@ class New(Base):
         self.assertTrue(os.path.isfile(os.path.join(self.pub, m.group(1))))
 
     def test_tokens_escopados_nunca_no_root(self):
-        _, _, _, doc = self.novo('t', 'macos', '--pack', 'brza-studio', '--scheme', 'both')
+        _, _, _, doc = self.novo('t', 'browser', '--pack', 'brza-studio', '--scheme', 'both')
         self.assertIn('.sa-art[data-pack="brza-studio"][data-scheme="light"]{', doc)
         self.assertIn('.sa-art[data-pack="brza-studio"][data-scheme="dark"]{', doc)
         self.assertIn('--sa-background:#fff', doc)
@@ -103,10 +103,43 @@ class New(Base):
         artboard.confere_regras(doc)
 
     def test_padrao_both_no_brza_studio_e_light_no_neutro(self):
-        _, _, _, d1 = self.novo('a', 'macos', '--pack', 'brza-studio')
+        _, _, _, d1 = self.novo('a', 'iphone', '--pack', 'brza-studio')
         _, _, _, d2 = self.novo('b', 'macos', '--pack', 'neutral')
         self.assertEqual(d1.count('class="sa-cell"'), 2)
         self.assertEqual(d2.count('class="sa-cell"'), 1)
+
+    def test_desktop_do_brza_studio_usa_os_tokens_vivos_sem_escopo_de_pacote(self):
+        for fr in ('macos', 'windows'):
+            rc, _, err, doc = self.novo('v' + fr, fr, '--pack', 'brza-studio')
+            self.assertEqual(rc, 0, err)
+            self.assertEqual(doc.count('class="sa-cell"'), 1)
+            self.assertIn('data-live', doc)
+            self.assertNotIn('data-scheme="light"]{', doc)           # nenhum bloco de pacote por esquema
+            self.assertNotIn('color-scheme:', doc)
+            self.assertIn('--sa-background:var(--background)', doc)
+            self.assertIn('--sa-muted-foreground:var(--muted-foreground)', doc)
+            self.assertIn('--sa-font-sans:var(--font-sans)', doc)
+            self.assertIn('--sa-radius:var(--radius)', doc)
+            self.assertIn('--sa-sidebar:var(--muted)', doc)           # o chat não injeta o --sidebar
+            self.assertNotIn('--sa-background:#', doc)
+            self.assertNotRegex(doc, r':root\s*\{')
+            self.assertTrue(artboard.le_meta(doc)['vivo'])
+            artboard.confere_regras(doc)
+
+    def test_mobile_browser_e_neutral_seguem_escopados(self):
+        for fr, pack in (('iphone', 'brza-studio'), ('android', 'brza-studio'), ('browser', 'brza-studio'),
+                         ('macos', 'neutral'), ('windows', 'neutral')):
+            _, _, _, doc = self.novo('e' + fr, fr, '--pack', pack, '--scheme', 'light')
+            self.assertIn(f'.sa-art[data-pack="{pack}"][data-scheme="light"]{{', doc, (fr, pack))
+            self.assertNotIn('data-live', doc, (fr, pack))
+            self.assertNotIn('"vivo"', doc)
+
+    def test_scheme_explicito_no_desktop_do_brza_studio_sai_2(self):
+        for sch in ('both', 'dark', 'light'):
+            rc, _, err, _ = self.novo('s', 'macos', '--pack', 'brza-studio', '--scheme', sch)
+            self.assertEqual(rc, 2)
+            self.assertIn('não se aplica ao desktop do brza-studio', err)
+        self.assertFalse(os.path.exists(self.pub))
 
     def test_zoom_inline_por_moldura(self):
         _, _, _, doc = self.novo('t', 'macos', '--pack', 'neutral')
@@ -122,7 +155,7 @@ class New(Base):
 
     def test_mobile_usa_o_valor_do_mobile_onde_ha_par(self):
         _, _, _, mob = self.novo('m', 'iphone', '--pack', 'brza-studio', '--scheme', 'light')
-        _, _, _, des = self.novo('d', 'macos', '--pack', 'brza-studio', '--scheme', 'light')
+        _, _, _, des = self.novo('d', 'browser', '--pack', 'brza-studio', '--scheme', 'light')
         self.assertIn('--sa-sidebar:#fafafa', des)
         self.assertIn('--sa-border:#e5e5e5', mob)
         _, _, _, mob_d = self.novo('md', 'iphone', '--pack', 'brza-studio', '--scheme', 'dark')
@@ -214,7 +247,7 @@ class Png(Base):
         return re.search(r'^arquivo: (.*)$', out, re.M).group(1)
 
     def test_shot_um_png_por_largura_e_tema_e_um_a_736(self):
-        a = self.artboard('macos')
+        a = self.artboard('browser', '--scheme', 'both', '--widths', '1280')
         out_dir = os.path.join(self.dir, 'png')
         rc, out, _ = roda('shot', a, '--out-dir', out_dir)
         self.assertEqual(rc, 0)
@@ -223,6 +256,51 @@ class Png(Base):
         self.assertEqual(nomes, [f'{base}-736.png', f'{base}-1280-light.png', f'{base}-1280-dark.png'])
         self.assertEqual([c['w'] for c in self.chamadas], [736, 1280 + 24, 1280 + 24])
         self.assertEqual([c['theme'] for c in self.chamadas], ['light', 'light', 'dark'])
+
+    def test_shot_desktop_do_brza_studio_injeta_o_fallback_so_no_png(self):
+        a = self.artboard('macos')
+        with open(a, encoding='utf-8') as f:
+            self.assertNotRegex(f.read(), r':root\s*\{')            # o artboard publicado não leva o fallback
+        out_dir = os.path.join(self.dir, 'png')
+        rc, out, _ = roda('shot', a, '--out-dir', out_dir, '--packs-dir', self.packs)
+        self.assertEqual(rc, 0)
+        base = os.path.splitext(os.path.basename(a))[0]
+        self.assertEqual([os.path.basename(x) for x in out.split()], [f'{base}-736.png', f'{base}-1280-light.png'])
+        self.assertEqual([c['w'] for c in self.chamadas], [736, 1304])
+        for c in self.chamadas:
+            with open(c['html'], encoding='utf-8') as f:
+                var = f.read()
+            self.assertIn(':root{color-scheme:light;--', var)
+            self.assertIn('--background:#fff', var)
+            self.assertIn('--font-sans:', var)
+            self.assertNotEqual(c['html'], a)
+
+    def test_shot_desktop_do_brza_studio_com_theme_dark(self):
+        a = self.artboard('windows')
+        roda('shot', a, '--out-dir', os.path.join(self.dir, 'png'), '--theme', 'dark', '--packs-dir', self.packs)
+        self.assertEqual([c['theme'] for c in self.chamadas], ['dark', 'dark'])
+        for c in self.chamadas:
+            with open(c['html'], encoding='utf-8') as f:
+                var = f.read()
+            self.assertIn(':root{color-scheme:dark;', var)
+            self.assertIn('--background:#0a0a0a', var)
+
+    def test_shot_mobile_e_neutral_nao_injetam_fallback(self):
+        a = self.artboard('iphone', '--scheme', 'dark')
+        roda('shot', a, '--out-dir', os.path.join(self.dir, 'png'))
+        with open(self.chamadas[1]['html'], encoding='utf-8') as f:
+            self.assertNotIn(':root{', f.read())
+
+    def test_promote_desktop_do_brza_studio_com_tema(self):
+        raiz = os.path.join(self.dir, 'repo')
+        os.makedirs(os.path.join(raiz, 'plans', 'PLN-099-x'))
+        a = self.artboard('macos')
+        rc, _, err = roda('promote', a, '--plan', '99', '--name', 'esc', '--scheme', 'dark', '--root', raiz,
+                          '--packs-dir', self.packs)
+        self.assertEqual(rc, 0, err)
+        self.assertEqual(self.chamadas[0]['theme'], 'dark')
+        with open(self.chamadas[0]['html'], encoding='utf-8') as f:
+            self.assertIn('--background:#0a0a0a', f.read())
 
     def test_shot_web_uma_variante_por_largura(self):
         _, out, _, _ = self.novo('w', 'browser', '--pack', 'neutral')
@@ -241,9 +319,9 @@ class Png(Base):
         self.assertEqual([c['w'] for c in self.chamadas], [736, 415 + 24])
 
     def test_shot_com_theme_so_tira_esse_esquema(self):
-        a = self.artboard('macos')
+        a = self.artboard('browser', '--scheme', 'both', '--widths', '1280')
         roda('shot', a, '--out-dir', os.path.join(self.dir, 'png'), '--theme', 'dark')
-        self.assertEqual([c['theme'] for c in self.chamadas], ['dark', 'dark'])
+        self.assertEqual([c['theme'] for c in self.chamadas], ['dark'] * 2)
 
     def test_shot_erro_do_png_sai_1(self):
         artboard.gera_png = lambda *a, **k: 'brza shot falhou'

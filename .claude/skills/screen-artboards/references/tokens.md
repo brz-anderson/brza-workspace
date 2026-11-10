@@ -20,7 +20,7 @@ Os tokens do projeto que não têm par nessa lista entram com o nome do projeto,
 mapa `pares_mobile` (`m-bg-base` → `background`, `m-text-primary` → `foreground`…): nas molduras `iphone` e `android`, o
 `new` sobrescreve o token do desktop pelo par do mobile, e o fragmento escrito com `var(--sa-background)` sai com a cor do
 app mobile sem mudar uma linha. `tokens.py list`
-imprime os nomes de cada pacote. O prefixo é a recomendação da PLN-021/R4.9, a confirmar.
+imprime os nomes de cada pacote. O prefixo é a decisão da PLN-021/R5.9.
 
 ## O pacote `brza-studio`
 

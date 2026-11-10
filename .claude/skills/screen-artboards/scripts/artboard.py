@@ -40,6 +40,17 @@ CDNS = {'cdn.jsdelivr.net', 'unpkg.com', 'cdnjs.cloudflare.com', 'esm.sh', 'font
 HOSTS_SEM_REDE = {'www.w3.org'}
 TOKENS_ORCA = tokens.NOMES_ORCA + ['sidebar', 'sidebar-foreground']
 ESQUEMA_NOME = {'light': 'claro', 'dark': 'escuro'}
+# Os tokens que o chat do BrzA Studio injeta no :root (skill orca-chat-visuals). No desktop do brza-studio o artboard os usa
+# vivos: `--sa-X` vira `var(--X)`, e o artboard segue o tema do chat.
+VIVOS = tokens.NOMES_ORCA
+# O que o chat não injeta mas o `main.css` tem, com o vivo mais próximo; o que não está aqui (brand-*, agent-*) vai com o valor
+# claro do pacote.
+ALIAS_VIVO = {'sidebar': 'muted', 'sidebar-foreground': 'foreground', 'sidebar-primary': 'primary',
+              'sidebar-primary-foreground': 'primary-foreground', 'sidebar-accent': 'accent',
+              'sidebar-accent-foreground': 'accent-foreground', 'sidebar-border': 'border', 'sidebar-ring': 'ring',
+              'editor-surface': 'background', 'floating-surface': 'popover', 'worktree-sidebar': 'muted',
+              'worktree-sidebar-foreground': 'foreground', 'worktree-sidebar-accent': 'accent',
+              'worktree-sidebar-border': 'border', 'split-divider': 'border'}
 
 
 class ErroRegra(Exception):
@@ -81,6 +92,44 @@ def css_pacote(pack, esquema, mobile):
     return f'.sa-art[data-pack="{pack["id"]}"][data-scheme="{esquema}"]{{' + ';'.join(linhas) + '}'
 
 
+def eh_vivo(pack, frame):
+    """Desktop (macos, windows) do brza-studio: tokens vivos do chat, sem o pacote escopado."""
+    return pack['id'] == 'brza-studio' and frame in ('macos', 'windows')
+
+
+def css_vivo(pack):
+    """`--sa-*` apontando para os tokens vivos do chat (`var(--<token>)`), escopado em `.sa-art[data-live]`."""
+    linhas = []
+    for k in sorted(VIVOS):
+        if k in ('font-sans', 'font-mono'):
+            continue
+        linhas.append(f'--sa-{k}:var(--{k})')
+    linhas += ['--sa-font-sans:var(--font-sans)', '--sa-font-mono:var(--font-mono)']
+    for k, v in sorted(ALIAS_VIVO.items()):
+        linhas.append(f'--sa-{k}:var(--{v})')
+    claro = pack['esquemas']['light']
+    for k in sorted(claro):
+        if k.startswith('m-') or k in VIVOS or k in ALIAS_VIVO:
+            continue
+        linhas.append(f'--sa-{k}:{claro[k]}')
+    linhas += [f'--sa-{k}:{v}' for k, v in sorted(pack.get('espacos', {}).items())]
+    return f'.sa-art[data-live]{{' + ';'.join(linhas) + '}'
+
+
+def fallback_vivo(pack, tema):
+    """O `:root` que o chat injetaria, com os valores do esquema do pacote: só para o PNG fora do chat."""
+    dec = pack['esquemas'][tema]
+    linhas = [f'color-scheme:{tema}']
+    for k in sorted(VIVOS):
+        if k in ('font-sans', 'font-mono'):
+            v = pack.get('fontes', {}).get(k[5:])
+        else:
+            v = dec.get(k)
+        if v:
+            linhas.append(f'--{k}:{v}')
+    return ':root{' + ';'.join(linhas) + '}'
+
+
 def le_moldura(nome):
     with open(os.path.join(AQUI, 'frames', f'{nome}.html'), encoding='utf-8') as f:
         txt = f.read()
@@ -113,7 +162,12 @@ def monta(slug, frame, fragmento, pack, esquemas, larguras, titulo_janela, url, 
     f = FRAMES[frame]
     mobile = bool(f.get('mobile'))
     css_frame, tpl = le_moldura(frame)
-    css = [BASE_CSS, css_frame] + [css_pacote(pack, e, mobile) for e in esquemas]
+    vivo = eh_vivo(pack, frame)
+    if vivo:
+        esquemas = ['light']   # uma célula só: o tema é o do chat; 'light' é o rótulo interno dela
+        css = [BASE_CSS, css_frame, css_vivo(pack)]
+    else:
+        css = [BASE_CSS, css_frame] + [css_pacote(pack, e, mobile) for e in esquemas]
     celulas = []
     for w in larguras:
         for e in esquemas:
@@ -146,13 +200,16 @@ def monta(slug, frame, fragmento, pack, esquemas, larguras, titulo_janela, url, 
                     partes.append(ESQUEMA_NOME[e])
                 cap = f'<div class="sa-cap">{html.escape(" · ".join(partes))}</div>'
             largo = f' style="flex:0 1 {outer}px"' if mobile and not lado_a_lado else ''
+            atrib_esq = 'data-live' if vivo else f'data-scheme="{e}"'
             cs.append(f'<div class="sa-cell" data-w="{w}" data-scheme="{e}"{largo}>{cap}'
-                      f'<div class="sa-art" data-pack="{pack["id"]}" data-scheme="{e}" data-frame="{frame}">'
+                      f'<div class="sa-art" data-pack="{pack["id"]}" {atrib_esq} data-frame="{frame}">'
                       f'<div class="sa-fit">{marcado}</div></div></div>')
         centro = ' style="justify-content:center"' if mobile and not lado_a_lado else ''
         linhas.append(f'<div class="sa-row"{centro}>' + ''.join(cs) + '</div>')
     meta = {'slug': slug, 'frame': frame, 'pack': pack['id'], 'esquemas': esquemas, 'larguras': larguras,
             'outer': {str(w): (f['outer'] or w) for w in larguras}, 'letra': letra, 'titulo': titulo}
+    if vivo:
+        meta['vivo'] = True
     doc = ('<!doctype html>\n<html lang="pt-BR"><head><meta charset="utf-8">'
            '<meta name="viewport" content="width=device-width,initial-scale=1">'
            f'<title>{html.escape(slug)}</title>'
@@ -187,6 +244,10 @@ def cmd_new(a):
     except OSError:
         print(f'pacote "{a.pack}" não existe em {a.packs_dir}: tokens.py list, ou tokens.py extract {a.pack} --src …',
               file=sys.stderr)
+        return 2
+    if a.scheme and eh_vivo(pack, a.frame):
+        print(f'--scheme {a.scheme} não se aplica ao desktop do brza-studio: o artboard usa os tokens vivos do chat e '
+              f'segue o tema dele (no PNG, shot --theme light|dark)', file=sys.stderr)
         return 2
     esquemas = ['light', 'dark'] if a.scheme == 'both' else [a.scheme]
     if a.scheme is None:
@@ -238,8 +299,8 @@ def cmd_new(a):
     return 0
 
 
-def _variante(doc, ocultar_css):
-    return doc.replace('</head>', f'<style>{ocultar_css}</style></head>', 1)
+def _variante(doc, ocultar_css, fallback=''):
+    return doc.replace('</head>', f'<style>{fallback}{ocultar_css}</style></head>', 1)
 
 
 def _seleciona(largura, esquema):
@@ -247,13 +308,21 @@ def _seleciona(largura, esquema):
             '.sa-row{display:block}.sa-cap{display:none}')
 
 
-def tira_variante(doc, meta, largura, esquema, destino, tmp_dir, scale):
+def _fallback(meta, tema, packs_dir):
+    """Só o desktop do brza-studio: o `:root` do esquema do pacote, no HTML temporário do PNG (o artboard não o leva)."""
+    if not meta.get('vivo'):
+        return ''
+    return fallback_vivo(tokens.carrega(meta['pack'], packs_dir), tema)
+
+
+def tira_variante(doc, meta, largura, esquema, destino, tmp_dir, scale, packs_dir=tokens.PACKS):
     """O PNG de uma largura nominal e um esquema: só essa moldura, na largura dela mais a margem."""
     os.makedirs(tmp_dir, exist_ok=True)
     nome = f'{meta["slug"]}-{largura}-{esquema}'
     htm = os.path.join(tmp_dir, nome + '.html')
+    celula = meta['esquemas'][0] if meta.get('vivo') else esquema
     with open(htm, 'w', encoding='utf-8') as f:
-        f.write(_variante(doc, _seleciona(largura, esquema)))
+        f.write(_variante(doc, _seleciona(largura, celula), _fallback(meta, esquema, packs_dir)))
     larg_png = meta['outer'][str(largura)] + 2 * MARGEM
     return gera_png(htm, destino, larg_png, theme=esquema, scale=scale)
 
@@ -269,15 +338,26 @@ def cmd_shot(a):
     os.makedirs(a.out_dir, exist_ok=True)
     base = os.path.splitext(os.path.basename(a.artboard))[0]
     tmp = os.path.join(a.out_dir, '_variantes')
-    esquemas = [a.theme] if a.theme and a.theme in meta['esquemas'] else meta['esquemas']
+    if meta.get('vivo'):
+        esquemas = [a.theme or 'light']
+    else:
+        esquemas = [a.theme] if a.theme and a.theme in meta['esquemas'] else meta['esquemas']
     saidas, erros = [], []
     chat = os.path.join(a.out_dir, f'{base}-{CHAT_LARGURA}.png')
-    erro = gera_png(a.artboard, chat, CHAT_LARGURA, theme=a.theme or 'light', scale=a.scale)
+    tema = a.theme or 'light'
+    if meta.get('vivo'):
+        os.makedirs(tmp, exist_ok=True)
+        htm = os.path.join(tmp, f'{base}-{CHAT_LARGURA}.html')
+        with open(htm, 'w', encoding='utf-8') as f:
+            f.write(_variante(doc, '', _fallback(meta, tema, a.packs_dir)))
+        erro = gera_png(htm, chat, CHAT_LARGURA, theme=tema, scale=a.scale)
+    else:
+        erro = gera_png(a.artboard, chat, CHAT_LARGURA, theme=tema, scale=a.scale)
     (erros if erro else saidas).append(f'{chat}: {erro}' if erro else chat)
     for w in meta['larguras']:
         for e in esquemas:
             destino = os.path.join(a.out_dir, f'{base}-{w}-{e}.png')
-            erro = tira_variante(doc, meta, w, e, destino, tmp, a.scale)
+            erro = tira_variante(doc, meta, w, e, destino, tmp, a.scale, a.packs_dir)
             (erros if erro else saidas).append(f'{destino}: {erro}' if erro else destino)
     for s in saidas:
         print(s)
@@ -321,11 +401,11 @@ def cmd_promote(a):
         print(f'--width {largura}: o artboard tem {meta["larguras"]}', file=sys.stderr)
         return 2
     esquema = a.scheme or meta['esquemas'][0]
-    if esquema not in meta['esquemas']:
+    if esquema not in (['light', 'dark'] if meta.get('vivo') else meta['esquemas']):
         print(f'--scheme {esquema}: o artboard tem {meta["esquemas"]}', file=sys.stderr)
         return 2
     tmp = tempfile.mkdtemp(prefix='sa-promote-')
-    erro = tira_variante(doc, meta, largura, esquema, destino, tmp, a.scale)
+    erro = tira_variante(doc, meta, largura, esquema, destino, tmp, a.scale, a.packs_dir)
     if erro:
         print(f'erro: {erro}', file=sys.stderr)
         return 1
@@ -343,7 +423,8 @@ def parser():
     n.add_argument('--widths', help='só browser: as larguras, "375,768,1280" por padrão')
     n.add_argument('--pack', default='neutral')
     n.add_argument('--scheme', choices=['light', 'dark', 'both'], default=None,
-                   help='o padrão é both no brza-studio e light nos outros pacotes')
+                   help='o padrão é both no brza-studio e light nos outros pacotes; não se aplica ao desktop do brza-studio '
+                        '(tokens vivos do chat)')
     n.add_argument('--letter')
     n.add_argument('--title')
     n.add_argument('--body', required=True, help='o fragmento HTML da tela; "-" lê da entrada padrão')
@@ -355,8 +436,9 @@ def parser():
     s = sub.add_parser('shot', help='um PNG por largura nominal e por tema, e um a 736')
     s.add_argument('artboard')
     s.add_argument('--out-dir', required=True)
-    s.add_argument('--theme', choices=['light', 'dark'], help='só este tema (e o tema do app no PNG de 736)')
+    s.add_argument('--theme', choices=['light', 'dark'], help='só este tema (e o tema do app no PNG de 736); no desktop do brza-studio, o tema do PNG')
     s.add_argument('--scale', type=float, default=1)
+    s.add_argument('--packs-dir', default=tokens.PACKS)
     p = sub.add_parser('promote', help='o PNG da escolhida, na pasta do plano ou da issue')
     p.add_argument('artboard')
     g = p.add_mutually_exclusive_group(required=True)
@@ -367,6 +449,7 @@ def parser():
     p.add_argument('--scheme', choices=['light', 'dark'])
     p.add_argument('--root')
     p.add_argument('--scale', type=float, default=2)
+    p.add_argument('--packs-dir', default=tokens.PACKS)
     return ap
 
 

@@ -14,7 +14,7 @@ do arquivo e o protocolo de fim), `consultores.json` (o manifesto: sessão, runt
 `<foco>.md`, que SÓ o consultor grava: tese, "Como fica", `Custo:` · `Se paga:` · `Reabre:` sobre os casos, o ataque às outras
 duas, o que enfraquece a própria (`Risco:`) e a última linha `<!-- fim-D<n>: <foco> -->`. A sessão abre no worktree do plano.
 
-O roster padrão (PLN-021/R4.3, recomendada, a confirmar): Claude Opus `high` na arquitetura limpa, Codex no maior esforço na
+O roster padrão (PLN-021/R5.3, confirmada): Claude Opus `high` na arquitetura limpa, Codex no maior esforço na
 mudança mínima, Grok no equilíbrio. `--roster arquivo.json` troca: `{"consultores": [{"foco", "agent", "model", "effort",
 "fallback": {…}}]}`. Runtime com `session_pct` acima de 55% no `brza quota --json` não entra: o `fallback` do roster o
 substitui, e a linha da abertura diz quem foi cortado.

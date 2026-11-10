@@ -4,8 +4,6 @@ Com todo passo `[x]` ou `[-]` — o `$S/plan_state.py PLN-NNN` sem `checked-with
 `status: in_review`.
 
 
-Com todo passo `[x]` ou `[-]`: `phase: review`, `status: in_review`.
-
 1. **Chame um revisor que não executou o passo** — um subagente, de preferência do modelo mais forte, ou uma sessão
    separada —, com os caminhos do plano e do que foi entregue. Ele confere o entregue contra o `## Pedido` e a
    Cobertura, e as evidências contra o disco; revisa isolado, e não corrige: quem executou não revisa o que executou.

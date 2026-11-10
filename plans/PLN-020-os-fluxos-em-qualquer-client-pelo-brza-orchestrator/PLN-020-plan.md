@@ -1,9 +1,9 @@
 ---
 status: open
-phase: interview
+phase: design
 origin: request
 description: Mede se as skills distribuídas ao Codex bastam e desenha os verbos com invariante e os MCP prompts do brza-orchestrator, para que plano, tarefa, notas e migração rodem igual em Codex, Cursor e Gemini.
-ready: "não — falta o Desenho de D1 a D6"
+ready: "não — o Desenho de D1 a D6 aguarda as R5 a R8, de Anderson"
 priority: medium
 scope:
   - workspace
@@ -17,7 +17,8 @@ tags:
 
 # PLN-020: Os fluxos do workspace rodam em qualquer client, pelas skills distribuídas e por verbos do brza-orchestrator
 
-- **Retomar:** R1 a R4 respondidas e a sonda no Terreno (M1–M11) em 2026-11-09. Próximo: o Desenho de D1 (symlink no `core/`), D2 (identidade no `brza doctor`), D3 (`close_task`), D4 (`start_task`), D5 (`index_query`) e D6 (`decision_record`), com o código do `brza-workflow` lido por consultor.
+- **Retomar:** R1 a R4 respondidas; o Desenho de D1 a D6 rascunhado por dois consultores, com o Terreno (M1–M11, T1–T25), em 2026-11-09. Próximo: enviar a R5, depois a R6, a R7 e a R8, que estão na Entrevista, preparadas e não enviadas; depois, gravar o vigente no Desenho e planejar os passos.
+- **Dividido:** [PLN-020 — Desenho](PLN-020-design.md)
 
 ## Pedido
 
@@ -185,60 +186,130 @@ Respondida em 2026-11-09, nesta sessão.
 
    **Decidido — `medium`.**
 
-## Desenho
+### Rodada 5 — D1 e D2: o link e a identidade (preparada em 2026-11-09, não enviada)
 
-### O que este desenho assume
+**Apresentado antes:** o Desenho (`PLN-020-design.md`), D1 e D2.
+- **O sync:** o `brza sync` não leva symlink — grava arquivo com o texto do alvo e quebra no sync seguinte (T3–T5).
+- **A identidade:** o `brza doctor` só confere e não grava (T12), e a fonte da identidade é o `[author]` do manifesto
+  (T11).
+- **As estimativas:** D1 e D2 passam de ~1 h para 2 h cada, porque viram código com testes.
 
-- **R1.1:** o motor é a portabilidade entre clients, e a sonda vem antes de construir.
-- **R4.1:** os fluxos longos ficam nas skills distribuídas, sem verbo nem MCP prompt; o MCP cobre só o que o client
-  não faz (D3–D6).
-- **R3.1–R3.3:** o symlink no `core/`, os quatro verbos e a identidade pelo `brza doctor`.
-- **R2.2:** os verbos da reunião esperam duas reuniões sem desvio.
+1. **D1 — O que o `brza sync` faz quando o workspace já tem um `.agents/skills` que não é o link do núcleo?** Hoje
+   nenhum workspace tem `.agents/`.
+   - recusa com mensagem: o link de outro alvo se troca com `--force`, e o diretório real nunca se apaga, nem com
+     `--force` (recomendada) — custo: incluído nas 2 h; o workspace com diretório real fica com o sync em saída 1 até
+     mover à mão; se paga: agora, porque nenhum dado se perde;
+   - mescla, com um link por skill dentro do diretório real — custo: +~1,5 h e uma entrada no lock por skill, e a skill
+     que só a branch tem some; se paga: nunca, enquanto nenhum workspace tiver skills próprias em `.agents/`;
+   - avisa e segue sem o link — custo: zero agora, e o workspace fica sem as skills no Codex sem erro visível; se
+     paga: nunca, pelo objetivo da R3.1.
+2. **D1 — Onde fica a linha de norma do link?**
+   - `core/AGENTS.md`, na lista da `master` e na seção do ferramental (recomendada) — custo: ~10 min, dentro do D1;
+     se paga: agora, porque o Codex lê o `AGENTS.md` e saberá onde criar skill;
+   - `core/CLAUDE.md`, como mecânica de runtime — custo: o mesmo, e o Codex e o Antigravity não o leem; se paga: nunca
+     para os outros clients;
+   - só na docstring do `brza-sync` — custo: zero; se paga: só se ninguém criar skill fora do Claude Code.
+3. **D2 — Quem grava a identidade no `.git/config`?** A R3.3 disse "o `brza doctor`/`install`".
+   - `brza install --identity` grava, e o doctor ganha a conferência `config`, que aponta esse comando (recomendada) —
+     custo: ~2 h com os testes; se paga: agora, no primeiro commit de outro client, e o doctor continua só lendo;
+   - `brza doctor --fix` grava só a identidade — custo: o mesmo, e o doctor passa a escrever, o que muda o contrato
+     dele; se paga: só se mais conferências ganharem conserto automático;
+   - o doctor grava sempre que diverge, sem flag — custo: ~1,5 h, e um diagnóstico muda o `.git/config` sem pedir; se
+     paga: nunca, pelo contrato do doctor.
+4. **D2 — O que fazer quando o `.git/config` já tem outro valor?** É o caso do workspace hoje, com o noreply.
+   - sobrescreve e mostra `antigo -> novo`, com `--dry-run` para só mostrar (recomendada) — custo: zero além do D2; se
+     paga: agora, porque o caso real é o divergente;
+   - recusa sem `--force` — custo: um comando a mais por repositório, ~0,25 h; se paga: só se um workspace tiver
+     identidade local diferente de propósito, e nenhum foi medido;
+   - só grava quando a chave está vazia — custo: zero, e o M10 não se resolve neste workspace; se paga: nunca, aqui.
 
-### Terreno
+### Rodada 6 — D2 e D3: o workspace novo e o `close_task` (preparada em 2026-11-09, não enviada)
 
-A sonda de 2026-11-09 rodou num clone isolado no scratch da sessão: repositório bare como `origin`, a `master` e os
-worktrees dos workstreams, com `BRZA_WORKSPACE` e `MEASURE_DIR` apontando para o clone. As saídas brutas (`a.jsonl` a
-`k.txt`) ficaram no scratch, fora do git.
+**Apresentado antes:** o Desenho de D2 e D3 e o padrão comum dos verbos. O verbo chama o `brza note … --json`, e a
+sessão vem num argumento, `session: {runtime, id}`. Há um fato novo: 7 tarefas do Codex de hoje, no log real, saíram
+com `session_id` null (T20).
 
-#### O catálogo de skills em cada client
+1. **D2 — O `brza init` grava a identidade no workspace que nasce?**
+   - sim, chamando o `set_identity` depois do commit inicial (recomendada) — custo: ~0,25 h e um teste; se paga: no
+     primeiro workspace novo usado por outro client;
+   - não, e o `brza install --identity` vai aos próximos passos que o init imprime — custo: ~5 min, e quem pula o passo
+     commita com o global; se paga: agora, pelo escopo menor.
+2. **D3 — A entrada do `close_task`.** O critério de aceite diz "recebe o worklog estruturado".
+   - os caminhos dos arquivos que o client já escreveu (recomendada) — custo: nenhum além do adaptador, e diverge da
+     redação do critério; se paga: agora, e o client `read-only` não ganha escrita pelo servidor (M9);
+   - o texto Markdown inteiro no argumento — custo: ~1 h, e um client `read-only` passa a escrever nota pelo servidor;
+     se paga: só com client sem disco, fora de escopo;
+   - os campos estruturados — custo: ~3 a 4 h, uma segunda forma do worklog e um schema que muda com a norma; se paga:
+     nunca, enquanto o checador não exigir seções.
+3. **D3 — A sessão fora do Claude.**
+   - o client declara `session {runtime, id}`, o motor ganha `--session` e `--runtime`, e o worklog sem linha `turn`
+     ganha "Não medida" (recomendada) — custo: ~2 h no motor, e o Codex segue não medido até o hook do PLN-004; se
+     paga: na primeira tarefa do Codex com a linha `turn` gravada;
+   - igual, mas o worklog sem linha `turn` fica sem a seção, como hoje — custo: ~2 h, e o worklog não diz que não foi
+     medido; se paga: agora, se a seção for ruído;
+   - o servidor acha a sessão pelo rollout mais recente do cwd — custo: ~2 h, e erra com duas sessões no mesmo
+     worktree; se paga: só num client que não sabe o próprio id.
+4. **D3 e D6 — A identidade no motor.**
+   - o motor avisa, sem recusar, quando o e-mail do commit não é o do `[author]` (recomendada) — custo: ~0,5 h depois
+     do D2; se paga: no primeiro commit de um client sem o `.git/config` certo;
+   - não conferir — custo: zero; se paga: agora, se o D2 bastar;
+   - recusar o commit com o e-mail errado — custo: ~0,5 h, e quebra o commit à mão de quem não rodou o install; se
+     paga: só se o e-mail errado voltar ao GitHub.
 
-- **M1 — Codex sem distribuição não vê as skills do workspace.** Codex CLI `0.166.0`, `codex exec -s read-only`: o
-  catálogo trouxe as de usuário (`~/.codex/skills`), as de sistema e as de plugin, e "do repositório: nenhuma". [medido]
-- **M2 — Codex vê as seis com um symlink.** `.agents/skills -> ../.claude/skills`, no worktree: as seis no catálogo,
-  com a descrição. [medido]
-- **M3 — Cursor lê o `.claude/skills` sem nada.** `cursor-agent 2026.10.22`, `--mode ask`: as seis, com e sem o
-  `.agents/`. [medido]
-- **M4 — Antigravity precisa do `.agents/skills` e corta por orçamento.** `agy --mode plan --sandbox`: sem o symlink,
-  nenhuma; com ele, quatro. `meeting-runner` (896 caracteres de descrição) e `agent-instructions-writer` (636) saem
-  "excluded due to context budget limits", na disputa com as skills de `~/.gemini/`. [medido]
-- **M5 — O Gemini CLI não está instalado**; não medido.
-- **M6 — O `brza-workflow` não distribui skill a outro client.** A busca por `.agents/skills` e `codex/skills` no
-  repositório não achou nada. [lido]
+### Rodada 7 — D4, D5 e D6: o briefing, o índice e a frase (preparada em 2026-11-09, não enviada)
 
-#### O fluxo pelo Codex
+**Apresentado antes:** o Desenho de D4 a D6.
+- **O Codex:** o PLN-018 fechou, mas a linha `turn` do Codex não se grava (T21).
+- **O índice:** o motor e o servidor o reduzem por regras diferentes (T23).
+- **A frase de confirmação:** se acha no transcript do Claude e do Codex, e não no dos outros clients (T24).
 
-- **M7 — O gatilho natural ativa a skill.** "confere as notas", sem o nome da skill: o Codex leu o `SKILL.md` do
-  `notes-checker`, rodou a busca de `blocks` do `AGENTS.md` e o `check_notes.py --detail`, e relatou os achados sem
-  editar. 112.816 tokens de entrada, 93.184 em cache. [medido]
-- **M8 — O Codex segue o `close-task` até o commit.** Pedido "crie a issue … depois fecha a tarefa":
-  - leu o `work/README.md` e os dois `SKILL.md`;
-  - conferiu o `CLAUDE_CODE_SESSION_ID` (ausente);
-  - rodou o `fact_outcome.py --pending`, o checador e o `brza note commit`;
-  - relatou fielmente o que barrou.
+1. **D4 — O marco do `start_task`.**
+   - o briefing agora, sem gravar, e o marco espera a linha `turn` do Codex (recomendada) — custo: ~4 h, e o critério
+     de aceite perde "grava o marco" até lá; se paga: agora, nos clients que não leem a memória do workstream;
+   - o briefing e o marco, num evento `task_start` — custo: ~7 h, e reabre a forma que a R1.1 do PLN-012 recusou; se
+     paga: no Codex, depois do PLN-004; no Claude, quase nunca.
+2. **D4 — Quem aciona o `start_task`.**
+   - uma linha no `core/AGENTS.md` — "antes de começar, `start_task` ou `brza note brief`" — no lugar do laço de
+     `blocks` (recomendada) — custo: ~0,5 h e uma emenda de norma comum; se paga: agora, em todo client que lê o
+     `AGENTS.md`;
+   - uma skill `start-task` pela `skill-creator` — custo: ~2 a 3 h com os evals, que empatam com o baseline quando não
+     há regra nova; se paga: quando o modelo pular a linha da norma, o que não foi medido;
+   - ninguém: o modelo acha o verbo pela descrição — custo: zero; se paga: só se a descrição bastar, o que não foi
+     medido.
+3. **D5 — A fonte do `index_query`.**
+   - o `brza note ls` ganha `--json`, os filtros e a página, e o verbo o chama (recomendada) — custo: ~4 h; se paga:
+     agora, com uma redução só;
+   - o verbo lê pelo `git_index_reader` e o `reduce_index` — custo: ~2,5 h e uma segunda redução, que pode divergir;
+     se paga: nunca, pela restrição de uma fonte só.
+4. **D6 — A conferência da frase de confirmação.**
+   - o motor procura a frase no transcript da sessão, Claude e Codex, e recusa o `done` sem ela (recomendada) — custo:
+     ~2,5 h, e do Antigravity, do Grok e do Cursor a decisão só sai `open`; se paga: na primeira decisão gravada por
+     subagente ou outra sessão;
+   - a frase como declarada, sem conferência — custo: nenhum; se paga: nunca, contra o erro da norma;
+   - o gate do `dispatch` — custo: ~1,5 h; se paga: nunca, porque quem aprova é a mesma sessão.
 
-  497.963 tokens de entrada nos dois turnos, 460.544 em cache. [medido]
-- **M9 — O sandbox padrão do Codex barra o commit.** `workspace-write`: o `git add` falha em
-  `.git/worktrees/playground/index.lock` com `Operation not permitted`, mesmo com o clone em `--add-dir`. Com a
-  configuração de Anderson (`approval_policy = "on-request"`), cada `brza note commit` pede escalada. O modo sem
-  sandbox foi barrado nesta sessão pelo classificador, e o commit foi rodado pela sessão com o comando e o ambiente do
-  Codex. [medido]
-- **M10 — A identidade do commit não é a da norma.** Sem `GIT_AUTHOR_*` no ambiente, o commit sai com o `user.email`
-  do repositório, `240569289+brz-anderson@users.noreply.github.com`, e não com o `brz.anderson.pereira@gmail.com` que o
-  `CLAUDE.md` fixa pelo `env`. [medido]
-- **M11 — A tarefa do Codex não é medida.** O evento `task` sai com `session_id: null` (e o `chat_id` que veio do
-  ambiente desta sessão, não do Codex), e o worklog fica sem a seção `## Custo da tarefa`. A linha de turno do Codex é
-  do PLN-018, em revisão no `tools-kit`. [medido]
+### Rodada 8 — D6 e as condições dos verbos (preparada em 2026-11-09, não enviada)
+
+**Apresentado antes:**
+- **O daemon:** está de novo carregado sem processo, e o `KeepAlive` só religa em erro (T17).
+- **Os clients:** nenhum tem o servidor configurado (T18).
+- **A chave do push:** tem senha e depende do agente (T25).
+
+1. **D6 — Onde mora a frase.**
+   - só no corpo da decisão, na linha "Decidido por … em …" de hoje (recomendada) — custo: nenhum na norma; se paga:
+     agora;
+   - também num campo `confirmation_quote` no frontmatter — custo: ~1 h, com a tabela de propriedades, o checador e o
+     índice; se paga: quando alguém consultar decisões pela frase.
+2. **A classificação para o proxy remoto.**
+   - `index_query` e o briefing do `start_task` remotos; `close_task`, `decision_record` e o marco só no Mac
+     (recomendada) — custo: ~0,5 h, um atributo `remote` no registro; se paga: quando o proxy existir;
+   - os quatro só no Mac — custo: zero, e a sessão Cloud fica sem o índice; se paga: agora.
+3. **O daemon parado e os clients sem o servidor**, que é a condição dos quatro verbos.
+   - uma issue ao `tools-kit`, com o `KeepAlive` incondicional e um `brza install --codex-mcp` que grava o
+     `brza-orchestrator` no `~/.codex/config.toml` (recomendada) — custo: ~2 a 3 h lá; se paga: no primeiro
+     `close_task` do Codex;
+   - a reserva do CLI cobre — custo: zero; se paga: nunca para o M9, porque com o daemon fora o Codex volta a pedir
+     escalada.
 
 ## Worklogs
 
@@ -246,3 +317,5 @@ worktrees dos workstreams, com `BRZA_WORKSPACE` e `MEASURE_DIR` apontando para o
   [As ferramentas MCP dos fluxos vão a plano: a discussão e as rodadas 1 e 2](../../work/worklogs/2026-11-09-as-ferramentas-mcp-dos-fluxos-vao-a-plano.md)
 - 2026-11-09 — a sonda (M1–M11), a R3 e a R4. Parou antes do Desenho.
   [A sonda dos clients e a R3 do PLN-020: as skills chegam por symlink, e o MCP fica para o que o client não faz](../../work/worklogs/2026-11-09-a-sonda-dos-clients-e-a-r3-do-pln-020.md)
+- 2026-11-09 — o Desenho de D1 a D6, rascunhado por dois consultores, e as R5 a R8 preparadas. Parou antes de enviar a R5.
+  [O desenho de D1 a D6 do PLN-020: dois consultores, e as rodadas 5 a 8 prontas para enviar](../../work/worklogs/2026-11-09-o-desenho-de-d1-a-d6-do-pln-020.md)

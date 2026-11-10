@@ -1,1 +1,6 @@
 - [Decisor quer estado e números no chat](decisor-quer-estado-e-numeros-no-chat.md) — painel barato agora, alternativa maior medida, conteúdo integral adiado
+- [Verbo MCP é adaptador sobre o CLI](verbo-mcp-adaptador-sobre-o-cli.md) — PLN-020: uma fonte só, a conferência no motor, entrada por caminho, a sessão em argumento
+- [Cliente com shell: CLI antes do MCP](criterio-cliente-com-shell.md) — primitiva nasce como verbo de CLI com `--json`; o MCP só embrulha
+- [Base de estimativa do brza sessions](base-de-estimativa-brza-sessions.md) — CLI a 50–100% do estimado, skill a ~35% (PLN-017); testes com `env -u BRZA_WORKSPACE`
+- [Custo da coordenação domina](coordinator-cost-dominates.md) — passo extra de reunião: some o turno da coordenação
+- [Narração da reunião no chat](meeting-chat-narration-criterion.md) — posição e confiança por persona; integral fica para o painel

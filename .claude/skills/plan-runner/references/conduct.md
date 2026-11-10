@@ -51,9 +51,13 @@ não autoriza o P4.
 open → (wait → evento)* → evidence → evidence --apply → close
 ```
 
-1. **Abrir.** `$S/executor.py open PLN-NNN P<n> [--tree <nome> --type feat] [--agent claude --model … --effort …]`.
-   - Com `--tree`, o worktree do `brza-studio` nasce pelo `brza tree`; sem ele, `--checkout <caminho>`, ou o worktree do
-     workspace para o passo de nota.
+1. **Abrir.** `$S/executor.py open PLN-NNN P<n> (--checkout <caminho> | --tree <nome> [--type feat]) [--agent claude --model … --effort …]`.
+   - Com `--tree`, o worktree do `brza-studio` nasce pelo `brza tree` (o pedido é conferido antes); sem ele, `--checkout
+     <caminho>` é obrigatório, e o `open` recusa a falta dos dois. Checkout na `master`/`main` leva a branch `feat/pln-nnn-pn`,
+     nunca a principal; o do próprio workspace (passo de nota) não autoriza commit.
+   - O Codex com `--effort` leva o `--model` padrão (`CODEX_MODEL`); o `brza sessions` recusa o esforço sem modelo.
+   - `open` não reabre passo `feito` nem com evidência gravada; passo `parado` ou `falhado` reabre, e o marcador velho do
+     worklog vira comentário.
    - Ele gera o pedido pelo `step_request.py` (o passo, os `D` do `Executa`, as rodadas citadas, as restrições, as
      regras e o protocolo de fim), cria o worklog do executor no workstream, abre a sessão pelo `brza sessions <nome>
      --prompt-file … --title "PLN-NNN P<n>: …" --rename --wait`, grava o manifesto e publica o painel.
@@ -71,13 +75,21 @@ open → (wait → evento)* → evidence → evidence --apply → close
 3. **Ler a evidência.** `$S/executor.py evidence PLN-NNN P<n>` lê o `## Evidência` do worklog do executor, confere cada
    commit (`git cat-file -e`), roda de novo o comando marcado `(≤ 2 min)` e mede o `Executado` pela janela da abertura ao
    marcador. Ele imprime a linha `**Evidência:**` e o `Executado` propostos.
+   - **A proposta não roda o comando do worklog.** `--rerun` o roda sem gravar e o `--apply` o roda e grava, por argv e sem
+     shell: aceita `VAR=v` e `cd X &&` na frente, glob e `~`; recusa `;`, `|`, `>`, `$` e crase. **Isso não é segurança:**
+     `bash -c "…"` e `git push --force` passam pelo filtro, que só tira o que o argv não reproduz. A proteção é você ler a
+     proposta antes do `--rerun` ou do `--apply`.
    - **Leia a proposta antes de aplicar.** O que não confere (commit que não existe, teste que falha) volta ao executor
      pelo `send`, e o passo não fecha.
    - Narre o que conferiu: "confere: `git -C … cat-file -e a1b2c3d` → ok; `<testes>` → 42 passed; Executado 0,6 h".
 4. **Aplicar.** `$S/executor.py evidence PLN-NNN P<n> --apply` grava a evidência no `### Pn`, marca o `[x]`, roda o
-   `plan_state.py --fix` e republica o painel. Ele marca `[x]` em **todos** os subpassos pendentes do passo, porque o
-   script não sabe quais a evidência cobre: desmarque à mão o que ficou de fora. Os `X` propostos no worklog entram em
-   `## Desvios` pela coordenação, à mão, depois de lidos.
+   `plan_state.py --fix` e republica o painel. Ele marca `[x]` só nos subpassos da linha `cobre:` do worklog (`cobre: todos` marca todos); sem `cobre:`, marca todos os
+   pendentes e avisa: confira à mão. Os `X` propostos no worklog entram em
+   `## Desvios` pela coordenação, à mão, depois de lidos. Várias linhas `cobre:` se juntam, e `todos` vence.
+   - **Passo parcial** (`cobre:` não cobre tudo; sobra `[ ]`): o passo fica `evidencia-gravada`, e o ciclo continua com
+     `send` do que falta (neutraliza o marcador e volta a `em-curso`), `wait`, e `evidence --apply` de novo, com o
+     `cobre:` acumulado no worklog. `open` também reabre o passo com `[ ]` pendente; sem pendente, `open` e `send` não o
+     reabrem.
 5. **Fechar.** `$S/executor.py close PLN-NNN P<n>` pede o encerramento e confere o aceite (`--wait-settled 180`).
    `closing` não é fechado. `--keep-open` mantém a sessão para Anderson consultar.
 

@@ -106,11 +106,23 @@ class Itens(Base):
         self.assertEqual(self.res(r)[2], "falta")
 
     def test_item3_decidida_sem_d_nem_link_e_manual(self):
-        # a R1.1 foi decidida e nenhum D a cita; a R1.2 só tem resposta literal, que não é decisão
+        # a R1.1 foi decidida e nenhum D a cita; a R1.2 é resposta literal, e o D a cita
         d = DESENHO.replace("R1.1, R1.2", "R1.2").replace("- **Origem:** R1.1\n", "- **Origem:** R1.2\n")
         r, _ = self.confere(plano(FEITO, RODADA1, fm=FM_FECHADO), design=d)
         self.assertEqual(self.res(r)[3], "manual")
         self.assertEqual([c.split(" —")[0] for c in r["itens"][2]["detalhe"]], ["R1.1"])
+
+    def test_item3_conta_a_resposta_em_texto_livre_lida_como_opcao(self):
+        # A10: a R1.2 foi respondida por `Resposta:` com a leitura; sem D nem link, também vai ao Retomar
+        d = DESENHO.replace("R1.1, R1.2", "R1.1")
+        r, _ = self.confere(plano(FEITO, RODADA1, fm=FM_FECHADO), design=d)
+        self.assertEqual([c.split(" —")[0] for c in r["itens"][2]["detalhe"]], ["R1.2"])
+
+    def test_item3_contraproposta_nao_conta(self):
+        rod = RODADA1.replace('lida como a primeira opção.', 'Lida como contraproposta: foi à rodada 2.')
+        d = DESENHO.replace("R1.1, R1.2", "R1.1")
+        r, _ = self.confere(plano(FEITO, rod, fm=FM_FECHADO), design=d)
+        self.assertEqual(self.res(r)[3], "ok")
 
     def test_item3_link_em_decisoes_cobre(self):
         d = DESENHO.replace("R1.1, R1.2", "R1.2").replace("- **Origem:** R1.1\n", "- **Origem:** R1.2\n")

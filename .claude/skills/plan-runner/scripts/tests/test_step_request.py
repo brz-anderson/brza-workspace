@@ -1,6 +1,7 @@
 import io
 import os
 import shutil
+import subprocess
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
 
@@ -57,6 +58,8 @@ class Pedido(unittest.TestCase):
         self.assertIn("`commit: brza-studio@<sha7>` (ou `commit: aguarda confirmação`)", texto)
         self.assertIn("`<!-- fim-P2: feito -->` ou `<!-- fim-P2: parado -->`", texto)
         self.assertIn("Não envie `worker_done`", texto)
+        self.assertIn("escreva a forma simples", texto)
+        self.assertIn("`cobre: <n>, <n>`", texto)
         self.assertIn("autoriza o commit na branch `feat/pln-021-p2`", texto)
         self.assertIn("Merge e push pedem confirmação", texto)
 
@@ -66,6 +69,42 @@ class Pedido(unittest.TestCase):
         self.assertIn("- checkout: /c/estudio (branch feat/outro)", texto)
         self.assertIn("- worklog: /w/x.md", texto)
         self.assertIn("`<!-- fim-P3: feito -->`", texto)
+
+    def test_o_commit_e_so_no_checkout_e_o_pedido_nao_se_contradiz(self):
+        raiz, path = self.monta(plano(passo("P1"), RODADA1), design=DESENHO)
+        texto, _ = step_request.monta(path, "P1", checkout="/c/estudio", branch="feat/x")
+        self.assertIn("não commite nada no brza-workspace", texto)
+        self.assertIn("autoriza o commit na branch `feat/x` do checkout `/c/estudio`", texto)
+        # o checkout é o do próprio workspace: nenhuma branch é autorizada, e o pedido diz isso
+        texto, _ = step_request.monta(path, "P1", checkout=raiz, branch="feat/x")
+        self.assertNotIn("autoriza o commit", texto)
+        self.assertIn("não commite em lugar nenhum", texto)
+        self.assertIn("commit: aguarda confirmação", texto)
+
+    def test_outro_checkout_do_mesmo_repositorio_tambem_nao_autoriza_commit(self):
+        raiz, path = self.monta(plano(passo("P1"), RODADA1), design=DESENHO)
+        git = ["git", "-C", raiz, "-c", "user.name=t", "-c", "user.email=t@t"]
+        subprocess.run(git + ["init", "-q"], check=True)
+        subprocess.run(git + ["add", "-A"], check=True)
+        subprocess.run(git + ["commit", "-qm", "c"], check=True)
+        outro = raiz + "-wt"
+        self.dirs.append(outro)
+        subprocess.run(git + ["worktree", "add", "-q", "-b", "outra", outro], check=True)
+        sub = os.path.join(raiz, "plans")
+        for co in (outro, sub):
+            texto, _ = step_request.monta(path, "P1", checkout=co, branch="feat/x")
+            self.assertNotIn("autoriza o commit", texto, co)
+            self.assertIn("não commite em lugar nenhum", texto, co)
+
+    def test_a_branch_autorizada_nunca_e_master_nem_main(self):
+        raiz, path = self.monta(plano(passo("P1"), RODADA1), design=DESENHO)
+        for b in ("master", "main"):
+            with self.assertRaises(step_request.Recusa) as cm:
+                step_request.monta(path, "P1", checkout="/c/estudio", branch=b)
+            self.assertIn("master/main", str(cm.exception))
+        rc, _, err = self.cli(path, "P1", "--checkout", "/c/estudio", "--branch", "master")
+        self.assertEqual(rc, 1)
+        self.assertIn("master/main", err)
 
     def test_resposta_literal_e_sem_resposta(self):
         pl = plan_md.carrega("PLN-021", raiz=_paths.RAIZ)

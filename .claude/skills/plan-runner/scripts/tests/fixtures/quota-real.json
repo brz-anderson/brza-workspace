@@ -1,0 +1,123 @@
+{
+  "accounts": [
+    {
+      "runtime": "claude",
+      "account": "systemDefault",
+      "label": "conta-0",
+      "system_default": true,
+      "active": true,
+      "cap": 90.0,
+      "windows": [
+        {
+          "name": "session",
+          "used": 30,
+          "resets_at": 1794331200241,
+          "projected": 30.0
+        },
+        {
+          "name": "weekly",
+          "used": 42,
+          "resets_at": 1794718800241,
+          "projected": 139.48339096965918
+        },
+        {
+          "name": "fableWeekly",
+          "used": 13,
+          "resets_at": 1794718800241,
+          "projected": 38.653523939383994
+        }
+      ]
+    },
+    {
+      "runtime": "claude",
+      "account": "8eee0e1b-f5d7-40ba-8337-8cae0df3a062",
+      "label": "conta-1",
+      "system_default": false,
+      "active": false,
+      "cap": 90.0,
+      "windows": [
+        {
+          "name": "weekly",
+          "used": 41,
+          "resets_at": 1794348000411,
+          "projected": 44.15593769679013
+        },
+        {
+          "name": "fableWeekly",
+          "used": 0,
+          "resets_at": 1794348000000,
+          "projected": 0.0
+        }
+      ]
+    },
+    {
+      "runtime": "claude",
+      "account": "c2e4f85c-388a-4603-8edc-a0844496c902",
+      "label": "conta-2",
+      "system_default": false,
+      "active": false,
+      "cap": 90.0,
+      "windows": []
+    },
+    {
+      "runtime": "codex",
+      "account": "systemDefault",
+      "label": "conta-3",
+      "system_default": true,
+      "active": true,
+      "cap": 90.0,
+      "windows": [
+        {
+          "name": "session",
+          "used": 0,
+          "resets_at": 1794344840000,
+          "projected": 0.0
+        },
+        {
+          "name": "weekly",
+          "used": 53,
+          "resets_at": 1794361798000,
+          "projected": 55.650528369823434
+        }
+      ]
+    },
+    {
+      "runtime": "grok",
+      "account": "systemDefault",
+      "label": "conta-4",
+      "system_default": true,
+      "active": true,
+      "cap": 90.0,
+      "windows": [
+        {
+          "name": "weekly",
+          "used": 22,
+          "resets_at": 1794360524711,
+          "projected": 22.304043569799944
+        }
+      ]
+    },
+    {
+      "runtime": "antigravity",
+      "account": "systemDefault",
+      "label": "conta-5",
+      "system_default": true,
+      "active": true,
+      "cap": 90.0,
+      "windows": [
+        {
+          "name": "session",
+          "used": 3,
+          "resets_at": 1794340815000,
+          "projected": 3.0
+        },
+        {
+          "name": "weekly",
+          "used": 16,
+          "resets_at": 1794625229000,
+          "projected": 32.5351613231969
+        }
+      ]
+    }
+  ]
+}

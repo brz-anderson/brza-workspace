@@ -90,6 +90,22 @@ class Mini(unittest.TestCase):
         self.dirs.append(raiz)
         return raiz, path
 
+    def test_resposta_com_a_leitura_conta_e_contraproposta_nao(self):
+        multipla = RODADA1 + """
+3. **Escolhas menores** (seleção múltipla). Opções:
+   - a (recomendada);
+   - b.
+
+   **Resposta:** "restante recomendado" Lida como: a e b.
+"""
+        raiz, path = self.monta(plano(passo(), multipla), design=DESENHO)
+        pl = plan_md.carrega(path)
+        self.assertTrue(pl.pergunta("R1.2").decidida)       # `Resposta:` com "lida como a primeira opção"
+        self.assertTrue(pl.pergunta("R1.3").decidida)       # seleção múltipla em texto livre
+        contra = multipla.replace("lida como a primeira opção.", "Lida como contraproposta: foi à rodada 2.")
+        raiz, path = self.monta(plano(passo(), contra), design=DESENHO)
+        self.assertFalse(plan_md.carrega(path).pergunta("R1.2").decidida)
+
     def test_heading_em_cerca_nao_conta(self):
         raiz, path = self.monta(plano(passo(), RODADA1), design=DESENHO)
         pl = plan_md.carrega(path)

@@ -75,16 +75,29 @@ def _chrome(html_path, png, width, altura, scale):
     return None if os.path.exists(png) else 'o Chrome não gerou o PNG'
 
 
-def gera_png(html_path, png, width, altura=None, *, theme='light', scale=1):
+def gera_png(html_path, png, width, altura=None, *, theme='light', scale=1, chrome_css=''):
     """Tira o PNG do HTML. Devolve None se deu certo, ou a mensagem de erro.
 
     Roda `brza shot <html> <png> --width W --theme T --scale S --force`; só cai no Chrome headless se o `brza` faltar ou
     sair ≠ 0, e o erro, se o Chrome também falhar, diz as duas falhas. O `brza shot` mede a altura sozinho: `altura` só
-    vale para o Chrome (padrão 2000)."""
+    vale para o Chrome (padrão 2000). `chrome_css` (por exemplo o `:root` dos tokens) vai só ao Chrome, num HTML temporário
+    ao lado do original: o `brza shot` já injeta os tokens do chat, e um `:root` no HTML venceria o tema dele."""
     rc, out, err = _run(shot_argv(html_path, png, width, theme, scale))
     if rc == 0 and os.path.exists(png):
         return None
     motivo = (f'o brza não gerou o PNG (rc {rc})' if rc == 0
               else f'brza shot falhou (rc {rc}): {(err or out or "").strip()[:200]}')
-    erro = _chrome(html_path, png, width, altura or ALTURA_CHROME, scale)
+    tmp = None
+    if chrome_css:
+        tmp = os.path.splitext(html_path)[0] + '.chrome.html'
+        with open(html_path, encoding='utf-8') as f:
+            doc = f.read()
+        with open(tmp, 'w', encoding='utf-8') as f:
+            f.write(doc.replace('</head>', f'<style>{chrome_css}</style></head>', 1) if '</head>' in doc
+                    else f'<style>{chrome_css}</style>{doc}')
+    try:
+        erro = _chrome(tmp or html_path, png, width, altura or ALTURA_CHROME, scale)
+    finally:
+        if tmp and os.path.exists(tmp):
+            os.remove(tmp)
     return None if erro is None else f'{motivo}; {erro}'

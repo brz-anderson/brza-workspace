@@ -4,9 +4,22 @@ import os
 import _exec
 import _paths  # noqa: F401
 import consult
+import executor
 from mini import DESENHO, RODADA1, passo, plano
 
 FIM = "<!-- fim-D1: %s -->"
+QUOTA_REAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "quota-real.json")   # a saída do `brza quota --json`
+
+
+def quota_json(cota):
+    """O `brza quota --json` real (fixture) com a janela de cada runtime trocada: `session`, ou `weekly` quando é a única."""
+    with open(QUOTA_REAL, encoding="utf-8") as f:
+        d = json.load(f)
+    for conta in d["accounts"]:
+        if conta["active"] and conta["runtime"] in cota:
+            nomes = {w["name"]: w for w in conta["windows"]}
+            nomes.get("session", nomes.get("weekly"))["used"] = cota[conta["runtime"]]
+    return json.dumps(d)
 
 
 class Consultores(_exec.Base):
@@ -17,7 +30,7 @@ class Consultores(_exec.Base):
         with open(self.brief, "w", encoding="utf-8") as f:
             f.write("# Brief\n\nTerreno: x.\nCasos: um, dois.\n")
         self.cota = {"claude": 20, "codex": 30, "grok": 10}
-        self.brza = lambda argv: (0, json.dumps({k: {"session_pct": v} for k, v in self.cota.items()}), "")
+        self.brza = lambda argv: (0, quota_json(self.cota), "")
 
     def abre(self, *extra):
         return self.roda(consult, "open", self.path, "D1", "--brief", self.brief, "--no-panel", *extra)
@@ -38,7 +51,10 @@ class Consultores(_exec.Base):
         self.assertEqual(abertas[0][abertas[0].index("--model") + 1], "claude-opus-5-5")
         self.assertEqual(abertas[0][abertas[0].index("--effort") + 1], "high")
         self.assertEqual(abertas[0][0], "pln900-d1-arquitetura-limpa")
-        self.assertNotIn("--model", abertas[1])
+        self.assertEqual(abertas[1][abertas[1].index("--model") + 1], executor.CODEX_MODEL)   # A1: --effort exige --model
+        self.assertEqual(abertas[1][abertas[1].index("--effort") + 1], "xhigh")
+        for a in abertas:
+            self.assertEqual("--effort" in a, "--model" in a, a)
         self.assertEqual(abertas[0][abertas[0].index("--checkout") + 1], self.raiz)
         self.assertIn("| arquitetura-limpa | pln900-d1-arquitetura-limpa | Claude |", self.out)
         self.assertEqual(sorted(self.man()["focos"]), ["arquitetura-limpa", "equilibrio", "mudanca-minima"])
@@ -61,6 +77,30 @@ class Consultores(_exec.Base):
         self.assertEqual(abertas[1][abertas[1].index("--model") + 1], "claude-sonnet-5-5")
         self.assertIn("cota: codex cortado: codex a 56%", self.out)
         self.assertEqual(self.man()["focos"]["mudanca-minima"]["agent"], "claude")
+
+    def test_cotas_le_a_forma_real_do_brza_quota(self):
+        # A2: `accounts[].windows[]`, a conta ativa de cada runtime; o Grok só tem `weekly`
+        with open(QUOTA_REAL, encoding="utf-8") as f:
+            real = f.read()
+        self.brza = lambda argv: (0, real, "")
+        self.assertEqual(consult.cotas(), {"claude": 30, "codex": 0, "grok": 22, "antigravity": 3})
+
+    def test_cota_do_claude_pela_forma_real_corta_e_nao_avisa(self):
+        self.cota["claude"] = 80
+        self.abre()
+        abertas = [a for k, a in self.chamadas if k == "sessions"]
+        self.assertEqual(abertas[0][abertas[0].index("--agent") + 1], "grok")       # o fallback da arquitetura-limpa
+        self.assertNotIn("não li o `brza quota --json`", self.err)
+
+    def test_roster_com_esforco_sem_modelo_no_runtime_sem_padrao_perde_o_esforco(self):
+        r = os.path.join(self.raiz, "r.json")
+        with open(r, "w") as f:
+            json.dump({"consultores": [{"foco": "a", "agent": "grok", "effort": "high"}, {"foco": "b", "agent": "codex", "effort": "high"}]}, f)
+        self.abre("--roster", r)
+        abertas = [a for k, a in self.chamadas if k == "sessions"]
+        self.assertNotIn("--effort", abertas[0])
+        self.assertEqual(abertas[1][abertas[1].index("--model") + 1], executor.CODEX_MODEL)
+        self.assertIn("recusa --effort sem --model", self.err)
 
     def test_cota_igual_a_55_entra(self):
         self.cota["claude"] = 55
@@ -120,6 +160,33 @@ class Consultores(_exec.Base):
         self.assertIn("o turno acabou sem o marcador", self.out)
         self.wait = lambda nomes, t, markers=(), any_=True: (1, {"done": [{"name": "pln900-d1-equilibrio", "outcome": "failed"}], "timed_out": False, "events": []})
         self.assertEqual(self.roda(consult, "wait", self.path, "D1", "--timeout", "30"), 1)
+
+    def test_wait_sessao_perdida_marca_so_esse_foco_e_segue_com_os_outros(self):
+        self.abre()
+        self.wait = lambda nomes, t, markers=(), any_=True: (
+            (1, {"error": "0 chats abertos se chamam pln900-d1-equilibrio: "}) if "pln900-d1-equilibrio" in nomes
+            else (75, {"done": [], "timed_out": True, "events": []}))
+        self.assertEqual(self.roda(consult, "wait", self.path, "D1", "--timeout", "60"), 1)
+        self.assertEqual(self.man()["focos"]["equilibrio"]["estado"], "falhou")
+        self.assertEqual(self.man()["focos"]["mudanca-minima"]["estado"], "aberto")
+        self.assertIn("a espera segue com as outras", self.out)
+        # as outras ainda esperam depois do erro (mais de uma chamada)
+        self.assertGreater(len([x for x in self.chamadas if x[0] == "wait"]), 1)
+
+    def test_wait_erro_repetido_pausa_e_desiste(self):
+        self.abre()
+        self.wait = lambda *a, **k: (1, {"error": "saída sem JSON (rc 1): boom"})
+        self.assertEqual(self.roda(consult, "wait", self.path, "D1", "--timeout", "600"), 1)
+        self.assertEqual(len([x for x in self.chamadas if x[0] == "wait"]), executor.MAX_WAIT_ERRORS)
+
+    def test_wait_a_linha_em_curso_sai_a_cada_batida_e_nao_a_cada_volta(self):
+        # A15: o turno acaba sem o marcador, o `wait` volta na hora
+        self.abre()
+        self.wait = lambda nomes, t, markers=(), any_=True: (0, {"done": [{"name": "pln900-d1-equilibrio", "outcome": "done"}], "timed_out": False, "events": []})
+        self.assertEqual(self.roda(consult, "wait", self.path, "D1", "--timeout", "600"), 75)
+        linhas = [l for l in self.saidas if "em curso" in l]
+        self.assertGreaterEqual(len(linhas), 2)
+        self.assertLessEqual(len(linhas), 600 // consult.BATIDA + 1)
 
     def test_tabela_lado_a_lado_com_os_tres_arquivos(self):
         self.abre()

@@ -231,8 +231,8 @@ class Png(Base):
         self.chamadas = []
         self.orig = artboard.gera_png
 
-        def falso(html, png, width, altura=None, *, theme='light', scale=1):
-            self.chamadas.append({'html': html, 'png': png, 'w': width, 'theme': theme, 'scale': scale})
+        def falso(html, png, width, altura=None, *, theme='light', scale=1, chrome_css=''):
+            self.chamadas.append({'html': html, 'png': png, 'w': width, 'theme': theme, 'scale': scale, 'css': chrome_css})
             with open(png, 'wb') as f:
                 f.write(b'png')
             return None
@@ -268,12 +268,13 @@ class Png(Base):
         self.assertEqual([os.path.basename(x) for x in out.split()], [f'{base}-736.png', f'{base}-1280-light.png'])
         self.assertEqual([c['w'] for c in self.chamadas], [736, 1304])
         for c in self.chamadas:
+            # A14: o HTML que o `brza shot` abre não leva o `:root` (venceria os tokens que ele injeta); o CSS de reserva
+            # vai à parte, só para o Chrome
             with open(c['html'], encoding='utf-8') as f:
-                var = f.read()
-            self.assertIn(':root{color-scheme:light;--', var)
-            self.assertIn('--background:#fff', var)
-            self.assertIn('--font-sans:', var)
-            self.assertNotEqual(c['html'], a)
+                self.assertNotIn(':root{', f.read())
+            self.assertIn(':root{color-scheme:light;--', c['css'])
+            self.assertIn('--background:#fff', c['css'])
+            self.assertIn('--font-sans:', c['css'])
 
     def test_shot_desktop_do_brza_studio_com_theme_dark(self):
         a = self.artboard('windows')
@@ -281,15 +282,16 @@ class Png(Base):
         self.assertEqual([c['theme'] for c in self.chamadas], ['dark', 'dark'])
         for c in self.chamadas:
             with open(c['html'], encoding='utf-8') as f:
-                var = f.read()
-            self.assertIn(':root{color-scheme:dark;', var)
-            self.assertIn('--background:#0a0a0a', var)
+                self.assertNotIn(':root{', f.read())
+            self.assertIn(':root{color-scheme:dark;', c['css'])
+            self.assertIn('--background:#0a0a0a', c['css'])
 
     def test_shot_mobile_e_neutral_nao_injetam_fallback(self):
         a = self.artboard('iphone', '--scheme', 'dark')
         roda('shot', a, '--out-dir', os.path.join(self.dir, 'png'))
         with open(self.chamadas[1]['html'], encoding='utf-8') as f:
             self.assertNotIn(':root{', f.read())
+        self.assertEqual([c['css'] for c in self.chamadas], ['', ''])
 
     def test_promote_desktop_do_brza_studio_com_tema(self):
         raiz = os.path.join(self.dir, 'repo')
@@ -299,8 +301,9 @@ class Png(Base):
                           '--packs-dir', self.packs)
         self.assertEqual(rc, 0, err)
         self.assertEqual(self.chamadas[0]['theme'], 'dark')
+        self.assertIn('--background:#0a0a0a', self.chamadas[0]['css'])
         with open(self.chamadas[0]['html'], encoding='utf-8') as f:
-            self.assertIn('--background:#0a0a0a', f.read())
+            self.assertNotIn(':root{', f.read())
 
     def test_shot_web_uma_variante_por_largura(self):
         _, out, _, _ = self.novo('w', 'browser', '--pack', 'neutral')

@@ -16,7 +16,7 @@ duas, o que enfraquece a própria (`Risco:`) e a última linha `<!-- fim-D<n>: <
 
 O roster padrão (PLN-021/R5.3, confirmada): Claude Opus `high` na arquitetura limpa, Codex no maior esforço na
 mudança mínima, Grok no equilíbrio. `--roster arquivo.json` troca: `{"consultores": [{"foco", "agent", "model", "effort",
-"fallback": {…}}]}`. Runtime com `session_pct` acima de 55% no `brza quota --json` não entra: o `fallback` do roster o
+"fallback": {…}}]}`. Runtime com a janela `session` (ou `weekly`, no Grok) acima de 55% no `brza quota --json` não entra: o `fallback` do roster o
 substitui, e a linha da abertura diz quem foi cortado.
 
 `wait`: 0 com todos entregues, 75 no prazo (diz quem falta), 1 com falha de sessão. `table`: Markdown para a mensagem e a
@@ -47,7 +47,7 @@ FALLBACK = {"agent": "claude", "model": "claude-sonnet-5-5", "effort": "high"}
 ROSTER_PADRAO = {"consultores": [
     {"foco": "arquitetura-limpa", "agent": "claude", "model": "claude-opus-5-5", "effort": "high",
      "fallback": {"agent": "grok", "model": None, "effort": None}},
-    {"foco": "mudanca-minima", "agent": "codex", "model": None, "effort": "xhigh", "fallback": FALLBACK},
+    {"foco": "mudanca-minima", "agent": "codex", "model": executor.CODEX_MODEL, "effort": "xhigh", "fallback": FALLBACK},
     {"foco": "equilibrio", "agent": "grok", "model": None, "effort": None, "fallback": FALLBACK},
 ]}
 FOCOS = {
@@ -84,17 +84,22 @@ def carrega_roster(ref):
 
 
 def cotas():
-    """{runtime: session_pct} do `brza quota --json`; {} se não leu."""
+    """{runtime: pct} do `brza quota --json` (`accounts[].windows[]`); {} se não leu. Vale a conta ativa de cada runtime (a
+    maior, se houver mais de uma) e a janela `session`; sem ela (o Grok), a `weekly`."""
     rc, so, _ = run_brza(["quota", "--json"])
     try:
         d = json.loads(so)
     except ValueError:
         return {}
     out = {}
-    if isinstance(d, dict):
-        for k, v in d.items():
-            if isinstance(v, dict) and isinstance(v.get("session_pct"), (int, float)):
-                out[k] = v["session_pct"]
+    contas = d.get("accounts") if isinstance(d, dict) else None
+    for conta in contas if isinstance(contas, list) else []:
+        if not isinstance(conta, dict) or not conta.get("active") or not conta.get("runtime"):
+            continue
+        janelas = {w.get("name"): w.get("used") for w in conta.get("windows") or [] if isinstance(w, dict)}
+        usado = janelas.get("session", janelas.get("weekly"))
+        if isinstance(usado, (int, float)):
+            out[conta["runtime"]] = max(out.get(conta["runtime"], 0), usado)
     return out
 
 
@@ -204,6 +209,9 @@ def cmd_open(a, c):
     linhas = []
     for ef, nota in escolhidos:
         foco = ef["foco"]
+        ef["model"], ef["effort"], aviso = executor.effective_model_effort(ef["agent"], ef.get("model"), ef.get("effort"))
+        if aviso:
+            c.err("⚠ %s: %s" % (foco, aviso))
         nome = sessao_nome(pl, did, foco)
         arquivo = os.path.join(dpasta, "%s.md" % slug_foco(foco))
         ppath = os.path.join(dpasta, "prompt-%s.md" % slug_foco(foco))
@@ -265,6 +273,8 @@ def cmd_wait(a, c):
     fim = c.clock() + a.timeout
     vistos_sem = set()
     falhou = []
+    erros = 0
+    ultima_batida = c.clock()
 
     def faltam():
         return [f for f, v in focos.items() if v.get("estado") not in ("entregou", "falhou", "fechado")]
@@ -288,10 +298,22 @@ def cmd_wait(a, c):
         trecho = min(fim - c.clock(), BATIDA)
         ini = c.clock()
         rc, dado = wait_brza(list(nomes), trecho, any_=True)
-        if dado.get("error") and rc not in (0, 1, 75):
-            c.err("o `brza sessions wait` falhou (rc %s): %s" % (rc, dado["error"]))
-            salva_man(pl, did, m)
-            return 1
+        if dado.get("error"):
+            erros += 1
+            action, msg, perdida = executor.wait_error_verdict(rc, dado["error"], erros, list(nomes))
+            c.err(msg)
+            if action == "stop":
+                salva_man(pl, did, m)
+                return 1
+            if action == "missing":
+                focos[nomes[perdida]]["estado"] = "falhou"
+                falhou.append(nomes[perdida])
+                c.out("%s · %s falhou: a sessão %s não existe mais; a espera segue com as outras" % (did, nomes[perdida], perdida))
+                erros = 0
+            else:
+                c.sleep(executor.WAIT_ERROR_PAUSE)
+            continue
+        erros = 0
         sem_fim = False
         for row in dado.get("done") or []:
             f = nomes.get(row.get("name"))
@@ -313,7 +335,8 @@ def cmd_wait(a, c):
             c.sleep(min(5, max(0, fim - c.clock())))
         elif c.clock() - ini < trecho and (dado.get("timed_out") or rc == 75):
             c.sleep(max(0, trecho - (c.clock() - ini)))
-        if c.clock() < fim and faltam():
+        if c.clock() < fim and faltam() and c.clock() - ultima_batida >= BATIDA:
+            ultima_batida = c.clock()
             c.out(resumo("%s · em curso;" % did))
     salva_man(pl, did, m)
     if falhou:

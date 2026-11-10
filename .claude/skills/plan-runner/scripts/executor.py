@@ -4,10 +4,10 @@ evidência, leva-a ao plano e fecha. A coordenação não digita comando de sess
 
 Uso:
     executor.py open     PLN-NNN Pn [--agent claude|codex|grok|antigravity] [--model M] [--effort E]
-                                    [--checkout CAMINHO | --tree NOME [--type feat|fix|docs|chore]] [--no-panel] [--dry-run]
+                                    (--checkout CAMINHO | --tree NOME [--type feat|fix|docs|chore]) [--branch B] [--no-panel] [--dry-run]
     executor.py send     PLN-NNN Pn (--text T | --file F) [--operation OP]
     executor.py wait     PLN-NNN [Pn …] [--timeout SEG] [--no-panel]
-    executor.py evidence PLN-NNN Pn [--apply] [--settle 60] [--no-panel]
+    executor.py evidence PLN-NNN Pn [--apply | --rerun] [--settle 60] [--no-panel]
     executor.py close    PLN-NNN Pn [--keep-open | --stop] [--wait-settled SEG] [--no-panel]
     executor.py status   PLN-NNN [--json]
 
@@ -27,7 +27,9 @@ linha diz "o turno acabou sem o marcador" e a espera segue até o prazo. Saída:
 
 `evidence` lê a `## Evidência` do worklog, confere cada commit (`git cat-file -e`) e roda de novo o comando marcado
 `(≤ 2 min)`, e mede o `Executado` (janela da abertura ao marcador; Claude também pelos turnos do hook). Sem `--apply`, só
-propõe. Com `--apply`, grava a `**Evidência:**` no `### Pn` do plano, marca `[x]`, roda o `plan_state.py --fix` e publica o
+propõe, e a proposta NÃO roda o comando do worklog (entrada de outra sessão): `--rerun` o roda sem gravar, e o
+`--apply` o roda e grava, por argv e sem shell (aceita `VAR=v` e `cd X &&` na frente, glob e `~`). O filtro só tira o que o argv
+não reproduz: NÃO é segurança, a proteção é a coordenação ler a proposta antes do `--rerun` ou do `--apply`. Com `--apply`, grava a `**Evidência:**` no `### Pn` do plano, marca `[x]`, roda o `plan_state.py --fix` e publica o
 painel. Só se aplica depois de a coordenação ler a proposta (regra da SKILL.md). Saída 1 se algo não confere.
 
 `close` pede o encerramento e confere o aceite (`closing` não é fechado; `--wait-settled SEG` repete a cada 5 s).
@@ -36,6 +38,7 @@ Saída: 0 ok, 1 falha, 2 uso ou plano/passo que não existe, 3 bloqueado (`wait`
 """
 import argparse
 import datetime
+import glob
 import json
 import os
 import re
@@ -57,8 +60,12 @@ from skillkit.sessions_cli import (close_argv, interpreta_abertura, open_argv, r
                                    wait_brza, list_states)
 
 SONNET = "claude-sonnet-5-5"
+CODEX_MODEL = "gpt-6.1-sol"   # o `brza sessions` exige --model com --effort; o modelo do ~/.codex/config.toml e do smoke do PLN-017
 VIVOS = ("aberto", "em-curso", "bloqueado")
 BATIDA = 180          # a cada ~3 min sem evento o `wait` repete a linha com a idade
+MAX_WAIT_ERRORS = 5   # erros seguidos do `brza sessions wait` até desistir
+WAIT_ERROR_PAUSE = 5  # segundos de pausa entre eles
+RE_NO_SESSION = re.compile(r"\b(\d+) chats? abertos? se chamam ([^\s:]+)", re.I)
 FALHOU = ("failed", "stopped", "abandoned")
 OK_FINAL = ("encerrada e aceita", "liberada")
 INCERTOS = ("stop_unknown", "release_unknown", "release_pending")
@@ -81,10 +88,68 @@ def run_git(argv):
     return r.returncode, r.stdout, r.stderr
 
 
-def run_shell(cmd, cwd, timeout=120):
-    """(rc, saída) de um comando rodado de novo na conferência; estourar o tempo vale rc 124."""
+RE_SHELL = re.compile(r"[;&|<>`$(){}\\\n\r]")
+
+
+RE_CD = re.compile(r"^\s*cd\s+(\S+)\s*&&\s*(.+)$", re.S)
+RE_ENV = re.compile(r"^([A-Za-z_]\w*)=(.*)$", re.S)
+
+
+def parse_command(cmd):
+    """(env, cwd, words) de um comando que o argv reproduz: `VAR=v` na frente (vai ao env), um `cd X &&` na frente (vai ao
+    cwd), palavras e aspas. Glob e `~` sem aspas se expandem na hora de rodar. None se tiver qualquer outro operador de shell.
+    Isto só tira o que o argv não reproduz: NÃO é segurança, a proteção é a leitura da proposta."""
+    if not cmd:
+        return None
+    cwd = None
+    m = RE_CD.match(cmd)
+    if m:
+        cwd, cmd = m.group(1).strip("'\""), m.group(2)
+        if RE_SHELL.search(cwd):
+            return None
+    if RE_SHELL.search(cmd):
+        return None
+    lex = shlex.shlex(cmd, posix=False)
+    lex.whitespace_split = True
+    lex.commenters = ""   # `#` no meio da palavra não é comentário
     try:
-        r = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True, timeout=timeout)
+        raw = list(lex)
+    except ValueError:
+        return None
+    words = []
+    for w in raw:
+        if "'" in w or '"' in w:
+            try:
+                words.append((shlex.split(w)[0] if shlex.split(w) else "", False))
+            except ValueError:
+                return None
+        else:
+            words.append((w, True))
+    env = {}
+    while words and RE_ENV.match(words[0][0]):
+        k, v = RE_ENV.match(words.pop(0)[0]).groups()
+        env[k] = v
+    return (env, cwd, words) if words else None
+
+
+def run_shell(cmd, cwd, timeout=120):
+    """(rc, saída) de um comando rodado de novo na conferência, por argv e sem shell; estourar o tempo vale rc 124."""
+    parsed = parse_command(cmd)
+    if parsed is None:
+        return 2, "não é um comando que o argv reproduz: %s" % cmd
+    env, sub, words = parsed
+    workdir = os.path.abspath(os.path.join(cwd, os.path.expanduser(sub))) if sub else cwd
+    argv = []
+    for w, expand in words:
+        if expand:
+            w = os.path.expanduser(w)
+            if re.search(r"[*?\[]", w):
+                achados = sorted(glob.glob(w, root_dir=workdir))
+                argv.extend(achados or [w])
+                continue
+        argv.append(w)
+    try:
+        r = subprocess.run(argv, cwd=workdir, env={**os.environ, **env}, capture_output=True, text=True, timeout=timeout)
     except subprocess.TimeoutExpired:
         return 124, "tempo esgotado (%d s)" % timeout
     except OSError as e:
@@ -159,6 +224,29 @@ def ultimo_marcador(path, pid):
     return m.group(1) if m else None
 
 
+def has_pending_checks(pl, pid):
+    """True se o `### Pn` ainda tem subpasso `[ ]`."""
+    p = pl.passo(pid)
+    return p is not None and any(marca == " " for _, marca, _ in p.checks)
+
+
+def neutraliza_marcador(path, pid):
+    """Troca o último `<!-- fim-Pn: feito|parado -->` do worklog por um comentário que o `wait` não lê; o texto fica."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            linhas = f.read().split("\n")
+    except OSError:
+        return False
+    for i in range(len(linhas) - 1, -1, -1):
+        m = re.match(RE_MARCADOR % re.escape(pid), linhas[i].rstrip())
+        if m:
+            linhas[i] = "<!-- reaberto: era fim-%s: %s -->" % (pid, m.group(1))
+            with open(path, "w", encoding="utf-8") as f:
+                f.write("\n".join(linhas))
+            return True
+    return False
+
+
 def _abs(pl, caminho):
     return caminho if os.path.isabs(caminho) else os.path.join(pl.raiz, caminho)
 
@@ -175,8 +263,8 @@ tags:
 # {pln} {pid}: {titulo}
 
 Worklog do executor do passo {pid} do {pln}, criado pela coordenação em {hoje}. O executor preenche as seções abaixo; a
-coordenação o confere e o commita com o plano. O marcador de fim (`<!-- fim-{pid}: feito -->` ou `parado`) é a última
-linha, e só entra quando o passo termina.
+coordenação o confere e o commita com o plano. O marcador de fim é o comentário HTML `fim-{pid}` com `feito` ou `parado`
+(o pedido dá a forma exata), última linha do arquivo, e só entra quando o passo termina.
 
 ## O que se fez
 
@@ -200,6 +288,16 @@ def cria_worklog(pl, p, path, hoje):
     with open(path, "w", encoding="utf-8") as f:
         f.write(txt)
     return True
+
+
+def effective_model_effort(agent, model, effort):
+    """(model, effort, aviso): o `brza sessions` recusa `--effort` sem `--model`. O Codex ganha o `CODEX_MODEL`; o runtime sem
+    modelo padrão conhecido perde o esforço, com o aviso."""
+    if model or not effort:
+        return model, effort, None
+    if agent == "codex":
+        return CODEX_MODEL, effort, None
+    return None, None, "o `brza sessions` recusa --effort sem --model e não há modelo padrão para %s: abro sem --effort" % agent
 
 
 def _caminho_da_arvore(saida, nome):
@@ -228,19 +326,35 @@ def cmd_open(a, c):
     m = le_manifesto(pl)
     ant = m["passos"].get(pid) or {}
     if ant.get("estado") in VIVOS and not a.dry_run:
-        c.err("o passo %s já tem executor %s (%s): use `wait` ou `status`; `open` só reabre passo fechado, parado ou "
-              "falhado" % (pid, ant.get("sessao"), ant.get("estado")))
+        c.err("o passo %s já tem executor %s (%s): use `wait` ou `status`; `open` só reabre passo parado, falhado ou "
+              "fechado sem evidência" % (pid, ant.get("sessao"), ant.get("estado")))
         return 1
+    if (ant.get("estado") == "feito" or ant.get("estado") == "evidencia-gravada" or ant.get("evidencia")) and not a.dry_run:
+        if ant.get("estado") == "feito" or not has_pending_checks(pl, pid):
+            c.err("o passo %s está %s e a evidência dele já foi lida: `open` não reabre (só passo parado, falhado, fechado ou com "
+                  "subpasso `[ ]` pendente); a evidência fica como está" % (pid, ant.get("estado")))
+            return 1
     agent = a.agent or "claude"
     model = a.model or (SONNET if agent == "claude" else None)
-    effort = a.effort
+    model, effort, aviso = effective_model_effort(agent, model, a.effort)
+    if aviso:
+        c.err("⚠ " + aviso)
     hoje = c.hoje()
     worklog = os.path.join(pl.raiz, "work", "worklogs", "%s-%s-%s.md" % (hoje, base, step_request.slug(p.titulo)))
-    # o checkout: `brza tree`, o dado ou o worktree do workspace
+    # o checkout: `brza tree` ou o dado; sem nenhum dos dois, recusa (o padrão seria o próprio brza-workspace)
+    if not a.tree and not a.checkout:
+        c.err("passe --checkout <worktree> ou --tree <nome>: sem eles o executor trabalharia no brza-workspace, onde o "
+              "pedido proíbe o commit")
+        return 2
     if a.tree:
         tipo = a.type or "feat"
         branch = "%s/%s" % (tipo, a.tree)
         padrao = os.path.join(os.path.dirname(step_request._repo_principal(pl.raiz)), "brza-studio", ".worktrees", a.tree)
+        try:   # A13: confere o pedido antes de criar o worktree
+            step_request.monta(pl, pid, worklog, padrao, branch, hoje)
+        except step_request.Recusa as e:
+            c.err("recusado: %s" % e)
+            return 1
         argv_tree = ["tree", a.tree, "--type", tipo]
         if a.dry_run:
             c.out("[dry-run] brza " + shlex.join(argv_tree))
@@ -251,11 +365,11 @@ def cmd_open(a, c):
                 c.err("o `brza tree` falhou (rc %s): %s" % (rc, (se or so or "").strip()[:300]))
                 return 1
             checkout = _caminho_da_arvore(so, a.tree) or padrao
-    elif a.checkout:
+    else:
         checkout = os.path.abspath(a.checkout)
         branch = a.branch or _branch_atual(checkout)
-    else:
-        checkout, branch = pl.raiz, _branch_atual(pl.raiz)
+        if branch in ("master", "main") and not a.branch:
+            branch = "feat/%s" % base   # nunca a branch principal: a do passo
     if not a.dry_run and not os.path.isdir(checkout):
         c.err("o checkout %s não existe; passe --checkout ou --tree" % checkout)
         return 1
@@ -288,9 +402,13 @@ def cmd_open(a, c):
         c.err("`brza sessions %s` falhou (rc %s): %s" % (nome, rc, ((se or "") + (so or "")).strip()[:400]))
         return 1
     if res == "ja":
-        c.err("⚠ %s já estava aberta (`running:`); não reabri." % nome)
-    elif res == "sem-id":
+        c.err("%s já está aberta (`running:`) e o pedido novo não chegou a ela: feche com `brza sessions close %s` e rode `open` "
+              "de novo; o marcador do worklog ficou como estava" % (nome, nome))
+        return 1
+    if res == "sem-id":
         c.err("⚠ %s abriu sem o id do provedor; o `wait` o grava depois. Não relance." % nome)
+    if not novo:
+        neutraliza_marcador(worklog, pid)   # só com a sessão nova aberta: o marcador do executor anterior não vale para ela
     e = {"sessao": nome, "agent": agent, "model": model, "effort": effort, "checkout": checkout, "branch": branch,
          "pedido": os.path.relpath(pedido, pl.raiz), "worklog": os.path.relpath(worklog, pl.raiz),
          "marcador": "fim-%s:" % pid, "estado": "aberto", "eventos": [], "evidencia": None, "medicao": None}
@@ -340,13 +458,35 @@ def cmd_send(a, c):
         c.err("`brza sessions send` falhou (rc %s): %s" % (rc, (se or so or "").strip()[:300]))
         return 1
     c.out("%s · enviado a %s (%s)" % (pid, e["sessao"], st or "ok"))
-    novo = "em-curso" if e.get("estado") in ("bloqueado", "parado", "aberto") else e.get("estado")
+    partial = e.get("estado") == "evidencia-gravada" and has_pending_checks(pl, pid)   # cobre parcial: falta subpasso
+    if e.get("estado") in ("feito", "parado") or partial:
+        neutraliza_marcador(_abs(pl, e["worklog"]), pid)   # o retrabalho pede um marcador novo, e o `wait` não pode devolver o velho
+    novo = "em-curso" if e.get("estado") in ("bloqueado", "parado", "aberto", "feito") or partial else e.get("estado")
     evento(c, e, novo, "send: %s" % (a.operation or "sem operation"))
     salva_manifesto(pl, m)
     return 0
 
 
 # ---------------------------------------------------------------- wait
+
+def wait_error_verdict(rc, erro, streak, nomes):
+    """(ação, mensagem, nome) para o `error` do `brza sessions wait`. Ação: `missing` (o `brza` diz "0 chats abertos se chamam
+    <nome>" para um dos `nomes`: só essa sessão se perdeu, e quem chama a marca `falhou` e segue com as outras), `stop` (nome
+    duplicado, rc fora de 0/1/75 ou `MAX_WAIT_ERRORS` erros seguidos) ou `retry` (pausa `WAIT_ERROR_PAUSE`)."""
+    m = RE_NO_SESSION.search(erro)
+    if m and m.group(2) in nomes:
+        if int(m.group(1)) == 0:
+            return "missing", "a sessão %s não existe mais no `brza sessions` (fechada à mão?); confira `brza sessions list` e "\
+                              "reabra com `open`" % m.group(2), m.group(2)
+        return "stop", "o nome %s está em %s chats abertos: o `brza sessions` não sabe qual esperar; feche o que sobra" % (
+            m.group(2), m.group(1)), m.group(2)
+    if rc not in (0, 1, 75):
+        return "stop", "o `brza sessions wait` falhou (rc %s): %s" % (rc, erro), None
+    if streak >= MAX_WAIT_ERRORS:
+        return "stop", "o `brza sessions wait` falhou %d vezes seguidas (rc %s): %s" % (streak, rc, erro), None
+    return "retry", "⚠ o `brza sessions wait` falhou (rc %s, %d/%d): %s; espero %d s" % (
+        rc, streak, MAX_WAIT_ERRORS, erro, WAIT_ERROR_PAUSE), None
+
 
 def _linha_evento(pid, estado, c, e):
     mi = minutos(c, e)
@@ -378,6 +518,8 @@ def cmd_wait(a, c):
     resultado = {}
     avisado = set()
     vistos = set()
+    erros = 0
+    ultima_batida = t0
     for pid in pids:
         e = m["passos"][pid]
         if e.get("estado") == "aberto":
@@ -403,9 +545,21 @@ def cmd_wait(a, c):
             marcadores = ["%s:<!-- %s" % (_abs(pl, m["passos"][pids[0]]["worklog"]), m["passos"][pids[0]]["marcador"])]
         ini = c.clock()
         rc, dado = wait_brza(list(nomes), trecho, markers=marcadores)
-        if dado.get("error") and rc not in (0, 1, 75):
-            c.err("o `brza sessions wait` falhou (rc %s): %s" % (rc, dado["error"]))
-            return 1
+        if dado.get("error"):
+            erros += 1
+            action, msg, perdida = wait_error_verdict(rc, dado["error"], erros, list(nomes))
+            c.err(msg)
+            if action == "stop":
+                return 1
+            if action == "missing":
+                perdido = nomes[perdida]
+                resultado[perdido] = "falhou"
+                evento(c, m["passos"][perdido], "falhou", "wait: sessão inexistente")
+                c.out(_linha_evento(perdido, "falhou", c, m["passos"][perdido]))
+                break
+            c.sleep(WAIT_ERROR_PAUSE)
+            continue
+        erros = 0
         sem_fim = False
         for ev in dado.get("events") or []:
             tipo = str(ev.get("type") or "").lower().replace("-", "_")
@@ -442,7 +596,8 @@ def cmd_wait(a, c):
             c.sleep(min(5, max(0, fim - c.clock())))   # o `wait` volta na hora com o turno já terminado: não gira
         elif c.clock() - ini < trecho and (dado.get("timed_out") or rc == 75):
             c.sleep(max(0, trecho - (c.clock() - ini)))
-        if c.clock() < fim and not resultado:
+        if c.clock() < fim and not resultado and c.clock() - ultima_batida >= BATIDA:
+            ultima_batida = c.clock()
             c.out(" · ".join("%s · em curso %s min (último evento há %s min)" % (
                 p, minutos(c, m["passos"][p]) or 0, minutos(c, m["passos"][p], m["passos"][p]["eventos"][-1]["at"]) or 0)
                 for p in pids))
@@ -462,7 +617,7 @@ def cmd_wait(a, c):
 
 # ---------------------------------------------------------------- evidence
 
-RE_ITEM = re.compile(r"^\s*(?:[-*]\s+)?(commit|comando|arquivos|desvios)\s*:\s*(.*)$", re.I)
+RE_ITEM = re.compile(r"^\s*(?:[-*]\s+)?(commit|comando|arquivos|desvios|cobre)\s*:\s*(.*)$", re.I)
 RE_COMMIT = re.compile(r"(?:([\w.-]+)@)?\b([0-9a-f]{7,40})\b")
 RE_COMANDO = re.compile(r"^`(.+?)`\s*(?:→|->)\s*(.*?)\s*(\(\s*≤\s*2\s*min\s*\))?\s*$")
 
@@ -473,7 +628,7 @@ def le_evidencia(texto):
     ini = next((i for i, l in enumerate(linhas) if re.match(r"^##\s+Evidência\s*$", l)), None)
     if ini is None:
         return None
-    ev = {"commits": [], "comandos": [], "arquivos": [], "desvios": [], "aguarda": False, "bruta": []}
+    ev = {"commits": [], "comandos": [], "arquivos": [], "desvios": [], "aguarda": False, "bruta": [], "cobre": None}
     dentro = False
     for l in linhas[ini + 1:]:
         if re.match(r"^#{1,2}\s", l) or re.match(r"^<!-- fim-", l.strip()):
@@ -498,6 +653,12 @@ def le_evidencia(texto):
             mc = RE_COMANDO.match(valor.replace("\\`", "`"))
             if mc:
                 ev["comandos"].append({"cmd": mc.group(1), "resultado": mc.group(2), "rerun": bool(mc.group(3))})
+        elif tipo == "cobre":   # `cobre: todos` ou `cobre: 1, 3`: os subpassos que a evidência cobre
+            if re.match(r"^todos\b", valor, re.I) or ev["cobre"] == "todos":
+                ev["cobre"] = "todos"   # `todos` vence; várias linhas `cobre:` se juntam
+            else:
+                novos = [x.strip().strip("`*") for x in valor.split(",") if x.strip()]
+                ev["cobre"] = (ev["cobre"] or []) + [x for x in novos if x not in (ev["cobre"] or [])]
         elif tipo == "arquivos":
             ev["arquivos"] = [x.strip().strip("`") for x in valor.split(",") if x.strip()]
         else:
@@ -505,8 +666,9 @@ def le_evidencia(texto):
     return ev
 
 
-def confere(ev, checkout, raiz, c):
-    """Roda as conferências: [(ok, linha)]. `ok` None é "não conferido" (informativo)."""
+def confere(ev, checkout, raiz, c, rerun=False):
+    """Roda as conferências: [(ok, linha)]. `ok` None é "não conferido" (informativo). O comando do worklog só roda com
+    `rerun` (o `--apply` ou o `--rerun`) e se for simples: o worklog é entrada de outra sessão."""
     res = []
     for repo, sha in ev["commits"]:
         base = raiz if repo == "brza-workspace" else checkout
@@ -516,6 +678,14 @@ def confere(ev, checkout, raiz, c):
     for k in ev["comandos"]:
         if not k["rerun"]:
             res.append((None, "não rodei `%s` (sem `(≤ 2 min)`): vale a palavra do executor: %s" % (k["cmd"], k["resultado"])))
+            continue
+        if not rerun:
+            res.append((None, "não rodei `%s`: a proposta não roda comando do worklog (use `--rerun` ou `--apply` depois de ler): "
+                              "vale a palavra do executor: %s" % (k["cmd"], k["resultado"])))
+            continue
+        if parse_command(k["cmd"]) is None:
+            res.append((None, "não rodei `%s`: não é um comando que o argv reproduz (só `VAR=v` e `cd X &&` na frente; sem `;`, `|`, `>`, `$`, crase); vale a palavra do "
+                              "executor: %s" % (k["cmd"], k["resultado"])))
             continue
         rc, so = run_shell(k["cmd"], checkout)
         cauda = [l for l in so.strip().split("\n") if l.strip()]
@@ -592,8 +762,23 @@ def mede(c, pl, e, settle, measurements=None, sessions=None):
     return out
 
 
-def aplica_no_plano(pl, pid, linha, executado):
-    """Grava no `### Pn`: o `Executado`, o `[x]` nos subpassos pendentes e a `**Evidência:**`. Devolve os subpassos marcados."""
+def check_number(texto):
+    """O número do subpasso (`**3. Texto**` → `3`, `**4a. …**` → `4a`); None se o texto não começa por número."""
+    m = re.match(r"^[\s*`]*(\d+[a-z]?)\s*[.)]", texto)
+    return m.group(1).lower() if m else None
+
+
+def unknown_covered(p, cobre):
+    """Os números de `cobre:` que o passo não tem."""
+    if not isinstance(cobre, list):
+        return []
+    tem = {check_number(texto) for _, _, texto in p.checks}
+    return [x for x in cobre if x.lower() not in tem]
+
+
+def aplica_no_plano(pl, pid, linha, executado, cobre=None):
+    """Grava no `### Pn`: o `Executado`, o `[x]` nos subpassos pendentes e a `**Evidência:**`. Devolve os subpassos marcados.
+    `cobre` é a lista de números que a evidência declara; None ou `"todos"` marca todos os pendentes."""
     p = pl.passo(pid)
     arq = p.arquivo
     linhas = list(arq.linhas)
@@ -603,7 +788,7 @@ def aplica_no_plano(pl, pid, linha, executado):
         linhas[p.linha_horas] = ("%s · Executado: %s" % (mm.group(1), executado)) if mm else "%s · Executado: %s" % (l.rstrip(), executado)
     marcados = []
     for i, marca, texto in p.checks:
-        if marca == " ":
+        if marca == " " and (not isinstance(cobre, list) or (check_number(texto) or "") in [x.lower() for x in cobre]):
             linhas[i] = linhas[i].replace("[ ]", "[x]", 1)
             marcados.append(re.sub(r"\*\*", "", texto).split("—")[0].strip())
     if p.evidencia_ini is not None:
@@ -648,7 +833,7 @@ def cmd_evidence(a, c):
     if ev is None or not (ev["commits"] or ev["comandos"] or ev["arquivos"] or ev["aguarda"]):
         c.err("o worklog %s não traz `## Evidência` com itens (`commit:`, `comando:`, `arquivos:`): volte ao executor pelo `send`" % wl)
         return 1
-    res = confere(ev, e["checkout"], pl.raiz, c)
+    res = confere(ev, e["checkout"], pl.raiz, c, rerun=bool(a.apply or getattr(a, "rerun", False)))
     for _, linha in res:
         c.out(linha)
     ruins = [l for ok, l in res if ok is False]
@@ -662,6 +847,14 @@ def cmd_evidence(a, c):
     if not plan_state.evidencia_valida(linha):
         c.err("a evidência não traz commit, comando com `→` nem `arquivo:linha`: não vale")
         ruins.append("evidência sem prova")
+    faltam = unknown_covered(pl.passo(pid), ev.get("cobre"))
+    if faltam:
+        c.err("`cobre:` cita o subpasso %s, que o passo %s não tem" % (", ".join(faltam), pid))
+        ruins.append("cobre com subpasso inexistente")
+    if ev.get("cobre") is None:
+        c.out("⚠ o worklog não traz `cobre:`: sem `cobre:`, o `--apply` marca todos os subpassos pendentes")
+    else:
+        c.out("cobre: %s" % (ev["cobre"] if ev["cobre"] == "todos" else ", ".join(ev["cobre"])))
     if ruins:
         c.err("não confere (%d): volte ao executor pelo `send`; o passo não fecha" % len(ruins))
         return 1
@@ -672,7 +865,7 @@ def cmd_evidence(a, c):
         c.err("o marcador é `parado`: o executor achou desvio que muda o D; leve o X à rodada, não grave o passo como feito")
         return 1
     executado = medicao["texto"]
-    marcados = aplica_no_plano(pl, pid, linha, executado)
+    marcados = aplica_no_plano(pl, pid, linha, executado, ev.get("cobre"))
     mudou = plan_state.fix_horas(pl.path)
     e["evidencia"] = {"linha": linha, "executado": executado, "desvios": ev["desvios"], "gravada_em": iso(c.clock()),
                       "conferencias": [l for _, l in res]}
@@ -851,6 +1044,7 @@ def main(argv=None, *, out=None, err=None, clock=None, sleep=None):
     ev.add_argument("plano")
     ev.add_argument("passo")
     ev.add_argument("--apply", action="store_true")
+    ev.add_argument("--rerun", action="store_true", help="roda os comandos `(≤ 2 min)` do worklog, só os simples, sem gravar")
     ev.add_argument("--settle", type=float, default=60)
     ev.add_argument("--no-panel", action="store_true")
     ev.add_argument("--measurements")

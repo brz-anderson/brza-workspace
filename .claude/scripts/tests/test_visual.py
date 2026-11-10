@@ -91,6 +91,28 @@ class Png(unittest.TestCase):
         self.assertIsNone(visual.gera_png(self.html, self.png, 736, 4200))
         self.assertEqual(visto["args"], (self.html, self.png, 736, 4200, 1))
 
+    def test_css_de_reserva_so_vai_ao_chrome_e_o_brza_recebe_o_html_intacto(self):
+        # A14: o `brza shot` injeta os tokens do chat; um `:root` no HTML venceria o tema dele
+        self.runner(0)
+        self.assertIsNone(visual.gera_png(self.html, self.png, 736, chrome_css=":root{--x:1}"))
+        self.assertEqual(self.chamadas[0][2], os.path.abspath(self.html))
+        with open(self.html, encoding="utf-8") as f:
+            self.assertEqual(f.read(), "<p>oi</p>")
+        os.remove(self.png)
+        self.runner(2, err="boom")
+        visto = {}
+
+        def chrome(html, png, width, altura, scale):
+            with open(html, encoding="utf-8") as f:
+                visto["texto"], visto["html"] = f.read(), html
+            open(png, "wb").close()
+            return None
+        visual._chrome = chrome
+        self.assertIsNone(visual.gera_png(self.html, self.png, 736, chrome_css=":root{--x:1}"))
+        self.assertIn("<style>:root{--x:1}</style>", visto["texto"])
+        self.assertNotEqual(visto["html"], self.html)
+        self.assertFalse(os.path.exists(visto["html"]))      # o temporário não fica
+
     def test_brza_ausente_cai_no_chrome_com_a_altura_padrao(self):
         self.runner(127, err="No such file")
         visto = {}

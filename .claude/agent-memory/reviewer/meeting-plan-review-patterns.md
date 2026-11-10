@@ -31,6 +31,24 @@ repete em cinco lugares:
   Claude da R1, e o `estado-rN.json` não tem o custo deles (`custo_usd: null`).
 - **Linha citada da issue de origem desliza** (a proposta citou 46–50, o pedido está em 62–66); confira toda faixa.
 
+- **O plano viola a regra que ele mesmo declara, num lugar distante dela** (reunião tev1, 2026-11-09): o portão P6
+  recusa opção com > 80% das respostas, e a tabela de fases põe no catálogo a pergunta que dá 86%. O "começa pelo
+  corpus" do requisito convive com o corpus na fase 3. O "probe com texto real, não resumo" desqualifica a medição que
+  sustenta o uso "começar". Para achar: liste as regras da proposta (portão, régua, "nunca") e passe cada linha das
+  fases e da classificação por elas. Deu 90–95.
+- **A ressalva da R3 some sem registro, mesmo quando a proposta diz que marcou todas.** Compare cada célula de
+  ressalva com um grep na proposta, e cuidado com a atribuição invertida: o plano citava Ferrolho como apoio do uso,
+  e o worklog dele punha uma condição que o plano dizia o contrário.
+- **Retenção ou limpeza desenhada num só escritor, enquanto outra peça grava o mesmo tipo de dado por fora** (o hook,
+  o `route` no `measurements.jsonl`). É o caso irmão da correção.
+- **Na reescrita a partir do parecer, a correção abre um buraco vizinho, e o número do revisor vira custo do plano.**
+  O "escritor único" não dizia onde mora: o hook é norma comum (`.brza/core.lock`) e o resolver está em outro
+  repositório. O esquema novo perdeu os `runs`. O "probe em < 1 min" que eu dei contava só a máquina, sem a rotulagem
+  à mão. Na reverificação, confira se cada correção cabe no repositório e no volume reais (≥ 20 itens existem?), e
+  revise o seu próprio número citado.
+- **Limite de contexto medido com texto sintético** (vocabulário pequeno, palavras curtas): o texto real estoura bem
+  antes. Refaça com um trecho de worklog real; 6.000 caracteres deram 2.169 tokens.
+
 Como achar rápido: extrair as tabelas de voto dos worklogs por regex e recalcular, e comparar cada HEX do plano com
 as entradas fixas do script de auditoria.
 
@@ -47,6 +65,9 @@ as entradas fixas do script de auditoria.
 
 - "Fatos M marcados [medido] pela coordenação estão errados": na reunião CI no chat, M1–M8 conferiram todos; o erro
   estava no recorte (taxa por autor) e na citação (`:84` cobre só metade do M8).
+
+- Na reunião tev1, de novo: M1–M19, o placar da R3 e a média da sala bateram. O desvio estava na frase ("somam no
+  total" era o acréscimo) e na fonte (valor que só o briefing traz, citado como do `.out`).
 
 **Quando o pedido manda não ler as confianças antes de dar o número**, elas podem estar no próprio alvo (a seção "A
 confiança do plano") e no `estado-rN.json`: leia o alvo por faixa de linhas e não abra o estado inteiro; se viu,

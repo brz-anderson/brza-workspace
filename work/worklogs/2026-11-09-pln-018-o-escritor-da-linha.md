@@ -25,10 +25,12 @@ Codex ficam no PLN-004 e chamam o escritor daqui, e que este plano não instala 
   `subagents/` não vira linha.
 - `python3 -m unittest tests.hooks.test_runtime_turn` e os testes do carimbo e do `usage` no checkout do
   `brza-workflow` → 21 passed. Nenhum json de hook foi instalado.
+- O commit é o `5098439` na `master` local do `brza-workflow`. P1–P4 fecham com ele. As horas executadas, 1,5 no
+  total, são a conta desta sessão, não um cronômetro do log.
 
 ## O que ficou
 
-O commit do `brza-workflow` espera confirmação. P1–P4 fecham com ele.
+A revisão da entrega. O commit ainda não foi enviado ao `origin`.
 
 ## Fora do workspace
 
@@ -37,10 +39,10 @@ O commit do `brza-workflow` espera confirmação. P1–P4 fecham com ele.
 - **O quê e onde:** `core/.claude/hooks/runtime_turn.py`, `tests/hooks/test_runtime_turn.py`, e as emendas em
   `bin/brza-note`, `packages/client/bin/brza-sessions`, `tests/cli/test_brza_note.py`,
   `tests/cli/test_brza_sessions.py` e `README.md`, no checkout `/Users/andepb/Projects/brza-workflow`, branch `master`.
-- **O risco:** a `master` fica suja, e outra sessão pode commitar ou descartar esses arquivos.
-- **Estado:** ativo, sem commit.
-- **Como desfazer:** `git checkout --` nos arquivos rastreados e apagar os dois novos.
+- **O risco:** o commit está só na `master` local; outra sessão pode divergir antes do push.
+- **Estado:** commitado em `5098439`, sem push.
+- **Como desfazer:** `git revert 5098439` nesse checkout.
 
 ## Custo da tarefa
 
-Não medida — sessão sem turno medido · até 21:22 de 2026-11-09, pelo `brza note commit` · sem o turno do commit
+Não medida — sessão sem turno medido · até 21:43 de 2026-11-09, pelo `brza note commit` · sem o turno do commit

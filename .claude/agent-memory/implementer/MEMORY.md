@@ -1,2 +1,3 @@
 - [brza-workflow MCP](brza-workflow-mcp.md) — tempo da suíte cli, falhas de base, armadilhas de signal/poll_interval no servidor
 - [Correções de revisão no packages/mcp](brza-workflow-mcp-correcoes.md) — stash para provar o teste antes, reserva de vaga, escopo da passada, config com lista fechada
+- [P7 e o isolamento do ambiente](brza-workflow-p7-isolamento-env.md) — NoteFixture limpa o ambiente da sessão; linha de base de falhas; golden à mão

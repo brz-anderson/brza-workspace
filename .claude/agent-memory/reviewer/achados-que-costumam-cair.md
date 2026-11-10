@@ -97,6 +97,24 @@ Hipóteses que caíram na revisão do `fix/brza-run-argv` (2026-11-09):
 - **"Algum chamador conta com o contrato antigo de juntar com espaço"** (~70): o ▶ digita o bloco no zsh da aba e o
   despacho do `brza` passa o argv intacto; as linhas `run` da medição e os transcripts só mostram um argumento citado.
 
+Hipóteses que caíram na revisão do PLN-012/P7 (2026-11-09, isolamento do ambiente na suíte):
+
+- **"Teste fora do `NoteFixture` ainda grava `task` no log real"** (~80): o `test_migrate_pln008` e o
+  `test_brza_note_index` herdam do `IndexFixture`, que herda o `setUp`; o `test_brza_init` só commita issue, e sem
+  worklog não há `task`. Conferir a herança da classe e a condição que grava antes de afirmar.
+- **"O título novo no `re.split` casa `## Custo da tarefa anterior`"** (~70): o `\s*$` exige fim de linha; o CRLF passa.
+
 **Why:** cada um teria entrado como achado importante e sido refutado pela sessão principal em um comando.
 **How to apply:** nesses três formatos, rodar o cheque antes de pôr confiança; o que cair vai como `→ falso`.
 Relacionado: [[padroes-de-erro-em-planos-extraidos]].
+
+Hipóteses que caíram na revisão da entrega do PLN-012 (2026-11-09):
+
+- **"O CLAUDE.md sincronizado não tem `task` nem `run`"** (~85): o `system-reminder` do arranque traz o `CLAUDE.md` do
+  começo da sessão; o arquivo em disco já tinha. Ler o disco antes de acusar a norma.
+- **"Commit com n worklogs não divide: cada um mostra o total"** (~80): a coluna `turnos` não divide, mas custo e tempo
+  sim (US$ 16,00 da sessão → 4,00 em cada um dos 4). Somar os turnos do segmento no log antes de afirmar.
+- **"O `claude_pid()` chamado no `brza-note` fora de sessão quebra ou trava o commit"** (~70, 2ª rodada): ele engole
+  toda exceção e devolve `(None, None)`; o `ps` tem `timeout=2` e leva ~6 ms. Ler o `try` da função reaproveitada.
+- **"A CPU arredondada a '0 s' vira ruído"** (~60): só sai "0 s" abaixo de 0,5 s, o que é verdade na resolução da
+  regra do D3, e a CPU do `brza run` já tinha a mesma forma.

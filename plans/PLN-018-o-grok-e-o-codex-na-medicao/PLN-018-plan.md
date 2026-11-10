@@ -1,12 +1,12 @@
 ---
-status: in_progress
-phase: execution
+status: in_review
+phase: review
 origin: request
 description: Grava a linha de turno do Grok e do Codex no log de medida, com o mesmo id no carimbo da tarefa, e sonda como medir o Antigravity.
 ready: sim
 estimate_h: 5
-executed_h: 0
-remaining_h: 5
+executed_h: 1.5
+remaining_h: 0
 scope:
   - brza-workflow
 opened: 2026-11-09
@@ -18,9 +18,9 @@ tags:
 
 # PLN-018: O turno do Grok e do Codex entra no log, e a tarefa carimba o id dessa sessão
 
-- **Retomar:** Em 2026-11-09 Anderson mandou executar o escritor aqui (R4). O `runtime_turn.py` está no working tree
-  do `brza-workflow`; os testes passaram. P1–P4 fecham no commit de lá, que ainda não foi feito. O
-  `.grok/hooks/runtime.json` e o hook do Codex ficam no PLN-004. Este plano não instala outro json.
+- **Retomar:** P1–P4 fechados em 2026-11-09, `brza-workflow@5098439`, ainda só na `master` local. Próximo: a revisão
+  da entrega. O `.grok/hooks/runtime.json` e o hook do Codex ficam no PLN-004 e chamam esse script. Este plano não
+  instala outro json.
 - **Dividido:** [PLN-018 — Entrevista](PLN-018-interview.md)
 
 ## Pedido
@@ -280,43 +280,51 @@ sonda, e o processo do hook não tem nenhuma das duas. Sem a igualdade com o `se
 
 Executa D1 · executor: sessão que conduz
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0.5 h
 
-- [ ] **1. Teste que falha** — dois turnos no `usage.json` do pai, o do filho já contido neles, e um segundo Stop `shutdown`
-- [ ] **2. O script** `brza-workflow/core/.claude/hooks/runtime_turn.py`, modo `grok`
-- [ ] **3. Rodar** `python3 -m unittest tests.hooks.test_runtime_turn`
-- [ ] **4. Commit** no `brza-workflow`
+- [x] **1. Teste que falha** — dois turnos no `usage.json` do pai, o do filho já contido neles, e um segundo Stop `shutdown`
+- [x] **2. O script** `brza-workflow/core/.claude/hooks/runtime_turn.py`, modo `grok`
+- [x] **3. Rodar** `python3 -m unittest tests.hooks.test_runtime_turn`
+- [x] **4. Commit** no `brza-workflow`
+
+**Evidência:** `brza-workflow@5098439` · `python3 -m unittest tests.hooks.test_runtime_turn` e os testes do carimbo e do `usage` → 21 passed
 
 ### P2 — A linha do Codex
 
 Executa D2 · executor: sessão que conduz
 
-Estimado: 1 h · Executado: — h
+Estimado: 1 h · Executado: 0.5 h
 
-- [ ] **1. O mesmo script, modo `codex`** — delta `usage`, custo null, `guardian_review` sem linha
-- [ ] **2. Rodar** o mesmo unittest
-- [ ] **3. Commit** no `brza-workflow`, junto do P1
+- [x] **1. O mesmo script, modo `codex`** — delta `usage`, custo null, `guardian_review` sem linha
+- [x] **2. Rodar** o mesmo unittest
+- [x] **3. Commit** no `brza-workflow`, junto do P1
+
+**Evidência:** `brza-workflow@5098439` · o mesmo unittest → 21 passed
 
 ### P3 — O carimbo lê o id do Grok
 
 Executa D3 · executor: sessão que conduz
 
-Estimado: 1 h · Executado: — h
+Estimado: 1 h · Executado: 0.3 h
 
-- [ ] **1. `task_context`** lê `GROK_SESSION_ID` só na ausência de `CLAUDE_CODE_SESSION_ID`
-- [ ] **2. `--until`** continua a exigir sessão Claude
-- [ ] **3. Rodar** `tests/cli/test_brza_note.py`, com o teste de 1138 verde
-- [ ] **4. Commit** no `brza-workflow`, junto do P1
+- [x] **1. `task_context`** lê `GROK_SESSION_ID` só na ausência de `CLAUDE_CODE_SESSION_ID`
+- [x] **2. `--until`** continua a exigir sessão Claude
+- [x] **3. Rodar** `tests/cli/test_brza_note.py`, com o teste de 1138 verde
+- [x] **4. Commit** no `brza-workflow`, junto do P1
+
+**Evidência:** `brza-workflow@5098439` · `TaskCommitTest.test_without_session_preserves_worklog_bytes_and_writes_null_session`, `test_grok_session_id_alone_is_stamped_on_the_worklog_and_the_task` e `test_until_with_only_grok_session_id_is_refused` → passed
 
 ### P4 — O `brza sessions usage` chama a leitura
 
 Executa D1 · executor: sessão que conduz
 
-Estimado: 1 h · Executado: — h
+Estimado: 1 h · Executado: 0.2 h
 
-- [ ] **1. O comando `usage` do Grok** chama `read_grok_usage`. Sem arquivo, continua `unmeasured`. O Antigravity não muda
-- [ ] **2. Rodar** `tests/cli/test_brza_sessions.py`
-- [ ] **3. Commit** no `brza-workflow`, junto do P1
+- [x] **1. O comando `usage` do Grok** chama `read_grok_usage`. Sem arquivo, continua `unmeasured`. O Antigravity não muda
+- [x] **2. Rodar** `tests/cli/test_brza_sessions.py`
+- [x] **3. Commit** no `brza-workflow`, junto do P1
+
+**Evidência:** `brza-workflow@5098439` · `test_usage_grok_sums_turns_from_usage_json_and_not_the_session_object`, `test_usage_grok_and_antigravity_are_unmeasured` e `test_usage_codex_ignores_info_null_and_returns_last_totals` → passed
 
 ## Regressão
 
@@ -336,8 +344,8 @@ Estimado: 1 h · Executado: — h
   arquivo de hook fica lá. O complemento do mesmo dia nomeou este plano como único escritor, os três leitores da
   função e a reescrita do D8 e do D9 contra este Desenho. O corte dos passos continua esperando.
   [PLN-018: o aviso do PLN-004](../../work/worklogs/2026-11-09-pln-018-o-aviso-do-pln-004.md)
-- 2026-11-09 — R4: executar o escritor aqui. P1–P4 abertos; o script está no working tree do `brza-workflow` e os
-  testes passaram. O commit de lá espera confirmação. Nenhum json de hook foi instalado.
+- 2026-11-09 — R4: executar o escritor aqui. P1–P4 fechados em `brza-workflow@5098439`, na `master` local. A revisão
+  da entrega é o próximo. Nenhum json de hook foi instalado.
   [PLN-018: o escritor da linha](../../work/worklogs/2026-11-09-pln-018-o-escritor-da-linha.md)
 
 ## Pendências conhecidas

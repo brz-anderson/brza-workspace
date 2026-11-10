@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40345, #39162 e as issues #40492, #40343, #39177 trazem autocompletion inline, IDs/paths de workspaces e histórico de navegação.
+description: Os PRs #40743, #40345, #39162 e as issues #40492, #40343, #39177 trazem listagem de agentes por workspace, foco de terminal por plugins e autocompletion.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,8 @@ tags:
 
 # Histórico de navegação no editor e identificação de workspaces por plugins
 
-Rastreado do PR aberto no upstream [`stablyai/orca#40345`](https://github.com/stablyai/orca/pull/40345) (resolve Issue [`#40343`](https://github.com/stablyai/orca/issues/40343)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40743`](https://github.com/stablyai/orca/pull/40743) (resolve Issue [`#40742`](https://github.com/stablyai/orca/issues/40742)),
+[`stablyai/orca#40345`](https://github.com/stablyai/orca/pull/40345) (resolve Issue [`#40343`](https://github.com/stablyai/orca/issues/40343)),
 [`stablyai/orca#39162`](https://github.com/stablyai/orca/pull/39162) e das issues
 [`stablyai/orca#40492`](https://github.com/stablyai/orca/issues/40492),
 [`stablyai/orca#39177`](https://github.com/stablyai/orca/issues/39177),
@@ -48,9 +49,16 @@ Rastreado do PR aberto no upstream [`stablyai/orca#40345`](https://github.com/st
    O editor embutido Monaco suportava autocompletar e snippets via hooks tradicionais de linguagem, mas não expunha ponto
    de extensão para sugestões inline em texto cinza (*ghost text*) aceitas via `Tab` (estilo Copilot, Supermaven ou modelos locais).
    Plugins que quisessem oferecer completude assistida por IA precisavam substituir o editor inteiro por um webview customizado.
+7. **Incapacidade de plugins inspecionarem agentes de outros workspaces e focarem terminais (`#40743`, resolve `#40742`):**
+   A API de plugins (`agents.list`) retornava exclusivamente os agentes do workspace ativo no momento. Extensões e pontes
+   externas (como Stream Deck, hubs de monitoramento ou scripts de orquestração) ficavam cegas em relação a agentes em execução
+   em outros workspaces e não dispunham de método para focar diretamente a aba/painel do terminal de um agente alvo (`terminal.focus`).
 
 ## O que o upstream implementa
 
+- **Listagem de agentes por workspace e foco de terminal via API de plugins (`#40743`):**
+  - Atualiza a Host API de plugins para v1.7, adicionando `workspaceId?` opcional em `agents.list(params?: { workspaceId? })`;
+  - Adiciona o método `terminal.focus({ terminalId })` sob a permissão `workspace:write`, trazendo a aba e o painel do terminal correspondente para o primeiro plano da janela ativa do desktop.
 - **Hook de plugin `editor.inlineCompletion` para sugestões de ghost text (`#40345`):**
   - Introduz o hook de worker `editor.inlineCompletion` (schema since `1.4.256`), permitindo que plugins injetem o campo mutável `suggestion`;
   - Conecta um provedor nativo no Monaco (`monaco-inline-completion-provider.ts`) com debounce de digitação de 300ms, enviando contexto delimitado do cursor (até 32 KiB de prefixo e 8 KiB de sufixo) e exibindo a resposta diretamente como texto fantasma inline aceito com `Tab`.
@@ -78,6 +86,7 @@ Rastreado do PR aberto no upstream [`stablyai/orca#40345`](https://github.com/st
 
 ## O que fazer
 
+- Adotar `agents.list({ workspaceId? })` e `terminal.focus({ terminalId })` na API de plugins (`#40743`) para controle externo de agentes.
 - Adotar o hook `editor.inlineCompletion` para habilitar plugins de completude de código via IA em ghost text no Monaco (`#40345`).
 - Expor `id` e `path` absoluto do workspace em `workspace.readContext` e no evento `workspace.changed` (`#40492`).
 - Adotar o histórico de navegação (`editor.navigateBack` / `editor.navigateForward`) no editor do `brza-studio` (`#39162`).

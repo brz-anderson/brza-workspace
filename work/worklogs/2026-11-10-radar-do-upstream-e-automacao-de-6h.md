@@ -8,6 +8,7 @@ completed: 2026-11-10
 tags:
   - tooling
 refs:
+  - issue:aprovacao-de-workers-no-chat-atualizacao-de-agentes-e-diretorio-de-mensagens
   - issue:autenticacao-mcp-no-chat-alerta-de-turnos-ativos-e-cache-de-orquestracao
   - issue:badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes
   - issue:bifurcacao-de-conversas-no-chat-ui-e-resiliencia-de-inicializacao-do-claude
@@ -83,3 +84,25 @@ refs:
    - [Workers de plugins em hosts remotos e gerenciamento CLI de SSH](../issues/workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh.md):
      adicionado o PR `#40589` / issue `#38342` (execução de painéis de plugins da barra lateral direita no host pareado onde o workspace
      focado reside, usando RPC de streaming `plugins.panelSession` com validação de fingerprint de consentimento e nota visual informativa `Running on <host>`).
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-10)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-10T09:00:00Z` e `2026-11-10T15:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Aprovação de workers no chat, atualização de agentes e diretório de mensagens](../issues/aprovacao-de-workers-no-chat-atualizacao-de-agentes-e-diretorio-de-mensagens.md):
+     rastreia o PR `#40756` (cartões `NativeChatApprovalCard` no chat do coordenador com contagem regressiva, faixa "N approvals · Show" e botões
+     Allow/Deny que respondem via `orchestration.approvalAnswer` gerando recibos transparentes),
+     PR `#40760` / issue `#40714` (painel expansível "Chat history" no Chat UI com virtualização `VirtualizedList` para mais de 10k mensagens e atalhos completos de teclado),
+     PR `#40679` / issue `#24958` (segmento na status bar informando CLIs de agentes desatualizadas com popover detalhado e atualização com 1 clique),
+     PR `#40754` e PR `#40712` (resiliência contra exaustão de PIDs/processos em cgroups, contendo falha ao spawn individual e protegendo o daemon),
+     PR `#40757` (exibição de credenciais herdadas e allowlist `passEnv` em scripts de receitas de ambiente) e
+     PR `#40750` (rolagem suave e sem flicker no Claude Code em tela cheia).
+3. **Atualização de 2 issues existentes em `work/issues/`:**
+   - [Bifurcação de conversas no Chat UI e resiliência de inicialização do Claude](../issues/bifurcacao-de-conversas-no-chat-ui-e-resiliencia-de-inicializacao-do-claude.md):
+     adicionado o PR `#40705` / issue `#40704` (bifurcação direta de chats para um novo worktree isolado com cópia nativa de conversação
+     `destinationCwd` para Claude, Codex e ACP, além do modo "As a background subagent…" que reporta automaticamente via `orca orchestration send`).
+   - [Histórico de navegação no editor e identificação de workspaces por plugins](../issues/historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins.md):
+     adicionado o PR `#40743` / issue `#40742` (extensão da API de plugins Host API 1.7 com `agents.list({ workspaceId? })` para listar agentes de qualquer
+     workspace e `terminal.focus({ terminalId })` para trazer aba e painel de terminal para o primeiro plano via plugin).

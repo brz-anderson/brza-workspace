@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40548, #40558, #39823, #38326, #39168, #38001 e #38381 trazem identidade nativa, persistência de contas, fork de chats e resiliência de startup.
+description: Os PRs #40705, #40548, #40558, #39823, #38326, #39168, #38001 e #38381 trazem fork para novo worktree, identidade nativa, persistência de contas e resiliência de startup.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Bifurcação de conversas no Chat UI e resiliência de inicialização do Claude
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40548`](https://github.com/stablyai/orca/pull/40548),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40705`](https://github.com/stablyai/orca/pull/40705) (resolve Issue [`#40704`](https://github.com/stablyai/orca/issues/40704)),
+[`stablyai/orca#40548`](https://github.com/stablyai/orca/pull/40548),
 [`stablyai/orca#40558`](https://github.com/stablyai/orca/pull/40558),
 [`stablyai/orca#39823`](https://github.com/stablyai/orca/pull/39823) (atendendo à Issue [`#38326`](https://github.com/stablyai/orca/issues/38326)),
 [`stablyai/orca#38001`](https://github.com/stablyai/orca/pull/38001) (resolve Issue [`#37707`](https://github.com/stablyai/orca/issues/37707)),
@@ -64,9 +65,20 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40548`](https://github.com
 10. **Aba inoperante ao retomar conversa de CLI com transcript inexistente (`#38001`, resolve `#37707`):**
    Ao tentar retomar uma sessão de histórico do Claude CLI cuja transcrição em disco estivesse corrompida, vazia ou ausente,
    a interface do Native Chat congelava aguardando mensagens inexistentes, criando uma aba morta sem recuperação automática.
+11. **Impossibilidade de bifurcar chats para novos worktrees isolados com histórico completo (`#40705`, resolve `#40704`):**
+   A ação "Fork from this response" só permitia criar uma cópia em uma nova aba dentro do mesmo worktree. Ao desejar testar
+   uma abordagem arriscada, refatoração paralela ou investigação paralela sem sobrescrever arquivos locais, o desenvolvedor
+   tinha que abrir manualmente um terminal, criar outro worktree e colar um resumo limitado, perdendo a conversa original do agente.
 
 ## O que o upstream implementa
 
+- **Bifurcação de chat diretamente para novo worktree com histórico nativo (`#40705`, resolve `#40704`):**
+  - Adiciona menu no botão de Fork com opções: "In a new tab", "Into a new worktree…" e "As a background subagent…";
+  - Permite escolher a base do novo branch (Main branch ou This branch), cria o worktree e solicita cópia nativa da conversa para o novo diretório (`destinationCwd`):
+    - Claude: grava a cópia no bucket de projeto da nova pasta;
+    - Codex e agentes ACP: bifurcam a sessão apontando o novo folder como `cwd`;
+  - "As a background subagent…" inicializa o agente em segundo plano no novo worktree com a tarefa informada e endereço de reporte automático via `orca orchestration send`;
+  - Organiza os novos worktrees de fork aninhados visualmente sob o worktree pai na barra lateral e exibe link "Forked from" funcional.
 - **Identidade nativa estrita e delimitação de lançamento para o Claude (`#40548`):**
   - Restringe a identidade de chat do Claude estritamente ao ambiente nativo interativo do Studio/Orca;
   - Isola a geração de títulos e execuções em segundo plano sob identidades separadas de cliente e impõe limites rígidos
@@ -104,6 +116,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40548`](https://github.com
 
 ## O que fazer
 
+- Adotar o fork de conversas diretamente para novos worktrees e subagentes em segundo plano com reporte via orquestração (`#40705`).
 - Adotar a contenção de identidade nativa e fronteira de lançamento do Claude (`#40548`).
 - Incorporar a preservação de estado de runtime por conta no refresh do Claude (`#40558`).
 - Implementar o fallback seguro para nova sessão ao retomar conversas sem transcript salvo (`#38001`).

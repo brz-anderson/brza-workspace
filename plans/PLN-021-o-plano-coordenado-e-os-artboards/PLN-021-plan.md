@@ -544,3 +544,4 @@ Estimado: 0.5 h · Executado: — h
   [A entrevista do PLN-021: o plan-runner com sessão coordenadora e a skill de artboards](../../work/worklogs/2026-11-09-a-entrevista-do-pln-021.md)
 - 2026-11-10 — Desenho D1–D7 registrado e R4 enviada sem resposta; P1 a P7 executados com as recomendadas, a pedido;
   evals da iteração 1 das duas skills. Travou na R4. [As skills do PLN-021 escritas e os evals da iteração 1](../../work/worklogs/2026-11-10-as-skills-do-pln-021-e-os-evals.md)
+- 2026-11-10 — R4 respondida (Rodada 5, com a R4.6.2 em outra opção), P7 reaberto (X6), P8 feito ([REV-026](../../work/reviews/REV-026-pln-021-p1-a-p7.md)), Rodada 6 e o P11 aberto; o código em inglês subiu à norma. Próximo: o pedido do P11. [O PLN-021: a R4 respondida, o P7 reaberto e a revisão do P8](../../work/worklogs/2026-11-10-pln-021-r4-respondida-e-a-revisao-do-p8.md)

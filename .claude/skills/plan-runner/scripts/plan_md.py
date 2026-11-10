@@ -257,8 +257,15 @@ class Pergunta:
         return saida
 
     @property
+    def respondida_com_leitura(self):
+        """True se a `**Resposta:**` em texto livre traz a leitura "lida como" que nomeia a opção (e não é contraproposta)."""
+        texto = self.resposta
+        return bool(texto) and bool(re.search(r"[Ll]ida como", texto)) and not re.search(r"contraproposta|esclarecimento", texto)
+
+    @property
     def decidida(self):
-        return self.indice_decidido() is not None
+        """Decidida: a linha `**Decidido**`, ou a resposta em texto livre (também a de seleção múltipla) lida como opção."""
+        return self.indice_decidido() is not None or self.respondida_com_leitura
 
 
 class Rodada:

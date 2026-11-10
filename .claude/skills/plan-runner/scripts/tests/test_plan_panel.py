@@ -67,7 +67,7 @@ class Painel(_exec.Base):
 
     def test_ultima_rodada(self):
         _, h = self.html()
-        self.assertIn("R1 — 2 perguntas, 1 decidida", h)
+        self.assertIn("R1 — 2 perguntas, 2 decididas", h)
 
     def test_publica_seguro_nao_levanta(self):
         r = plan_panel.publica_seguro("PLN-999-nao-existe")

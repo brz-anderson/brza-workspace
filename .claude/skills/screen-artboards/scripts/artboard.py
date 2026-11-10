@@ -299,8 +299,8 @@ def cmd_new(a):
     return 0
 
 
-def _variante(doc, ocultar_css, fallback=''):
-    return doc.replace('</head>', f'<style>{fallback}{ocultar_css}</style></head>', 1)
+def _variante(doc, ocultar_css):
+    return doc.replace('</head>', f'<style>{ocultar_css}</style></head>', 1)
 
 
 def _seleciona(largura, esquema):
@@ -309,7 +309,8 @@ def _seleciona(largura, esquema):
 
 
 def _fallback(meta, tema, packs_dir):
-    """Só o desktop do brza-studio: o `:root` do esquema do pacote, no HTML temporário do PNG (o artboard não o leva)."""
+    """Só o desktop do brza-studio: o `:root` do esquema do pacote, só para o Chrome de reserva do PNG. O `brza shot` já
+    injeta os tokens do chat, e um `:root` no HTML venceria o tema dele."""
     if not meta.get('vivo'):
         return ''
     return fallback_vivo(tokens.carrega(meta['pack'], packs_dir), tema)
@@ -322,9 +323,9 @@ def tira_variante(doc, meta, largura, esquema, destino, tmp_dir, scale, packs_di
     htm = os.path.join(tmp_dir, nome + '.html')
     celula = meta['esquemas'][0] if meta.get('vivo') else esquema
     with open(htm, 'w', encoding='utf-8') as f:
-        f.write(_variante(doc, _seleciona(largura, celula), _fallback(meta, esquema, packs_dir)))
+        f.write(_variante(doc, _seleciona(largura, celula)))
     larg_png = meta['outer'][str(largura)] + 2 * MARGEM
-    return gera_png(htm, destino, larg_png, theme=esquema, scale=scale)
+    return gera_png(htm, destino, larg_png, theme=esquema, scale=scale, chrome_css=_fallback(meta, esquema, packs_dir))
 
 
 def cmd_shot(a):
@@ -349,8 +350,8 @@ def cmd_shot(a):
         os.makedirs(tmp, exist_ok=True)
         htm = os.path.join(tmp, f'{base}-{CHAT_LARGURA}.html')
         with open(htm, 'w', encoding='utf-8') as f:
-            f.write(_variante(doc, '', _fallback(meta, tema, a.packs_dir)))
-        erro = gera_png(htm, chat, CHAT_LARGURA, theme=tema, scale=a.scale)
+            f.write(_variante(doc, ''))
+        erro = gera_png(htm, chat, CHAT_LARGURA, theme=tema, scale=a.scale, chrome_css=_fallback(meta, tema, a.packs_dir))
     else:
         erro = gera_png(a.artboard, chat, CHAT_LARGURA, theme=tema, scale=a.scale)
     (erros if erro else saidas).append(f'{chat}: {erro}' if erro else chat)

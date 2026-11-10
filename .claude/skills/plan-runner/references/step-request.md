@@ -37,7 +37,8 @@ conduz o plano, executa um passo dele.
 
 ## Regras
 - Não grave o plano, não commite nada no brza-workspace, não pergunte a Anderson.
-- Commite na branch do passo quando os testes do que você tocou passarem; não faça merge nem push.
+- Commite na branch do passo, só no checkout dado e nunca na `master`/`main`, quando os testes do que você tocou passarem;
+  não faça merge nem push. Se o checkout for o do próprio brza-workspace, nenhum commit: `commit: aguarda confirmação`.
 - Desvio local: registre no worklog como `X` proposto e siga. Desvio que muda o contrato de um D: pare, registre e
   feche com `parado`.
 
@@ -45,7 +46,9 @@ conduz o plano, executa um passo dele.
 1. Preencha `## Evidência` no worklog, uma linha por item:
    - `commit: brza-studio@<sha7>`
    - `comando: \`<comando>\` → <resultado> (≤ 2 min)` quando roda em até dois minutos
+     (a coordenação reroda sem shell: a forma simples, com no máximo `VAR=v` e `cd <pasta> &&` na frente; sem `;`, `|`, `>`, `$`, crase)
    - `arquivos: <caminho>, …`
+   - `cobre: <n>, <n>` (os números dos subpassos que a evidência cobre) ou `cobre: todos`; só esses viram `[x]`
    - `desvios: X? — <uma linha>` ou `desvios: nenhum`
 2. A última linha do worklog é `<!-- fim-P3: feito -->` ou `<!-- fim-P3: parado -->`.
 3. Envie o status do protocolo que vem abaixo deste pedido. Não envie `worker_done`: a coordenação pede o encerramento.

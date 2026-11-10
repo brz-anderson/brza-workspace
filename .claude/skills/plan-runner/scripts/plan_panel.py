@@ -153,7 +153,7 @@ def coleta(plano, *, at=None, list_json=None, measurements=None, sessions=None, 
     ultima = None
     if rod:
         r = rod[-1]
-        ultima = {"n": r.n, "perguntas": len(r.perguntas), "decididas": sum(1 for q in r.perguntas if q.decidido)}
+        ultima = {"n": r.n, "perguntas": len(r.perguntas), "decididas": sum(1 for q in r.perguntas if q.decidida)}
     h = est["horas"]
     titulo = re.sub(r"^PLN-\d+\s*[:—–-]\s*", "", est["titulo"] or "")
     return {"plano": pl.id, "titulo": titulo, "phase": est["phase"], "status": est["status"], "ready": est["ready"],

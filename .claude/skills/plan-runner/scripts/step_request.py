@@ -10,7 +10,8 @@ trabalhar, as regras e o protocolo de fim (seção `## Evidência` no worklog do
 `<!-- fim-Pn: feito|parado -->`; o commit na branch do passo com os testes verdes, merge e push pedem confirmação).
 
 Padrões: `--out` = `<raiz>/.sessions/pln-nnn/Pn/pedido.md`; `--worklog` = `<raiz>/work/worklogs/<hoje>-pln-nnn-pn-<slug>.md`;
-`--checkout` = `<pasta do repositório>/../brza-studio/.worktrees/pln-nnn-pn`; `--branch` = `feat/pln-nnn-pn`.
+`--checkout` = `<pasta do repositório>/../brza-studio/.worktrees/pln-nnn-pn`; `--branch` = `feat/pln-nnn-pn`, nunca
+`master`/`main` (recusa). O `executor.py open` não usa esse padrão de checkout: exige `--checkout` ou `--tree`.
 
 Recusa, com saída 1, o passo sem `D` quando o plano tem Desenho (salvo os de rodada, revisão, aceite e fechamento) e o
 `R` ou `D` citado que não existe. Imprime o caminho gravado. Saída 2: uso ou plano que não existe.
@@ -53,6 +54,21 @@ def _repo_principal(raiz):
     except (OSError, subprocess.SubprocessError):
         pass
     return raiz
+
+
+def same_repo(path_a, path_b):
+    """True se as duas pastas são do mesmo repositório git (mesmo `--git-common-dir`: raiz, subpasta ou outro worktree dele)."""
+    dirs = []
+    for pth in (path_a, path_b):
+        try:
+            r = subprocess.run(["git", "-C", pth, "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                               capture_output=True, text=True, timeout=15)
+        except (OSError, subprocess.SubprocessError):
+            return os.path.realpath(path_a) == os.path.realpath(path_b)
+        if r.returncode != 0 or not r.stdout.strip():
+            return os.path.realpath(path_a) == os.path.realpath(path_b)
+        dirs.append(os.path.realpath(r.stdout.strip()))
+    return dirs[0] == dirs[1]
 
 
 def _texto_d(plano, d):
@@ -127,6 +143,9 @@ def monta(plano, pid, worklog=None, checkout=None, branch=None, hoje=None):
         checkout = os.path.join(os.path.dirname(_repo_principal(raiz)), "brza-studio", ".worktrees", base)
     if branch is None:
         branch = "feat/%s" % base
+    if branch in ("master", "main"):
+        raise Recusa("a branch autorizada para commit não pode ser master/main; passe a branch do passo (`--branch feat/%s`)" % base)
+    commit_ok = not same_repo(checkout, raiz)
     restr = pl.secao(r"^Restrições\b")
     regr = pl.secao(r"^Regressão\b")
     passo_texto = "\n".join(p.secao.linhas).rstrip()
@@ -163,17 +182,26 @@ def monta(plano, pid, worklog=None, checkout=None, branch=None, hoje=None):
     L.append("- worklog: %s" % worklog)
     L.append("")
     L.append("## Regras")
-    L.append("- Não grave o plano, não commite nada no brza-workspace, não pergunte a Anderson.")
+    L.append("- Não grave o plano, não commite nada no brza-workspace (o worklog fica sem commit: a coordenação o commita), "
+             "não pergunte a Anderson.")
     L.append("- Desvio local: registre no worklog como `X` proposto e siga. Desvio que muda o contrato do D: pare, "
              "registre e feche com `parado`.")
-    L.append("- O pedido autoriza o commit na branch `%s` do checkout, com os testes verdes. Merge e push pedem "
-             "confirmação: não os faça." % branch)
+    if commit_ok:
+        L.append("- O pedido autoriza o commit na branch `%s` do checkout `%s`, e só nele, com os testes verdes; se o "
+                 "checkout estiver em outra branch, crie essa a partir do estado atual. Merge e push pedem "
+                 "confirmação: não os faça." % (branch, checkout))
+    else:
+        L.append("- Este checkout é o do brza-workspace: não commite em lugar nenhum e registre `commit: aguarda "
+                 "confirmação` na evidência.")
     L.append("")
     L.append("## O fim")
     L.append("1. Preencha `## Evidência` no worklog, uma linha por item:")
     L.append("   - `commit: brza-studio@<sha7>` (ou `commit: aguarda confirmação`)")
     L.append("   - `comando: \\`<comando>\\` → <resultado> (≤ 2 min)` quando roda em até dois minutos")
+    L.append("     (a coordenação reroda o comando sem shell: escreva a forma simples, com no máximo `VAR=v` e `cd <pasta> &&` na "
+             "frente; sem `;`, `|`, `>`, `$` nem crase)")
     L.append("   - `arquivos: <caminho>, …`")
+    L.append("   - `cobre: <n>, <n>` (os números dos subpassos que a evidência cobre) ou `cobre: todos`; só esses viram `[x]`")
     L.append("   - `desvios: X? — <uma linha>` ou `desvios: nenhum`")
     L.append("2. A última linha do worklog é `<!-- fim-%s: feito -->` ou `<!-- fim-%s: parado -->`." % (pid, pid))
     L.append("3. Envie o status do protocolo que vem abaixo deste pedido. Não envie `worker_done`: a coordenação pede o "

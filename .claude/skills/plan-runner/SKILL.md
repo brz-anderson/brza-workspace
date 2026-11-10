@@ -52,7 +52,7 @@ perguntas", "Quem pergunta e grava é a sessão principal"); esta skill não a r
 | uma alternativa que muda o que se vê | a skill `screen-artboards` |
 | consultores: `Agent` ou sessão, e a rodada lado a lado | `references/consultants.md`; `$S/consult.py open\|wait\|table\|close PLN-NNN D<n>` |
 | retomar: onde o plano está, o próximo passo, o que não confere | `$S/plan_state.py PLN-NNN` (`--fix` reescreve as três horas) |
-| executar um passo por sessão | `references/conduct.md` e `references/step-request.md`; `$S/executor.py open PLN-NNN P<n>` |
+| executar um passo por sessão | `references/conduct.md` e `references/step-request.md`; `$S/executor.py open PLN-NNN P<n> (--checkout <caminho> \| --tree <nome>)` |
 | esperar o executor, ler a evidência, fechar a sessão | `$S/executor.py wait\|evidence\|close\|status PLN-NNN …` |
 | o painel do plano | sai sozinho dos scripts que mudam o estado; à mão, `$S/plan_panel.py publish PLN-NNN` |
 | o que dizer no chat | `references/narration.md` |

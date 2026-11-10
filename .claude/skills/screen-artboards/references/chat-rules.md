@@ -25,8 +25,9 @@ python3 -I .claude/skills/screen-artboards/scripts/artboard.py shot "<artboard>.
 ```
 
 O `shot` roda o `brza shot` na largura do chat (736) e, na web, uma vez por largura nominal; com `--scheme both`, os dois
-temas. No desktop do `brza-studio`, que usa os tokens vivos, o `shot` injeta o esquema do pacote só no HTML temporário
-(`--theme light|dark`, claro por padrão); o artboard publicado não o leva. Leia cada imagem e procure: corte na direita ou embaixo, coluna estourada, texto sobreposto, contraste ruim no
+temas. No desktop do `brza-studio`, que usa os tokens vivos, o PNG mostra o tema que o `brza shot` emula
+(`--theme light|dark`, claro por padrão), com os tokens que ele injeta; o esquema do pacote só entra se o `shot` cair no
+Chrome de reserva, num HTML temporário, e o artboard publicado nunca o leva. Leia cada imagem e procure: corte na direita ou embaixo, coluna estourada, texto sobreposto, contraste ruim no
 escuro, a moldura desalinhada. Corrija no fragmento e gere de novo, com nome novo.
 
 ## Fora do chat

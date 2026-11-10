@@ -53,8 +53,10 @@ import time
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
+import _kit  # noqa: E402,F401
 import common  # noqa: E402
 import sessions_map  # noqa: E402
+from skillkit import sessions_cli  # noqa: E402
 
 BRZA = os.environ.get("BRZA_BIN", "brza")
 MOLDE = ("Você é uma persona numa reunião multiagente: {nome}, {papel}. Tema: {tema}. Leia o briefing ({briefing}) e a "
@@ -140,20 +142,17 @@ def ensure_prompt(reuniao, p, root):
 def open_argv(reuniao, p, root):
     """O argv (sem o `brza sessions`) que abre a persona."""
     agent, model, effort = settings(p)
-    argv = [p["sessao"], "--agent", agent, "--checkout", checkout_abs(reuniao, root),
-            "--prompt-file", prompt_path(reuniao, p, root), "--title", title_for(reuniao, p, agent, model, effort),
-            "--wait"]
-    return argv + (["--model", model] if model else []) + (["--effort", effort] if effort else [])
+    return sessions_cli.open_argv(p["sessao"], agent=agent, checkout=checkout_abs(reuniao, root),
+                                  prompt_file=prompt_path(reuniao, p, root),
+                                  title=title_for(reuniao, p, agent, model, effort), model=model, effort=effort)
 
 
 def send_argv(sessoes, texto, operation=None):
     """O argv (sem o `brza sessions`) do `send`: UMA chamada para todas as sessões."""
-    return ["send", *sessoes, "--text", texto, "--json"] + (["--operation", operation] if operation else [])
+    return sessions_cli.send_argv(sessoes, text=texto, operation=operation)
 
 
-def close_argv(sessao, modo="close"):
-    """O argv (sem o `brza sessions`) do `close` de UMA sessão; `modo`: close | stop | keep-open."""
-    return ["close", sessao, *{"close": [], "stop": ["--force"], "keep-open": ["--keep-open"]}[modo], "--json"]
+close_argv = sessions_cli.close_argv  # (sessao, modo="close"): close | stop | keep-open
 
 
 def pick(reuniao, nomes):
@@ -168,48 +167,20 @@ raiz_padrao = common.raiz_padrao
 
 # ---------------------------------------------------------------- os corredores
 
-def _roda(argv):
-    """(rc, stdout, stderr), sem shell; `brza` ausente vira rc 127."""
-    try:
-        r = subprocess.run(argv, capture_output=True, text=True)
-    except OSError as e:
-        return 127, "", str(e)
-    return r.returncode, r.stdout, r.stderr
-
-
-def run_sessions(argv):
-    """O corredor do `brza sessions <argv>`."""
-    return _roda([BRZA, "sessions", *argv])
-
-
-def run_brza(argv):
-    """O corredor do `brza <argv>` (só a leitura `orchestration worker-show` do `--status`)."""
-    return _roda([BRZA, *argv])
+run_sessions = sessions_cli.run_sessions  # o corredor do `brza sessions <argv>`
+run_brza = sessions_cli.run_brza  # o corredor do `brza <argv>` (só a leitura `orchestration worker-show` do `--status`)
 
 
 def _cmd(argv):
     return "brza " + " ".join(shlex.quote(a) for a in argv)
 
 
-def _json(texto):
-    try:
-        return json.loads(texto)
-    except (ValueError, TypeError):
-        return None
+_json = sessions_cli._json
 
 
 # ---------------------------------------------------------------- abrir
 
-def interpreta_abertura(rc, out, err):
-    """'aberta' | 'ja' | 'nao-abriu' | 'sem-id' | 'falha', pela saída do `brza sessions <nome>` v2."""
-    texto = f"{out or ''}\n{err or ''}"
-    if rc == 0:
-        return "ja" if re.search(r"^running:", texto, re.M) else "aberta"
-    if re.search(r"CHECK:\s+\S+ não abriu:", texto):
-        return "nao-abriu"
-    if re.search(r"não deu a sessão em", texto):
-        return "sem-id"
-    return "falha"
+interpreta_abertura = sessions_cli.interpreta_abertura  # 'aberta' | 'ja' | 'nao-abriu' | 'sem-id' | 'falha'
 
 
 def tabela(reuniao, escolhidas, entradas, out=print):

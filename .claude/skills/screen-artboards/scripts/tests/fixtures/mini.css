@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+/* um comentário { com chave } */
+:root {
+  --font-sans: var(--app-font-family);
+  --app-font-family: 'Geist', sans-serif;
+  --font-mono: ui-monospace, monospace;
+  --radius: 0.625rem;
+  --background: #fff;
+  --foreground: #0a0a0a;
+  --primary: #171717;
+  --border: #e5e5e5;
+  --chart-1: var(--color-blue-300);
+  --sidebar: #fafafa;
+  --so-light: #123456;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #f0f0f0;
+  --primary: #e5e5e5;
+  --border: rgb(255 255 255 / 0.07);
+  --sidebar: #171717;
+}
+
+@media (min-width: 10px) {
+  :root { --background: #ff0000; }
+}
+
+:root,
+.native-chat-appearance[data-native-chat-scheme='light'] {
+  --destructive: #e40014;
+}
+
+.dark,
+.native-chat-appearance[data-native-chat-scheme='dark'] {
+  --destructive: #ff6568;
+}

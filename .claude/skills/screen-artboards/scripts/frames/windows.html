@@ -1,0 +1,30 @@
+<!-- Janela Windows 11: 1280 x 800 de conteúdo, controles à direita, barra de título reta, cantos de 8 px. -->
+<style>
+.sa-windows { border-radius: 8px; overflow: hidden; background: var(--sa-background);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.3), 0 16px 36px -8px rgba(0,0,0,.38), 0 2px 6px rgba(0,0,0,.2); }
+.sa-windows .sa-win-bar { height: 32px; display: flex; align-items: center; justify-content: space-between;
+  background: var(--sa-sidebar, var(--sa-muted)); border-bottom: 1px solid var(--sa-border); }
+.sa-windows .sa-win-title { display: flex; align-items: center; gap: 8px; padding-left: 12px; font-size: 12px;
+  color: var(--sa-foreground); min-width: 0; }
+.sa-windows .sa-win-title svg { width: 14px; height: 14px; flex: none; color: var(--sa-primary); }
+.sa-windows .sa-win-title span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sa-windows .sa-win-ctl { display: flex; height: 100%; flex: none; }
+.sa-windows .sa-win-ctl b { width: 46px; height: 100%; display: flex; align-items: center; justify-content: center;
+  color: var(--sa-foreground); }
+.sa-windows .sa-win-ctl b:last-child:hover { background: #c42b1c; color: #fff; }
+.sa-windows .sa-win-ctl svg { width: 10px; height: 10px; stroke: currentColor; fill: none; stroke-width: 1; }
+</style>
+<div class="sa-frame sa-windows" data-w="{{W}}" style="width:{{W}}px">
+  <div class="sa-win-bar">
+    <div class="sa-win-title">
+      <svg viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="3.5" fill="currentColor"/></svg>
+      <span>{{TITLE}}</span>
+    </div>
+    <div class="sa-win-ctl">
+      <b><svg viewBox="0 0 10 10"><path d="M0 5.5h10"/></svg></b>
+      <b><svg viewBox="0 0 10 10"><rect x=".5" y=".5" width="9" height="9"/></svg></b>
+      <b><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10"/></svg></b>
+    </div>
+  </div>
+  <div class="sa-screen" style="height:{{H}}px">{{SCREEN}}</div>
+</div>

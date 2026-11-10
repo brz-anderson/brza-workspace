@@ -1,6 +1,6 @@
-# O fluxo principal — abrir, entrevistar, desenhar, planejar
+# O fluxo principal — abrir, entrevistar, planejar
 
-Quatro etapas, nesta ordem, e no `PLN` cada uma pode ser o ponto em que o plano para por uma sessão. O que decide a
+Abrir, entrevistar, desenhar e planejar, nesta ordem, e no `PLN` cada uma pode ser o ponto em que o plano para por uma sessão. O que decide a
 ordem é que cada etapa depende da anterior: não há passo sem desenho quando o gatilho do Desenho vale, e não há desenho
 sem saber o que foi pedido. Antes delas, os Passos 1 e 2 da `SKILL.md` já disseram que é plano e onde ele mora.
 
@@ -37,42 +37,19 @@ recurso, não o primeiro. As rodadas seguem "Como perguntar", na `SKILL.md`.
   o que o teste afirma —, e Anderson confirma antes de ele entrar na Cobertura.
 - **Cada rodada vai ao plano ao fechar**, com o "Apresentado antes", cada opção com o custo e quando se paga, e a
   resposta. Resposta em texto livre vai entre aspas, com a leitura que você fez dela e o que acontece em seguida.
+- **Grave pelo `round_log.py`**, não à mão: escreva a rodada em JSON (a forma está no docstring do script e em
+  `PLN-NNN-design.md` do PLN-021, D6) e rode `$S/round_log.py PLN-NNN --from rodada.json --dry-run`, leia, e rode sem o
+  `--dry-run`. Ele numera a rodada pelo maior `### Rodada` + 1, escreve as opções no formato do molde, põe
+  **Decidido — …** só quando há opção escolhida sem texto livre, e marca "→ reaberta em RN.k" na pergunta que `reabre`
+  cita. A resposta em texto livre vai em `literal`, sem `escolhidas`: ela não é decisão até a rodada seguinte fechar.
 
 Ao terminar, devolva em uma lista o que continua aberto, separado em **estrutura** (bloqueia o desenho) e **texto**
 (vira marcador no plano).
 
 ## Desenhar
 
-**Confira o gatilho** — o molde lista as condições que abrem o Desenho: bifurcação que precisa ser vista para ser
-escolhida, mudança que toca mais de uma parte do app, remodelagem do que já existe. Sem Desenho, a ordem dos passos é a
-do pedido, e o plano segue para Planejar.
-
-1. **Peça o Terreno a um subagente**, que devolve o que existe — a norma, o código, o que outros trabalhos já decidiram —
-   com fonte (`arquivo:linha`) e os arquivos essenciais. Ele não grava nada.
-2. **Peça os itens `D` no molde, com o artefato escrito**, no mesmo laço. Bifurcação com três ou mais alternativas
-   defensáveis ativa os consultores em paralelo, com foco; cada alternativa volta com custo e momento em que se paga.
-3. **Leve as alternativas a uma rodada na mensagem, em texto**, no formato sem a ferramenta, lado a lado sobre os
-   mesmos casos, com a tabela e a recomendação marcada: a caixa da pergunta com opções esconde o artefato que precisa
-   estar à vista para escolher. Quem escolhe é Anderson. Opção que muda o que se vê vem com a comparação à vista:
-   - **Cada alternativa de interface é um artboard**, um `.html` no _scratch_, e a rodada leva o caminho dele. No chat
-     de um app que mostre o artboard na conversa, a forma de entregá-lo e de conferi-lo está em
-     `.claude/rules/brza-client.md`, quando o pacote `client` está instalado.
-4. **Grave o vigente**, com a origem de cada item. A alternativa que perdeu fica até o passo que a transcreve e então
-   sai, com uma linha **Descartada** e o porquê. No `PLN`, a crítica posterior vai para a Entrevista, e o item é
-   reescrito no lugar. A alternativa de interface escolhida vira PNG na pasta do plano, para sobreviver ao scratch:
-   `brza shot <artboard>.html plans/PLN-NNN-…/PLN-NNN-<assunto>.png`, e o item `D` linka a imagem. **A escolhida que vai a
-   uma issue**, e não a um plano, deixa o PNG ao lado dela, `work/issues/<nome-da-issue>.png`, e o corpo da issue linka
-   a imagem.
-5. **Aplique o reverso**: item que vira regra durável do `brza-studio` sai para a norma dele, e o plano cita. Sem isso o
-   Desenho vira uma segunda norma.
-
-**Consultor**, o subagente devolve o Terreno e os itens `D` no molde — a origem de cada item, as alternativas com custo
-e quando se paga, cada ponto sem lastro marcado no lugar em que aparece —, e nada vai ao plano.
-
-**O `PLN` pode parar aqui** — a proposta que espera decisão: `phase: design`,
-`ready: não — aguarda decisão de <quem> sobre D2`. Sai do Desenho ao virar decisão, passos ou norma do `brza-studio`, ou
-ao ser rejeitado, com `status: dropped`, `phase: dropped` e a linha do porquê em `## Worklogs`. O plano de worklog não
-para no Desenho: ou é aceito, ou não entra em `work/`.
+Quando o gatilho do Desenho vale, a etapa está em `references/design.md`: o Terreno, os itens `D`, os consultores e a
+rodada das alternativas, com os artboards de tela pela `screen-artboards`.
 
 ## Planejar
 
@@ -81,10 +58,12 @@ para no Desenho: ou é aceito, ou não entra em `work/`.
    subpassos com o teste que falha antes, o comando e o commit, a linha de evidência —; curta quando é uma rodada ou um
    registro. **Código no passo é instrução, não fonte**: o trecho que o passo pede — a assinatura, o teste que falha
    antes, o corpo quando o `D` o fixou — vale até o commit que o fecha, e dali em diante o disco é a verdade.
-3. **Nomeie o executor**: a sessão que conduz, para o que é nota e rodada; **a sessão do `brza-studio`**, para o passo de
-   código — aberta em `~/Projects/brza-studio`, num worktree em `.worktrees/`, na branch `<tipo>/pln-NNN-<slug>`, uma
-   sessão por entrega (`plans/README.md`, "Branch"); um subagente, para leitura e rascunho; **Anderson**, para o que só
-   se prova no aparelho dele.
+3. **Nomeie o executor**: a coordenação, para o que é nota e rodada; **uma sessão executora**, aberta pelo
+   `executor.py open`, para o passo de código — no `brza-studio`, num worktree em `.worktrees/` que o `--tree` cria, na
+   branch `<tipo>/pln-NNN-pN`, uma sessão por passo (`plans/README.md`, "Branch") —, para o protótipo e para o passo
+   longo do próprio workspace; um subagente (`Agent`), para leitura, rascunho e o passo curto que cabe numa devolução;
+   **Anderson**, para o que só se prova no aparelho dele. A linha `Executa` diz qual: `executor: sessão (executor.py)`,
+   `executor: implementer`, `executor: a coordenação`, `executor: Anderson`.
 4. **Feche a Cobertura**: toda linha com passo e teste, no nível que prova o critério — unidade, ou conferência manual no
    app. Linha da Origem leva o item do pedido (`Pedido 5`) ou a rodada (`R3.2`).
 5. **Escreva o que tem gatilho, quando ele vale**: os Pré-requisitos como assinatura, as Restrições particulares deste
@@ -95,6 +74,9 @@ para no Desenho: ou é aceito, ou não entra em `work/`.
 6. **Leve o corte a uma rodada** — aceitar, juntar, dividir — e só então grave. **A opção que aceita é o aceite do
    plano**, com a data da rodada; frase de aprovação na conversa conta igual, citada. O commit fecha a cada passo verde,
    então o corte em passos é também o corte em commits.
+
+Antes do aceite, rode `$S/plan_state.py PLN-NNN`: passo sem `Executa D…`, `D` sem origem e horas que não somam
+aparecem ali, e o aceite não vai com problema aberto. `$S/plan_state.py PLN-NNN --fix` escreve as três horas.
 
 `ready: sim` quando todo pré-requisito existe em disco. No `PLN`: `phase: execution`, `status: in_progress`. No destino
 worklog, o aceite abre o worklog com o plano dentro, sem frontmatter.

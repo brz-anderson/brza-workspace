@@ -94,6 +94,38 @@ HEAD contra os do disco.
 Caíram de novo, deram 95 de partida: as contagens de teste da Evidência (bateram), os testes novos que não discriminariam
 (5 falharam no código de HEAD) e o `:root` vazado no artboard publicado. Rodar a mutação é o que derruba ou confirma.
 
+**Na 6ª revisão (P11.1 do PLN-021, a reverificação do REV-026, 2026-11-10), a correção cobriu um verbo e deixou o
+vizinho com o mesmo defeito.** O padrão "a correção abre um buraco vizinho" voltou, em quatro formas:
+
+- **O estado velho:** o `open` passou a apagar o marcador velho, e o `send` a um passo `feito` não apagou. O `wait`
+  seguinte voltou na hora. Para cada verbo que retoma o executor (`open`, `send`), rode o `wait` logo depois.
+- **O ramo do `brza` que o falso nunca devolve:** o `sessions` falso sempre "abre", e o `running:` (rc 0, sem mandar o
+  prompt) passou sem teste. Leia o CLI real (`brza-workflow/packages/client/bin/brza-sessions`) atrás dos ramos de rc 0
+  que não fazem o que o nome diz.
+- **A igualdade de caminho no lugar de mesmo repositório:** o `realpath(checkout) != realpath(raiz)` deixou passar o
+  checkout da `master` e as subpastas. Rode com três caminhos do mesmo repositório.
+- **O argv sem shell:** trocar `shell=True` por argv quebra glob, `~`, `VAR=` e `cd &&`, e vira "NÃO confere" falso. O
+  filtro não barra `bash -c`.
+
+O `--marker` do `brza` faz `re.search` no arquivo inteiro, e o molde do worklog cita o marcador na prosa. Confira se a
+conferência do CLI pode casar com o texto do molde.
+
+Caíram de novo, com 90–97 de partida: o laço que gira (agora dorme e para no 5º), os testes que não discriminam
+(`PR_SCRIPTS`/`SKILLKIT` contra o HEAD no scratch: 25 falhas e 3 erros), a cota e o filtro recusando o comando simples.
+A contraproposta "Lida como contraproposta" também ficou fora, como devia. O `PR_SCRIPTS` e o `SKILLKIT` dos `_paths.py`
+são o atalho barato para rodar a suíte nova contra o HEAD.
+
+**Na rodada 2 do P11.1, o parser de comando caseiro errou nos detalhes do shell que ele imita.** O
+`shlex(posix=False)` com `#` como comentário cortava `echo a#b` em `echo a`, e a conferência dava "confere" a outro
+comando. O `~` era expandido nas palavras, mas não no `cd ~/… &&`. A mensagem de recusa mandava um verbo (`executor.py
+close`) que só funciona com a entrada do manifesto. Quando alguém imita o shell, rode `#`, `~` em cada posição, aspas
+com espaço e `cd`. Quando a mensagem de erro manda rodar um comando, rode esse comando no mesmo estado.
+
+**Na rodada 3, o estado novo herdou o buraco antigo.** O `cobre:` parcial deixou o passo em `evidencia-gravada` com
+subpasso `[ ]`. O `open` recusa esse estado, o `send` não o reabre, e o `wait` devolve o `feito` velho. Toda vez que um
+recurso cria um estado parcial, siga o ciclo inteiro dali: `open`, `send`, `wait`, `close` e de novo `open`. Não ponha
+na sonda um comando que grava fora do scratch: o `npm` rodado como amostra deixou um log em `~/.npm/_logs`.
+
 **Why:** a skill nasce de protótipos de scratch, e cada script é endurecido em separado; o contrato entre eles e os
 moldes das references é o que ninguém roda junto.
 **How to apply:** em toda revisão de skill com `scripts/`, rode os comandos do SKILL.md como estão escritos, passe o

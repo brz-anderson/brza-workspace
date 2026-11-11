@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40616, #40564, #40550, #40612 e as issues #40640, #40682 trazem auth MCP no chat, cache de orquestração, alerta de fechamento e fixes de performance.
+description: Os PRs #40953, #40616, #40564, #40550, #40923 trazem alerta antes de fechar janela com chat ocupado, auth MCP, cache e correções.
 scope:
   - brza-studio
   - brza-workflow
@@ -15,11 +15,11 @@ tags:
 
 # Autenticação MCP no chat, alerta de turnos ativos e cache de orquestração
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40616`](https://github.com/stablyai/orca/pull/40616) (resolve Issue [`#38962`](https://github.com/stablyai/orca/issues/38962), relacionado a [`#39920`](https://github.com/stablyai/orca/issues/39920) e [`#38190`](https://github.com/stablyai/orca/issues/38190)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40953`](https://github.com/stablyai/orca/pull/40953) (resolve Issue [`#40640`](https://github.com/stablyai/orca/issues/40640)),
+[`stablyai/orca#40616`](https://github.com/stablyai/orca/pull/40616) (resolve Issue [`#38962`](https://github.com/stablyai/orca/issues/38962), relacionado a [`#39920`](https://github.com/stablyai/orca/issues/39920) e [`#38190`](https://github.com/stablyai/orca/issues/38190)),
 [`stablyai/orca#40564`](https://github.com/stablyai/orca/pull/40564),
 [`stablyai/orca#40550`](https://github.com/stablyai/orca/pull/40550) (resolve Issue [`#39852`](https://github.com/stablyai/orca/issues/39852) e PR [`#40527`](https://github.com/stablyai/orca/pull/40527)),
-[`stablyai/orca#40612`](https://github.com/stablyai/orca/pull/40612) (resolve Issue [`#40607`](https://github.com/stablyai/orca/issues/40607)) e das issues
-[`stablyai/orca#40640`](https://github.com/stablyai/orca/issues/40640) e
+[`stablyai/orca#40923`](https://github.com/stablyai/orca/pull/40923) / [`stablyai/orca#40612`](https://github.com/stablyai/orca/pull/40612) (resolve Issue [`#40607`](https://github.com/stablyai/orca/issues/40607)) e da issue
 [`stablyai/orca#40682`](https://github.com/stablyai/orca/issues/40682).
 
 ## O problema

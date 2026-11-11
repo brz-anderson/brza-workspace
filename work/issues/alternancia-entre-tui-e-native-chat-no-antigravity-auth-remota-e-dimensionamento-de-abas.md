@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40201, #40228, #40229, #40208, #40175 trazem toggle TUI/Chat no Antigravity, login remoto em um clique, tab sizing e catálogo de modelos.
+description: Os PRs #40986, #40980, #40867, #40201 trazem skills no picker do Antigravity, injeção de regras GEMINI/AGENTS, modelos dinâmicos e toggle TUI/Chat.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,12 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40201`](https://github.com/stablyai/orca/pull/40201) (resolve Issue [`#40192`](https://github.com/stablyai/orca/issues/40192)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40986`](https://github.com/stablyai/orca/pull/40986) (resolve Issue [`#40984`](https://github.com/stablyai/orca/issues/40984)),
+[`stablyai/orca#40980`](https://github.com/stablyai/orca/pull/40980) (resolve Issue [`#40979`](https://github.com/stablyai/orca/issues/40979)),
+[`stablyai/orca#40867`](https://github.com/stablyai/orca/pull/40867) (resolve Issue [`#40865`](https://github.com/stablyai/orca/issues/40865)),
+[`stablyai/orca#40912`](https://github.com/stablyai/orca/pull/40912),
+[`stablyai/orca#40901`](https://github.com/stablyai/orca/pull/40901),
+[`stablyai/orca#40201`](https://github.com/stablyai/orca/pull/40201) (resolve Issue [`#40192`](https://github.com/stablyai/orca/issues/40192)),
 [`stablyai/orca#40228`](https://github.com/stablyai/orca/pull/40228),
 [`stablyai/orca#40229`](https://github.com/stablyai/orca/pull/40229) (resolve Issue [`#40227`](https://github.com/stablyai/orca/issues/40227)),
 [`stablyai/orca#40208`](https://github.com/stablyai/orca/pull/40208),
@@ -49,6 +54,19 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40201`](https://github.com
 7. **Painéis remotos presos em "Working" por perda de notificação de parada (`#40183`, resolve `#15317`):**
    Quando eventos assíncronos de `SubagentStop` eram perdidos na rede entre o host remoto e o app, o painel do agente
    permanecia indefinidamente marcado como executando, mesmo com o Claude já ocioso.
+8. **Omissão de skills do Antigravity no menu slash (`/`) do Native Chat (`#40986`, resolve `#40984`):**
+   Ao digitar `/` em chats do Antigravity, a interface listava apenas comandos embutidos de ACP (`/model`, `/effort`, `/clear`,
+   `/plan`, etc.). As skills instaladas em `~/.gemini/config/skills` e `~/.agents/skills` ficavam omitidas porque a falta de um
+   perfil de picker dedicado fazia o relatório de comandos embutidos do ACP suprimir a varredura das pastas de skills.
+9. **Descarte de regras de usuário e workspace (`GEMINI.md` / `AGENTS.md`) pelo Antigravity ACP (`#40867`, resolve `#40865`):**
+   O servidor ACP do Antigravity omitia `rules_config` durante a criação de sessão ACP, ignorando instruções personalizadas
+   globais (`~/.gemini/GEMINI.md` ou `AGENTS.md`) e locais do workspace (`<cwd>/AGENTS.md` ou `GEMINI.md`).
+10. **Descoberta estática de modelos do Antigravity no novo chat (`#40980`, resolve `#40979`):**
+    O seletor de modelos ao criar novos chats do Antigravity não consultava dinamicamente a CLI host `agy`, impedindo o uso imediato
+    de modelos recém-lançados disponíveis na máquina.
+11. **Bloqueio de envio e seleção no primeiro chat de um novo worktree (`#40912`):**
+    O primeiro chat aberto em um novo worktree travava o composer e a escolha de modelos enquanto o runtime do agente inicializava,
+    forçando o desenvolvedor a aguardar o término do bootstrap para redigir o primeiro prompt.
 
 ## O que o upstream implementa e corrige
 
@@ -78,12 +96,25 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40201`](https://github.com
   - Libera previews de respostas consumidas, mantém helpers ativos em índices dedicados e substitui o payload integral de ACP por digests de 64 caracteres, eliminando a lentidão em turnos avançados.
 - **Reconciliação de tarefas pendentes via transcript (`#40183`):**
   - Ao detectar o prompt ocioso, inspeciona atômica e assincronamente os limites do transcript da tarefa do Claude para confirmar a conclusão, eliminando o travamento do estado "Working".
+- **Descoberta de skills do Antigravity no menu slash (`/`) do Native Chat (`#40986`, resolve `#40984`):**
+  - Concede ao Antigravity um perfil de menu de barra (`slash profile`) que preserva a varredura das pastas de skills (`~/.gemini/config/skills` e `~/.agents/skills`) enquanto a sessão relata comandos embutidos de ACP;
+  - Exibe no picker tanto comandos embutidos (`/model`, `/clear`, etc.) quanto skills instaladas com autocomplete.
+- **Injeção de regras de usuário e workspace no Antigravity ACP (`#40867`, resolve `#40865`):**
+  - Localiza arquivos de instrução globais (`~/.gemini/GEMINI.md` ou `AGENTS.md`) e do workspace (`<cwd>/AGENTS.md` ou `GEMINI.md`) com desduplicação por caminho real (`realpath`);
+  - Injeta as regras formatadas sob `<user_rules>` no parâmetro `_meta.antigravity.systemPrompt.append` durante a inicialização (`session/new`, `session/load`, `session/resume`), garantindo obediência às normas de projeto sem alterar binários.
+- **Descoberta dinâmica de modelos da CLI Antigravity (`#40980`, resolve `#40979`):**
+  - Consulta dinamicamente a CLI host `agy` para alimentar o picker de criação de novo chat com todos os modelos disponíveis.
+- **Composer e seletor desbloqueados no primeiro chat de novos worktrees (`#40912`):**
+  - Permite digitar, enviar mensagens e selecionar modelos imediatamente no primeiro chat de um worktree, enfileirando o prompt até o término da inicialização do runtime.
 
 ## O que fazer no BrzA Studio
 
 1. Habilitar a alternância entre TUI e Native Chat para o Antigravity (`#40201`), permitindo alternar via `⌘⇧J` entre a interface de linha de comando e o chat estruturado sem perder o processo ativo.
-2. Adotar o `AgentSignInCard` com túnel de callback de autenticação (`#40228`) para inicialização de Claude e Codex em servidores remotos e SSH sem atrito.
-3. Incorporar os controles de dimensionamento de abas (`tabSizing`, `tabSizingMinWidth`, `tabSizingMaxWidth`) em `Settings → General → Navigation` (`#40229`).
-4. Incluir o fluxo guiado de instalação de agentes a partir do chat (`#40208`).
-5. Sincronizar os seletores de modelo de configurações e criação de workspace com o catálogo dinâmico da conta do host (`#40175`).
-6. Incorporar as otimizações de memória para sessões com muitos subagentes (`#40171`) e a reconciliação de tarefas pendentes via transcript (`#40183`).
+2. Adotar a descoberta de skills do Antigravity no menu slash (`/`) do Native Chat (`#40986`).
+3. Implementar a injeção de regras `AGENTS.md` e `GEMINI.md` via `_meta.antigravity.systemPrompt.append` nas sessões ACP (`#40867`).
+4. Habilitar a descoberta dinâmica de modelos da CLI `agy` (`#40980`) e o composer desbloqueado no primeiro chat de novos worktrees (`#40912`).
+5. Adotar o `AgentSignInCard` com túnel de callback de autenticação (`#40228`) para inicialização de Claude e Codex em servidores remotos e SSH sem atrito.
+6. Incorporar os controles de dimensionamento de abas (`tabSizing`, `tabSizingMinWidth`, `tabSizingMaxWidth`) em `Settings → General → Navigation` (`#40229`).
+7. Incluir o fluxo guiado de instalação de agentes a partir do chat (`#40208`).
+8. Sincronizar os seletores de modelo de configurações e criação de workspace com o catálogo dinâmico da conta do host (`#40175`).
+9. Incorporar as otimizações de memória para sessões com muitos subagentes (`#40171`) e a reconciliação de tarefas pendentes via transcript (`#40183`).

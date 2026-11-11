@@ -1,9 +1,8 @@
 - [Convivência BrzA × Orca](brza-orca-coexistence.md) — o que muda e o que fica Orca para os dois apps rodarem juntos
 - [Worktree node_modules sem symlink](worktree-node-modules-no-symlink.md) — symlink no worktree quebrou o node_modules da raiz; use pnpm install --offline
 - [Os .spec.ts de src/shared não rodam](shared-spec-files-do-not-run.md) — teste novo vai num .test.ts
-- [Procedimento do sync do upstream](upstream-sync-procedure.md) — rebrand por script, linha de base na tag pura, --no-verify no merge, uma suíte por vez
+- [Procedimento do sync do upstream](upstream-sync-procedure.md) — rebrand por script, linha de base na tag pura, pela CI, --no-verify no merge
 - [Worklog sem pedir autorização](worklog-sem-pedir-autorizacao.md) — fechou a tarefa, grave o worklog e commite sem perguntar
-- [Suíte completa uma vez, no merge](suite-completa-uma-vez-no-merge.md) — sessões paralelas rodam só o alvo; a coordenação roda a suíte inteira uma vez na master
 - [oxfmt/oxlint no worktree](oxfmt-oxlint-no-worktree.md) — com vários caminhos não acham arquivo; um por um, e o lint vale pelo lint-staged
 - [O brza-mcp coordena de um chat do Studio](brza-mcp-coordena-de-um-chat-do-studio.md) — dispatch só com os headers de um chat do Studio, por HTTP; --mcp-config fora dele falha
 - [Rodadas com o agy às cegas](rodadas-com-agy-as-cegas.md) — sem a recomendação, opções embaralhadas; discordou, discute-se até o acordo, cinco rodadas e depois Anderson

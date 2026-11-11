@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41099, #41100, #40823, #40820, #39287 trazem confirmação de Escape para parar turnos, PRs mergeados visíveis após rebase e steer.
+description: Os PRs #41212, #41224, #41180, #41099, #41100 trazem chips e hover cards de issues/PRs, indentação com Tab, escape e steer.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,11 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41099`](https://github.com/stablyai/orca/pull/41099) (resolve Issue [`#41097`](https://github.com/stablyai/orca/issues/41097)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41212`](https://github.com/stablyai/orca/pull/41212) (resolve Issue [`#41211`](https://github.com/stablyai/orca/issues/41211)),
+[`stablyai/orca#41224`](https://github.com/stablyai/orca/pull/41224) (resolve Issue [`#41217`](https://github.com/stablyai/orca/issues/41217)),
+[`stablyai/orca#41180`](https://github.com/stablyai/orca/pull/41180) (resolve Issue [`#41178`](https://github.com/stablyai/orca/issues/41178)),
+[`stablyai/orca#41242`](https://github.com/stablyai/orca/pull/41242),
+[`stablyai/orca#41099`](https://github.com/stablyai/orca/pull/41099) (resolve Issue [`#41097`](https://github.com/stablyai/orca/issues/41097)),
 [`stablyai/orca#41100`](https://github.com/stablyai/orca/pull/41100),
 [`stablyai/orca#40823`](https://github.com/stablyai/orca/pull/40823) (resolve Issue [`#40819`](https://github.com/stablyai/orca/issues/40819)),
 [`stablyai/orca#40820`](https://github.com/stablyai/orca/pull/40820),
@@ -164,9 +168,22 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41099`](https://github.com
 - **Prova local de rebase para retenção de PRs mergeados (`#41100`):**
   - Implementa prova local via `git merge-tree --write-tree` (ou `git diff-tree` em Git < 2.38) para certificar que o HEAD rebaseado contém estritamente o trabalho do PR mergeado;
   - Marca o commit como `contained`, mantendo visível o cartão do PR no Source Control e liberando o aviso de exclusão segura do worktree.
+- **Chips e hover cards para issues, PRs e tickets de rastreadores (`#41212`, resolve `#41211`):**
+  - Converte menções a chaves de tickets (`KEY-123` de Linear ou Jira) e URLs de GitHub/GitLab em chips interativos compactos ou completos (`NativeChatReferenceChip`), exibindo título, status e tipo;
+  - Adiciona hover cards nativos sem consultar a web, consultando os stores locais de Linear/Jira e as contas autenticadas de GitHub/GitLab;
+  - Introduz a configuração `Chat > Issue and PR chips` (`Full`, `Compact` ou `Off`) e permite pré-visualizações de links github.com mesmo em workspaces de pastas avulsas sem remotos Git.
+- **Indentação e recuo de listas markdown com Tab e Shift+Tab no composer (`#41224`, resolve `#41217`):**
+  - Intercepta as teclas <kbd>Tab</kbd> e <kbd>Shift+Tab</kbd> no editor ProseMirror do Native Chat quando o cursor está em itens de lista, indentando ou recuando marcadores sem perder o foco nem inserir tabulações cruas.
+- **Ajuste de largura do botão de branch no composer (`#41180`, resolve `#41178`):**
+  - Corrige o estilo CSS do botão de branch no rodapé do composer para abraçar estritamente o texto do branch em vez de esticar por toda a largura restante.
+- **Invalidação inteligente de títulos de chat em cache (`#41242`):**
+  - Atualiza títulos de abas e sessões de chat em cache somente quando os inputs salvos forem modificados, eliminando recomputações cíclicas na barra lateral.
 
 ## O que fazer
 
+- Adotar os chips interativos e hover cards de issues/PRs no Native Chat (`#41212`, resolve `#41211`).
+- Incorporar os atalhos <kbd>Tab</kbd> e <kbd>Shift+Tab</kbd> para indentar/recuar listas no composer (`#41224`, resolve `#41217`).
+- Ajustar a largura do botão de branch no composer (`#41180`, resolve `#41178`) e a invalidação de títulos de chat (`#41242`).
 - Adotar a confirmação de dois toques na tecla Escape antes de interromper turnos ativos no chat (`#41099`).
 - Aplicar a validação local de árvore para preservar PRs mergeados após rebase no Source Control (`#41100`).
 - Manter visíveis as respostas a instruções Steer fora do colapso de turno ("Worked for N") (`#40823`).

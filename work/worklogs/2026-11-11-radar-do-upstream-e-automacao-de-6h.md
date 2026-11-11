@@ -8,6 +8,7 @@ completed: 2026-11-11
 tags:
   - tooling
 refs:
+  - issue:adaptadores-acp-customizados-e-isolamento-de-permissoes-de-sessao
   - issue:agente-kiro-no-native-chat-janela-flutuante-e-enderecamento-de-workspaces
   - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
   - issue:autenticacao-mcp-no-chat-alerta-de-turnos-ativos-e-cache-de-orquestracao
@@ -19,6 +20,7 @@ refs:
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
   - issue:notificacao-de-perda-de-workers-desengasgo-de-correio-e-tipo-notice
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
+  - issue:retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal
   - issue:seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes
 ---
 
@@ -93,4 +95,31 @@ refs:
      adicionado o PR `#40858` / issue `#13302` (abertura de novos terminais e agentes em servidores remotos pareados diretamente a partir do submenu "Open on another host" no botão "+" do Floating Workspace).
    - [Melhorias de Native Chat, ACP do Gemini CLI, abas e diff no upstream](../issues/melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream.md):
      adicionado o PR `#40932` / issue `#40321` (suporte a Antigravity ACP no Windows a partir de `%LOCALAPPDATA%\agy\bin\agy.exe`, catálogo dinâmico de modelos via `agy models` e streamer reativo `antigravity-reactive-turn-streamer.ts` para exibição instantânea de turnos de wakeup de subagentes/tarefas a partir de `transcript.jsonl`).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-11)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-11T15:00:00Z` e `2026-11-11T21:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal](../issues/retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal.md):
+     rastreia o PR `#41206` / issue `#41204` (descoberta de sessões gravadas via `orca agent sessions --worktree <selector> --json` e retomada in-place com `orca agent resume --pane <paneKey>` / `--agent <id> --session <providerSessionId>` sem duplicar abas de agentes ao acordar sessões hibernadas),
+     PR `#41183` (seleção determinística do host de execução padrão no seletor `Run on` por preferências configuradas em vez de ordem de array),
+     PR `#41248` (eliminação de ordenação global O(N log N) de todas as pastas do disco ao resolver o host de um único workspace),
+     PR `#41247` (captura consistente de snapshots de replay de terminal em ponto único de repouso da saída) e
+     issue `#41184` (consulta via CLI sobre qual workspace está em foco e exibido na janela do Studio através de hosts pareados).
+3. **Atualização de 3 issues existentes em `work/issues/`:**
+   - [Cartões de Pull Request, feedback de Steer e atalhos no Native Chat](../issues/cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat.md):
+     adicionados o PR `#41212` / issue `#41211` (chips interativos de tickets Linear/Jira e links de GitHub/GitLab com hover cards nativos no chat),
+     o PR `#41224` / issue `#41217` (suporte a indentação e recuo de listas markdown no composer com <kbd>Tab</kbd> e <kbd>Shift+Tab</kbd>),
+     o PR `#41180` / issue `#41178` (ajuste geométrico do botão de branch no rodapé do composer para abraçar seu conteúdo) e
+     o PR `#41242` (invalidação seletiva de cache para títulos de chat apenas quando os inputs salvos forem modificados).
+   - [Autenticação MCP no chat, alerta de turnos ativos e cache de orquestração](../issues/autenticacao-mcp-no-chat-alerta-de-turnos-ativos-e-cache-de-orquestracao.md):
+     adicionado o PR `#41216` (guarda de consentimento `requireStartupDialog` relendo tela headless antes de enviar cliques de cartões para a PTY do Claude, suporte a cartões para o diálogo multi-servidor `.mcp.json` do Claude 2.1.322 e resumo legível no pill de espera do dashboard de agentes).
+   - [Adaptadores ACP customizados e isolamento de permissões de sessão](../issues/adaptadores-acp-customizados-e-isolamento-de-permissoes-de-sessao.md):
+     adicionados o PR `#41229` / issue `#41170` (redação e ofuscação de credenciais e tokens em saídas stderr de agentes ACP gravadas em mensagens e transcripts),
+     os PRs `#41228`, `#41230` e `#41231` / issues `#41168` e `#41169` (sandbox, limitação de ambiente e validação de setup para sessões Hermes),
+     o PR `#41201` / issue `#41185` (adoção do comando oficial `agent` do Cursor em vez de `cursor-agent`) e
+     o PR `#41243` (isolamento de variáveis de ambiente de tarefas do Codex impedindo vazamento para sessões de chat).
+
 

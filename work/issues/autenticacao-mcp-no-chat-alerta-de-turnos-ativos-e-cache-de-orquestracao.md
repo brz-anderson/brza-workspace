@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40953, #40616, #40564, #40550, #40923 trazem alerta antes de fechar janela com chat ocupado, auth MCP, cache e correções.
+description: Os PRs #41216, #40953, #40616, #40564, #40550, #40923 trazem guarda de cartões MCP, alerta de janela ocupada, auth MCP e cache.
 scope:
   - brza-studio
   - brza-workflow
@@ -15,7 +15,8 @@ tags:
 
 # Autenticação MCP no chat, alerta de turnos ativos e cache de orquestração
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40953`](https://github.com/stablyai/orca/pull/40953) (resolve Issue [`#40640`](https://github.com/stablyai/orca/issues/40640)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41216`](https://github.com/stablyai/orca/pull/41216),
+[`stablyai/orca#40953`](https://github.com/stablyai/orca/pull/40953) (resolve Issue [`#40640`](https://github.com/stablyai/orca/issues/40640)),
 [`stablyai/orca#40616`](https://github.com/stablyai/orca/pull/40616) (resolve Issue [`#38962`](https://github.com/stablyai/orca/issues/38962), relacionado a [`#39920`](https://github.com/stablyai/orca/issues/39920) e [`#38190`](https://github.com/stablyai/orca/issues/38190)),
 [`stablyai/orca#40564`](https://github.com/stablyai/orca/pull/40564),
 [`stablyai/orca#40550`](https://github.com/stablyai/orca/pull/40550) (resolve Issue [`#39852`](https://github.com/stablyai/orca/issues/39852) e PR [`#40527`](https://github.com/stablyai/orca/pull/40527)),
@@ -69,12 +70,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40953`](https://github.com
   - Enfileira startup exclusivo de variáveis de ambiente mesmo sem comando inicial, mantendo `ORCA_REMOTE_VIEWER_CLIPBOARD` ativo.
 - **Remoção de hook incompatível do Droid (`#40612`):**
   - Remove o registro de `PermissionRequest` do instalador Droid, preservando esperas de aprovação nos eventos suportados `PreToolUse` e `Notification`.
+- **Validação de consentimento e cartões para múltiplos servidores MCP (`#41216`):**
+  - Implementa a guarda de segurança `requireStartupDialog` no envio de respostas de cartões interativos para a PTY do Claude: relê a tela headless imediatamente antes de enviar sequências de setas/Enter e recusa o envio se o destaque na tela tiver mudado ou se a tela repintou, impedindo aprovações acidentais em opções divergentes;
+  - Adiciona suporte nativo a cartões para o diálogo multi-servidor `.mcp.json` do Claude 2.1.322 ("N new MCP servers found") com ações "Enable selected" e "Reject all";
+  - Substitui o payload JSON bruto no pill do dashboard de agentes por um resumo legível com o título ou questão da espera interativa (`interactivePromptLabel`).
 
 ## O que fazer no BrzA Studio
 
-1. Incorporar a barra de ferramentas de controle de MCP e comandos Claude (`#40616`) no composer do Native Chat.
-2. Adotar a indexação e cache de fatos de orquestração (`#40564`) para eliminar gargalos de SQLite no Studio.
-3. Adotar o diálogo de proteção de fechamento de janela com chats em andamento (`#40640`).
-4. Considerar a refatoração incremental de projeção de histórico do chat nativo (`#40682`) para prevenir travamentos com chats longos.
-5. Garantir o repasse de ambiente de clipboard em terminais remotos (`#40550`).
-6. Atualizar os hooks do Droid eliminando `PermissionRequest` (`#40612`).
+1. Adotar a guarda de consentimento `requireStartupDialog` e o suporte a cartões de múltiplos servidores MCP (`#41216`).
+2. Incorporar a barra de ferramentas de controle de MCP e comandos Claude (`#40616`) no composer do Native Chat.
+3. Adotar a indexação e cache de fatos de orquestração (`#40564`) para eliminar gargalos de SQLite no Studio.
+4. Adotar o diálogo de proteção de fechamento de janela com chats em andamento (`#40640`).
+5. Considerar a refatoração incremental de projeção de histórico do chat nativo (`#40682`) para prevenir travamentos com chats longos.
+6. Garantir o repasse de ambiente de clipboard em terminais remotos (`#40550`).
+7. Atualizar os hooks do Droid eliminando `PermissionRequest` (`#40612`).

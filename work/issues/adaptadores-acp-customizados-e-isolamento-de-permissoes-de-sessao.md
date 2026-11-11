@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38826, #38807, #37842 e as issues #38866, #38849 trazem contas Codex em keyring, trust de workspace do Cursor, isolamento de permissões SSH e conectores ACP.
+description: Os PRs #41229, #41201, #41243, #38826, #38807 trazem redação de credenciais em ACP stderr, comando oficial do Cursor e isolamento de variáveis.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,12 @@ tags:
 
 # Adaptadores ACP customizados e isolamento de permissões de sessão
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38826`](https://github.com/stablyai/orca/pull/38826),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41229`](https://github.com/stablyai/orca/pull/41229) (resolve Issue [`#41170`](https://github.com/stablyai/orca/issues/41170)),
+[`stablyai/orca#41201`](https://github.com/stablyai/orca/pull/41201) (resolve Issue [`#41185`](https://github.com/stablyai/orca/issues/41185)),
+[`stablyai/orca#41243`](https://github.com/stablyai/orca/pull/41243),
+[`stablyai/orca#41228`](https://github.com/stablyai/orca/pull/41228),
+[`stablyai/orca#41230`](https://github.com/stablyai/orca/pull/41230),
+[`stablyai/orca#38826`](https://github.com/stablyai/orca/pull/38826),
 [`stablyai/orca#38807`](https://github.com/stablyai/orca/pull/38807) (Issue [`#38806`](https://github.com/stablyai/orca/issues/38806)),
 [`stablyai/orca#37842`](https://github.com/stablyai/orca/pull/37842),
 [`stablyai/orca#37895`](https://github.com/stablyai/orca/pull/37895) (Issue [`#37889`](https://github.com/stablyai/orca/issues/37889)),
@@ -70,9 +75,21 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38826`](https://github.com
   `"session"` no RPC de aprovação, mantendo as permissões apenas em memória.
 - **Reflexo de fallback e visibilidade de turnos (`#37861`, `#37883`):** exibe alertas no chat e ajusta o seletor do composer
   quando há fallback de modelo.
+- **Redação de credenciais e segredos em stderr de agentes ACP (`#41229`, resolve `#41170`):**
+  - Aplica filtros de higienização de credenciais, chaves e tokens de autenticação em saídas de stderr emitidas por agentes ACP
+    antes de armazená-las em mensagens de erro do chat e nas transcrições salvas em disco.
+- **Transição para o comando oficial `agent` do Cursor (`#41201`, resolve `#41185`):**
+  - Adota `agent` em vez do binário legado `cursor-agent`, alinhando flags de inicialização e rotas de descoberta com a versão oficial atual.
+- **Isolamento de variáveis de ambiente de tarefas Codex (`#41243`):**
+  - Impede que variáveis de ambiente injetadas em tarefas de geração de código e Codex vazem para agentes de chat e outros adaptadores de texto.
+- **Contenção e sandbox para sessões Hermes (`#41228`, `#41230`, `#41231`):**
+  - Limita a herança de ambiente e acesso CLI a chats Hermes, impede ativação indevida de `--yolo` em trocas de permissão e inclui checks de setup nas configurações.
 
 ## O que fazer
 
+- Implementar a redação de segredos e credenciais em stderr de adaptadores ACP (`#41229`, resolve `#41170`).
+- Adotar o comando oficial `agent` do Cursor (`#41201`, resolve `#41185`) e o isolamento de variáveis do Codex (`#41243`).
+- Aplicar as regras de contenção e sandbox para sessões Hermes (`#41228`, `#41230`).
 - Adotar o suporte a credenciais em Keyring do Codex (`#38826`) e a correção de slugs de trust do Cursor (`#38807`).
 - Garantir que permissões de agentes respeitem as configurações do host de execução em ambientes remotos (`#38866`).
 - Portar o suporte de adaptadores customizados ACP (`#37842`) e o conector ZeroClaw (`#38849`) para o `brza-studio`.

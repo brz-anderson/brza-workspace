@@ -23,6 +23,9 @@ destinatário e devolve um `id`), `mail_status` (recibo), `mail_inbox`/`mail_rea
 `total` e corte declarado. Exposto por Cloudflare Tunnel nomeado + Access com service token, e um token por cliente
 vinculado no servidor ao remetente e aos destinos.
 
+O domínio do túnel já existe: `brza.dev`, registrado em 2026-11-11, com os nameservers na Cloudflare. O host será um
+subdomínio dele, ainda sem nome, e é esse host que entra no "network secret" da Claude Code Cloud.
+
 ## O que a reunião já mediu
 
 - O transporte funciona: Codex CLI e Claude Code consumiram um MCP de prova pelo túnel, com 401 sem token e ~125 ms de

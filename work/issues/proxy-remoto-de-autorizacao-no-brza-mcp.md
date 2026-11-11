@@ -39,6 +39,13 @@ com `BRZA_HOME` isolado).
 - **Gate e política:** o `approved` remoto é recusado (aprova-se no Mac); o `config` também.
 - **Worker:** o `cycle.py` recusa `remote:` como sessão local; o coordenador do worker remoto é uma sessão-caixa.
 
+## O domínio
+
+O túnel nomeado com Access pede um domínio na Cloudflare, e a rodada da reunião deixou "túnel e domínio só depois"
+(D1). **O domínio existe desde 2026-11-11: `brza.dev`**, com os nameservers na Cloudflare (`piper` e
+`sergi.ns.cloudflare.com`, pelo `dig NS brza.dev`). O host do túnel será um subdomínio dele, ainda sem nome. A ordem do
+D1 não muda: o proxy vem antes do túnel.
+
 ## Pronto quando
 
 Os testes negativos em `tests/mcp/` passam: o cabeçalho de fora é ignorado; o `approved` remoto, o `config` e o

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39769, #39733, #39722, #39692 e #39741 trazem agente Kiro via ACP no chat, janela destacada para Floating Workspaces e regras unificadas de CLI.
+description: Os PRs #40858, #39769, #39733, #39722, #39692 trazem terminais remotos no Floating Workspace, agente Kiro via ACP e janela destacada.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,8 @@ tags:
 
 # Agente Kiro no Native Chat, janela flutuante e endereçamento de workspaces
 
-Rastreado do PR aberto no upstream [`stablyai/orca#39769`](https://github.com/stablyai/orca/pull/39769) (resolve Issue [`#30095`](https://github.com/stablyai/orca/issues/30095)),
+Rastreado do PR aberto no upstream [`stablyai/orca#40858`](https://github.com/stablyai/orca/pull/40858) (resolve Issue [`#13302`](https://github.com/stablyai/orca/issues/13302)),
+do PR [`stablyai/orca#39769`](https://github.com/stablyai/orca/pull/39769) (resolve Issue [`#30095`](https://github.com/stablyai/orca/issues/30095)),
 do PR [`stablyai/orca#39733`](https://github.com/stablyai/orca/pull/39733),
 do PR [`stablyai/orca#39722`](https://github.com/stablyai/orca/pull/39722) (atendendo à Issue [`#22167`](https://github.com/stablyai/orca/issues/22167)),
 do PR [`stablyai/orca#39692`](https://github.com/stablyai/orca/pull/39692) e
@@ -42,6 +43,9 @@ do PR [`stablyai/orca#39741`](https://github.com/stablyai/orca/pull/39741) (reso
 5. **Falha de pareamento mobile com bind fixado em interface de rede (`#39741`, `#39728`):**
    Em execuções de `orca serve` com bind associado a uma interface de rede específica (ex.: IP de Tailscale ou VPN),
    o serviço falhava na geração de credenciais e URL de pareamento, assumindo `127.0.0.1` ou abortando conexões remotas válidas.
+6. **Confinamento de terminais em Floating Workspaces exclusivamente ao host local (`#40858`, resolve `#13302`):**
+   No painel do Floating Workspace, o menu "+" permitia abrir apenas novos terminais e agentes locais. Para trabalhar em um
+   servidor pareado, o usuário era obrigado a alternar o servidor ativo de todo o aplicativo.
 
 ## O que o upstream implementa
 
@@ -61,9 +65,13 @@ do PR [`stablyai/orca#39741`](https://github.com/stablyai/orca/pull/39741) (reso
   - Torna o indicador de branch sob o composer em botão interativo que dispara o seletor rápido de branches da barra de status.
 - **Correção de pareamento com binds de interface (`#39741`):**
   - Detecta a interface de rede especificada no bind do servidor `serve`, anunciando o endereço correto no QR code e payload de pareamento mobile.
+- **Terminais e agentes remotos no Floating Workspace (`#40858`, resolve `#13302`):**
+  - Adiciona o submenu "Open on another host" no botão "+" do Floating Workspace, permitindo disparar novos terminais
+    e agentes em servidores pareados sem precisar alterar o host ativo de todo o app.
 
 ## O que fazer
 
+- Permitir a abertura de terminais e agentes em servidores pareados no menu "+" do Floating Workspace (`#40858`).
 - Integrar o Kiro como agente selecionável no Native Chat via ACP com seletor de esforço (`#39769`).
 - Adotar a regra unificada `resolveEnclosingWorkspace`, a flag `--parent-environment` e a proteção contra auto-remoção de worktrees na CLI (`#39733`).
 - Avaliar e portar a janela independente para terminais de Floating Workspaces (`#39722`).

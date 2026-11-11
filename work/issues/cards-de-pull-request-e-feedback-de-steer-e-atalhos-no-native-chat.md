@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40823, #40820, #39287, #39309 trazem visibilidade de respostas a steer, botão send estável, escolhas mid-turn isoladas e atalhos.
+description: Os PRs #41099, #41100, #40823, #40820, #39287 trazem confirmação de Escape para parar turnos, PRs mergeados visíveis após rebase e steer.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,9 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40823`](https://github.com/stablyai/orca/pull/40823) (resolve Issue [`#40819`](https://github.com/stablyai/orca/issues/40819)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41099`](https://github.com/stablyai/orca/pull/41099) (resolve Issue [`#41097`](https://github.com/stablyai/orca/issues/41097)),
+[`stablyai/orca#41100`](https://github.com/stablyai/orca/pull/41100),
+[`stablyai/orca#40823`](https://github.com/stablyai/orca/pull/40823) (resolve Issue [`#40819`](https://github.com/stablyai/orca/issues/40819)),
 [`stablyai/orca#40820`](https://github.com/stablyai/orca/pull/40820),
 [`stablyai/orca#39287`](https://github.com/stablyai/orca/pull/39287) (Issue [`#39286`](https://github.com/stablyai/orca/issues/39286)),
 [`stablyai/orca#39309`](https://github.com/stablyai/orca/pull/39309),
@@ -101,6 +103,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40823`](https://github.com
 20. **Distorção geométrica do botão Send ao alternar prévia de Steer (`#40820`):**
     Ao segurar Cmd/Ctrl para inspecionar o estado de Steer no composer, o botão de envio mudava de formato e perdia o dimensionamento
     circular padronizado, causando tremor visual na barra inferior.
+21. **Parada acidental de turnos de chat ao pressionar Escape (`#41099`, resolve `#41097`):**
+    No composer do chat, um único pressionamento acidental da tecla <kbd>Esc</kbd> cancelava imediatamente o turno ativo do assistente
+    e descartava mensagens pendentes. Faltava uma barreira de confirmação rápida para evitar cancelamentos não intencionais.
+22. **Ocultação de cartões de PRs mergeados após rebase local equivalente (`#41100`):**
+    Ao efetuar o rebase local de um branch sobre a `main` após o merge do PR, o Git gerava um novo SHA local para o HEAD que não
+    constava nos registros do GitHub (`commits/{oid}/pulls`). Isso fazia o Source Control ocultar o cartão do PR e suprimir o
+    aviso de segurança "PR #N is merged … safe to delete".
 
 ## O que o upstream implementa
 
@@ -149,9 +158,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40823`](https://github.com
   - Elimina timeouts curtos artificiais de 60s para Claude, ACP e Pi.
 - **Pass-through de atalhos do aplicativo a partir do composer (`#38724`):**
   - Permite acionar atalhos de janelas e navegação mesmo com foco no editor de texto do chat.
+- **Confirmação de Escape para cancelamento de turnos ativos (`#41099`, resolve `#41097`):**
+  - Exige um segundo pressionamento da tecla Escape dentro de dois segundos para interromper o turno ativo, exibindo "Press Esc again to stop";
+  - Limpa o estado de confirmação ao editar o rascunho, trocar de conversa ou abrir cartões; mantém o botão Stop visual com parada imediata.
+- **Prova local de rebase para retenção de PRs mergeados (`#41100`):**
+  - Implementa prova local via `git merge-tree --write-tree` (ou `git diff-tree` em Git < 2.38) para certificar que o HEAD rebaseado contém estritamente o trabalho do PR mergeado;
+  - Marca o commit como `contained`, mantendo visível o cartão do PR no Source Control e liberando o aviso de exclusão segura do worktree.
 
 ## O que fazer
 
+- Adotar a confirmação de dois toques na tecla Escape antes de interromper turnos ativos no chat (`#41099`).
+- Aplicar a validação local de árvore para preservar PRs mergeados após rebase no Source Control (`#41100`).
 - Manter visíveis as respostas a instruções Steer fora do colapso de turno ("Worked for N") (`#40823`).
 - Adotar a estabilidade visual e proporção circular do botão Send em prévias de Steer (`#40820`).
 - Incorporar o auto-shrink de imagens coladas (`#39050`) e a limpeza de cartões de modelo redundantes (`#39141`) no `brza-studio`.

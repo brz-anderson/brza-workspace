@@ -1,9 +1,9 @@
 {
   "id": "neutral",
-  "extraido_em": "2026-11-09",
-  "origem": {},
-  "pares_mobile": {},
-  "esquemas": {
+  "extracted_at": "2026-11-09",
+  "origin": {},
+  "mobile_pairs": {},
+  "schemes": {
     "light": {
       "background": "#ffffff",
       "foreground": "#1f2328",
@@ -69,9 +69,9 @@
       "sidebar-accent-foreground": "#a9c4fb"
     }
   },
-  "fontes": {
+  "fonts": {
     "sans": "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
     "mono": "ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
   },
-  "espacos": {}
+  "spaces": {}
 }

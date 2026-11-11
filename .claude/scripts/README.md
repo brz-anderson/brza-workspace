@@ -8,11 +8,11 @@ PNG dele. O código nasceu na `meeting-runner` e foi extraído para cá (PLN-021
 
 | Módulo | O que tem |
 | :-- | :-- |
-| `paths.py` | `raiz_padrao()`, `common_root(root)`, `corta_medida(texto)` |
+| `paths.py` | `default_root()`, `common_root(root)`, `strip_measurement(texto)` |
 | `sessions_map.py` | `fold_map`, `load_map`, `map_file`, `read_rows`, `epoch` (o mapa v2) |
-| `sessions_cli.py` | `run_sessions`, `run_brza`, `open_argv`, `send_argv`, `wait_argv`, `close_argv`, `interpreta_abertura`, `wait_brza`, `list_states` |
+| `sessions_cli.py` | `run_sessions`, `run_brza`, `open_argv`, `send_argv`, `wait_argv`, `close_argv`, `interpret_open`, `wait_brza`, `list_states` |
 | `measure.py` | `load_jsonl`, `parse_ts`, `session_ids`, `win_bounds`, `measure_claude`, `measure_codex` |
-| `visual.py` | `salva_visual`, `titulo_seguro`, `gera_png` (`brza shot`; Chrome de reserva), `LIMITE_HTML` |
+| `visual.py` | `save_visual`, `safe_title`, `render_png` (`brza shot`; Chrome de reserva), `LIMIT_HTML` |
 
 ## O import
 

@@ -109,11 +109,11 @@ worktree do playground.
   README.md                 o que mora aqui, a regra do import, como rodar os testes
   skillkit/
     __init__.py
-    paths.py                raiz_padrao(), common_root(root), corta_medida(texto)
+    paths.py                default_root(), common_root(root), strip_measurement(text)
     sessions_map.py         o de hoje, sem dispatch_of (que fica na meeting-runner)
     sessions_cli.py         corredores e argv do `brza sessions` v2
     measure.py              load_jsonl, parse_ts, session_ids, win_bounds, measure_claude, measure_codex
-    visual.py               salva_visual, titulo_seguro, gera_png (brza shot; Chrome de reserva), LIMITE_HTML
+    visual.py               save_visual, safe_title, render_png (brza shot; Chrome de reserva), LIMIT_HTML
   tests/
     _paths.py               põe .claude/scripts no sys.path (ou SKILLKIT)
     test_paths.py  test_sessions_map.py  test_sessions_cli.py  test_measure.py  test_visual.py
@@ -143,21 +143,24 @@ e no script: `sys.path.insert(0, AQUI); import _kit; from skillkit import sessio
 | `open_argv` | `(name, *, agent, checkout, prompt_file, title, model=None, effort=None, rename=False) -> list` | a forma de `launch_persona.py:140-146`; o Antigravity sem modelo |
 | `send_argv` | `(names, text=None, file=None, operation=None) -> list` | `send … --json` |
 | `wait_argv` | `(names, timeout_s, *, any_=True, markers=()) -> list` | `wait … --json`, um `--marker` por item |
-| `close_argv` | `(name, modo="close"\|"stop"\|"keep-open") -> list` | `close [--force\|--keep-open] --json` |
-| `interpreta_abertura` | `(rc, out, err) -> "aberta"\|"ja"\|"nao-abriu"\|"sem-id"\|"falha"` | a de `launch_persona.py:203-212` |
+| `close_argv` | `(name, mode="close"\|"stop"\|"keep-open") -> list` | `close [--force\|--keep-open] --json` |
+| `interpret_open` | `(rc, out, err) -> "aberta"\|"ja"\|"nao-abriu"\|"sem-id"\|"falha"` | a de `launch_persona.py:203-212` |
 | `wait_brza` | `(names, timeout_s, markers=()) -> dict` | roda o `wait` e devolve o JSON (`done`, `pending`, `timed_out`, `events`) |
 | `list_states` | `(names, list_json=None) -> {nome: estado}` | o `fetch_states` de hoje, com a lista de nomes no lugar do manifesto |
 
-**`visual.py`:** `salva_visual(doc, prefixo, meio, chave, titulo, *, publish_dir=None, alvo_padrao=None)` com o
-comportamento de `panel.py:519-539`; `gera_png(html_path, png, width, altura=None, *, theme="light", scale=1)` roda o
+**`visual.py`:** `save_visual(doc, prefix, part, key, title, *, publish_dir=None, default_path=None)` com o
+comportamento de `panel.py:519-539`; `render_png(html_path, png, width, height=None, *, theme="light", scale=1, chrome_css="")` roda o
 `brza shot <html> <png> --width W --theme T --scale S --force` e só cai no Chrome headless se o `brza` faltar ou sair ≠ 0,
-dizendo isso no erro. A assinatura aceita `altura` para a `meeting-runner` não mudar de chamada; o `brza shot` mede a
-altura sozinho. A escala padrão 1 mantém o tamanho do PNG do painel de hoje **[sem lastro, menor]**.
+dizendo isso no erro. `height` só vale para o Chrome (padrão 2000); o `brza shot` mede a
+altura sozinho. `chrome_css` vai só ao HTML temporário do Chrome. A escala padrão 1 mantém o tamanho do PNG do painel de hoje **[sem lastro, menor]**.
 
 **A migração da `meeting-runner`:** cada módulo dela importa por nome do `skillkit`
 (`from skillkit.sessions_map import fold_map, load_map, map_file, read_rows, epoch, common_root`); `sessions_map.py`
-local vira um shim de três linhas mais o `dispatch_of`; `panel.py` troca `gera_png` e `salva_visual` pelos do kit;
-`tally.py` troca o bloco de medição (`:455-560`) pelo `measure`. A troca por atribuição dos testes continua valendo (F3).
+local vira um shim de três linhas mais o `dispatch_of`. Os nomes que os 323 testes já chamam ficam como apelido no
+módulo dela: `default_root as raiz_padrao`, `strip_measurement as corta_medida`, `interpret_open` como
+`interpreta_abertura`, `LIMIT_HTML as LIMITE_HTML`, `PublishError as ErroPublicacao`, e `panel.py` embrulha
+`save_visual` / `render_png` em `salva_visual` / `gera_png`. `tally.py` lê o `measure` e devolve as chaves que a
+reunião já gravava (`custo_usd`, `latencia_s`, `entrada`, `saida`). A troca por atribuição dos testes continua valendo (F3).
 
 **Conferência:** os 323 testes da `meeting-runner` e os do kit, nos dois comandos:
 
@@ -280,27 +283,27 @@ e os números, e o texto integral vai por caminho:
 
 ```json
 {
-  "plano": "PLN-021",
-  "plano_path": "plans/PLN-021-o-plano-coordenado-e-os-artboards/PLN-021-plan.md",
-  "passos": {
+  "plan": "PLN-021",
+  "plan_path": "plans/PLN-021-o-plano-coordenado-e-os-artboards/PLN-021-plan.md",
+  "steps": {
     "P3": {
-      "sessao": "pln021-p3",
+      "session": "pln021-p3",
       "agent": "claude", "model": "claude-opus-5-5", "effort": "high",
       "checkout": "/Users/andepb/Projects/brza-studio/.worktrees/pln-021-p3",
       "branch": "feat/pln-021-p3",
-      "pedido": ".sessions/pln-021/P3/pedido.md",
+      "request": ".sessions/pln-021/P3/pedido.md",
       "worklog": "work/worklogs/2026-11-10-pln-021-p3-o-executor.md",
-      "marcador": "fim-P3:",
-      "estado": "aberto",
-      "eventos": [{"at": "2026-11-10T14:02:11-03:00", "estado": "aberto", "nota": "open: pln021-p3"}],
-      "evidencia": null,
-      "medicao": null
+      "marker": "fim-P3:",
+      "state": "aberto",
+      "events": [{"at": "2026-11-10T14:02:11-03:00", "state": "aberto", "note": "open: pln021-p3"}],
+      "evidence": null,
+      "measurement": null
     }
   }
 }
 ```
 
-`estado` ∈ `aberto` → `em-curso` → `feito` | `parado` (desvio que muda o `D`) | `bloqueado` (o chat pede resposta) |
+O arquivo continua `.sessions/pln-nnn/execucao.json`. O valor de `state` ∈ `aberto` → `em-curso` → `feito` | `parado` (desvio que muda o `D`) | `bloqueado` (o chat pede resposta) |
 `falhou` → `evidencia-gravada` → `fechado`. O mapa de identidade (Dispatch, Run, id do provedor) continua só no
 `.sessions/sessions.jsonl` da raiz comum: o manifesto guarda o nome da sessão, e o resto vem do `sessions_map`.
 
@@ -321,7 +324,7 @@ executor.py status   PLN-NNN [--json]
   `brza sessions pln021-p3 --agent … --model … --effort … --checkout <abs> --prompt-file pedido.md
   --title "PLN-021 P3: <título do passo>" --rename --wait` (F14); grava o manifesto, publica o painel e imprime a tabela.
   O padrão é `--agent claude` com o modelo da camada do passo: Sonnet para a implementação, pela tabela do `AGENTS.md`
-  **[sem lastro, menor]**. A saída segue `interpreta_abertura`: "não abriu" não se relança antes do `pending-*.json`.
+  **[sem lastro, menor]**. A saída segue `interpret_open`: "não abriu" não se relança antes do `pending-*.json`.
 - **`wait`:** `brza sessions wait <sessões> --any --marker <worklog>:<!-- fim-Pn: --timeout T --json` (F9, F10). O
   `ended_without_marker` não é fim: a linha diz "o turno acabou sem o marcador" e a espera segue até o prazo. O marcador
   com `feito` vai a `feito`; com `parado`, a `parado`; o `blocked` do `wait`, a `bloqueado`. Saída: 0 com algum feito ou
@@ -431,7 +434,7 @@ consult.py close PLN-NNN D<n>
   `Custo:` · `Se paga:` · `Reabre:` sobre os casos dados, ataque às outras duas, o que enfraquece a própria e
   `<!-- fim-D<n>: <foco> -->`. Sessão aberta no worktree do playground, só leitura no resto.
 - **`table`** junta os três arquivos numa tabela lado a lado (linhas: custo, se paga, reabre, risco; colunas: os focos),
-  em Markdown para a mensagem e em `::orca-visual` pelo `visual.salva_visual`.
+  em Markdown para a mensagem e em `::orca-visual` pelo `visual.save_visual`.
 - **O roster padrão:** três focos da SKILL.md de hoje (mudança mínima, arquitetura limpa, equilíbrio,
   `SKILL.md:159-161`), cada um num runtime: R5.3.
 
@@ -455,7 +458,7 @@ plan_panel.py render  PLN-NNN --out arquivo.html
 ```
 
 - **Quem chama:** `executor.py` (open, cada evento do `wait`, `evidence --apply`, `close`), `round_log.py` e
-  `plan_state.py --fix`, por import (`plan_panel.publica(...)`), com `--no-panel` para desligar. `⚠ painel: …` não muda
+  `plan_state.py --fix`, por import (`plan_panel.publish_safe(...)`), com `--no-panel` para desligar. `⚠ painel: …` não muda
   o código de saída.
 - **O que mostra:**
   - o cabeçalho: o PLN, o H1, `phase`/`status`, o `ready`, as horas `estimate/executed/remaining` e a soma conferida
@@ -464,10 +467,10 @@ plan_panel.py render  PLN-NNN --out arquivo.html
     a idade do último evento;
   - os executores e consultores vivos, com o estado do `brza sessions list --json`;
   - a última rodada, como `R3 — 3 perguntas, 3 decididas`.
-- **O arquivo:** `pln-nnn-painel-<hash4>.html` pelo `salva_visual`, com a chave `PLN-NNN|AAAA-MM-DD`: um arquivo por
+- **O arquivo:** `pln-nnn-painel-<hash4>.html` pelo `save_visual`, com a chave `PLN-NNN|AAAA-MM-DD`: um arquivo por
   plano e dia, republicado no mesmo nome **[sem lastro, menor]**. O PNG sai na abertura e no fechamento de cada executor,
   como a R10.3 do PLN-017 fez para a reunião (`meeting-runner/SKILL.md:126-128`).
-- **Os dados:** `plan_state.estado(plano)` (D6), o manifesto, o `sessions_map` e o `measure`. Sem `measurements.jsonl`,
+- **Os dados:** `plan_state.state(plan)` (D6), o manifesto, o `sessions_map` e o `measure`. Sem `measurements.jsonl`,
   "sem medição", nunca zero.
 
 ---
@@ -486,9 +489,9 @@ plan_state.py PLN-NNN|caminho [--json] [--next] [--fix] [--strict]
 ```
 
 - **Saída** (`--json`):
-  `{plano, phase, status, ready, proximo: "P4"|null, passos: [{id, titulo, executa: ["D3"], executor, estimado_h,
-  executado_h, estado: "pendente"|"feito"|"descartado", evidencia: bool}], horas: {frontmatter: {...}, somado: {...},
-  confere: bool}, ids: {R: [...], D: [...], P: [...], X: [...], A: [...], C: [...]}, problemas: [{codigo, onde, msg}]}`.
+  `{plan, file, title, phase, status, ready, next: "P4"|null, steps: [{id, title, executes: ["D3"], executor, estimated_h,
+  executed_h, state: "pendente"|"feito"|"descartado", evidence: bool}], hours: {frontmatter: {...}, summed: {...},
+  matches: bool}, ids: {R: [...], D: [...], P: [...], X: [...], A: [...], C: [...]}, problems: [{code, where, msg, level, line}]}`.
   Sem `--json`, uma tela: onde o plano está, o próximo passo e os problemas.
 - **Códigos:** `checked-without-evidence` (o `[x]` sem `**Evidência:**`, ou com uma que não traz commit, comando com
   `→` nem `arquivo:linha`); `checked-without-executed`; `hours-mismatch`; `step-without-design` (o passo sem
@@ -519,30 +522,31 @@ round_log.py PLN-NNN --from rodada.json [--dry-run]
 
 ```json
 {
-  "titulo": "o nome, o executor, os consultores",
-  "enviada": "2026-11-10",
-  "apresentado_antes": "o texto do bloco citado",
-  "respondida": {"data": "2026-11-10", "sessao": "a sessão do workstream playground"},
-  "perguntas": [
+  "title": "o nome, o executor, os consultores",
+  "sent_on": "2026-11-10",
+  "presented_before": "o texto do bloco citado",
+  "answered": {"data": "2026-11-10", "session": "a sessão do workstream playground"},
+  "questions": [
     {
-      "tema": "O commit do executor",
-      "multipla": false,
-      "opcoes": [
-        {"rotulo": "o pedido do passo autoriza o commit na branch do passo", "recomendada": true,
-         "custo": "…", "se_paga": "…"},
-        {"rotulo": "o executor para antes do commit", "custo": "…", "se_paga": "…"}
+      "topic": "O commit do executor",
+      "multiple": false,
+      "options": [
+        {"label": "o pedido do passo autoriza o commit na branch do passo", "recommended": true,
+         "cost": "…", "pays_when": "…"},
+        {"label": "o executor para antes do commit", "cost": "…", "pays_when": "…"}
       ],
-      "resposta": {"escolhidas": [0], "literal": null},
-      "reabre": null
+      "answer": {"chosen": [0], "literal": null, "reading": null},
+      "reopens": null
     }
   ]
 }
 ```
 
-- Acrescenta `### Rodada N — <titulo> (enviada <data>)` na Entrevista (no `-interview.md` quando ele existe), com o
+- Acrescenta `### Rodada N — <título> (enviada <data>)` na Entrevista (no `-interview.md` quando ele existe), com o
   "Apresentado antes", as opções no formato do molde (`plan-template.md:127-143`), e **Decidido — …** quando há
-  `escolhidas` sem `literal`; **Resposta:** "…" com a leitura, quando há `literal`. Com `reabre: "R1.2"`, acrescenta
+  `chosen` sem `literal`; **Resposta:** "…" com a leitura, quando há `literal`. Com `reopens: "R1.2"`, acrescenta
   "**→ reaberta em RN.k**" à linha antiga. O N sai do maior `### Rodada` + 1. Saída 0, 1 com JSON fora da forma.
+  `literal` fica; o Markdown gravado no plano continua em pt-BR.
 
 #### `close_check.py`
 
@@ -632,20 +636,21 @@ tokens.py list
 ```json
 {
   "id": "brza-studio",
-  "extraido_em": "2026-11-10",
-  "origem": {
-    "desktop": {"arquivo": "~/Projects/brza-studio/src/renderer/src/assets/main.css", "sha256": "…",
-                "blocos": [":root", ".dark"]},
-    "mobile": {"arquivo": "~/Projects/brza-studio/mobile/src/theme/mobile-theme.ts", "sha256": "…",
+  "extracted_at": "2026-11-10",
+  "origin": {
+    "desktop": {"file": "~/Projects/brza-studio/src/renderer/src/assets/main.css", "sha256": "…",
+                "blocks": [":root", ".dark"]},
+    "mobile": {"file": "~/Projects/brza-studio/mobile/src/theme/mobile-theme.ts", "sha256": "…",
                "exports": ["lightColors", "darkColors", "spacing", "radii", "typography"]}
   },
-  "esquemas": {
+  "mobile_pairs": {"m-bg-base": "background"},
+  "schemes": {
     "light": {"background": "#ffffff", "foreground": "…", "primary": "…", "border": "…", "radius": "0.625rem",
               "m-bg-panel": "…", "m-bg-raised": "…"},
     "dark":  {"background": "#0a0a0a", "...": "..."}
   },
-  "fontes": {"sans": "…", "mono": "…"},
-  "espacos": {"…": "…"}
+  "fonts": {"sans": "…", "mono": "…"},
+  "spaces": {"…": "…"}
 }
 ```
 
@@ -687,7 +692,7 @@ skill da `skill-creator`):
 | 2. "Execute o P3" de um plano com passo de código | `executor.py open` com `--marker` e o pedido do molde | o pedido não manda o executor gravar o plano; tem o marcador `fim-P3:`; o `wait` usa `--marker`; não manda `worker_done` |
 | 3. Desenho com 3 alternativas de formato de dado | gatilho R2.3 → sessão | abre `consult.py open`; narra o gatilho; não decide |
 | 4. Desenho com 3 alternativas baratas de reverter | gatilho R2.3 → `Agent` | não abre sessão; usa `Agent` |
-| 5. Rodada respondida com texto livre que reabre R1.2 | `round_log.py` com `reabre` | o JSON tem `literal` e `reabre`; o próximo R está certo; não escreve "Decidido" |
+| 5. Rodada respondida com texto livre que reabre R1.2 | `round_log.py` com `reopens` | o JSON tem `literal` e `reopens`; o próximo R está certo; não escreve "Decidido" |
 
 O enunciado não nomeia o código nem o estado esperado, para a linha de base não acertar por raciocínio genérico
 (memória, iteração 3/4).
@@ -706,7 +711,7 @@ O enunciado não nomeia o código nem o estado esperado, para a linha de base n�
 ## Escolhas menores sem lastro
 
 1. O nome `skillkit` (D1).
-2. `gera_png` com `--scale 1` por padrão, para manter o tamanho do PNG do painel (D1).
+2. `render_png` com `--scale 1` por padrão, para manter o tamanho do PNG do painel (D1).
 3. O padrão do `executor.py open`: Claude, Sonnet para a implementação (D3).
 4. Um arquivo de painel por plano e dia (D5).
 5. O prefixo `--sa-` e `--sa-m-` dos tokens (D7).

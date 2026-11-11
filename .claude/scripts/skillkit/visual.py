@@ -9,45 +9,45 @@ import os
 import re
 import subprocess
 
-LIMITE_HTML = 512 * 1024
+LIMIT_HTML = 512 * 1024
 CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 BRZA = os.environ.get('BRZA_BIN', 'brza')
-ALTURA_CHROME = 2000
+CHROME_HEIGHT = 2000
 
 
-class ErroPublicacao(Exception):
+class PublishError(Exception):
     """Falha ao gravar o visual; `rc` é o código de saída do subcomando."""
     def __init__(self, msg, rc=1):
         super().__init__(msg)
         self.rc = rc
 
 
-def titulo_seguro(tit):
-    tit = re.sub(r'[\x00-\x1f\x7f"{}]+', ' ', str(tit or '')).replace('\\', ' ')
-    return ' '.join(tit.split())
+def safe_title(raw_title):
+    raw_title = re.sub(r'[\x00-\x1f\x7f"{}]+', ' ', str(raw_title or '')).replace('\\', ' ')
+    return ' '.join(raw_title.split())
 
 
-def salva_visual(doc, prefixo, meio, chave, titulo, *, publish_dir=None, alvo_padrao=None):
-    """Grava `doc`. Com `publish_dir`, o arquivo é `<prefixo>-<meio>-<hash>.html` (nome fixo para a mesma `chave`, para
-    republicar no mesmo arquivo) e a linha `::orca-visual` volta; senão grava em `alvo_padrao` e a linha é None.
-    Devolve (caminho, linha). Levanta ErroPublicacao."""
-    if len(doc.encode('utf-8')) >= LIMITE_HTML:
-        raise ErroPublicacao('HTML >= 512 KB, o visual não aceita', 1)
+def save_visual(doc, prefix, part, key, title, *, publish_dir=None, default_path=None):
+    """Grava `doc`. Com `publish_dir`, o arquivo é `<prefix>-<part>-<hash>.html` (nome fixo para a mesma `key`, para
+    republicar no mesmo arquivo) e a linha `::orca-visual` volta; senão grava em `default_path` e a linha é None.
+    Devolve (caminho, linha). Levanta PublishError."""
+    if len(doc.encode('utf-8')) >= LIMIT_HTML:
+        raise PublishError('HTML >= 512 KB, o visual não aceita', 1)
     if publish_dir:
-        rid = str(prefixo or 'reuniao')
+        rid = str(prefix or 'reuniao')
         if '/' in rid or '\\' in rid or '..' in rid:
-            raise ErroPublicacao(f'reuniao.id "{rid}" tem caminho; recuso gravar fora de --publish-dir', 1)
+            raise PublishError(f'reuniao.id "{rid}" tem caminho; recuso gravar fora de --publish-dir', 1)
         rid = re.sub(r'[^\w.-]+', '-', rid).strip('.-') or 'reuniao'
-        h = hashlib.sha1(f'{prefixo}|{chave}'.encode()).hexdigest()[:4]
-        nome = f'{rid}-{meio}-{h}.html'
+        h = hashlib.sha1(f'{prefix}|{key}'.encode()).hexdigest()[:4]
+        name = f'{rid}-{part}-{h}.html'
         os.makedirs(publish_dir, exist_ok=True)
-        alvo = os.path.join(publish_dir, nome)
-        linha = f'::orca-visual{{file="{nome}" title="{titulo_seguro(titulo)}"}}'
+        saved_path = os.path.join(publish_dir, name)
+        line = f'::orca-visual{{file="{name}" title="{safe_title(title)}"}}'
     else:
-        alvo, linha = alvo_padrao, None
-    with open(alvo, 'w', encoding='utf-8') as f:
+        saved_path, line = default_path, None
+    with open(saved_path, 'w', encoding='utf-8') as f:
         f.write(doc)
-    return alvo, linha
+    return saved_path, line
 
 
 def _run(argv, timeout=60):
@@ -64,28 +64,28 @@ def shot_argv(html_path, png, width, theme='light', scale=1):
             '--scale', f'{scale:g}', '--force']
 
 
-def _chrome(html_path, png, width, altura, scale):
+def _chrome(html_path, png, width, height, scale):
     """O PNG pelo Chrome headless (a reserva). Devolve None se deu certo, ou a mensagem de erro."""
     if not os.path.exists(CHROME):
         return 'Chrome não encontrado; sem PNG'
-    rc, _, err = _run([CHROME, '--headless=new', f'--screenshot={png}', f'--window-size={width},{altura}',
+    rc, _, err = _run([CHROME, '--headless=new', f'--screenshot={png}', f'--window-size={width},{height}',
                        f'--force-device-scale-factor={scale:g}', 'file://' + os.path.abspath(html_path)])
     if rc == 127:
         return f'o Chrome falhou: {err}'
     return None if os.path.exists(png) else 'o Chrome não gerou o PNG'
 
 
-def gera_png(html_path, png, width, altura=None, *, theme='light', scale=1, chrome_css=''):
+def render_png(html_path, png, width, height=None, *, theme='light', scale=1, chrome_css=''):
     """Tira o PNG do HTML. Devolve None se deu certo, ou a mensagem de erro.
 
     Roda `brza shot <html> <png> --width W --theme T --scale S --force`; só cai no Chrome headless se o `brza` faltar ou
-    sair ≠ 0, e o erro, se o Chrome também falhar, diz as duas falhas. O `brza shot` mede a altura sozinho: `altura` só
+    sair ≠ 0, e o erro, se o Chrome também falhar, diz as duas falhas. O `brza shot` mede a altura sozinho: `height` só
     vale para o Chrome (padrão 2000). `chrome_css` (por exemplo o `:root` dos tokens) vai só ao Chrome, num HTML temporário
     ao lado do original: o `brza shot` já injeta os tokens do chat, e um `:root` no HTML venceria o tema dele."""
     rc, out, err = _run(shot_argv(html_path, png, width, theme, scale))
     if rc == 0 and os.path.exists(png):
         return None
-    motivo = (f'o brza não gerou o PNG (rc {rc})' if rc == 0
+    reason = (f'o brza não gerou o PNG (rc {rc})' if rc == 0
               else f'brza shot falhou (rc {rc}): {(err or out or "").strip()[:200]}')
     tmp = None
     if chrome_css:
@@ -96,8 +96,8 @@ def gera_png(html_path, png, width, altura=None, *, theme='light', scale=1, chro
             f.write(doc.replace('</head>', f'<style>{chrome_css}</style></head>', 1) if '</head>' in doc
                     else f'<style>{chrome_css}</style>{doc}')
     try:
-        erro = _chrome(tmp or html_path, png, width, altura or ALTURA_CHROME, scale)
+        error = _chrome(tmp or html_path, png, width, height or CHROME_HEIGHT, scale)
     finally:
         if tmp and os.path.exists(tmp):
             os.remove(tmp)
-    return None if erro is None else f'{motivo}; {erro}'
+    return None if error is None else f'{reason}; {error}'

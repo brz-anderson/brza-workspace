@@ -40,8 +40,8 @@ recurso, não o primeiro. As rodadas seguem "Como perguntar", na `SKILL.md`.
 - **Grave pelo `round_log.py`**, não à mão: escreva a rodada em JSON (a forma está no docstring do script e em
   `PLN-NNN-design.md` do PLN-021, D6) e rode `$S/round_log.py PLN-NNN --from rodada.json --dry-run`, leia, e rode sem o
   `--dry-run`. Ele numera a rodada pelo maior `### Rodada` + 1, escreve as opções no formato do molde, põe
-  **Decidido — …** só quando há opção escolhida sem texto livre, e marca "→ reaberta em RN.k" na pergunta que `reabre`
-  cita. A resposta em texto livre vai em `literal`, sem `escolhidas`: ela não é decisão até a rodada seguinte fechar.
+  **Decidido — …** só quando há opção escolhida sem texto livre, e marca "→ reaberta em RN.k" na pergunta que `reopens`
+  cita. A resposta em texto livre vai em `literal`, sem `chosen`: ela não é decisão até a rodada seguinte fechar.
 
 Ao terminar, devolva em uma lista o que continua aberto, separado em **estrutura** (bloqueia o desenho) e **texto**
 (vira marcador no plano).

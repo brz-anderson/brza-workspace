@@ -180,7 +180,7 @@ _json = sessions_cli._json
 
 # ---------------------------------------------------------------- abrir
 
-interpreta_abertura = sessions_cli.interpreta_abertura  # 'aberta' | 'ja' | 'nao-abriu' | 'sem-id' | 'falha'
+interpreta_abertura = sessions_cli.interpret_open  # 'aberta' | 'ja' | 'nao-abriu' | 'sem-id' | 'falha'
 
 
 def tabela(reuniao, escolhidas, entradas, out=print):

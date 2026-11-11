@@ -24,36 +24,36 @@ import subprocess
 import sys
 import unicodedata
 
-AQUI = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, AQUI)
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
 import plan_md  # noqa: E402
 import plan_state  # noqa: E402
 
 
-class Recusa(Exception):
+class Refusal(Exception):
     pass
 
 
-def slug(txt, limite=48):
+def slug(txt, limit=48):
     t = unicodedata.normalize("NFKD", txt).encode("ascii", "ignore").decode()
     t = re.sub(r"`", "", t).lower()
     t = re.sub(r"[^a-z0-9]+", "-", t).strip("-")
-    if len(t) > limite:
-        t = t[:limite]
+    if len(t) > limit:
+        t = t[:limit]
         if "-" in t:
             t = t.rsplit("-", 1)[0]
     return t.strip("-")
 
 
-def _repo_principal(raiz):
+def _repo_main(root):
     try:
-        r = subprocess.run(["git", "-C", raiz, "rev-parse", "--path-format=absolute", "--git-common-dir"],
+        r = subprocess.run(["git", "-C", root, "rev-parse", "--path-format=absolute", "--git-common-dir"],
                            capture_output=True, text=True, timeout=15)
         if r.returncode == 0 and r.stdout.strip():
             return os.path.dirname(r.stdout.strip().rstrip("/"))
     except (OSError, subprocess.SubprocessError):
         pass
-    return raiz
+    return root
 
 
 def same_repo(path_a, path_b):
@@ -71,111 +71,111 @@ def same_repo(path_a, path_b):
     return dirs[0] == dirs[1]
 
 
-def _texto_d(plano, d):
-    s = d["secao"]
-    linhas = s.arquivo.linhas[s.ini:s.fim]
-    return "\n".join(linhas).rstrip()
+def _text_d(plan, d):
+    s = d["section"]
+    lines = s.file.lines[s.start:s.end]
+    return "\n".join(lines).rstrip()
 
 
-def _bloco_r(plano, rid):
+def _block_r(plan, rid):
     """O texto de uma `R<n>.<k>`: pergunta, opção escolhida, resposta literal."""
-    q = plano.pergunta(rid)
+    q = plan.question_text(rid)
     if q is None:
-        raise Recusa("o R citado não existe na Entrevista: %s" % rid)
-    ls = ["### %s — %s" % (rid, q.tema or "pergunta")]
-    ls.append("- **Rodada:** R%d — %s%s" % (q.n, q.rodada.titulo, " (enviada %s)" % q.rodada.enviada if q.rodada.enviada else ""))
-    ops = q.opcoes()
-    if ops:
+        raise Refusal("o R citado não existe na Entrevista: %s" % rid)
+    ls = ["### %s — %s" % (rid, q.topic or "pergunta")]
+    ls.append("- **Rodada:** R%d — %s%s" % (q.n, q.round.title, " (enviada %s)" % q.round.sent_on if q.round.sent_on else ""))
+    options = q.option_list()
+    if options:
         ls.append("- **Opções:**")
-        for o in ops:
-            ls.append("  - %s%s" % (o["rotulo"], " (recomendada)" if o["recomendada"] else ""))
-    dec = q.decidido
+        for o in options:
+            ls.append("  - %s%s" % (o["label"], " (recomendada)" if o["recommended"] else ""))
+    dec = q.decided_line
     if dec:
         ls.append("- **Escolhida:** %s" % re.sub(r"^(Decidid[oa]|Escolhid[oa])[^—:]*[—:]\s*", "", re.sub(r"\*\*", "", dec).strip()))
-    elif q.rodada.sem_resposta or not q.resposta:
-        rec = [o["rotulo"] for o in ops if o["recomendada"]]
+    elif q.round.unanswered or not q.answer:
+        rec = [o["label"] for o in options if o["recommended"]]
         ls.append("- **Escolhida:** sem resposta na rodada%s" % (
             "; vale a recomendada, a confirmar: %s" % rec[0] if rec else ""))
-    lit = q.resposta
+    lit = q.answer
     if lit:
         ls.append("- **Resposta literal:** %s" % re.sub(r"^\*\*Resposta[^*]*\*\*:?\s*", "", lit))
     return "\n".join(ls)
 
 
-def monta(plano, pid, worklog=None, checkout=None, branch=None, hoje=None):
+def build(plan, pid, worklog=None, checkout=None, branch=None, on_date=None):
     """Devolve (texto, caminhos). Levanta `Recusa`."""
-    pl = plan_md.carrega(plano)
-    p = pl.passo(pid)
+    pl = plan_md.load(plan)
+    p = pl.step(pid)
     if p is None:
-        raise Recusa("o plano %s não tem o passo %s" % (pl.id, pid))
+        raise Refusal("o plano %s não tem o passo %s" % (pl.id, pid))
     pid = p.id
-    if plan_state.passo_exige_design(pl, p):
-        raise Recusa("o passo %s não tem `Executa D…` e o plano tem Desenho" % pid)
+    if plan_state.step_requires_design(pl, p):
+        raise Refusal("o passo %s não tem `Executa D…` e o plano tem Desenho" % pid)
     ds = []
-    for did in p.executa:
-        d = pl.desenho(did)
+    for did in p.executes:
+        d = pl.design_text(did)
         if d is None:
-            raise Recusa("o passo %s executa %s, que o Desenho não tem" % (pid, did))
+            raise Refusal("o passo %s executa %s, que o Desenho não tem" % (pid, did))
         ds.append(d)
     rs = []
     for d in ds:
-        for r in d["origem_rs"]:
+        for r in d["origin_ids"]:
             if r not in rs:
                 rs.append(r)
-    blocos_r = []
+    blocks_r = []
     for r in rs:
         if "." in r:
-            blocos_r.append(_bloco_r(pl, r))
+            blocks_r.append(_block_r(pl, r))
         else:
-            rod = pl.rodada(int(r[1:]))
-            if rod is None:
-                raise Recusa("o R citado não existe na Entrevista: %s" % r)
-            for q in rod.perguntas:
-                blocos_r.append(_bloco_r(pl, q.id))
+            round_row = pl.round(int(r[1:]))
+            if round_row is None:
+                raise Refusal("o R citado não existe na Entrevista: %s" % r)
+            for q in round_row.questions:
+                blocks_r.append(_block_r(pl, q.id))
     num = re.match(r"PLN-(\d+)", pl.id)
     pln = pl.id
     base = "%s-%s" % (pln.lower(), pid.lower())
-    hoje = hoje or datetime.date.today().isoformat()
-    raiz = pl.raiz
+    on_date = on_date or datetime.date.today().isoformat()
+    root = pl.root
     if worklog is None:
-        worklog = os.path.join(raiz, "work", "worklogs", "%s-%s-%s.md" % (hoje, base, slug(p.titulo)))
+        worklog = os.path.join(root, "work", "worklogs", "%s-%s-%s.md" % (on_date, base, slug(p.title)))
     if checkout is None:
-        checkout = os.path.join(os.path.dirname(_repo_principal(raiz)), "brza-studio", ".worktrees", base)
+        checkout = os.path.join(os.path.dirname(_repo_main(root)), "brza-studio", ".worktrees", base)
     if branch is None:
         branch = "feat/%s" % base
     if branch in ("master", "main"):
-        raise Recusa("a branch autorizada para commit não pode ser master/main; passe a branch do passo (`--branch feat/%s`)" % base)
-    commit_ok = not same_repo(checkout, raiz)
-    restr = pl.secao(r"^Restrições\b")
-    regr = pl.secao(r"^Regressão\b")
-    passo_texto = "\n".join(p.secao.linhas).rstrip()
+        raise Refusal("a branch autorizada para commit não pode ser master/main; passe a branch do passo (`--branch feat/%s`)" % base)
+    commit_ok = not same_repo(checkout, root)
+    constraints = pl.section(r"^Restrições\b")
+    regression = pl.section(r"^Regressão\b")
+    step_text = "\n".join(p.section.lines).rstrip()
     L = []
     L.append("Você executa o passo %s do %s numa sessão aberta pela coordenação. Não acione a skill `plan-runner`: você "
              "não conduz o plano, executa um passo dele." % (pid, pln))
     L.append("")
     L.append("## O passo")
-    L.append(passo_texto)
+    L.append(step_text)
     L.append("")
     L.append("## O que o Desenho fixou")
     if ds:
         for d in ds:
-            L.append(_texto_d(pl, d))
+            L.append(_text_d(pl, d))
             L.append("")
         L.pop()
     else:
         L.append("O passo não cita item do Desenho; vale o texto dele acima.")
     L.append("")
     L.append("## O que as rodadas decidiram")
-    L.append("\n\n".join(blocos_r) if blocos_r else "Nenhuma rodada citada na Origem dos itens acima.")
+    L.append("\n\n".join(blocks_r) if blocks_r else "Nenhuma rodada citada na Origem dos itens acima.")
     L.append("")
     L.append("## Restrições e Regressão")
     L.append("**Restrições do plano**")
     L.append("")
-    L.append(restr.texto().strip() if restr and restr.texto().strip() else "O plano não tem `## Restrições`.")
+    L.append(constraints.text().strip() if constraints and constraints.text().strip() else "O plano não tem `## Restrições`.")
     L.append("")
     L.append("**Regressão**")
     L.append("")
-    L.append(regr.texto().strip() if regr and regr.texto().strip() else "O plano não tem `## Regressão`.")
+    L.append(regression.text().strip() if regression and regression.text().strip() else "O plano não tem `## Regressão`.")
     L.append("")
     L.append("## Onde trabalhar")
     L.append("- checkout: %s (branch %s)" % (checkout, branch))
@@ -211,8 +211,8 @@ def monta(plano, pid, worklog=None, checkout=None, branch=None, hoje=None):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="step_request.py", description="monta o pedido do passo")
-    ap.add_argument("plano")
-    ap.add_argument("passo")
+    ap.add_argument("plan")
+    ap.add_argument("step")
     ap.add_argument("--out")
     ap.add_argument("--worklog")
     ap.add_argument("--checkout")
@@ -222,22 +222,22 @@ def main(argv=None):
     except SystemExit as e:
         return 2 if e.code else 0
     try:
-        pl = plan_md.carrega(a.plano)
-    except plan_md.PlanoNaoEncontrado as e:
+        pl = plan_md.load(a.plan)
+    except plan_md.PlanNotFound as e:
         print("erro: %s" % e, file=sys.stderr)
         return 2
     try:
-        texto, info = monta(pl, a.passo, a.worklog, a.checkout, a.branch)
-    except Recusa as e:
+        text, info = build(pl, a.step, a.worklog, a.checkout, a.branch)
+    except Refusal as e:
         print("recusado: %s" % e, file=sys.stderr)
         return 1
     out = a.out
     if not out:
-        pid = pl.passo(a.passo).id
-        out = os.path.join(pl.raiz, ".sessions", pl.id.lower(), pid, "pedido.md")
+        pid = pl.step(a.step).id
+        out = os.path.join(pl.root, ".sessions", pl.id.lower(), pid, "pedido.md")
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
-        f.write(texto)
+        f.write(text)
     print(os.path.abspath(out))
     return 0
 

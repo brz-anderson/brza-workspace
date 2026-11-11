@@ -41,7 +41,7 @@ import _kit  # noqa: E402,F401
 import tally as _tally  # noqa: E402  (a conta da sala e a raiz padrão moram lá, em um lugar só)
 import common as _common  # noqa: E402  (o prazo e a duração anunciada da rodada também: a espera lê o mesmo)
 from skillkit import visual as _visual  # noqa: E402
-from skillkit.visual import CHROME, ErroPublicacao, LIMITE_HTML  # noqa: E402,F401  (o PNG e o visual moram no kit)
+from skillkit.visual import CHROME, LIMIT_HTML as LIMITE_HTML, PublishError as ErroPublicacao  # noqa: E402,F401  (o PNG e o visual moram no kit)
 A_PARTE = 'antigravity'  # runtime que fica fora da média da sala (decisão E-1 do D1)
 FORA = 'fora da rodada'  # persona fora do subconjunto da rodada (X18)
 
@@ -488,7 +488,7 @@ def _cmd_collect(a):
 
 def gera_png(html_path, png, width, altura=2000):
     """Tira o PNG do HTML (`brza shot`, com o Chrome de reserva). Devolve None se deu certo, ou a mensagem de erro."""
-    return _visual.gera_png(html_path, png, width, altura)
+    return _visual.render_png(html_path, png, width, altura)
 
 
 def _png(html_path, png, width, altura=2000):
@@ -496,12 +496,12 @@ def _png(html_path, png, width, altura=2000):
     print(f'panel render: {erro}' if erro else f'png: {png}', file=sys.stderr)
 
 
-_titulo_seguro = _visual.titulo_seguro
+_titulo_seguro = _visual.safe_title
 
 
 def salva_visual(doc, reu_id, meio, chave, titulo, *, publish_dir=None, alvo_padrao=None):
     """Grava `doc` (ver `skillkit.visual.salva_visual`); devolve (caminho, linha). Levanta ErroPublicacao."""
-    return _visual.salva_visual(doc, reu_id, meio, chave, titulo, publish_dir=publish_dir, alvo_padrao=alvo_padrao)
+    return _visual.save_visual(doc, reu_id, meio, chave, titulo, publish_dir=publish_dir, default_path=alvo_padrao)
 
 
 def _cmd_render(a):

@@ -3,10 +3,10 @@ status: in_progress
 phase: execution
 origin: request
 description: Protótipo no playground de um plan-runner com sessão coordenadora (executores dos passos, consultores em sessões, painel de andamento), scripts e references como os da meeting-runner, e uma skill própria de artboards para protótipos de tela web, mobile e desktop.
-ready: "não — o P11 (os defeitos do P8 e o código em inglês) espera o pedido de Anderson; o P9 depende dele"
+ready: "não — o P9 (o aceite manual) espera o pedido de Anderson"
 estimate_h: 47
 executed_h: 0.99
-remaining_h: 8
+remaining_h: 2
 priority: medium
 scope:
   - workspace
@@ -19,7 +19,7 @@ tags:
 
 # PLN-021: O plano roda por uma sessão coordenadora, com scripts de apoio e artboards de tela
 
-- **Retomar:** a R4 foi respondida na Rodada 5 (todas as recomendadas, menos a R4.6.2) e o P8 rodou: [REV-026](../../work/reviews/REV-026-pln-021-p1-a-p7.md), com 12 achados importantes, 6 sugestões e 5 falsos, e o destino de cada um na Rodada 6. A coordenação corrigiu o plano e as skills (A6–A9, A16–A18); o código vai ao **P11**, que espera o pedido de Anderson, e o P9 só depois. O ajuste R4.6.2 do P7 está no disco e sem commit. P11.1 e o subpasso 3 feitos e commitados em 2026-11-10, com três rodadas de revisão (X9). Próximo: o subpasso 2 do P11, o código em inglês, e o subpasso 4; o P9 depois.
+- **Retomar:** o P11 fechou em 2026-11-10: os defeitos do REV-026 no `4350325` e o código em inglês no `0797029`, com três rodadas de revisão em cada frente. Próximo: o P9, o aceite manual, a pedido de Anderson.
 - **Dividido:** [PLN-021 — Desenho](PLN-021-design.md)
 
 ## Pedido
@@ -470,21 +470,16 @@ Estimado: 2 h · Executado: 0.2 h
 
 Executa D2, D3, D4, D5, D6 e D7, a partir de [REV-026](../../work/reviews/REV-026-pln-021-p1-a-p7.md) e da R6 · executor: `implementer`, pela coordenação, por sessão aberta pelo `executor.py` quando Anderson mandar · depende de P8
 
-Estimado: 6 h · Executado: — h
+Estimado: 6 h · Executado: sem medição desta sessão
 
-- [ ] **1. Os defeitos de código do REV-026** (A1–A5, A10, A11, A13–A15), cada um com o teste que falha antes e, onde der, a prova pelo `brza` real em `--dry-run`
-- [ ] **2. O código em inglês** (R6.5): nomes de arquivo, função, classe e variável de `.claude/scripts/skillkit/`, `plan-runner/scripts/` e `screen-artboards/scripts/` em inglês, com a `meeting-runner` importando do kit sem mudar um teste; pt-BR só em docstring e no texto que volta ao usuário
-- [ ] **3. O `--apply` do `executor.py` marca só os subpassos que a evidência cobre** (D3), e não todos os pendentes (X4; REV-026 A9)
-- [ ] **4. As skills e o Desenho acompanham** os nomes novos (SKILL.md, references, D1–D7)
+- [x] **1. Os defeitos de código do REV-026** (A1–A5, A10, A11, A13–A15), cada um com o teste que falha antes e, onde der, a prova pelo `brza` real em `--dry-run`
+- [x] **2. O código em inglês** (R6.5): nomes de arquivo, função, classe e variável de `.claude/scripts/skillkit/`, `plan-runner/scripts/` e `screen-artboards/scripts/` em inglês, com a `meeting-runner` importando do kit sem mudar um teste; pt-BR só em docstring e no texto que volta ao usuário
+- [x] **3. O `--apply` do `executor.py` marca só os subpassos que a evidência cobre** (D3), e não todos os pendentes (X4; REV-026 A9)
+- [x] **4. As skills e o Desenho acompanham** os nomes novos (SKILL.md, references, D1–D7)
 
 Faz-se antes do P9: o aceite manual roda sobre o roster e o `wait` corrigidos.
 
-**Andamento (2026-11-10):** os subpassos 1 e 3 estão no disco e commitados, com três rodadas de revisão do `reviewer` e o
-`implementer` (pareceres `/private/tmp/pln021/p11-review-r1.md` a `r3.md`: 4+0+1 importantes corrigidos, as sugestões
-corrigidas menos o nome em português): `python3 -I -m unittest discover` → 56 (kit), 193 (plan-runner), 55
-(screen-artboards), 323 (meeting-runner) OK. Faltam o subpasso 2 (o código em inglês, que inclui `neutraliza_marcador`,
-`respondida_com_leitura`, `achados`, `erros`, `ultima_batida`, `contas` e os métodos de teste novos) e o 4. As correções da
-última rodada (C1 e C2) não passaram por uma 4ª revisão: o limite de três rodadas foi o pedido de Anderson.
+**Evidência:** `brza-workspace@0797029` · `python3 -I -m unittest discover` nos quatro conjuntos → 56 (kit), 193 (plan-runner), 56 (screen-artboards), 323 (meeting-runner) OK · a `meeting-runner` só mudou em `common.py`, `launch_persona.py`, `panel.py` e `tally.py`, e o `_legacy_measure` traduz as chaves inglesas da medida · subpassos 1 e 3 no `4350325`, sem uma 4ª rodada (o limite de três foi o pedido) · três rodadas de revisão dos subpassos 2 e 4, pareceres `/tmp/pln021-p11-parecer-r2.md` e `/tmp/pln021-p11-parecer-r3.md` (a rodada 1 em `/private/tmp/claude-501/-Users-andepb-Projects-brza-workspace--worktrees-playground/341e5834-9208-41c8-8ffb-50dd91b32e7a/scratchpad/parecer-p11.md`) · `Executado`: sem medição desta sessão · desvio proposto em X10
 
 ### P9 — O aceite manual
 
@@ -547,6 +542,9 @@ Estimado: 0.5 h · Executado: — h
   sem `--checkout` nem `--tree` recusa (rc 2); `running:` recusa, também na primeira abertura; o `--apply` marca só os
   subpassos que a linha `cobre:` declara (`todos` vence; sem ela, marca todos e avisa); o passo coberto em parte volta
   pelo `send` ou pelo `open`. Afeta P3 a P5, D3 e D4.
+- **X10 — Duas chaves ficaram em português. Proposta, sem decisão de Anderson.** `last_send["origem"]` em `sessions_map.py` ficou porque o teste da `meeting-runner` afirma a chave. `answered.data` em `round_log.py` e no Desenho D6 ficou porque a spec fechada do subpasso 2 manda `literal` e `data`; a rodada 2 marcou o pedido de renome como falso. Afeta P11 e D6. Se houver rodada:
+  1. Manter as duas (recomendada) — custo: nenhuma troca agora; se paga: já, o adaptador e a spec não quebram.
+  2. Renomear `origem` → `origin` e `data` → `date` nos leitores e escritores, com o teste da `meeting-runner` — custo: uma rodada de código e os 323 testes; se paga: quando a spec for reaberta.
 
 ## Revisões
 
@@ -561,3 +559,4 @@ Estimado: 0.5 h · Executado: — h
 - 2026-11-10 — Desenho D1–D7 registrado e R4 enviada sem resposta; P1 a P7 executados com as recomendadas, a pedido;
   evals da iteração 1 das duas skills. Travou na R4. [As skills do PLN-021 escritas e os evals da iteração 1](../../work/worklogs/2026-11-10-as-skills-do-pln-021-e-os-evals.md)
 - 2026-11-10 — R4 respondida (Rodada 5, com a R4.6.2 em outra opção), P7 reaberto (X6), P8 feito ([REV-026](../../work/reviews/REV-026-pln-021-p1-a-p7.md)), Rodada 6 e o P11 aberto; o código em inglês subiu à norma. Próximo: o pedido do P11. [O PLN-021: a R4 respondida, o P7 reaberto e a revisão do P8](../../work/worklogs/2026-11-10-pln-021-r4-respondida-e-a-revisao-do-p8.md)
+- 2026-11-10 — P11 fechado: subpassos 1 e 3 no `4350325`, subpassos 2 e 4 no `0797029`, três rodadas de revisão em cada frente. Próximo: o P9, a pedido. [O PLN-021: o código em inglês do P11](../../work/worklogs/2026-11-10-pln-021-codigo-em-ingles.md)

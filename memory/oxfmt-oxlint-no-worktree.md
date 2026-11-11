@@ -11,4 +11,4 @@ metadata:
 Em `~/Projects/brza-studio/.worktrees/*`, `pnpm exec oxfmt --check a b c` só achou o CSS, e `oxlint a b c` disse "No files found" (2026-11-02, P80). Arquivo por arquivo, com `--ignore-path=/dev/null`, o `oxfmt` funciona. Suspeita não confirmada: o `.worktrees/` no `.git/info/exclude`.
 
 **Why:** um lint "limpo" sem saída pode não ter lido nada.
-**How to apply:** formate arquivo por arquivo e conte como lint válido o `lint-staged` do commit (oxlint, ast-grep, react-doctor) e o `pnpm check:changed`. Veja [[suite-completa-uma-vez-no-merge]].
+**How to apply:** formate arquivo por arquivo e conte como lint válido o `lint-staged` do commit (oxlint, ast-grep, react-doctor) e o `pnpm check:changed`. A suíte completa só roda na CI (norma em `.claude/rules/workspace.md`).

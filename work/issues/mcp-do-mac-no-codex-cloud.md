@@ -25,4 +25,6 @@ domínio, o host do túnel pode entrar, e o token, que hoje só existe no setup,
   só no setup, removidos antes do agente; MCP local "pode não estar disponível" na nuvem.
 - O Codex **CLI** consome o MCP remoto (medido na reunião), mas o `codex exec` barra a ferramenta sem
   `tools.<t>.approval_mode="approve"`.
+- O host do túnel, quando existir, será um subdomínio de `brza.dev`, registrado em 2026-11-11, com os nameservers na
+  Cloudflare. É esse o domínio que entraria na lista de domínios liberados do Codex Cloud.
 - Alternativa de contorno sem rede: o git como barramento (a ideia F do Salto), com latência de minutos.

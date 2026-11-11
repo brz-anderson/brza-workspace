@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39649, #39606, #39276 e as issues #39619, #39074 trazem isolamento de OSC 7501 do OpenCode, limpeza de títulos após /clear e subagentes OpenCode.
+description: Os PRs #40935, #39649, #39606, #39276 e as issues #41008, #39619 tratam de imagens geradas no chat, badges de modelo/effort de subagentes e isolamento de status.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,12 +13,14 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39649`](https://github.com/stablyai/orca/pull/39649) (resolve Issue [`#39619`](https://github.com/stablyai/orca/issues/39619)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40935`](https://github.com/stablyai/orca/pull/40935),
+[`stablyai/orca#39649`](https://github.com/stablyai/orca/pull/39649) (resolve Issue [`#39619`](https://github.com/stablyai/orca/issues/39619)),
 [`stablyai/orca#39606`](https://github.com/stablyai/orca/pull/39606) (resolve Issue [`#37379`](https://github.com/stablyai/orca/issues/37379)),
 [`stablyai/orca#39276`](https://github.com/stablyai/orca/pull/39276) (Issue [`#39275`](https://github.com/stablyai/orca/issues/39275)),
 [`stablyai/orca#39082`](https://github.com/stablyai/orca/pull/39082) (Issue [`#39074`](https://github.com/stablyai/orca/issues/39074)),
 [`stablyai/orca#39079`](https://github.com/stablyai/orca/pull/39079) (Issue [`#39073`](https://github.com/stablyai/orca/issues/39073)),
-além da issue [`stablyai/orca#39619`](https://github.com/stablyai/orca/issues/39619),
+além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues/41008) e
+[`stablyai/orca#39619`](https://github.com/stablyai/orca/issues/39619),
 [`stablyai/orca#38995`](https://github.com/stablyai/orca/pull/38995) (Issue [`#38994`](https://github.com/stablyai/orca/issues/38994)),
 [`stablyai/orca#38963`](https://github.com/stablyai/orca/pull/38963),
 [`stablyai/orca#38945`](https://github.com/stablyai/orca/pull/38945),
@@ -68,6 +70,15 @@ além da issue [`stablyai/orca#39619`](https://github.com/stablyai/orca/issues/3
 10. **Poluição de títulos de abas do Claude Code com texto de aviso após `/clear` (`#39606`, resolve `#37379`):**
     Após rodar `/clear`, o título da aba no Orca assumia o texto bruto `<local-command-caveat>The command below was run directly in Claude Code...`
     em vez de preservar o título ao vivo (`✳ Claude Code`), permanecendo ilegível até o envio do próximo prompt real.
+11. **Sobrescrita, duplicação e desaparecimento de imagens geradas no Native Chat (`#40935`):**
+    Quando agentes geravam imagens (artboards, mockups ou diagramas), a entrega do artefato sobrescrevia o texto em prosa da
+    resposta final quando chegava com atraso, aparecia duplicada caso a resposta já a incorporasse, ou desaparecia completamente
+    ao navegar de volta pelo histórico de sessões anteriores.
+12. **Invisibilidade do modelo e nível de esforço de subagentes no painel de agentes (`#41008`):**
+    No painel de agentes da sessão do Claude ("1 agent — working", com nome, ferramenta ativa, tokens e tempo), não havia exibição
+    do modelo e esforço de raciocínio de cada subagente. Quando agentes customizados ou chamadas dinâmicas utilizavam modelos
+    discrepantes do pai (ex.: subagente executando em Opus no esforço high em sessão pai Sonnet), o operador ficava no escuro sobre
+    os parâmetros de execução e custos correspondentes.
 
 ## O que o upstream implementa
 
@@ -100,9 +111,19 @@ além da issue [`stablyai/orca#39619`](https://github.com/stablyai/orca/issues/3
   - Filtra as sequências de escape OSC 7501 emitidas pelo OpenCode em instâncias compartilhadas (`opencode serve --service`),
     impedindo que o broadcast de status marque abas ociosas como em execução e garantindo que apenas a aba dona do comando
     exiba o status `working`.
+- **Preservação de imagens geradas integradas à resposta final (`#40935`):**
+  - Mantém imagens concluídas acopladas ao cartão da resposta final do assistente no desktop e cliente móvel, mesmo quando o
+    artefato chega após o início do streaming de prosa;
+  - Desduplica artefatos já referenciados no corpo Markdown e assegura que a projeção de histórico do SQLite retenha as
+    imagens e seus controles intactos ao revisitar a sessão.
+- **Exibição de modelo e nível de esforço de subagentes no painel (`#41008`):**
+  - Propõe exibir badge compacto (ex.: `Opus · high`) ao lado da contagem de tokens na linha de cada subagente ativo no
+    painel de agentes, extraindo a informação de `.claude/projects/.../subagents/agent-<id>.meta.json` e dos cabeçalhos de mensagens.
 
 ## O que fazer
 
+- Integrar imagens geradas ao cartão da resposta final no chat nativo (`#40935`), evitando perdas e duplicações.
+- Adotar badges de identificação de modelo e esforço de raciocínio de subagentes no painel de agentes (`#41008`).
 - Adotar a supressão de textos de harness em títulos de abas do Claude (`#39606`).
 - Isolar sessões irmãs do OpenCode no mesmo serviço (`#39649`, `#39619`), contendo sequências OSC 7501 e computando `working` apenas para a sessão ativa e seus filhos reais.
 - Adotar a pré-visualização read-only de chats no Agent Dashboard (`#39082`) e o filtro de notificações de perguntas (`#39079`).

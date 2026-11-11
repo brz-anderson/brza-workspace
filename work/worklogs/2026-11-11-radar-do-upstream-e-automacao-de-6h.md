@@ -10,7 +10,11 @@ tags:
 refs:
   - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
   - issue:autenticacao-mcp-no-chat-alerta-de-turnos-ativos-e-cache-de-orquestracao
+  - issue:comandos-shell-no-chat-recibos-de-perguntas-e-foco-espacial-em-terminais
+  - issue:exclusao-de-repositorios-bare-como-alvos-de-arranque-e-criacao-de-pastas
+  - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
   - issue:notificacao-de-perda-de-workers-desengasgo-de-correio-e-tipo-notice
+  - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
   - issue:seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes
 ---
 
@@ -43,3 +47,25 @@ refs:
    - [Segurança de hooks em worktrees e integridade de setup em automações](../issues/seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes.md):
      adicionados o PR `#40978` / issue `#40974` (comando `/hooks` para revisão e homologação criptográfica de hooks do Codex diretamente no chat) e
      o PR `#40976` (cartão unificado e condensado para hooks de worktree nas configurações).
+
+### 2. Ciclo de 6h (06:00 BRT / 09:00 UTC em 2026-11-11)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-11T03:00:00Z` e `2026-11-11T09:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Exclusão de repositórios bare como alvos de arranque e criação de pastas](../issues/exclusao-de-repositorios-bare-como-alvos-de-arranque-e-criacao-de-pastas.md):
+     rastreia o PR `#41018` / issue `#40698` e STA-14647 (eliminação de diretórios Git `.bare` como alvos de lançamento executáveis, prevenindo chats e terminais em pastas vazias sem arquivos de checkout, e seleção automática de checkouts reais vinculados como default workspace),
+     PR `#40999` / issue `#40995` (dispensa da exigência de identidade Git `user.name`/`user.email` na criação de folder projects locais ou remotos via SSH),
+     PR `#40774` (remoção da retenção em memória de instâncias e PTYs de agentes cujas tarefas foram concluídas) e
+     PR `#40852` (resultados diretos em lista navegável na pesquisa de configurações do Studio).
+3. **Atualização de 3 issues existentes em `work/issues/`:**
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados o PR `#40935` (preservação de imagens geradas acopladas ao cartão da resposta final no chat, impedindo sobrescrita de texto, duplicação e perda em histórico) e
+     a issue `#41008` (exibição de badges de modelo e nível de esforço de raciocínio, e.g. `Opus · high`, na listagem de subagentes do painel de agentes).
+   - [Comandos shell no chat, recibos de perguntas e foco espacial em terminais](../issues/comandos-shell-no-chat-recibos-de-perguntas-e-foco-espacial-em-terminais.md):
+     adicionados o PR `#41015` / issue `#41010` (restauração de foco na folha/split ativa ao navegar via paleta `Cmd+J`),
+     o PR `#40870` / issue `#40868` (criação de divisões de terminal via RPC com `activate: false` em segundo plano para não roubar foco) e
+     a issue `#41009` (emissão de sequências de escape para reset de rastreamento de mouse e foco em restauração a frio de PTYs).
+   - [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):
+     adicionada a issue `#41017` (invalidação e ciclo de vida de `paneDiscoveryCache` para permitir descoberta imediata de skills recém-instaladas em chats existentes).

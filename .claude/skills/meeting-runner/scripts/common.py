@@ -9,7 +9,13 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _kit  # noqa: E402,F401
-from skillkit.paths import FIM_RODADA_RE, MEDIDA_RE, TITULO_N12_RE, corta_medida, raiz_padrao  # noqa: E402,F401
+from skillkit.paths import (  # noqa: E402,F401
+    HEADING_H12_RE as TITULO_N12_RE,
+    MEASUREMENT_RE as MEDIDA_RE,
+    ROUND_END_RE as FIM_RODADA_RE,
+    default_root as raiz_padrao,
+    strip_measurement as corta_medida,
+)
 
 PRAZO_RE = re.compile(r'\(\s*prazo:\s*(\d{1,2})\s*[h:]\s*(\d{2})\s*\)')
 DURACAO_RE = re.compile(r'\(\s*dura[çc][ãa]o:\s*~?\s*(\d+)\s*min(?:utos?)?\s*\)', re.IGNORECASE)

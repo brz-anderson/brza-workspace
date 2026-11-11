@@ -34,11 +34,11 @@ def parse_ts(s):
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
 
-def session_ids(sessions_rows, sessao, persona=None):
-    """Os ids do mapa do `brza sessions` v2 para a `sessao` (`sessions_map.fold_map`: o `open` e o `session` do mesmo
+def session_ids(sessions_rows, session, persona=None):
+    """Os ids do mapa do `brza sessions` v2 para a `session` (`sessions_map.fold_map`: o `open` e o `session` do mesmo
     nome, também depois do `close`); `claude_session`/`provider_session` da persona no manifesto SOBRESCREVEM o mapa.
     Nada aqui procura transcript: o id vem do mapa ou da sobrescrita explícita."""
-    e = sessions_map.fold_map(sessions_rows).get(sessao) or {}
+    e = sessions_map.fold_map(sessions_rows).get(session) or {}
     claude, provider = set(), set()
     if e.get("claude_session"):
         claude.add(e["claude_session"])
@@ -73,36 +73,36 @@ def measure_claude(rows, ids, win):
         sel.append((ts, r))
     if not sel:
         return None
-    return {"custo_usd": round(sum(r.get("estimated_cost_usd") or 0 for _, r in sel), 2),
-            "latencia_s": int(round(sum(r.get("duration_s") or 0 for _, r in sel))),
-            "fim": max(ts for ts, _ in sel) if win else None, "eventos": len(sel)}
+    return {"cost_usd": round(sum(r.get("estimated_cost_usd") or 0 for _, r in sel), 2),
+            "latency_s": int(round(sum(r.get("duration_s") or 0 for _, r in sel))),
+            "end": max(ts for ts, _ in sel) if win else None, "events": len(sel)}
 
 
 def find_rollout(codex_dir, provider_ids):
     for pid in provider_ids:
-        achados = glob.glob(os.path.join(codex_dir, "**", f"*-{pid}.jsonl"), recursive=True)
-        if achados:
-            return sorted(achados)[0]
+        matches = glob.glob(os.path.join(codex_dir, "**", f"*-{pid}.jsonl"), recursive=True)
+        if matches:
+            return sorted(matches)[0]
     return None
 
 
 def codex_turns(path):
-    """Turnos do rollout: [{inicio, fim, erro, snap}], `snap` = o total_token_usage ao fim do turno (info null ignorado)."""
-    turns, abertos, cum = [], {}, None
+    """Turnos do rollout: [{start, end, failed, snap}], `snap` = o total_token_usage ao fim do turno (info null ignorado)."""
+    turns, open_states, cum = [], {}, None
     for d in load_jsonl(path):
         p = d.get("payload") or {}
         if d.get("type") != "event_msg" or "timestamp" not in d:
             continue
         t = p.get("type")
         if t == "task_started":
-            abertos[p.get("turn_id")] = parse_ts(d["timestamp"])
+            open_states[p.get("turn_id")] = parse_ts(d["timestamp"])
         elif t == "token_count":
             info = p.get("info")
             if isinstance(info, dict) and isinstance(info.get("total_token_usage"), dict):
                 cum = info["total_token_usage"]
-        elif t == "task_complete" and p.get("turn_id") in abertos:
-            turns.append({"inicio": abertos.pop(p["turn_id"]), "fim": parse_ts(d["timestamp"]),
-                          "erro": bool(p.get("error")), "snap": cum})
+        elif t == "task_complete" and p.get("turn_id") in open_states:
+            turns.append({"start": open_states.pop(p["turn_id"]), "end": parse_ts(d["timestamp"]),
+                          "failed": bool(p.get("error")), "snap": cum})
     return turns
 
 
@@ -112,17 +112,17 @@ def measure_codex(codex_dir, provider_ids, n, win):
         return None
     turns = codex_turns(path)
     if win:
-        idx = [i for i, t in enumerate(turns) if win[0] <= t["fim"] <= win[1]]
+        idx = [i for i, t in enumerate(turns) if win[0] <= t["end"] <= win[1]]
         k = idx[-1] if idx else None
     else:
         k = None  # sem janela não há como saber quais turnos são da reunião: N-1 por posição erra com um turno a mais
     if k is None:
         return None
-    t, ant = turns[k], (turns[k - 1]["snap"] if k > 0 else {})
+    t, prior_snap = turns[k], (turns[k - 1]["snap"] if k > 0 else {})
     tokens = None
     if t["snap"]:
-        def dif(key):
-            return int((t["snap"].get(key) or 0) - ((ant or {}).get(key) or 0))
-        tokens = {"entrada": dif("input_tokens"), "cache": dif("cached_input_tokens"), "saida": dif("output_tokens")}
-    return {"latencia_s": int(round((t["fim"] - t["inicio"]).total_seconds())), "tokens": tokens,
-            "erro": t["erro"], "fim": t["fim"]}
+        def delta(key):
+            return int((t["snap"].get(key) or 0) - ((prior_snap or {}).get(key) or 0))
+        tokens = {"input_tokens": delta("input_tokens"), "cache": delta("cached_input_tokens"), "output_tokens": delta("output_tokens")}
+    return {"latency_s": int(round((t["end"] - t["start"]).total_seconds())), "tokens": tokens,
+            "failed": t["failed"], "end": t["end"]}

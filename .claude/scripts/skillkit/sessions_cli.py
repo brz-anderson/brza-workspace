@@ -12,10 +12,10 @@ import shlex
 import subprocess
 
 BRZA = os.environ.get("BRZA_BIN", "brza")
-MODOS_FECHAR = {"close": [], "stop": ["--force"], "keep-open": ["--keep-open"]}
+CLOSE_MODES = {"close": [], "stop": ["--force"], "keep-open": ["--keep-open"]}
 
 
-def _roda(argv):
+def _run(argv):
     """(rc, stdout, stderr), sem shell; `brza` ausente vira rc 127."""
     try:
         r = subprocess.run(argv, capture_output=True, text=True)
@@ -26,17 +26,17 @@ def _roda(argv):
 
 def run_sessions(argv):
     """O corredor do `brza sessions <argv>`."""
-    return _roda([BRZA, "sessions", *argv])
+    return _run([BRZA, "sessions", *argv])
 
 
 def run_brza(argv):
     """O corredor do `brza <argv>` (por exemplo, a leitura `orchestration worker-show`)."""
-    return _roda([BRZA, *argv])
+    return _run([BRZA, *argv])
 
 
-def _json(texto):
+def _json(text):
     try:
-        return json.loads(texto)
+        return json.loads(text)
     except (ValueError, TypeError):
         return None
 
@@ -73,19 +73,19 @@ def wait_argv(names, timeout_s, *, any_=True, markers=()):
     return argv + ["--timeout", f"{max(0.0, timeout_s):g}", "--json"]
 
 
-def close_argv(name, modo="close"):
-    """O argv (sem o `brza sessions`) do `close` de UMA sessão; `modo`: close | stop | keep-open."""
-    return ["close", name, *MODOS_FECHAR[modo], "--json"]
+def close_argv(name, mode="close"):
+    """O argv (sem o `brza sessions`) do `close` de UMA sessão; `mode`: close | stop | keep-open."""
+    return ["close", name, *CLOSE_MODES[mode], "--json"]
 
 
-def interpreta_abertura(rc, out, err):
+def interpret_open(rc, out, err):
     """'aberta' | 'ja' | 'nao-abriu' | 'sem-id' | 'falha', pela saída do `brza sessions <nome>` v2."""
-    texto = f"{out or ''}\n{err or ''}"
+    text = f"{out or ''}\n{err or ''}"
     if rc == 0:
-        return "ja" if re.search(r"^running:", texto, re.M) else "aberta"
-    if re.search(r"CHECK:\s+\S+ não abriu:", texto):
+        return "ja" if re.search(r"^running:", text, re.M) else "aberta"
+    if re.search(r"CHECK:\s+\S+ não abriu:", text):
         return "nao-abriu"
-    if re.search(r"não deu a sessão em", texto):
+    if re.search(r"não deu a sessão em", text):
         return "sem-id"
     return "falha"
 
@@ -99,10 +99,10 @@ def wait_brza(names, timeout_s, markers=(), *, any_=True):
     except (OSError, subprocess.SubprocessError) as e:
         return 127, {"error": str(e)}
     try:
-        dado = json.loads(r.stdout)
+        payload = json.loads(r.stdout)
     except ValueError:
         return r.returncode or 1, {"error": f"saída sem JSON (rc {r.returncode}): {(r.stderr or r.stdout).strip()[:200]}"}
-    return r.returncode, dado if isinstance(dado, dict) else {"error": "JSON inesperado"}
+    return r.returncode, payload if isinstance(payload, dict) else {"error": "JSON inesperado"}
 
 
 def list_states(names, list_json=None, cmd=None, ids=None):
@@ -120,11 +120,11 @@ def list_states(names, list_json=None, cmd=None, ids=None):
     except (OSError, ValueError, subprocess.SubprocessError):
         return {}
     sess = data.get("sessions", []) if isinstance(data, dict) else []
-    nomes = set(names)
-    out = {s.get("name"): s.get("state") for s in sess if s.get("name") in nomes}
-    for nome, quais in (ids or {}).items():
-        quais = set(quais) - {None, ""}
+    name_list = set(names)
+    out = {s.get("name"): s.get("state") for s in sess if s.get("name") in name_list}
+    for name, which in (ids or {}).items():
+        which = set(which) - {None, ""}
         for s in sess:
-            if quais & {s.get("claude_session"), s.get("provider_session")}:
-                out[nome] = s.get("state")
+            if which & {s.get("claude_session"), s.get("provider_session")}:
+                out[name] = s.get("state")
     return out

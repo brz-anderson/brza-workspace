@@ -47,31 +47,31 @@ import subprocess
 import sys
 import time
 
-AQUI = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, AQUI)
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
 import _kit  # noqa: E402,F401
 import plan_md  # noqa: E402
 import plan_panel  # noqa: E402
 import plan_state  # noqa: E402
 import step_request  # noqa: E402
 from skillkit import measure, sessions_map  # noqa: E402
-from skillkit.paths import common_root, corta_medida  # noqa: E402
-from skillkit.sessions_cli import (close_argv, interpreta_abertura, open_argv, run_brza, run_sessions, send_argv,  # noqa: E402
+from skillkit.paths import common_root, strip_measurement  # noqa: E402
+from skillkit.sessions_cli import (close_argv, interpret_open, open_argv, run_brza, run_sessions, send_argv,  # noqa: E402
                                    wait_brza, list_states)
 
 SONNET = "claude-sonnet-5-5"
 CODEX_MODEL = "gpt-6.1-sol"   # o `brza sessions` exige --model com --effort; o modelo do ~/.codex/config.toml e do smoke do PLN-017
-VIVOS = ("aberto", "em-curso", "bloqueado")
-BATIDA = 180          # a cada ~3 min sem evento o `wait` repete a linha com a idade
+LIVE_FLAGS = ("aberto", "em-curso", "bloqueado")
+TICK = 180          # a cada ~3 min sem evento o `wait` repete a linha com a idade
 MAX_WAIT_ERRORS = 5   # erros seguidos do `brza sessions wait` até desistir
 WAIT_ERROR_PAUSE = 5  # segundos de pausa entre eles
 RE_NO_SESSION = re.compile(r"\b(\d+) chats? abertos? se chamam ([^\s:]+)", re.I)
-FALHOU = ("failed", "stopped", "abandoned")
+FAILED = ("failed", "stopped", "abandoned")
 OK_FINAL = ("encerrada e aceita", "liberada")
-INCERTOS = ("stop_unknown", "release_unknown", "release_pending")
-RUIDO = "worker stopped without reporting"
-ATENCAO = {"question", "blocked", "decision_gate", "escalation"}
-RE_MARCADOR = r"^<!-- fim-%s: (feito|parado) -->$"
+UNCERTAIN = ("stop_unknown", "release_unknown", "release_pending")
+NOISE = "worker stopped without reporting"
+ATTENTION = {"question", "blocked", "decision_gate", "escalation"}
+RE_MARKER = r"^<!-- fim-%s: (feito|parado) -->$"
 
 
 # ---------------------------------------------------------------- relógio, saída e corredores (os testes trocam)
@@ -144,8 +144,8 @@ def run_shell(cmd, cwd, timeout=120):
         if expand:
             w = os.path.expanduser(w)
             if re.search(r"[*?\[]", w):
-                achados = sorted(glob.glob(w, root_dir=workdir))
-                argv.extend(achados or [w])
+                findings = sorted(glob.glob(w, root_dir=workdir))
+                argv.extend(findings or [w])
                 continue
         argv.append(w)
     try:
@@ -165,27 +165,27 @@ class Ctx:
         self.err = err or (lambda s: print(s, file=sys.stderr, flush=True))
         self.clock = clock or time.time
         self.sleep = sleep or time.sleep
-        self.hoje = lambda: datetime.date.fromtimestamp(self.clock()).isoformat()
+        self.on_date = lambda: datetime.date.fromtimestamp(self.clock()).isoformat()
 
 
 # ---------------------------------------------------------------- o manifesto
 
-def sessao_nome(plan_id, pid):
+def session_name(plan_id, pid):
     n = re.search(r"\d+", plan_id).group(0)
     return "pln%s-%s" % (n, pid.lower())
 
 
-def le_manifesto(pl):
-    m = plan_panel.le_json(plan_panel.manifesto_path(pl.raiz, pl.id))
-    m.setdefault("plano", pl.id)
-    m.setdefault("passos", {})
+def read_manifest(pl):
+    m = plan_panel.read_json(plan_panel.manifest_path(pl.root, pl.id))
+    m.setdefault("plan", pl.id)
+    m.setdefault("steps", {})
     return m
 
 
-def salva_manifesto(pl, m):
-    m["plano"] = pl.id
-    m["plano_path"] = os.path.relpath(pl.path, pl.raiz)
-    path = plan_panel.manifesto_path(pl.raiz, pl.id)
+def write_manifest(pl, m):
+    m["plan"] = pl.id
+    m["plan_path"] = os.path.relpath(pl.path, pl.root)
+    path = plan_panel.manifest_path(pl.root, pl.id)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = "%s.%d.tmp" % (path, os.getpid())
     with open(tmp, "w", encoding="utf-8") as f:
@@ -194,75 +194,75 @@ def salva_manifesto(pl, m):
     os.replace(tmp, path)
 
 
-def evento(c, e, estado, nota):
-    e["estado"] = estado
-    e.setdefault("eventos", []).append({"at": iso(c.clock()), "estado": estado, "nota": nota})
+def append_event(c, e, state, note):
+    e["state"] = state
+    e.setdefault("events", []).append({"at": iso(c.clock()), "state": state, "note": note})
 
 
-def minutos(c, e, desde=None):
-    """Minutos desde `desde` (ISO) ou desde a abertura."""
-    ev = e.get("eventos") or []
-    t0 = sessions_map.epoch(desde or (ev[0].get("at") if ev else None))
+def minutes(c, e, since=None):
+    """Minutos desde `since` (ISO) ou desde a abertura."""
+    ev = e.get("events") or []
+    t0 = sessions_map.epoch(since or (ev[0].get("at") if ev else None))
     return None if t0 is None else max(0, int((c.clock() - t0) // 60))
 
 
-def _painel(pl, c, a, png=False):
+def _panel(pl, c, a, png=False):
     if getattr(a, "no_panel", False):
         return
-    plan_panel.emite(plan_panel.publica_seguro(pl, png=True if png else None), c.out, c.err)
+    plan_panel.emit(plan_panel.publish_safe(pl, png=True if png else None), c.out, c.err)
 
 
-def ultimo_marcador(path, pid):
+def last_marker(path, pid):
     """'feito' | 'parado' | None: o marcador do passo é a última linha não vazia do worklog (sem o anexo `## Medida`)."""
     try:
         with open(path, encoding="utf-8") as f:
-            texto = corta_medida(f.read())
+            text = strip_measurement(f.read())
     except OSError:
         return None
-    linhas = [l.rstrip() for l in texto.split("\n") if l.strip()]
-    m = re.match(RE_MARCADOR % re.escape(pid), linhas[-1]) if linhas else None
+    lines = [l.rstrip() for l in text.split("\n") if l.strip()]
+    m = re.match(RE_MARKER % re.escape(pid), lines[-1]) if lines else None
     return m.group(1) if m else None
 
 
 def has_pending_checks(pl, pid):
     """True se o `### Pn` ainda tem subpasso `[ ]`."""
-    p = pl.passo(pid)
-    return p is not None and any(marca == " " for _, marca, _ in p.checks)
+    p = pl.step(pid)
+    return p is not None and any(mark_text == " " for _, mark_text, _ in p.checks)
 
 
-def neutraliza_marcador(path, pid):
+def neutralize_marker(path, pid):
     """Troca o último `<!-- fim-Pn: feito|parado -->` do worklog por um comentário que o `wait` não lê; o texto fica."""
     try:
         with open(path, encoding="utf-8") as f:
-            linhas = f.read().split("\n")
+            lines = f.read().split("\n")
     except OSError:
         return False
-    for i in range(len(linhas) - 1, -1, -1):
-        m = re.match(RE_MARCADOR % re.escape(pid), linhas[i].rstrip())
+    for i in range(len(lines) - 1, -1, -1):
+        m = re.match(RE_MARKER % re.escape(pid), lines[i].rstrip())
         if m:
-            linhas[i] = "<!-- reaberto: era fim-%s: %s -->" % (pid, m.group(1))
+            lines[i] = "<!-- reaberto: era fim-%s: %s -->" % (pid, m.group(1))
             with open(path, "w", encoding="utf-8") as f:
-                f.write("\n".join(linhas))
+                f.write("\n".join(lines))
             return True
     return False
 
 
-def _abs(pl, caminho):
-    return caminho if os.path.isabs(caminho) else os.path.join(pl.raiz, caminho)
+def _abs(pl, path):
+    return path if os.path.isabs(path) else os.path.join(pl.root, path)
 
 
 # ---------------------------------------------------------------- open
 
-MOLDE_WORKLOG = """---
+WORKLOG_TEMPLATE = """---
 scope:
 {scope}
 tags:
 {tags}
 ---
 
-# {pln} {pid}: {titulo}
+# {pln} {pid}: {title}
 
-Worklog do executor do passo {pid} do {pln}, criado pela coordenação em {hoje}. O executor preenche as seções abaixo; a
+Worklog do executor do passo {pid} do {pln}, criado pela coordenação em {on_date}. O executor preenche as seções abaixo; a
 coordenação o confere e o commita com o plano. O marcador de fim é o comentário HTML `fim-{pid}` com `feito` ou `parado`
 (o pedido dá a forma exata), última linha do arquivo, e só entra quando o passo termina.
 
@@ -274,24 +274,24 @@ coordenação o confere e o commita com o plano. O marcador de fim é o comentá
 """
 
 
-def _lista_yaml(v, padrao):
-    itens = v if isinstance(v, list) and v else [padrao]
-    return "\n".join("  - %s" % x for x in itens)
+def _yaml_list(v, default_value):
+    item_list = v if isinstance(v, list) and v else [default_value]
+    return "\n".join("  - %s" % x for x in item_list)
 
 
-def cria_worklog(pl, p, path, hoje):
+def create_worklog(pl, p, path, on_date):
     if os.path.exists(path):
         return False
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    txt = MOLDE_WORKLOG.format(scope=_lista_yaml(pl.fm.get("scope"), "workspace"), tags=_lista_yaml(pl.fm.get("tags"), "tooling"),
-                               pln=pl.id, pid=p.id, titulo=p.titulo, hoje=hoje)
+    txt = WORKLOG_TEMPLATE.format(scope=_yaml_list(pl.fm.get("scope"), "workspace"), tags=_yaml_list(pl.fm.get("tags"), "tooling"),
+                               pln=pl.id, pid=p.id, title=p.title, on_date=on_date)
     with open(path, "w", encoding="utf-8") as f:
         f.write(txt)
     return True
 
 
 def effective_model_effort(agent, model, effort):
-    """(model, effort, aviso): o `brza sessions` recusa `--effort` sem `--model`. O Codex ganha o `CODEX_MODEL`; o runtime sem
+    """(model, effort, warning): o `brza sessions` recusa `--effort` sem `--model`. O Codex ganha o `CODEX_MODEL`; o runtime sem
     modelo padrão conhecido perde o esforço, com o aviso."""
     if model or not effort:
         return model, effort, None
@@ -300,127 +300,127 @@ def effective_model_effort(agent, model, effort):
     return None, None, "o `brza sessions` recusa --effort sem --model e não há modelo padrão para %s: abro sem --effort" % agent
 
 
-def _caminho_da_arvore(saida, nome):
-    for tok in re.findall(r"(/\S+)", saida or ""):
-        if os.path.basename(tok.rstrip("/")) == nome:
+def _tree_path(output, name):
+    for tok in re.findall(r"(/\S+)", output or ""):
+        if os.path.basename(tok.rstrip("/")) == name:
             return tok.rstrip("/")
     return None
 
 
-def _branch_atual(raiz):
-    rc, so, _ = run_git(["-C", raiz, "branch", "--show-current"])
-    return so.strip() if rc == 0 and so.strip() else "workstream"
+def _current_branch(root):
+    rc, stdout, _ = run_git(["-C", root, "branch", "--show-current"])
+    return stdout.strip() if rc == 0 and stdout.strip() else "workstream"
 
 
 def cmd_open(a, c):
     try:
-        pl = plan_md.carrega(a.plano)
-    except plan_md.PlanoNaoEncontrado as e:
+        pl = plan_md.load(a.plan)
+    except plan_md.PlanNotFound as e:
         c.err("erro: %s" % e)
         return 2
-    p = pl.passo(a.passo)
+    p = pl.step(a.step)
     if p is None:
-        c.err("erro: o plano %s não tem o passo %s" % (pl.id, a.passo))
+        c.err("erro: o plano %s não tem o passo %s" % (pl.id, a.step))
         return 2
     pid, base = p.id, "%s-%s" % (pl.id.lower(), p.id.lower())
-    m = le_manifesto(pl)
-    ant = m["passos"].get(pid) or {}
-    if ant.get("estado") in VIVOS and not a.dry_run:
+    m = read_manifest(pl)
+    prior = m["steps"].get(pid) or {}
+    if prior.get("state") in LIVE_FLAGS and not a.dry_run:
         c.err("o passo %s já tem executor %s (%s): use `wait` ou `status`; `open` só reabre passo parado, falhado ou "
-              "fechado sem evidência" % (pid, ant.get("sessao"), ant.get("estado")))
+              "fechado sem evidência" % (pid, prior.get("session"), prior.get("state")))
         return 1
-    if (ant.get("estado") == "feito" or ant.get("estado") == "evidencia-gravada" or ant.get("evidencia")) and not a.dry_run:
-        if ant.get("estado") == "feito" or not has_pending_checks(pl, pid):
+    if (prior.get("state") == "feito" or prior.get("state") == "evidencia-gravada" or prior.get("evidence")) and not a.dry_run:
+        if prior.get("state") == "feito" or not has_pending_checks(pl, pid):
             c.err("o passo %s está %s e a evidência dele já foi lida: `open` não reabre (só passo parado, falhado, fechado ou com "
-                  "subpasso `[ ]` pendente); a evidência fica como está" % (pid, ant.get("estado")))
+                  "subpasso `[ ]` pendente); a evidência fica como está" % (pid, prior.get("state")))
             return 1
     agent = a.agent or "claude"
     model = a.model or (SONNET if agent == "claude" else None)
-    model, effort, aviso = effective_model_effort(agent, model, a.effort)
-    if aviso:
-        c.err("⚠ " + aviso)
-    hoje = c.hoje()
-    worklog = os.path.join(pl.raiz, "work", "worklogs", "%s-%s-%s.md" % (hoje, base, step_request.slug(p.titulo)))
+    model, effort, warning_text = effective_model_effort(agent, model, a.effort)
+    if warning_text:
+        c.err("⚠ " + warning_text)
+    on_date = c.on_date()
+    worklog = os.path.join(pl.root, "work", "worklogs", "%s-%s-%s.md" % (on_date, base, step_request.slug(p.title)))
     # o checkout: `brza tree` ou o dado; sem nenhum dos dois, recusa (o padrão seria o próprio brza-workspace)
     if not a.tree and not a.checkout:
         c.err("passe --checkout <worktree> ou --tree <nome>: sem eles o executor trabalharia no brza-workspace, onde o "
               "pedido proíbe o commit")
         return 2
     if a.tree:
-        tipo = a.type or "feat"
-        branch = "%s/%s" % (tipo, a.tree)
-        padrao = os.path.join(os.path.dirname(step_request._repo_principal(pl.raiz)), "brza-studio", ".worktrees", a.tree)
+        kind = a.type or "feat"
+        branch = "%s/%s" % (kind, a.tree)
+        default_value = os.path.join(os.path.dirname(step_request._repo_main(pl.root)), "brza-studio", ".worktrees", a.tree)
         try:   # A13: confere o pedido antes de criar o worktree
-            step_request.monta(pl, pid, worklog, padrao, branch, hoje)
-        except step_request.Recusa as e:
+            step_request.build(pl, pid, worklog, default_value, branch, on_date)
+        except step_request.Refusal as e:
             c.err("recusado: %s" % e)
             return 1
-        argv_tree = ["tree", a.tree, "--type", tipo]
+        argv_tree = ["tree", a.tree, "--type", kind]
         if a.dry_run:
             c.out("[dry-run] brza " + shlex.join(argv_tree))
-            checkout = padrao
+            checkout = default_value
         else:
-            rc, so, se = run_brza(argv_tree)
+            rc, stdout, se = run_brza(argv_tree)
             if rc != 0:
-                c.err("o `brza tree` falhou (rc %s): %s" % (rc, (se or so or "").strip()[:300]))
+                c.err("o `brza tree` falhou (rc %s): %s" % (rc, (se or stdout or "").strip()[:300]))
                 return 1
-            checkout = _caminho_da_arvore(so, a.tree) or padrao
+            checkout = _tree_path(stdout, a.tree) or default_value
     else:
         checkout = os.path.abspath(a.checkout)
-        branch = a.branch or _branch_atual(checkout)
+        branch = a.branch or _current_branch(checkout)
         if branch in ("master", "main") and not a.branch:
             branch = "feat/%s" % base   # nunca a branch principal: a do passo
     if not a.dry_run and not os.path.isdir(checkout):
         c.err("o checkout %s não existe; passe --checkout ou --tree" % checkout)
         return 1
-    pedido = os.path.join(plan_panel.pasta_sessoes(pl.raiz, pl.id), pid, "pedido.md")
+    request = os.path.join(plan_panel.folder_sessions(pl.root, pl.id), pid, "pedido.md")
     try:
-        texto, info = step_request.monta(pl, pid, worklog, checkout, branch, hoje)
-    except step_request.Recusa as e:
+        text, info = step_request.build(pl, pid, worklog, checkout, branch, on_date)
+    except step_request.Refusal as e:
         c.err("recusado: %s" % e)
         return 1
-    nome = sessao_nome(pl.id, pid)
-    titulo = "%s %s: %s" % (pl.id, pid, p.titulo.replace("`", ""))
-    argv = open_argv(nome, agent=agent, checkout=checkout, prompt_file=pedido, title=titulo, model=model, effort=effort,
+    name = session_name(pl.id, pid)
+    title = "%s %s: %s" % (pl.id, pid, p.title.replace("`", ""))
+    argv = open_argv(name, agent=agent, checkout=checkout, prompt_file=request, title=title, model=model, effort=effort,
                      rename=True)
     if a.dry_run:
-        c.out("[dry-run] pedido: %s" % pedido)
+        c.out("[dry-run] pedido: %s" % request)
         c.out("[dry-run] worklog: %s" % worklog)
         c.out("[dry-run] brza sessions " + shlex.join(argv))
         return 0
-    os.makedirs(os.path.dirname(pedido), exist_ok=True)
-    with open(pedido, "w", encoding="utf-8") as f:
-        f.write(texto)
-    novo = cria_worklog(pl, p, worklog, hoje)
-    rc, so, se = run_sessions(argv)
-    res = interpreta_abertura(rc, so, se)
+    os.makedirs(os.path.dirname(request), exist_ok=True)
+    with open(request, "w", encoding="utf-8") as f:
+        f.write(text)
+    fresh = create_worklog(pl, p, worklog, on_date)
+    rc, stdout, se = run_sessions(argv)
+    res = interpret_open(rc, stdout, se)
     if res == "nao-abriu":
         c.err("%s não abriu: leia o `pending-*.json` que o `brza sessions` cita antes de relançar; não relanço.\n%s"
-              % (nome, ((se or "") + (so or "")).strip()[:400]))
+              % (name, ((se or "") + (stdout or "")).strip()[:400]))
         return 1
     if res == "falha":
-        c.err("`brza sessions %s` falhou (rc %s): %s" % (nome, rc, ((se or "") + (so or "")).strip()[:400]))
+        c.err("`brza sessions %s` falhou (rc %s): %s" % (name, rc, ((se or "") + (stdout or "")).strip()[:400]))
         return 1
     if res == "ja":
         c.err("%s já está aberta (`running:`) e o pedido novo não chegou a ela: feche com `brza sessions close %s` e rode `open` "
-              "de novo; o marcador do worklog ficou como estava" % (nome, nome))
+              "de novo; o marcador do worklog ficou como estava" % (name, name))
         return 1
     if res == "sem-id":
-        c.err("⚠ %s abriu sem o id do provedor; o `wait` o grava depois. Não relance." % nome)
-    if not novo:
-        neutraliza_marcador(worklog, pid)   # só com a sessão nova aberta: o marcador do executor anterior não vale para ela
-    e = {"sessao": nome, "agent": agent, "model": model, "effort": effort, "checkout": checkout, "branch": branch,
-         "pedido": os.path.relpath(pedido, pl.raiz), "worklog": os.path.relpath(worklog, pl.raiz),
-         "marcador": "fim-%s:" % pid, "estado": "aberto", "eventos": [], "evidencia": None, "medicao": None}
-    evento(c, e, "aberto", "open: %s%s" % (nome, "" if novo else " (worklog já existia)"))
-    m["passos"][pid] = e
-    salva_manifesto(pl, m)
+        c.err("⚠ %s abriu sem o id do provedor; o `wait` o grava depois. Não relance." % name)
+    if not fresh:
+        neutralize_marker(worklog, pid)   # só com a sessão nova aberta: o marcador do executor anterior não vale para ela
+    e = {"session": name, "agent": agent, "model": model, "effort": effort, "checkout": checkout, "branch": branch,
+         "request": os.path.relpath(request, pl.root), "worklog": os.path.relpath(worklog, pl.root),
+         "marker": "fim-%s:" % pid, "state": "aberto", "events": [], "evidence": None, "measurement": None}
+    append_event(c, e, "aberto", "open: %s%s" % (name, "" if fresh else " (worklog já existia)"))
+    m["steps"][pid] = e
+    write_manifest(pl, m)
     c.out("| Passo | Executor | Runtime | Modelo | Esforço | Checkout | Branch |")
     c.out("| :-- | :-- | :-- | :-- | :-- | :-- | :-- |")
-    c.out("| %s | %s | %s | %s | %s | %s | %s |" % (pid, nome, agent, model or "padrão do runtime", effort or "padrão", checkout, branch))
-    c.out("pedido: %s" % pedido)
+    c.out("| %s | %s | %s | %s | %s | %s | %s |" % (pid, name, agent, model or "padrão do runtime", effort or "padrão", checkout, branch))
+    c.out("pedido: %s" % request)
     c.out("worklog: %s" % worklog)
-    _painel(pl, c, a, png=True)
+    _panel(pl, c, a, png=True)
     return 0
 
 
@@ -428,189 +428,189 @@ def cmd_open(a, c):
 
 def cmd_send(a, c):
     try:
-        pl = plan_md.carrega(a.plano)
-    except plan_md.PlanoNaoEncontrado as e:
+        pl = plan_md.load(a.plan)
+    except plan_md.PlanNotFound as e:
         c.err("erro: %s" % e)
         return 2
-    m = le_manifesto(pl)
-    pid = a.passo.upper() if re.match(r"^p\d", a.passo) else a.passo
-    e = m["passos"].get(pid)
+    m = read_manifest(pl)
+    pid = a.step.upper() if re.match(r"^p\d", a.step) else a.step
+    e = m["steps"].get(pid)
     if not e:
-        c.err("erro: o passo %s não tem executor aberto em %s" % (a.passo, plan_panel.manifesto_path(pl.raiz, pl.id)))
+        c.err("erro: o passo %s não tem executor aberto em %s" % (a.step, plan_panel.manifest_path(pl.root, pl.id)))
         return 2
     try:
-        argv = send_argv([e["sessao"]], text=a.text, file=a.file, operation=a.operation)
+        argv = send_argv([e["session"]], text=a.text, file=a.file, operation=a.operation)
     except ValueError as ex:
         c.err("erro: %s" % ex)
         return 2
-    rc, so, se = run_sessions(argv)
+    rc, stdout, se = run_sessions(argv)
     try:
-        d = json.loads(so)
+        d = json.loads(stdout)
     except ValueError:
         d = None
     rec = (d or {}).get("receipts") if isinstance(d, dict) else None
     st = (rec[0].get("status") if rec else None) if isinstance(rec, list) and rec else None
     if rc == 75 or st in ("pending", "unknown"):
         c.err("%s: envio incerto (%s): não reenvie às cegas; confira com `status` e `brza sessions read %s --last`"
-              % (e["sessao"], st or "rc 75", e["sessao"]))
+              % (e["session"], st or "rc 75", e["session"]))
         return 75
     if rc != 0:
-        c.err("`brza sessions send` falhou (rc %s): %s" % (rc, (se or so or "").strip()[:300]))
+        c.err("`brza sessions send` falhou (rc %s): %s" % (rc, (se or stdout or "").strip()[:300]))
         return 1
-    c.out("%s · enviado a %s (%s)" % (pid, e["sessao"], st or "ok"))
-    partial = e.get("estado") == "evidencia-gravada" and has_pending_checks(pl, pid)   # cobre parcial: falta subpasso
-    if e.get("estado") in ("feito", "parado") or partial:
-        neutraliza_marcador(_abs(pl, e["worklog"]), pid)   # o retrabalho pede um marcador novo, e o `wait` não pode devolver o velho
-    novo = "em-curso" if e.get("estado") in ("bloqueado", "parado", "aberto", "feito") or partial else e.get("estado")
-    evento(c, e, novo, "send: %s" % (a.operation or "sem operation"))
-    salva_manifesto(pl, m)
+    c.out("%s · enviado a %s (%s)" % (pid, e["session"], st or "ok"))
+    partial = e.get("state") == "evidencia-gravada" and has_pending_checks(pl, pid)   # cobre parcial: falta subpasso
+    if e.get("state") in ("feito", "parado") or partial:
+        neutralize_marker(_abs(pl, e["worklog"]), pid)   # o retrabalho pede um marcador novo, e o `wait` não pode devolver o velho
+    fresh = "em-curso" if e.get("state") in ("bloqueado", "parado", "aberto", "feito") or partial else e.get("state")
+    append_event(c, e, fresh, "send: %s" % (a.operation or "sem operation"))
+    write_manifest(pl, m)
     return 0
 
 
 # ---------------------------------------------------------------- wait
 
-def wait_error_verdict(rc, erro, streak, nomes):
+def wait_error_verdict(rc, error, streak, name_list):
     """(ação, mensagem, nome) para o `error` do `brza sessions wait`. Ação: `missing` (o `brza` diz "0 chats abertos se chamam
-    <nome>" para um dos `nomes`: só essa sessão se perdeu, e quem chama a marca `falhou` e segue com as outras), `stop` (nome
+    <nome>" para um dos `name_list`: só essa sessão se perdeu, e quem chama a marca `falhou` e segue com as outras), `stop` (nome
     duplicado, rc fora de 0/1/75 ou `MAX_WAIT_ERRORS` erros seguidos) ou `retry` (pausa `WAIT_ERROR_PAUSE`)."""
-    m = RE_NO_SESSION.search(erro)
-    if m and m.group(2) in nomes:
+    m = RE_NO_SESSION.search(error)
+    if m and m.group(2) in name_list:
         if int(m.group(1)) == 0:
             return "missing", "a sessão %s não existe mais no `brza sessions` (fechada à mão?); confira `brza sessions list` e "\
                               "reabra com `open`" % m.group(2), m.group(2)
         return "stop", "o nome %s está em %s chats abertos: o `brza sessions` não sabe qual esperar; feche o que sobra" % (
             m.group(2), m.group(1)), m.group(2)
     if rc not in (0, 1, 75):
-        return "stop", "o `brza sessions wait` falhou (rc %s): %s" % (rc, erro), None
+        return "stop", "o `brza sessions wait` falhou (rc %s): %s" % (rc, error), None
     if streak >= MAX_WAIT_ERRORS:
-        return "stop", "o `brza sessions wait` falhou %d vezes seguidas (rc %s): %s" % (streak, rc, erro), None
+        return "stop", "o `brza sessions wait` falhou %d vezes seguidas (rc %s): %s" % (streak, rc, error), None
     return "retry", "⚠ o `brza sessions wait` falhou (rc %s, %d/%d): %s; espero %d s" % (
-        rc, streak, MAX_WAIT_ERRORS, erro, WAIT_ERROR_PAUSE), None
+        rc, streak, MAX_WAIT_ERRORS, error, WAIT_ERROR_PAUSE), None
 
 
-def _linha_evento(pid, estado, c, e):
-    mi = minutos(c, e)
-    quando = " em %d min" % mi if mi is not None else ""
-    if estado == "feito":
-        return "%s · feito%s" % (pid, quando)
-    if estado == "parado":
-        return "%s · parado%s — o executor achou desvio que muda o D: leia o X no worklog %s" % (pid, quando, e.get("worklog"))
-    if estado == "bloqueado":
-        return "%s · bloqueado%s — o chat espera resposta: `brza sessions read %s --last`" % (pid, quando, e["sessao"])
-    return "%s · falhou%s — a sessão %s falhou; confira com `brza sessions read %s --last`" % (pid, quando, e["sessao"], e["sessao"])
+def _event_line(pid, state, c, e):
+    mi = minutes(c, e)
+    when = " em %d min" % mi if mi is not None else ""
+    if state == "feito":
+        return "%s · feito%s" % (pid, when)
+    if state == "parado":
+        return "%s · parado%s — o executor achou desvio que muda o D: leia o X no worklog %s" % (pid, when, e.get("worklog"))
+    if state == "bloqueado":
+        return "%s · bloqueado%s — o chat espera resposta: `brza sessions read %s --last`" % (pid, when, e["session"])
+    return "%s · falhou%s — a sessão %s falhou; confira com `brza sessions read %s --last`" % (pid, when, e["session"], e["session"])
 
 
 def cmd_wait(a, c):
     try:
-        pl = plan_md.carrega(a.plano)
-    except plan_md.PlanoNaoEncontrado as e:
+        pl = plan_md.load(a.plan)
+    except plan_md.PlanNotFound as e:
         c.err("erro: %s" % e)
         return 2
-    m = le_manifesto(pl)
-    pids = [x.upper() for x in a.passos] if a.passos else [k for k, v in m["passos"].items() if v.get("estado") in VIVOS]
-    falta = [x for x in pids if x not in m["passos"]]
-    if falta or not pids:
-        c.err("erro: %s" % ("sem executor aberto para %s" % ", ".join(falta) if falta else "nenhum executor vivo em %s"
-                            % plan_panel.manifesto_path(pl.raiz, pl.id)))
+    m = read_manifest(pl)
+    pids = [x.upper() for x in a.steps] if a.steps else [k for k, v in m["steps"].items() if v.get("state") in LIVE_FLAGS]
+    missing_ids = [x for x in pids if x not in m["steps"]]
+    if missing_ids or not pids:
+        c.err("erro: %s" % ("sem executor aberto para %s" % ", ".join(missing_ids) if missing_ids else "nenhum executor vivo em %s"
+                            % plan_panel.manifest_path(pl.root, pl.id)))
         return 2
     t0 = c.clock()
-    fim = t0 + a.timeout
-    resultado = {}
-    avisado = set()
-    vistos = set()
-    erros = 0
-    ultima_batida = t0
+    end = t0 + a.timeout
+    result_text = {}
+    warned = set()
+    seen = set()
+    errors = 0
+    last_tick = t0
     for pid in pids:
-        e = m["passos"][pid]
-        if e.get("estado") == "aberto":
-            evento(c, e, "em-curso", "wait")
-    salva_manifesto(pl, m)
+        e = m["steps"][pid]
+        if e.get("state") == "aberto":
+            append_event(c, e, "em-curso", "wait")
+    write_manifest(pl, m)
     while True:
         for pid in pids:
-            e = m["passos"][pid]
-            mk = ultimo_marcador(_abs(pl, e["worklog"]), pid)
-            if mk and pid not in resultado:
-                resultado[pid] = mk
-                evento(c, e, mk, "marcador no worklog")
-                c.out(_linha_evento(pid, mk, c, e))
-        if resultado:
+            e = m["steps"][pid]
+            mk = last_marker(_abs(pl, e["worklog"]), pid)
+            if mk and pid not in result_text:
+                result_text[pid] = mk
+                append_event(c, e, mk, "marcador no worklog")
+                c.out(_event_line(pid, mk, c, e))
+        if result_text:
             break
-        restante = fim - c.clock()
-        if restante <= 0:
+        remainder = end - c.clock()
+        if remainder <= 0:
             break
-        trecho = min(restante, BATIDA)
-        nomes = {m["passos"][p]["sessao"]: p for p in pids}
-        marcadores = []
+        snippet = min(remainder, TICK)
+        name_list = {m["steps"][p]["session"]: p for p in pids}
+        markers = []
         if len(pids) == 1:   # o `--marker` do brza vale para todas as sessões: com duas, o script confere sozinho
-            marcadores = ["%s:<!-- %s" % (_abs(pl, m["passos"][pids[0]]["worklog"]), m["passos"][pids[0]]["marcador"])]
-        ini = c.clock()
-        rc, dado = wait_brza(list(nomes), trecho, markers=marcadores)
-        if dado.get("error"):
-            erros += 1
-            action, msg, perdida = wait_error_verdict(rc, dado["error"], erros, list(nomes))
+            markers = ["%s:<!-- %s" % (_abs(pl, m["steps"][pids[0]]["worklog"]), m["steps"][pids[0]]["marker"])]
+        start = c.clock()
+        rc, payload = wait_brza(list(name_list), snippet, markers=markers)
+        if payload.get("error"):
+            errors += 1
+            action, msg, lost_index = wait_error_verdict(rc, payload["error"], errors, list(name_list))
             c.err(msg)
             if action == "stop":
                 return 1
             if action == "missing":
-                perdido = nomes[perdida]
-                resultado[perdido] = "falhou"
-                evento(c, m["passos"][perdido], "falhou", "wait: sessão inexistente")
-                c.out(_linha_evento(perdido, "falhou", c, m["passos"][perdido]))
+                lost_name = name_list[lost_index]
+                result_text[lost_name] = "falhou"
+                append_event(c, m["steps"][lost_name], "falhou", "wait: sessão inexistente")
+                c.out(_event_line(lost_name, "falhou", c, m["steps"][lost_name]))
                 break
             c.sleep(WAIT_ERROR_PAUSE)
             continue
-        erros = 0
-        sem_fim = False
-        for ev in dado.get("events") or []:
-            tipo = str(ev.get("type") or "").lower().replace("-", "_")
+        errors = 0
+        without_marker = False
+        for ev in payload.get("events") or []:
+            kind = str(ev.get("type") or "").lower().replace("-", "_")
             pl_ev = ev.get("payload") if isinstance(ev.get("payload"), dict) else {}
-            if tipo == "escalation" and (str(ev.get("subject") or "").strip().lower() == RUIDO or pl_ev.get("stopReason") == "finished"):
+            if kind == "escalation" and (str(ev.get("subject") or "").strip().lower() == NOISE or pl_ev.get("stopReason") == "finished"):
                 continue
-            if tipo in ATENCAO and (ev.get("id") or json.dumps(ev, sort_keys=True)) not in vistos:
-                vistos.add(ev.get("id") or json.dumps(ev, sort_keys=True))
-                c.out("atenção · %s%s" % (tipo, (" — " + str(ev.get("subject"))) if ev.get("subject") else ""))
-        for row in dado.get("done") or []:
-            pid = nomes.get(row.get("name"))
-            if pid is None or pid in resultado:
+            if kind in ATTENTION and (ev.get("id") or json.dumps(ev, sort_keys=True)) not in seen:
+                seen.add(ev.get("id") or json.dumps(ev, sort_keys=True))
+                c.out("atenção · %s%s" % (kind, (" — " + str(ev.get("subject"))) if ev.get("subject") else ""))
+        for row in payload.get("done") or []:
+            pid = name_list.get(row.get("name"))
+            if pid is None or pid in result_text:
                 continue
-            e = m["passos"][pid]
-            saida = row.get("outcome")
-            mk = ultimo_marcador(_abs(pl, e["worklog"]), pid)
-            if saida == "failed":
-                resultado[pid] = "falhou"
-            elif saida == "blocked":
-                resultado[pid] = "bloqueado"
+            e = m["steps"][pid]
+            output = row.get("outcome")
+            mk = last_marker(_abs(pl, e["worklog"]), pid)
+            if output == "failed":
+                result_text[pid] = "falhou"
+            elif output == "blocked":
+                result_text[pid] = "bloqueado"
             elif mk:
-                resultado[pid] = mk
+                result_text[pid] = mk
             else:
-                sem_fim = True
-                if pid not in avisado:
-                    avisado.add(pid)
+                without_marker = True
+                if pid not in warned:
+                    warned.add(pid)
                     c.out("%s · o turno acabou sem o marcador `<!-- fim-%s: … -->` como última linha; a espera segue" % (pid, pid))
                 continue
-            evento(c, e, resultado[pid], "wait: %s" % saida)
-            c.out(_linha_evento(pid, resultado[pid], c, e))
-        if resultado:
+            append_event(c, e, result_text[pid], "wait: %s" % output)
+            c.out(_event_line(pid, result_text[pid], c, e))
+        if result_text:
             break
-        if sem_fim:
-            c.sleep(min(5, max(0, fim - c.clock())))   # o `wait` volta na hora com o turno já terminado: não gira
-        elif c.clock() - ini < trecho and (dado.get("timed_out") or rc == 75):
-            c.sleep(max(0, trecho - (c.clock() - ini)))
-        if c.clock() < fim and not resultado and c.clock() - ultima_batida >= BATIDA:
-            ultima_batida = c.clock()
+        if without_marker:
+            c.sleep(min(5, max(0, end - c.clock())))   # o `wait` volta na hora com o turno já terminado: não gira
+        elif c.clock() - start < snippet and (payload.get("timed_out") or rc == 75):
+            c.sleep(max(0, snippet - (c.clock() - start)))
+        if c.clock() < end and not result_text and c.clock() - last_tick >= TICK:
+            last_tick = c.clock()
             c.out(" · ".join("%s · em curso %s min (último evento há %s min)" % (
-                p, minutos(c, m["passos"][p]) or 0, minutos(c, m["passos"][p], m["passos"][p]["eventos"][-1]["at"]) or 0)
+                p, minutes(c, m["steps"][p]) or 0, minutes(c, m["steps"][p], m["steps"][p]["events"][-1]["at"]) or 0)
                 for p in pids))
-    salva_manifesto(pl, m)
-    if resultado:
-        _painel(pl, c, a)
-    if not resultado:
+    write_manifest(pl, m)
+    if result_text:
+        _panel(pl, c, a)
+    if not result_text:
         c.out("prazo: %s sem marcador em %d s; `status` e decida, sem envio novo às cegas" % (", ".join(pids), a.timeout))
         return 75
-    estados = set(resultado.values())
-    if "falhou" in estados:
+    state_values = set(result_text.values())
+    if "falhou" in state_values:
         return 1
-    if "bloqueado" in estados:
+    if "bloqueado" in state_values:
         return 3
     return 0
 
@@ -619,244 +619,244 @@ def cmd_wait(a, c):
 
 RE_ITEM = re.compile(r"^\s*(?:[-*]\s+)?(commit|comando|arquivos|desvios|cobre)\s*:\s*(.*)$", re.I)
 RE_COMMIT = re.compile(r"(?:([\w.-]+)@)?\b([0-9a-f]{7,40})\b")
-RE_COMANDO = re.compile(r"^`(.+?)`\s*(?:→|->)\s*(.*?)\s*(\(\s*≤\s*2\s*min\s*\))?\s*$")
+RE_COMMAND = re.compile(r"^`(.+?)`\s*(?:→|->)\s*(.*?)\s*(\(\s*≤\s*2\s*min\s*\))?\s*$")
 
 
-def le_evidencia(texto):
-    """A seção `## Evidência` do worklog: {commits, comandos, arquivos, desvios, aguarda}. None sem a seção."""
-    linhas = corta_medida(texto).split("\n")
-    ini = next((i for i, l in enumerate(linhas) if re.match(r"^##\s+Evidência\s*$", l)), None)
-    if ini is None:
+def read_evidence(text):
+    """A seção `## Evidência` do worklog: {commits, commands, files, deviations, waiting, raw, covers}. None sem a seção."""
+    lines = strip_measurement(text).split("\n")
+    start = next((i for i, l in enumerate(lines) if re.match(r"^##\s+Evidência\s*$", l)), None)
+    if start is None:
         return None
-    ev = {"commits": [], "comandos": [], "arquivos": [], "desvios": [], "aguarda": False, "bruta": [], "cobre": None}
-    dentro = False
-    for l in linhas[ini + 1:]:
+    ev = {"commits": [], "commands": [], "files": [], "deviations": [], "waiting": False, "raw": [], "covers": None}
+    inside = False
+    for l in lines[start + 1:]:
         if re.match(r"^#{1,2}\s", l) or re.match(r"^<!-- fim-", l.strip()):
             break
         if l.strip().startswith("```"):
-            dentro = not dentro
+            inside = not inside
             continue
-        if dentro:
+        if inside:
             continue
         mi = RE_ITEM.match(l)
         if not mi:
             continue
-        tipo, valor = mi.group(1).lower(), mi.group(2).strip()
-        ev["bruta"].append(l.strip())
-        if tipo == "commit":
-            if re.search(r"aguarda", valor, re.I):
-                ev["aguarda"] = True
-            for repo, sha in RE_COMMIT.findall(valor):
+        kind, value = mi.group(1).lower(), mi.group(2).strip()
+        ev["raw"].append(l.strip())
+        if kind == "commit":
+            if re.search(r"aguarda", value, re.I):
+                ev["waiting"] = True
+            for repo, sha in RE_COMMIT.findall(value):
                 if re.search(r"\d", sha):
                     ev["commits"].append((repo or None, sha))
-        elif tipo == "comando":
-            mc = RE_COMANDO.match(valor.replace("\\`", "`"))
+        elif kind == "comando":
+            mc = RE_COMMAND.match(value.replace("\\`", "`"))
             if mc:
-                ev["comandos"].append({"cmd": mc.group(1), "resultado": mc.group(2), "rerun": bool(mc.group(3))})
-        elif tipo == "cobre":   # `cobre: todos` ou `cobre: 1, 3`: os subpassos que a evidência cobre
-            if re.match(r"^todos\b", valor, re.I) or ev["cobre"] == "todos":
-                ev["cobre"] = "todos"   # `todos` vence; várias linhas `cobre:` se juntam
+                ev["commands"].append({"cmd": mc.group(1), "result": mc.group(2), "rerun": bool(mc.group(3))})
+        elif kind == "cobre":   # `cobre: todos` ou `cobre: 1, 3`: os subpassos que a evidência cobre
+            if re.match(r"^todos\b", value, re.I) or ev["covers"] == "todos":
+                ev["covers"] = "todos"   # `todos` vence; várias linhas `cobre:` se juntam
             else:
-                novos = [x.strip().strip("`*") for x in valor.split(",") if x.strip()]
-                ev["cobre"] = (ev["cobre"] or []) + [x for x in novos if x not in (ev["cobre"] or [])]
-        elif tipo == "arquivos":
-            ev["arquivos"] = [x.strip().strip("`") for x in valor.split(",") if x.strip()]
+                added = [x.strip().strip("`*") for x in value.split(",") if x.strip()]
+                ev["covers"] = (ev["covers"] or []) + [x for x in added if x not in (ev["covers"] or [])]
+        elif kind == "arquivos":
+            ev["files"] = [x.strip().strip("`") for x in value.split(",") if x.strip()]
         else:
-            ev["desvios"].append(valor)
+            ev["deviations"].append(value)
     return ev
 
 
-def confere(ev, checkout, raiz, c, rerun=False):
+def check(ev, checkout, root, c, rerun=False):
     """Roda as conferências: [(ok, linha)]. `ok` None é "não conferido" (informativo). O comando do worklog só roda com
     `rerun` (o `--apply` ou o `--rerun`) e se for simples: o worklog é entrada de outra sessão."""
     res = []
     for repo, sha in ev["commits"]:
-        base = raiz if repo == "brza-workspace" else checkout
+        base = root if repo == "brza-workspace" else checkout
         rc, _, se = run_git(["-C", base, "cat-file", "-e", sha])
         cmd = "git -C %s cat-file -e %s" % (base, sha)
         res.append((rc == 0, ("confere: `%s` → ok" % cmd) if rc == 0 else "NÃO confere: `%s` → rc %s %s" % (cmd, rc, (se or "").strip()[:120])))
-    for k in ev["comandos"]:
+    for k in ev["commands"]:
         if not k["rerun"]:
-            res.append((None, "não rodei `%s` (sem `(≤ 2 min)`): vale a palavra do executor: %s" % (k["cmd"], k["resultado"])))
+            res.append((None, "não rodei `%s` (sem `(≤ 2 min)`): vale a palavra do executor: %s" % (k["cmd"], k["result"])))
             continue
         if not rerun:
             res.append((None, "não rodei `%s`: a proposta não roda comando do worklog (use `--rerun` ou `--apply` depois de ler): "
-                              "vale a palavra do executor: %s" % (k["cmd"], k["resultado"])))
+                              "vale a palavra do executor: %s" % (k["cmd"], k["result"])))
             continue
         if parse_command(k["cmd"]) is None:
             res.append((None, "não rodei `%s`: não é um comando que o argv reproduz (só `VAR=v` e `cd X &&` na frente; sem `;`, `|`, `>`, `$`, crase); vale a palavra do "
-                              "executor: %s" % (k["cmd"], k["resultado"])))
+                              "executor: %s" % (k["cmd"], k["result"])))
             continue
-        rc, so = run_shell(k["cmd"], checkout)
-        cauda = [l for l in so.strip().split("\n") if l.strip()]
-        fim = cauda[-1].strip()[:140] if cauda else "sem saída"
-        res.append((rc == 0, ("confere: `%s` → %s (disse: %s)" % (k["cmd"], fim, k["resultado"])) if rc == 0
-                    else "NÃO confere: `%s` → rc %s, %s (disse: %s)" % (k["cmd"], rc, fim, k["resultado"])))
-    ausentes = [f for f in ev["arquivos"] if not os.path.exists(os.path.join(checkout, f)) and not os.path.exists(os.path.join(raiz, f))]
-    if ev["arquivos"]:
-        res.append((None, "arquivos: %d citados%s" % (len(ev["arquivos"]), ("; não achei no disco: " + ", ".join(ausentes)) if ausentes else ", todos no disco")))
+        rc, stdout = run_shell(k["cmd"], checkout)
+        tail = [l for l in stdout.strip().split("\n") if l.strip()]
+        end = tail[-1].strip()[:140] if tail else "sem saída"
+        res.append((rc == 0, ("confere: `%s` → %s (disse: %s)" % (k["cmd"], end, k["result"])) if rc == 0
+                    else "NÃO confere: `%s` → rc %s, %s (disse: %s)" % (k["cmd"], rc, end, k["result"])))
+    missing_files = [f for f in ev["files"] if not os.path.exists(os.path.join(checkout, f)) and not os.path.exists(os.path.join(root, f))]
+    if ev["files"]:
+        res.append((None, "arquivos: %d citados%s" % (len(ev["files"]), ("; não achei no disco: " + ", ".join(missing_files)) if missing_files else ", todos no disco")))
     return res
 
 
-def linha_evidencia(ev):
-    partes = []
+def line_evidence(ev):
+    pieces = []
     for repo, sha in ev["commits"]:
-        partes.append("%s@%s" % (repo or "brza-studio", sha[:7]))
-    if ev["aguarda"] and not ev["commits"]:
-        partes.append("commit aguarda confirmação")
-    for k in ev["comandos"]:
-        partes.append("`%s` → %s" % (k["cmd"], k["resultado"]))
-    if ev["arquivos"]:
-        partes.append("arquivos: " + ", ".join(ev["arquivos"]))
-    return "**Evidência:** " + " · ".join(partes)
+        pieces.append("%s@%s" % (repo or "brza-studio", sha[:7]))
+    if ev["waiting"] and not ev["commits"]:
+        pieces.append("commit aguarda confirmação")
+    for k in ev["commands"]:
+        pieces.append("`%s` → %s" % (k["cmd"], k["result"]))
+    if ev["files"]:
+        pieces.append("arquivos: " + ", ".join(ev["files"]))
+    return "**Evidência:** " + " · ".join(pieces)
 
 
-def _janela(c, e, pl):
-    """(aberto_iso, fim_iso, fim_epoch): da abertura ao marcador (o evento `feito`/`parado`, ou o mtime do worklog)."""
-    ev = e.get("eventos") or []
-    aberto = ev[0].get("at") if ev else None
-    fim = next((x.get("at") for x in reversed(ev) if x.get("estado") in ("feito", "parado")), None)
-    if fim is None:
+def _window(c, e, pl):
+    """(opened_at, end): da abertura ao marcador (o evento `feito`/`parado`, ou o mtime do worklog)."""
+    ev = e.get("events") or []
+    opened_at = ev[0].get("at") if ev else None
+    end = next((x.get("at") for x in reversed(ev) if x.get("state") in ("feito", "parado")), None)
+    if end is None:
         try:
-            fim = iso(os.path.getmtime(_abs(pl, e["worklog"])))
+            end = iso(os.path.getmtime(_abs(pl, e["worklog"])))
         except OSError:
-            fim = None
-    return aberto, fim
+            end = None
+    return opened_at, end
 
 
-def mede(c, pl, e, settle, measurements=None, sessions=None):
-    """{texto, custo_usd, janela_h, turnos_h}: o `Executado` proposto. Grok e Antigravity: `sem medição`."""
+def measures(c, pl, e, settle, measurements=None, sessions=None):
+    """{text, cost_usd, window_h, turns_h}: o `Executado` proposto. Grok e Antigravity: `sem medição`."""
     agent = e.get("agent") or "claude"
     if agent not in ("claude", "codex"):
-        return {"texto": "sem medição", "custo_usd": None, "janela_h": None, "turnos_h": None}
-    aberto, fim = _janela(c, e, pl)
-    ea, ef = sessions_map.epoch(aberto), sessions_map.epoch(fim)
-    if ea is None or ef is None or ef < ea:
-        return {"texto": "sem medição", "custo_usd": None, "janela_h": None, "turnos_h": None}
-    janela_h = round((ef - ea) / 3600, 3)
-    srows = measure.load_jsonl(sessions or sessions_map.map_file(pl.raiz))
-    claude_ids, provider_ids = measure.session_ids(srows, e["sessao"])
-    d0, d1 = (datetime.datetime.fromtimestamp(x).astimezone() for x in (ea, ef))
+        return {"text": "sem medição", "cost_usd": None, "window_h": None, "turns_h": None}
+    opened_at, end = _window(c, e, pl)
+    opened_epoch, ended_epoch = sessions_map.epoch(opened_at), sessions_map.epoch(end)
+    if opened_epoch is None or ended_epoch is None or ended_epoch < opened_epoch:
+        return {"text": "sem medição", "cost_usd": None, "window_h": None, "turns_h": None}
+    window_h = round((ended_epoch - opened_epoch) / 3600, 3)
+    srows = measure.load_jsonl(sessions or sessions_map.map_file(pl.root))
+    claude_ids, provider_ids = measure.session_ids(srows, e["session"])
+    d0, d1 = (datetime.datetime.fromtimestamp(x).astimezone() for x in (opened_epoch, ended_epoch))
     win = measure.win_bounds(d0, d1)
-    out = {"custo_usd": None, "janela_h": janela_h, "turnos_h": None}
+    out = {"cost_usd": None, "window_h": window_h, "turns_h": None}
     if agent == "claude":
-        mpath = measurements or plan_panel._achar(pl.raiz, ".measurements/measurements.jsonl")
-        limite = c.clock() + settle
+        mpath = measurements or plan_panel._find(pl.root, ".measurements/measurements.jsonl")
+        limit = c.clock() + settle
         while True:
             r = measure.measure_claude(measure.load_jsonl(mpath), claude_ids, win) if claude_ids else None
-            if r or not claude_ids or not os.path.isfile(mpath) or c.clock() >= limite:
+            if r or not claude_ids or not os.path.isfile(mpath) or c.clock() >= limit:
                 break
             c.sleep(5)
         if r:
-            out["custo_usd"], out["turnos_h"] = r["custo_usd"], round(r["latencia_s"] / 3600, 3)
-            out["texto"] = "%s h (janela; %s h de turnos; US$ %.2f)" % (plan_md.fmt_horas(janela_h), plan_md.fmt_horas(out["turnos_h"]), r["custo_usd"])
+            out["cost_usd"], out["turns_h"] = r["cost_usd"], round(r["latency_s"] / 3600, 3)
+            out["text"] = "%s h (janela; %s h de turnos; US$ %.2f)" % (plan_md.format_hours(window_h), plan_md.format_hours(out["turns_h"]), r["cost_usd"])
         else:
-            out["texto"] = "%s h (janela; sem medição dos turnos)" % plan_md.fmt_horas(janela_h)
+            out["text"] = "%s h (janela; sem medição dos turnos)" % plan_md.format_hours(window_h)
     else:
         r = measure.measure_codex(os.path.expanduser("~/.codex/sessions"), provider_ids, 1, win)
         if r:
-            out["turnos_h"] = round(r["latencia_s"] / 3600, 3)
-            out["texto"] = "%s h (janela; %s h do último turno Codex; sem custo medido)" % (plan_md.fmt_horas(janela_h), plan_md.fmt_horas(out["turnos_h"]))
+            out["turns_h"] = round(r["latency_s"] / 3600, 3)
+            out["text"] = "%s h (janela; %s h do último turno Codex; sem custo medido)" % (plan_md.format_hours(window_h), plan_md.format_hours(out["turns_h"]))
         else:
-            out["texto"] = "%s h (janela; sem medição dos turnos)" % plan_md.fmt_horas(janela_h)
+            out["text"] = "%s h (janela; sem medição dos turnos)" % plan_md.format_hours(window_h)
     return out
 
 
-def check_number(texto):
+def check_number(text):
     """O número do subpasso (`**3. Texto**` → `3`, `**4a. …**` → `4a`); None se o texto não começa por número."""
-    m = re.match(r"^[\s*`]*(\d+[a-z]?)\s*[.)]", texto)
+    m = re.match(r"^[\s*`]*(\d+[a-z]?)\s*[.)]", text)
     return m.group(1).lower() if m else None
 
 
-def unknown_covered(p, cobre):
+def unknown_covered(p, covers):
     """Os números de `cobre:` que o passo não tem."""
-    if not isinstance(cobre, list):
+    if not isinstance(covers, list):
         return []
-    tem = {check_number(texto) for _, _, texto in p.checks}
-    return [x for x in cobre if x.lower() not in tem]
+    known = {check_number(text) for _, _, text in p.checks}
+    return [x for x in covers if x.lower() not in known]
 
 
-def aplica_no_plano(pl, pid, linha, executado, cobre=None):
+def apply_to_plan(pl, pid, line, executed_text, covers=None):
     """Grava no `### Pn`: o `Executado`, o `[x]` nos subpassos pendentes e a `**Evidência:**`. Devolve os subpassos marcados.
-    `cobre` é a lista de números que a evidência declara; None ou `"todos"` marca todos os pendentes."""
-    p = pl.passo(pid)
-    arq = p.arquivo
-    linhas = list(arq.linhas)
-    if p.linha_horas is not None and executado:
-        l = linhas[p.linha_horas]
+    `covers` é a lista de números que a evidência declara; None ou `"todos"` marca todos os pendentes."""
+    p = pl.step(pid)
+    plan_file = p.file
+    lines = list(plan_file.lines)
+    if p.line_hours is not None and executed_text:
+        l = lines[p.line_hours]
         mm = re.match(r"^(Estimado:\s*.*?)\s*·\s*Executado:.*$", l)
-        linhas[p.linha_horas] = ("%s · Executado: %s" % (mm.group(1), executado)) if mm else "%s · Executado: %s" % (l.rstrip(), executado)
-    marcados = []
-    for i, marca, texto in p.checks:
-        if marca == " " and (not isinstance(cobre, list) or (check_number(texto) or "") in [x.lower() for x in cobre]):
-            linhas[i] = linhas[i].replace("[ ]", "[x]", 1)
-            marcados.append(re.sub(r"\*\*", "", texto).split("—")[0].strip())
-    if p.evidencia_ini is not None:
-        j = p.evidencia_ini + 1
-        while j < p.secao.fim and linhas[j].strip():
+        lines[p.line_hours] = ("%s · Executado: %s" % (mm.group(1), executed_text)) if mm else "%s · Executado: %s" % (l.rstrip(), executed_text)
+    marked = []
+    for i, mark_text, text in p.checks:
+        if mark_text == " " and (not isinstance(covers, list) or (check_number(text) or "") in [x.lower() for x in covers]):
+            lines[i] = lines[i].replace("[ ]", "[x]", 1)
+            marked.append(re.sub(r"\*\*", "", text).split("—")[0].strip())
+    if p.evidence_at is not None:
+        j = p.evidence_at + 1
+        while j < p.section.end and lines[j].strip():
             j += 1
-        linhas[p.evidencia_ini:j] = [linha]
+        lines[p.evidence_at:j] = [line]
     else:
-        fim = p.secao.fim
-        while fim > p.secao.ini + 1 and not linhas[fim - 1].strip():
-            fim -= 1
-        linhas[fim:fim] = ["", linha]
-    with open(arq.path, "w", encoding="utf-8") as f:
-        f.write("\n".join(linhas))
-    return marcados
+        end = p.section.end
+        while end > p.section.start + 1 and not lines[end - 1].strip():
+            end -= 1
+        lines[end:end] = ["", line]
+    with open(plan_file.path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    return marked
 
 
 def cmd_evidence(a, c):
     try:
-        pl = plan_md.carrega(a.plano)
-    except plan_md.PlanoNaoEncontrado as e:
+        pl = plan_md.load(a.plan)
+    except plan_md.PlanNotFound as e:
         c.err("erro: %s" % e)
         return 2
-    m = le_manifesto(pl)
-    pid = a.passo.upper()
-    e = m["passos"].get(pid)
+    m = read_manifest(pl)
+    pid = a.step.upper()
+    e = m["steps"].get(pid)
     if not e:
-        c.err("erro: o passo %s não tem executor aberto" % a.passo)
+        c.err("erro: o passo %s não tem executor aberto" % a.step)
         return 2
     wl = _abs(pl, e["worklog"])
     try:
         with open(wl, encoding="utf-8") as f:
-            texto = f.read()
+            text = f.read()
     except OSError as ex:
         c.err("erro: não li o worklog %s: %s" % (wl, ex))
         return 1
-    mk = ultimo_marcador(wl, pid)
+    mk = last_marker(wl, pid)
     if mk is None:
         c.err("o worklog %s não termina em `<!-- fim-%s: feito|parado -->`: o executor não fechou; não há evidência para ler" % (wl, pid))
         return 1
-    ev = le_evidencia(texto)
-    if ev is None or not (ev["commits"] or ev["comandos"] or ev["arquivos"] or ev["aguarda"]):
+    ev = read_evidence(text)
+    if ev is None or not (ev["commits"] or ev["commands"] or ev["files"] or ev["waiting"]):
         c.err("o worklog %s não traz `## Evidência` com itens (`commit:`, `comando:`, `arquivos:`): volte ao executor pelo `send`" % wl)
         return 1
-    res = confere(ev, e["checkout"], pl.raiz, c, rerun=bool(a.apply or getattr(a, "rerun", False)))
-    for _, linha in res:
-        c.out(linha)
-    ruins = [l for ok, l in res if ok is False]
-    linha = linha_evidencia(ev)
-    medicao = mede(c, pl, e, a.settle, getattr(a, "measurements", None), getattr(a, "sessions", None))
-    c.out(linha)
-    c.out("Executado: %s" % medicao["texto"])
-    c.out("desvios (lidos do worklog, não gravados): %s" % ("; ".join(ev["desvios"]) if ev["desvios"] else "o executor não declarou"))
-    if ev["aguarda"] and not ev["commits"]:
+    res = check(ev, e["checkout"], pl.root, c, rerun=bool(a.apply or getattr(a, "rerun", False)))
+    for _, line in res:
+        c.out(line)
+    bad = [l for ok, l in res if ok is False]
+    line = line_evidence(ev)
+    measured = measures(c, pl, e, a.settle, getattr(a, "measurements", None), getattr(a, "sessions", None))
+    c.out(line)
+    c.out("Executado: %s" % measured["text"])
+    c.out("desvios (lidos do worklog, não gravados): %s" % ("; ".join(ev["deviations"]) if ev["deviations"] else "o executor não declarou"))
+    if ev["waiting"] and not ev["commits"]:
         c.out("⚠ o executor deixou `commit: aguarda confirmação`: não há commit para conferir")
-    if not plan_state.evidencia_valida(linha):
+    if not plan_state.evidence_validates(line):
         c.err("a evidência não traz commit, comando com `→` nem `arquivo:linha`: não vale")
-        ruins.append("evidência sem prova")
-    faltam = unknown_covered(pl.passo(pid), ev.get("cobre"))
-    if faltam:
-        c.err("`cobre:` cita o subpasso %s, que o passo %s não tem" % (", ".join(faltam), pid))
-        ruins.append("cobre com subpasso inexistente")
-    if ev.get("cobre") is None:
+        bad.append("evidência sem prova")
+    still_missing = unknown_covered(pl.step(pid), ev.get("covers"))
+    if still_missing:
+        c.err("`cobre:` cita o subpasso %s, que o passo %s não tem" % (", ".join(still_missing), pid))
+        bad.append("cobre com subpasso inexistente")
+    if ev.get("covers") is None:
         c.out("⚠ o worklog não traz `cobre:`: sem `cobre:`, o `--apply` marca todos os subpassos pendentes")
     else:
-        c.out("cobre: %s" % (ev["cobre"] if ev["cobre"] == "todos" else ", ".join(ev["cobre"])))
-    if ruins:
-        c.err("não confere (%d): volte ao executor pelo `send`; o passo não fecha" % len(ruins))
+        c.out("cobre: %s" % (ev["covers"] if ev["covers"] == "todos" else ", ".join(ev["covers"])))
+    if bad:
+        c.err("não confere (%d): volte ao executor pelo `send`; o passo não fecha" % len(bad))
         return 1
     if not a.apply:
         c.out("proposta: leia e rode `evidence %s %s --apply` para gravar no plano" % (pl.id, pid))
@@ -864,26 +864,26 @@ def cmd_evidence(a, c):
     if mk != "feito":
         c.err("o marcador é `parado`: o executor achou desvio que muda o D; leve o X à rodada, não grave o passo como feito")
         return 1
-    executado = medicao["texto"]
-    marcados = aplica_no_plano(pl, pid, linha, executado, ev.get("cobre"))
-    mudou = plan_state.fix_horas(pl.path)
-    e["evidencia"] = {"linha": linha, "executado": executado, "desvios": ev["desvios"], "gravada_em": iso(c.clock()),
-                      "conferencias": [l for _, l in res]}
-    e["medicao"] = {"custo_usd": medicao["custo_usd"], "janela_h": medicao["janela_h"], "turnos_h": medicao["turnos_h"]}
-    evento(c, e, "evidencia-gravada", "evidence --apply")
-    salva_manifesto(pl, m)
-    c.out("gravado em %s: `### %s`, %d subpasso(s) marcados, Executado: %s" % (os.path.relpath(pl.path, pl.raiz), pid, len(marcados), executado))
-    c.out("--fix: %s" % (", ".join(mudou) if mudou else "as horas já conferiam"))
-    prob = [p for p in plan_state.estado(pl.path)["problemas"] if p["nivel"] == "erro"]
+    executed_text = measured["text"]
+    marked = apply_to_plan(pl, pid, line, executed_text, ev.get("covers"))
+    changed = plan_state.fix_hours(pl.path)
+    e["evidence"] = {"line": line, "executed": executed_text, "deviations": ev["deviations"], "recorded_at": iso(c.clock()),
+                      "checks": [l for _, l in res]}
+    e["measurement"] = {"cost_usd": measured["cost_usd"], "window_h": measured["window_h"], "turns_h": measured["turns_h"]}
+    append_event(c, e, "evidencia-gravada", "evidence --apply")
+    write_manifest(pl, m)
+    c.out("gravado em %s: `### %s`, %d subpasso(s) marcados, Executado: %s" % (os.path.relpath(pl.path, pl.root), pid, len(marked), executed_text))
+    c.out("--fix: %s" % (", ".join(changed) if changed else "as horas já conferiam"))
+    prob = [p for p in plan_state.state(pl.path)["problems"] if p["level"] == "erro"]
     for p in prob:
-        c.err("plan_state: %s %s: %s" % (p["codigo"], p["onde"], p["msg"]))
-    _painel(pl, c, a)
+        c.err("plan_state: %s %s: %s" % (p["code"], p["where"], p["msg"]))
+    _panel(pl, c, a)
     return 0
 
 
 # ---------------------------------------------------------------- close
 
-def veredito(show):
+def verdict(show):
     """(veredito, campos) do JSON do `worker-show --full`, com ou sem o envelope `{"ok", "result"}`."""
     r = show.get("result") if isinstance(show.get("result"), dict) else show
     d, w, tr = r.get("dispatch") or {}, r.get("worker") or {}, r.get("terminalResource") or {}
@@ -891,7 +891,7 @@ def veredito(show):
           "releaseState": tr.get("releaseState"), "retainedReason": tr.get("retainedReason")}
     if cc["releaseState"] == "released":
         v = "liberada (falhou)" if cc["state"] == "failed" else "liberada"
-    elif cc["state"] in FALHOU:
+    elif cc["state"] in FAILED:
         v = "falhou"
     elif cc["state"] == "succeeded" and cc["stage"] == "settled" and cc["releaseState"] == "retained":
         v = "encerrada, retida (%s): não fecha sozinha" % (cc["retainedReason"] or "motivo não informado")
@@ -902,51 +902,51 @@ def veredito(show):
     return v, cc
 
 
-def _consulta(pl, nome):
-    ent = sessions_map.load_map(pl.raiz).get(nome) or {}
-    d = ent.get("dispatch")
+def _lookup(pl, name):
+    entry = sessions_map.load_map(pl.root).get(name) or {}
+    d = entry.get("dispatch")
     if not d:
         return None, "sem Dispatch no mapa: nada a conferir"
-    rc, so, se = run_brza(["orchestration", "worker-show", "--dispatch", d, "--full", "--json"])
+    rc, stdout, se = run_brza(["orchestration", "worker-show", "--dispatch", d, "--full", "--json"])
     try:
-        show = json.loads(so)
+        show = json.loads(stdout)
     except ValueError:
         show = None
     if rc != 0 or not isinstance(show, dict):
-        return None, "worker-show falhou (rc %s): %s" % (rc, (se or so or "").strip()[:200])
-    return veredito(show)[0], None
+        return None, "worker-show falhou (rc %s): %s" % (rc, (se or stdout or "").strip()[:200])
+    return verdict(show)[0], None
 
 
 def cmd_close(a, c):
     try:
-        pl = plan_md.carrega(a.plano)
-    except plan_md.PlanoNaoEncontrado as e:
+        pl = plan_md.load(a.plan)
+    except plan_md.PlanNotFound as e:
         c.err("erro: %s" % e)
         return 2
-    m = le_manifesto(pl)
-    pid = a.passo.upper()
-    e = m["passos"].get(pid)
+    m = read_manifest(pl)
+    pid = a.step.upper()
+    e = m["steps"].get(pid)
     if not e:
-        c.err("erro: o passo %s não tem executor aberto" % a.passo)
+        c.err("erro: o passo %s não tem executor aberto" % a.step)
         return 2
-    nome = e["sessao"]
-    modo = "keep-open" if a.keep_open else "stop" if a.stop else "close"
-    rc, so, se = run_sessions(close_argv(nome, modo))
+    name = e["session"]
+    mode = "keep-open" if a.keep_open else "stop" if a.stop else "close"
+    rc, stdout, se = run_sessions(close_argv(name, mode))
     try:
-        d = json.loads(so)
+        d = json.loads(stdout)
     except ValueError:
         d = None
     if isinstance(d, dict) and isinstance(d.get("results"), list) and d["results"]:
         d = d["results"][0]
     if not isinstance(d, dict):
-        c.err("%s: sem JSON do close (rc %s): %s; não repita; confira com `status`" % (nome, rc, (se or so or "").strip()[:300]))
+        c.err("%s: sem JSON do close (rc %s): %s; não repita; confira com `status`" % (name, rc, (se or stdout or "").strip()[:300]))
         return rc or 1
     st = d.get("status")
-    if st in INCERTOS:
-        c.err("%s: incerto (%s): não está fechada; não repita" % (nome, st))
+    if st in UNCERTAIN:
+        c.err("%s: incerto (%s): não está fechada; não repita" % (name, st))
         return 75
     if st == "refused" or "error" in d:
-        c.err("%s: recusado: %s" % (nome, d.get("error") or d))
+        c.err("%s: recusado: %s" % (name, d.get("error") or d))
         return 1
     if st == "kept_open":
         c.out("%s · mantida aberta (kept_open); não fecha sozinha" % pid)
@@ -954,59 +954,59 @@ def cmd_close(a, c):
     if st == "closing":
         c.out("%s · pedido de encerramento enviado; NÃO está fechada (closing)" % pid)
     if a.wait_settled:
-        fim = c.clock() + a.wait_settled
+        end = c.clock() + a.wait_settled
     else:
-        fim = None
+        end = None
     v = None
     while True:
-        v, motivo = _consulta(pl, nome)
+        v, reason = _lookup(pl, name)
         if v in OK_FINAL or v in ("falhou", "liberada (falhou)"):
             break
-        if fim is None or c.clock() >= fim:
+        if end is None or c.clock() >= end:
             break
         c.sleep(5)
     if v in OK_FINAL:
-        if e.get("estado") != "evidencia-gravada":
-            c.err("⚠ %s fechada sem a evidência aplicada ao plano (estado %s)" % (pid, e.get("estado")))
-        evento(c, e, "fechado", "close: %s" % v)
-        salva_manifesto(pl, m)
+        if e.get("state") != "evidencia-gravada":
+            c.err("⚠ %s fechada sem a evidência aplicada ao plano (estado %s)" % (pid, e.get("state")))
+        append_event(c, e, "fechado", "close: %s" % v)
+        write_manifest(pl, m)
         c.out("%s · encerrada e aceita" % pid if v == "encerrada e aceita" else "%s · %s" % (pid, v))
-        _painel(pl, c, a, png=True)
+        _panel(pl, c, a, png=True)
         return 0
     if v in ("falhou", "liberada (falhou)"):
         c.err("%s · a sessão falhou (%s)" % (pid, v))
         return 1
-    c.out("%s · %s" % (pid, ("não encerrada: " + v) if v else motivo))
-    return 75 if fim is not None else 0
+    c.out("%s · %s" % (pid, ("não encerrada: " + v) if v else reason))
+    return 75 if end is not None else 0
 
 
 # ---------------------------------------------------------------- status
 
 def cmd_status(a, c):
     try:
-        pl = plan_md.carrega(a.plano)
-    except plan_md.PlanoNaoEncontrado as e:
+        pl = plan_md.load(a.plan)
+    except plan_md.PlanNotFound as e:
         c.err("erro: %s" % e)
         return 2
-    m = le_manifesto(pl)
-    if not m["passos"]:
+    m = read_manifest(pl)
+    if not m["steps"]:
         c.out("%s · sem executor aberto" % pl.id)
         return 0
-    estados = list_states([e["sessao"] for e in m["passos"].values()])
-    linhas = []
-    for pid, e in m["passos"].items():
-        ev = e.get("eventos") or []
-        linhas.append({"passo": pid, "sessao": e["sessao"], "estado": e.get("estado"), "agent": e.get("agent"),
-                       "aberto_ha_min": minutos(c, e), "ultimo_evento_ha_min": minutos(c, e, ev[-1]["at"]) if ev else None,
-                       "ultimo_evento": ev[-1] if ev else None, "sessao_state": estados.get(e["sessao"]),
-                       "worklog": e.get("worklog"), "evidencia": bool(e.get("evidencia"))})
+    state_values = list_states([e["session"] for e in m["steps"].values()])
+    lines = []
+    for pid, e in m["steps"].items():
+        ev = e.get("events") or []
+        lines.append({"step": pid, "session": e["session"], "state": e.get("state"), "agent": e.get("agent"),
+                       "open_for_min": minutes(c, e), "last_event_for_min": minutes(c, e, ev[-1]["at"]) if ev else None,
+                       "last_event": ev[-1] if ev else None, "session_state": state_values.get(e["session"]),
+                       "worklog": e.get("worklog"), "evidence": bool(e.get("evidence"))})
     if a.json:
-        c.out(json.dumps({"plano": pl.id, "passos": linhas}, ensure_ascii=False, indent=2))
+        c.out(json.dumps({"plan": pl.id, "steps": lines}, ensure_ascii=False, indent=2))
         return 0
-    for l in linhas:
+    for l in lines:
         c.out("%s · %s · %s · aberto há %s min · último evento há %s min · sessão: %s%s" % (
-            l["passo"], l["sessao"], l["estado"], l["aberto_ha_min"], l["ultimo_evento_ha_min"],
-            l["sessao_state"] or "?", " · evidência gravada" if l["evidencia"] else ""))
+            l["step"], l["session"], l["state"], l["open_for_min"], l["last_event_for_min"],
+            l["session_state"] or "?", " · evidência gravada" if l["evidence"] else ""))
     return 0
 
 
@@ -1016,8 +1016,8 @@ def main(argv=None, *, out=None, err=None, clock=None, sleep=None):
     ap = argparse.ArgumentParser(prog="executor.py", description="as sessões executoras dos passos do plano")
     sub = ap.add_subparsers(dest="cmd", required=True)
     o = sub.add_parser("open")
-    o.add_argument("plano")
-    o.add_argument("passo")
+    o.add_argument("plan")
+    o.add_argument("step")
     o.add_argument("--agent", choices=("claude", "codex", "grok", "antigravity"))
     o.add_argument("--model")
     o.add_argument("--effort")
@@ -1029,20 +1029,20 @@ def main(argv=None, *, out=None, err=None, clock=None, sleep=None):
     o.add_argument("--no-panel", action="store_true")
     o.add_argument("--dry-run", action="store_true")
     s = sub.add_parser("send")
-    s.add_argument("plano")
-    s.add_argument("passo")
+    s.add_argument("plan")
+    s.add_argument("step")
     gs = s.add_mutually_exclusive_group(required=True)
     gs.add_argument("--text")
     gs.add_argument("--file")
     s.add_argument("--operation")
     w = sub.add_parser("wait")
-    w.add_argument("plano")
-    w.add_argument("passos", nargs="*")
+    w.add_argument("plan")
+    w.add_argument("steps", nargs="*")
     w.add_argument("--timeout", type=float, default=1800)
     w.add_argument("--no-panel", action="store_true")
     ev = sub.add_parser("evidence")
-    ev.add_argument("plano")
-    ev.add_argument("passo")
+    ev.add_argument("plan")
+    ev.add_argument("step")
     ev.add_argument("--apply", action="store_true")
     ev.add_argument("--rerun", action="store_true", help="roda os comandos `(≤ 2 min)` do worklog, só os simples, sem gravar")
     ev.add_argument("--settle", type=float, default=60)
@@ -1050,15 +1050,15 @@ def main(argv=None, *, out=None, err=None, clock=None, sleep=None):
     ev.add_argument("--measurements")
     ev.add_argument("--sessions")
     cl = sub.add_parser("close")
-    cl.add_argument("plano")
-    cl.add_argument("passo")
+    cl.add_argument("plan")
+    cl.add_argument("step")
     gc = cl.add_mutually_exclusive_group()
     gc.add_argument("--keep-open", action="store_true")
     gc.add_argument("--stop", action="store_true")
     cl.add_argument("--wait-settled", type=float, default=0, metavar="SEG")
     cl.add_argument("--no-panel", action="store_true")
     st = sub.add_parser("status")
-    st.add_argument("plano")
+    st.add_argument("plan")
     st.add_argument("--json", action="store_true")
     try:
         a = ap.parse_args(argv)

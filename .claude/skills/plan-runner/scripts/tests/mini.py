@@ -15,9 +15,9 @@ owner: Anderson
 """
 
 
-def plano(passos="", entrevista="", desvios="", extra="", est="5", exe="0", rest="5", fm=None):
-    cab = fm if fm is not None else FM.format(est=est, exe=exe, rest=rest)
-    return cab + """
+def plan(steps="", interview="", deviations="", extra="", estimate="5", exe="0", rest="5", fm=None):
+    header = fm if fm is not None else FM.format(est=estimate, exe=exe, rest=rest)
+    return header + """
 # PLN-900: Um plano de teste
 
 - **Retomar:** nada.
@@ -28,14 +28,14 @@ def plano(passos="", entrevista="", desvios="", extra="", est="5", exe="0", rest
 
 ## Entrevista
 
-""" + entrevista + """
+""" + interview + """
 ## Passos
 
-""" + passos + """
-""" + desvios + extra
+""" + steps + """
+""" + deviations + extra
 
 
-RODADA1 = """### Rodada 1 — o começo (enviada 2026-11-09)
+ROUND1 = """### Rodada 1 — o começo (enviada 2026-11-09)
 
 > **Apresentado antes:** o texto.
 
@@ -54,7 +54,7 @@ Respondida em 2026-11-09, na sessão do workstream `playground`.
    **Resposta:** "mantém o nome" — lida como a primeira opção.
 """
 
-DESENHO = """# PLN-900 — Desenho
+DESIGN = """# PLN-900 — Desenho
 
 ## O que este desenho assume
 
@@ -89,10 +89,10 @@ DESENHO = """# PLN-900 — Desenho
 """
 
 
-def passo(pid="P1", titulo="Um passo", executa="Executa D1", est="5", exe="— h", checks="- [ ] **1. A**",
-          evidencia=None, extra=""):
+def step(pid="P1", title="Um passo", executes="Executa D1", estimate="5", exe="— h", checks="- [ ] **1. A**",
+          evidence=None, extra=""):
     t = "### %s — %s\n\n%s · executor: `implementer`\n\nEstimado: %s h · Executado: %s\n\n%s\n" % (
-        pid, titulo, executa, est, exe, checks)
-    if evidencia is not None:
-        t += "\n**Evidência:** %s\n" % evidencia
+        pid, title, executes, estimate, exe, checks)
+    if evidence is not None:
+        t += "\n**Evidência:** %s\n" % evidence
     return t + extra + "\n"

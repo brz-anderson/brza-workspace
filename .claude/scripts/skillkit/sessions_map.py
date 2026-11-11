@@ -58,7 +58,7 @@ OPEN_FIELDS = ("dispatch", "run", "sender", "coordinator", "agent", "model", "ef
                "provider_session", "chat", "checkout", "title")
 
 
-def _novo(row):
+def _new_entry(row):
     e = {"name": row.get("name"), "opened": row.get("at"), "closed": False, "closed_at": None, "legacy": False,
          "last_send": None, "last_turn": None}
     e.update({k: row.get(k) for k in OPEN_FIELDS})
@@ -72,25 +72,25 @@ def fold_map(rows):
     chat (sem `chat` na linha, vale para o nome); `send` guarda `last_send`, `turn` guarda `last_turn`; `close` marca
     `closed` sem apagar os ids (a medição precisa deles depois do auto-release). O `open` também é o `last_send` da
     rodada 1 (`origem: "open"`), como no v2. Linha v1 entra como `dispatch` legado só quando o nome não tem linha v2."""
-    entradas, legado = {}, {}
+    entry_list, legacy_rows = {}, {}
     for row in rows:
-        nome, ev = row.get("name"), row.get("event")
-        if not nome or not ev:
+        name, ev = row.get("name"), row.get("event")
+        if not name or not ev:
             continue
         if ev == "open":
             if not row.get("chat"):
                 if row.get("dispatch_id"):
-                    legado[nome] = row
+                    legacy_rows[name] = row
                 continue
-            e = entradas[nome] = _novo(row)
+            e = entry_list[name] = _new_entry(row)
             if row.get("operation") or row.get("round_id"):
                 e["last_send"] = {"operation": row.get("operation"), "round_id": row.get("round_id") or row.get("operation"),
                                   "at": row.get("at"), "status": None, "origem": "open"}
             continue
-        e = entradas.get(nome)
+        e = entry_list.get(name)
         if ev == "session":
             if e is None:  # `session` sem `open` antes: o id vale para o nome
-                e = entradas[nome] = _novo(row)
+                e = entry_list[name] = _new_entry(row)
                 e["opened"] = None
             elif row.get("chat") and e.get("chat") and row["chat"] != e["chat"]:
                 continue
@@ -113,12 +113,12 @@ def fold_map(rows):
             for k in ("model", "effort"):
                 if k in row:
                     e[k] = row[k]
-    for nome, row in legado.items():
-        if nome not in entradas:
-            e = _novo(row)
+    for name, row in legacy_rows.items():
+        if name not in entry_list:
+            e = _new_entry(row)
             e.update(dispatch=row.get("dispatch_id"), legacy=True, model=row.get("model"), effort=row.get("effort"))
-            entradas[nome] = e
-    return entradas
+            entry_list[name] = e
+    return entry_list
 
 
 def load_map(root, sessions=None):

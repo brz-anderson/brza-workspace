@@ -13,7 +13,7 @@ O painel mostra o cabeçalho do plano (fase, `ready`, as três horas, com `⚠` 
 (estado do manifesto do executor, Estimado × Executado, custo medido, idade do último evento), as sessões vivas (executores
 e consultores, com o estado do `brza sessions list --json`) e a última rodada. Sem medição, "sem medição", nunca zero.
 
-Os scripts que mudam o estado (`executor.py`, `round_log.py`, `plan_state.py --fix`) chamam `publica_seguro` por import, com
+Os scripts que mudam o estado (`executor.py`, `round_log.py`, `plan_state.py --fix`) chamam `publish_safe` por import, com
 `--no-panel` para desligar; a falha vira `⚠ painel: …` e não muda o código de saída deles.
 
 Saída: 0, 1 falha ao gravar, 2 uso ou plano que não existe.
@@ -27,29 +27,29 @@ import re
 import sys
 from datetime import datetime, timedelta
 
-AQUI = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, AQUI)
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
 import _kit  # noqa: E402,F401
 import plan_md  # noqa: E402
 import plan_state  # noqa: E402
 from skillkit import measure, sessions_map, visual  # noqa: E402
 from skillkit.paths import common_root  # noqa: E402
 from skillkit.sessions_cli import list_states  # noqa: E402
-from skillkit.visual import ErroPublicacao, gera_png, salva_visual  # noqa: E402,F401
+from skillkit.visual import PublishError, render_png, save_visual  # noqa: E402,F401
 
-VIVOS = ("aberto", "em-curso", "bloqueado")
-SEM = "sem medição"
-
-
-def pasta_sessoes(raiz, plan_id):
-    return os.path.join(raiz, ".sessions", plan_id.lower())
+LIVE_FLAGS = ("aberto", "em-curso", "bloqueado")
+ABSENT = "sem medição"
 
 
-def manifesto_path(raiz, plan_id):
-    return os.path.join(pasta_sessoes(raiz, plan_id), "execucao.json")
+def folder_sessions(root, plan_id):
+    return os.path.join(root, ".sessions", plan_id.lower())
 
 
-def le_json(path):
+def manifest_path(root, plan_id):
+    return os.path.join(folder_sessions(root, plan_id), "execucao.json")
+
+
+def read_json(path):
     try:
         with open(path, encoding="utf-8") as f:
             d = json.load(f)
@@ -58,7 +58,7 @@ def le_json(path):
         return {}
 
 
-def agora(at=None):
+def clock_now(at=None):
     if at:
         d = datetime.fromisoformat(str(at).replace("Z", "+00:00"))
         return d if d.tzinfo else d.astimezone()
@@ -70,7 +70,7 @@ def _ts(s):
     return e
 
 
-def idade(at_iso, now):
+def age(at_iso, now):
     """'6 min', '2 h 10 min', 'agora'; None sem horário."""
     e = _ts(at_iso)
     if e is None:
@@ -83,91 +83,91 @@ def idade(at_iso, now):
 
 
 def _h(v):
-    return "—" if v is None else plan_md.fmt_horas(v) + " h"
+    return "—" if v is None else plan_md.format_hours(v) + " h"
 
 
-def consultores(raiz, plan_id):
-    """Os consultores abertos pelo `consult.py`: [{decisao, foco, sessao, agent, estado}] dos `D*/consultores.json`."""
-    saida = []
-    for f in sorted(glob.glob(os.path.join(pasta_sessoes(raiz, plan_id), "D*", "consultores.json"))):
-        m = le_json(f)
-        for foco, c in (m.get("focos") or {}).items():
-            if isinstance(c, dict) and c.get("sessao"):
-                saida.append({"decisao": m.get("decisao"), "foco": foco, "sessao": c["sessao"], "agent": c.get("agent"),
-                              "estado": c.get("estado")})
-    return saida
+def consultants(root, plan_id):
+    """Os consultores abertos pelo `consult.py`: [{decision, focus, session, agent, state}] dos `D*/consultants.json`."""
+    output = []
+    for f in sorted(glob.glob(os.path.join(folder_sessions(root, plan_id), "D*", "consultants.json"))):
+        m = read_json(f)
+        for focus, c in (m.get("focuses") or {}).items():
+            if isinstance(c, dict) and c.get("session"):
+                output.append({"decision": m.get("decision"), "focus": focus, "session": c["session"], "agent": c.get("agent"),
+                              "state": c.get("state")})
+    return output
 
 
-def _custo(entry, raiz, mrows, srows, now):
+def _cost(entry, root, mrows, srows, now):
     """O custo do executor: o do manifesto (medido no `evidence`) ou, com a sessão viva e Claude, o da janela até agora."""
-    med = entry.get("medicao") or {}
-    if med.get("custo_usd") is not None:
-        return "US$ %.2f" % med["custo_usd"]
+    med = entry.get("measurement") or {}
+    if med.get("cost_usd") is not None:
+        return "US$ %.2f" % med["cost_usd"]
     if entry.get("agent", "claude") != "claude" or not mrows:
-        return SEM
-    ev = entry.get("eventos") or []
-    abre = _ts(ev[0].get("at")) if ev else None
-    ids, _ = measure.session_ids(srows, entry.get("sessao"))
-    if abre is None or not ids:
-        return SEM
-    ini = datetime.fromtimestamp(abre).astimezone()
-    r = measure.measure_claude(mrows, ids, (ini, now + timedelta(seconds=1)))
-    return "US$ %.2f" % r["custo_usd"] if r else SEM
+        return ABSENT
+    ev = entry.get("events") or []
+    open_step = _ts(ev[0].get("at")) if ev else None
+    ids, _ = measure.session_ids(srows, entry.get("session"))
+    if open_step is None or not ids:
+        return ABSENT
+    start = datetime.fromtimestamp(open_step).astimezone()
+    r = measure.measure_claude(mrows, ids, (start, now + timedelta(seconds=1)))
+    return "US$ %.2f" % r["cost_usd"] if r else ABSENT
 
 
-def coleta(plano, *, at=None, list_json=None, measurements=None, sessions=None, states=None):
+def collect(plan, *, at=None, list_json=None, measurements=None, sessions=None, states=None):
     """Os dados do painel, em dicionário (o `render` só formata). `states` ({sessão: state}) dispensa o `brza sessions list`."""
-    pl = plan_md.carrega(plano)
-    now = agora(at)
-    est = plan_state.estado(pl)
-    man = le_json(manifesto_path(pl.raiz, pl.id))
-    passos_m = man.get("passos") or {}
-    mpath = measurements or _achar(pl.raiz, ".measurements/measurements.jsonl")
-    spath = sessions or sessions_map.map_file(pl.raiz)
+    pl = plan_md.load(plan)
+    now = clock_now(at)
+    overview = plan_state.state(pl)
+    man = read_json(manifest_path(pl.root, pl.id))
+    steps_m = man.get("steps") or {}
+    mpath = measurements or _find(pl.root, ".measurements/measurements.jsonl")
+    spath = sessions or sessions_map.map_file(pl.root)
     mrows = measure.load_jsonl(mpath)
     srows = measure.load_jsonl(spath)
-    linhas = []
-    for p in est["passos"]:
-        e = passos_m.get(p["id"]) or {}
-        ev = e.get("eventos") or []
-        estado = e.get("estado") or p["estado"]
-        linhas.append({"id": p["id"], "titulo": p["titulo"], "executa": p["executa"],
-                       "executor": e.get("sessao") or (p["executor"] or "—"), "estado": estado,
-                       "estimado_h": p["estimado_h"], "executado_h": p["executado_h"],
-                       "custo": _custo(e, pl.raiz, mrows, srows, now) if e else SEM,
-                       "idade": idade(ev[-1].get("at"), now) if ev else None, "manual": not e})
-    vivos = []
-    for pid, e in passos_m.items():
-        if e.get("estado") in VIVOS and e.get("sessao"):
-            vivos.append({"quem": "%s (%s)" % (e["sessao"], pid), "sessao": e["sessao"], "agent": e.get("agent"),
-                          "papel": "executor"})
-    for c in consultores(pl.raiz, pl.id):
-        if c.get("estado") != "fechado":
-            vivos.append({"quem": "%s (%s · %s)" % (c["sessao"], c["decisao"], c["foco"]), "sessao": c["sessao"],
-                          "agent": c.get("agent"), "papel": "consultor"})
+    lines = []
+    for p in overview["steps"]:
+        e = steps_m.get(p["id"]) or {}
+        ev = e.get("events") or []
+        state = e.get("state") or p["state"]
+        lines.append({"id": p["id"], "title": p["title"], "executes": p["executes"],
+                       "executor": e.get("session") or (p["executor"] or "—"), "state": state,
+                       "estimated_h": p["estimated_h"], "executed_h": p["executed_h"],
+                       "cost": _cost(e, pl.root, mrows, srows, now) if e else ABSENT,
+                       "age_text": age(ev[-1].get("at"), now) if ev else None, "manual": not e})
+    live_flags = []
+    for pid, e in steps_m.items():
+        if e.get("state") in LIVE_FLAGS and e.get("session"):
+            live_flags.append({"who": "%s (%s)" % (e["session"], pid), "session": e["session"], "agent": e.get("agent"),
+                          "role": "executor"})
+    for c in consultants(pl.root, pl.id):
+        if c.get("state") != "fechado":
+            live_flags.append({"who": "%s (%s · %s)" % (c["session"], c["decision"], c["focus"]), "session": c["session"],
+                          "agent": c.get("agent"), "role": "consultor"})
     if states is None:
-        states = list_states([v["sessao"] for v in vivos], list_json=list_json) if vivos else {}
-    for v in vivos:
-        v["state"] = states.get(v["sessao"])
-    rod = pl.rodadas()
-    ultima = None
-    if rod:
-        r = rod[-1]
-        ultima = {"n": r.n, "perguntas": len(r.perguntas), "decididas": sum(1 for q in r.perguntas if q.decidida)}
-    h = est["horas"]
-    titulo = re.sub(r"^PLN-\d+\s*[:—–-]\s*", "", est["titulo"] or "")
-    return {"plano": pl.id, "titulo": titulo, "phase": est["phase"], "status": est["status"], "ready": est["ready"],
-            "horas": h, "problemas": [p for p in est["problemas"] if p["codigo"] == "hours-mismatch"],
-            "passos": linhas, "vivos": vivos, "rodada": ultima, "agora": now.isoformat(timespec="seconds"),
-            "proximo": est["proximo"]}
+        states = list_states([v["session"] for v in live_flags], list_json=list_json) if live_flags else {}
+    for v in live_flags:
+        v["state"] = states.get(v["session"])
+    rounds = pl.rounds()
+    last = None
+    if rounds:
+        r = rounds[-1]
+        last = {"n": r.n, "questions": len(r.questions), "decided": sum(1 for q in r.questions if q.is_decided)}
+    h = overview["hours"]
+    title = re.sub(r"^PLN-\d+\s*[:—–-]\s*", "", overview["title"] or "")
+    return {"plan": pl.id, "title": title, "phase": overview["phase"], "status": overview["status"], "ready": overview["ready"],
+            "hours": h, "problems": [p for p in overview["problems"] if p["code"] == "hours-mismatch"],
+            "steps": lines, "live": live_flags, "round": last, "at": now.isoformat(timespec="seconds"),
+            "next": overview["next"]}
 
 
-def _achar(raiz, rel):
-    for r in (raiz, common_root(raiz)):
+def _find(root, rel):
+    for r in (root, common_root(root)):
         p = os.path.join(r, rel)
         if os.path.isfile(p):
             return p
-    return os.path.join(raiz, rel)
+    return os.path.join(root, rel)
 
 
 CSS = """
@@ -196,7 +196,7 @@ ul{margin:0;padding-left:18px} li{margin:3px 0}
 @media (max-width:520px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))} .row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .row.hd{display:none}}
 """
 
-CLASSE = {"feito": "ok", "fechado": "ok", "evidencia-gravada": "ok", "em-curso": "run", "aberto": "run",
+CLASS_NAME = {"feito": "ok", "fechado": "ok", "evidencia-gravada": "ok", "em-curso": "run", "aberto": "run",
           "bloqueado": "alerta", "parado": "alerta", "falhou": "ruim"}
 
 
@@ -205,36 +205,36 @@ def _e(s):
 
 
 def render_html(D, dark=False):
-    h = D["horas"]
-    fm, som = h["frontmatter"], h["somado"]
-    aviso = not h["confere"]
+    h = D["hours"]
+    fm, summed = h["frontmatter"], h["summed"]
+    warning_text = not h["matches"]
 
-    def tile_h(rot, k):
+    def tile_h(tile_label, k):
         v = fm.get(k)
         s = _h(v)
         extra = ""
-        if aviso and som.get(k) is not None and (v is None or abs(v - som[k]) > plan_state.TOL):
-            extra = " ⚠ soma dos passos: %s" % _h(som[k])
-        return '<div class="tile%s"><b>%s</b><span>%s%s</span></div>' % (" warn" if extra else "", _e(s), rot, _e(extra))
-    feitos = sum(1 for p in D["passos"] if p["estado"] in ("feito", "fechado", "evidencia-gravada"))
+        if warning_text and summed.get(k) is not None and (v is None or abs(v - summed[k]) > plan_state.TOL):
+            extra = " ⚠ soma dos passos: %s" % _h(summed[k])
+        return '<div class="tile%s"><b>%s</b><span>%s%s</span></div>' % (" warn" if extra else "", _e(s), tile_label, _e(extra))
+    done_states = sum(1 for p in D["steps"] if p["state"] in ("feito", "fechado", "evidencia-gravada"))
     rows = []
-    for p in D["passos"]:
-        est = p["estado"]
-        tit = p["titulo"].replace("`", "")
-        tit = tit if len(tit) <= 52 else tit[:51].rstrip() + "…"
-        quem = str(p["executor"]).replace("`", "")
-        quem = quem if len(quem) <= 30 else quem[:29].rstrip() + "…"
-        exe = _h(p["estimado_h"]) + " × " + (_h(p["executado_h"]) if p["executado_h"] is not None else "—")
+    for p in D["steps"]:
+        step_state = p["state"]
+        short_title = p["title"].replace("`", "")
+        short_title = short_title if len(short_title) <= 52 else short_title[:51].rstrip() + "…"
+        who = str(p["executor"]).replace("`", "")
+        who = who if len(who) <= 30 else who[:29].rstrip() + "…"
+        exe = _h(p["estimated_h"]) + " × " + (_h(p["executed_h"]) if p["executed_h"] is not None else "—")
         rows.append('<div class="row"><div><b>%s</b>%s<span class="sm">Executa %s</span></div><div>%s</div>'
                     '<div><span class="st %s">%s</span></div><div class="num">%s</div><div class="num">%s</div>'
                     '<div class="num">%s</div></div>' % (
-                        _e(p["id"]), _e(tit), _e(", ".join(p["executa"]) or "—"), _e(quem),
-                        CLASSE.get(est, ""), _e(est), _e(exe), _e(p["custo"]), _e(p["idade"] or "—")))
-    vivos = "".join("<li>%s · %s · %s</li>" % (_e(v["quem"]), _e(v["papel"]), _e(v.get("state") or "estado desconhecido"))
-                    for v in D["vivos"]) or '<li class="mut">nenhum aberto</li>'
-    r = D["rodada"]
-    rod = ("R%d — %d pergunta%s, %d decidida%s" % (r["n"], r["perguntas"], "" if r["perguntas"] == 1 else "s", r["decididas"],
-                                                    "" if r["decididas"] == 1 else "s")) if r else "sem rodada registrada"
+                        _e(p["id"]), _e(short_title), _e(", ".join(p["executes"]) or "—"), _e(who),
+                        CLASS_NAME.get(step_state, ""), _e(step_state), _e(exe), _e(p["cost"]), _e(p["age_text"] or "—")))
+    live_flags = "".join("<li>%s · %s · %s</li>" % (_e(v["who"]), _e(v["role"]), _e(v.get("state") or "estado desconhecido"))
+                    for v in D["live"]) or '<li class="mut">nenhum aberto</li>'
+    r = D["round"]
+    round_line = ("R%d — %d pergunta%s, %d decidida%s" % (r["n"], r["questions"], "" if r["questions"] == 1 else "s", r["decided"],
+                                                    "" if r["decided"] == 1 else "s")) if r else "sem rodada registrada"
     ready = str(D["ready"] or "—")
     ready = ready if len(ready) <= 90 else ready[:89] + "…"
     body = """<header><div class="eyebrow">Painel do plano</div><h1>%s — %s</h1>
@@ -245,65 +245,65 @@ def render_html(D, dark=False):
 <p class="sm">Custo sem medição quando o hook não gravou a sessão (Grok e Antigravity não gravam). Passo sem executor por sessão mostra o estado do plano.</p>
 <h2>As sessões vivas</h2><ul>%s</ul>
 <h2>A última rodada</h2><p>%s</p>""" % (
-        _e(D["plano"]), _e(D["titulo"]), _e(D["phase"]), _e(D["status"]), _e(ready), _e(D["agora"][11:16]),
+        _e(D["plan"]), _e(D["title"]), _e(D["phase"]), _e(D["status"]), _e(ready), _e(D["at"][11:16]),
         tile_h("estimado", "estimate_h"), tile_h("executado", "executed_h"), tile_h("restante", "remaining_h"),
-        feitos, len(D["passos"]), "".join(rows), vivos, _e(rod))
+        done_states, len(D["steps"]), "".join(rows), live_flags, _e(round_line))
     return ('<!doctype html><html lang="pt-BR"%s><head><meta charset="utf-8"><title>%s — painel</title><style>%s</style>'
-            '</head><body>%s</body></html>' % (" class=dark" if dark else "", _e(D["plano"]), CSS, body))
+            '</head><body>%s</body></html>' % (" class=dark" if dark else "", _e(D["plan"]), CSS, body))
 
 
-def destino_padrao(raiz, plan_id, publish_dir=None):
+def default_target(root, plan_id, publish_dir=None):
     d = publish_dir or os.environ.get("ORCA_CHAT_SCRATCH_DIR")
-    return d or os.path.join(pasta_sessoes(raiz, plan_id), "painel")
+    return d or os.path.join(folder_sessions(root, plan_id), "painel")
 
 
-def publica(plano, *, publish_dir=None, png=None, width=736, at=None, list_json=None, measurements=None, sessions=None,
+def publish(plan, *, publish_dir=None, png=None, width=736, at=None, list_json=None, measurements=None, sessions=None,
             states=None):
-    """Coleta, renderiza e grava o painel; com `png` (True ou caminho), tira o PNG. Devolve {html, linha, png, png_erro}.
-    Levanta ErroPublicacao, OSError, ValueError ou plan_md.PlanoNaoEncontrado."""
-    pl = plan_md.carrega(plano)
-    D = coleta(pl, at=at, list_json=list_json, measurements=measurements, sessions=sessions, states=states)
-    dia = agora(at).date().isoformat()
-    dest = destino_padrao(pl.raiz, pl.id, publish_dir)
-    alvo, linha = salva_visual(render_html(D), pl.id.lower(), "painel", "%s|%s" % (pl.id, dia),
+    """Coleta, renderiza e grava o painel; com `png` (True ou caminho), tira o PNG. Devolve {html, line, png, png_error}.
+    Levanta PublishError, OSError, ValueError ou plan_md.PlanNotFound."""
+    pl = plan_md.load(plan)
+    D = collect(pl, at=at, list_json=list_json, measurements=measurements, sessions=sessions, states=states)
+    day = clock_now(at).date().isoformat()
+    dest = default_target(pl.root, pl.id, publish_dir)
+    saved_path, line = save_visual(render_html(D), pl.id.lower(), "painel", "%s|%s" % (pl.id, day),
                                "%s — painel do plano" % pl.id, publish_dir=dest)
-    caminho_png, erro = None, None
+    path_png, error = None, None
     if png:
-        caminho_png = png if isinstance(png, str) else os.path.join(dest, "%s-painel.png" % pl.id.lower())
-        erro = gera_png(alvo, caminho_png, width)
-        if erro:
-            caminho_png = None
-    return {"html": alvo, "linha": linha, "png": caminho_png, "png_erro": erro}
+        path_png = png if isinstance(png, str) else os.path.join(dest, "%s-painel.png" % pl.id.lower())
+        error = render_png(saved_path, path_png, width)
+        if error:
+            path_png = None
+    return {"html": saved_path, "line": line, "png": path_png, "png_error": error}
 
 
-def publica_seguro(plano, **kw):
-    """Como `publica`, mas nunca levanta: a falha volta em `aviso` (`⚠ painel: …`). {html, linha, png, png_erro, aviso}."""
+def publish_safe(plan, **kw):
+    """Como `publish`, mas nunca levanta: a falha volta em `warning` (`⚠ painel: …`). {html, line, png, png_error, warning}."""
     try:
-        r = publica(plano, **kw)
-    except (ErroPublicacao, OSError, ValueError, KeyError, plan_md.PlanoNaoEncontrado) as e:
-        return {"html": None, "linha": None, "png": None, "png_erro": None, "aviso": "⚠ painel: %s" % e}
-    r["aviso"] = ("⚠ painel: %s" % r["png_erro"]) if r["png_erro"] else None
+        r = publish(plan, **kw)
+    except (PublishError, OSError, ValueError, KeyError, plan_md.PlanNotFound) as e:
+        return {"html": None, "line": None, "png": None, "png_error": None, "warning": "⚠ painel: %s" % e}
+    r["warning"] = ("⚠ painel: %s" % r["png_error"]) if r["png_error"] else None
     return r
 
 
-def emite(r, out=None, err=None):
+def emit(r, out=None, err=None):
     """Imprime a linha `::orca-visual` (e o PNG) em `out` e o aviso em `err`."""
     out = out or (lambda s: print(s, flush=True))
     err = err or (lambda s: print(s, file=sys.stderr, flush=True))
-    if r.get("linha"):
-        out(r["linha"])
+    if r.get("line"):
+        out(r["line"])
     if r.get("png"):
         out("png: %s" % r["png"])
-    if r.get("aviso"):
-        err(r["aviso"])
+    if r.get("warning"):
+        err(r["warning"])
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="plan_panel.py", description="o painel do plano")
     sub = ap.add_subparsers(dest="cmd", required=True)
-    for nome in ("publish", "render"):
-        s = sub.add_parser(nome)
-        s.add_argument("plano")
+    for name in ("publish", "render"):
+        s = sub.add_parser(name)
+        s.add_argument("plan")
         s.add_argument("--at")
         s.add_argument("--list-json")
         s.add_argument("--measurements")
@@ -317,28 +317,28 @@ def main(argv=None):
     except SystemExit as e:
         return 2 if e.code else 0
     try:
-        pl = plan_md.carrega(a.plano)
-    except plan_md.PlanoNaoEncontrado as e:
+        pl = plan_md.load(a.plan)
+    except plan_md.PlanNotFound as e:
         print("erro: %s" % e, file=sys.stderr)
         return 2
     kw = dict(at=a.at, list_json=a.list_json, measurements=a.measurements, sessions=a.sessions)
     try:
         if a.cmd == "render":
-            doc = render_html(coleta(pl, **kw))
+            doc = render_html(collect(pl, **kw))
             os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
             with open(a.out, "w", encoding="utf-8") as f:
                 f.write(doc)
             print(os.path.abspath(a.out))
             return 0
-        r = publica(pl, publish_dir=a.publish_dir, png=a.png, width=a.width, **kw)
-    except (ErroPublicacao, OSError, ValueError) as e:
+        r = publish(pl, publish_dir=a.publish_dir, png=a.png, width=a.width, **kw)
+    except (PublishError, OSError, ValueError) as e:
         print("plan_panel: %s" % e, file=sys.stderr)
         return 1
-    print(r["linha"])
+    print(r["line"])
     if r["png"]:
         print("png: %s" % r["png"])
-    elif r["png_erro"]:
-        print("plan_panel: %s" % r["png_erro"], file=sys.stderr)
+    elif r["png_error"]:
+        print("plan_panel: %s" % r["png_error"], file=sys.stderr)
     return 0
 
 

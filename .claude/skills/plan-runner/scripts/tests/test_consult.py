@@ -5,63 +5,63 @@ import _exec
 import _paths  # noqa: F401
 import consult
 import executor
-from mini import DESENHO, RODADA1, passo, plano
+from mini import DESIGN, ROUND1, step, plan
 
-FIM = "<!-- fim-D1: %s -->"
+END_TEXT = "<!-- fim-D1: %s -->"
 QUOTA_REAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "quota-real.json")   # a saída do `brza quota --json`
 
 
-def quota_json(cota):
+def quota_json(quota):
     """O `brza quota --json` real (fixture) com a janela de cada runtime trocada: `session`, ou `weekly` quando é a única."""
     with open(QUOTA_REAL, encoding="utf-8") as f:
         d = json.load(f)
-    for conta in d["accounts"]:
-        if conta["active"] and conta["runtime"] in cota:
-            nomes = {w["name"]: w for w in conta["windows"]}
-            nomes.get("session", nomes.get("weekly"))["used"] = cota[conta["runtime"]]
+    for account in d["accounts"]:
+        if account["active"] and account["runtime"] in quota:
+            name_list = {w["name"]: w for w in account["windows"]}
+            name_list.get("session", name_list.get("weekly"))["used"] = quota[account["runtime"]]
     return json.dumps(d)
 
 
-class Consultores(_exec.Base):
+class Consultants(_exec.Base):
     def setUp(self):
         super().setUp()
-        self.raiz, self.path = self.monta()
-        self.brief = os.path.join(self.raiz, "brief.md")
+        self.root, self.path = self.build()
+        self.brief = os.path.join(self.root, "brief.md")
         with open(self.brief, "w", encoding="utf-8") as f:
             f.write("# Brief\n\nTerreno: x.\nCasos: um, dois.\n")
-        self.cota = {"claude": 20, "codex": 30, "grok": 10}
-        self.brza = lambda argv: (0, quota_json(self.cota), "")
+        self.quota = {"claude": 20, "codex": 30, "grok": 10}
+        self.brza = lambda argv: (0, quota_json(self.quota), "")
 
-    def abre(self, *extra):
-        return self.roda(consult, "open", self.path, "D1", "--brief", self.brief, "--no-panel", *extra)
+    def open_step(self, *extra):
+        return self.invoke(consult, "open", self.path, "D1", "--brief", self.brief, "--no-panel", *extra)
 
     def man(self):
-        with open(os.path.join(self.raiz, ".sessions", "pln-900", "D1", "consultores.json"), encoding="utf-8") as f:
+        with open(os.path.join(self.root, ".sessions", "pln-900", "D1", "consultants.json"), encoding="utf-8") as f:
             return json.load(f)
 
-    def grava(self, foco, corpo, marcador=True):
-        p = os.path.join(self.raiz, ".sessions", "pln-900", "D1", foco + ".md")
+    def writes(self, focus, body_text, marker=True):
+        p = os.path.join(self.root, ".sessions", "pln-900", "D1", focus + ".md")
         with open(p, "w", encoding="utf-8") as f:
-            f.write(corpo + ("\n" + FIM % foco + "\n" if marcador else ""))
+            f.write(body_text + ("\n" + END_TEXT % focus + "\n" if marker else ""))
 
-    def test_roster_padrao_abre_tres_em_runtimes_diferentes(self):
-        self.assertEqual(self.abre(), 0, self.err)
-        abertas = [a for k, a in self.chamadas if k == "sessions"]
-        self.assertEqual([a[a.index("--agent") + 1] for a in abertas], ["claude", "codex", "grok"])
-        self.assertEqual(abertas[0][abertas[0].index("--model") + 1], "claude-opus-5-5")
-        self.assertEqual(abertas[0][abertas[0].index("--effort") + 1], "high")
-        self.assertEqual(abertas[0][0], "pln900-d1-arquitetura-limpa")
-        self.assertEqual(abertas[1][abertas[1].index("--model") + 1], executor.CODEX_MODEL)   # A1: --effort exige --model
-        self.assertEqual(abertas[1][abertas[1].index("--effort") + 1], "xhigh")
-        for a in abertas:
+    def test_roster_default_opens_three_in_runtimes_different(self):
+        self.assertEqual(self.open_step(), 0, self.err)
+        opened = [a for k, a in self.calls if k == "sessions"]
+        self.assertEqual([a[a.index("--agent") + 1] for a in opened], ["claude", "codex", "grok"])
+        self.assertEqual(opened[0][opened[0].index("--model") + 1], "claude-opus-5-5")
+        self.assertEqual(opened[0][opened[0].index("--effort") + 1], "high")
+        self.assertEqual(opened[0][0], "pln900-d1-arquitetura-limpa")
+        self.assertEqual(opened[1][opened[1].index("--model") + 1], executor.CODEX_MODEL)   # A1: --effort exige --model
+        self.assertEqual(opened[1][opened[1].index("--effort") + 1], "xhigh")
+        for a in opened:
             self.assertEqual("--effort" in a, "--model" in a, a)
-        self.assertEqual(abertas[0][abertas[0].index("--checkout") + 1], self.raiz)
+        self.assertEqual(opened[0][opened[0].index("--checkout") + 1], self.root)
         self.assertIn("| arquitetura-limpa | pln900-d1-arquitetura-limpa | Claude |", self.out)
-        self.assertEqual(sorted(self.man()["focos"]), ["arquitetura-limpa", "equilibrio", "mudanca-minima"])
+        self.assertEqual(sorted(self.man()["focuses"]), ["arquitetura-limpa", "equilibrio", "mudanca-minima"])
 
-    def test_prompt_comeca_pelo_consultor_e_manda_gravar_so_o_arquivo(self):
-        self.abre()
-        with open(os.path.join(self.raiz, ".sessions", "pln-900", "D1", "prompt-mudanca-minima.md"), encoding="utf-8") as f:
+    def test_prompt_starts_by_consultant_and_sends_write_only_the_file(self):
+        self.open_step()
+        with open(os.path.join(self.root, ".sessions", "pln-900", "D1", "prompt-mudanca-minima.md"), encoding="utf-8") as f:
             t = f.read()
         self.assertTrue(t.startswith("Você é consultor do Desenho de D1 do PLN-900"))
         self.assertIn("Terreno: x.", t)
@@ -69,163 +69,163 @@ class Consultores(_exec.Base):
         self.assertIn("<!-- fim-D1: mudanca-minima -->", t)
         self.assertIn("Não envie `worker_done`", t)
 
-    def test_cota_acima_de_55_troca_pelo_fallback(self):
-        self.cota["codex"] = 56
-        self.abre()
-        abertas = [a for k, a in self.chamadas if k == "sessions"]
-        self.assertEqual(abertas[1][abertas[1].index("--agent") + 1], "claude")
-        self.assertEqual(abertas[1][abertas[1].index("--model") + 1], "claude-sonnet-5-5")
+    def test_quota_above_of_55_switches_by_fallback(self):
+        self.quota["codex"] = 56
+        self.open_step()
+        opened = [a for k, a in self.calls if k == "sessions"]
+        self.assertEqual(opened[1][opened[1].index("--agent") + 1], "claude")
+        self.assertEqual(opened[1][opened[1].index("--model") + 1], "claude-sonnet-5-5")
         self.assertIn("cota: codex cortado: codex a 56%", self.out)
-        self.assertEqual(self.man()["focos"]["mudanca-minima"]["agent"], "claude")
+        self.assertEqual(self.man()["focuses"]["mudanca-minima"]["agent"], "claude")
 
-    def test_cotas_le_a_forma_real_do_brza_quota(self):
+    def test_quotas_read_a_shape_real_of_brza_quota(self):
         # A2: `accounts[].windows[]`, a conta ativa de cada runtime; o Grok só tem `weekly`
         with open(QUOTA_REAL, encoding="utf-8") as f:
             real = f.read()
         self.brza = lambda argv: (0, real, "")
-        self.assertEqual(consult.cotas(), {"claude": 30, "codex": 0, "grok": 22, "antigravity": 3})
+        self.assertEqual(consult.quotas(), {"claude": 30, "codex": 0, "grok": 22, "antigravity": 3})
 
-    def test_cota_do_claude_pela_forma_real_corta_e_nao_avisa(self):
-        self.cota["claude"] = 80
-        self.abre()
-        abertas = [a for k, a in self.chamadas if k == "sessions"]
-        self.assertEqual(abertas[0][abertas[0].index("--agent") + 1], "grok")       # o fallback da arquitetura-limpa
+    def test_quota_of_claude_by_shape_real_strips_and_not_warns(self):
+        self.quota["claude"] = 80
+        self.open_step()
+        opened = [a for k, a in self.calls if k == "sessions"]
+        self.assertEqual(opened[0][opened[0].index("--agent") + 1], "grok")       # o fallback da arquitetura-limpa
         self.assertNotIn("não li o `brza quota --json`", self.err)
 
-    def test_roster_com_esforco_sem_modelo_no_runtime_sem_padrao_perde_o_esforco(self):
-        r = os.path.join(self.raiz, "r.json")
+    def test_roster_with_effort_without_model_in_a_runtime_without_default_loses_the_effort(self):
+        r = os.path.join(self.root, "r.json")
         with open(r, "w") as f:
-            json.dump({"consultores": [{"foco": "a", "agent": "grok", "effort": "high"}, {"foco": "b", "agent": "codex", "effort": "high"}]}, f)
-        self.abre("--roster", r)
-        abertas = [a for k, a in self.chamadas if k == "sessions"]
-        self.assertNotIn("--effort", abertas[0])
-        self.assertEqual(abertas[1][abertas[1].index("--model") + 1], executor.CODEX_MODEL)
+            json.dump({"consultants": [{"focus": "a", "agent": "grok", "effort": "high"}, {"focus": "b", "agent": "codex", "effort": "high"}]}, f)
+        self.open_step("--roster", r)
+        opened = [a for k, a in self.calls if k == "sessions"]
+        self.assertNotIn("--effort", opened[0])
+        self.assertEqual(opened[1][opened[1].index("--model") + 1], executor.CODEX_MODEL)
         self.assertIn("recusa --effort sem --model", self.err)
 
-    def test_cota_igual_a_55_entra(self):
-        self.cota["claude"] = 55
-        self.abre()
-        self.assertEqual([a[a.index("--agent") + 1] for k, a in self.chamadas if k == "sessions"][0], "claude")
+    def test_quota_equal_a_55_enters(self):
+        self.quota["claude"] = 55
+        self.open_step()
+        self.assertEqual([a[a.index("--agent") + 1] for k, a in self.calls if k == "sessions"][0], "claude")
 
-    def test_sem_quota_avisa_e_nao_corta(self):
+    def test_without_quota_warns_and_not_strips(self):
         self.brza = lambda argv: (1, "", "falhou")
-        self.assertEqual(self.abre(), 0)
+        self.assertEqual(self.open_step(), 0)
         self.assertIn("não li o `brza quota --json`", self.err)
 
-    def test_roster_proprio(self):
-        r = os.path.join(self.raiz, "r.json")
+    def test_roster_own(self):
+        r = os.path.join(self.root, "r.json")
         with open(r, "w") as f:
-            json.dump({"consultores": [{"foco": "a", "agent": "grok"}, {"foco": "b", "agent": "grok"}]}, f)
-        self.abre("--roster", r)
-        self.assertEqual(sorted(self.man()["focos"]), ["a", "b"])
+            json.dump({"consultants": [{"focus": "a", "agent": "grok"}, {"focus": "b", "agent": "grok"}]}, f)
+        self.open_step("--roster", r)
+        self.assertEqual(sorted(self.man()["focuses"]), ["a", "b"])
         with open(r, "w") as f:
             f.write("[]")
-        self.assertEqual(self.abre("--roster", r), 2)
+        self.assertEqual(self.open_step("--roster", r), 2)
 
-    def test_dry_run_nao_abre(self):
-        self.assertEqual(self.abre("--dry-run"), 0)
-        self.assertEqual([k for k, _ in self.chamadas if k == "sessions"], [])
+    def test_dry_run_not_opens(self):
+        self.assertEqual(self.open_step("--dry-run"), 0)
+        self.assertEqual([k for k, _ in self.calls if k == "sessions"], [])
         self.assertIn("[dry-run] brza sessions pln900-d1-arquitetura-limpa", self.out)
-        self.assertFalse(os.path.exists(os.path.join(self.raiz, ".sessions")))
+        self.assertFalse(os.path.exists(os.path.join(self.root, ".sessions")))
 
-    def test_nao_abriu_para_o_lote(self):
+    def test_not_opened_stops_the_batch(self):
         self.sessions = lambda argv: (1, "", "CHECK: x não abriu: pending-1.json")
-        self.assertEqual(self.abre(), 1)
-        self.assertEqual(len([1 for k, _ in self.chamadas if k == "sessions"]), 1)
+        self.assertEqual(self.open_step(), 1)
+        self.assertEqual(len([1 for k, _ in self.calls if k == "sessions"]), 1)
 
-    def test_decisao_inexistente_e_brief_ausente(self):
-        self.assertEqual(self.roda(consult, "open", self.path, "D9", "--brief", self.brief), 2)
-        self.assertEqual(self.roda(consult, "open", self.path, "D1", "--brief", "/nao/existe.md"), 2)
+    def test_decision_missing_and_brief_missing(self):
+        self.assertEqual(self.invoke(consult, "open", self.path, "D9", "--brief", self.brief), 2)
+        self.assertEqual(self.invoke(consult, "open", self.path, "D1", "--brief", "/nao/existe.md"), 2)
 
-    def test_wait_narra_cada_chegada_e_chega_a_zero(self):
-        self.abre()
-        self.grava("arquitetura-limpa", "Tese: a.")
-        self.grava("mudanca-minima", "Tese: b.")
-        self.grava("equilibrio", "Tese: c.")
-        self.assertEqual(self.roda(consult, "wait", self.path, "D1"), 0)
+    def test_wait_narrates_each_arrival_and_reaches_zero(self):
+        self.open_step()
+        self.writes("arquitetura-limpa", "Tese: a.")
+        self.writes("mudanca-minima", "Tese: b.")
+        self.writes("equilibrio", "Tese: c.")
+        self.assertEqual(self.invoke(consult, "wait", self.path, "D1"), 0)
         self.assertEqual(self.out.count("entregou"), 3)
         self.assertIn("D1 · 3/3 — entregaram", self.out)
 
-    def test_wait_prazo_75_lista_quem_falta(self):
-        self.abre()
-        self.grava("equilibrio", "Tese: c.")
-        self.assertEqual(self.roda(consult, "wait", self.path, "D1", "--timeout", "20"), 75)
+    def test_wait_deadline_75_listing_who_missing_ids(self):
+        self.open_step()
+        self.writes("equilibrio", "Tese: c.")
+        self.assertEqual(self.invoke(consult, "wait", self.path, "D1", "--timeout", "20"), 75)
         self.assertIn("prazo: faltam arquitetura-limpa, mudanca-minima", self.out)
 
-    def test_wait_arquivo_sem_marcador_nao_vale_e_falha_da_sessao(self):
-        self.abre()
-        self.grava("equilibrio", "Tese: c.", marcador=False)
-        self.wait = lambda nomes, t, markers=(), any_=True: (0, {"done": [{"name": "pln900-d1-equilibrio", "outcome": "done"}], "timed_out": False, "events": []})
-        self.assertEqual(self.roda(consult, "wait", self.path, "D1", "--timeout", "30"), 75)
+    def test_wait_file_without_marker_not_counts_and_failure_of_session(self):
+        self.open_step()
+        self.writes("equilibrio", "Tese: c.", marker=False)
+        self.wait = lambda name_list, t, markers=(), any_=True: (0, {"done": [{"name": "pln900-d1-equilibrio", "outcome": "done"}], "timed_out": False, "events": []})
+        self.assertEqual(self.invoke(consult, "wait", self.path, "D1", "--timeout", "30"), 75)
         self.assertIn("o turno acabou sem o marcador", self.out)
-        self.wait = lambda nomes, t, markers=(), any_=True: (1, {"done": [{"name": "pln900-d1-equilibrio", "outcome": "failed"}], "timed_out": False, "events": []})
-        self.assertEqual(self.roda(consult, "wait", self.path, "D1", "--timeout", "30"), 1)
+        self.wait = lambda name_list, t, markers=(), any_=True: (1, {"done": [{"name": "pln900-d1-equilibrio", "outcome": "failed"}], "timed_out": False, "events": []})
+        self.assertEqual(self.invoke(consult, "wait", self.path, "D1", "--timeout", "30"), 1)
 
-    def test_wait_sessao_perdida_marca_so_esse_foco_e_segue_com_os_outros(self):
-        self.abre()
-        self.wait = lambda nomes, t, markers=(), any_=True: (
-            (1, {"error": "0 chats abertos se chamam pln900-d1-equilibrio: "}) if "pln900-d1-equilibrio" in nomes
+    def test_wait_session_lost_index_marks_only_that_focus_and_continues_with_the_others(self):
+        self.open_step()
+        self.wait = lambda name_list, t, markers=(), any_=True: (
+            (1, {"error": "0 chats abertos se chamam pln900-d1-equilibrio: "}) if "pln900-d1-equilibrio" in name_list
             else (75, {"done": [], "timed_out": True, "events": []}))
-        self.assertEqual(self.roda(consult, "wait", self.path, "D1", "--timeout", "60"), 1)
-        self.assertEqual(self.man()["focos"]["equilibrio"]["estado"], "falhou")
-        self.assertEqual(self.man()["focos"]["mudanca-minima"]["estado"], "aberto")
+        self.assertEqual(self.invoke(consult, "wait", self.path, "D1", "--timeout", "60"), 1)
+        self.assertEqual(self.man()["focuses"]["equilibrio"]["state"], "falhou")
+        self.assertEqual(self.man()["focuses"]["mudanca-minima"]["state"], "aberto")
         self.assertIn("a espera segue com as outras", self.out)
         # as outras ainda esperam depois do erro (mais de uma chamada)
-        self.assertGreater(len([x for x in self.chamadas if x[0] == "wait"]), 1)
+        self.assertGreater(len([x for x in self.calls if x[0] == "wait"]), 1)
 
-    def test_wait_erro_repetido_pausa_e_desiste(self):
-        self.abre()
+    def test_wait_error_repeated_pause_and_gives_up(self):
+        self.open_step()
         self.wait = lambda *a, **k: (1, {"error": "saída sem JSON (rc 1): boom"})
-        self.assertEqual(self.roda(consult, "wait", self.path, "D1", "--timeout", "600"), 1)
-        self.assertEqual(len([x for x in self.chamadas if x[0] == "wait"]), executor.MAX_WAIT_ERRORS)
+        self.assertEqual(self.invoke(consult, "wait", self.path, "D1", "--timeout", "600"), 1)
+        self.assertEqual(len([x for x in self.calls if x[0] == "wait"]), executor.MAX_WAIT_ERRORS)
 
-    def test_wait_a_linha_em_curso_sai_a_cada_batida_e_nao_a_cada_volta(self):
+    def test_wait_a_line_in_progress_exits_on_each_tick_and_not_on_each_loop(self):
         # A15: o turno acaba sem o marcador, o `wait` volta na hora
-        self.abre()
-        self.wait = lambda nomes, t, markers=(), any_=True: (0, {"done": [{"name": "pln900-d1-equilibrio", "outcome": "done"}], "timed_out": False, "events": []})
-        self.assertEqual(self.roda(consult, "wait", self.path, "D1", "--timeout", "600"), 75)
-        linhas = [l for l in self.saidas if "em curso" in l]
-        self.assertGreaterEqual(len(linhas), 2)
-        self.assertLessEqual(len(linhas), 600 // consult.BATIDA + 1)
+        self.open_step()
+        self.wait = lambda name_list, t, markers=(), any_=True: (0, {"done": [{"name": "pln900-d1-equilibrio", "outcome": "done"}], "timed_out": False, "events": []})
+        self.assertEqual(self.invoke(consult, "wait", self.path, "D1", "--timeout", "600"), 75)
+        lines = [l for l in self.outputs if "em curso" in l]
+        self.assertGreaterEqual(len(lines), 2)
+        self.assertLessEqual(len(lines), 600 // consult.TICK + 1)
 
-    def test_tabela_lado_a_lado_com_os_tres_arquivos(self):
-        self.abre()
-        self.grava("arquitetura-limpa", "Tese: JSON.\n\n- **Caso 1:** Custo: 3 h · Se paga: já · Reabre: o schema\n- **Caso 2:** Custo: 1 h · Se paga: com anexo · Reabre: nada\n\nRisco: ninguém abre JSON.")
-        self.grava("mudanca-minima", "Tese: Markdown.\n\n**Custo:** 1 h\n**Se paga:** agora\n**Reabre:** o importador\nRisco: sem metadado\n  que continua aqui.")
-        self.grava("equilibrio", "Tese: YAML.\nCusto: 2 h · Se paga: já · Reabre: pouco\nRisco: formato novo")
-        pub = os.path.join(self.raiz, "pub")
-        self.assertEqual(self.roda(consult, "table", self.path, "D1", "--publish-dir", pub), 0, self.err)
-        linhas = self.saidas[0].split("\n")
-        self.assertEqual(linhas[0], "| | arquitetura-limpa (Claude) | mudanca-minima (Codex) | equilibrio (Grok) |")
-        self.assertIn("| **Custo** | 3 h / 1 h | 1 h | 2 h |", linhas)
-        self.assertIn("| **Se paga** | já / com anexo | agora | já |", linhas)
-        self.assertIn("| **Reabre** | o schema / nada | o importador | pouco |", linhas)
-        self.assertIn("| **Risco** | ninguém abre JSON. | sem metadado que continua aqui. | formato novo |", linhas)
-        self.assertRegex(self.saidas[-1], r'^::orca-visual\{file="pln-900-d1-[0-9a-f]{4}\.html" title="PLN-900 D1')
-        nome = self.saidas[-1].split('"')[1]
-        with open(os.path.join(pub, nome), encoding="utf-8") as f:
+    def test_table_side_by_side_with_the_three_files(self):
+        self.open_step()
+        self.writes("arquitetura-limpa", "Tese: JSON.\n\n- **Caso 1:** Custo: 3 h · Se paga: já · Reabre: o schema\n- **Caso 2:** Custo: 1 h · Se paga: com anexo · Reabre: nada\n\nRisco: ninguém abre JSON.")
+        self.writes("mudanca-minima", "Tese: Markdown.\n\n**Custo:** 1 h\n**Se paga:** agora\n**Reabre:** o importador\nRisco: sem metadado\n  que continua aqui.")
+        self.writes("equilibrio", "Tese: YAML.\nCusto: 2 h · Se paga: já · Reabre: pouco\nRisco: formato novo")
+        pub = os.path.join(self.root, "pub")
+        self.assertEqual(self.invoke(consult, "table", self.path, "D1", "--publish-dir", pub), 0, self.err)
+        lines = self.outputs[0].split("\n")
+        self.assertEqual(lines[0], "| | arquitetura-limpa (Claude) | mudanca-minima (Codex) | equilibrio (Grok) |")
+        self.assertIn("| **Custo** | 3 h / 1 h | 1 h | 2 h |", lines)
+        self.assertIn("| **Se paga** | já / com anexo | agora | já |", lines)
+        self.assertIn("| **Reabre** | o schema / nada | o importador | pouco |", lines)
+        self.assertIn("| **Risco** | ninguém abre JSON. | sem metadado que continua aqui. | formato novo |", lines)
+        self.assertRegex(self.outputs[-1], r'^::orca-visual\{file="pln-900-d1-[0-9a-f]{4}\.html" title="PLN-900 D1')
+        name = self.outputs[-1].split('"')[1]
+        with open(os.path.join(pub, name), encoding="utf-8") as f:
             self.assertIn("arquitetura-limpa", f.read())
 
-    def test_tabela_com_foco_que_nao_entregou(self):
-        self.abre()
-        self.grava("equilibrio", "Tese: YAML.\nCusto: 2 h")
-        self.roda(consult, "table", self.path, "D1", "--publish-dir", os.path.join(self.raiz, "pub"))
+    def test_table_with_focus_that_not_delivered(self):
+        self.open_step()
+        self.writes("equilibrio", "Tese: YAML.\nCusto: 2 h")
+        self.invoke(consult, "table", self.path, "D1", "--publish-dir", os.path.join(self.root, "pub"))
         self.assertIn("(não entregou)", self.out)
         self.assertIn("sem arquivo com o marcador", self.err)
         self.assertIn("o arquivo não traz `Se paga:`", self.err)
 
-    def test_close_um_por_um(self):
-        self.abre()
+    def test_close_one_by_one(self):
+        self.open_step()
         self.sessions = lambda argv: (0, json.dumps({"status": "released"}), "")
-        self.assertEqual(self.roda(consult, "close", self.path, "D1"), 0)
-        self.assertEqual({v["estado"] for v in self.man()["focos"].values()}, {"fechado"})
-        fechos = [a for k, a in self.chamadas if k == "sessions" and a[0] == "close"]
-        self.assertEqual(len(fechos), 3)
+        self.assertEqual(self.invoke(consult, "close", self.path, "D1"), 0)
+        self.assertEqual({v["state"] for v in self.man()["focuses"].values()}, {"fechado"})
+        closures = [a for k, a in self.calls if k == "sessions" and a[0] == "close"]
+        self.assertEqual(len(closures), 3)
         self.sessions = lambda argv: (0, json.dumps({"status": "closing"}), "")
-        self.assertIn("NÃO está fechada", (self.roda(consult, "close", self.path, "D1"), self.out)[1])
+        self.assertIn("NÃO está fechada", (self.invoke(consult, "close", self.path, "D1"), self.out)[1])
 
-    def test_pipe_na_celula_nao_quebra_a_tabela(self):
-        self.assertEqual(consult.cel("a | b\nc"), "a \\| b c")
+    def test_pipe_in_cell_not_breaks_a_table(self):
+        self.assertEqual(consult.escape_cell("a | b\nc"), "a \\| b c")
 
 
 if __name__ == "__main__":

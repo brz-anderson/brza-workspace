@@ -17,7 +17,7 @@ artboard*), para nunca colidir com os do chat:
 
 Os tokens do projeto que não têm par nessa lista entram com o nome do projeto, sem o `--` de origem: o `--sidebar` do
 `main.css` vira `--sa-sidebar`. **Todos os tokens do mobile entram com `--sa-m-`** (`--sa-m-bg-panel`), e o pacote guarda o
-mapa `pares_mobile` (`m-bg-base` → `background`, `m-text-primary` → `foreground`…): nas molduras `iphone` e `android`, o
+mapa `mobile_pairs` (`m-bg-base` → `background`, `m-text-primary` → `foreground`…): nas molduras `iphone` e `android`, o
 `new` sobrescreve o token do desktop pelo par do mobile, e o fragmento escrito com `var(--sa-background)` sai com a cor do
 app mobile sem mudar uma linha. `tokens.py list`
 imprime os nomes de cada pacote. O prefixo é a decisão da PLN-021/R5.9.

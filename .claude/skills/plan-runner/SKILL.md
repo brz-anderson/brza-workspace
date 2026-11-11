@@ -159,7 +159,7 @@ O worklog é `work/worklogs/AAAA-MM-DD-assunto-em-kebab.md`. O do executor de um
 | `C1`   | Caso manual                                   | Só com o gatilho do teste em aparelho                |
 
 Citação de fora: `PLN-NNN/D3`. Decisão reaberta ganha, na linha antiga, "→ reaberta em R10.1" (o `round_log.py` faz
-isso com `reabre`), e o `D` passa a declarar a origem nova. O `plan_state.py` aponta o ID citado que não existe.
+isso com `reopens`), e o `D` passa a declarar a origem nova. O `plan_state.py` aponta o ID citado que não existe.
 
 ## Os consultores, em resumo
 

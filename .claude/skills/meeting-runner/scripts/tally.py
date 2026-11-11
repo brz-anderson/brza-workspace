@@ -28,7 +28,8 @@ Como biblioteca (o `panel.py` faz `sys.path.insert` e `import tally`):
                  exclude_raters=(), opened=None, closed=None, at=None, participantes=None, settle=0) -> dict
     render_md(estado) -> str
     parse_worklog(text, names=()) -> dict
-    measure_claude(...), measure_codex(...), stats(valores)   # auxiliares públicos
+    measure_claude(...), measure_codex(...)   # devolvem cost_usd, latency_s, end, failed e tokens; _legacy_measure traduz para as chaves que o tally grava
+    stats(valores)
 
 O MANIFESTO `reuniao.json` (caminhos relativos a `--root`):
     {"id": "reuniao-mcp-remoto", "tema": "...", "decisor": "Anderson", "fim": "22h15",
@@ -104,6 +105,18 @@ import common  # noqa: E402  (a leitura do marcador de fim de rodada é a mesma 
 import sessions_map  # noqa: E402  (a identidade da persona vem do mapa do `brza sessions` v2, em um lugar só)
 from skillkit.measure import (codex_turns, find_rollout, load_jsonl, measure_claude, measure_codex,  # noqa: E402,F401
                               parse_ts, session_ids, win_bounds)
+
+def _legacy_measure(med):
+    """Traduz o retorno em inglês do skillkit para as chaves que esta skill já grava."""
+    if not med:
+        return med
+    tokens = med.get("tokens")
+    if tokens:
+        tokens = {"entrada": tokens.get("input_tokens"), "cache": tokens.get("cache"),
+                  "saida": tokens.get("output_tokens")}
+    return {"custo_usd": med.get("cost_usd"), "latencia_s": med.get("latency_s"), "fim": med.get("end"),
+            "erro": med.get("failed"), "tokens": tokens, "events": med.get("events")}
+
 
 RUNTIME_NOME = {"claude": "Claude", "codex": "Codex", "grok": "Grok", "antigravity": "Antigravity"}
 NUM_CELL = re.compile(r"^\**\s*(\d+(?:[.,]\d+)?)\s*\**\s*(?:/\s*\**\s*(?:10|100)\s*\**|%)?\s*$")
@@ -591,11 +604,11 @@ def _montar(reuniao, n, root, mrows, srows, codex_dir, exclude_raters, opened, c
         ids_claude, ids_prov = session_ids(srows, p.get("sessao"), p)
         med, aviso_med = None, None
         if runtime == "claude":
-            med = measure_claude(mrows, ids_claude, win)
+            med = _legacy_measure(measure_claude(mrows, ids_claude, win))
             if not ids_claude and not ids_prov:
                 aviso_med = SEM_MEDICAO
         elif runtime == "codex":
-            med = measure_codex(codex_dir, ids_prov, n, win)
+            med = _legacy_measure(measure_codex(codex_dir, ids_prov, n, win))
             if not ids_prov:
                 aviso_med = SEM_MEDICAO
         erro_limite = bool(med and med.get("erro"))

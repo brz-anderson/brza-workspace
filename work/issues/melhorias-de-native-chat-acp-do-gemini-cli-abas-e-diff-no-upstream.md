@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39398, #39006, #33360 e as issues #39742, #39523, #39528, #39556, #39514 trazem fix de account switch, auth macOS, skills e ACP.
+description: Os PRs #40932, #39398, #39006, #33360 e as issues #40321, #39742, #39523, #39528, #39556, #39514 trazem suporte a Windows, fix de account switch, auth macOS, skills e ACP.
 scope:
   - brza-studio
 priority: high
@@ -12,7 +12,8 @@ tags:
 
 # Melhorias de Native Chat, ACP do Gemini CLI, abas e diff no upstream
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39398`](https://github.com/stablyai/orca/pull/39398) (Issue [`#39395`](https://github.com/stablyai/orca/issues/39395)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40932`](https://github.com/stablyai/orca/pull/40932) (resolve a Issue [`#40321`](https://github.com/stablyai/orca/issues/40321)),
+[`stablyai/orca#39398`](https://github.com/stablyai/orca/pull/39398) (Issue [`#39395`](https://github.com/stablyai/orca/issues/39395)),
 [`stablyai/orca#39006`](https://github.com/stablyai/orca/pull/39006) (atendendo à Issue [`#38833`](https://github.com/stablyai/orca/issues/38833)),
 [`stablyai/orca#39012`](https://github.com/stablyai/orca/pull/39012),
 [`stablyai/orca#38976`](https://github.com/stablyai/orca/pull/38976) (Issue [`#38975`](https://github.com/stablyai/orca/issues/38975)),
@@ -136,9 +137,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39398`](https://github.com
     - O problema ocorre porque o comparador de identidade de conta valida o hash completo do token armazenado em vez do
       identificador durável de usuário/e-mail; como a CLI atualiza o timestamp e tokens de renovação a cada turno, o hash
       diverge e o app interpreta a renovação como troca de usuário.
+26. **Suporte ao Antigravity ACP no cliente Windows e streaming reativo de subagentes (`#40932`, resolve `#40321`):**
+    - Estende a arquitetura de backend de host de `#39006` para o cliente Windows, admitindo o executável `agy.exe` em
+      `%LOCALAPPDATA%\agy\bin\agy.exe` ou descoberto via `PATH`;
+    - Implementa descoberta dinâmica do catálogo de modelos via `agy models` com fallbacks estruturados;
+    - Introduz o streamer reativo de turnos (`antigravity-reactive-turn-streamer.ts`) para monitorar `transcript.jsonl` e
+      `transcript_full.jsonl` em tempo real, permitindo exibir turnos de wakeup de tarefas em segundo plano e subagentes
+      imediatamente na interface do chat nativo sem polling e suprimindo eventos tardios duplicados.
 
 ## O que fazer
 
+- Adotar o suporte ao executável Windows de Antigravity ACP (`%LOCALAPPDATA%\agy\bin\agy.exe`) e o streaming reativo de turnos (`antigravity-reactive-turn-streamer.ts`) para subagentes e tarefas em background (`#40932`, resolve `#40321`).
 - Corrigir a comparação de identidade de conta no Antigravity (`#39742`), validando ID/e-mail do usuário em vez do hash mutável de credenciais para eliminar avisos falsos após cada execução de worker.
 - Implementar fallback no `HybridCredentialStore` para leitura de `acp_token.json` quando o item do Keychain não existir,
   ou sincronizar o token no Keychain do macOS durante o sign-in no `brza-studio` (`#39523`).

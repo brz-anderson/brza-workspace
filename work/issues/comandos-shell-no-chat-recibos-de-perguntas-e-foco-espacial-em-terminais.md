@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40620, #40432, #40424, #40420, #40404, #40412 trazem execução inline de shell ! no chat, recibos expansíveis de perguntas, foco espacial e atalho de repouso.
+description: Os PRs #41015, #40870, #40620, #40432 e a issue #41009 trazem foco no split ativo via Cmd+J, splits RPC em background, reset de mouse em PTY e shell ! no chat.
 scope:
   - brza-studio
   - workspace
@@ -15,14 +15,17 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40620`](https://github.com/stablyai/orca/pull/40620) (resolve Issue [`#32165`](https://github.com/stablyai/orca/issues/32165)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41015`](https://github.com/stablyai/orca/pull/41015) (resolve Issue [`#41010`](https://github.com/stablyai/orca/issues/41010)),
+[`stablyai/orca#40870`](https://github.com/stablyai/orca/pull/40870) (resolve Issue [`#40868`](https://github.com/stablyai/orca/issues/40868)),
+[`stablyai/orca#40620`](https://github.com/stablyai/orca/pull/40620) (resolve Issue [`#32165`](https://github.com/stablyai/orca/issues/32165)),
 [`stablyai/orca#40432`](https://github.com/stablyai/orca/pull/40432),
 [`stablyai/orca#40424`](https://github.com/stablyai/orca/pull/40424),
 [`stablyai/orca#40420`](https://github.com/stablyai/orca/pull/40420) (resolve Issue [`#40408`](https://github.com/stablyai/orca/issues/40408)),
 [`stablyai/orca#40404`](https://github.com/stablyai/orca/pull/40404),
 [`stablyai/orca#40412`](https://github.com/stablyai/orca/pull/40412) (resolve Issue [`#39864`](https://github.com/stablyai/orca/issues/39864)),
 [`stablyai/orca#40405`](https://github.com/stablyai/orca/pull/40405) (resolve Issue [`#40402`](https://github.com/stablyai/orca/issues/40402)) e
-[`stablyai/orca#40398`](https://github.com/stablyai/orca/pull/40398) (resolve Issue [`#12572`](https://github.com/stablyai/orca/issues/12572)).
+[`stablyai/orca#40398`](https://github.com/stablyai/orca/pull/40398) (resolve Issue [`#12572`](https://github.com/stablyai/orca/issues/12572)),
+além da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
 
 ## O problema
 
@@ -52,6 +55,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40620`](https://github.com
 7. **Recusa de arquivos locais arrastados para chats remotos pareados (`#40398`, resolve `#12572`):**
    Em chats vinculados a terminais rodando em servidores Orca remotos, arrastar um arquivo ou usar o botão `+` era recusado com
    "Local attachments are not available for remote sessions", obrigando transferências manuais via SCP/SSH.
+8. **Perda de foco do painel dividido ativo ao selecionar aba de terminal via `Cmd+J` (`#41015`, resolve `#41010`):**
+   Ao navegar para uma aba de terminal que possui splits usando o seletor `Cmd+J`, o foco era atribuído cegamente ao primeiro
+   painel (`first pane`) em vez de restaurar o painel que estava ativo antes da abertura da paleta.
+9. **Captura indevida de foco por splits de terminal criados via RPC (`#40870`, resolve `#40868`):**
+   Quando agentes ou scripts de extensão invocavam o método RPC `terminal.split`, a nova divisão ativava imediatamente a aba
+   e o painel, roubando o foco do teclado do desenvolvedor enquanto este digitava em outra aba.
+10. **Injeção de sequências de escape de mouse no prompt após restauração a frio de painéis (`#41009`):**
+    Quando um painel de terminal era restaurado a frio após a terminação inesperada de um agente, os modos de rastreamento de mouse
+    e foco (`\e[?1000h`, `\e[?1002h`, etc.) permaneciam ativados no PTY, fazendo com que movimentos do mouse ou cliques
+    injetassem sequências brutas como `^[[<35;20;10M` no prompt do shell.
 
 ## O que o upstream implementa e corrige
 
@@ -78,12 +91,24 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40620`](https://github.com
   - Habilita `canSetOptionWhileIdle` no adaptador estruturado do Claude, invocando `connection.setModel` em repouso e mantendo o seletor sincronizado.
 - **Upload transparente de arquivos arrastados para sessões remotas pareadas (`#40398`):**
   - Implementa `fs:uploadPathsToRuntimeTempFiles`, transmitindo arquivos arrastados para pastas temporárias seguras do servidor remoto pareado e inserindo os caminhos remotos válidos no prompt do agente.
+- **Restauração de foco na folha ativa de split via Cmd+J (`#41015`, resolve `#41010`):**
+  - Ao ativar uma aba de terminal dividida através da paleta de abas do workspace (`Cmd+J`), passa `terminalLayoutsByTabId[entityId].activeLeafId`
+    para `focusTerminalTabSurface`, preservando exatamente o painel de terminal ativo anterior.
+- **Criação de splits de terminal via RPC em background (`#40870`, resolve `#40868`):**
+  - Define `activate: false` na fronteira de chamadas RPC de `terminal.split`, garantindo que divisões requisitadas por scripts,
+    ferramentas ou agentes ocorram em segundo plano sem desviar o foco do usuário.
+- **Reset de modos de escape de mouse e foco em PTYs restaurados (`#41009`):**
+  - Propõe emitir sequências de desarme de mouse (`\e[?1000l`, `\e[?1002l`, `\e[?1006l`) e foco (`\e[?1004l`) ao reiniciar
+    ou restaurar a frio terminais cujos agentes morreram, evitando poluição de caracteres de coordenadas no prompt.
 
 ## O que fazer no BrzA Studio
 
-1. Adotar a execução inline de comandos shell `!` no Chat UI com streaming, cancelamento e injeção opcional de contexto via "Add to chat" (`#40620`), mantendo transbordo opcional para aba de terminal (`#40432`).
-2. Adotar os recibos expansíveis para prompts de perguntas com alternativas (`#40424`).
-3. Disponibilizar a ação `workspace.sleep` nos atalhos globais de teclado (`#40420`).
-4. Implementar a navegação direcional espacial entre splits de terminais via `Cmd+Option+Setas` (`#40404`).
-5. Incorporar a verificação de múltiplas janelas de cota antes do auto-continue em Native Chat (`#40412`).
-6. Aplicar a atualização de modelo em sessões ociosas do Claude (`#40405`) e o upload automático de anexos em sessões pareadas (`#40398`).
+1. Preservar o foco no painel dividido ativo ao selecionar abas via `Cmd+J` (`#41015`).
+2. Manter divisões de terminal por RPC em segundo plano com `activate: false` (`#40870`).
+3. Resetar modos de escape de mouse e foco em PTYs restaurados a frio (`#41009`).
+4. Adotar a execução inline de comandos shell `!` no Chat UI com streaming, cancelamento e injeção opcional de contexto via "Add to chat" (`#40620`), mantendo transbordo opcional para aba de terminal (`#40432`).
+5. Adotar os recibos expansíveis para prompts de perguntas com alternativas (`#40424`).
+6. Disponibilizar a ação `workspace.sleep` nos atalhos globais de teclado (`#40420`).
+7. Implementar a navegação direcional espacial entre splits de terminais via `Cmd+Option+Setas` (`#40404`).
+8. Incorporar a verificação de múltiplas janelas de cota antes do auto-continue em Native Chat (`#40412`).
+9. Aplicar a atualização de modelo em sessões ociosas do Claude (`#40405`) e o upload automático de anexos em sessões pareadas (`#40398`).

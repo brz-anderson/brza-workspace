@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40812, #40788, #40214, #35220 trazem hashes estáveis de pacotes, hints de argumentos no picker, leitura antecipada e preservação no arranque.
+description: Os PRs #40812, #40788, #40214, #35220 e a issue #41017 tratam de invalidação de cache de skills, hashes de pacotes, hints de argumentos e leitura antecipada.
 scope:
   - brza-studio
 priority: high
@@ -18,6 +18,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com
 [`stablyai/orca#36897`](https://github.com/stablyai/orca/pull/36897),
 [`stablyai/orca#37659`](https://github.com/stablyai/orca/pull/37659) e
 [`stablyai/orca#19680`](https://github.com/stablyai/orca/pull/19680), além das issues
+[`stablyai/orca#41017`](https://github.com/stablyai/orca/issues/41017),
 [`stablyai/orca#14690`](https://github.com/stablyai/orca/issues/14690),
 [`stablyai/orca#37875`](https://github.com/stablyai/orca/issues/37875) e
 [`stablyai/orca#32573`](https://github.com/stablyai/orca/issues/32573).
@@ -47,6 +48,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com
 7. **Omissão de dicas de argumentos (argument-hints) de skills no seletor do Native Chat (`#40788`, resolve `#40785`):**
    Ao abrir o picker `/` no chat para invocar uma skill (ex.: `/review`, `/test`), a interface descartava os metadados de
    `argument-hint` definidos no Claude Code, deixando o usuário sem saber quais parâmetros a ferramenta esperava.
+8. **Cache infinito do picker impedindo descoberta de novas skills instaladas (`#41017`):**
+   O hook `useNativeChatSkills` armazenava o resultado de varreduras bem-sucedidas em `paneDiscoveryCache` sem tempo de expiração
+   nem invalidação ao reabrir o seletor. Quando uma nova skill era instalada ou linkada simbolicamente em `~/.agents/skills/`,
+   o chat existente continuava afirmando que a ferramenta não existia até a reinicialização da janela do app.
 
 ## O que os PRs fazem
 
@@ -63,6 +68,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com
   mantendo links legados e aliases do CLI para evitar quebras.
 - **Issues `#37875` e `#32573`:** propõem expor pontos de contribuição declarativos `skills` e `subagents` no manifesto
   do plugin para carregar arquivos de agentes e skills embutidos.
+- **Issue `#41017`:** propõe limitar o snapshot em `paneDiscoveryCache` ao período em que o seletor está visível, consultando
+  o runtime novamente ao reabrir o picker para detectar skills recém-instaladas sem precisar de watchers em background.
 
 ## O que fazer
 
@@ -72,3 +79,4 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com
    nativos entregues por pacotes de terceiros.
 3. Adotar a ordenação determinística de caminhos no cálculo de identidade de pacotes de skills (`#40812`).
 4. Exibir dicas de argumentos (`argument-hint`) no seletor de comandos/skills do chat (`#40788`).
+5. Invalidar o cache do seletor de skills ao fechar ou reabrir o picker no Native Chat (`#41017`).

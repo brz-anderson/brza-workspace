@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39229, #38558 e as issues #39771, #39736, #39714, #39609, #39617 tratam de hooks com symlink/permissão, recusas do Claude e segurança.
+description: Os PRs #40978, #40976, #39229, #38558 e as issues #40974, #39771 tratam de revisão e confiança de hooks no chat, visualização plana e segurança.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,9 @@ tags:
 
 # Segurança de hooks em worktrees e integridade de setup em automações
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39229`](https://github.com/stablyai/orca/pull/39229) (resolve Issue [`#39617`](https://github.com/stablyai/orca/issues/39617)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#40978`](https://github.com/stablyai/orca/pull/40978) (resolve Issue [`#40974`](https://github.com/stablyai/orca/issues/40974)),
+[`stablyai/orca#40976`](https://github.com/stablyai/orca/pull/40976),
+[`stablyai/orca#39229`](https://github.com/stablyai/orca/pull/39229) (resolve Issue [`#39617`](https://github.com/stablyai/orca/issues/39617)),
 [`stablyai/orca#38558`](https://github.com/stablyai/orca/pull/38558),
 [`stablyai/orca#38648`](https://github.com/stablyai/orca/pull/38648),
 [`stablyai/orca#38585`](https://github.com/stablyai/orca/pull/38585),
@@ -90,6 +92,11 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39229`](https://github.com
 14. **Exceção `FileNotFoundError` no hook do Hermes após limpeza de tarefas de Kanban (`#39736`):**
     Quando automações de Kanban removem o diretório de trabalho de um lote concluído, o gancho de status do Hermes falha
     no ciclo `pre_tool_call` ao tentar acessar o `cwd` inexistente, travando todas as invocações de ferramentas subsequentes.
+15. **Inexistência de revisão e aprovação de hooks de repositório no Native Chat do Codex (`#40978`, resolve `#40974`):**
+    No chat nativo com o Codex, não havia mecanismo para inspecionar e aprovar comandos de hooks declarados no repositório.
+    O usuário precisava sair do chat para a linha de comando ou configurações para autorizá-los manualmente.
+16. **Fragmentação de cartões de hooks de worktree nas configurações (`#40976`):**
+    Cada hook de worktree consumia um cartão isolado na interface de configurações, gerando rolagem excessiva e desorganização visual.
 
 ## O que o upstream propõe e implementa
 
@@ -127,9 +134,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39229`](https://github.com
   - Adiciona o campo `agentPermissionGuardSkip` nas configurações por agente;
   - Quando ativado em modo Full access, remove o hook `PermissionRequest` gerenciado pelo Orca em `~/.claude/settings.json`,
     permitindo que as checagens e recusas embutidas do Claude Code sejam dispensadas sem emitir avisos bloqueantes.
+- **Revisão e confiança de hooks do Codex no Native Chat (`#40978`, resolve `#40974`):**
+  - Adiciona o comando de barra `/hooks` no chat nativo com o Codex para revisar comandos de hooks do repositório e salvar
+    seus hashes aprovados sem sair da conversa;
+  - Rejeita comandos modificados cujo hash não coincida e preserva hooks desabilitados.
+- **Cartão unificado e achatado para hooks de worktree nas configurações (`#40976`):**
+  - Condensa os hooks de worktree em linhas dentro de um único cartão nas configurações, eliminando dispersão visual.
 
 ## O que fazer
 
+- Adotar o comando `/hooks` no Native Chat para revisão e autorização de hooks do Codex (`#40978`).
+- Incorporar o cartão unificado de hooks de worktree nas configurações (`#40976`).
 - Resolver symlinks de executáveis na inspeção de remetentes de hooks para preservar o status de agentes sob wrappers (`#39771`).
 - Tratar descritores restritivos e falhas de escrita no `printf` do SessionStart hook do Claude (`#39714`).
 - Adicionar verificação defensiva de existência do `cwd` no hook do Hermes para evitar quebras em limpezas de Kanban (`#39736`).

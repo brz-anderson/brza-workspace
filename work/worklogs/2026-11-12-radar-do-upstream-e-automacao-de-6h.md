@@ -12,6 +12,8 @@ refs:
   - issue:badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes
   - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
+  - issue:notificacao-de-perda-de-workers-desengasgo-de-correio-e-tipo-notice
+  - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
 ---
 
 # Radar de issues e PRs do upstream e automação de 6h (00h, 06h, 12h e 18h BRT)
@@ -39,3 +41,24 @@ refs:
      adicionados o PR `#41332` (eliminação de 500 fetches e 422 merge checks repetidos no watch de status de CI/PR checks),
      o PR `#41268` / issue `#41269` (suspensão imediata de consultas de rate limit em segundo plano para Claude e Codex quando desativados em configurações, evitando vazamentos fora de VPN) e
      o PR `#41325` (descoberta assíncrona de caminhos de setup e atribuição de demanda Git).
+
+### 2. Ciclo de 6h (06:00 BRT / 09:00 UTC em 2026-11-12)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-12T03:00:00Z` e `2026-11-12T09:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):
+     rastreia o PR `#41446` (aviso prévio e bloqueio antes de excluir workspaces com arquivos ignorados locais não replicados, como `.env` e configs locais, através de `readWorktreeAtRiskLocalFiles`),
+     PR `#41392` (compactação em tempo real do histórico SQLite de chat com gatilho `journal_outcome_item_supersede` e worker thread dedicada retendo apenas primeiro e último registro de cada mensagem, reduzindo o banco em 528 MB sem travar o loop principal),
+     PR `#41366` / STA-14925 (corroboração de prontidão `tui-idle` exigindo o marcador de composer `❯` do Claude também para terminais adotados identificados por título OSC, prevenindo despacho prematuro de comandos) e
+     PR `#41384` (remoção de refetches cíclicos de badges do Linear por foco de janela, reduzindo requisições em 83,3%).
+3. **Atualização de 2 issues existentes em `work/issues/`:**
+   - [Cartões de Pull Request, feedback de Steer e atalhos no Native Chat](../issues/cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat.md):
+     adicionado o PR `#41359` (roteamento de pré-visualizações de PRs privados do GitHub em chats de pastas avulsas sem repositório Git através de clones locais existentes no mesmo host, eliminando erros 404 e "No preview for this page").
+   - [Notificação de perda de workers, desengasgo de correio e tipo notice](../issues/notificacao-de-perda-de-workers-desengasgo-de-correio-e-tipo-notice.md):
+     adicionados o PR `#41426` / STA-14936 (encerramento do loop de busca de correio remoto em servidores pareados quando todas as conexões terminam),
+     o PR `#41424` / STA-14935 (reconstrução preguiçosa da saída de terminal apenas quando um relatório de saída de worker for emitido),
+     o PR `#41423` / STA-14934 (descarte do bookkeeping de turnos no `worker stop reporter` no fechamento de chats para evitar vazamento de memória) e
+     o PR `#41422` / STA-14933 (encerramento automático de cartões de aprovação órfãos no startup da aplicação).
+

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40983, #40972, #40977, #40967 e #40962 trazem alerta de workers perdidos, tipo notice interagentes, desengasgo de correio e resiliência de restart.
+description: Os PRs #41426, #41424, #41423, #41422, #40983 trazem encerramento de loop de mail remoto, corte de CPU em saída de PTY e limpeza de bookkeeping.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,11 @@ tags:
 
 # Notificação de perda de workers, desengasgo de correio e tipo notice
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40983`](https://github.com/stablyai/orca/pull/40983),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41426`](https://github.com/stablyai/orca/pull/41426) (STA-14936),
+[`stablyai/orca#41424`](https://github.com/stablyai/orca/pull/41424) (STA-14935),
+[`stablyai/orca#41423`](https://github.com/stablyai/orca/pull/41423) (STA-14934),
+[`stablyai/orca#41422`](https://github.com/stablyai/orca/pull/41422) (STA-14933),
+[`stablyai/orca#40983`](https://github.com/stablyai/orca/pull/40983),
 [`stablyai/orca#40972`](https://github.com/stablyai/orca/pull/40972),
 [`stablyai/orca#40977`](https://github.com/stablyai/orca/pull/40977) (resolve Issue [`#40968`](https://github.com/stablyai/orca/issues/40968)),
 [`stablyai/orca#40967`](https://github.com/stablyai/orca/pull/40967),
@@ -69,11 +73,25 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40983`](https://github.com
 - **Substituição de subshell no profile do Claude (`#40962`, resolve `#40956`):**
   - Substitui o subshell intermediário no wrapper do Claude por `exec`, garantindo que o executável do Claude assuma diretamente
     o primeiro plano do grupo de processos do PTY.
+- **Encerramento de loop de busca de correio remoto quando ocioso (`#41426`, STA-14936):**
+  - Finaliza o loop contínuo de pull de mensagens em servidores pareados assim que todas as conexões de Run associadas terminam,
+    evitando que requisições vazias continuem rodando indefinidamente (~180 requisições/hora por servidor).
+- **Leitura preguiçosa da saída final de terminal apenas para workers (`#41424`, STA-14935):**
+  - Defer a reconstrução das últimas 15 linhas do buffer (até 2.000 linhas ou 256 KB) para o momento em que um relatório de saída
+    de worker for efetivamente gerado, eliminando trabalho de CPU desnecessário no fechamento de terminais comuns.
+- **Liberação de bookkeeping de turnos no encerramento de chats (`#41423`, STA-14934):**
+  - Descarta as entradas de rastreamento de turnos no `worker stop reporter` quando um chat é fechado, estancando o vazamento
+    de memória em sessões de longa duração.
+- **Encerramento automático de cartões de aprovação órfãos no arranque (`#41422`, STA-14933):**
+  - Durante o startup, identifica e encerra cartões de aprovação de chat cujas respostas já foram registradas antes de uma queda ou restart,
+    impedindo que cartões sem resposta fiquem abertos eternamente na interface do coordenador.
 
 ## O que fazer
 
 1. Incorporar no `brza-studio` o manipulador `reportWorkerTurnStop` com motivo `lost` para que o coordenador em sessões multiagente
    seja notificado prontamente caso subagentes morram ou sofram falhas de terminal (`#40983`).
 2. Adotar a tipologia `notice` como padrão em envios interagentes na CLI e biblioteca de orquestração do BrzA (`#40972`).
-3. Aplicar o patch de desobstrução de relay para perguntas de workers remotos (`#40977`).
-4. Assegurar que scripts de startup do Claude executem com substituição direta de processo (`exec`) em perfis shell (`#40962`).
+3. Aplicar o encerramento do loop de correio remoto (`#41426`) e a leitura sob demanda da cauda de terminal de workers (`#41424`).
+4. Limpar o bookkeeping de chats fechados (`#41423`) e encerrar aprovações órfãs no startup (`#41422`).
+5. Aplicar o patch de desobstrução de relay para perguntas de workers remotos (`#40977`).
+6. Assegurar que scripts de startup do Claude executem com substituição direta de processo (`exec`) em perfis shell (`#40962`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41333, #41337, #41212, #41224 trazem envio de imagens >5MB no Claude, clique em wikilinks, chips de PRs e listas Tab.
+description: Os PRs #41359, #41333, #41337, #41212 trazem prévia de PRs em pastas sem git, imagens >5MB no Claude e chips de PRs.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41333`](https://github.com/stablyai/orca/pull/41333) (resolve Issue [`#37005`](https://github.com/stablyai/orca/issues/37005)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41359`](https://github.com/stablyai/orca/pull/41359),
+[`stablyai/orca#41333`](https://github.com/stablyai/orca/pull/41333) (resolve Issue [`#37005`](https://github.com/stablyai/orca/issues/37005)),
 [`stablyai/orca#41337`](https://github.com/stablyai/orca/pull/41337) (resolve Issue [`#41134`](https://github.com/stablyai/orca/issues/41134) / STA-14852),
 [`stablyai/orca#41212`](https://github.com/stablyai/orca/pull/41212) (resolve Issue [`#41211`](https://github.com/stablyai/orca/issues/41211)),
 [`stablyai/orca#41224`](https://github.com/stablyai/orca/pull/41224) (resolve Issue [`#41217`](https://github.com/stablyai/orca/issues/41217)),
@@ -186,9 +187,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41333`](https://github.com
 - **Clique com Cmd/Ctrl em wikilinks e citações em qualquer ponto do rótulo (`#41337`, resolve `#41134` / STA-14852):**
   - Corrige a rota de clique `getClickedNode` no editor ProseMirror de Markdown rico: cliques na metade direita de links atômicos inline (`[[wikilink]]` e `<sup><a href>`) antes eram interpretados pelo `posAtCoords` como o nó seguinte, falhando em abrir o documento alvo;
   - Agora resolve o nó atômico anterior quando o alvo DOM estiver dentro do elemento renderizado, abrindo o link independentemente de onde o usuário clicar no rótulo.
+- **Pré-visualização de links de PRs do GitHub em chats de pastas sem repositório Git (`#41359`):**
+  - Quando um chat é iniciado em um workspace de pasta comum (sem repositório Git registrado), links para PRs privados do GitHub caíam no fallback web anônimo gerando erro 404 e "No preview for this page";
+  - Agora roteia a consulta `preview: true` através de qualquer repositório Git local registrado no mesmo host autenticado, usando a credencial do `gh` do usuário para exibir o card rico com título, autor e status do PR.
 
 ## O que fazer
 
+- Rotear pré-visualizações de PRs em chats de pastas avulsas através de repositórios locais existentes no mesmo host GitHub (`#41359`).
 - Permitir envio de imagens e capturas de tela > 5 MB no Claude Chat (`#41333`, resolve `#37005`), aproveitando o auto-shrink nativo do Claude Code.
 - Corrigir a abertura de wikilinks `[[wikilink]]` e citações com Cmd/Ctrl-click em toda a extensão do rótulo (`#41337`, resolve `#41134`).
 - Adotar os chips interativos e hover cards de issues/PRs no Native Chat (`#41212`, resolve `#41211`).

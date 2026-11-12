@@ -34,6 +34,15 @@ metadata:
   cherry-pick posterior "vai conflitar" (simule com `git merge-tree --write-tree --merge-base`).
 - **Falha de teste vista só por outro agente, sob carga**: abaixo de 80 sem rodar; vai a ponto
   para rodada, conferida contra o `test-base.failed` da tag pura.
+- **Corrida de escrita assíncrona contra leitura no renderer** (sync da 256): 82, não 90. A
+  janela foi provada pela leitura (caminho devolvido antes da escrita, falha em cache no
+  leitor); que ela se abra na prática ficou como premissa escrita, sem medição.
+- **Token faltando num porte do upstream**: 85, com a premissa de que um tema de plugin define
+  o token (provada por `plugin-theme-artifact.ts`), mas sem reproduzir no app.
+- **Hipóteses que caíram no sync da 256:** "teste do fork perdido" que só mudou de título e de
+  pasta (procure pelo corpo, não pelo título); asserção de teste cortada pelo conserto porque o
+  upstream mudou o comportamento (confira o teste novo do upstream); campo descartado por um
+  spread trocado por função `brza/` (confira o tipo: hoje cobre tudo).
 - **zsh**: `$r:src/...` também quebra em `git show`/`git grep` com `$r` antes de `:`; use `"${r}:…"`.
 
 Related: [[sync-review-patterns]]

@@ -12,6 +12,10 @@ tags:
 
 # Melhorias de Native Chat, ACP do Gemini CLI, abas e diff no upstream
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `não verificada` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado dos PRs abertos no upstream [`stablyai/orca#41314`](https://github.com/stablyai/orca/pull/41314) (unificando e resolvendo a Issue [`#40321`](https://github.com/stablyai/orca/issues/40321), além de [`#41298`](https://github.com/stablyai/orca/issues/41298)),
 [`stablyai/orca#40932`](https://github.com/stablyai/orca/pull/40932),
 [`stablyai/orca#39398`](https://github.com/stablyai/orca/pull/39398) (Issue [`#39395`](https://github.com/stablyai/orca/issues/39395)),

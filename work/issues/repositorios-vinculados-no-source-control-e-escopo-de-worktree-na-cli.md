@@ -13,6 +13,10 @@ tags:
 
 # Repositórios vinculados no Source Control e escopo de worktree na CLI
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `parcial` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado dos PRs abertos no upstream [`stablyai/orca#39096`](https://github.com/stablyai/orca/pull/39096) (resolve Issue [`#38940`](https://github.com/stablyai/orca/issues/38940)),
 [`stablyai/orca#39089`](https://github.com/stablyai/orca/pull/39089),
 [`stablyai/orca#39087`](https://github.com/stablyai/orca/pull/39087),

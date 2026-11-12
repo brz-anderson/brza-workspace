@@ -13,6 +13,10 @@ tags:
 
 # Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado dos PRs abertos no upstream [`stablyai/orca#40597`](https://github.com/stablyai/orca/pull/40597) (fecha Issue [`#39620`](https://github.com/stablyai/orca/issues/39620)),
 [`stablyai/orca#40604`](https://github.com/stablyai/orca/pull/40604) (resolve Issue [`#40392`](https://github.com/stablyai/orca/issues/40392)),
 [`stablyai/orca#40603`](https://github.com/stablyai/orca/pull/40603) (resolve Issue [`#40397`](https://github.com/stablyai/orca/issues/40397)),
@@ -53,7 +57,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40597`](https://github.com
 [`stablyai/orca#37661`](https://github.com/stablyai/orca/pull/37661),
 [`stablyai/orca#37664`](https://github.com/stablyai/orca/pull/37664),
 [`stablyai/orca#37696`](https://github.com/stablyai/orca/pull/37696),
-[`stablyai/orca#37730`](https://github.com/stablyai/orca/pull/37730),
+[`stablyai/orca#37730 (MERGED no upstream; não está no fork)`](https://github.com/stablyai/orca/pull/37730),
 [`stablyai/orca#37557`](https://github.com/stablyai/orca/pull/37557) e
 [`stablyai/orca#37510`](https://github.com/stablyai/orca/pull/37510), além das issues
 [`#39086`](https://github.com/stablyai/orca/issues/39086),

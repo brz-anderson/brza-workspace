@@ -1,9 +1,7 @@
 # PLN-021 — Desenho
 
-Rascunho do `designer` de 2026-11-09, registrado como está. Os pontos marcados **[sem lastro → Pn]** e
-**[sem lastro, menor]** estão na rodada 4 do [PLN-021: O plano roda por uma sessão coordenadora, com scripts de apoio e artboards de tela](PLN-021-plan.md),
-ainda sem resposta. A pedido de Anderson ("siga direto para escrever as skills"), a execução segue as opções
-recomendadas, confirmadas na R5 (menos a R4.6, que a R5.6 trocou pela opção 2). As marcas `[F…]`/`[C…]` seguem a regra de evidência do papel. Caminhos relativos ao
+Desenho de 2026-11-09, reescrito no lugar em 2026-11-10 e 2026-11-11, do [PLN-021: O plano roda por uma sessão coordenadora, com scripts de apoio e artboards de tela](PLN-021-plan.md).
+A Rodada 5 respondeu a Rodada 4: as recomendadas, menos a R4.6, que a R5.6 trocou pela opção 2. As escolhas menores fecharam na R5.9. A R6.5 pôs o código em inglês. A R8.1 aplicou os oito achados de texto antes do P9. As marcas `[F…]`/`[C…]` seguem a regra de evidência do papel. Caminhos relativos ao
 worktree do playground.
 
 ## O que este desenho assume
@@ -80,7 +78,7 @@ worktree do playground.
 
 ### D1 — O código comum — `.claude/scripts/skillkit/` (P1)
 
-- **Origem:** R3.2, R3.3.
+- **Origem:** R3.2, R3.3, R5.9, R6.5, R8.1.
 - **Contexto:** abrir, enviar, esperar, ler o mapa, medir e salvar o visual estão escritos uma vez, misturados ao manifesto
   de reunião (Terreno §1). Três skills vão precisar disso.
 
@@ -132,7 +130,7 @@ if KIT not in sys.path:
     sys.path.insert(0, KIT)
 ```
 
-e no script: `sys.path.insert(0, AQUI); import _kit; from skillkit import sessions_map, sessions_cli`.
+e no script: `sys.path.insert(0, HERE); import _kit; from skillkit import sessions_map, sessions_cli`.
 
 **`sessions_cli.py`**, extraído de `launch_persona.py:140-212` e `wait_round.py:153-196`, sem o manifesto de reunião:
 
@@ -145,14 +143,14 @@ e no script: `sys.path.insert(0, AQUI); import _kit; from skillkit import sessio
 | `wait_argv` | `(names, timeout_s, *, any_=True, markers=()) -> list` | `wait … --json`, um `--marker` por item |
 | `close_argv` | `(name, mode="close"\|"stop"\|"keep-open") -> list` | `close [--force\|--keep-open] --json` |
 | `interpret_open` | `(rc, out, err) -> "aberta"\|"ja"\|"nao-abriu"\|"sem-id"\|"falha"` | a de `launch_persona.py:203-212` |
-| `wait_brza` | `(names, timeout_s, markers=()) -> dict` | roda o `wait` e devolve o JSON (`done`, `pending`, `timed_out`, `events`) |
-| `list_states` | `(names, list_json=None) -> {nome: estado}` | o `fetch_states` de hoje, com a lista de nomes no lugar do manifesto |
+| `wait_brza` | `(names, timeout_s, markers=(), *, any_=True) -> (rc, dict)` | roda o `wait` e devolve o rc e o JSON (`done`, `pending`, `timed_out`, `events`); X2 |
+| `list_states` | `(names, list_json=None, cmd=None, ids=None) -> {nome: estado}` | o `fetch_states` de hoje, com a lista de nomes no lugar do manifesto; `cmd` troca o comando e `ids` acha a sessão pelo id; X2 |
 
 **`visual.py`:** `save_visual(doc, prefix, part, key, title, *, publish_dir=None, default_path=None)` com o
 comportamento de `panel.py:519-539`; `render_png(html_path, png, width, height=None, *, theme="light", scale=1, chrome_css="")` roda o
 `brza shot <html> <png> --width W --theme T --scale S --force` e só cai no Chrome headless se o `brza` faltar ou sair ≠ 0,
 dizendo isso no erro. `height` só vale para o Chrome (padrão 2000); o `brza shot` mede a
-altura sozinho. `chrome_css` vai só ao HTML temporário do Chrome. A escala padrão 1 mantém o tamanho do PNG do painel de hoje **[sem lastro, menor]**.
+altura sozinho. `chrome_css` vai só ao HTML temporário do Chrome. A escala padrão 1 mantém o tamanho do PNG do painel de hoje (R5.9).
 
 **A migração da `meeting-runner`:** cada módulo dela importa por nome do `skillkit`
 (`from skillkit.sessions_map import fold_map, load_map, map_file, read_rows, epoch, common_root`); `sessions_map.py`
@@ -172,15 +170,13 @@ python3 -I -m unittest discover -s ".claude/skills/meeting-runner/scripts/tests"
 python3 -I -m unittest discover -s ".claude/scripts/tests"
 ```
 
-#### Em aberto
-
-- O nome `skillkit` **[sem lastro, menor]**.
+O nome do pacote ficou `skillkit` (R5.9).
 
 ---
 
 ### D2 — O `plan-runner` coordenador — `.claude/skills/plan-runner/` (P6)
 
-- **Origem:** R3.1, R1.3, R2.2, Pedido 1 e 2.
+- **Origem:** R3.1, R1.3, R2.2, R5.7, R6.5, R8.1, Pedido 1 e 2.
 - **Contexto:** hoje a skill é só prosa: SKILL.md com 211 linhas e quatro references [F26 · rodado · 95]. O passo de
   código "roda numa sessão nova" sem quem a abra nem leia a evidência (F15).
 
@@ -268,15 +264,13 @@ e os números, e o texto integral vai por caminho:
 | consultores | ver D4 e o R5.4 |
 | hora | `date '+%H:%M:%S'`, rodado na hora |
 
-#### Em aberto
-
-- Quando a versão nova passa a conduzir o próprio PLN-021: ver o R5.7.
+A versão nova passa a conduzir o próprio PLN-021 ao fechar o P6. O P7 ao P10 rodam por ela, e o P9 é o aceite (R5.7).
 
 ---
 
 ### D3 — As sessões executoras — `scripts/executor.py`, `references/step-request.md` (P3)
 
-- **Origem:** R1.3(a).
+- **Origem:** R1.3(a), R5.1, R5.2, R5.9, R6.5, R7.3, R8.1.
 - **Contexto:** abrir, enviar, esperar, ler a evidência e fechar, sem comando digitado por Anderson (Cobertura, linha 1).
 
 #### Como fica — o manifesto `.sessions/pln-021/execucao.json`
@@ -310,12 +304,12 @@ O arquivo continua `.sessions/pln-nnn/execucao.json`. O valor de `state` ∈ `ab
 #### Como fica — a CLI
 
 ```
-executor.py open     PLN-NNN Pn [--agent claude|codex|grok] [--model M] [--effort E]
-                                [--checkout CAMINHO | --tree NOME [--type feat|fix|docs|chore]] [--no-panel] [--dry-run]
+executor.py open     PLN-NNN Pn [--agent claude|codex|grok|antigravity] [--model M] [--effort E]
+                                (--checkout CAMINHO | --tree NOME [--type feat|fix|docs|chore]) [--branch B] [--no-panel] [--dry-run]
 executor.py send     PLN-NNN Pn (--text T | --file F) [--operation OP]
 executor.py wait     PLN-NNN [Pn …] [--timeout SEG] [--no-panel]
-executor.py evidence PLN-NNN Pn [--apply] [--settle 60]
-executor.py close    PLN-NNN Pn [--keep-open | --stop] [--wait-settled SEG]
+executor.py evidence PLN-NNN Pn [--apply | --rerun] [--settle 60] [--no-panel]
+executor.py close    PLN-NNN Pn [--keep-open | --stop] [--wait-settled SEG] [--no-panel]
 executor.py status   PLN-NNN [--json]
 ```
 
@@ -324,7 +318,8 @@ executor.py status   PLN-NNN [--json]
   `brza sessions pln021-p3 --agent … --model … --effort … --checkout <abs> --prompt-file pedido.md
   --title "PLN-021 P3: <título do passo>" --rename --wait` (F14); grava o manifesto, publica o painel e imprime a tabela.
   O padrão é `--agent claude` com o modelo da camada do passo: Sonnet para a implementação, pela tabela do `AGENTS.md`
-  **[sem lastro, menor]**. A saída segue `interpret_open`: "não abriu" não se relança antes do `pending-*.json`.
+  (R5.9). A saída segue `interpret_open`: "não abriu" não se relança antes do `pending-*.json`.
+  Um de `--checkout` ou `--tree` é obrigatório: sem os dois, o `open` recusa com rc 2 (X9).
 - **`wait`:** `brza sessions wait <sessões> --any --marker <worklog>:<!-- fim-Pn: --timeout T --json` (F9, F10). O
   `ended_without_marker` não é fim: a linha diz "o turno acabou sem o marcador" e a espera segue até o prazo. O marcador
   com `feito` vai a `feito`; com `parado`, a `parado`; o `blocked` do `wait`, a `bloqueado`. Saída: 0 com algum feito ou
@@ -333,12 +328,12 @@ executor.py status   PLN-NNN [--json]
 - **`evidence`:** lê a seção `## Evidência` do worklog do executor e confere por comando: cada commit com
   `git -C <checkout> cat-file -e <sha>`, cada comando de teste rodado de novo quando a linha traz `(≤ 2 min)`; mede o
   `Executado` pela janela da abertura ao marcador no `measurements.jsonl` (`measure.measure_claude`; Codex pelo rollout;
-  Grok e Antigravity, `sem medição`). O `--settle` espera a linha do `Stop`, como no `tally.py`. Sem `--apply`, imprime a
-  linha `**Evidência:**` e o `Executado` propostos; com `--apply`, grava no `### Pn` do plano, marca `[x]` nos subpassos
-  que a evidência cobre, roda o `plan_state.py --fix` e publica o painel. **O `--apply` só roda depois de a coordenação
+  Grok e Antigravity, `sem medição`). O `--settle` espera a linha do `Stop`, como no `tally.py`. O comando marcado
+  `(≤ 2 min)` é o que a coordenação roda de novo (R5.9). Sem `--apply` e sem `--rerun`, imprime a
+  linha `**Evidência:**` e o `Executado` propostos e não roda o comando do worklog. O `--rerun` roda esses comandos simples, sem gravar o plano. Com `--apply`, grava no `### Pn` do plano e marca `[x]` só nos subpassos
+  da linha `cobre:` (`cobre: todos` marca todos), roda o `plan_state.py --fix` e publica o painel. Sem a linha `cobre:`, o `--apply` não roda o comando, não grava e manda completar pelo `send` (R7.3). **O `--apply` só roda depois de a coordenação
   ler a proposta** (regra da SKILL.md, não do script).
-- **`close`:** o `close` do `brza sessions` e a conferência do aceite, com o `veredito` de `launch_persona.py:360-447`
-  movido ao `sessions_cli`.
+- **`close`:** o `close` do `brza sessions` e a conferência do aceite. O `verdict` fica no `executor.py` (X4).
 
 **O `Executado`** é a janela da abertura ao marcador, como o P5 do PLN-017 mediu (F21), com a soma dos turnos entre
 parênteses: `Executado: 0,6 h (janela; 0,4 h de turnos; US$ 3,10)`. A janela acaba no marcador, antes da ida e volta do
@@ -354,7 +349,7 @@ conduz o plano, executa um passo dele.
 <o ### P3 inteiro, copiado do plano: título, Executa, Estimado, subpassos>
 
 ## O que o Desenho fixou
-<o texto de cada D citado no "Executa", da Origem ao Em aberto>
+<o texto de cada D citado no "Executa", o D inteiro>
 
 ## O que as rodadas decidiram
 <cada R citado na Origem dos D, com a pergunta, a opção escolhida e a resposta literal>
@@ -368,16 +363,19 @@ conduz o plano, executa um passo dele.
 
 ## Regras
 - Não grave o plano, não commite nada no brza-workspace, não pergunte a Anderson.
+- Commite na branch do passo, com os testes do que você tocou verdes; merge e push pedem confirmação (R5.1).
+  Se o checkout for o do próprio brza-workspace, nenhum commit: `commit: aguarda confirmação`.
 - Desvio local: registre no worklog como `X` proposto e siga. Desvio que muda o contrato do D: pare, registre e feche
   com `parado`.
-- <o commit: pela resposta ao R5.1>
 
 ## O fim
 1. Preencha `## Evidência` no worklog, uma linha por item:
    - `commit: brza-studio@<sha7>` (ou `commit: aguarda confirmação`)
    - `comando: \`<comando>\` → <resultado> (≤ 2 min)` quando roda em até dois minutos
    - `arquivos: <caminho>, …`
+   - `cobre: <n>, <n>` (os números dos subpassos que a evidência cobre) ou `cobre: todos`
    - `desvios: X? — <uma linha>` ou `desvios: nenhum`
+   Sem a linha `cobre:`, o `--apply` da coordenação não roda o comando, não grava o plano e manda completar pelo `send` (R7.3).
 2. A última linha do worklog é `<!-- fim-P3: feito -->` ou `<!-- fim-P3: parado -->`.
 3. Envie o status do protocolo que vem abaixo deste pedido. Não envie `worker_done`: a coordenação pede o encerramento.
 ```
@@ -401,15 +399,13 @@ conduz o plano, executa um passo dele.
 > se o Claude pedir permissão para isso (F25), o executor trava em `blocked`. O mesmo vale para a A2. A sonda é o
 > primeiro subpasso do P3.
 
-#### Em aberto
-
-- O commit do executor: R5.1.
+O commit do executor é o da R5.1: na branch do passo, com testes verdes; merge e push pedem confirmação.
 
 ---
 
 ### D4 — Os consultores em sessão — `scripts/consult.py`, `references/consultants.md` (P5)
 
-- **Origem:** R1.3(b), R2.3.
+- **Origem:** R1.3(b), R2.3, R5.3, R5.4, R6.5, R7.2, R8.1.
 - **Contexto:** o laço por `Agent` continua o padrão; a sessão entra só no gatilho da R2.3.
 
 #### Como fica — o gatilho, escrito na reference
@@ -435,18 +431,15 @@ consult.py close PLN-NNN D<n>
   `<!-- fim-D<n>: <foco> -->`. Sessão aberta no worktree do playground, só leitura no resto.
 - **`table`** junta os três arquivos numa tabela lado a lado (linhas: custo, se paga, reabre, risco; colunas: os focos),
   em Markdown para a mensagem e em `::orca-visual` pelo `visual.save_visual`.
-- **O roster padrão:** três focos da SKILL.md de hoje (mudança mínima, arquitetura limpa, equilíbrio,
-  `SKILL.md:159-161`), cada um num runtime: R5.3.
-
-#### Em aberto
-
-- O que vai ao chat: R5.4.
+- **O roster padrão (R5.3):** arquitetura limpa no Claude Opus `high`, mudança mínima no Codex `xhigh` com `CODEX_MODEL` `gpt-6.1-sol`, equilíbrio no Grok.
+- **O que vai ao chat (R5.4):** a tabela lado a lado e a argumentação integral de cada consultor. O cabeçalho sem corte é `| | arquitetura-limpa (Claude) | mudanca-minima (Codex) | equilibrio (Grok) |`.
+- **A troca por cota (R7.2):** acima de 55% (`QUOTA_MAX`), o consultor sai e entra o fallback. A tabela e a narração dizem quem saiu e qual modelo entrou, na forma `codex gpt-6.1-sol → claude claude-sonnet-5-5 por cota (56% > 55%)` e `era Codex gpt-6.1-sol, por cota`. O modelo que entrou vai no `<small>` do HTML e na linha de chegada do `wait`. O fallback padrão é Claude `claude-sonnet-5-5`, esforço `high`.
 
 ---
 
 ### D5 — O painel do plano — `scripts/plan_panel.py` (P4)
 
-- **Origem:** R1.3(c).
+- **Origem:** R1.3(c), R5.9, R6.5, R8.1.
 - **Contexto:** "gerado por script a cada mudança de estado" (R1.3). Leio isso como os scripts que mudam o estado
   republicando sozinhos, pelo precedente da R10.1 do PLN-017 (F28).
 
@@ -468,7 +461,7 @@ plan_panel.py render  PLN-NNN --out arquivo.html
   - os executores e consultores vivos, com o estado do `brza sessions list --json`;
   - a última rodada, como `R3 — 3 perguntas, 3 decididas`.
 - **O arquivo:** `pln-nnn-painel-<hash4>.html` pelo `save_visual`, com a chave `PLN-NNN|AAAA-MM-DD`: um arquivo por
-  plano e dia, republicado no mesmo nome **[sem lastro, menor]**. O PNG sai na abertura e no fechamento de cada executor,
+  plano e dia, republicado no mesmo nome (R5.9). O PNG sai na abertura e no fechamento de cada executor,
   como a R10.3 do PLN-017 fez para a reunião (`meeting-runner/SKILL.md:126-128`).
 - **Os dados:** `plan_state.state(plan)` (D6), o manifesto, o `sessions_map` e o `measure`. Sem `measurements.jsonl`,
   "sem medição", nunca zero.
@@ -477,7 +470,7 @@ plan_panel.py render  PLN-NNN --out arquivo.html
 
 ### D6 — Os quatro scripts de R2.2 — `scripts/{plan_state,step_request,round_log,close_check}.py` (P2)
 
-- **Origem:** R2.2.
+- **Origem:** R2.2, R5.8, R6.5, R7.1, R8.1.
 - **Contexto:** o `check_notes.py` cobre o frontmatter e os links, mas não soma as horas, não confere IDs, nem o `[x]`
   com evidência, nem a origem do `D` (Terreno §3). Os quatro scripts usam o leitor `plan_md.py`, que entende `-plan.md`,
   `-interview.md` e `-design*.md` divididos.
@@ -496,10 +489,12 @@ plan_state.py PLN-NNN|caminho [--json] [--next] [--fix] [--strict]
 - **Códigos:** `checked-without-evidence` (o `[x]` sem `**Evidência:**`, ou com uma que não traz commit, comando com
   `→` nem `arquivo:linha`); `checked-without-executed`; `hours-mismatch`; `step-without-design` (o passo sem
   `Executa D…`, salvo os de rodada e "a pedido"); `step-cites-unknown-design`; `design-without-origin`;
-  `origin-unknown-round` (o `D` cita um `R` que a Entrevista não tem); `deviation-not-cited` (o `X` que nenhum passo cita);
+  `origin-unknown-round` (o `D` cita um `R` que a Entrevista não tem); `deviation-not-cited` (o `X` que nenhum passo cita; aviso, R7.1);
+  `hours-unreadable` (o `Estimado` que não é um número de horas; aviso, R7.1);
   `duplicate-id`.
 - **`--fix`** reescreve só as três horas do frontmatter, pela soma das linhas `Estimado`/`Executado`. **`--next`**
   imprime só o próximo passo. Saída 0 limpo, 1 com problema (com `--strict`, também os avisos), 2 uso.
+  A base das horas é a das faixas das rodadas (41 h), com a nota da calibração e o executado medido (R5.8).
 
 #### `step_request.py`
 
@@ -569,7 +564,7 @@ Saída 0 só com tudo `ok` ou `n/a`, mais os `manual` listados; 1 com algum `fal
 
 ### D7 — A skill `screen-artboards` — `.claude/skills/screen-artboards/` (P7)
 
-- **Origem:** R1.4, R2.4.
+- **Origem:** R1.4, R2.4, R5.5, R5.6, R5.9, R6.5, R8.1.
 - **Contexto:** não há molde de tela nem moldura (Terreno §4), e o emulador do `brza-studio` não tem moldura
   reaproveitável (F19).
 
@@ -655,7 +650,7 @@ tokens.py list
 ```
 
 - **Os nomes:** os 26 tokens que o `orca-chat-visuals` expõe (F16), com o prefixo `--sa-`, mais os do mobile que não têm
-  par no desktop, com `--sa-m-` **[sem lastro, menor]**.
+  par no desktop, com `--sa-m-` (R5.9).
 - **`tokens.py extract`** lê o `:root` e o `.dark` do `main.css` e os objetos do `mobile-theme.ts` por regex (sem Node),
   e grava o JSON com o `sha256` de cada fonte. **`check`** compara o hash e, se mudou, extrai de novo em memória e
   imprime os tokens que mudaram: `⚠ deriva: main.css mudou desde 2026-11-10 — 3 tokens: --primary, --ring, --chart-2;
@@ -668,12 +663,10 @@ tokens.py list
 confere cada um pelo `shot` antes da rodada; a escolhida vai ao plano pelo `promote`, e o item `D` linka o PNG." Isso
 substitui o parágrafo de `open-and-plan.md:57-65`.
 
-#### Em aberto
-
-- ~~O tema do artboard: R5.6.~~ Decidido em R4.6 (Rodada 5): o desktop do `brza-studio` usa os tokens vivos do
-  chat (`.sa-art[data-live]` mapeia `--sa-*` para `var(--…)`, sem `--scheme`; o `shot` injeta o fallback só no PNG); o
-  mobile, o navegador, o `neutral` e os outros projetos seguem com o pacote escopado. **Descartada:** o pacote em todo o
-  desktop — o mockup não seguia o tema do chat, que Anderson quer ver.
+**O tema (R5.6):** o desktop do `brza-studio` usa os tokens vivos do
+chat (`.sa-art[data-live]` mapeia `--sa-*` para `var(--…)`, sem `--scheme`; o `shot` injeta o fallback só no PNG); o
+mobile, o navegador, o `neutral` e os outros projetos seguem com o pacote escopado. **Descartada:** o pacote em todo o
+desktop — o mockup não seguia o tema do chat, que Anderson quer ver.
 
 ---
 
@@ -708,7 +701,9 @@ O enunciado não nomeia o código nem o estado esperado, para a linha de base n�
 ---
 
 
-## Escolhas menores sem lastro
+## Escolhas menores, decididas na R5.9
+
+A R5.9 confirmou as seis, nas recomendadas:
 
 1. O nome `skillkit` (D1).
 2. `render_png` com `--scale 1` por padrão, para manter o tamanho do PNG do painel (D1).

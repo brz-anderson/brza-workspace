@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+"""Subcomando brza jira: despacha operações para a Atlassian CLI (acli jira) com atalhos de produtividade.
+
+Uso:
+  brza jira my-work [opções...]
+      busca os itens de trabalho atribuídos ao usuário logado que não estão concluídos
+  brza jira view <KEY> [--web] [--json] [opções...]
+      mostra detalhes de um item de trabalho (ou abre no navegador com --web)
+  brza jira search "<JQL>" [opções...]
+      executa uma busca personalizada com JQL
+  brza jira done <KEY> [opções...]
+      transiciona um item para o estado concluído (Done) sem confirmação interativa
+  brza jira start <KEY> [opções...]
+      transiciona um item para em andamento (In Progress) sem confirmação interativa
+  brza jira transition <KEY> <STATUS> [opções...]
+      transiciona um item para qualquer status informado
+  brza jira create [opções...]
+      cria um novo item de trabalho via acli jira workitem create
+  brza jira auth [status|login|logout] [opções...]
+      gerencia ou consulta o estado da autenticação no Jira Cloud
+  brza jira <subcomando> [argumentos...]
+      repasse direto para qualquer comando do 'acli jira' (ex: sprint, board, project)
+
+Opções globais:
+  -h, --help      mostra esta ajuda
+  -v, --version   mostra a versão do brza jira
+"""
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+VERSION = '1.0.0'
+DEFAULT_FALLBACK_PATHS = (
+    Path('/opt/homebrew/bin/acli'),
+    Path('/usr/local/bin/acli'),
+)
+
+
+def find_acli_binary() -> Path | None:
+    """Localiza o binário 'acli' no PATH ou em diretórios padrão do sistema."""
+    which_path = shutil.which('acli')
+    if which_path:
+        p = Path(which_path)
+        if p.is_file() and os.access(p, os.X_OK):
+            return p
+
+    for candidate in DEFAULT_FALLBACK_PATHS:
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            return candidate
+
+    return None
+
+
+def show_help():
+    print(__doc__.strip())
+
+
+def build_acli_args(args: list[str]) -> list[str]:
+    """Traduz argumentos de conveniência do brza jira para argumentos nativos do acli jira."""
+    if not args:
+        return ['--help']
+
+    cmd = args[0]
+    rest = args[1:]
+
+    if cmd in ('-h', '--help'):
+        return ['--help']
+
+    if cmd in ('my-work', 'mine'):
+        has_jql = any(arg in ('-j', '--jql') for arg in rest)
+        jql_args = [] if has_jql else ['--jql', 'assignee = currentUser() AND statusCategory != Done']
+        return ['workitem', 'search', *jql_args, *rest]
+
+    if cmd == 'view':
+        if not rest:
+            raise ValueError("uso: brza jira view <KEY> [--web] [--json]")
+        return ['workitem', 'view', *rest]
+
+    if cmd == 'search':
+        if not rest:
+            raise ValueError("uso: brza jira search \"<JQL>\" [opções...]")
+        if not rest[0].startswith('-'):
+            jql = rest[0]
+            extra = rest[1:]
+            return ['workitem', 'search', '--jql', jql, *extra]
+        return ['workitem', 'search', *rest]
+
+    if cmd == 'done':
+        if not rest:
+            raise ValueError("uso: brza jira done <KEY> [opções...]")
+        key = rest[0]
+        extra = rest[1:]
+        return ['workitem', 'transition', '--key', key, '--status', 'Done', '--yes', *extra]
+
+    if cmd in ('start', 'in-progress'):
+        if not rest:
+            raise ValueError(f"uso: brza jira {cmd} <KEY> [opções...]")
+        key = rest[0]
+        extra = rest[1:]
+        return ['workitem', 'transition', '--key', key, '--status', 'In Progress', '--yes', *extra]
+
+    if cmd == 'transition':
+        if len(rest) < 2:
+            raise ValueError("uso: brza jira transition <KEY> <STATUS> [opções...]")
+        key, status = rest[0], rest[1]
+        extra = rest[2:]
+        return ['workitem', 'transition', '--key', key, '--status', status, '--yes', *extra]
+
+    if cmd == 'create':
+        return ['workitem', 'create', *rest]
+
+    # Passthrough: repassa diretamente para o acli jira
+    return args
+
+
+def run_acli(acli_bin: Path, acli_jira_args: list[str]) -> int:
+    """Executa o subprocesso acli jira repassando streams intactos."""
+    full_cmd = [str(acli_bin), 'jira', *acli_jira_args]
+    try:
+        proc = subprocess.run(full_cmd)
+        return proc.returncode
+    except KeyboardInterrupt:
+        return 130
+    except OSError as err:
+        print(f"falhou: erro ao executar '{full_cmd[0]}': {err}", file=sys.stderr)
+        return 1
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = sys.argv[1:] if argv is None else argv
+
+    if not args or args[0] in ('-h', '--help'):
+        show_help()
+        return 0
+
+    if args[0] in ('-v', '--version'):
+        print(f'brza jira {VERSION}')
+        return 0
+
+    acli_bin = find_acli_binary()
+    if not acli_bin:
+        print("falhou: Atlassian CLI ('acli') não encontrada. Instale com 'brew install atlassian/acli/acli'.",
+              file=sys.stderr)
+        return 1
+
+    try:
+        acli_args = build_acli_args(args)
+    except ValueError as err:
+        print(f"falhou: {err}", file=sys.stderr)
+        return 2
+
+    return run_acli(acli_bin, acli_args)
+
+
+if __name__ == '__main__':
+    sys.exit(main())

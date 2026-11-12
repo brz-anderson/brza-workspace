@@ -21,7 +21,7 @@ ORCA_APP_BIN = Path('/Applications/Orca.app/Contents/Resources/bin/orca')
 KNOWN_SUBCOMMANDS = (
     'tree', 'test', 'app', 'dev', 'shot', 'note', 'init', 'sync',
     'doctor', 'install', 'mcp', 'quota', 'sessions', 'run', 'print',
-    'devices', 'where', 'register',
+    'devices', 'where', 'register', 'jira',
 )
 
 

@@ -11,6 +11,7 @@ refs:
   - issue:aprovacao-de-permissoes-de-workers-pelo-coordenador-identidade-duravel-e-id-de-requisicao
   - issue:badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes
   - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
+  - issue:indicador-de-uso-de-contexto-virtualizacao-de-ferramentas-e-opcoes-de-chat
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
   - issue:notificacao-de-perda-de-workers-desengasgo-de-correio-e-tipo-notice
   - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
@@ -61,4 +62,29 @@ refs:
      o PR `#41424` / STA-14935 (reconstrução preguiçosa da saída de terminal apenas quando um relatório de saída de worker for emitido),
      o PR `#41423` / STA-14934 (descarte do bookkeeping de turnos no `worker stop reporter` no fechamento de chats para evitar vazamento de memória) e
      o PR `#41422` / STA-14933 (encerramento automático de cartões de aprovação órfãos no startup da aplicação).
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-12)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-12T09:00:00Z` e `2026-11-12T15:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Indicador de uso de contexto, virtualização de ferramentas e opções de chat](../issues/indicador-de-uso-de-contexto-virtualizacao-de-ferramentas-e-opcoes-de-chat.md):
+     rastreia o PR `#41546` (indicador persistente com anel gráfico e leitura de tokens ocupados na janela de contexto no Native Chat desktop e mobile, atendendo às issues `#29995` e `#41119`),
+     PR `#41552` (virtualização de linhas de execução de ferramentas abertas no leitor de chat, renderizando apenas linhas no viewport e eliminando engasgos com saídas longas),
+     PR `#41544` / STA-14534 e STA-14532 (associação isolada de opções de modelo/esforço por conversa e bloqueio preventivo contra submissão involuntária de rascunhos no terminal) e
+     PR `#41491` / tickets 5122 e 5141 (preservação de processos filhos de OMP e retenção de saídas de background durante varreduras periódicas de ociosidade do chat).
+3. **Atualização de 3 issues existentes em `work/issues/`:**
+   - [Melhorias de Native Chat, ACP do Gemini CLI, abas e diff no upstream](../issues/melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream.md):
+     adicionados o PR `#41504` / issue `#40865` (injeção automática de regras `GEMINI.md`/`AGENTS.md` e estabilização de opções restauradas em chats gerenciados Antigravity),
+     o PR `#41511` (exclusões explícitas de loopback no ambiente de proxy para impedir erros SOCKS na conexão privada local do Antigravity) e
+     o PR `#41531` (redesenho de configurações de contas Antigravity em cartões dedicados para terminal e chat).
+   - [Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):
+     adicionados o PR `#41483` (tabela durável de exclusão e ocultação imediata de linha na UI durante cleanup em background com recuperação após reinicialização),
+     o PR `#41480` (proprietário único para o catálogo de worktrees de cada repositório, compartilhando observações e eliminando `git worktree list` redundantes) e
+     o PR `#41457` (restrição estrita dos atalhos de exclusão de workspace à seleção na barra lateral, evitando acionamentos a partir de foco no terminal ou editor).
+   - [Aprovação de permissões de workers pelo coordenador, identidade durável e ID de requisição](../issues/aprovacao-de-permissoes-de-workers-pelo-coordenador-identidade-duravel-e-id-de-requisicao.md):
+     adicionados o PR `#41498` (inspeção de linha de comando de processos para preservar flags de permissão total `--yolo`/`bypassPermissions` em split-panes e retomadas não gravadas) e
+     o PR `#41476` (enfileiramento atômico de mensagens e configurações do Codex, retendo o despacho até que os parâmetros atualizados sejam aceitos pelo provedor).
+
 

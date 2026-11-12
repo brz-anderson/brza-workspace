@@ -193,7 +193,18 @@ h2{font-size:11.5px;margin:18px 0 6px;text-transform:uppercase;letter-spacing:.0
 .st.alerta{background:color-mix(in srgb,var(--chart-4,var(--fb-c4)) 28%,transparent)}
 .st.ruim{background:color-mix(in srgb,var(--destructive,var(--fb-de)) 22%,transparent)}
 ul{margin:0;padding-left:18px} li{margin:3px 0}
-@media (max-width:520px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))} .row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .row.hd{display:none}}
+.panel{container-type:inline-size}
+.who{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+.row>[data-l]::before{content:none}
+@container (max-width:699px){
+.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tbl{border-top:0}
+.row.hd{display:none}
+.row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"p s" "x x" "e e" "c c" "l l";row-gap:3px;padding:10px 12px;margin-bottom:8px;border:1px solid var(--border,var(--fb-bd));border-radius:var(--radius,10px)}
+.who{display:inline;-webkit-line-clamp:unset;line-clamp:unset;overflow:visible}
+.c-p{grid-area:p} .c-x{grid-area:x} .c-s{grid-area:s} .c-e{grid-area:e} .c-c{grid-area:c} .c-l{grid-area:l}
+.row>[data-l]::before{content:attr(data-l) ": ";color:var(--muted-foreground,var(--fb-mut));font-size:11.5px}
+}
 """
 
 CLASS_NAME = {"feito": "ok", "fechado": "ok", "evidencia-gravada": "ok", "em-curso": "run", "aberto": "run",
@@ -223,12 +234,12 @@ def render_html(D, dark=False):
         short_title = p["title"].replace("`", "")
         short_title = short_title if len(short_title) <= 52 else short_title[:51].rstrip() + "…"
         who = str(p["executor"]).replace("`", "")
-        who = who if len(who) <= 30 else who[:29].rstrip() + "…"
         exe = _h(p["estimated_h"]) + " × " + (_h(p["executed_h"]) if p["executed_h"] is not None else "—")
-        rows.append('<div class="row"><div><b>%s</b>%s<span class="sm">Executa %s</span></div><div>%s</div>'
-                    '<div><span class="st %s">%s</span></div><div class="num">%s</div><div class="num">%s</div>'
-                    '<div class="num">%s</div></div>' % (
-                        _e(p["id"]), _e(short_title), _e(", ".join(p["executes"]) or "—"), _e(who),
+        rows.append('<div class="row"><div class="c-p"><b>%s</b>%s<span class="sm">Executa %s</span></div>'
+                    '<div class="c-x" data-l="Executor"><span class="who" title="%s">%s</span></div>'
+                    '<div class="c-s"><span class="st %s">%s</span></div><div class="c-e num" data-l="Estimado × Executado">%s</div>'
+                    '<div class="c-c num" data-l="Custo">%s</div><div class="c-l num" data-l="Último evento">%s</div></div>' % (
+                        _e(p["id"]), _e(short_title), _e(", ".join(p["executes"]) or "—"), _e(who), _e(who),
                         CLASS_NAME.get(step_state, ""), _e(step_state), _e(exe), _e(p["cost"]), _e(p["age_text"] or "—")))
     live_flags = "".join("<li>%s · %s · %s</li>" % (_e(v["who"]), _e(v["role"]), _e(v.get("state") or "estado desconhecido"))
                     for v in D["live"]) or '<li class="mut">nenhum aberto</li>'
@@ -237,14 +248,14 @@ def render_html(D, dark=False):
                                                     "" if r["decided"] == 1 else "s")) if r else "sem rodada registrada"
     ready = str(D["ready"] or "—")
     ready = ready if len(ready) <= 90 else ready[:89] + "…"
-    body = """<header><div class="eyebrow">Painel do plano</div><h1>%s — %s</h1>
+    body = """<div class="panel"><header><div class="eyebrow">Painel do plano</div><h1>%s — %s</h1>
 <div class="meta">fase %s · status %s · ready: %s · estado das %s</div></header>
 <section class="tiles">%s%s%s<div class="tile"><b>%d/%d</b><span>passos feitos</span></div></section>
 <h2>Os passos</h2>
 <div class="tbl"><div class="row hd"><div>Passo</div><div>Executor</div><div>Estado</div><div>Estimado × Executado</div><div>Custo</div><div>Último evento</div></div>%s</div>
 <p class="sm">Custo sem medição quando o hook não gravou a sessão (Grok e Antigravity não gravam). Passo sem executor por sessão mostra o estado do plano.</p>
 <h2>As sessões vivas</h2><ul>%s</ul>
-<h2>A última rodada</h2><p>%s</p>""" % (
+<h2>A última rodada</h2><p>%s</p></div>""" % (
         _e(D["plan"]), _e(D["title"]), _e(D["phase"]), _e(D["status"]), _e(ready), _e(D["at"][11:16]),
         tile_h("estimado", "estimate_h"), tile_h("executado", "executed_h"), tile_h("restante", "remaining_h"),
         done_states, len(D["steps"]), "".join(rows), live_flags, _e(round_line))

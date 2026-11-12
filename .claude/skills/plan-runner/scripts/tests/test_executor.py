@@ -210,6 +210,126 @@ class Open(_exec.Base):
         self.assertEqual([x for x in self.calls if x[0] == "brza"], [])
 
 
+class OpenWindow(_exec.Base):
+    """O `open` grava o `aberto` na hora do `open` do `sessions.jsonl`, e o `wait` grava o `feito` na hora do worklog."""
+
+    def fake_brza_sessions(self, root, open_offset, marker_offset, write_open=True):
+        """O `brza sessions … --wait` falso: grava a linha `open` e o marcador do executor durante a chamada."""
+        def run(argv):
+            t0 = self.clock.t
+            if write_open:
+                os.makedirs(os.path.join(root, ".sessions"), exist_ok=True)
+                with open(os.path.join(root, ".sessions", "sessions.jsonl"), "a") as f:
+                    f.write(json.dumps({"event": "open", "name": "pln900-p1", "at": executor.iso(t0 + open_offset)}) + "\n")
+            wl = next(os.path.join(d, n) for d, _, ns in os.walk(os.path.join(root, "work")) for n in ns if n.endswith(".md"))
+            with open(wl, "a", encoding="utf-8") as f:
+                f.write("\n<!-- fim-P1: feito -->\n")
+            os.utime(wl, (t0 + marker_offset, t0 + marker_offset))
+            self.clock.t = t0 + 100      # o `--wait` só volta depois
+            self.t0 = t0
+            return (0, "open: x", "")
+        return run
+
+    def test_open_wait_measures_window_from_the_open_event_to_the_marker(self):
+        root, path = self.build()
+        co, _ = self.checkout()
+        self.sessions = self.fake_brza_sessions(root, 1, 20)
+        self.assertEqual(self.invoke(executor, "open", path, "P1", "--checkout", co, "--no-panel"), 0, self.err)
+        ev = self.manifest_text(root)["steps"]["P1"]["events"]
+        self.assertEqual(ev[0]["at"], executor.iso(self.t0 + 1))
+        self.assertEqual(self.invoke(executor, "wait", path, "--no-panel"), 0, self.err)
+        ev = self.manifest_text(root)["steps"]["P1"]["events"]
+        self.assertEqual(ev[-1]["state"], "feito")
+        self.assertEqual(ev[-1]["at"], executor.iso(self.t0 + 20))
+        pl = executor.plan_md.load(path)
+        a, b = executor._window(None, self.manifest_text(root)["steps"]["P1"], pl)
+        self.assertEqual(round((executor.sessions_map.epoch(b) - executor.sessions_map.epoch(a)) / 3600, 3), 0.005)
+
+    def test_open_without_event_in_the_map_uses_the_time_before_the_call(self):
+        root, path = self.build()
+        co, _ = self.checkout()
+        self.sessions = self.fake_brza_sessions(root, 0, 20, write_open=False)
+        self.assertEqual(self.invoke(executor, "open", path, "P1", "--checkout", co, "--no-panel"), 0, self.err)
+        at = self.manifest_text(root)["steps"]["P1"]["events"][0]["at"]
+        before = executor.sessions_map.epoch(at)
+        self.assertLess(before, self.t0 + 2)     # a hora tomada antes da chamada, e não a da volta do `--wait` (t0 + 100)
+        self.assertGreaterEqual(before, self.t0 - 5)
+
+    def test_open_ignores_an_old_open_event_of_the_same_session(self):
+        root, path = self.build()
+        co, _ = self.checkout()
+        os.makedirs(os.path.join(root, ".sessions"), exist_ok=True)
+        with open(os.path.join(root, ".sessions", "sessions.jsonl"), "w") as f:
+            f.write(json.dumps({"event": "open", "name": "pln900-p1", "at": executor.iso(self.clock.t - 7200)}) + "\n")
+        self.sessions = self.fake_brza_sessions(root, 0, 20, write_open=False)
+        self.invoke(executor, "open", path, "P1", "--checkout", co, "--no-panel")
+        at = executor.sessions_map.epoch(self.manifest_text(root)["steps"]["P1"]["events"][0]["at"])
+        self.assertGreater(at, self.t0 - 60)
+
+    def test_reopen_keeps_the_marker_that_the_new_executor_writes_inside_the_wait(self):
+        root, path = self.build()
+        co, _ = self.checkout()
+        self.sessions = lambda argv: (self.append_marker(root, "parado"), (0, "open: x", ""))[1]
+        self.assertEqual(self.invoke(executor, "open", path, "P1", "--checkout", co, "--no-panel"), 0, self.err)
+        self.assertEqual(self.invoke(executor, "wait", path, "--no-panel"), 0, self.err)
+        self.assertEqual(self.manifest_text(root)["steps"]["P1"]["state"], "parado")
+        self.sessions = self.fake_brza_sessions(root, 1, 20)     # o executor novo fecha dentro do `--wait`
+        self.assertEqual(self.invoke(executor, "open", path, "P1", "--checkout", co, "--no-panel"), 0, self.err)
+        wl = self.worklog(root)
+        self.assertEqual(executor.last_marker(wl, "P1"), "feito")
+        with open(wl, encoding="utf-8") as f:
+            text = f.read()
+        self.assertIn("<!-- reaberto: era fim-P1: parado -->", text)
+        self.assertEqual(text.count("<!-- fim-P1: feito -->"), 1)
+        self.assertEqual(self.invoke(executor, "wait", path, "--no-panel", "--timeout", "30"), 0, self.err)
+        self.assertEqual(self.manifest_text(root)["steps"]["P1"]["state"], "feito")
+
+    def append_marker(self, root, marker):
+        wl = next(os.path.join(d, n) for d, _, ns in os.walk(os.path.join(root, "work")) for n in ns if n.endswith(".md"))
+        with open(wl, "a", encoding="utf-8") as f:
+            f.write("\n<!-- fim-P1: %s -->\n" % marker)
+
+    def test_wait_done_row_with_the_marker_written_uses_the_mtime_of_the_worklog(self):
+        root, path = self.build()
+        self.open_step(root, path)
+        wl = self.worklog(root)
+        t = self.clock.t + 500
+
+        def wait(name_list, tt, markers=(), any_=True):
+            # o marcador chega durante o `wait_brza`: o 1º ponto do laço não o viu, e o `done` traz a sessão
+            self.append_marker(root, "feito")
+            os.utime(wl, (t, t))
+            self.clock.t = t + 100
+            return 0, {"done": [{"name": "pln900-p1", "outcome": "finished"}], "events": []}
+        self.wait = wait
+        self.assertEqual(self.invoke(executor, "wait", path, "--no-panel", "--timeout", "3000"), 0, self.err)
+        ev = self.manifest_text(root)["steps"]["P1"]["events"][-1]
+        self.assertEqual((ev["state"], ev["note"]), ("feito", "wait: finished"))
+        self.assertEqual(ev["at"], executor.iso(t))
+
+    def test_marker_before_the_open_or_in_the_future_falls_back_to_now(self):
+        root, path = self.build()
+        co, _ = self.checkout()
+        self.sessions = self.fake_brza_sessions(root, 1, -3600)     # mtime anterior ao `aberto`
+        self.invoke(executor, "open", path, "P1", "--checkout", co, "--no-panel")
+        self.invoke(executor, "wait", path, "--no-panel")
+        ev = self.manifest_text(root)["steps"]["P1"]["events"]
+        self.assertGreaterEqual(executor.sessions_map.epoch(ev[-1]["at"]), self.t0 + 100)
+
+    def test_marker_mtime_after_now_falls_back_to_now(self):
+        root, path = self.build()
+        co, _ = self.checkout()
+        self.sessions = self.fake_brza_sessions(root, 1, 20)
+        self.invoke(executor, "open", path, "P1", "--checkout", co, "--no-panel")
+        wl = self.worklog(root)
+        future = self.clock.t + 10 ** 6
+        os.utime(wl, (future, future))
+        self.invoke(executor, "wait", path, "--no-panel")
+        at = executor.sessions_map.epoch(self.manifest_text(root)["steps"]["P1"]["events"][-1]["at"])
+        self.assertLess(at, future)
+        self.assertLess(at, self.clock.t + 5)
+
+
 class Wait(_exec.Base):
     def setUp(self):
         super().setUp()

@@ -370,6 +370,7 @@ class Step:
 
 
 RE_EXECUTES = re.compile(r"^Executa\b(.*)$")
+RE_NOT_CONTINUATION = re.compile(r"^(Estimado:|Executor:|\*\*Evidência|[-*+]\s|[>#|]|\d+[.)]\s|```|~~~)")
 RE_ESTIMATED = re.compile(r"^Estimado:\s*(.*?)\s*(?:·\s*Executado:\s*(.*))?$")
 
 
@@ -381,12 +382,22 @@ def _parse_step(section, pid, title, order):
         m = RE_EXECUTES.match(s)
         if m and p.executes_txt is None:
             body_text = m.group(1)
+            for j, nxt in ls:                       # a linha `Executa` pode continuar até a linha em branco
+                if j <= i:
+                    continue
+                nxt = nxt.strip()
+                if not nxt or RE_NOT_CONTINUATION.match(nxt):
+                    break
+                body_text += " " + nxt
             seg = re.split(r"\s·\s", body_text, maxsplit=1)[0]
             p.executes_txt = seg.strip()
             p.executes = sorted(set(re.findall(r"\bD\d+\b", seg)), key=lambda x: int(x[1:]))
             mm = re.search(r"executor:\s*(.*)$", body_text, re.I)
             if mm:
                 p.executor = re.split(r"\s·\s", mm.group(1))[0].strip()
+            md = re.search(r"depende de ([^·\n]*)", body_text)
+            if md and not p.depends:
+                p.depends = _deps(md.group(1), order)
         elif re.match(r"^Executor:", s) and p.executor is None:
             p.executor = re.split(r"\s·\s", s[len("Executor:"):].strip())[0].strip()
         mm = re.search(r"depende de ([^·\n]*)", s)

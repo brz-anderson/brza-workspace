@@ -29,6 +29,30 @@ class PanelCase(_exec.Base):
         self.assertNotIn("US$ 0", h)
         self.assertRegex(r["line"], r'^::orca-visual\{file="pln-900-painel-[0-9a-f]{4}\.html" title="PLN-900 — painel do plano"\}$')
 
+    def test_cards_below_700px_by_container_query_with_the_fields_of_each_step(self):
+        _, h = self.html()
+        self.assertIn("container-type:inline-size", h)
+        self.assertRegex(h, r'\.panel\{container-type:inline-size\}')
+        self.assertIn('<body><div class="panel">', h)     # o elemento que leva o `container-type` envolve todo o painel
+        self.assertTrue(h.rstrip().endswith("</div></body></html>"))
+        self.assertIn("@container (max-width:699px)", h)
+        self.assertNotIn("@media", h)
+        for k in ("c-p", "c-x", "c-s", "c-e", "c-c", "c-l"):
+            self.assertIn('class="%s' % k, h)
+        for label in ("Executor", "Estimado × Executado", "Custo", "Último evento"):
+            self.assertIn('data-l="%s"' % label, h)
+        self.assertIn("Executa D1", h)
+
+    def test_executor_goes_whole_to_the_html_and_the_table_clamps_by_css(self):
+        long_name = "a sessão que conduz e Anderson e mais um texto comprido de executor que passa dos trinta caracteres"
+        root, path = self.build(plan(step("P1").replace("`implementer`", long_name), ROUND1))
+        r = plan_panel.publish(path, publish_dir=self.pub, **self.kw)
+        with open(r["html"], encoding="utf-8") as f:
+            h = f.read()
+        self.assertIn('<span class="who" title="%s">%s</span>' % (long_name, long_name), h)
+        self.assertNotIn("…</span>", h.split('class="c-x"')[1].split("</div>")[0])
+        self.assertIn("-webkit-line-clamp:2", h)
+
     def test_one_file_by_plan_and_day(self):
         a, _ = self.html()
         b, _ = self.html()

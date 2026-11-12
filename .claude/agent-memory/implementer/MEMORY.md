@@ -4,3 +4,4 @@
 - [Scripts da screen-artboards](screen-artboards-scripts.md) — artboard.py/tokens.py, blocos do main.css, meta sa-art, comando que valida
 - [executor, consult e plan_panel (PLN-021 P3-P5)](plan-runner-executor-consult-panel.md) — marker do wait vale p/ todas as sessões, testes, prova com brza falso
 - [P11 do PLN-021: correções do REV-026](plan-runner-p11-corrections.md) — provas com o brza real em dry-run, CODEX_MODEL, chrome_css, decidida por Resposta
+- [Suíte do plan-runner](plan-runner-tests.md) — comando da suíte e bases de teste do executor/painel

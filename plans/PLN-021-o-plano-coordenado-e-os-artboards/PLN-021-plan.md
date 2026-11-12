@@ -3,10 +3,10 @@ status: in_progress
 phase: execution
 origin: request
 description: Protótipo no playground de um plan-runner com sessão coordenadora (executores dos passos, consultores em sessões, painel de andamento), scripts e references como os da meeting-runner, e uma skill própria de artboards para protótipos de tela web, mobile e desktop.
-ready: "sim — o P13 (X11, X12 e os cartões) espera o pedido de Anderson"
+ready: "sim — o P10 (o fechamento) espera o pedido de Anderson"
 estimate_h: 49.75
-executed_h: 1.451
-remaining_h: 2.5
+executed_h: 1.871
+remaining_h: 0.5
 priority: medium
 scope:
   - workspace
@@ -19,7 +19,7 @@ tags:
 
 # PLN-021: O plano roda por uma sessão coordenadora, com scripts de apoio e artboards de tela
 
-- **Retomar:** a R10 (2026-11-12) deu "passa" ao C1–C4, escolheu os cartões (B) e mandou o X11 e o X12 ao P13; o P12 entrou na master do `brza-studio` (`c470dda`), e o P14 provou o X7 pelo `Write`. O P9 fechou. Próximo: o P13, a pedido de Anderson; depois o P10.
+- **Retomar:** o P13 fechou em 2026-11-12 (X11, X12, os cartões e o N1 da revisão), com o código no mesmo commit do worklog. Próximo: o P10, a pedido. O X13 permanece proposta: em 2026-11-12 Anderson escolheu não abrir o ensaio (R11.1).
 - **Dividido:** [PLN-021 — Desenho](PLN-021-design.md)
 
 ## Pedido
@@ -433,7 +433,7 @@ Respondida em 2026-11-12, 464ae592-7fb4-4ed1-9f6d-8dd26bd7d065.
    - O C4 roda de novo com o brza sync real — custo: cerca de 2 min e o git merge da master em todos os worktrees; se paga: agora, prova literal do C4;
    - Algum caso falha — custo: —; se paga: —.
 
-   **Resposta:** "1 e 2" C1 a C4 passam, com o X11 e o X12 como desvios; o X7 não fecha pela sonda no Bash: roda a segunda sonda, pelo Write
+   **Resposta:** "1 e 2" Lida como: C1 a C4 passam, com o X11 e o X12 como desvios; o X7 não fecha pela sonda no Bash: roda a segunda sonda, pelo Write
 
 2. **O C3: que layout o painel usa.** Opções:
    - A, a tabela de hoje (recomendada) — custo: nenhum; se paga: agora; o chat tem 736 px;
@@ -454,6 +454,19 @@ Respondida em 2026-11-12, 464ae592-7fb4-4ed1-9f6d-8dd26bd7d065.
    - Descartar a branch e o worktree — custo: perde a linha; se paga: nunca.
 
    **Resposta:** "merge" Lida como: Merge na master do brza-studio e push.
+
+### Rodada 11 — o ensaio do Codex coordenador e dos Sites (enviada 2026-11-12)
+
+> **Apresentado antes:** A reunião `pln021-codex-sites` fechou a R3 com apoio condicionado a O1–O4. O revisor da v1 deu 71 para registrar sem abrir passo e 28 de prontidão. O X13 já estava no plano como proposta. A v1.1 corrigiu o `--rerun`, o nome P1–P4 e o fallback do PNG, e não foi recontada.
+
+Respondida em 2026-11-12, 01a1d1e4-8335-7363-9528-e39e95abb43a.
+
+1. **O ensaio O4 vira passo do PLN-021 agora.** Opções:
+   - Não. O X13 fica proposta e o ensaio não abre (recomendada) — custo: nenhuma sessão e nenhum Site; se paga: agora, a confiança da v1 é 71 e a prontidão é 28;
+   - Abrir o O4 como passo, com as condições da v1.1 — custo: fixture, uma sessão e medição de fora da janela do executor; 1–2 h segue hipótese; se paga: quando a recusa sair pelo motivo certo;
+   - Tirar o X13 do plano — custo: o registro sai do plano; se paga: nunca, se a pergunta voltar.
+
+   **Resposta:** "siga com o recomendado" Lida como: o X13 permanece proposta e o ensaio O4 não abre.
 
 ## Passos
 
@@ -606,11 +619,15 @@ Estimado: 0.25 h · Executado: 0.006 h (da abertura da sessão, 19:33:53, ao wor
 
 Executa D3 e D5, a partir do X11, do X12 e da R10.2 · executor: `implementer`, pela coordenação, com o `reviewer` · depende de P12
 
-Estimado: 2 h · Executado: — h
+Estimado: 2 h · Executado: 0.42 h (relógio da coordenação, 19:41 → 20:06, com as duas rodadas de revisão; sem medição dos subagentes)
 
-- [ ] **1. O X11** — o leitor do passo junta a linha `Executa … · executor: …` que continua nas linhas seguintes, até a linha em branco, e o painel mostra o executor inteiro. Teste com o `### P9` quebrado em duas linhas.
-- [ ] **2. O X12** — o `executor.py open` grava o evento `aberto` com o `at` do evento `open` da sessão no `.sessions/sessions.jsonl`, e não com a hora em que o `--wait` volta; sem o evento, com a hora de antes da chamada ao `brza sessions`. Teste: a janela do P12 (19:14:15 → 19:14:34) dá 0.005 h.
-- [ ] **3. O painel em cartões** (D5, R10.2) — abaixo de 700 px, por `@container`, um cartão por passo, como no [protótipo](PLN-021-painel-cartoes.png); de 700 px para cima, a tabela de hoje, com as colunas que ela tem. Testes do painel, e o PNG conferido em 375 e 736 px.
+- [x] **1. O X11** — o leitor do passo junta a linha `Executa … · executor: …` que continua nas linhas seguintes, até a linha em branco, e o painel mostra o executor inteiro. Teste com o `
+
+**Evidência:** `cd .claude/skills/plan-runner/scripts && python3 -I -m unittest discover -s tests` → 215 tests OK (eram 193 antes do P13) · arquivos: `plan_md.py` (a continuação da linha `Executa`, fora de cerca, até a linha em branco ou o `RE_NOT_CONTINUATION`), `executor.py` (`_open_at` no `aberto`; `_marker_at`, a mtime do worklog no `feito`/`parado`; `find_marker` e `neutralize_marker(only=…)` na reabertura), `plan_panel.py` (`.panel{container-type:inline-size}`, cartões em `@container (max-width:699px)`, o executor inteiro com `-webkit-line-clamp:2` só na tabela) e os três `tests/` · replay com os eventos reais: P12 19:14:15.829 → 19:14:34 = 0.005 h, P14 = 0.006 h · a sonda da reabertura do revisor → `wait` rc 0, `feito` · PNG em 375 px (cartões, executor inteiro) e 736 px (a tabela de hoje) · duas rodadas do `reviewer`: a 1ª com A1–A5 importantes e A6 (a memória do `implementer` gravada dentro da skill, movida pela coordenação), a 2ª com o N1 importante (a reabertura apagava o `feito` novo, defeito antigo que o X12 tornou alcançável) e N2–N4 sugestões, tudo corrigido; 14 mutações, as que sobreviveram são equivalentes · commit: o do worklog do P13, confirmado por Anderson ("1") · desvios em X15
+
+### P9` quebrado em duas linhas.
+- [x] **2. O X12** — o `executor.py open` grava o evento `aberto` com o `at` do evento `open` da sessão no `.sessions/sessions.jsonl`, e não com a hora em que o `--wait` volta; sem o evento, com a hora de antes da chamada ao `brza sessions`. Teste: a janela do P12 (19:14:15 → 19:14:34) dá 0.005 h.
+- [x] **3. O painel em cartões** (D5, R10.2) — abaixo de 700 px, por `@container`, um cartão por passo, como no [protótipo](PLN-021-painel-cartoes.png); de 700 px para cima, a tabela de hoje, com as colunas que ela tem. Testes do painel, e o PNG conferido em 375 e 736 px.
 
 ### P9 — O aceite manual
 
@@ -692,6 +709,12 @@ Estimado: 0.5 h · Executado: — h
 
 - **X12 — A janela do `Executado` começa depois do trabalho**: o `executor.py open` grava o `aberto` quando o `brza sessions --wait` volta, e o executor do P12 fez o passo inteiro dentro desse `--wait` (sessão às 19:14:15, commit às 19:14:26, worklog às 19:14:34, `aberto` às 19:14:43). A janela deu 0.003 h contra 0.005 h, e o turno do executor não aparece no `measurements.jsonl`. A janela devia começar no `open` do `sessions.jsonl`. Afeta P3 e D3.
 
+- **X13 — Codex coordenador e Sites. Proposta. Anderson, em 2026-11-12, não abriu o ensaio (R11.1).** Reunião `pln021-codex-sites` (2026-11-12, R1–R3, 3/3). A sala apoia com ressalva, e ninguém chama a integração de pronta. As opções O1–O4 são o que a sala votou como P1–P4; não são os passos P1–P4 deste plano. O1: Codex coordenador, tabela de capacidade e skills por caminho; adaptador só depois de falha demonstrada. O2: contrato textual no worklog, somado a `commit`/`comando`/`arquivos`/`desvios`/`cobre`, sem manifesto novo; o parser não lê os campos novos. O3: artboard local como base; Sites só se Anderson pedir compartilhamento, noutro arquivo. O4: ensaio isolado, fora deste plano; a recusa provada é `evidence --apply` sem a linha `cobre:` e com marcador `feito` (não grava e não reroda). `--rerun` sozinho ainda roda o comando. `cobre:` vazio não é essa recusa. Desenho: Anderson → coordenador Codex → scripts que já existem → executor → contrato → coordenação confere → plano. O HTML ao vivo fica com `var(--…)`; o PNG feliz sai do `brza shot`, e um `:root` nesse HTML venceria o tema (`visual.py:85–87`, `artboard.py:314–316`). Medição da R3: `tally.py` janela 19:30:08–19:30:54 → sala 79,3 (mediana 80, 3/3, 72–86); Claude da rodada US$ 0,09; Codex em tokens, sem dólar. Revisor da v1: 71 para registrar sem abrir passo, prontidão 28. A hipótese de 1–2 h não entra no `estimate_h`. O O4 não abre passo (R11.1, "siga com o recomendado"). Afeta P3, P5 e P7. O texto inteiro está em [A reunião Codex e Sites no PLN-021](../../work/worklogs/2026-11-12-pln021-codex-sites-coordenacao.md).
+
+- **X14 — O `round_log.py` grava o `reading` cru, sem o "Lida como:"**: a R10.1 saiu `**Resposta:** "1 e 2" C1 a C4 passam…`, e o leitor só conta como decidida a resposta com "Lida como:" (o painel mostrou "4 perguntas, 3 decididas"). A coordenação acrescentou o prefixo à mão; o script segue sem pô-lo quando o `reading` vem sem ele. Afeta P2 e D6.
+
+- **X15 — As escolhas do `implementer` no P13, aceitas pela revisão**: o piso da `_marker_at` é o último `aberto` (equivalente ao primeiro, porque o `open` refaz os eventos); a edição do worklog depois do marcador adianta o `feito` até a hora da edição; só `feito` e `parado` levam a mtime; o `_open_at` aceita o `open` do `sessions.jsonl` até 60 s antes da chamada; o `neutralize_marker(only=…)` não neutraliza se a linha do marcador velho mudou durante o `--wait`, e segue sem aviso. Afeta P13, D3 e D5.
+
 ## Revisões
 
 - 2026-11-10 — [REV-026: PLN-021 P1 a P7, a entrega do plan-runner coordenado e da screen-artboards](../../work/reviews/REV-026-pln-021-p1-a-p7.md): 12 achados importantes, 6 sugestões e 5 falsos; o código vai ao P11, o plano e as skills foram corrigidos na coordenação, o A12 foi descartado.
@@ -711,6 +734,8 @@ Estimado: 0.5 h · Executado: — h
 - 2026-11-11 — Rodada 8, "aplicar agora": os oito achados de texto no plano e no Desenho, antes do P9. [O PLN-021: os oito achados de texto](../../work/worklogs/2026-11-11-pln-021-os-oito-achados-de-texto.md)
 - 2026-11-12 — Parecer da rodada 2 do texto: quatro resíduos aplicados, a CLI do D3, o `verdict`, `level`/`line` e a R6.5 em D4–D6. [O PLN-021: os quatro resíduos do texto](../../work/worklogs/2026-11-12-pln-021-os-quatro-residuos-do-texto.md)
 - 2026-11-12 — R9 e R10 respondidas; P12 e P14, as sondas do executor (`brza-studio@c470dda` na master); C1–C4 passam; X9 e X7 provados; o P9 fechou e o P13 nasceu com X11, X12 e os cartões da D5. Próximo: o P13, a pedido. [O PLN-021: o aceite manual e as sondas do executor](../../work/worklogs/2026-11-12-pln-021-o-aceite-manual-e-as-sondas.md)
+- 2026-11-12 — Reunião sobre Codex coordenador e Sites: O1–O4 como proposta (X13). R11.1: Anderson escolheu não abrir o ensaio. [A reunião Codex e Sites no PLN-021](../../work/worklogs/2026-11-12-pln021-codex-sites-coordenacao.md)
+- 2026-11-12 — P13 fechado: X11, X12 e os cartões da D5, com duas rodadas do `reviewer` (A1–A6, N1–N4); 215 testes OK; X14 e X15. Próximo: o P10, a pedido. [O PLN-021: o P13, o X11, o X12 e o painel em cartões](../../work/worklogs/2026-11-12-pln-021-p13-x11-x12-e-os-cartoes.md)
 
 ## Casos manuais
 

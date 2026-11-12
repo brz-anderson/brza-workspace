@@ -12,7 +12,7 @@ sessions:
 
 # O PLN-021: o código em inglês do P11
 
-Os subpassos 2 e 4 do [PLN-021: O plano roda por uma sessão coordenadora, com scripts de apoio e artboards de tela](../../plans/PLN-021-o-plano-coordenado-e-os-artboards/PLN-021-plan.md). O código do subpasso 1 e do 3 já estava no `4350325`.
+Os subpassos 2 e 4 do [PLN-021: O plano roda por uma sessão coordenadora, com scripts de apoio e artboards de tela](../../plans/PLN-021-o-plano-coordenado-e-os-artboards/PLN-021-plan.md). O código do subpasso 1 e do 3 já estava no `4350325`. O registro desses dois subpassos está em [O PLN-021: os defeitos do P11.1](2026-11-10-pln-021-p11-1-os-defeitos.md).
 
 ## O que se fez
 
@@ -35,4 +35,4 @@ Os subpassos 2 e 4 do [PLN-021: O plano roda por uma sessão coordenadora, com s
 
 ## Custo da tarefa
 
-Não medida — sessão sem turno medido · até 22:28 de 2026-11-10, pelo `brza note commit` · sem o turno do commit
+Não medida — sessão sem turno medido · até 00:04 de 2026-11-12, pelo `brza note commit` · sem o turno do commit

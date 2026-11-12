@@ -16,7 +16,10 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `não verificada` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41314`](https://github.com/stablyai/orca/pull/41314) (unificando e resolvendo a Issue [`#40321`](https://github.com/stablyai/orca/issues/40321), além de [`#41298`](https://github.com/stablyai/orca/issues/41298)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41504`](https://github.com/stablyai/orca/pull/41504) (Issue [`#40865`](https://github.com/stablyai/orca/issues/40865)),
+[`stablyai/orca#41511`](https://github.com/stablyai/orca/pull/41511),
+[`stablyai/orca#41531`](https://github.com/stablyai/orca/pull/41531),
+[`stablyai/orca#41314`](https://github.com/stablyai/orca/pull/41314) (unificando e resolvendo a Issue [`#40321`](https://github.com/stablyai/orca/issues/40321), além de [`#41298`](https://github.com/stablyai/orca/issues/41298)),
 [`stablyai/orca#40932`](https://github.com/stablyai/orca/pull/40932),
 [`stablyai/orca#39398`](https://github.com/stablyai/orca/pull/39398) (Issue [`#39395`](https://github.com/stablyai/orca/issues/39395)),
 [`stablyai/orca#39006`](https://github.com/stablyai/orca/pull/39006) (atendendo à Issue [`#38833`](https://github.com/stablyai/orca/issues/38833)),
@@ -149,9 +152,21 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41314`](https://github.com
     - Habilita descoberta de catálogo sessionless via `agy models` com tratamento de usuários deslogados e escopo estrito de contas;
     - Injeta automaticamente regras de usuário globais e do workspace (`GEMINI.md` e `AGENTS.md`) em `_meta.antigravity.systemPrompt.append` (até 256 KB);
     - Registra `antigravity` no menu slash `/` do Native Chat (`skillSourceOwner: 'antigravity'`) para autocompletar skills em `~/.gemini/config/skills` e `.agents/skills`.
+27. **Respeito a regras de usuário e preservação de opções em chats gerenciados Antigravity (`#41504`, rastreado em `#40865`):**
+    - Carrega instruções globais e de repositório (`GEMINI.md`/`AGENTS.md`) na ativação/reabertura de chats gerenciados via metadados de sessão ACP;
+    - Em chats ACP restaurados, aceita o modelo e esforço correntes se coincidirem exatamente com os solicitados, evitando escritas desnecessárias de configurações até nova escolha explícita do usuário.
+28. **Isolamento de conexões locais de loopback do proxy no Antigravity Chat (`#41511`):**
+    - Adiciona bypass explícito de loopback (`localhost`, `127.0.0.1`, `::1`) no ambiente de proxy do servidor gerenciado do Antigravity, evitando falhas do tipo `python-socks is required to use a SOCKS proxy`;
+    - Espelha proxies estáticos do sistema macOS para saídas externas sem interceptar o canal de comunicação privado interno.
+29. **Redesenho das configurações de contas Antigravity em cartões dedicados (`#41531`):**
+    - Elimina aninhamento de cartões em Settings -> Accounts para Antigravity, alinhando a experiência visual com as linhas de contas do Codex;
+    - Coloca ações diretamente nas linhas correspondentes (clique na linha para seleção, badge `Active` para conta nativa) e limpa chaves de tradução obsoletas.
 
 ## O que fazer
 
+- Incorporar a injeção de regras de usuário e estabilização de opções restauradas em chats gerenciados Antigravity (`#41504`).
+- Adotar as exclusões de loopback no ambiente de proxy para blindar o Antigravity Chat contra falhas de proxy local (`#41511`).
+- Atualizar o layout de configurações de contas Antigravity com cartões dedicados para terminal e chat (`#41531`).
 - Adotar a unificação completa de Antigravity ACP (`#41314`, resolve `#40321`), incluindo suporte a Windows (`agy.exe` e gerenciado 1.4.5), streaming reativo de subagentes/comandos em segundo plano, injeção de regras `GEMINI.md`/`AGENTS.md`, autocompletação slash `/` de skills e descoberta `agy models`.
 - Corrigir a comparação de identidade de conta no Antigravity (`#39742`), validando ID/e-mail do usuário em vez do hash mutável de credenciais para eliminar avisos falsos após cada execução de worker.
 - Implementar fallback no `HybridCredentialStore` para leitura de `acp_token.json` quando o item do Keychain não existir,

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41446, #41392, #41366, #41384 trazem aviso de perda de .env no cleanup, compactação SQLite de chat sem histórico intermediário e idle seguro.
+description: Os PRs #41483, #41480, #41457, #41446, #41392, #41366, #41384 trazem cleanup com ocultação imediata, cache único de worktrees e atalhos na sidebar.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,10 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41446`](https://github.com/stablyai/orca/pull/41446),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41483`](https://github.com/stablyai/orca/pull/41483),
+[`stablyai/orca#41480`](https://github.com/stablyai/orca/pull/41480),
+[`stablyai/orca#41457`](https://github.com/stablyai/orca/pull/41457),
+[`stablyai/orca#41446`](https://github.com/stablyai/orca/pull/41446),
 [`stablyai/orca#41392`](https://github.com/stablyai/orca/pull/41392),
 [`stablyai/orca#41366`](https://github.com/stablyai/orca/pull/41366) (STA-14925 / STA-2380) e
 [`stablyai/orca#41384`](https://github.com/stablyai/orca/pull/41384).
@@ -41,6 +44,14 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41446`](https://github.com
 4. **Rajadas desnecessárias de requisições de badges do Linear ao focar a janela (`#41384`):**
    - Cada retorno de foco à janela do app revalidava todos os badges de tarefas do Linear montados na tela após 60 segundos de inatividade,
      gerando centenas de requisições à API do Linear em paralelo sem que o usuário estivesse interagindo com aquelas tarefas.
+5. **Visibilidade persistente de workspaces durante cleanup demorado em background (`#41483`):**
+   - Na exclusão de workspaces com grande volume de arquivos, a linha permanecia visível na barra lateral durante todo o processo de limpeza em segundo plano;
+   - Caso o app sofresse encerramento ou reinicialização durante o processo, o cleanup ficava incompleto e o registro de remoção era perdido.
+6. **Execuções duplicadas e concorrentes de `git worktree list` em repositórios grandes (`#41480`):**
+   - Dois caches desacoplados no processo principal (um da barra lateral com TTL de 5s e outro de runtime para CLI/agentes com TTL de 30s) disparavam leituras repetidas de worktrees;
+   - Em repositórios com centenas de worktrees, o app executava `git worktree list` a cada ~48s, gerando sobrecarga desnecessária de CPU e I/O.
+7. **Disparo indevido de atalho de exclusão de workspace com foco no terminal ou editor (`#41457`):**
+   - O atalho de teclado para exclusão de workspace não verificava se o foco estava na árvore da barra lateral, abrindo diálogos de exclusão mesmo quando o usuário estava digitando no terminal ou editor.
 
 ## O que o upstream propõe e implementa
 
@@ -62,9 +73,21 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41446`](https://github.com
 4. **Desativação de refetch de badges do Linear por evento de foco (`#41384`):**
    - Remove os listeners de foco de janela para badges montados, atualizando detalhes apenas na montagem ou via notificação
      específica pós-escrita de ferramentas locais, reduzindo requisições em 83,3%.
+5. **Ocultação imediata de linha na UI e persistência de cleanup em tabela durável (`#41483`):**
+   - Registra exclusões em tabela durável (`worktree-removal-table.ts`) e oculta a linha da visualização imediatamente (`removal-visibility.ts`);
+   - Em reinicializações do app com remoções pendentes, o processo retoma o cleanup de arquivos e do registro Git sem intervenção manual.
+6. **Proprietário único de listagem de worktrees por repositório (`#41480`):**
+   - Cria modelo centralizado por repositório e runtime Git, unificando os acessos da barra lateral e do catálogo de runtime;
+   - Reutiliza leituras em andamento para requisições concorrentes e invalida o cache apenas diante de mutações ou eventos estruturais do watcher.
+7. **Restrição de atalhos de exclusão de workspace à seleção da barra lateral (`#41457`):**
+   - Vincula o listener de teclado de exclusão estritamente ao container da barra lateral quando focado (`use-sidebar-workspace-delete-keyboard.ts`);
+   - Garante que teclas pressionadas no terminal ou editor nunca acionem a caixa de confirmação de exclusão.
 
 ## O que fazer
 
+- Adotar a tabela durável de cleanup com ocultação imediata de workspaces em remoção (`#41483`).
+- Unificar o gerenciamento de cache de worktrees por repositório para eliminar chamadas redundantes a `git worktree list` (`#41480`).
+- Restringir os atalhos de exclusão de workspace exclusivamente ao foco na barra lateral (`#41457`).
 - Adotar a detecção e proteção de arquivos ignorados em risco (`readWorktreeAtRiskLocalFiles`) antes da exclusão de workspaces (`#41446`).
 - Incorporar o gatilho de substituição direta de revisões de chat (`journal_outcome_item_supersede`) para estancar o crescimento do SQLite (`#41392`).
 - Aplicar a corroboração do marcador do composer para instâncias adotadas do Claude no `tui-idle` (`#41366`).

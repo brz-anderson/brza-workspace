@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41306, #41304, #41286, #41301 trazem aprovação de permissões de workers pelo coordenador, request-id, agente durável e cópia de blocos no terminal.
+description: Os PRs #41498, #41476, #41306, #41304, #41286, #41301 trazem bypass de permissões em split-pane/resumes, fila de configurações Codex e aprovação de workers.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,9 @@ tags:
 
 # Aprovação de permissões de workers pelo coordenador, identidade durável e ID de requisição
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41306`](https://github.com/stablyai/orca/pull/41306),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41498`](https://github.com/stablyai/orca/pull/41498),
+[`stablyai/orca#41476`](https://github.com/stablyai/orca/pull/41476),
+[`stablyai/orca#41306`](https://github.com/stablyai/orca/pull/41306),
 [`stablyai/orca#41304`](https://github.com/stablyai/orca/pull/41304),
 [`stablyai/orca#41286`](https://github.com/stablyai/orca/pull/41286) e
 [`stablyai/orca#41301`](https://github.com/stablyai/orca/pull/41301) (resolve Issue [`#40914`](https://github.com/stablyai/orca/issues/40914)).
@@ -38,6 +40,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41306`](https://github.com
 4. **Dificuldade de copiar comandos e saídas isoladas no terminal (`#41301`, resolve `#40914`):**
    - Desenvolvedores precisavam arrastar o cursor do mouse manualmente por dezenas de linhas de output no terminal para copiar
      apenas o comando executado ou sua saída limpa, sujeitos a quebras indesejadas de linha ou poluição de prompts intermediários.
+5. **Perda de flags de acesso total (`--yolo`/`bypassPermissions`) em split-panes e retomadas não gravadas (`#41498`):**
+   - Ao dividir abas de terminal ou retomar agentes de terminal iniciados fora do fluxo registrado do app, as flags de permissão total eram perdidas;
+   - O agente caía silenciosamente no modo restrito, disparando prompts manuais de confirmação a cada ferramenta executada.
+6. **Dessincronização entre opções alteradas do Codex e mensagens pendentes na fila (`#41476`):**
+   - Alterações de modelo, velocidade ou modo de raciocínio submetidas enquanto um turno do Codex estava em execução podiam sofrer corrida ou ser rejeitadas pelo provedor;
+   - Sem uma fila associada entre mensagens e opções, cards de `Steer` e novas mensagens podiam executar com parâmetros defasados.
 
 ## O que o upstream propõe e implementa
 
@@ -62,9 +70,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41306`](https://github.com
 4. **Ações de cópia escopadas por comando com limites OSC 133 (`#41301`):**
    - Insere "Copy Command", "Copy Output" e "Copy Command and Output" no menu de clique direito do terminal, utilizando
      marcadores xterm OSC 133 para extração exata e sem quebras artificiais de linha.
+5. **Inspeção de linhagem de processos e preservação de flags de bypass (`#41498`):**
+   - Utiliza `@vscode/windows-process-tree` e `getFreshShellForegroundSnapshot` para inspecionar comandos em execução em terminais não registrados (`observePanePermissionBeforeHook`);
+   - Preserva `bypassPermissions` em split-panes locais e remotos (SSH/WSL), com política fail-closed caso a linhagem do processo seja ambígua.
+6. **Enfileiramento atômico de mensagens e opções do Codex (`#41476`):**
+   - Vincula mutações de opções à fila estruturada de mensagens (`structured-agent-session-queued-mutations.ts`), retendo o despacho até que o provedor confirme os novos parâmetros;
+   - Garante que transições entre modos (Plan/Default) e velocidades de raciocínio ocorram no início do turno seguinte, sem risco de corrupção de estado.
 
 ## O que fazer
 
+- Adotar a preservação de flags de permissão total (`bypassPermissions`) em divisões de painel e retomadas não gravadas de agentes (`#41498`).
+- Incorporar o enfileiramento seguro de mensagens com configurações atômicas no Codex (`#41476`).
 - Adotar a configuração e comandos de aprovação de permissões de workers pelo coordenador (`orchestration approve/deny`) com
   salvaguarda `personOnly` (`#41306`).
 - Incorporar `worker-start --request-id <uuid>` e o leitor estruturado de opções de execução (`#41304`).

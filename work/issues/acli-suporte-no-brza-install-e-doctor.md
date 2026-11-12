@@ -24,7 +24,7 @@ Com a incorporação de fluxos baseados na Atlassian CLI (`acli`), desenvolvedor
 
 1. **No `brza install`:**
    - Adicionar a opção `brza install acli` (ou incluir na rotina geral de setup).
-   - Para macOS: invocar Homebrew (`brew tap atlassian/acli && brew install acli`) ou baixar o binário standalone oficial (`https://acli.atlassian.com/darwin/...`).
+   - Para macOS: invocar Homebrew (`brew tap atlassian/homebrew-acli && brew install acli`) ou baixar o binário standalone oficial (`https://acli.atlassian.com/darwin/...`).
 2. **No `brza doctor`:**
    - Conferir se `acli` está acessível no PATH.
    - Executar checagem de integridade não-interativa do login (`acli jira auth status` e `acli rovodev auth status`).

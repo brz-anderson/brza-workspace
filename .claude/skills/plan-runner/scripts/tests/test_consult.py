@@ -75,8 +75,10 @@ class Consultants(_exec.Base):
         opened = [a for k, a in self.calls if k == "sessions"]
         self.assertEqual(opened[1][opened[1].index("--agent") + 1], "claude")
         self.assertEqual(opened[1][opened[1].index("--model") + 1], "claude-sonnet-5-5")
-        self.assertIn("cota: codex cortado: codex a 56%", self.out)
+        self.assertIn("cota: codex %s → claude claude-sonnet-5-5 por cota (56%% > 55%%)" % executor.CODEX_MODEL, self.out)
+        self.assertIn("era Codex %s, por cota" % executor.CODEX_MODEL, self.out)
         self.assertEqual(self.man()["focuses"]["mudanca-minima"]["agent"], "claude")
+        self.assertEqual(self.man()["focuses"]["mudanca-minima"]["swapped_from"]["agent"], "codex")
 
     def test_quotas_read_a_shape_real_of_brza_quota(self):
         # A2: `accounts[].windows[]`, a conta ativa de cada runtime; o Grok só tem `weekly`
@@ -136,6 +138,56 @@ class Consultants(_exec.Base):
     def test_decision_missing_and_brief_missing(self):
         self.assertEqual(self.invoke(consult, "open", self.path, "D9", "--brief", self.brief), 2)
         self.assertEqual(self.invoke(consult, "open", self.path, "D1", "--brief", "/nao/existe.md"), 2)
+
+    def test_open_already_running_keeps_who_opened(self):
+        self.open_step()
+        self.assertEqual(self.man()["focuses"]["mudanca-minima"]["agent"], "codex")
+        self.quota["codex"] = 56
+        self.sessions = lambda argv: (0, "running: %s" % argv[0], "") if "mudanca-minima" in argv[0] else (0, "open: x", "")
+        self.assertEqual(self.open_step(), 0, self.err)
+        self.assertIn("já estava aberta", self.err)
+        focus = self.man()["focuses"]["mudanca-minima"]
+        self.assertEqual(focus["agent"], "codex")
+        self.assertNotIn("swapped_from", focus)
+        self.assertNotIn("por cota (56%", self.out)
+
+    def test_open_already_running_keeps_the_swap_that_opened(self):
+        self.quota["codex"] = 56
+        self.open_step()
+        prior_note = self.man()["focuses"]["mudanca-minima"]["quota_note"]
+        self.quota["codex"] = 30
+        self.sessions = lambda argv: (0, "running: %s" % argv[0], "") if "mudanca-minima" in argv[0] else (0, "open: x", "")
+        self.assertEqual(self.open_step(), 0, self.err)
+        focus = self.man()["focuses"]["mudanca-minima"]
+        self.assertEqual(focus["agent"], "claude")
+        self.assertEqual(focus["model"], "claude-sonnet-5-5")
+        self.assertEqual(focus["swapped_from"]["agent"], "codex")
+        self.assertEqual(focus["quota_note"], prior_note)
+        self.assertIn("Claude (era Codex %s, por cota)" % executor.CODEX_MODEL, self.out)
+        self.assertIn("cota: %s" % prior_note, self.out)
+        self.assertNotIn("por cota (30%", self.out)
+
+    def test_open_already_running_without_a_prior_entry_does_not_record_a_swap(self):
+        self.quota["codex"] = 56
+        self.sessions = lambda argv: (0, "running: %s" % argv[0], "") if "mudanca-minima" in argv[0] else (0, "open: x", "")
+        self.assertEqual(self.open_step(), 0, self.err)
+        self.assertIn("já estava aberta", self.err)
+        focus = self.man()["focuses"]["mudanca-minima"]
+        self.assertNotIn("swapped_from", focus)
+        self.assertIsNone(focus.get("quota_note"))
+        self.assertIn("| mudanca-minima | pln900-d1-mudanca-minima | Claude | claude-sonnet-5-5 |", self.out)
+        self.assertNotIn("era Codex", self.out)
+        self.assertNotIn("por cota (56%", self.out)
+
+    def test_wait_names_the_model_that_entered_by_quota(self):
+        self.quota["codex"] = 56
+        self.open_step()
+        self.writes("arquitetura-limpa", "Tese: a.")
+        self.writes("mudanca-minima", "Tese: b.")
+        self.writes("equilibrio", "Tese: c.")
+        self.assertEqual(self.invoke(consult, "wait", self.path, "D1"), 0, self.err)
+        self.assertIn("mudanca-minima entregou (Claude claude-sonnet-5-5, era Codex %s, por cota)" % executor.CODEX_MODEL, self.out)
+        self.assertIn("arquitetura-limpa entregou (Claude)", self.out)
 
     def test_wait_narrates_each_arrival_and_reaches_zero(self):
         self.open_step()
@@ -205,6 +257,19 @@ class Consultants(_exec.Base):
         name = self.outputs[-1].split('"')[1]
         with open(os.path.join(pub, name), encoding="utf-8") as f:
             self.assertIn("arquitetura-limpa", f.read())
+
+    def test_table_names_the_consultant_swapped_by_quota(self):
+        self.quota["codex"] = 56
+        self.open_step()
+        self.writes("arquitetura-limpa", "Tese: a.\nCusto: 1 h · Se paga: já · Reabre: nada\nRisco: x")
+        self.writes("mudanca-minima", "Tese: b.\nCusto: 1 h · Se paga: já · Reabre: nada\nRisco: x")
+        self.writes("equilibrio", "Tese: c.\nCusto: 1 h · Se paga: já · Reabre: nada\nRisco: x")
+        pub = os.path.join(self.root, "pub")
+        self.assertEqual(self.invoke(consult, "table", self.path, "D1", "--publish-dir", pub), 0, self.err)
+        self.assertIn("mudanca-minima (Claude claude-sonnet-5-5, era Codex %s, por cota)" % executor.CODEX_MODEL, self.out)
+        name = self.outputs[-1].split('"')[1]
+        with open(os.path.join(pub, name), encoding="utf-8") as f:
+            self.assertIn("Claude · claude-sonnet-5-5 · high · era Codex %s, por cota" % executor.CODEX_MODEL, f.read())
 
     def test_table_with_focus_that_not_delivered(self):
         self.open_step()

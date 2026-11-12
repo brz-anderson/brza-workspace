@@ -8,7 +8,7 @@ PNG dele. O código nasceu na `meeting-runner` e foi extraído para cá (PLN-021
 
 | Módulo | O que tem |
 | :-- | :-- |
-| `paths.py` | `default_root()`, `common_root(root)`, `strip_measurement(texto)` |
+| `paths.py` | `default_root()`, `common_root(root)`, `strip_measurement(text)` |
 | `sessions_map.py` | `fold_map`, `load_map`, `map_file`, `read_rows`, `epoch` (o mapa v2) |
 | `sessions_cli.py` | `run_sessions`, `run_brza`, `open_argv`, `send_argv`, `wait_argv`, `close_argv`, `interpret_open`, `wait_brza`, `list_states` |
 | `measure.py` | `load_jsonl`, `parse_ts`, `session_ids`, `win_bounds`, `measure_claude`, `measure_codex` |
@@ -21,7 +21,7 @@ O `python3 -I` não põe a pasta do script no `sys.path` e ignora `PYTHONPATH`. 
 variável `SKILLKIT` apontar, para rodar contra outra cópia:
 
 ```python
-sys.path.insert(0, AQUI)
+sys.path.insert(0, HERE)
 import _kit  # noqa: E402,F401
 from skillkit import sessions_cli, visual  # noqa: E402
 ```

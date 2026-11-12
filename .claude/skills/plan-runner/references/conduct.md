@@ -83,8 +83,7 @@ open → (wait → evento)* → evidence → evidence --apply → close
      pelo `send`, e o passo não fecha.
    - Narre o que conferiu: "confere: `git -C … cat-file -e a1b2c3d` → ok; `<testes>` → 42 passed; Executado 0,6 h".
 4. **Aplicar.** `$S/executor.py evidence PLN-NNN P<n> --apply` grava a evidência no `### Pn`, marca o `[x]`, roda o
-   `plan_state.py --fix` e republica o painel. Ele marca `[x]` só nos subpassos da linha `cobre:` do worklog (`cobre: todos` marca todos); sem `cobre:`, marca todos os
-   pendentes e avisa: confira à mão. Os `X` propostos no worklog entram em
+   `plan_state.py --fix` e republica o painel. Ele marca `[x]` só nos subpassos da linha `cobre:` do worklog (`cobre: todos` marca todos); sem `cobre:`, o `--apply` não grava e manda o executor completar pelo `send`. Os `X` propostos no worklog entram em
    `## Desvios` pela coordenação, à mão, depois de lidos. Várias linhas `cobre:` se juntam, e `todos` vence.
    - **Passo parcial** (`cobre:` não cobre tudo; sobra `[ ]`): o passo fica `evidencia-gravada`, e o ciclo continua com
      `send` do que falta (neutraliza o marcador e volta a `em-curso`), `wait`, e `evidence --apply` de novo, com o

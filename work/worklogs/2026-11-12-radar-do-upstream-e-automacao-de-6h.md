@@ -15,6 +15,7 @@ refs:
   - issue:melhorias-de-native-chat-acp-do-gemini-cli-abas-e-diff-no-upstream
   - issue:notificacao-de-perda-de-workers-desengasgo-de-correio-e-tipo-notice
   - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
+  - issue:worktrees-com-clones-copy-on-write-prompt-inicial-de-workspace-e-ack-seletivo-de-inbox
 ---
 
 # Radar de issues e PRs do upstream e automação de 6h (00h, 06h, 12h e 18h BRT)
@@ -86,5 +87,28 @@ refs:
    - [Aprovação de permissões de workers pelo coordenador, identidade durável e ID de requisição](../issues/aprovacao-de-permissoes-de-workers-pelo-coordenador-identidade-duravel-e-id-de-requisicao.md):
      adicionados o PR `#41498` (inspeção de linha de comando de processos para preservar flags de permissão total `--yolo`/`bypassPermissions` em split-panes e retomadas não gravadas) e
      o PR `#41476` (enfileiramento atômico de mensagens e configurações do Codex, retendo o despacho até que os parâmetros atualizados sejam aceitos pelo provedor).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-12)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-12T15:00:00Z` e `2026-11-12T21:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Worktrees com clones Copy-on-Write, prompt inicial de workspace e ack seletivo de inbox](../issues/worktrees-com-clones-copy-on-write-prompt-inicial-de-workspace-e-ack-seletivo-de-inbox.md):
+     rastreia o PR `#41492` (criação ultrarrápida de worktrees via clones Copy-on-Write / reflink em APFS no macOS e Btrfs/XFS/ZFS no Linux, reduzindo consumo de disco em >90% e transferindo o stat cache para `git status` inicial instantâneo),
+     PR `#41649` / issue `#19555` (campo de prompt inicial de agente no diálogo de criação de workspace com readiness-aware delivery seguro),
+     PR `#41590` / issue `#41545` (reconhecimento seletivo de mensagens da caixa postal de orquestração por ID via `orchestration inbox ack <id>`) e
+     PR `#41651` (ponto cromático sutil de cor da aba nas linhas de agentes da barra lateral do workspace).
+3. **Atualização de 3 issues existentes em `work/issues/`:**
+   - [Cartões de Pull Request, feedback de Steer e atalhos no Native Chat](../issues/cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat.md):
+     adicionados o PR `#41642` / issue `#41641` (galeria lightbox navegável com setas para múltiplas imagens em uma mesma mensagem do chat) e
+     o PR `#41635` (confirmação e avanço com tecla Enter em cards de perguntas de múltipla escolha com opções já marcadas).
+   - [Notificação de perda de workers, desengasgo de correio e tipo notice](../issues/notificacao-de-perda-de-workers-desengasgo-de-correio-e-tipo-notice.md):
+     adicionado o PR `#41628` (superfície unificada de notices com harmonização de z-index e tokens de toasts e cartões de canto).
+   - [Badges de worktree para plugins, cadência de PR e redesenho de automações](../issues/badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes.md):
+     adicionados o PR `#41598` / issue `#41369` (configurações nativas de integração e handoff escopado de workspaces para plugins),
+     o PR `#41620` (unificação visual das telas de rotinas, histórico e criação de automações) e
+     a issue `#41616` (API mínima de diagnósticos de plugins para o editor nativo).
+
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41332, #41268, #41325, #40557, #40541 trazem eliminação de Git no watch de CI, rate-limit suspenso para agentes inativos e badges.
+description: Os PRs #41598, #41620, #41332, #41268, #41325 trazem configurações nativas de plugins, unificação de automações e corte de Git em CI.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,9 @@ tags:
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41332`](https://github.com/stablyai/orca/pull/41332),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41598`](https://github.com/stablyai/orca/pull/41598) (resolve Issue [`#41369`](https://github.com/stablyai/orca/issues/41369)),
+[`stablyai/orca#41620`](https://github.com/stablyai/orca/pull/41620),
+[`stablyai/orca#41332`](https://github.com/stablyai/orca/pull/41332),
 [`stablyai/orca#41268`](https://github.com/stablyai/orca/pull/41268) (resolve Issue [`#41269`](https://github.com/stablyai/orca/issues/41269)),
 [`stablyai/orca#41325`](https://github.com/stablyai/orca/pull/41325),
 [`stablyai/orca#40557`](https://github.com/stablyai/orca/pull/40557),
@@ -84,15 +86,25 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41332`](https://github.com
   - Ao desativar Claude ou Codex em Settings > Agents, desconecta o `RateLimitService` do polling de cota (`api.anthropic.com` / `chatgpt.com`), prevenindo emissão de pacotes fora de túneis VPN/proxy e protegendo contas contra suspensões geográficas.
 - **Atribuição de demanda Git e descoberta assíncrona de caminhos de setup (`#41325`):**
   - Substitui o spawn síncrono de processos Git no processo principal durante a preparação de scripts de setup pelo executor assíncrono com timeout de 15s, além de etiquetar demandas de catalogação e leituras de status.
+- **Configurações nativas de integração e handoff escopado por workspace para plugins (`#41598`, resolve `#41369`):**
+  - Adiciona painel nativo de configurações de integração para plugins (`IntegrationsPane`), permitindo parametrização direta sem abrir janelas de navegador externas;
+  - Suporta handoff escopado de workspaces para agentes de plugins, validando seletores de rotas e proprietários no processo hospedeiro sem expor credenciais ou chaves sensíveis.
+- **Unificação da experiência visual e navegação de páginas de automações (`#41620`):**
+  - Consolida as diferentes telas de automações em uma interface unificada (Opção D do redesign), agrupando listagem de rotinas, histórico de execuções e formulário de criação em abas fluidas e consistentes com o design system.
+- **API mínima de diagnósticos de plugins para o editor nativo ([`#41616`](https://github.com/stablyai/orca/issues/41616)):**
+  - Propõe interface enxuta para que plugins de linter e extensões de linguagem publiquem marcadores e diagnósticos diretamente na calha e nos painéis do editor sem sobrecarga de protocolos LSP completos.
 
 ## O que fazer no BrzA Studio
 
-1. Eliminar o trabalho repetido de Git (fetches e merge checks) durante o monitoramento de checks de PR (`#41332`).
-2. Desligar o polling em segundo plano de rate limits para provedores desativados em configurações (`#41268`, resolve `#41269`).
-3. Tornar assíncrona a descoberta de caminhos de setup e atribuição de spans Git (`#41325`).
-4. Adotar o ponto de extensão `contributes.worktreeBadges` (`#40557`) no runtime de plugins do `brza-studio`, permitindo que skills e ferramentas especializadas exibam seus badges e menus contextuais na sidebar.
-5. Incorporar a configuração `prAutoRefresh` em `Settings` (`#40541`) para aliviar carga de CPU e API rate limits em máquinas compartilhadas.
-6. Atualizar o layout do painel de automações (`#40507`) para melhor ergonomia de inspeção e prevenção de cliques destrutivos.
-7. Adotar a atualização sob demanda (`visible-only`) de issues do GitHub ao reativar a janela (`#40534`), desobstruindo a fila da CLI.
-8. Incorporar a checagem `hasTerminalCommandPainted` em `tui-idle` (`#40539`) para garantir entrega segura de comandos via `orchestration dispatch`.
-9. Garantir persistência de fullscreen nativo pós-reinício (`#40540`).
+1. Adotar as configurações nativas de integração e handoff de workspaces para plugins (`#41598`, resolve `#41369`).
+2. Incorporar a navegação unificada de páginas de automações (`#41620`).
+3. Avaliar a API mínima de diagnósticos de plugins para o editor nativo (`#41616`).
+4. Eliminar o trabalho repetido de Git (fetches e merge checks) durante o monitoramento de checks de PR (`#41332`).
+5. Desligar o polling em segundo plano de rate limits para provedores desativados em configurações (`#41268`, resolve `#41269`).
+6. Tornar assíncrona a descoberta de caminhos de setup e atribuição de spans Git (`#41325`).
+7. Adotar o ponto de extensão `contributes.worktreeBadges` (`#40557`) no runtime de plugins do `brza-studio`, permitindo que skills e ferramentas especializadas exibam seus badges e menus contextuais na sidebar.
+8. Incorporar a configuração `prAutoRefresh` em `Settings` (`#40541`) para aliviar carga de CPU e API rate limits em máquinas compartilhadas.
+9. Atualizar o layout do painel de automações (`#40507`) para melhor ergonomia de inspeção e prevenção de cliques destrutivos.
+10. Adotar a atualização sob demanda (`visible-only`) de issues do GitHub ao reativar a janela (`#40534`), desobstruindo a fila da CLI.
+11. Incorporar a checagem `hasTerminalCommandPainted` em `tui-idle` (`#40539`) para garantir entrega segura de comandos via `orchestration dispatch`.
+12. Garantir persistência de fullscreen nativo pós-reinício (`#40540`).

@@ -138,7 +138,7 @@ class Open(_exec.Base):
         root, path = self.build()
         co, sha = self.checkout()
         self.open_step(root, path, co)
-        self.closes_worklog(root, "- commit: brza-studio@%s\n- arquivos: a.py" % sha)
+        self.closes_worklog(root, "- commit: brza-studio@%s\n- arquivos: a.py\n- cobre: todos" % sha)
         self.assertEqual(self.invoke(executor, "wait", path, "--no-panel"), 0)
         self.assertEqual(self.invoke(executor, "open", path, "P1", "--checkout", co, "--no-panel"), 1)
         self.assertIn("não reabre", self.err)
@@ -370,7 +370,7 @@ class Evidence(_exec.Base):
         self.open_step(self.root, self.path, self.co)
 
     def closes(self, evidence=None, marker="feito"):
-        evidence = evidence or ("- commit: brza-studio@%s\n- comando: `pytest -q` → 3 passed (≤ 2 min)\n- arquivos: a.py\n- desvios: X? — nome trocado" % self.sha)
+        evidence = evidence or ("- commit: brza-studio@%s\n- comando: `pytest -q` → 3 passed (≤ 2 min)\n- arquivos: a.py\n- cobre: todos\n- desvios: X? — nome trocado" % self.sha)
         self.closes_worklog(self.root, evidence, marker)
 
     def plan_text(self):
@@ -398,6 +398,7 @@ class Evidence(_exec.Base):
         self.assertEqual(self.invoke(executor, "evidence", self.path, "P1", "--settle", "0"), 0, self.err)
         self.assertEqual(called, [])
         self.assertIn("não rodei `pytest -q`", self.out)
+        self.assertIn("a proposta não roda comando do worklog", self.out)
         self.assertEqual(self.invoke(executor, "evidence", self.path, "P1", "--settle", "0", "--rerun"), 0, self.err)
         self.assertEqual(called, ["pytest -q"])
         self.assertEqual(self.invoke(executor, "evidence", self.path, "P1", "--settle", "0", "--apply"), 0, self.err)
@@ -431,11 +432,55 @@ class Evidence(_exec.Base):
         self.assertEqual([c[1] for c in plan_md.load(self.path).step("P1").checks], ["x", "x"])
         self.assertNotIn("sem `cobre:`", self.out + self.err)
 
-    def test_without_covers_marks_all_and_warns(self):
+    def test_without_covers_refuses_the_apply_and_does_not_mark(self):
         self.closes("- commit: brza-studio@%s\n- arquivos: a.py" % self.sha)
-        self.assertEqual(self.invoke(executor, "evidence", self.path, "P1", "--settle", "0", "--apply"), 0, self.err)
-        self.assertEqual([c[1] for c in plan_md.load(self.path).step("P1").checks], ["x", "x"])
+        before = self.plan_text()
+        self.assertEqual(self.invoke(executor, "evidence", self.path, "P1", "--settle", "0", "--apply"), 1, self.err)
+        self.assertEqual(self.plan_text(), before)
         self.assertIn("sem `cobre:`", self.out + self.err)
+        self.assertIn("não grava", self.out + self.err)
+        self.assertIn("send", self.err)
+        self.assertNotEqual(self.manifest_text(self.root)["steps"]["P1"]["state"], "evidencia-gravada")
+
+    def test_proposal_without_covers_does_not_offer_the_apply(self):
+        self.closes("- commit: brza-studio@%s\n- arquivos: a.py" % self.sha)
+        self.assertEqual(self.invoke(executor, "evidence", self.path, "P1", "--settle", "0"), 0, self.err)
+        self.assertIn("proposta: não grave", self.out)
+        self.assertNotIn("para gravar no plano", self.out)
+
+    def test_apply_without_covers_does_not_run_the_command(self):
+        self.closes("- commit: brza-studio@%s\n- comando: `pytest -q` → 3 passed (≤ 2 min)\n- arquivos: a.py" % self.sha)
+        called = []
+        executor.run_shell = lambda cmd, cwd, timeout=120: (called.append(cmd), (0, "3 passed"))[1]
+        self.assertEqual(self.invoke(executor, "evidence", self.path, "P1", "--settle", "0", "--apply"), 1, self.err)
+        self.assertEqual(called, [])
+        self.assertIn("não rodei `pytest -q`: sem `cobre:`", self.out)
+        self.assertIn("volte ao executor pelo `send`", self.out)
+        self.assertNotIn("a proposta não roda", self.out)
+        self.assertNotIn("use `--rerun`", self.out)
+
+    def test_apply_rerun_without_covers_does_not_run_and_does_not_ask_to_rerun(self):
+        self.closes("- commit: brza-studio@%s\n- comando: `pytest -q` → 3 passed (≤ 2 min)\n- arquivos: a.py" % self.sha)
+        called = []
+        executor.run_shell = lambda cmd, cwd, timeout=120: (called.append(cmd), (0, "3 passed"))[1]
+        self.assertEqual(self.invoke(executor, "evidence", self.path, "P1", "--settle", "0", "--apply", "--rerun"), 1, self.err)
+        self.assertEqual(called, [])
+        self.assertIn("não rodei `pytest -q`: sem `cobre:`", self.out)
+        self.assertIn("volte ao executor pelo `send`", self.out)
+        self.assertNotIn("a proposta não roda", self.out)
+        self.assertNotIn("use `--rerun`", self.out)
+        self.assertEqual(self.plan_text().count("- [x]"), 0)
+
+    def test_rerun_without_covers_still_runs_the_command(self):
+        self.closes("- commit: brza-studio@%s\n- comando: `pytest -q` → 3 passed (≤ 2 min)\n- arquivos: a.py" % self.sha)
+        called = []
+        executor.run_shell = lambda cmd, cwd, timeout=120: (called.append(cmd), (0, "3 passed\n"))[1]
+        before = self.plan_text()
+        self.assertEqual(self.invoke(executor, "evidence", self.path, "P1", "--settle", "0", "--rerun"), 0, self.err)
+        self.assertEqual(called, ["pytest -q"])
+        self.assertIn("confere: `pytest -q`", self.out)
+        self.assertIn("proposta: não grave", self.out)
+        self.assertEqual(self.plan_text(), before)
 
     def test_covers_partial_leaves_the_step_reopenable_by_send_and_by_open(self):
         self.closes("- commit: brza-studio@%s\n- arquivos: a.py\n- cobre: 1" % self.sha)

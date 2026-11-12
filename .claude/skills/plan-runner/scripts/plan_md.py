@@ -31,7 +31,7 @@ RE_PN = re.compile(r"^(P\d+[a-z]?)\s*[—–-]\s*(.*)$")
 RE_DN = re.compile(r"^(D\d+)\s*[—–-]?\s*(.*)$")
 RE_AN = re.compile(r"^(A\d+)\s*[—–-]\s*(.*)$")
 RE_ROUND = re.compile(r"^Rodada\s+(\d+)\b\s*(?:[—–-]\s*)?(.*)$")
-RE_DATA = re.compile(r"\d{4}-\d{2}-\d{2}")
+RE_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 RE_R = re.compile(r"\bR(\d+)(?:\.(\d+))?\b")
 RE_HOURS = re.compile(r"^\s*[~≈]?\s*(\d+(?:[.,]\d+)?)\s*h\b")
 RE_CHECK = re.compile(r"^\s*[-*]\s+\[([ xX-])\]\s*(.*)$")
@@ -288,7 +288,7 @@ def _parse_round(section, m):
     n = int(m.group(1))
     remainder = m.group(2).strip()
     sent_on = None
-    md = RE_DATA.search(remainder)
+    md = RE_DATE.search(remainder)
     if md:
         sent_on = md.group(0)
     title = re.sub(r"\s*\([^()]*\)\s*$", "", remainder).strip()

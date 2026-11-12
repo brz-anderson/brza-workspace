@@ -29,8 +29,8 @@ linha diz "o turno acabou sem o marcador" e a espera segue até o prazo. Saída:
 `(≤ 2 min)`, e mede o `Executado` (janela da abertura ao marcador; Claude também pelos turnos do hook). Sem `--apply`, só
 propõe, e a proposta NÃO roda o comando do worklog (entrada de outra sessão): `--rerun` o roda sem gravar, e o
 `--apply` o roda e grava, por argv e sem shell (aceita `VAR=v` e `cd X &&` na frente, glob e `~`). O filtro só tira o que o argv
-não reproduz: NÃO é segurança, a proteção é a coordenação ler a proposta antes do `--rerun` ou do `--apply`. Com `--apply`, grava a `**Evidência:**` no `### Pn` do plano, marca `[x]`, roda o `plan_state.py --fix` e publica o
-painel. Só se aplica depois de a coordenação ler a proposta (regra da SKILL.md). Saída 1 se algo não confere.
+não reproduz: NÃO é segurança, a proteção é a coordenação ler a proposta antes do `--rerun` ou do `--apply`. Com `--apply`, grava a `**Evidência:**` no `### Pn` do plano, marca `[x]` só nos subpassos da linha `cobre:` (`todos` marca todos), roda o `plan_state.py --fix` e publica o
+painel. Sem `cobre:`, o `--apply` não roda o comando, não grava e manda completar pelo `send`. Só se aplica depois de a coordenação ler a proposta (regra da SKILL.md). Saída 1 se algo não confere.
 
 `close` pede o encerramento e confere o aceite (`closing` não é fechado; `--wait-settled SEG` repete a cada 5 s).
 
@@ -666,9 +666,10 @@ def read_evidence(text):
     return ev
 
 
-def check(ev, checkout, root, c, rerun=False):
+def check(ev, checkout, root, c, rerun=False, skip_reason=None):
     """Roda as conferências: [(ok, linha)]. `ok` None é "não conferido" (informativo). O comando do worklog só roda com
-    `rerun` (o `--apply` ou o `--rerun`) e se for simples: o worklog é entrada de outra sessão."""
+    `rerun` (o `--apply` ou o `--rerun`) e se for simples: o worklog é entrada de outra sessão. `skip_reason`
+    `missing-covers` é a recusa do `--apply` sem `cobre:`: a linha manda voltar pelo `send`, e não repetir o `--apply`."""
     res = []
     for repo, sha in ev["commits"]:
         base = root if repo == "brza-workspace" else checkout
@@ -680,8 +681,12 @@ def check(ev, checkout, root, c, rerun=False):
             res.append((None, "não rodei `%s` (sem `(≤ 2 min)`): vale a palavra do executor: %s" % (k["cmd"], k["result"])))
             continue
         if not rerun:
-            res.append((None, "não rodei `%s`: a proposta não roda comando do worklog (use `--rerun` ou `--apply` depois de ler): "
-                              "vale a palavra do executor: %s" % (k["cmd"], k["result"])))
+            if skip_reason == "missing-covers":
+                res.append((None, "não rodei `%s`: sem `cobre:`, o `--apply` não roda o comando (volte ao executor pelo `send` e peça a linha `cobre:`): "
+                                  "vale a palavra do executor: %s" % (k["cmd"], k["result"])))
+            else:
+                res.append((None, "não rodei `%s`: a proposta não roda comando do worklog (use `--rerun` ou `--apply` depois de ler): "
+                                  "vale a palavra do executor: %s" % (k["cmd"], k["result"])))
             continue
         if parse_command(k["cmd"]) is None:
             res.append((None, "não rodei `%s`: não é um comando que o argv reproduz (só `VAR=v` e `cd X &&` na frente; sem `;`, `|`, `>`, `$`, crase); vale a palavra do "
@@ -778,7 +783,8 @@ def unknown_covered(p, covers):
 
 def apply_to_plan(pl, pid, line, executed_text, covers=None):
     """Grava no `### Pn`: o `Executado`, o `[x]` nos subpassos pendentes e a `**Evidência:**`. Devolve os subpassos marcados.
-    `covers` é a lista de números que a evidência declara; None ou `"todos"` marca todos os pendentes."""
+    `covers` é a lista de números que a evidência declara; `"todos"` marca todos os pendentes. None não marca nenhum:
+    o `--apply` recusa antes de chegar aqui."""
     p = pl.step(pid)
     plan_file = p.file
     lines = list(plan_file.lines)
@@ -788,7 +794,8 @@ def apply_to_plan(pl, pid, line, executed_text, covers=None):
         lines[p.line_hours] = ("%s · Executado: %s" % (mm.group(1), executed_text)) if mm else "%s · Executado: %s" % (l.rstrip(), executed_text)
     marked = []
     for i, mark_text, text in p.checks:
-        if mark_text == " " and (not isinstance(covers, list) or (check_number(text) or "") in [x.lower() for x in covers]):
+        covered = covers == "todos" or (isinstance(covers, list) and (check_number(text) or "") in [x.lower() for x in covers])
+        if mark_text == " " and covered:
             lines[i] = lines[i].replace("[ ]", "[x]", 1)
             marked.append(re.sub(r"\*\*", "", text).split("—")[0].strip())
     if p.evidence_at is not None:
@@ -833,7 +840,11 @@ def cmd_evidence(a, c):
     if ev is None or not (ev["commits"] or ev["commands"] or ev["files"] or ev["waiting"]):
         c.err("o worklog %s não traz `## Evidência` com itens (`commit:`, `comando:`, `arquivos:`): volte ao executor pelo `send`" % wl)
         return 1
-    res = check(ev, e["checkout"], pl.root, c, rerun=bool(a.apply or getattr(a, "rerun", False)))
+    # Sem `cobre:`, o `--apply` recusa mais abaixo e não grava. Não roda o comando nessa ida.
+    refuse_missing_covers = bool(a.apply and ev.get("covers") is None)
+    res = check(ev, e["checkout"], pl.root, c,
+                rerun=bool((a.apply or getattr(a, "rerun", False)) and not refuse_missing_covers),
+                skip_reason="missing-covers" if refuse_missing_covers else None)
     for _, line in res:
         c.out(line)
     bad = [l for ok, l in res if ok is False]
@@ -852,17 +863,23 @@ def cmd_evidence(a, c):
         c.err("`cobre:` cita o subpasso %s, que o passo %s não tem" % (", ".join(still_missing), pid))
         bad.append("cobre com subpasso inexistente")
     if ev.get("covers") is None:
-        c.out("⚠ o worklog não traz `cobre:`: sem `cobre:`, o `--apply` marca todos os subpassos pendentes")
+        c.out("⚠ o worklog não traz `cobre:`; o `--apply` não grava. Volte ao executor pelo `send` e peça a linha `cobre:`.")
     else:
         c.out("cobre: %s" % (ev["covers"] if ev["covers"] == "todos" else ", ".join(ev["covers"])))
     if bad:
         c.err("não confere (%d): volte ao executor pelo `send`; o passo não fecha" % len(bad))
         return 1
     if not a.apply:
-        c.out("proposta: leia e rode `evidence %s %s --apply` para gravar no plano" % (pl.id, pid))
+        if ev.get("covers") is None:
+            c.out("proposta: não grave. Volte ao executor pelo `send` e peça a linha `cobre:`.")
+        else:
+            c.out("proposta: leia e rode `evidence %s %s --apply` para gravar no plano" % (pl.id, pid))
         return 0
     if mk != "feito":
         c.err("o marcador é `parado`: o executor achou desvio que muda o D; leve o X à rodada, não grave o passo como feito")
+        return 1
+    if ev.get("covers") is None:
+        c.err("sem `cobre:`, o `--apply` não grava. Volte ao executor pelo `send` e peça a linha `cobre:`.")
         return 1
     executed_text = measured["text"]
     marked = apply_to_plan(pl, pid, line, executed_text, ev.get("covers"))

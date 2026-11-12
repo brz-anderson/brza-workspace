@@ -17,7 +17,7 @@ duas, o que enfraquece a própria (`Risco:`) e a última linha `<!-- fim-D<n>: <
 O roster padrão (PLN-021/R5.3, confirmada): Claude Opus `high` na arquitetura limpa, Codex no maior esforço na
 mudança mínima, Grok no equilíbrio. `--roster arquivo.json` troca: `{"consultants": [{"focus", "agent", "model", "effort",
 "fallback": {…}}]}`. Runtime com a janela `session` (ou `weekly`, no Grok) acima de 55% no `brza quota --json` não entra: o `fallback` do roster o
-substitui, e a linha da abertura diz quem foi cortado.
+substitui, e a abertura e a tabela dizem quem saiu e qual modelo entrou, por cota.
 
 `wait`: 0 com todos entregues, 75 no prazo (diz quem falta), 1 com falha de sessão. `table`: Markdown para a mensagem e a
 linha `::orca-visual`; foco sem arquivo ou sem marcador vira "(não entregou)". Saída 2: uso ou plano que não existe.
@@ -104,17 +104,61 @@ def quotas():
 
 
 def chooses(roster, quota):
-    """[(entrada efetiva, nota)]: o runtime acima da cota vira o `fallback`."""
+    """[(entrada efetiva, origem ou None)]: o runtime acima da cota vira o `fallback`.
+    A origem é `{agent, model, pct}` de quem saiu."""
     output = []
     for r in roster:
         pct = quota.get(r["agent"])
         if pct is not None and pct > QUOTA_MAX and r.get("fallback"):
             fb = dict(r["fallback"])
             ef = {"focus": r["focus"], "agent": fb["agent"], "model": fb.get("model"), "effort": fb.get("effort")}
-            output.append((ef, "%s cortado: %s a %s%% (> %d%%); entra %s" % (r["agent"], r["agent"], pct, QUOTA_MAX, fb["agent"])))
+            output.append((ef, {"agent": r["agent"], "model": r.get("model"), "pct": pct}))
         else:
             output.append(({k: r.get(k) for k in ("focus", "agent", "model", "effort")}, None))
     return output
+
+
+def quota_note(origin, ef):
+    """`codex gpt-6.1-sol → claude claude-sonnet-5-5 por cota (56% > 55%)`."""
+    return "%s %s → %s %s por cota (%s%% > %d%%)" % (
+        origin["agent"], origin.get("model") or "padrão do runtime",
+        ef["agent"], ef.get("model") or "padrão do runtime",
+        origin["pct"], QUOTA_MAX)
+
+
+def swap_label(origin):
+    """`era Codex gpt-6.1-sol, por cota`."""
+    return "era %s %s, por cota" % (
+        RUNTIME_NAME.get(origin["agent"], origin["agent"]),
+        origin.get("model") or "padrão do runtime")
+
+
+def arrival_who(entry):
+    """Quem entregou. Com troca: `Claude claude-sonnet-5-5, era Codex gpt-6.1-sol, por cota`."""
+    name = RUNTIME_NAME.get(entry.get("agent"), entry.get("agent"))
+    src = entry.get("swapped_from")
+    if not src:
+        return name
+    return "%s %s, %s" % (name, entry.get("model") or "padrão do runtime", swap_label(src))
+
+
+def html_caption(entry):
+    """O `<small>` da coluna. Com troca, inclui o modelo que entrou."""
+    name = RUNTIME_NAME.get(entry.get("agent"), entry.get("agent"))
+    effort = (" · " + entry["effort"]) if entry.get("effort") else ""
+    src = entry.get("swapped_from")
+    if not src:
+        return "%s%s" % (name, effort)
+    return "%s · %s%s · %s" % (name, entry.get("model") or "padrão do runtime", effort, swap_label(src))
+
+
+def column_heading(focus, entry):
+    name = RUNTIME_NAME.get(entry.get("agent"), entry.get("agent"))
+    src = entry.get("swapped_from")
+    if not src:
+        return "%s (%s)" % (focus, name)
+    model = entry.get("model") or "padrão do runtime"
+    return "%s (%s %s, %s)" % (focus, name, model, swap_label(src))
 
 
 def prompt(pl, did, focus, brief, file):
@@ -207,9 +251,10 @@ def cmd_open(a, c):
     m = read_manifest(pl, did)
     m.update({"decision": did, "plan": pl.id})
     lines = []
-    for ef, note in chosen:
+    for ef, origin in chosen:
         focus = ef["focus"]
         ef["model"], ef["effort"], warning_text = executor.effective_model_effort(ef["agent"], ef.get("model"), ef.get("effort"))
+        note = quota_note(origin, ef) if origin else None
         if warning_text:
             c.err("⚠ %s: %s" % (focus, warning_text))
         name = session_name(pl, did, focus)
@@ -236,10 +281,22 @@ def cmd_open(a, c):
             c.err("⚠ %s abriu sem o id do provedor; o `wait` o grava depois. Não relance." % name)
         if res == "ja":
             c.err("⚠ %s já estava aberta; não reabri." % name)
-        m["focuses"][slug_focus(focus)] = {"session": name, "agent": ef["agent"], "model": ef.get("model"), "effort": ef.get("effort"),
-                                       "file": os.path.relpath(file, pl.root), "state": "aberto", "quota_note": note,
-                                       "opened_at": executor.iso(c.clock())}
-        lines.append((slug_focus(focus), name, ef, file, note))
+            prev = m["focuses"].get(slug_focus(focus))
+            if prev:
+                # A sessão viva é a da abertura anterior. Esta tentativa não abre modelo nenhum.
+                kept = {"agent": prev.get("agent"), "model": prev.get("model"), "effort": prev.get("effort")}
+                kept_from = prev.get("swapped_from")
+                lines.append((slug_focus(focus), name, kept, file,
+                              prev.get("quota_note") if kept_from else None, kept_from))
+                continue
+            origin, note = None, None
+        entry = {"session": name, "agent": ef["agent"], "model": ef.get("model"), "effort": ef.get("effort"),
+                 "file": os.path.relpath(file, pl.root), "state": "aberto", "quota_note": note,
+                 "opened_at": executor.iso(c.clock())}
+        if origin:
+            entry["swapped_from"] = {"agent": origin["agent"], "model": origin.get("model")}
+        m["focuses"][slug_focus(focus)] = entry
+        lines.append((slug_focus(focus), name, ef, file, note, origin))
     if a.dry_run:
         return 0
     if a.brief and os.path.abspath(a.brief) != os.path.join(decision_dir, "brief.md"):
@@ -248,10 +305,13 @@ def cmd_open(a, c):
     write_manifest(pl, did, m)
     c.out("| Foco | Sessão | Runtime | Modelo | Esforço | Arquivo |")
     c.out("| :-- | :-- | :-- | :-- | :-- | :-- |")
-    for focus, name, ef, file, _ in lines:
-        c.out("| %s | %s | %s | %s | %s | %s |" % (focus, name, RUNTIME_NAME.get(ef["agent"], ef["agent"]),
+    for focus, name, ef, file, _, origin in lines:
+        runtime = RUNTIME_NAME.get(ef["agent"], ef["agent"])
+        if origin:
+            runtime = "%s (%s)" % (runtime, swap_label(origin))
+        c.out("| %s | %s | %s | %s | %s | %s |" % (focus, name, runtime,
                                                     ef.get("model") or "padrão do runtime", ef.get("effort") or "padrão", file))
-    for _, _, _, _, note in lines:
+    for _, _, _, _, note, _ in lines:
         if note:
             c.out("cota: %s" % note)
     if not a.no_panel:
@@ -290,7 +350,7 @@ def cmd_wait(a, c):
             if arrived(pl, did, f, os.path.join(pl.root, v["file"])):
                 v["state"] = "entregou"
                 v["delivered_at"] = executor.iso(c.clock())
-                c.out("%s · %s entregou (%s)" % (did, f, RUNTIME_NAME.get(v["agent"], v["agent"])))
+                c.out("%s · %s entregou (%s)" % (did, f, arrival_who(v)))
                 c.out(summary_text("%s ·" % did))
     scans()
     while still_missing() and c.clock() < end:
@@ -383,7 +443,7 @@ def escape_cell(v):
 
 
 def table_md(focuses, payload):
-    header = "| | " + " | ".join("%s (%s)" % (f, RUNTIME_NAME.get(focuses[f]["agent"], focuses[f]["agent"])) for f in focuses) + " |"
+    header = "| | " + " | ".join(column_heading(f, focuses[f]) for f in focuses) + " |"
     sep = "| :-- |" + " :-- |" * len(focuses)
     body_text = ["| **%s** | %s |" % (row_label, " | ".join(escape_cell(payload[f].get(k) if payload[f] else ("(não entregou)" if k == "thesis" else None)) for f in focuses))
              for row_label, k in ROWS]
@@ -407,8 +467,7 @@ td.nao{color:var(--muted-foreground,var(--fb-mut));font-style:italic}
 
 
 def render_html(did, pln, focuses, payload):
-    header = "".join("<th>%s<small>%s</small></th>" % (H.escape(f), H.escape("%s%s" % (RUNTIME_NAME.get(v["agent"], v["agent"]),
-                                                                                    (" · " + v["effort"]) if v.get("effort") else "")))
+    header = "".join("<th>%s<small>%s</small></th>" % (H.escape(f), H.escape(html_caption(v)))
                   for f, v in focuses.items())
     body_text = ""
     for row_label, k in ROWS:

@@ -141,7 +141,8 @@ def main(argv: list[str] | None = None) -> int:
 
     acli_bin = find_acli_binary()
     if not acli_bin:
-        print("falhou: Atlassian CLI ('acli') não encontrada. Instale com 'brew install atlassian/acli/acli'.",
+        print("falhou: Atlassian CLI ('acli') não encontrada. "
+              "Instale com 'brew tap atlassian/homebrew-acli && brew install acli'.",
               file=sys.stderr)
         return 1
 

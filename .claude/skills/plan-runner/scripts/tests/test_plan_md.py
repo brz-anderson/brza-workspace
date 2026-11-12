@@ -90,6 +90,39 @@ class MiniPlan(unittest.TestCase):
         self.dirs.append(root)
         return root, path
 
+    def test_executes_line_broken_in_two_lines_is_joined(self):
+        txt = ("### P1 — Um\n\nExecuta os C1–C4, a sonda do X7 · executor: a sessão que\nconduz e Anderson · depende de P2 a P3 e P5\n\n"
+               "Estimado: 1 h · Executado: — h\n\n- [ ] **1. A**\n\n")
+        _, path = self.build(plan(txt + step("P2") + step("P3") + step("P4") + step("P5"), ROUND1))
+        p = plan_md.load(path).step("P1")
+        self.assertEqual(p.executor, "a sessão que conduz e Anderson")
+        self.assertEqual(p.depends, ["P2", "P3", "P5"])
+        q = plan_md.load(path).step("P2")
+        self.assertEqual(q.executor, "`implementer`")
+        self.assertTrue(q.has_estimate)
+
+    def test_executes_line_does_not_swallow_the_lines_glued_below(self):
+        glued = ["- [ ] **1. A** — aplica a regra do D7", "1. um subpasso do D7", "Estimado: 1 h · Executado: — h · D7",
+                 "Executor: a sessão D7", "**Evidência:** `x` → D7", "> citação do D7", "# título do D7", "| a | D7 |",
+                 "```\nD7\n```", "~~~\nD7\n~~~", "* item do D7", "+ item do D7"]
+        for g in glued:
+            txt = "### P1 — Um\n\nExecuta D1 · executor: `implementer`\n%s\n\nEstimado: 1 h · Executado: — h\n\n- [ ] **1. A**\n\n" % g
+            _, path = self.build(plan(txt + step("P2"), ROUND1))
+            p = plan_md.load(path).step("P1")
+            self.assertEqual(p.executes, ["D1"], g)
+            self.assertEqual(p.executor, "`implementer`", g)
+
+    def test_executes_line_continued_by_a_line_that_starts_with_emphasis_is_joined(self):
+        for cont in ("**a sessão** que conduz", "*a sessão* que conduz"):
+            txt = "### P1 — Um\n\nExecuta D1 · executor:\n%s e Anderson\n\nEstimado: 1 h · Executado: — h\n\n- [ ] **1. A**\n\n" % cont
+            _, path = self.build(plan(txt + step("P2"), ROUND1))
+            self.assertEqual(plan_md.load(path).step("P1").executor, cont + " e Anderson")
+
+    def test_executes_line_inside_a_fence_is_not_continued(self):
+        txt = "### P1 — Um\n\nExecuta D1\n```\nD7\n```\n\nEstimado: 1 h · Executado: — h\n\n- [ ] **1. A**\n\n"
+        _, path = self.build(plan(txt + step("P2"), ROUND1))
+        self.assertEqual(plan_md.load(path).step("P1").executes, ["D1"])
+
     def test_answer_with_a_reading_counts_and_counterproposal_does_not(self):
         multiple = ROUND1 + """
 3. **Escolhas menores** (seleção múltipla). Opções:

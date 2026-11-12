@@ -126,6 +126,28 @@ subpasso `[ ]`. O `open` recusa esse estado, o `send` não o reabre, e o `wait` 
 recurso cria um estado parcial, siga o ciclo inteiro dali: `open`, `send`, `wait`, `close` e de novo `open`. Não ponha
 na sonda um comando que grava fora do scratch: o `npm` rodado como amostra deixou um log em `~/.npm/_logs`.
 
+**Na 7ª revisão (P13 do PLN-021, 2026-11-12), o teste confirmou a conta com uma sequência de eventos que o código
+nunca grava.** O teste do X12 montou `aberto → feito(hora do worklog)`, mas o `wait` grava o `feito` na hora em que vê
+o marcador; com o manifesto real do P12 a janela dava 0.01 h, e não os 0.005 h do aceite. Teste: passe o `events`
+real do `.sessions/<plano>/execucao.json` pela função (90, confirmado por replay). Outras duas formas:
+- **O teste chama o helper, e não o verbo.** Apagar a atribuição no `cmd_open` deixou os 205 testes verdes (95).
+- **A continuação de linha só para na linha em branco.** O leitor juntou `Estimado:`, lista, cerca e `**Evidência:**`
+  colados; o `_parse_d` vizinho já parava em `^[-*#]`. Rode cinco entradas coladas contra o HEAD (95).
+
+Na rodada 2 do P13, as cinco correções fecharam, e o buraco ficou no vizinho, de novo:
+- **O fato novo do desvio torna alcançável um defeito antigo.** O X12 provou que o executor fecha o passo dentro do
+  `--wait` do `open`. Mas o `open` neutraliza o "último marcador" depois do `--wait`, e na reabertura apagava o `feito`
+  novo. Quando um desvio muda a premissa de tempo, rode o verbo vizinho sob a premissa nova (95, por teste-sonda no
+  scratch herdando a classe de teste dele).
+- **A mesma correção em dois sítios, e o teste cobre um só.**
+- **A regex de parada sem o espaço do marcador de lista** (`[-*+]` no lugar de `[-*+]\s`) corta a continuação que abre
+  com `**negrito**`.
+
+O conjunto de mutações num script só (`mutate.py`: cópia, `replace`, `PR_SCRIPTS`) mede a rodada inteira em segundos.
+
+Caíram, de 80–85 de partida: a regressão nos planos reais (o leitor do HEAD e o do disco sobre os `plans/` de todos os
+workstreams, por `git archive` de cada branch: 0 pioras, 16 melhoras), o `open` de reabertura antiga e o fuso.
+
 **Why:** a skill nasce de protótipos de scratch, e cada script é endurecido em separado; o contrato entre eles e os
 moldes das references é o que ninguém roda junto.
 **How to apply:** em toda revisão de skill com `scripts/`, rode os comandos do SKILL.md como estão escritos, passe o

@@ -194,9 +194,21 @@ def write_manifest(pl, m):
     os.replace(tmp, path)
 
 
-def append_event(c, e, state, note):
+def append_event(c, e, state, note, at=None):
     e["state"] = state
-    e.setdefault("events", []).append({"at": iso(c.clock()), "state": state, "note": note})
+    e.setdefault("events", []).append({"at": at or iso(c.clock()), "state": state, "note": note})
+
+
+def _marker_at(c, e, pl):
+    """A hora do `feito`/`parado`: o mtime do worklog, quando cai entre o último `aberto` e agora; senão, agora. O `wait` só
+    vê o marcador quando o `--wait` do `open` volta, e o executor pode ter fechado o passo muito antes."""
+    now = c.clock()
+    opened = next((sessions_map.epoch(x.get("at")) for x in reversed(e.get("events") or []) if x.get("state") == "aberto"), None)
+    try:
+        mtime = os.path.getmtime(_abs(pl, e["worklog"]))
+    except OSError:
+        return iso(now)
+    return iso(mtime if opened is not None and opened <= mtime <= now else now)
 
 
 def minutes(c, e, since=None):
@@ -230,14 +242,36 @@ def has_pending_checks(pl, pid):
     return p is not None and any(mark_text == " " for _, mark_text, _ in p.checks)
 
 
-def neutralize_marker(path, pid):
-    """Troca o último `<!-- fim-Pn: feito|parado -->` do worklog por um comentário que o `wait` não lê; o texto fica."""
+def find_marker(path, pid):
+    """(índice, texto) da última linha `<!-- fim-Pn: feito|parado -->` do worklog, ou None."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            lines = f.read().split("\n")
+    except OSError:
+        return None
+    for i in range(len(lines) - 1, -1, -1):
+        if re.match(RE_MARKER % re.escape(pid), lines[i].rstrip()):
+            return i, lines[i]
+    return None
+
+
+def neutralize_marker(path, pid, only=None):
+    """Troca o último `<!-- fim-Pn: feito|parado -->` do worklog por um comentário que o `wait` não lê; o texto fica.
+    Com `only=(índice, texto)`, troca só essa linha, e só se ela ainda tiver o texto: o marcador que o executor novo
+    acrescentou depois fica intacto."""
     try:
         with open(path, encoding="utf-8") as f:
             lines = f.read().split("\n")
     except OSError:
         return False
-    for i in range(len(lines) - 1, -1, -1):
+    if only is not None:
+        i, text = only
+        if i >= len(lines) or lines[i] != text:
+            return False
+        idx = [i]
+    else:
+        idx = range(len(lines) - 1, -1, -1)
+    for i in idx:
         m = re.match(RE_MARKER % re.escape(pid), lines[i].rstrip())
         if m:
             lines[i] = "<!-- reaberto: era fim-%s: %s -->" % (pid, m.group(1))
@@ -392,6 +426,8 @@ def cmd_open(a, c):
     with open(request, "w", encoding="utf-8") as f:
         f.write(text)
     fresh = create_worklog(pl, p, worklog, on_date)
+    old_marker = None if fresh else find_marker(worklog, pid)   # o `--wait` pode voltar com o marcador do executor novo
+    before = c.clock()
     rc, stdout, se = run_sessions(argv)
     res = interpret_open(rc, stdout, se)
     if res == "nao-abriu":
@@ -408,11 +444,13 @@ def cmd_open(a, c):
     if res == "sem-id":
         c.err("⚠ %s abriu sem o id do provedor; o `wait` o grava depois. Não relance." % name)
     if not fresh:
-        neutralize_marker(worklog, pid)   # só com a sessão nova aberta: o marcador do executor anterior não vale para ela
+        if old_marker:
+            neutralize_marker(worklog, pid, only=old_marker)   # só com a sessão nova aberta: o marcador do executor anterior não vale para ela
     e = {"session": name, "agent": agent, "model": model, "effort": effort, "checkout": checkout, "branch": branch,
          "request": os.path.relpath(request, pl.root), "worklog": os.path.relpath(worklog, pl.root),
          "marker": "fim-%s:" % pid, "state": "aberto", "events": [], "evidence": None, "measurement": None}
     append_event(c, e, "aberto", "open: %s%s" % (name, "" if fresh else " (worklog já existia)"))
+    e["events"][-1]["at"] = _open_at(pl, name, before) or iso(before)
     m["steps"][pid] = e
     write_manifest(pl, m)
     c.out("| Passo | Executor | Runtime | Modelo | Esforço | Checkout | Branch |")
@@ -531,7 +569,7 @@ def cmd_wait(a, c):
             mk = last_marker(_abs(pl, e["worklog"]), pid)
             if mk and pid not in result_text:
                 result_text[pid] = mk
-                append_event(c, e, mk, "marcador no worklog")
+                append_event(c, e, mk, "marcador no worklog", at=_marker_at(c, e, pl) if mk in ("feito", "parado") else None)
                 c.out(_event_line(pid, mk, c, e))
         if result_text:
             break
@@ -588,7 +626,8 @@ def cmd_wait(a, c):
                     warned.add(pid)
                     c.out("%s · o turno acabou sem o marcador `<!-- fim-%s: … -->` como última linha; a espera segue" % (pid, pid))
                 continue
-            append_event(c, e, result_text[pid], "wait: %s" % output)
+            append_event(c, e, result_text[pid], "wait: %s" % output,
+                         at=_marker_at(c, e, pl) if result_text[pid] in ("feito", "parado") else None)
             c.out(_event_line(pid, result_text[pid], c, e))
         if result_text:
             break
@@ -714,6 +753,17 @@ def line_evidence(ev):
     if ev["files"]:
         pieces.append("arquivos: " + ", ".join(ev["files"]))
     return "**Evidência:** " + " · ".join(pieces)
+
+
+def _open_at(pl, name, before, slack=60):
+    """O `at` do evento `open` mais recente da sessão no `sessions.jsonl`, se for desta chamada (não anterior a `before`
+    menos a folga); o `--wait` volta só depois que o executor pode ter terminado o passo, e a hora da volta encurta a janela."""
+    rows = [r for r in sessions_map.read_rows(sessions_map.map_file(pl.root))
+            if r.get("event") == "open" and r.get("name") == name and sessions_map.epoch(r.get("at")) is not None]
+    if not rows:
+        return None
+    at = max(rows, key=lambda r: sessions_map.epoch(r["at"]))["at"]
+    return at if sessions_map.epoch(at) >= before - slack else None
 
 
 def _window(c, e, pl):

@@ -13,6 +13,10 @@ tags:
 
 # Ler e enviar mensagens a chats pela CLI e expor Native Chat aos plugins
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `parcial` · casa `studio · tools-kit` · plano `PLN-011 · PLN-010`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado do PR aberto no upstream [`stablyai/orca#38719`](https://github.com/stablyai/orca/pull/38719) (Issue [`#38556`](https://github.com/stablyai/orca/issues/38556)),
 além das issues [`stablyai/orca#40664`](https://github.com/stablyai/orca/issues/40664),
 [`stablyai/orca#38952`](https://github.com/stablyai/orca/issues/38952),
@@ -22,8 +26,10 @@ além das issues [`stablyai/orca#40664`](https://github.com/stablyai/orca/issues
 [`stablyai/orca#37801`](https://github.com/stablyai/orca/issues/37801) e
 [`stablyai/orca#37807`](https://github.com/stablyai/orca/issues/37807), e dos PRs
 [`stablyai/orca#37467`](https://github.com/stablyai/orca/pull/37467),
-[`stablyai/orca#37774`](https://github.com/stablyai/orca/pull/37774) e
+[`stablyai/orca#37774 (MERGED no upstream; não está no fork)`](https://github.com/stablyai/orca/pull/37774) e
 [`stablyai/orca#37802`](https://github.com/stablyai/orca/pull/37802).
+**Handoff (PLN-014/R1.2):** fica `open`. Trabalho em [PLN-011](../../plans/PLN-011-chats-pela-cli-e-plugins/PLN-011-plan.md) (studio) e [PLN-010](../../plans/PLN-010-brza-sessions-sobre-o-brza-chat/PLN-010-plan.md) (tools-kit); o C1 do PLN-011 ainda não entregou.
+
 
 ## O problema
 
@@ -49,7 +55,7 @@ além das issues [`stablyai/orca#40664`](https://github.com/stablyai/orca/issues
    seleção para refletir o chat ativo.
 6. **Ausência de Native Chats na Jump Palette (`#37807`):** abas de Native Chat são omitidas da busca por título no Jump Palette.
 7. **Chats invisíveis para a API de plugins (`#37615`):** na `1.4.246`, o host emite status apenas a partir de terminais PTY.
-8. **Concorrência e travamento no journal de chats (`#37774`, `#37802`):** limpeza de histórico no SQLite do journal travava a UI.
+8. **Concorrência e travamento no journal de chats (`#37774 (MERGED no upstream; não está no fork)`, `#37802`):** limpeza de histórico no SQLite do journal travava a UI.
 
 ## O caminho técnico apontado no upstream
 
@@ -64,7 +70,7 @@ além das issues [`stablyai/orca#40664`](https://github.com/stablyai/orca/issues
   - Preserva a sincronia do título na barra de abas e nos registros persistentes do app.
 - **Na CLI e navegação (`#33114`, `#37801`, `#37807`):** expor comandos do grupo `chat` (`list`, `read`, `send`, `focus`),
   sincronizar bidirecionalmente a seleção da barra lateral com o chat ativo e incluir `agent-session` no Jump Palette.
-- **Na robustez do chat (`#37774`, `#37802`):** isolar rascunhos de terminal contra envios de chat e otimizar queries SQLite.
+- **Na robustez do chat (`#37774 (MERGED no upstream; não está no fork)`, `#37802`):** isolar rascunhos de terminal contra envios de chat e otimizar queries SQLite.
 
 ## O que fazer
 

@@ -11,6 +11,10 @@ tags:
 
 # Segurança no macOS: remoção de allow-dyld-environment-variables dos entitlements e colisão de LC_UUID
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado das issues abertas no upstream [`stablyai/orca#37674`](https://github.com/stablyai/orca/issues/37674) e
 [`stablyai/orca#38247`](https://github.com/stablyai/orca/issues/38247), além do PR
 [`stablyai/orca#37685`](https://github.com/stablyai/orca/pull/37685).

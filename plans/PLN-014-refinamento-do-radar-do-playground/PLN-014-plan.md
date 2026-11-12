@@ -1,28 +1,25 @@
 ---
 status: open
-phase: interview
+phase: design
 origin: request
 description: A entrevista escolhe o destino do refinamento das quinze issues do playground, com terreno e opções já medidos.
-ready: "não — aguarda a entrevista de Anderson sobre o destino do refinamento"
+ready: "sim — R1 respondida; emenda de despacho e parêntese aplicada; próximo é fechar o Desenho sob a regra A1"
 scope:
   - workspace
   - brza-studio
   - brza-workflow
 opened: 2026-11-04
 owner: Anderson
-blocks: A emenda das issues e qualquer porte esperam a entrevista deste plano.
 tags:
   - planning
 ---
 
 # PLN-014: O refinamento do radar do playground chega à entrevista com as opções medidas
 
-- **Retomar:** Terreno e opções estão no Desenho. A R1 foi reapresentada em 2026-11-12 na auditoria
-  [Priorização: issues high × planos abertos × Context7](../../work/worklogs/2026-11-12-priorizacao-issues-high-planos-e-context7.md),
-  com o cruzamento dos 13 planos abertos e provas Context7 (MCP OAuth/PKCE, Electron `kNoSandbox`, contraste WCAG).
-  Em 2026-11-12 o playground tem 47 issues `high` abertas (não mais só as nove do terreno de 2026-11-04); a regra
-  `blocks` deste plano continua: nada se emenda e nada se porta antes da resposta da R1. Cadeia paralela que não
-  espera este plano: C1 do PLN-011 → Desenho do PLN-010; PLN-003/P4 no `tools-kit` (com desvio de distribuição).
+- **Retomar:** R1 respondida em 2026-11-12 ("ambos recomendado"): A1 (regra de despacho), issue de chats fica
+  `open` com ponteiro PLN-011/PLN-010, parêntese nos 7 arquivos. Emenda aplicada nas quinze do terreno. Sem porte.
+  Próximo: fechar o Desenho sob A1 (D1 deixou de ser ponto sem lastro). Cadeia paralela: C1 do PLN-011 → PLN-010;
+  PLN-003/P4 no `tools-kit`.
 
 ## Pedido
 
@@ -58,11 +55,40 @@ tags:
 - **US$ 3,77 não é esta sessão.** É o recorte `playground` de 2026-11-03 no jsonl. Esta sessão é Grok e não está nesse arquivo.
 - **Hora não medida não entra no custo.** O que sustenta a opção é a contagem que o comando fez.
 
+## Entrevista
+
+### Rodada 1 — Destino do refinamento, issue de chats e parêntese nos números fechados (enviada 2026-11-12)
+
+> **Apresentado antes:** Terreno e D1 do PLN-014; reapresentação na auditoria de 2026-11-12. Anderson respondeu "ambos recomendado" (R1 e decisão do worker).
+
+Respondida em 2026-11-12, cloud-agent prioridade-issues-context7.
+
+1. **Destino do PLN-014.** Opções:
+   - A1 — regra de despacho (classe, casa e plano por nota; merge no upstream não muda status) (recomendada) — custo: 15 linhas de casa/classe e parêntese em 7 notas; hora fora; sem porte; se paga: na leitura do próximo ciclo de 6h, se a emenda sobreviver;
+   - A2 — a pergunta passa a ser o gate de setup — custo: outra rodada para o gate; hora de código fora; se paga: na execução pedida, no create da UI; nunca nas outras quatorze;
+   - A3 — dropar este plano e ficar na emenda — custo: plano aberto e fechado na mesma passagem; se paga: na leitura das 7 notas; nunca como a pergunta do pedido.
+
+   **Decidido — A1 — regra de despacho (classe, casa e plano por nota; merge no upstream não muda status).**
+
+2. **A issue de chats.** Opções:
+   - Fica open, com ponteiro para o PLN-011 e o PLN-010 (recomendada) — custo: nenhuma troca de status; se paga: agora, para a próxima leitura não tratar o C1 como entrega;
+   - Passa a done, com a linha de handoff — custo: uma troca de status, sem código; se paga: agora, se "quando elas existirem" basta.
+
+   **Decidido — Fica open, com ponteiro para o PLN-011 e o PLN-010.**
+
+3. **Parêntese nos 7 arquivos que citam número fechado.** Opções:
+   - Entra nesta passagem, no número, sem reescrever o adjetivo da lista mista (recomendada) — custo: 7 notas; se paga: na próxima leitura;
+   - Fica para outra passagem — custo: nenhum; se paga: nunca para o aberto que já não é.
+
+   **Decidido — Entra nesta passagem, no número, sem reescrever o adjetivo da lista mista.**
+
 ## Desenho
 
 ### O que este desenho assume
 
-- **Nada ainda.** A entrevista não foi respondida. D1 é ponto sem lastro.
+- **R1 fechou D1 como A1.** Cada nota do radar leva classe, casa e plano existente; merge no upstream não muda
+  `status`; plano de comportamento só na casa do código, a pedido. A emenda das quinze e o parêntese nas sete já
+  foram aplicados nesta passagem.
 
 ### Terreno
 
@@ -90,10 +116,11 @@ tags:
 
 - **A automação `f75b8281-8ae3-4558-afe4-7ab5bbc35601` está ligada**, cron `0 */6 * * *`, fuso `America/Sao_Paulo`, no worktree `playground`. O prompt manda criar ou atualizar `work/issues/` e commitar. Não manda preservar emenda manual. Se a emenda sobrevive ao próximo ciclo não foi observado.
 
-### D1 — O destino deste plano — ponto sem lastro
+### D1 — O destino deste plano — decidido em R1.1 (A1)
 
-- **Origem:** ponto sem lastro. A R1 ainda não foi respondida.
-- **Contexto:** o pedido abre este plano e pede a entrevista por último. As três hipóteses não concordam no que o plano passa a responder.
+- **Origem:** R1.1. A pergunta deste plano é a regra de despacho.
+- **Contexto:** o pedido abre este plano e pede a entrevista por último. A1 venceu A2 (gate de setup) e A3 (dropar).
+
 
 #### As alternativas
 
@@ -123,18 +150,7 @@ A origem passa a ser a [Segurança de hooks em worktrees e integridade de setup 
 
 #### Em aberto
 
-1. **Destino do PLN-014.** A1, a regra de despacho, é a recomendada: o pedido é o refinamento das issues, o gate de setup não é "sempre roda", e porte não foi pedido.
-   - A1 — custo: 15 linhas e parêntese em 7 notas, hora fora; se paga: na leitura do próximo ciclo, se a frase sobreviver.
-   - A2 — custo: outra rodada para o gate, hora de código fora; se paga: na execução pedida, no create da UI; nunca nas outras quatorze.
-   - A3 — custo: dropar o número recém-aberto; se paga: na leitura das 7 notas; nunca como a pergunta do pedido.
-
-2. **A issue de chats.** Fica `open`, com ponteiro para o PLN-011 e o PLN-010, é a recomendada. As filhas existem e estão `open`, e o PLN-011 espera o C1.
-   - Fica `open` — custo: nenhuma troca de `status`; se paga: agora, para a próxima leitura não tratar o C1 como entrega.
-   - Passa a `done`, com a linha de handoff — custo: uma troca de `status`, sem código; se paga: agora, se "quando elas existirem" basta.
-
-3. **Parêntese nos 7 arquivos que citam número fechado.** Entra nesta passagem, no número, sem reescrever o adjetivo da lista mista, é a recomendada. `MERGED` não vira "já está no fork".
-   - Entra — custo: 7 notas; se paga: na próxima leitura.
-   - Fica para outra passagem — custo: nenhum; se paga: nunca para o "aberto" que já não é.
+Nada desta rodada. R1.1–R1.3 gravadas na Entrevista.
 
 ## Worklogs
 
@@ -142,6 +158,8 @@ A origem passa a ser a [Segurança de hooks em worktrees e integridade de setup 
   [Refinamento do radar do playground até a entrevista](../../work/worklogs/2026-11-04-refinamento-do-radar-do-playground.md)
 - 2026-11-12 — auditoria high × planos × Context7; R1 reapresentada; sem emenda nem porte.
   [Priorização: issues high × planos abertos × Context7](../../work/worklogs/2026-11-12-priorizacao-issues-high-planos-e-context7.md)
+- 2026-11-12 — R1 respondida ("ambos recomendado"); emenda A1 e parêntese aplicados.
+  [R1 do PLN-014 e default dos plugins](../../work/worklogs/2026-11-12-r1-pln-014-e-default-dos-plugins.md)
 
 ## Documentação
 

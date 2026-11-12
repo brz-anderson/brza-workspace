@@ -13,6 +13,10 @@ tags:
 
 # Subagentes nativos, limpeza de correio de orquestração e superfície de super-agent
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado dos PRs abertos no upstream [`stablyai/orca#39804`](https://github.com/stablyai/orca/pull/39804),
 [`stablyai/orca#39802`](https://github.com/stablyai/orca/pull/39802),
 [`stablyai/orca#39599`](https://github.com/stablyai/orca/pull/39599) (resolve Issue [`#39598`](https://github.com/stablyai/orca/issues/39598)),
@@ -51,14 +55,14 @@ além da issue [`stablyai/orca#39631`](https://github.com/stablyai/orca/issues/3
 [`stablyai/orca#34895`](https://github.com/stablyai/orca/pull/34895),
 [`stablyai/orca#37918`](https://github.com/stablyai/orca/pull/37918),
 [`stablyai/orca#37966`](https://github.com/stablyai/orca/pull/37966),
-[`stablyai/orca#37974`](https://github.com/stablyai/orca/pull/37974),
+[`stablyai/orca#37974 (MERGED no upstream; não está no fork)`](https://github.com/stablyai/orca/pull/37974),
 [`stablyai/orca#37574`](https://github.com/stablyai/orca/pull/37574),
 [`stablyai/orca#33403`](https://github.com/stablyai/orca/pull/33403),
 [`stablyai/orca#21333`](https://github.com/stablyai/orca/pull/21333),
-[`stablyai/orca#37703`](https://github.com/stablyai/orca/pull/37703),
+[`stablyai/orca#37703 (MERGED no upstream; não está no fork)`](https://github.com/stablyai/orca/pull/37703),
 [`stablyai/orca#37868`](https://github.com/stablyai/orca/pull/37868),
 [`stablyai/orca#37866`](https://github.com/stablyai/orca/pull/37866),
-[`stablyai/orca#37891`](https://github.com/stablyai/orca/pull/37891),
+[`stablyai/orca#37891 (MERGED no upstream; não está no fork)`](https://github.com/stablyai/orca/pull/37891),
 [`stablyai/orca#37850`](https://github.com/stablyai/orca/pull/37850) e
 [`stablyai/orca#11279`](https://github.com/stablyai/orca/pull/11279), além das issues
 [`stablyai/orca#39807`](https://github.com/stablyai/orca/issues/39807),

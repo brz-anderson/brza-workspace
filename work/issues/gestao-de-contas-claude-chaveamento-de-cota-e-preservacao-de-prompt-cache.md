@@ -13,6 +13,10 @@ tags:
 
 # Gestão de contas Claude, chaveamento de cota e preservação de prompt cache
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado dos PRs abertos no upstream [`stablyai/orca#38581`](https://github.com/stablyai/orca/pull/38581),
 [`stablyai/orca#39169`](https://github.com/stablyai/orca/pull/39169),
 [`stablyai/orca#38654`](https://github.com/stablyai/orca/pull/38654),

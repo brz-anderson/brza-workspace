@@ -5,7 +5,6 @@ tags:
   - infra
   - auth
 refs:
-  - PLN-020
   - issue:fila-de-saida-se-o-mac-dormindo-perder-correio
   - issue:proxy-remoto-de-autorizacao-no-brza-mcp
   - issue:sessao-cloud-executando-no-mac-pelo-worker
@@ -37,8 +36,7 @@ https://github.com/desktop-commander/remote-desktop-commander".
     por cima do gate;
   - [A fila de saída, se o Mac dormindo perder correio](../issues/fila-de-saida-se-o-mac-dormindo-perder-correio.md):
     ele é um relay, mas não uma fila, e com o Mac suspenso a chamada falha.
-- **O que ficou como estava:** o [PLN-020](../../plans/PLN-020-os-fluxos-em-qualquer-client-pelo-brza-orchestrator/PLN-020-plan.md)
-  decidiu a portabilidade entre clients, e não o acesso remoto, como motor. Nada instalado: o agente do Mac não rodou.
+- **Nada instalado:** o agente do Mac não rodou.
 
 ## O que ficou
 
@@ -46,4 +44,4 @@ A medida do alcance pela Claude Code Cloud ficou na issue do worker, em `## A pe
 
 ## Custo da tarefa
 
-Corrido 1 min — agente 1 min, quem pediu 0 s, pausa 0 s · US$ 1,08 (turnos 1,08, subagentes 0,00) · CPU 3 s do `claude` e 2 s dos comandos, RSS até 379 MB · 1 turno, 1 sessão · até 22:49 de 2026-11-11, pelo `brza note commit`
+Corrido 2 min — agente 2 min, quem pediu 0 s, pausa 0 s · US$ 1,24 (turnos 1,24, subagentes 0,00) · CPU 4 s do `claude` e 4 s dos comandos, RSS até 384 MB · 1 turno, 1 sessão · até 22:49 de 2026-11-11, pelo `brza note commit`

@@ -46,6 +46,15 @@ O túnel nomeado com Access pede um domínio na Cloudflare, e a rodada da reuni�
 `sergi.ns.cloudflare.com`, pelo `dig NS brza.dev`). O host do túnel será um subdomínio dele, ainda sem nome. A ordem do
 D1 não muda: o proxy vem antes do túnel.
 
+## O Remote Desktop Commander não substitui o proxy
+
+O [Remote Desktop Commander](https://github.com/desktop-commander/remote-desktop-commander), visto em 2026-11-11, chega
+ao Mac sem túnel nem domínio, por um relay hospedado. Mas ele expõe o terminal (`Start Process`), e uma sessão
+remota com terminal roda o `brza` como chamador local. Isso desfaz tudo o que este proxy garante: o chamador sai do
+token, o `dispatch` remoto vira gate, o `config` fica só no Mac. Como canal até o orquestrador, ele é o caso da
+"porta crua", que a reunião julgou inaceitável. O lugar dele é a
+[A sessão Cloud executando no Mac pelo worker](sessao-cloud-executando-no-mac-pelo-worker.md), com o mesmo risco.
+
 ## Pronto quando
 
 Os testes negativos em `tests/mcp/` passam: o cabeçalho de fora é ignorado; o `approved` remoto, o `config` e o

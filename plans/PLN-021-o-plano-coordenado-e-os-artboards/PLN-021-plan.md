@@ -3,10 +3,10 @@ status: in_progress
 phase: execution
 origin: request
 description: Protótipo no playground de um plan-runner com sessão coordenadora (executores dos passos, consultores em sessões, painel de andamento), scripts e references como os da meeting-runner, e uma skill própria de artboards para protótipos de tela web, mobile e desktop.
-ready: "não — o P9 (o aceite manual) espera o pedido de Anderson"
-estimate_h: 47
-executed_h: 0.99
-remaining_h: 2
+ready: "sim — o P13 (X11, X12 e os cartões) espera o pedido de Anderson"
+estimate_h: 49.75
+executed_h: 1.451
+remaining_h: 2.5
 priority: medium
 scope:
   - workspace
@@ -19,7 +19,7 @@ tags:
 
 # PLN-021: O plano roda por uma sessão coordenadora, com scripts de apoio e artboards de tela
 
-- **Retomar:** o P11 fechou em 2026-11-10. Próximo: o P9, a pedido de Anderson — os casos C1–C4, a sonda de permissão do X7 e a prova do `CODEX_MODEL` do X9.
+- **Retomar:** a R10 (2026-11-12) deu "passa" ao C1–C4, escolheu os cartões (B) e mandou o X11 e o X12 ao P13; o P12 entrou na master do `brza-studio` (`c470dda`), e o P14 provou o X7 pelo `Write`. O P9 fechou. Próximo: o P13, a pedido de Anderson; depois o P10.
 - **Dividido:** [PLN-021 — Desenho](PLN-021-design.md)
 
 ## Pedido
@@ -400,10 +400,65 @@ Respondida em 2026-11-10, 01a1c7c8-3571-7120-bb0f-1125dc3e36ea.
 
    **Resposta:** "aplicar agora" Lida como: aplicar os oito achados de texto agora, antes do P9.
 
+### Rodada 9 — o que roda do P9 e o passo-sonda do C1 e do X7 (enviada 2026-11-12)
+
+> **Apresentado antes:** O PLN-021 tem 9 de 11 passos feitos; o próximo é o P9, com os C1–C4, a sonda do X7 e a prova do CODEX_MODEL do X9. Nenhum plano aberto tem passo de execução pronto: o PLN-014 está no Desenho, e o PLN-019 e o PLN-020 esperam rodadas. Por isso o C1 e o X7 precisam de um passo para servir de sonda.
+
+Respondida em 2026-11-12, 464ae592-7fb4-4ed1-9f6d-8dd26bd7d065.
+
+1. **Quais itens do P9 rodam agora** (seleção múltipla). Opções:
+   - C2 + C4 (recomendada) — custo: cerca de 10 min, nenhuma sessão aberta; se paga: agora, fecha 2 dos 6 itens sem cota;
+   - X9: CODEX_MODEL — custo: 5 a 10 min e um turno da cota Codex; se paga: na primeira bifurcação cara com consultor Codex pelo consult.py;
+   - C1 + X7 juntos — custo: 30 a 45 min e uma sessão Sonnet, num worktree do brza-studio por --tree; se paga: no primeiro passo de código de um plano real;
+   - C3: artboards — custo: 20 a 30 min, e uma tela para desenhar; se paga: no primeiro Desenho que muda o que se vê.
+
+   **Decidido — C2 + C4; X9: CODEX_MODEL; C1 + X7 juntos; C3: artboards.**
+
+2. **Que passo serve de sonda para o C1 e o X7.** Opções:
+   - P12 sonda no PLN-021 (recomendada) — custo: cerca de 5 min de plano e um passo a mais; o executor muda uma linha no brza-studio num worktree --tree, sem merge; se paga: agora, o P9 fecha sem esperar outro plano;
+   - Esperar um plano real — custo: o PLN-021 aberto por dias ou semanas; se paga: quando o passo chegar, com prova mais fiel;
+   - C1 no workspace, X7 depois — custo: cerca de 20 min; se paga: agora para o C1; nunca para o X7, se ficar só no achado.
+
+   **Decidido — P12 sonda no PLN-021.**
+
+### Rodada 10 — os vereditos do P9, o layout do painel, o destino do X11 e do X12, a branch do P12 (enviada 2026-11-12)
+
+> **Apresentado antes:** O P9 rodou: o C1 pelo P12 (brza-studio@c470dda, sem comando digitado), o C2 pelo PNG do painel (X11: a linha Executa cortada), o C3 com os artboards A (tabela) e B (cartões abaixo de 700 px) em 375, 768 e 1280, o C4 pelo diff e pelo brza sync --dry-run (o sync real barrado pelo classificador). O X9 provado pelo rollout do Codex. O X7 provado em parte: o executor gravou o worklog fora do checkout pelo Bash, não pelo Write. O X12: a janela do Executado começa depois do --wait do open.
+
+Respondida em 2026-11-12, 464ae592-7fb4-4ed1-9f6d-8dd26bd7d065.
+
+1. **Os vereditos do C1 ao C4, e o X7** (seleção múltipla). Opções:
+   - Os quatro passam, com o X11 e o X12 como desvios, e o X7 fecha pela sonda no Bash (recomendada) — custo: nenhum agora; se paga: agora, o P9 fecha;
+   - Uma segunda sonda do X7 que obrigue o executor a gravar pelo Write — custo: cerca de 5 min e mais uma sessão Sonnet; se paga: no primeiro executor que gravar pelo Write e travar;
+   - O C4 roda de novo com o brza sync real — custo: cerca de 2 min e o git merge da master em todos os worktrees; se paga: agora, prova literal do C4;
+   - Algum caso falha — custo: —; se paga: —.
+
+   **Resposta:** "1 e 2" C1 a C4 passam, com o X11 e o X12 como desvios; o X7 não fecha pela sonda no Bash: roda a segunda sonda, pelo Write
+
+2. **O C3: que layout o painel usa.** Opções:
+   - A, a tabela de hoje (recomendada) — custo: nenhum; se paga: agora; o chat tem 736 px;
+   - B, cartões abaixo de 700 px — custo: cerca de 1 h no plan_panel.py e os testes do painel; reabre a D5; se paga: quando o painel for aberto no celular.
+
+   **Resposta:** "B" Lida como: B, cartões abaixo de 700 px.
+
+3. **O destino do X11 e do X12.** Opções:
+   - Um P13 no PLN-021, pelo implementer com revisão (recomendada) — custo: cerca de 1 h; se paga: no próximo plano com executor;
+   - Uma issue no playground, e o PLN-021 fecha sem eles — custo: cerca de 10 min; se paga: na promoção ao core;
+   - Só os desvios registrados — custo: nenhum; se paga: nunca.
+
+   **Resposta:** "P13" Lida como: Um P13 no PLN-021, pelo implementer com revisão.
+
+4. **A branch docs/pln-021-p12 do brza-studio.** Opções:
+   - Merge na master do brza-studio e push (recomendada) — custo: cerca de 2 min; o push vai ao GitHub; se paga: agora;
+   - Manter a branch e remover o worktree — custo: nenhum; se paga: nunca, se ninguém voltar;
+   - Descartar a branch e o worktree — custo: perde a linha; se paga: nunca.
+
+   **Resposta:** "merge" Lida como: Merge na master do brza-studio e push.
+
 ## Passos
 
 Do Desenho, com as horas do `designer` (R4.8 confirmada na Rodada 5). A ordem: P1 ∥ P2 → P3 → P4, P5 → P6; o P7 depois do P1; P8 →
-P11 → P9 → P10. Executam a pedido de Anderson de 2026-11-09, com as recomendadas da R4, confirmadas na Rodada 5 (menos a R4.6.2).
+P11 → P12 → P14 → P9 → P10, e o P13 depois do P12. Executam a pedido de Anderson de 2026-11-09, com as recomendadas da R4, confirmadas na Rodada 5 (menos a R4.6.2).
 
 ### P1 — O `skillkit` e a migração da `meeting-runner`
 
@@ -525,19 +580,52 @@ Faz-se antes do P9: o aceite manual roda sobre o roster e o `wait` corrigidos.
 
 **Evidência:** `brza-workspace@0797029` · `python3 -I -m unittest discover` nos quatro conjuntos → 56 (kit), 193 (plan-runner), 56 (screen-artboards), 323 (meeting-runner) OK · a `meeting-runner` só mudou em `common.py`, `launch_persona.py`, `panel.py` e `tally.py`, e o `_legacy_measure` traduz as chaves inglesas da medida · subpassos 1 e 3 no `4350325`, com o registro em [O PLN-021: os defeitos do P11.1](../../work/worklogs/2026-11-10-pln-021-p11-1-os-defeitos.md), sem uma 4ª rodada (o limite de três foi o pedido) · seis rodadas de revisão do P11 no [REV-027](../../work/reviews/REV-027-pln-021-p11.md) · `Executado`: sem medição desta sessão · desvios em X9 e proposta em X10
 
+### P12 — A sonda do executor: uma linha no `brza-studio`
+
+Executa D3 pelo `executor.py`, como sonda do C1 e do X7 (R9.2) · executor: uma sessão executora Claude Sonnet, aberta pelo `executor.py open --tree pln-021-p12 --type docs` · depende de P11
+
+Estimado: 0.5 h · Executado: 0.005 h (da abertura da sessão, 19:14:15, ao worklog, 19:14:34; a janela do `executor.py` deu 0.003 h, X12)
+
+- [x] **1. A linha** — no `docs/development.md` do `brza-studio`, ao fim de `## Troubleshooting`, um item em inglês: a máquina que trava nos testes roda só os arquivos tocados, por caminho, com `--maxWorkers=2` (`pnpm test <file> --maxWorkers=2`), e a suíte completa roda no GitHub pelo `node-next-compat.yml` (`gh workflow run node-next-compat.yml --ref <branch>`). Commit na branch `docs/pln-021-p12`, sem merge nem push.
+- [x] **2. O worklog fora do checkout** — o executor grava a evidência no worklog do workstream, fora do worktree do `brza-studio`; se o Claude pedir permissão para isso, o `wait` devolve `bloqueado`, e esse é o resultado da sonda do X7.
+
+**Evidência:** brza-studio@c470dda · `git -C /Users/andepb/Projects/brza-studio/.worktrees/pln-021-p12 show --stat HEAD` → 1 arquivo, `docs/development.md`, +1 linha · arquivos: docs/development.md · o commit é das 19:14:26, com o autor `brz-anderson`, na `docs/pln-021-p12`, sem merge · o worklog gravado fora do checkout sem pedido de permissão e o `wait` sem `bloqueado` (X7), mas por script no Bash, e não pela ferramenta `Write` (o `worker_done` do executor): a gravação pelo `Write` fora do checkout segue sem prova · o worktree nasceu pelo `brza tree` em ~3 min, fora da janela · desvios em X12
+
+### P14 — A segunda sonda do X7: o worklog pelo `Write`
+
+Executa D3 pelo `executor.py`, como a segunda sonda do X7 (R10.1) · executor: uma sessão executora Claude Sonnet, aberta pelo `executor.py open --tree pln-021-p14 --type chore` · depende de P12
+
+Estimado: 0.25 h · Executado: 0.006 h (da abertura da sessão, 19:33:53, ao worklog, 19:34:15; a janela do `executor.py` deu 0.002 h, X12)
+
+- [x] **1. A leitura** — no `docs/development.md` do `brza-studio`, ache a linha que o P12 acrescentou (a do `--maxWorkers=2`) e anote no worklog o número dela. Sem mudar arquivo do `brza-studio` e sem commit.
+- [x] **2. O worklog pelo `Write`** — grave o worklog, fora do checkout, só pelas ferramentas `Write` ou `Edit`, nunca por comando de shell. Se o Claude pedir permissão, o `wait` devolve `bloqueado`, e esse é o resultado da sonda.
+
+**Evidência:** sem commit, como o passo pede · `cd /Users/andepb/Projects/brza-studio/.worktrees/pln-021-p14 && grep -n -e --maxWorkers=2 docs/development.md` → uma linha, a 59 · arquivos: /Users/andepb/Projects/brza-workspace/.worktrees/playground/work/worklogs/2026-11-12-pln-021-p14-a-segunda-sonda-do-x7-o-worklog-pelo-write.md · o transcript do executor tem um `Write` no worklog às 19:34:13 e nenhum resultado de permissão negada; nenhum `Bash` gravou nele · a sonda vale para o modo de permissão que o `open` dá à sessão · o worktree removido sem mudança
+
+### P13 — Os desvios X11 e X12 e o painel em cartões
+
+Executa D3 e D5, a partir do X11, do X12 e da R10.2 · executor: `implementer`, pela coordenação, com o `reviewer` · depende de P12
+
+Estimado: 2 h · Executado: — h
+
+- [ ] **1. O X11** — o leitor do passo junta a linha `Executa … · executor: …` que continua nas linhas seguintes, até a linha em branco, e o painel mostra o executor inteiro. Teste com o `### P9` quebrado em duas linhas.
+- [ ] **2. O X12** — o `executor.py open` grava o evento `aberto` com o `at` do evento `open` da sessão no `.sessions/sessions.jsonl`, e não com a hora em que o `--wait` volta; sem o evento, com a hora de antes da chamada ao `brza sessions`. Teste: a janela do P12 (19:14:15 → 19:14:34) dá 0.005 h.
+- [ ] **3. O painel em cartões** (D5, R10.2) — abaixo de 700 px, por `@container`, um cartão por passo, como no [protótipo](PLN-021-painel-cartoes.png); de 700 px para cima, a tabela de hoje, com as colunas que ela tem. Testes do painel, e o PNG conferido em 375 e 736 px.
+
 ### P9 — O aceite manual
 
-Executa os C1–C4, a sonda de permissão do X7 e a prova do `CODEX_MODEL` do X9 · executor: a sessão que
-conduz e Anderson · depende de P6 a P8 e P11
+Executa os C1–C4, a sonda de permissão do X7 e a prova do `CODEX_MODEL` do X9 · executor: a sessão que conduz e Anderson · depende de P6 a P8, P11, P12 e P14
 
-Estimado: 1.5 h · Executado: — h
+Estimado: 1.5 h · Executado: 0.45 h (relógio da coordenação, 19:09 → 19:36, sem a espera da R10)
 
-- [ ] **1. C1** — um passo real de um plano aberto pelo `executor.py`, sem comando digitado por Anderson
-- [ ] **2. C2** — o PNG do painel conferido no chat
-- [ ] **3. C3** — um Desenho com artboards no chat, conferido pelo PNG em cada largura
-- [ ] **4. C4** — o `plan-runner` novo só na branch do playground, e a master limpa depois do `brza sync`
-- [ ] **5. A sonda de permissão do X7**, com o `brza` real, no executor do `brza-studio`
-- [ ] **6. A prova do `CODEX_MODEL`** `gpt-6.1-sol`, com uma sessão real
+- [x] **1. C1** — um passo real de um plano aberto pelo `executor.py`, sem comando digitado por Anderson: o P12 (R9.2)
+- [x] **2. C2** — o PNG do painel conferido no chat
+- [x] **3. C3** — um Desenho com artboards no chat, conferido pelo PNG em cada largura
+- [x] **4. C4** — o `plan-runner` novo só na branch do playground, e a master limpa depois do `brza sync`
+- [x] **5. A sonda de permissão do X7**, com o `brza` real, no executor do `brza-studio`: o P12 (R9.2) pelo Bash, e o P14 pelo `Write` (R10.1)
+- [x] **6. A prova do `CODEX_MODEL`** `gpt-6.1-sol`, com uma sessão real — em 2026-11-12, `brza sessions pln021-x9-codex --agent codex --model gpt-6.1-sol --effort xhigh` abriu e respondeu sem recusa; o modelo não sabe o próprio nome, e a prova é o rollout `~/.codex/sessions/2026/11/12/rollout-2026-11-12T19-18-21-01a1d1d7-….jsonl` → `"model":"gpt-6.1-sol"` (7×) e `"effort":"xhigh"`; o `executor.CODEX_MODEL` é o mesmo
+
+**Evidência:** parcial, 2026-11-12 — o 6: `grep -o '"model":"[^"]*"' ~/.codex/sessions/2026/11/12/rollout-2026-11-12T19-18-21-01a1d1d7-25e1-74e2-bc75-c7aab19f4231.jsonl` → `"model":"gpt-6.1-sol"`; C1 a C4 com o Observado na tabela de `## Casos manuais` e o Veredito de Anderson, "passa" (R10.1); o 5 pelo P12 (Bash) e pelo P14 (`Write`), os dois sem `bloqueado` nem pedido de permissão
 
 ### P10 — O fechamento
 
@@ -584,7 +672,7 @@ Estimado: 0.5 h · Executado: — h
   não injeta); `--scheme` ali é erro (código 2); o `shot` injeta o esquema do pacote só no HTML temporário; o navegador com
   `--pack brza-studio` segue o pacote (R6.4). Os 55 testes passam e os PNGs estão em `v3`. Afeta P7 e D7.
 - **X7 — A sonda de permissão do P3 não rodou**: o `brza` dos testes era falso, e o executor do `brza-studio` grava o
-  worklog fora do checkout. Roda no P9, com o `brza` real. Afeta P3 e D3.
+  worklog fora do checkout. Roda no P9, com o `brza` real. Afeta P3 e D3. **Rodou em 2026-11-12**: o P12 gravou o worklog pelo Bash e o P14 pelo `Write`, fora do checkout, sem pedido de permissão (R10.1).
 - **X8 — Os evals saíram com 3 e 2 casos, contra os 5 e 3 do Desenho**: faltam o caso negativo do gatilho R2.3, o do
   `round_log` com `reabre` e o da deriva de tokens, e cada configuração rodou uma vez. Descartado como achado (R6.3): o
   delta de +0,44 já discrimina. Afeta P6, P7 e D2.
@@ -599,6 +687,10 @@ Estimado: 0.5 h · Executado: — h
 - **X10 — Duas chaves ficaram em português. Proposta, sem decisão de Anderson.** `last_send["origem"]` em `sessions_map.py` ficou porque o teste da `meeting-runner` afirma a chave. `answered.data` em `round_log.py` e no Desenho D6 ficou porque a spec fechada do subpasso 2 manda `literal` e `data`; a rodada 2 marcou o pedido de renome como falso. Afeta P11 e D6. Se houver rodada:
   1. Manter as duas (recomendada) — custo: nenhuma troca agora; se paga: já, o adaptador e a spec não quebram.
   2. Renomear `origem` → `origin` e `data` → `date` nos leitores e escritores, com o teste da `meeting-runner` — custo: uma rodada de código e os 323 testes; se paga: quando a spec for reaberta.
+
+- **X11 — O painel corta a linha `Executa` que quebra no Markdown**: no PNG do C2, o executor do P9 saiu "a sessão que", porque o resto ("conduz e Anderson") estava na linha seguinte do `### P9`, e o leitor do passo lê só a primeira. A linha do P9 foi juntada; o leitor segue sem a correção. Afeta P4 e D5.
+
+- **X12 — A janela do `Executado` começa depois do trabalho**: o `executor.py open` grava o `aberto` quando o `brza sessions --wait` volta, e o executor do P12 fez o passo inteiro dentro desse `--wait` (sessão às 19:14:15, commit às 19:14:26, worklog às 19:14:34, `aberto` às 19:14:43). A janela deu 0.003 h contra 0.005 h, e o turno do executor não aparece no `measurements.jsonl`. A janela devia começar no `open` do `sessions.jsonl`. Afeta P3 e D3.
 
 ## Revisões
 
@@ -618,6 +710,7 @@ Estimado: 0.5 h · Executado: — h
 - 2026-11-10 — P11 fechado: subpassos 2 e 4 no `0797029`, três rodadas de revisão. Próximo: o P9, a pedido. [O PLN-021: o código em inglês do P11](../../work/worklogs/2026-11-10-pln-021-codigo-em-ingles.md)
 - 2026-11-11 — Rodada 8, "aplicar agora": os oito achados de texto no plano e no Desenho, antes do P9. [O PLN-021: os oito achados de texto](../../work/worklogs/2026-11-11-pln-021-os-oito-achados-de-texto.md)
 - 2026-11-12 — Parecer da rodada 2 do texto: quatro resíduos aplicados, a CLI do D3, o `verdict`, `level`/`line` e a R6.5 em D4–D6. [O PLN-021: os quatro resíduos do texto](../../work/worklogs/2026-11-12-pln-021-os-quatro-residuos-do-texto.md)
+- 2026-11-12 — R9 e R10 respondidas; P12 e P14, as sondas do executor (`brza-studio@c470dda` na master); C1–C4 passam; X9 e X7 provados; o P9 fechou e o P13 nasceu com X11, X12 e os cartões da D5. Próximo: o P13, a pedido. [O PLN-021: o aceite manual e as sondas do executor](../../work/worklogs/2026-11-12-pln-021-o-aceite-manual-e-as-sondas.md)
 
 ## Casos manuais
 
@@ -625,7 +718,7 @@ O Observado e o Veredito ficam "—" até Anderson rodar o P9.
 
 | ID | Critério | Passos | Esperado | Observado | Veredito |
 | :-- | :-- | :-- | :-- | :-- | :-- |
-| C1 | A coordenação abre um passo real de um plano aberto pelo `executor.py`, sem comando digitado por Anderson | Abrir o passo pelo `executor.py open`, esperar o status e trazer a evidência | A sessão abre, o pedido segue, o `wait` devolve o status e a evidência volta ao plano | — | — |
-| C2 | O PNG do painel conferido no chat | Publicar o painel e abrir o PNG no chat | O PNG mostra os passos, a fase, as horas e os executores, sem corte | — | — |
-| C3 | Um Desenho com artboards no chat, conferido pelo PNG em cada largura | Rodar uma rodada de Desenho com artboards | Um artboard por alternativa, conferido pelo PNG em cada largura | — | — |
-| C4 | O `plan-runner` novo só na branch do playground, e a master no do core | No playground, `git diff master workstream/playground --stat -- .claude/skills/plan-runner`; depois do `brza sync`, `git status` na master | O diff do `plan-runner` aparece só na branch do playground, e a master fica limpa | — | — |
+| C1 | A coordenação abre um passo real de um plano aberto pelo `executor.py`, sem comando digitado por Anderson | Abrir o passo pelo `executor.py open`, esperar o status e trazer a evidência | A sessão abre, o pedido segue, o `wait` devolve o status e a evidência volta ao plano | P12, em 2026-11-12: o `executor.py open --tree` abriu a `pln021-p12` (Sonnet), o executor commitou `brza-studio@c470dda` e marcou o worklog, o `wait` devolveu `feito`, o `evidence --apply` gravou o `### P12`; nenhum comando digitado por Anderson. A janela mediu mal (X12) | passa, Anderson, 2026-11-12, R10.1 (com o X12) |
+| C2 | O PNG do painel conferido no chat | Publicar o painel e abrir o PNG no chat | O PNG mostra os passos, a fase, as horas e os executores, sem corte | 2026-11-12, `brza shot --width 736` → 1472×2654, tema light: os 11 passos, a fase, as horas e o estado, sem corte nem sobreposição; o executor do P9 saiu "a sessão que" (X11) | passa, Anderson, 2026-11-12, R10.1 (com o X11) |
+| C3 | Um Desenho com artboards no chat, conferido pelo PNG em cada largura | Rodar uma rodada de Desenho com artboards | Um artboard por alternativa, conferido pelo PNG em cada largura | 2026-11-12: o layout do painel na largura estreita, A (a tabela de hoje) e B (cartões abaixo de 700 px), pelo `artboard.py new --frame browser --pack brza-studio`; o `shot` deu 375, 768 e 1280 em claro e escuro; o PNG pegou o B v1 com o estado na coluna do Executor, corrigido no B v2; o `new` avisou a deriva de 2 tokens do mobile, fora do `browser` | passa, Anderson, 2026-11-12, R10.1 — escolhida a B (R10.2) |
+| C4 | O `plan-runner` novo só na branch do playground, e a master no do core | No playground, `git diff master workstream/playground --stat -- .claude/skills/plan-runner`; depois do `brza sync`, `git status` na master | O diff do `plan-runner` aparece só na branch do playground, e a master fica limpa | 2026-11-12: `git diff master workstream/playground --stat -- .claude/skills/plan-runner` → 39 arquivos, +10016 −259; a master com `git status` limpo, o `plan-runner` dela igual ao `core@45e6013` a menos dos `{{…}}` do molde; `brza sync --dry-run` → nada a escrever. O `brza sync` real não rodou (o classificador barrou, por mexer em recurso compartilhado) | passa, Anderson, 2026-11-12, R10.1 sem o `brza sync` real |

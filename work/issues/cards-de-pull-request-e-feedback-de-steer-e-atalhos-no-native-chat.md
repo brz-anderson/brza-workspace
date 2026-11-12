@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41359, #41333, #41337, #41212 trazem prévia de PRs em pastas sem git, imagens >5MB no Claude e chips de PRs.
+description: Os PRs #41642, #41635, #41359, #41333, #41337 trazem galeria lightbox de imagens no chat, confirmação Enter em cards e prévia de PRs.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,9 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41359`](https://github.com/stablyai/orca/pull/41359),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41642`](https://github.com/stablyai/orca/pull/41642) (resolve Issue [`#41641`](https://github.com/stablyai/orca/issues/41641)),
+[`stablyai/orca#41635`](https://github.com/stablyai/orca/pull/41635),
+[`stablyai/orca#41359`](https://github.com/stablyai/orca/pull/41359),
 [`stablyai/orca#41333`](https://github.com/stablyai/orca/pull/41333) (resolve Issue [`#37005`](https://github.com/stablyai/orca/issues/37005)),
 [`stablyai/orca#41337`](https://github.com/stablyai/orca/pull/41337) (resolve Issue [`#41134`](https://github.com/stablyai/orca/issues/41134) / STA-14852),
 [`stablyai/orca#41212`](https://github.com/stablyai/orca/pull/41212) (resolve Issue [`#41211`](https://github.com/stablyai/orca/issues/41211)),
@@ -190,9 +192,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41359`](https://github.com
 - **Pré-visualização de links de PRs do GitHub em chats de pastas sem repositório Git (`#41359`):**
   - Quando um chat é iniciado em um workspace de pasta comum (sem repositório Git registrado), links para PRs privados do GitHub caíam no fallback web anônimo gerando erro 404 e "No preview for this page";
   - Agora roteia a consulta `preview: true` através de qualquer repositório Git local registrado no mesmo host autenticado, usando a credencial do `gh` do usuário para exibir o card rico com título, autor e status do PR.
+- **Galeria lightbox de imagens com navegação por teclado no chat (`#41642`, resolve `#41641`):**
+  - Integra um visualizador modal (`PanZoomImageDialog`) que permite percorrer sequencialmente com as setas do teclado todas as imagens anexadas ou geradas em uma mesma linha/mensagem do chat;
+  - Refina `useLocalImageSrc` para omitir flashes da imagem anterior durante trocas de fonte, carregando apenas a imagem ativa em tamanho completo e preservando desempenho.
+- **Confirmação e avanço com tecla Enter em cards de perguntas de escolha única (`#41635`):**
+  - Corrige o comportamento do teclado em `NativeChatQuestionCard`: ao retornar com <kbd>ArrowLeft</kbd> a uma etapa anterior com opção já marcada, pressionar <kbd>Enter</kbd> agora confirma a seleção e avança ("Next ↵" / "Submit") em vez de desselecionar a opção;
+  - Mantém <kbd>Space</kbd> e cliques como alternadores de marcação e preserva o comportamento de toggle estritamente em perguntas de múltipla escolha.
 
 ## O que fazer
 
+- Adotar o visualizador lightbox com navegação por setas para galerias de imagens no chat (`#41642`, resolve `#41641`).
+- Incorporar o avanço com tecla Enter em cards de perguntas com seleção prévia (`#41635`).
 - Rotear pré-visualizações de PRs em chats de pastas avulsas através de repositórios locais existentes no mesmo host GitHub (`#41359`).
 - Permitir envio de imagens e capturas de tela > 5 MB no Claude Chat (`#41333`, resolve `#37005`), aproveitando o auto-shrink nativo do Claude Code.
 - Corrigir a abertura de wikilinks `[[wikilink]]` e citações com Cmd/Ctrl-click em toda a extensão do rótulo (`#41337`, resolve `#41134`).

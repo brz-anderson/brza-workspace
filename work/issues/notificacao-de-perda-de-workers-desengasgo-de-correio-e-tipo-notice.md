@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41426, #41424, #41423, #41422, #40983 trazem encerramento de loop de mail remoto, corte de CPU em saída de PTY e limpeza de bookkeeping.
+description: Os PRs #41628, #41426, #41424, #41423, #41422, #40983 trazem superfície unificada de notices, encerramento de loop de mail remoto e tipo notice.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,8 @@ tags:
 
 # Notificação de perda de workers, desengasgo de correio e tipo notice
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41426`](https://github.com/stablyai/orca/pull/41426) (STA-14936),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41628`](https://github.com/stablyai/orca/pull/41628),
+[`stablyai/orca#41426`](https://github.com/stablyai/orca/pull/41426) (STA-14936),
 [`stablyai/orca#41424`](https://github.com/stablyai/orca/pull/41424) (STA-14935),
 [`stablyai/orca#41423`](https://github.com/stablyai/orca/pull/41423) (STA-14934),
 [`stablyai/orca#41422`](https://github.com/stablyai/orca/pull/41422) (STA-14933),
@@ -49,6 +50,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41426`](https://github.com
    Ao invocar `worker-start --agent claude` em ambientes Linux/macOS com bash, funções de profile do Claude deixavam um
    subshell bash em primeiro plano no grupo de processos do terminal, fazendo o supervisor rejeitar o arranque com erro
    `agent_not_in_foreground`.
+6. **Colisão visual e empilhamento desordenado entre toasts e cartões de notificação (`#41628`):**
+   Toasts efêmeros e cartões persistentes de notificação no canto inferior direito utilizavam contextos de renderização
+   e z-index separados, resultando em sobreposições visuais ilegíveis e inconsistência de cores/bordas contra o fundo da janela.
 
 ## O que o upstream implementa
 
@@ -85,13 +89,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41426`](https://github.com
 - **Encerramento automático de cartões de aprovação órfãos no arranque (`#41422`, STA-14933):**
   - Durante o startup, identifica e encerra cartões de aprovação de chat cujas respostas já foram registradas antes de uma queda ou restart,
     impedindo que cartões sem resposta fiquem abertos eternamente na interface do coordenador.
+- **Superfície compartilhada de avisos para toasts e cartões de notificação (`#41628`):**
+  - Eleva toasts (`sonner`) e a pilha de cartões de notificação (`NotificationCardStack`) para uma camada visual unificada (`notice-surface-tokens.ts`);
+  - Harmoniza z-index, tokens de cor de fundo, bordas e sombras em `main.css`, eliminando oclusões indesejadas e garantindo legibilidade sobre qualquer tema.
 
 ## O que fazer
 
-1. Incorporar no `brza-studio` o manipulador `reportWorkerTurnStop` com motivo `lost` para que o coordenador em sessões multiagente
+1. Incorporar a superfície compartilhada de avisos (`#41628`) para unificar z-index e tokens de toasts e cartões de notificação no `brza-studio`.
+2. Incorporar no `brza-studio` o manipulador `reportWorkerTurnStop` com motivo `lost` para que o coordenador em sessões multiagente
    seja notificado prontamente caso subagentes morram ou sofram falhas de terminal (`#40983`).
-2. Adotar a tipologia `notice` como padrão em envios interagentes na CLI e biblioteca de orquestração do BrzA (`#40972`).
-3. Aplicar o encerramento do loop de correio remoto (`#41426`) e a leitura sob demanda da cauda de terminal de workers (`#41424`).
-4. Limpar o bookkeeping de chats fechados (`#41423`) e encerrar aprovações órfãs no startup (`#41422`).
-5. Aplicar o patch de desobstrução de relay para perguntas de workers remotos (`#40977`).
-6. Assegurar que scripts de startup do Claude executem com substituição direta de processo (`exec`) em perfis shell (`#40962`).
+3. Adotar a tipologia `notice` como padrão em envios interagentes na CLI e biblioteca de orquestração do BrzA (`#40972`).
+4. Aplicar o encerramento do loop de correio remoto (`#41426`) e a leitura sob demanda da cauda de terminal de workers (`#41424`).
+5. Limpar o bookkeeping de chats fechados (`#41423`) e encerrar aprovações órfãs no startup (`#41422`).
+6. Aplicar o patch de desobstrução de relay para perguntas de workers remotos (`#40977`).
+7. Assegurar que scripts de startup do Claude executem com substituição direta de processo (`exec`) em perfis shell (`#40962`).

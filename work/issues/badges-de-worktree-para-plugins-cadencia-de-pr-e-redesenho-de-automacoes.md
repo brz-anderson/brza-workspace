@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40557, #40541, #40507, #40534, #40539 trazem badges de worktree para plugins, cadência de PR, novo overview de automações e tui-idle seguro.
+description: Os PRs #41332, #41268, #41325, #40557, #40541 trazem eliminação de Git no watch de CI, rate-limit suspenso para agentes inativos e badges.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,10 @@ tags:
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40557`](https://github.com/stablyai/orca/pull/40557),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41332`](https://github.com/stablyai/orca/pull/41332),
+[`stablyai/orca#41268`](https://github.com/stablyai/orca/pull/41268) (resolve Issue [`#41269`](https://github.com/stablyai/orca/issues/41269)),
+[`stablyai/orca#41325`](https://github.com/stablyai/orca/pull/41325),
+[`stablyai/orca#40557`](https://github.com/stablyai/orca/pull/40557),
 [`stablyai/orca#40541`](https://github.com/stablyai/orca/pull/40541) (atendendo STA-8667),
 [`stablyai/orca#40507`](https://github.com/stablyai/orca/pull/40507),
 [`stablyai/orca#40534`](https://github.com/stablyai/orca/pull/40534),
@@ -74,12 +77,22 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40557`](https://github.com
   - Exige que o processo em execução tenha efetivamente desenhado texto após o marcador de comando OSC 133;C antes de declarar o terminal como ocioso e pronto para injeção de tarefas.
 - **Persistência do estado de tela cheia nativa (`#40540`):**
   - Registra a flag de fullscreen nativo nas preferências de restauração de janela e aplica `setFullScreen(true)` logo após a inicialização no desktop.
+- **Eliminação de trabalho Git repetido no watch de checks de CI (`#41332`):**
+  - Desacopla o monitoramento contínuo de status de CI do cálculo prévio de arquivos em conflito e detalhes de stack da branch base: 500 leituras de watch passaram de 500 fetches e 422 verificações de mesclagem (2.688 comandos Git) para zero;
+  - Preserva o enriquecimento completo de arquivos conflitantes estritamente para leituras explícitas, ativas ou disparadas no mobile.
+- **Suspensão de requisições de rate limit para agentes desativados (`#41268`, resolve `#41269`):**
+  - Ao desativar Claude ou Codex em Settings > Agents, desconecta o `RateLimitService` do polling de cota (`api.anthropic.com` / `chatgpt.com`), prevenindo emissão de pacotes fora de túneis VPN/proxy e protegendo contas contra suspensões geográficas.
+- **Atribuição de demanda Git e descoberta assíncrona de caminhos de setup (`#41325`):**
+  - Substitui o spawn síncrono de processos Git no processo principal durante a preparação de scripts de setup pelo executor assíncrono com timeout de 15s, além de etiquetar demandas de catalogação e leituras de status.
 
 ## O que fazer no BrzA Studio
 
-1. Adotar o ponto de extensão `contributes.worktreeBadges` (`#40557`) no runtime de plugins do `brza-studio`, permitindo que skills e ferramentas especializadas exibam seus badges e menus contextuais na sidebar.
-2. Incorporar a configuração `prAutoRefresh` em `Settings` (`#40541`) para aliviar carga de CPU e API rate limits em máquinas compartilhadas.
-3. Atualizar o layout do painel de automações (`#40507`) para melhor ergonomia de inspeção e prevenção de cliques destrutivos.
-4. Adotar a atualização sob demanda (`visible-only`) de issues do GitHub ao reativar a janela (`#40534`), desobstruindo a fila da CLI.
-5. Incorporar a checagem `hasTerminalCommandPainted` em `tui-idle` (`#40539`) para garantir entrega segura de comandos via `orchestration dispatch`.
-6. Garantir persistência de fullscreen nativo pós-reinício (`#40540`).
+1. Eliminar o trabalho repetido de Git (fetches e merge checks) durante o monitoramento de checks de PR (`#41332`).
+2. Desligar o polling em segundo plano de rate limits para provedores desativados em configurações (`#41268`, resolve `#41269`).
+3. Tornar assíncrona a descoberta de caminhos de setup e atribuição de spans Git (`#41325`).
+4. Adotar o ponto de extensão `contributes.worktreeBadges` (`#40557`) no runtime de plugins do `brza-studio`, permitindo que skills e ferramentas especializadas exibam seus badges e menus contextuais na sidebar.
+5. Incorporar a configuração `prAutoRefresh` em `Settings` (`#40541`) para aliviar carga de CPU e API rate limits em máquinas compartilhadas.
+6. Atualizar o layout do painel de automações (`#40507`) para melhor ergonomia de inspeção e prevenção de cliques destrutivos.
+7. Adotar a atualização sob demanda (`visible-only`) de issues do GitHub ao reativar a janela (`#40534`), desobstruindo a fila da CLI.
+8. Incorporar a checagem `hasTerminalCommandPainted` em `tui-idle` (`#40539`) para garantir entrega segura de comandos via `orchestration dispatch`.
+9. Garantir persistência de fullscreen nativo pós-reinício (`#40540`).

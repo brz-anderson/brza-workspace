@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40932, #39398, #39006, #33360 e as issues #40321, #39742, #39523, #39528, #39556, #39514 trazem suporte a Windows, fix de account switch, auth macOS, skills e ACP.
+description: Os PRs #41314, #40932, #39398, #39006, #33360 e as issues #40321, #41298, #39742 trazem unificação Windows ACP, regras GEMINI.md, skills e turnos reativos.
 scope:
   - brza-studio
 priority: high
@@ -12,7 +12,8 @@ tags:
 
 # Melhorias de Native Chat, ACP do Gemini CLI, abas e diff no upstream
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40932`](https://github.com/stablyai/orca/pull/40932) (resolve a Issue [`#40321`](https://github.com/stablyai/orca/issues/40321)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41314`](https://github.com/stablyai/orca/pull/41314) (unificando e resolvendo a Issue [`#40321`](https://github.com/stablyai/orca/issues/40321), além de [`#41298`](https://github.com/stablyai/orca/issues/41298)),
+[`stablyai/orca#40932`](https://github.com/stablyai/orca/pull/40932),
 [`stablyai/orca#39398`](https://github.com/stablyai/orca/pull/39398) (Issue [`#39395`](https://github.com/stablyai/orca/issues/39395)),
 [`stablyai/orca#39006`](https://github.com/stablyai/orca/pull/39006) (atendendo à Issue [`#38833`](https://github.com/stablyai/orca/issues/38833)),
 [`stablyai/orca#39012`](https://github.com/stablyai/orca/pull/39012),
@@ -137,17 +138,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40932`](https://github.com
     - O problema ocorre porque o comparador de identidade de conta valida o hash completo do token armazenado em vez do
       identificador durável de usuário/e-mail; como a CLI atualiza o timestamp e tokens de renovação a cada turno, o hash
       diverge e o app interpreta a renovação como troca de usuário.
-26. **Suporte ao Antigravity ACP no cliente Windows e streaming reativo de subagentes (`#40932`, resolve `#40321`):**
-    - Estende a arquitetura de backend de host de `#39006` para o cliente Windows, admitindo o executável `agy.exe` em
-      `%LOCALAPPDATA%\agy\bin\agy.exe` ou descoberto via `PATH`;
-    - Implementa descoberta dinâmica do catálogo de modelos via `agy models` com fallbacks estruturados;
-    - Introduz o streamer reativo de turnos (`antigravity-reactive-turn-streamer.ts`) para monitorar `transcript.jsonl` e
-      `transcript_full.jsonl` em tempo real, permitindo exibir turnos de wakeup de tarefas em segundo plano e subagentes
-      imediatamente na interface do chat nativo sem polling e suprimindo eventos tardios duplicados.
+26. **Unificação completa de Antigravity ACP no Windows, regras, catálogo e turnos reativos (`#41314`, resolve `#40321`, `#41298`):**
+    - Unifica os esforços de `#40932`, `#41021`, `#40344`, `#40980`, `#40867`, `#40986` e `#40308` em uma única arquitetura coesa;
+    - Habilita suporte out-of-the-box no Windows tanto para o runtime gerenciado 1.4.5 quanto para a CLI do host `agy >= 1.5.2` (`%LOCALAPPDATA%\agy\bin\agy.exe`), com limpeza de variáveis de ambiente Windows (`ELECTRON_RUN_AS_NODE=1`), bloqueio de escritas em pastas de usuário (`_meta.antigravity.disabledTools: ['run_workflow']`) e timeout de prontidão alargado para 15s;
+    - Implementa o monitoramento reativo de `<GEMINI_HOME>/antigravity-cli/brain/<sessionId>/.system_generated` (`antigravity-prompt-turn-tracker.ts`), fazendo com que chamadas `run_command` em background se assentem imediatamente e que turnos de wakeup de subagentes/tarefas concluídas sejam projetados ao vivo no chat sem necessidade de polling ou de nova mensagem do usuário;
+    - Habilita descoberta de catálogo sessionless via `agy models` com tratamento de usuários deslogados e escopo estrito de contas;
+    - Injeta automaticamente regras de usuário globais e do workspace (`GEMINI.md` e `AGENTS.md`) em `_meta.antigravity.systemPrompt.append` (até 256 KB);
+    - Registra `antigravity` no menu slash `/` do Native Chat (`skillSourceOwner: 'antigravity'`) para autocompletar skills em `~/.gemini/config/skills` e `.agents/skills`.
 
 ## O que fazer
 
-- Adotar o suporte ao executável Windows de Antigravity ACP (`%LOCALAPPDATA%\agy\bin\agy.exe`) e o streaming reativo de turnos (`antigravity-reactive-turn-streamer.ts`) para subagentes e tarefas em background (`#40932`, resolve `#40321`).
+- Adotar a unificação completa de Antigravity ACP (`#41314`, resolve `#40321`), incluindo suporte a Windows (`agy.exe` e gerenciado 1.4.5), streaming reativo de subagentes/comandos em segundo plano, injeção de regras `GEMINI.md`/`AGENTS.md`, autocompletação slash `/` de skills e descoberta `agy models`.
 - Corrigir a comparação de identidade de conta no Antigravity (`#39742`), validando ID/e-mail do usuário em vez do hash mutável de credenciais para eliminar avisos falsos após cada execução de worker.
 - Implementar fallback no `HybridCredentialStore` para leitura de `acp_token.json` quando o item do Keychain não existir,
   ou sincronizar o token no Keychain do macOS durante o sign-in no `brza-studio` (`#39523`).

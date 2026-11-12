@@ -20,3 +20,10 @@ Cloud, e a pessoa reenvia à mão.
 A fase 1 do [O correio remoto por MCP para sessões fora do Mac](correio-remoto-por-mcp-para-sessoes-fora-do-mac.md) suspende o Mac 10 min
 com 20 mensagens e conta perda e duplicata. Se houver perda, um relay só de saída (o Mac disca, a Cloud deposita)
 entra antes da fase 2.
+
+## O relay pronto não é a fila
+
+O [Remote Desktop Commander](https://github.com/desktop-commander/remote-desktop-commander), visto em 2026-11-11, é um
+relay hospedado em que o Mac disca. Mas ele não guarda nada: o README diz que a máquina "is reachable only while its
+device agent is running", e que fechar o terminal encerra o acesso. Com o Mac suspenso, a chamada falha, como no túnel.
+Ele não atende a esta condição.

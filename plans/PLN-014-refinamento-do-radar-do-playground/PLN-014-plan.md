@@ -17,7 +17,12 @@ tags:
 
 # PLN-014: O refinamento do radar do playground chega à entrevista com as opções medidas
 
-- **Retomar:** Terreno e opções estão no Desenho. A próxima ação é a entrevista R1. Nada se emenda e nada se porta antes da resposta.
+- **Retomar:** Terreno e opções estão no Desenho. A R1 foi reapresentada em 2026-11-12 na auditoria
+  [Priorização: issues high × planos abertos × Context7](../../work/worklogs/2026-11-12-priorizacao-issues-high-planos-e-context7.md),
+  com o cruzamento dos 13 planos abertos e provas Context7 (MCP OAuth/PKCE, Electron `kNoSandbox`, contraste WCAG).
+  Em 2026-11-12 o playground tem 47 issues `high` abertas (não mais só as nove do terreno de 2026-11-04); a regra
+  `blocks` deste plano continua: nada se emenda e nada se porta antes da resposta da R1. Cadeia paralela que não
+  espera este plano: C1 do PLN-011 → Desenho do PLN-010; PLN-003/P4 no `tools-kit` (com desvio de distribuição).
 
 ## Pedido
 
@@ -135,6 +140,24 @@ A origem passa a ser a [Segurança de hooks em worktrees e integridade de setup 
 
 - 2026-11-04 — abertura, terreno e D1 em aberto. Parou na R1.
   [Refinamento do radar do playground até a entrevista](../../work/worklogs/2026-11-04-refinamento-do-radar-do-playground.md)
+- 2026-11-12 — auditoria high × planos × Context7; R1 reapresentada; sem emenda nem porte.
+  [Priorização: issues high × planos abertos × Context7](../../work/worklogs/2026-11-12-priorizacao-issues-high-planos-e-context7.md)
+
+## Documentação
+
+- MCP Authorization (spec 2025-11-25): OAuth 2.1 + PKCE no HTTP; STDIO lê credenciais do ambiente —
+  `https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization` (Context7
+  `/websites/modelcontextprotocol_io_specification_2025-11-25`).
+- Electron sandbox / `utilityProcess` sem sandbox Chromium (`kNoSandbox`) — docs Electron via Context7
+  `/electron/electron`.
+- Contraste WCAG 2.1 / `forced-colors` — WAI-ARIA APG via Context7 `/w3c/aria-practices`.
+
+## Pendências conhecidas
+
+- [Autenticação MCP no chat, alerta de turnos ativos e cache de orquestração](../../work/issues/autenticacao-mcp-no-chat-alerta-de-turnos-ativos-e-cache-de-orquestracao.md)
+  — `high`; porte só depois da R1 (e alinhamento OAuth/PKCE da spec).
+- [O default dos plugins e o alcance do worker sem sandbox](../../work/decisions/o-default-dos-plugins-e-o-alcance-do-worker-sem-sandbox.md)
+  — proposta `open`; Context7 confirma worker Electron unsandboxed.
 
 ## Fechamento
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41212, #41224, #41180, #41099, #41100 trazem chips e hover cards de issues/PRs, indentação com Tab, escape e steer.
+description: Os PRs #41333, #41337, #41212, #41224 trazem envio de imagens >5MB no Claude, clique em wikilinks, chips de PRs e listas Tab.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,9 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41212`](https://github.com/stablyai/orca/pull/41212) (resolve Issue [`#41211`](https://github.com/stablyai/orca/issues/41211)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41333`](https://github.com/stablyai/orca/pull/41333) (resolve Issue [`#37005`](https://github.com/stablyai/orca/issues/37005)),
+[`stablyai/orca#41337`](https://github.com/stablyai/orca/pull/41337) (resolve Issue [`#41134`](https://github.com/stablyai/orca/issues/41134) / STA-14852),
+[`stablyai/orca#41212`](https://github.com/stablyai/orca/pull/41212) (resolve Issue [`#41211`](https://github.com/stablyai/orca/issues/41211)),
 [`stablyai/orca#41224`](https://github.com/stablyai/orca/pull/41224) (resolve Issue [`#41217`](https://github.com/stablyai/orca/issues/41217)),
 [`stablyai/orca#41180`](https://github.com/stablyai/orca/pull/41180) (resolve Issue [`#41178`](https://github.com/stablyai/orca/issues/41178)),
 [`stablyai/orca#41242`](https://github.com/stablyai/orca/pull/41242),
@@ -178,9 +180,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41212`](https://github.com
   - Corrige o estilo CSS do botão de branch no rodapé do composer para abraçar estritamente o texto do branch em vez de esticar por toda a largura restante.
 - **Invalidação inteligente de títulos de chat em cache (`#41242`):**
   - Atualiza títulos de abas e sessões de chat em cache somente quando os inputs salvos forem modificados, eliminando recomputações cíclicas na barra lateral.
+- **Envio de imagens maiores que 5 MB no Claude Chat sem recusa de mensagem (`#41333`, resolve `#37005`):**
+  - Remove o bloqueio artificial de 5 MiB por imagem no envio de mensagens do Native Chat Claude: o próprio Claude Code já encolhe nativamente imagens para no máximo 2000px e ~500 KB JPEG antes de consultar a API da Anthropic;
+  - Eleva os limites do despachador do Orca para concordar com o teto de upload (`AGENT_SESSION_ATTACHMENT_MAX_BYTES` de 50 MiB por imagem e 64 MiB por mensagem total), permitindo colar capturas de tela Retina e fotos em alta resolução fluidamente.
+- **Clique com Cmd/Ctrl em wikilinks e citações em qualquer ponto do rótulo (`#41337`, resolve `#41134` / STA-14852):**
+  - Corrige a rota de clique `getClickedNode` no editor ProseMirror de Markdown rico: cliques na metade direita de links atômicos inline (`[[wikilink]]` e `<sup><a href>`) antes eram interpretados pelo `posAtCoords` como o nó seguinte, falhando em abrir o documento alvo;
+  - Agora resolve o nó atômico anterior quando o alvo DOM estiver dentro do elemento renderizado, abrindo o link independentemente de onde o usuário clicar no rótulo.
 
 ## O que fazer
 
+- Permitir envio de imagens e capturas de tela > 5 MB no Claude Chat (`#41333`, resolve `#37005`), aproveitando o auto-shrink nativo do Claude Code.
+- Corrigir a abertura de wikilinks `[[wikilink]]` e citações com Cmd/Ctrl-click em toda a extensão do rótulo (`#41337`, resolve `#41134`).
 - Adotar os chips interativos e hover cards de issues/PRs no Native Chat (`#41212`, resolve `#41211`).
 - Incorporar os atalhos <kbd>Tab</kbd> e <kbd>Shift+Tab</kbd> para indentar/recuar listas no composer (`#41224`, resolve `#41217`).
 - Ajustar a largura do botão de branch no composer (`#41180`, resolve `#41178`) e a invalidação de títulos de chat (`#41242`).

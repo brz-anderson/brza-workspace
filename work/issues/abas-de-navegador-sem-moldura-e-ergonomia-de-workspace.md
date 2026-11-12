@@ -13,11 +13,15 @@ tags:
 
 # Abas de navegador sem moldura e ergonomia de workspace
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado dos PRs abertos no upstream [`stablyai/orca#37708`](https://github.com/stablyai/orca/pull/37708),
 [`stablyai/orca#37810`](https://github.com/stablyai/orca/pull/37810),
 [`stablyai/orca#37803`](https://github.com/stablyai/orca/pull/37803),
 [`stablyai/orca#37718`](https://github.com/stablyai/orca/pull/37718) e
-[`stablyai/orca#37716`](https://github.com/stablyai/orca/pull/37716), além das issues
+[`stablyai/orca#37716 (MERGED no upstream; não está no fork)`](https://github.com/stablyai/orca/pull/37716), além das issues
 [`stablyai/orca#37700`](https://github.com/stablyai/orca/issues/37700),
 [`stablyai/orca#37808`](https://github.com/stablyai/orca/issues/37808),
 [`stablyai/orca#37784`](https://github.com/stablyai/orca/issues/37784),
@@ -37,9 +41,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#37708`](https://github.com
    workspace diretamente pela paleta de comandos (`Cmd+J` / `Ctrl+Shift+J`) sem precisar interagir com o mouse.
 4. **Carregamento tardio de novas pastas de projetos (`#37713`):** uma nova pasta de projeto adicionada ao host não era
    recarregada automaticamente no painel de Projetos aberto até que o app fosse reiniciado.
-5. **Ergonomia e controle da árvore de projetos e editor (`#37718`, `#37716`, `#37746`):**
+5. **Ergonomia e controle da árvore de projetos e editor (`#37718`, `#37716 (MERGED no upstream; não está no fork)`, `#37746`):**
    - `#37718`: adiciona comando associável a atalho para recolher ou expandir todos os projetos na barra lateral;
-   - `#37716`: introduz opção opt-in de format-on-save no editor;
+   - `#37716 (MERGED no upstream; não está no fork)`: introduz opção opt-in de format-on-save no editor;
    - `#37746`: configuração do local de abertura da aba de Setup ao criar novo workspace.
 
 ## O que o upstream implementa

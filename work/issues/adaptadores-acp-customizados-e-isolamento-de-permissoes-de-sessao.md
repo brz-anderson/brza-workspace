@@ -13,6 +13,10 @@ tags:
 
 # Adaptadores ACP customizados e isolamento de permissões de sessão
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado dos PRs abertos no upstream [`stablyai/orca#41229`](https://github.com/stablyai/orca/pull/41229) (resolve Issue [`#41170`](https://github.com/stablyai/orca/issues/41170)),
 [`stablyai/orca#41201`](https://github.com/stablyai/orca/pull/41201) (resolve Issue [`#41185`](https://github.com/stablyai/orca/issues/41185)),
 [`stablyai/orca#41243`](https://github.com/stablyai/orca/pull/41243),
@@ -22,9 +26,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41229`](https://github.com
 [`stablyai/orca#38807`](https://github.com/stablyai/orca/pull/38807) (Issue [`#38806`](https://github.com/stablyai/orca/issues/38806)),
 [`stablyai/orca#37842`](https://github.com/stablyai/orca/pull/37842),
 [`stablyai/orca#37895`](https://github.com/stablyai/orca/pull/37895) (Issue [`#37889`](https://github.com/stablyai/orca/issues/37889)),
-[`stablyai/orca#37861`](https://github.com/stablyai/orca/pull/37861) (Issue [`#37859`](https://github.com/stablyai/orca/issues/37859)),
+[`stablyai/orca#37861 (CLOSED sem merge no upstream)`](https://github.com/stablyai/orca/pull/37861) (Issue [`#37859 (CLOSED no upstream)`](https://github.com/stablyai/orca/issues/37859)),
 [`stablyai/orca#37862`](https://github.com/stablyai/orca/issues/37862) e
-[`stablyai/orca#37883`](https://github.com/stablyai/orca/pull/37883), além das issues
+[`stablyai/orca#37883 (MERGED no upstream; não está no fork)`](https://github.com/stablyai/orca/pull/37883), além das issues
 [`stablyai/orca#38866`](https://github.com/stablyai/orca/issues/38866) e
 [`stablyai/orca#38849`](https://github.com/stablyai/orca/issues/38849).
 
@@ -52,7 +56,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41229`](https://github.com
 6. **\"Allow for this session\" persistia permissões definitivas no disco (`#37895`, `#37889`):** no chat de Claude Code,
    ao aprovar uma ferramenta com \"Allow for this session\", o app repassava a sugestão com `destination: \"localSettings\"`,
    gravando permanentemente a regra em `<projeto>/.claude/settings.local.json`.
-7. **Fallback silencioso de modelo (`#37861`, `#37859`):** quando o Claude realizava fallback automático de modelo,
+7. **Fallback silencioso de modelo (`#37861 (CLOSED sem merge no upstream)`, `#37859 (CLOSED no upstream)`):** quando o Claude realizava fallback automático de modelo,
    o composer permanecia fixado no modelo antigo sem feedback ao usuário.
 8. **Tarefas de background sem inspeção de saída ao vivo (`#37862`):** comandos disparados em background pelo agente
    exibiam apenas uma linha de status estática no chat.
@@ -73,7 +77,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41229`](https://github.com
   `customAgentAdapters` nas configurações do host, definindo comando, argumentos, variáveis de ambiente e transporte (`stdio` ou `sse`).
 - **Isolamento estrito de aprovações de sessão (`#37895`):** reescreve o destino de regras de "Allow for this session" para
   `"session"` no RPC de aprovação, mantendo as permissões apenas em memória.
-- **Reflexo de fallback e visibilidade de turnos (`#37861`, `#37883`):** exibe alertas no chat e ajusta o seletor do composer
+- **Reflexo de fallback e visibilidade de turnos (`#37861 (CLOSED sem merge no upstream)`, `#37883 (MERGED no upstream; não está no fork)`):** exibe alertas no chat e ajusta o seletor do composer
   quando há fallback de modelo.
 - **Redação de credenciais e segredos em stderr de agentes ACP (`#41229`, resolve `#41170`):**
   - Aplica filtros de higienização de credenciais, chaves e tokens de autenticação em saídas de stderr emitidas por agentes ACP

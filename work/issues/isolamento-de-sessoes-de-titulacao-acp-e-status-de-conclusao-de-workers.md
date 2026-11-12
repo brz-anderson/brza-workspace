@@ -13,6 +13,10 @@ tags:
 
 # Isolamento de sessões de titulação ACP e status de conclusão de workers
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `parcial` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado da issue aberta no upstream [`stablyai/orca#37832`](https://github.com/stablyai/orca/issues/37832) e dos PRs
 [`stablyai/orca#37063`](https://github.com/stablyai/orca/pull/37063) (Issue
 [`stablyai/orca#37040`](https://github.com/stablyai/orca/issues/37040)) e

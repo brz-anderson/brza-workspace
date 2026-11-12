@@ -11,12 +11,16 @@ tags:
 
 # Leitura antecipada e preservação de skills no arranque e nos plugins
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com/stablyai/orca/pull/40812),
 [`stablyai/orca#40788`](https://github.com/stablyai/orca/pull/40788) (resolve Issue [`#40785`](https://github.com/stablyai/orca/issues/40785)),
 [`stablyai/orca#40214`](https://github.com/stablyai/orca/pull/40214) (resolve Issue [`#40181`](https://github.com/stablyai/orca/issues/40181)),
 [`stablyai/orca#35220`](https://github.com/stablyai/orca/pull/35220),
 [`stablyai/orca#36897`](https://github.com/stablyai/orca/pull/36897),
-[`stablyai/orca#37659`](https://github.com/stablyai/orca/pull/37659) e
+[`stablyai/orca#37659 (MERGED no upstream; não está no fork)`](https://github.com/stablyai/orca/pull/37659) e
 [`stablyai/orca#19680`](https://github.com/stablyai/orca/pull/19680), além das issues
 [`stablyai/orca#41017`](https://github.com/stablyai/orca/issues/41017),
 [`stablyai/orca#14690`](https://github.com/stablyai/orca/issues/14690),
@@ -30,7 +34,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com
    cache de plugins, a varredura chega a levar mais de 30 segundos.
 2. **Perda de descoberta no arranque (`#36897`):** a confirmação de status após o startup descartava ou refazia a
    descoberta inicial de skills.
-3. **Colisão de nomes no seletor `/` (`#19680`) e colisão com skills empacotadas (`#37659`):** skills vindas de plugins
+3. **Colisão de nomes no seletor `/` (`#19680`) e colisão com skills empacotadas (`#37659 (MERGED no upstream; não está no fork)`):** skills vindas de plugins
    perdiam o namespace `plugin:skill` nos pickers de comando `/`; além disso, a skill bundled `computer use` colidia com
    ferramentas externas de mesmo nome.
 4. **Falta de ponto de contribuição para subagentes e skills em plugins (`#37875`, `#32573`):** plugins modernos
@@ -64,7 +68,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com
   enquanto a atual é processada e mantendo a ordem determinística; reduz o tempo de varredura de 3x a 6x.
 - **PR `#36897`:** preserva a lista de skills descobertas no arranque após a confirmação de status.
 - **PR `#19680`:** mantém o identificador qualificado `plugin:skill` nos seletores `/` do chat.
-- **PR `#37659`:** renomeia a skill empacotada para `orca-computer-use` na descoberta, configurações e documentação,
+- **PR `#37659 (MERGED no upstream; não está no fork)`:** renomeia a skill empacotada para `orca-computer-use` na descoberta, configurações e documentação,
   mantendo links legados e aliases do CLI para evitar quebras.
 - **Issues `#37875` e `#32573`:** propõem expor pontos de contribuição declarativos `skills` e `subagents` no manifesto
   do plugin para carregar arquivos de agentes e skills embutidos.
@@ -75,7 +79,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com
 
 1. Adotar a correção de classificação de bundled skills do [`stablyai/orca#40214`](https://github.com/stablyai/orca/pull/40214) para não bloquear atualizações por presença de arquivos sidecar (`agents/openai.yaml`).
 2. Aplicar o [`stablyai/orca#35220`](https://github.com/stablyai/orca/pull/35220) (4 arquivos autocontidos em
-   `src/main/skills/`) no `brza-studio`, incorporar o `#37659` e preparar o sistema de plugins para registrar subagentes
+   `src/main/skills/`) no `brza-studio`, incorporar o `#37659 (MERGED no upstream; não está no fork)` e preparar o sistema de plugins para registrar subagentes
    nativos entregues por pacotes de terceiros.
 3. Adotar a ordenação determinística de caminhos no cálculo de identidade de pacotes de skills (`#40812`).
 4. Exibir dicas de argumentos (`argument-hint`) no seletor de comandos/skills do chat (`#40788`).

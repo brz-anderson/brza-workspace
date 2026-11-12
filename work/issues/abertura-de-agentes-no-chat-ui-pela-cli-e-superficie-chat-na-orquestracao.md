@@ -13,6 +13,10 @@ tags:
 
 # Abertura de agentes no Chat UI pela CLI e superfície chat na orquestração
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado dos PRs abertos no upstream [`stablyai/orca#31595`](https://github.com/stablyai/orca/pull/31595),
 [`stablyai/orca#37710`](https://github.com/stablyai/orca/pull/37710),
 [`stablyai/orca#38001`](https://github.com/stablyai/orca/pull/38001) e

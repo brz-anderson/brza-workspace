@@ -147,14 +147,23 @@ upstream apagou (#40115), foram para `src/cli/brza/chat-caller-evidence.test.ts`
 
 ## O que ficou
 
-- **A conferência no app**, com Anderson, no build `dist/mac-arm64/BrzA Studio.app` do worktree `sync-v1.4.256`, pelo
-  roteiro: cartão de arquivos alterados e Hide; o switch "Changed files summary" em Settings › Chat; um só botão de
+- **A conferência no app**, com Anderson, pelo DMG `~/Downloads/brza-studio-1.4.256-macos-arm64.dmg`, pelo roteiro: cartão de arquivos alterados e Hide; o switch "Changed files summary" em Settings › Chat; um só botão de
   Fork, e o fork de chat fixado na conta dele; Markdown na prévia e com cor no Islands Dark; a seleção no chat com tema
   de terminal; o "Continuar em outra conta" e a retomada; a imagem de tool-result; a convivência com o Orca.
-- **Os worktrees `sync-v1.4.246`, `sync-v1.4.251`, `base-v1.4.251` e `bisect-251`**, e depois os `sync-v1.4.256` e
-  `base-v1.4.256`, saem depois da conferência (R1).
 - **O teste da CLI empacotada na CI Linux**, na issue acima.
 - **Os 214 commits do `upstream/main` depois da `v1.4.256`** entram no próximo sync.
+
+## O DMG e os worktrees
+
+A pedido de Anderson ("gere o DMG e remova os worktrees"):
+- **O DMG** saiu do `pnpm build:mac --dmg` no `sync-v1.4.256`, em `2b490c84526`, o mesmo commit da `master`. O
+  `hdiutil verify` deu válido, e ele foi copiado para `~/Downloads/brza-studio-1.4.256-macos-arm64.dmg`, com 237 MB e
+  sha256 `d7e4957eca62712330c216ba689ac405e00579e61a139d540b79e0a57336d1c9`. É assinado ad hoc e sem notarização.
+- **Os worktrees `sync-v1.4.246`, `sync-v1.4.251`, `base-v1.4.251`, `bisect-251`, `sync-v1.4.256` e `base-v1.4.256`**
+  do `brza-studio` saíram com `git worktree remove`, todos limpos. As branches `sync/*` ficam. Ficaram o
+  `brza-dark-theme`, o `feature-1`, o `pln-008-d11` e o `pln-011-chat-cli`.
+- **O scratch da sessão se perdeu** quando a sessão reiniciou: os briefs, as devoluções, a revisão e os logs das suítes
+  que estavam em `/private/tmp/brza-sync-256` não existem mais. O que importa deles está neste worklog.
 
 ## Fora do workspace
 
@@ -168,10 +177,14 @@ upstream apagou (#40115), foram para `src/cli/brza/chat-caller-evidence.test.ts`
   - **Risco:** nenhum.
   - **Estado:** ativo.
   - **Como desfazer:** `git push origin --delete sync/v1.4.256` e `git push origin :refs/tags/v1.4.256`.
+- **O DMG em `~/Downloads/brza-studio-1.4.256-macos-arm64.dmg`.**
+  - **Risco:** nenhum; é cópia do build local, assinado ad hoc.
+  - **Estado:** ativo.
+  - **Como desfazer:** apagar o arquivo.
 - **Link `/private/tmp/brza-sync-256`**, para o scratch da sessão. Guarda os briefs, as devoluções, as rodadas, os logs e
   a revisão.
   - **Risco:** nenhum; some no reboot.
 
 ## Custo da tarefa
 
-Corrido 19 h 15 min — agente 43 min, quem pediu 3 h 1 min, pausa 15 h 31 min · US$ 58,15 (turnos 14,51, subagentes 43,64) · CPU 9 min do `claude` e 6 h 10 min dos comandos, RSS até 433 MB · 20 turnos, 1 sessão · até 21:31 de 2026-11-11, pelo `brza note commit`
+Corrido 21 h 25 min — agente 49 min, quem pediu 3 h 31 min, pausa 17 h 5 min · US$ 62,32 (turnos 18,63, subagentes 43,69) · CPU 9 min do `claude` e 6 h 20 min dos comandos, RSS até 433 MB · 22 turnos, 1 sessão · até 23:43 de 2026-11-11, pelo `brza note commit`

@@ -7,4 +7,12 @@
 - [Receita UD/UU de teste no sync](brza-studio-sync-ud-uu-recipes.md) — achar destino do movido, reaplicar rebrand por bloco, untracked do antigo
 - [Lições do sync v1.4.251](brza-studio-sync-251-lessons.md) — base ruidosa, resíduo do auto-merge, tsc temporário, features duplicadas
 - [Consertos pós-merge v1.4.251](brza-studio-sync-251-fixes.md) — teste escondido por import, remover feature do fork, default de setting, sed no macOS
+- [Lições do sync v1.4.256 em src/main](brza-studio-sync-256-main-lessons.md) — fork-only em caminho velho, pick duplicado, worker do Claude, tsc temporário, zsh
 - [Consertos pós-revisão v1.4.251](brza-studio-sync-251-review-fixes.md) — entrada de build movida, hash gravado de leitor, bundle versionado, max-lines por helper
+- [Lições do sync v1.4.256 (g4)](brza-studio-sync-256-lessons.md) — bloco rebrand-puro, testes apagados pelo upstream, locale por JSON, max-lines por import
+- [Sync v1.4.256, grupo renderer](brza-studio-sync-256-renderer-lessons.md) — rebrand por script, typecheck com cópia sombra, testes do fork que o upstream envelhece
+- [Lições do UD do sync v1.4.256](brza-studio-sync-256-ud-lessons.md) — rastrear destino por log, rename não detectado, merge-file, barril apagado
+- [Rebrand de código e catálogos no sync 256](brza-studio-sync-256-rebrand-lessons.md) — troca só com aspas, listar todos os drifts, chave reusada, órfãs
+- [Lições do g1-chat-ui do sync v1.4.256](brza-studio-sync-256-chat-ui-lessons.md) — tsc TS7 com marcadores, símbolo movido, teste apagado, fork duplicado
+- [Remoção do Bifurcar e pino no Fork, sync 256](brza-studio-sync-256-fork-fix-lessons.md) — restaurar da tag, onde o pino de conta mora, falhas de linha de base
+- [Consertos pós-merge v1.4.256](brza-studio-sync-256-fix-lessons.md) — max-lines por tipo em brza/, ratchet fs, rig sem ready, check:changed com base

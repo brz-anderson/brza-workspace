@@ -1,2 +1,2 @@
-- [Padrões da revisão de sync do upstream](sync-review-patterns.md) — identidade copiada, slug, pino P36, ~/.orca × Keychain, caminho em config de build
+- [Padrões da revisão de sync do upstream](sync-review-patterns.md) — identidade, slug, P36, ~/.orca, config de build, porte de lista, ratchet assíncrono, receptor órfão
 - [Calibração da confiança](reviewer-confidence-calibration.md) — arquivo sob edição cai; teste temporário; hipóteses P36 e /tmp que caem

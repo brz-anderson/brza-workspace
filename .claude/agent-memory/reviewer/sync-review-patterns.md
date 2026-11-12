@@ -39,9 +39,26 @@ Padrões que se repetiram na revisão do merge da v1.4.246 (2026-11-02):
   tests"): a linha do fork vai junto e o conserto fica sem guarda. Ao ver um conserto antigo do
   fork em arquivo de config, procure o teste dele no HEAD.
 
+- **Porte de lista do upstream para módulo `brza/`** (sync da 256, 2026-11-11): o fork copia
+  a lista de tokens zerados do upstream (`applyTerminalChatColors`) para o
+  `native-chat-theme-surface-style.ts`, e um item fica de fora (`--text-link`). O teste do porte
+  enumera a mesma lista incompleta, então passa. Compare o porte item por item com
+  `git show <tag>:<arquivo de origem>`.
+- **Troca de `*Sync` por `fs/promises` para passar no ratchet** do upstream
+  (`check:main-sync-fs-ratchet`): o produtor síncrono passa a devolver o caminho antes do
+  arquivo existir, e o `.catch(() => undefined)` esconde a falha. Siga o caminho até o leitor
+  (`useLocalImageSrc` grava a falha em cache e não tenta de novo).
+- **Feature do fork removida por rodada** deixa o receptor no host (schema zod, resolver,
+  ramo no import) sem produtor. Procure quem ainda escreve o campo (`git grep` no renderer e
+  no `src/cli`) antes de dar como "sem resto".
+
 **Método que rendeu:** listar as linhas que o fork somou (`git diff -U0 <base do último sync> <master do
 fork> -- src`) e que não existem em lugar nenhum da árvore atual. Quase tudo é refatoração ou texto
 reescrito; o resto aponta o que caiu. Depois, `git diff v1.4.246 -- <arquivo>` nas junções.
+O inverso também rende: as linhas da tag que faltam no HEAD, separadas em "estava na `master`"
+(caiu agora), "nova na tag" (o upstream trouxe e a junção descartou) e o resto (decisão
+antiga do fork). Isso corta ~900 linhas para ~80. Para o rebrand de catálogo, `\bOrca\b` não
+acha "Orcas" (genitivo alemão): procure `Orca` sem borda.
 
 **Cuidados:**
 - Outra sessão edita o worktree do sync durante a revisão. Antes de reportar, releia o índice

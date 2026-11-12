@@ -439,7 +439,7 @@ consult.py close PLN-NNN D<n>
 
 ### D5 — O painel do plano — `scripts/plan_panel.py` (P4)
 
-- **Origem:** R1.3(c), R5.9, R6.5, R8.1.
+- **Origem:** R1.3(c), R5.9, R6.5, R8.1, R10.2.
 - **Contexto:** "gerado por script a cada mudança de estado" (R1.3). Leio isso como os scripts que mudam o estado
   republicando sozinhos, pelo precedente da R10.1 do PLN-017 (F28).
 
@@ -457,12 +457,15 @@ plan_panel.py render  PLN-NNN --out arquivo.html
   - o cabeçalho: o PLN, o H1, `phase`/`status`, o `ready`, as horas `estimate/executed/remaining` e a soma conferida
     pelo `plan_state` (com `⚠` quando diverge);
   - uma linha por passo: ID, título curto, `Executa`, executor, estado do manifesto, Estimado × Executado, custo medido e
-    a idade do último evento;
+    a idade do último evento; abaixo de 700 px, por `@container`, a lista vira um cartão por passo, com os mesmos campos
+    (R10.2, P13);
   - os executores e consultores vivos, com o estado do `brza sessions list --json`;
   - a última rodada, como `R3 — 3 perguntas, 3 decididas`.
 - **O arquivo:** `pln-nnn-painel-<hash4>.html` pelo `save_visual`, com a chave `PLN-NNN|AAAA-MM-DD`: um arquivo por
   plano e dia, republicado no mesmo nome (R5.9). O PNG sai na abertura e no fechamento de cada executor,
   como a R10.3 do PLN-017 fez para a reunião (`meeting-runner/SKILL.md:126-128`).
+- **Protótipo:** ![painel em cartões](PLN-021-painel-cartoes.png) — o B da R10.2, em 375, 768 e 1280 px. **Descartada**, a A
+  (a tabela também abaixo de 700 px): corta as colunas Custo e Último evento em 375 px.
 - **Os dados:** `plan_state.state(plan)` (D6), o manifesto, o `sessions_map` e o `measure`. Sem `measurements.jsonl`,
   "sem medição", nunca zero.
 

@@ -14,6 +14,10 @@ tags:
 
 # Segurança de hooks em worktrees e integridade de setup em automações
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado dos PRs abertos no upstream [`stablyai/orca#40978`](https://github.com/stablyai/orca/pull/40978) (resolve Issue [`#40974`](https://github.com/stablyai/orca/issues/40974)),
 [`stablyai/orca#40976`](https://github.com/stablyai/orca/pull/40976),
 [`stablyai/orca#39229`](https://github.com/stablyai/orca/pull/39229) (resolve Issue [`#39617`](https://github.com/stablyai/orca/issues/39617)),

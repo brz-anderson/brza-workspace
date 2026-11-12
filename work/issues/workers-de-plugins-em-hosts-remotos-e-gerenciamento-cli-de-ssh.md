@@ -14,6 +14,10 @@ tags:
 
 # Workers de plugins em hosts remotos e gerenciamento CLI de SSH
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `parcial` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado dos PRs abertos no upstream [`stablyai/orca#40589`](https://github.com/stablyai/orca/pull/40589) (resolve Issue [`#38342`](https://github.com/stablyai/orca/issues/38342)),
 [`stablyai/orca#38774`](https://github.com/stablyai/orca/pull/38774) (Issues [`#37826`](https://github.com/stablyai/orca/issues/37826) e [`#37949`](https://github.com/stablyai/orca/issues/37949)),
 além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues/38673),

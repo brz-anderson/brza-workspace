@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40153 e #37507 preservam o paneOwner do Antigravity e desembrulham o wrapper sh -c de hooks para manter a linha do agente estável na barra lateral.
+description: Os PRs #40153 e #37507 (CLOSED sem merge no upstream) preservam o paneOwner do Antigravity e desembrulham o wrapper sh -c de hooks para manter a linha do agente estável na barra lateral.
 scope:
   - brza-studio
 priority: high
@@ -11,13 +11,17 @@ tags:
 
 # Preservar o dono do painel do Antigravity em subagentes aninhados
 
+<!-- pln-014-despacho -->
+> **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
+> Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
+
 Rastreado do upstream [`stablyai/orca#40153`](https://github.com/stablyai/orca/pull/40153) (endereça Issue [`#40100`](https://github.com/stablyai/orca/issues/40100)),
-[`stablyai/orca#37507`](https://github.com/stablyai/orca/pull/37507) e da issue
-[`stablyai/orca#37505`](https://github.com/stablyai/orca/issues/37505).
+[`stablyai/orca#37507 (CLOSED sem merge no upstream)`](https://github.com/stablyai/orca/pull/37507) e da issue
+[`stablyai/orca#37505 (CLOSED no upstream)`](https://github.com/stablyai/orca/issues/37505).
 
 ## O problema
 
-1. **Sobrescrita da identidade do agente dono por processos convidados (`#37507`):**
+1. **Sobrescrita da identidade do agente dono por processos convidados (`#37507 (CLOSED sem merge no upstream)`):**
    Quando uma sessão do Antigravity dispara subagentes ou processos de CLI aninhados no mesmo painel, os hooks de processo
    convidado podem sobrescrever a identidade do agente dono da aba no servidor e na projeção mobile. Com isso, a aba perde
    o vínculo com a sessão principal do Antigravity ou exibe o estado do subagente depois que ele encerra.
@@ -30,7 +34,7 @@ Rastreado do upstream [`stablyai/orca#40153`](https://github.com/stablyai/orca/p
 
 ## O que o upstream implementa e corrige
 
-- **Preservação de paneOwner (`#37507`):**
+- **Preservação de paneOwner (`#37507 (CLOSED sem merge no upstream)`):**
   - Captura `ORCA_HOOK_AGENT_PID` (`PPID`) e `agentProcess` no script POSIX `src/main/antigravity/hook-script.ts` e admite
     `antigravity` em `readHookAgentProcess` (`src/main/agent-hooks/server/server-status-identity.ts`), fazendo donos de
     processo ociosos do Antigravity rejeitarem hooks de CLIs convidados aninhados;
@@ -49,5 +53,5 @@ Rastreado do upstream [`stablyai/orca#40153`](https://github.com/stablyai/orca/p
 ## O que fazer
 
 1. Incorporar o desembrulho de wrappers `sh -c` do [`stablyai/orca#40153`](https://github.com/stablyai/orca/pull/40153) para eliminar o piscamento de status do Antigravity na sidebar.
-2. Aplicar o cherry-pick do [`stablyai/orca#37507`](https://github.com/stablyai/orca/pull/37507) para a `master` do
+2. Aplicar o cherry-pick do [`stablyai/orca#37507 (CLOSED sem merge no upstream)`](https://github.com/stablyai/orca/pull/37507) para a `master` do
    `brza-studio`, conferindo a preservação do rename `BrzA` em `src/main/antigravity/hook-script.ts` e `src/main/antigravity/hook-service.ts`.

@@ -56,7 +56,8 @@ class BrzaJiraTest(unittest.TestCase):
             code, out, err = self.run_jira('my-work')
             self.assertEqual(code, 1)
             self.assertIn('Atlassian CLI', err)
-            self.assertIn('brew install', err)
+            self.assertIn('brew tap atlassian/homebrew-acli', err)
+            self.assertIn('brew install acli', err)
 
     def test_build_acli_args_my_work(self):
         build = JIRA_GLOBALS['build_acli_args']
@@ -147,13 +148,15 @@ class BrzaJiraTest(unittest.TestCase):
     def test_run_acli_invocation(self):
         mock_proc = MagicMock()
         mock_proc.returncode = 0
+        fake_acli = Path('/fake/bin/acli')
 
-        with patch('subprocess.run', return_value=mock_proc) as mock_run:
+        with patch.dict(JIRA_GLOBALS, {'find_acli_binary': lambda: fake_acli}), \
+             patch.object(JIRA_GLOBALS['subprocess'], 'run', return_value=mock_proc) as mock_run:
             code, _, _ = self.run_jira('view', 'FIX-113')
             self.assertEqual(code, 0)
             mock_run.assert_called_once()
             called_cmd = mock_run.call_args[0][0]
-            self.assertEqual(called_cmd[1:], ['jira', 'workitem', 'view', 'FIX-113'])
+            self.assertEqual(called_cmd, [str(fake_acli), 'jira', 'workitem', 'view', 'FIX-113'])
 
     def test_brza_dispatcher_calls_jira(self):
         # Testa a integração com o despachante principal brza

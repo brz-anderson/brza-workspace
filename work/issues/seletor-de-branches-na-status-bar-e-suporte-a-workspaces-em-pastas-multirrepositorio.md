@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39999, #39977, #39779, #39637, #39575 trazem source control mobile em pastas, renomeação e seletores de projetos.
+description: Os PRs #41930, #39999, #39977, #39779, #39637 trazem ativação consistente de workspace pelo branch picker, source control mobile em pastas e seletores de projetos.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,8 @@ tags:
 
 # Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39999`](https://github.com/stablyai/orca/pull/39999),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41930`](https://github.com/stablyai/orca/pull/41930) (resolve Issue [`#41929`](https://github.com/stablyai/orca/issues/41929)),
+[`stablyai/orca#39999`](https://github.com/stablyai/orca/pull/39999),
 [`stablyai/orca#39977`](https://github.com/stablyai/orca/pull/39977),
 [`stablyai/orca#39779`](https://github.com/stablyai/orca/pull/39779) (resolve Issue [`#39777`](https://github.com/stablyai/orca/issues/39777)),
 [`stablyai/orca#39637`](https://github.com/stablyai/orca/pull/39637),
@@ -72,6 +73,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39999`](https://github.com
 12. **Incapacidade de renomear projetos pelo menu da barra lateral (`#39977`):**
     Não havia ação rápida no cabeçalho de projetos na barra lateral para renomear projetos/workspaces de forma intuitiva,
     exigindo edições manuais em arquivos de configuração ou recadastramento.
+13. **Janela em branco ao abrir workspace de outra branch pelo seletor de branches (`#41930`, resolve `#41929`):**
+    Ao selecionar "Open workspace" para uma branch que pertencia a outro workspace cujas abas haviam sido fechadas, a ação
+    invocava apenas a mutação interna `setActiveWorktree`. Como não passava pelo ciclo de ativação do usuário, a tela permanecia
+    completamente em branco até o operador clicar manualmente na linha correspondente na barra lateral.
 
 ## O que o upstream implementa e corrige
 
@@ -115,6 +120,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39999`](https://github.com
 - **Renomeação de projeto no menu do cabeçalho da barra lateral (`#39977`):**
   - Inclui a opção "Rename project" no menu de opções do cabeçalho de projeto da barra lateral;
   - Abre modal direto para atualizar o nome amigável do projeto/workspace e propaga a alteração para a lista de projetos e histórico.
+- **Abertura de workspace pelo branch picker com reativação completa (`#41930`, resolve `#41929`):**
+  - Altera a ação "Open workspace" no branch picker para utilizar `activateAndRevealWorktree(id, { navigationIntent: 'user-open' })`;
+  - Garante que a abertura restabeleça abas padrão (shell ou chat nativo), desperte agentes em sleep mode e registre a visita, evitando janelas em branco quando as abas anteriores haviam sido fechadas.
 
 ## O que fazer no BrzA Studio
 
@@ -127,3 +135,4 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39999`](https://github.com
 7. Integrar a busca combinada de projetos e hosts (`project-host-query`, `#39779`) nos modais de criação de workspace.
 8. Expor a visão de Source Control para folder workspaces no cliente móvel (`#39999`).
 9. Incluir a ação "Rename project" no menu de contexto de projeto da sidebar (`#39977`).
+10. Adotar a ativação completa via `activateAndRevealWorktree` na abertura de workspaces a partir do branch picker (`#41930`, resolve `#41929`).

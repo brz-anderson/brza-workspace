@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40589, #38774 e as issues #37788, #37826, #37949, #38347 e #38673 trazem painéis de plugins no host pareado, orca host rm na CLI e correções remotas.
+description: Os PRs #41910, #40589, #38774 e as issues #37788, #37826, #37949, #38347 e #38673 trazem painéis de plugins no host pareado, deltas de catálogo em servidores pareados, orca host rm na CLI e correções remotas.
 scope:
   - brza-studio
   - workspace
@@ -18,7 +18,8 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `parcial` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40589`](https://github.com/stablyai/orca/pull/40589) (resolve Issue [`#38342`](https://github.com/stablyai/orca/issues/38342)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41910`](https://github.com/stablyai/orca/pull/41910),
+[`stablyai/orca#40589`](https://github.com/stablyai/orca/pull/40589) (resolve Issue [`#38342`](https://github.com/stablyai/orca/issues/38342)),
 [`stablyai/orca#38774`](https://github.com/stablyai/orca/pull/38774) (Issues [`#37826`](https://github.com/stablyai/orca/issues/37826) e [`#37949`](https://github.com/stablyai/orca/issues/37949)),
 além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues/38673),
 [`stablyai/orca#38669`](https://github.com/stablyai/orca/issues/38669),
@@ -57,9 +58,15 @@ além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues
 7. **Respeito a `IdentitiesOnly` no transporte SSH nativo (`#37926`):** conexões manuais com chave específica falhavam
    quando o agente SSH local oferecia múltiplas identidades antes da chave configurada, porque o transporte interno não
    repassava o parâmetro `IdentitiesOnly=yes`.
+8. **Latência e sobrecarga de polling de catálogo de worktrees em servidores pareados (`#41910`):**
+   Clientes pareados e feeds móveis dependiam de varreduras completas (`worktree.ps`) repetidas a intervalos fixos para detectar
+   alterações de status, branches e novos worktrees em daemons remotos, gerando latência de vários segundos e tráfego redundante.
 
 ## O caminho proposto no upstream
 
+- **Deltas reativos de catálogo via `worktreeRowsChanged` (`#41910`):**
+  - Implementa evento `worktreeRowsChanged` emitido pelo daemon de servidor pareado contendo apenas as linhas de catálogo modificadas;
+  - Clientes conectados e feeds remotos sincronizam atualizações em ~2s sem necessidade de varredura total.
 - **Subcomando CLI `orca host rm` com limpeza profunda (`#38774`, resolve `#37826` e `#37949`):**
   - Adiciona `orca host rm <host>` permitindo excluir servidores SSH diretamente pelo terminal;
   - Limpa de forma consistente em todo o aplicativo o estado da conexão ao vivo, alvos pareados e rótulos customizados.
@@ -79,6 +86,7 @@ além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Adotar o evento reativo `worktreeRowsChanged` (`#41910`) para atualização contínua e rápida de catálogo de worktrees em servidores pareados e feeds móveis.
 - Adotar a sessão remota de painéis de plugins via `plugins.panelSession` (`#40589`) para que painéis de plugins na barra lateral reflitam com fidelidade os dados do host onde o workspace ativo está hospedado.
 - Implementar `brza host rm` (`#38774`) na CLI do `brza`, permitindo ciclo de vida completo de servidores em automações.
 - Adotar o isolamento estrito de host em criação de novos workspaces (`#38782`) no `brza-studio`.

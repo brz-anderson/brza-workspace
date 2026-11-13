@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41979, #41757, #41746, #41702, #41729 trazem baixa automática de perguntas respondidas na orquestração, retenção de Runs e despertar de coordenadores.
+description: Os PRs #42122, #42114, #42112, #42111, #41979, #41757, #41746, #41702, #41729 trazem otimização do pull-loop, reuso de worker mid-turn e baixa de perguntas.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,12 +14,17 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41979`](https://github.com/stablyai/orca/pull/41979) (resolve Issue [`#41975`](https://github.com/stablyai/orca/issues/41975)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42122`](https://github.com/stablyai/orca/pull/42122) (resolve STA-15102),
+[`stablyai/orca#42114`](https://github.com/stablyai/orca/pull/42114),
+[`stablyai/orca#42112`](https://github.com/stablyai/orca/pull/42112),
+[`stablyai/orca#42111`](https://github.com/stablyai/orca/pull/42111),
+[`stablyai/orca#41979`](https://github.com/stablyai/orca/pull/41979) (resolve Issue [`#41975`](https://github.com/stablyai/orca/issues/41975)),
 [`stablyai/orca#41757`](https://github.com/stablyai/orca/pull/41757) (resolve Issue [`#41756`](https://github.com/stablyai/orca/issues/41756)),
 [`stablyai/orca#41746`](https://github.com/stablyai/orca/pull/41746),
 [`stablyai/orca#41702`](https://github.com/stablyai/orca/pull/41702),
 [`stablyai/orca#41729`](https://github.com/stablyai/orca/pull/41729) (resolve Issue [`#41726`](https://github.com/stablyai/orca/issues/41726)) e
-[`stablyai/orca#41754`](https://github.com/stablyai/orca/pull/41754) (resolve Issue [`#40838`](https://github.com/stablyai/orca/issues/40838)).
+[`stablyai/orca#41754`](https://github.com/stablyai/orca/pull/41754) (resolve Issue [`#40838`](https://github.com/stablyai/orca/issues/40838)),
+além das issues [`stablyai/orca#42103`](https://github.com/stablyai/orca/issues/42103) e [`stablyai/orca#42084`](https://github.com/stablyai/orca/issues/42084).
 
 ## O problema
 
@@ -40,6 +45,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41979`](https://github.com
 6. **Perguntas de workers respondidas continuavam retidas como não lidas na caixa de correio do coordenador (`#41979`, resolve `#41975`):**
    - Quando um coordenador respondia à pergunta de um worker através de `answerQuestion`, a mensagem da pergunta original não era marcada como lida (`read = 1`);
    - O coordenador precisava rodar chamadas extras de `orchestration check --run <run>` exclusivamente para limpar a pendência da pergunta respondida, gerando centenas de transações e recibos redundantes no banco.
+7. **Sobrecarga do pull-loop de servidores pareados com conjunto temporário no SQLite (`#42122`, resolve STA-15102):**
+   - A consulta de links abertos no pull-loop (`state IN ('open', 'cancel_owed')`) obrigava o SQLite a construir um conjunto temporário em cada iteração, e a checagem de home-conversation rodava como instrução separada;
+   - Servidores com apenas um link ativo pagavam mais caro a cada pull do que a varredura global legada.
+8. **Timeout de 60s em `worker-start --terminal` ao reutilizar agente que segue ativo pós-conclusão (`#42114`):**
+   - O comando `worker-start --terminal <pane>` passava uma nova tarefa a um agente já rodando na aba, mas sua verificação de prontidão aguardava `tui-idle`;
+   - Como agentes frequentemente continuam executando tarefas em background após `worker_done` (ex.: observando CI), o reuso falhava com `agent_readiness: timeout` após 60s em vez de entregar a instrução no correio do agente.
+9. **Estado inconsistente e ausência do nome do agente em falhas de binding no reuse-start (`#42112`, `#42111`):**
+   - Quando um início de reuso de worker falhava antes da conclusão do binding, o registro marcava o worker como iniciado incorretamente e omitia o nome do agente reutilizado nos metadados.
+10. **Omissão do objeto `run` e perda de acesso ao coordenador na saída concisa `--json` (`#42103`):**
+    - A versão 1.4.258 removeu o nó `run` da saída concisa de `run-show`, `run-current` e `run-use`, impossibilitando que scripts de CLI obtenham o `coordinator_handle` sem exigir o despejo `--full`.
 
 ## O que o upstream implementa
 
@@ -60,9 +75,19 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41979`](https://github.com
    - Preserva quebras de linha e caracteres de controle, mantendo prompts confidenciais fora da lista de processos do SO.
 6. **Marcação atômica de pergunta como lida ao submeter resposta (`#41979`, resolve `#41975`):**
    - Executa `markAsRead([question.message_id])` dentro da mesma transação em `answerQuestion`, eliminando a necessidade de consultas `orchestration check` subsequentes para limpar mensagens já respondidas.
+7. **Consulta otimizada do pull-loop sem tabela temporária (`#42122`, resolve STA-15102):**
+   - Reformula a checagem de pull em uma única consulta SQL compacta, unificando estados de link e verificação de home conversation sem construir temporary sets no SQLite.
+8. **Reutilização imediata de workers mid-turn via entrega em mailbox (`#42114`):**
+   - Permite que `worker-start --terminal` despache a tarefa subsequente diretamente na caixa de correio do agente ativo, dispensando a espera por `tui-idle` e prevenindo falsos timeouts de 60s em workers que monitoram processos pós-turno.
+9. **Resiliência e nomeação em falhas pré-binding de reuse-starts (`#42112`, `#42111`):**
+   - Trata abortos antes do binding marcando a tarefa como nunca iniciada e preservando o identificador e nome do agente reutilizado nos registros.
 
 ## O que fazer
 
+- Adotar a consulta compacta do pull-loop sem temporary sets no SQLite (`#42122`, resolve STA-15102).
+- Permitir reutilização de workers mid-turn via correio direto sem esperar `tui-idle` (`#42114`).
+- Adotar tratamento consistente e preservação de nome em falhas pré-binding de reuse-starts (`#42112`, `#42111`).
+- Preservar o nó `run` e o identificador do coordenador no output conciso `--json` de comandos de orquestração (`#42103`).
 - Marcar perguntas de workers automaticamente como lidas no ato da resposta (`#41979`, resolve `#41975`).
 - Adotar o ciclo de retenção e limpeza periódica do banco `orchestration.db` (`#41757`, resolve `#41756`).
 - Implementar o despertar automático de coordenadores em repouso diante de mensagens de workers (`#41746`).

@@ -10,9 +10,11 @@ tags:
 refs:
   - issue:alocacao-de-chats-sob-host-independente-admissao-de-git-e-cache-de-modelos
   - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
+  - issue:contagem-de-atencao-no-dock-serializacao-incremental-e-alivio-de-gc
   - issue:controle-de-agentes-e-chats-pela-cli-por-id-de-sessao-e-rotulagem-de-contas
   - issue:historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
+  - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
   - issue:preservar-o-dono-do-painel-do-antigravity-em-subagentes-aninhados
   - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
@@ -100,5 +102,41 @@ refs:
      adicionado o PR `#41955` (importação estruturada de transcrições do Kimi Code via `session_index.jsonl` e adoção transparente de conversas de CLI pelo Native Chat).
    - [Workers de plugins em hosts remotos e gerenciamento CLI de SSH](../issues/workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh.md):
      adicionado o PR `#41910` (evento reativo `worktreeRowsChanged` com deltas de catálogo para servidores pareados e feeds móveis, reduzindo latência de atualização para ~2s sem varreduras totais).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-13)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-13T15:00:00Z` e `2026-11-13T21:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Contagem de atenção no Dock, serialização incremental e alívio de GC](../issues/contagem-de-atencao-no-dock-serializacao-incremental-e-alivio-de-gc.md):
+     rastreia o PR `#42061` (resolve Issue `#42060` — métrica do badge do Dock no macOS contando chats não lidos em vez de workspaces),
+     PR `#41949` (marcador visual `!` no ícone do Dock quando agentes estão aguardando input do operador),
+     PR `#42133` (cessação de coleta de lixo periódica forçada `window.gc()` a cada 30s no Chromium em alto consumo de memória, eliminando engasgos na UI),
+     PR `#42127` (serialização incremental ao salvar abas, enviando apenas entradas modificadas em JSON para o background writer em vez de reprocessar a sessão inteira),
+     PR `#42104` (emissão pontual de alterações de status sem reconstruir e republicar o grafo completo de sessões via IPC),
+     PR `#42045` e PR `#42024` (inicialização precoce do escritor do diário de chat e adiamento de rotinas pesadas de manutenção),
+     PR `#42132` (resolve Issue `#42096` — pular rotinas de manutenção e tratar datas ausentes como vazias quando a CLI do Codex não estiver presente) e
+     as issues `#41918` (Dock badge no Linux via D-Bus) e `#42069` (foco programático de abas de chat).
+3. **Atualização de 4 issues existentes em `work/issues/`:**
+   - [Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):
+     adicionados o PR `#42039` (página de configurações *Settings > Workspace Cleanup* com regras, botão 'Clean up now' e diálogo com prévia de exclusões iminentes) e
+     o PR `#42055` (seção *Workspace cleanup* em *Project Settings* com opções de usar regras globais, desativar ou configurar regras customizadas por projeto).
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionados o PR `#42122` / STA-15102 (otimização do pull-loop sem temporary sets no SQLite),
+     o PR `#42114` (reúso de worker mid-turn entregando instrução diretamente no mailbox sem timeout de 60s esperando `tui-idle`),
+     os PRs `#42112` e `#42111` (resiliência e nomeação em falhas pré-binding de reuse-starts) e
+     as issues `#42103` (preservação do objeto `run` no `--json` conciso) e `#42084` (alinhamento de profundidade de workers aninhados).
+   - [Cartões de Pull Request, feedback de Steer e atalhos no Native Chat](../issues/cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat.md):
+     adicionados o PR `#42129` / Issue `#41908` (pill visual de Side chat no composer para prefixos `/btw ` e `/side `),
+     o PR `#42095` (renderização visual inline de links diretos de imagens na conversa),
+     o PR `#42092` / Issue `#42091` (ação "Open in Orca" para links de GitHub PR),
+     o PR `#42067` / Issue `#42059` (abertura de links no terminal via middle-click / botão 1) e
+     o PR `#42131` (realce de sintaxe de frontmatter YAML no editor de Markdown).
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados o PR `#42085` / Issue `#42080` (painéis de plugins abrindo como páginas dedicadas a partir da barra de navegação superior esquerda),
+     o PR `#42057` (editores gráficos customizados de plugins para arquivos específicos em abas de diff do Source Control) e
+     o PR `#42068` (RFC de popovers de plugins na barra de status pertencentes ao host).
+
 
 

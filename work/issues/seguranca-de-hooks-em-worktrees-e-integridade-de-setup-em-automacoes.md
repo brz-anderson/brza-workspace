@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40978, #40976, #39229, #38558 e as issues #40974, #39771 tratam de revisão e confiança de hooks no chat, visualização plana e segurança.
+description: Os PRs #41823, #40978, #40976, #39229 trazem aprovação de setup a partir do branch base de criação, revisão de hooks e integridade criptográfica.
 scope:
   - brza-studio
   - brza-workflow
@@ -18,7 +18,8 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40978`](https://github.com/stablyai/orca/pull/40978) (resolve Issue [`#40974`](https://github.com/stablyai/orca/issues/40974)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41823`](https://github.com/stablyai/orca/pull/41823),
+[`stablyai/orca#40978`](https://github.com/stablyai/orca/pull/40978) (resolve Issue [`#40974`](https://github.com/stablyai/orca/issues/40974)),
 [`stablyai/orca#40976`](https://github.com/stablyai/orca/pull/40976),
 [`stablyai/orca#39229`](https://github.com/stablyai/orca/pull/39229) (resolve Issue [`#39617`](https://github.com/stablyai/orca/issues/39617)),
 [`stablyai/orca#38558`](https://github.com/stablyai/orca/pull/38558),
@@ -101,6 +102,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40978`](https://github.com
     O usuário precisava sair do chat para a linha de comando ou configurações para autorizá-los manualmente.
 16. **Fragmentação de cartões de hooks de worktree nas configurações (`#40976`):**
     Cada hook de worktree consumia um cartão isolado na interface de configurações, gerando rolagem excessiva e desorganização visual.
+17. **Alerta falso de divergência de setup ao criar workspaces a partir de branches atualizados (`#41823`):**
+    A checagem de aprovação pré-criação lia o `orca.yaml` do checkout principal (geralmente desatualizado em relação a `origin/main`),
+    enquanto a pós-criação lia o `orca.yaml` da branch alvo. Isso gerava o modal "This workspace's branch has different setup commands"
+    em praticamente toda criação de workspace, bloqueando a execução automática do setup até um clique manual de autorização.
 
 ## O que o upstream propõe e implementa
 
@@ -144,9 +149,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40978`](https://github.com
   - Rejeita comandos modificados cujo hash não coincida e preserva hooks desabilitados.
 - **Cartão unificado e achatado para hooks de worktree nas configurações (`#40976`):**
   - Condensa os hooks de worktree em linhas dentro de um único cartão nas configurações, eliminando dispersão visual.
+- **Aprovação pré-criação de setup a partir da branch base de origem (`#41823`):**
+  - Altera a validação de segurança pré-criação para inspecionar o arquivo `orca.yaml` da branch base a partir da qual o novo workspace será criado, em vez do checkout principal da máquina;
+  - Garante que os comandos apresentados para aprovação sejam rigorosamente idênticos aos que serão executados na inicialização do novo worktree, eliminando popups bloqueantes desnecessários.
 
 ## O que fazer
 
+- Adotar a leitura pré-criação do setup a partir da branch de origem do workspace (`#41823`), eliminando falsos alertas de divergência de comandos.
 - Adotar o comando `/hooks` no Native Chat para revisão e autorização de hooks do Codex (`#40978`).
 - Incorporar o cartão unificado de hooks de worktree nas configurações (`#40976`).
 - Resolver symlinks de executáveis na inspeção de remetentes de hooks para preservar o status de agentes sob wrappers (`#39771`).

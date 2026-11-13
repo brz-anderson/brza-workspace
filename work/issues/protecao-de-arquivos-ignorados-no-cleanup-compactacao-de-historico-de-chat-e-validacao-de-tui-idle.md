@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41483, #41480, #41457, #41446, #41392, #41366, #41384 trazem cleanup com ocultação imediata, cache único de worktrees e atalhos na sidebar.
+description: Os PRs #41765, #41760, #41483, #41480, #41457 trazem varreduras offline rápidas, runner automático em background e proteção de worktrees no cleanup.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,9 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41483`](https://github.com/stablyai/orca/pull/41483),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41765`](https://github.com/stablyai/orca/pull/41765),
+[`stablyai/orca#41760`](https://github.com/stablyai/orca/pull/41760),
+[`stablyai/orca#41483`](https://github.com/stablyai/orca/pull/41483),
 [`stablyai/orca#41480`](https://github.com/stablyai/orca/pull/41480),
 [`stablyai/orca#41457`](https://github.com/stablyai/orca/pull/41457),
 [`stablyai/orca#41446`](https://github.com/stablyai/orca/pull/41446),
@@ -52,6 +54,11 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41483`](https://github.com
    - Em repositórios com centenas de worktrees, o app executava `git worktree list` a cada ~48s, gerando sobrecarga desnecessária de CPU e I/O.
 7. **Disparo indevido de atalho de exclusão de workspace com foco no terminal ou editor (`#41457`):**
    - O atalho de teclado para exclusão de workspace não verificava se o foco estava na árvore da barra lateral, abrindo diálogos de exclusão mesmo quando o usuário estava digitando no terminal ou editor.
+8. **Sobrecarga de rede e lentidão nas varreduras de cleanup de worktrees (`#41765`):**
+   - A varredura de histórico Git para verificar se o trabalho de um worktree já havia sido integrado (`merged`/`squashed`) realizava downloads lentos de blobs faltantes em clones parciais (`--filter=blob:none`);
+   - Em repositórios com dezenas de worktrees, a checagem demorava mais de 20s e corria o risco de expirar antes de concluir.
+9. **Ausência de automação em segundo plano para aplicação de regras de limpeza de workspaces (`#41760`):**
+   - A limpeza de workspaces exigia abertura manual do diálogo de cleanup a partir da barra de status, acumulando branches mesclados, checkouts inativos e diretórios órfãos ao longo do tempo.
 
 ## O que o upstream propõe e implementa
 
@@ -82,9 +89,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41483`](https://github.com
 7. **Restrição de atalhos de exclusão de workspace à seleção da barra lateral (`#41457`):**
    - Vincula o listener de teclado de exclusão estritamente ao container da barra lateral quando focado (`use-sidebar-workspace-delete-keyboard.ts`);
    - Garante que teclas pressionadas no terminal ou editor nunca acionem a caixa de confirmação de exclusão.
+8. **Varredura offline 4x mais rápida de cleanup de workspaces (`#41765`):**
+   - Executa as checagens de merge e provas Git com `GIT_NO_LAZY_FETCH=1` e `GIT_ALLOW_PROTOCOL=none`, impedindo fetches acidentais de rede em clones parciais;
+   - Memoiza referências base (`createWorkspaceCleanupRepoRefs`) por repositório durante a varredura e otimiza a busca de squashes (`git log --name-only --no-renames` + `patch-id` apenas para commits com conjunto idêntico de arquivos tocados), reduzindo o tempo de varredura de ~23s para ~5s.
+9. **Execução automática de regras de cleanup de workspace em background por host (`#41760`):**
+   - Implementa o `WorkspaceCleanupRunner` com ciclo de avaliação compartilhada (`evaluateWorkspaceCleanup`), disparado 2 minutos após o boot, a cada hora e 10s após alterações de regras;
+   - Executa isoladamente no host/processo dono do repositório (desktop local, orcad de SSH ou WSL), revalidando evidências (pins, drafts não salvos, terminais abertos, daemons e arquivos dirty) imediatamente antes da remoção segura via `queueWorkspaceDelete`.
 
 ## O que fazer
 
+- Adotar a varredura offline rápida de cleanup (`#41765`), eliminando lazy fetches do Git e acelerando o cálculo de merges e squashes.
+- Incorporar o runner de background de cleanup de workspaces (`#41760`) com revalidação estrita de evidências e proteção contra deleção acidental.
 - Adotar a tabela durável de cleanup com ocultação imediata de workspaces em remoção (`#41483`).
 - Unificar o gerenciamento de cache de worktrees por repositório para eliminar chamadas redundantes a `git worktree list` (`#41480`).
 - Restringir os atalhos de exclusão de workspace exclusivamente ao foco na barra lateral (`#41457`).

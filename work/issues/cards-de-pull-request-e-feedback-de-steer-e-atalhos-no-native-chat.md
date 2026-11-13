@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41642, #41635, #41359, #41333, #41337 trazem galeria lightbox de imagens no chat, confirmação Enter em cards e prévia de PRs.
+description: Os PRs #41770, #41762, #41642, #41635, #41359 trazem envio configurável com Enter/Cmd+Enter, medidor de cota Claude via rate_limit_event e galeria de imagens.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,9 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41642`](https://github.com/stablyai/orca/pull/41642) (resolve Issue [`#41641`](https://github.com/stablyai/orca/issues/41641)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41770`](https://github.com/stablyai/orca/pull/41770),
+[`stablyai/orca#41762`](https://github.com/stablyai/orca/pull/41762),
+[`stablyai/orca#41642`](https://github.com/stablyai/orca/pull/41642) (resolve Issue [`#41641`](https://github.com/stablyai/orca/issues/41641)),
 [`stablyai/orca#41635`](https://github.com/stablyai/orca/pull/41635),
 [`stablyai/orca#41359`](https://github.com/stablyai/orca/pull/41359),
 [`stablyai/orca#41333`](https://github.com/stablyai/orca/pull/41333) (resolve Issue [`#37005`](https://github.com/stablyai/orca/issues/37005)),
@@ -119,6 +121,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41642`](https://github.com
     Ao efetuar o rebase local de um branch sobre a `main` após o merge do PR, o Git gerava um novo SHA local para o HEAD que não
     constava nos registros do GitHub (`commits/{oid}/pulls`). Isso fazia o Source Control ocultar o cartão do PR e suprimir o
     aviso de segurança "PR #N is merged … safe to delete".
+23. **Envios acidentais de mensagens inacabadas ao quebrar linhas no chat (`#41770`):**
+    Usuários redigindo mensagens multilinha ou utilizando IMEs (ex.: japonês) sofriam com disparos acidentais ao pressionar <kbd>Enter</kbd>
+    para quebrar linha ou confirmar ideogramas, sem opção de exigir <kbd>Cmd+Enter</kbd> (macOS) ou <kbd>Ctrl+Enter</kbd> (Windows/Linux) para envio.
+24. **Barra de limites de uso do Claude estática ou desatualizada no Native Chat (`#41762`):**
+    A barra de cotas do Claude no chat dependia unicamente de chamadas a `/api/oauth/usage`. Com tokens de inferência direta (`CLAUDE_CODE_OAUTH_TOKEN`)
+    ou logins ociosos, o endpoint falhava e a barra exibia alerta ⚠️ e valores desatualizados, mesmo com chats ativos recebendo metadados de limite por streaming.
 
 ## O que o upstream implementa
 
@@ -198,9 +206,15 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41642`](https://github.com
 - **Confirmação e avanço com tecla Enter em cards de perguntas de escolha única (`#41635`):**
   - Corrige o comportamento do teclado em `NativeChatQuestionCard`: ao retornar com <kbd>ArrowLeft</kbd> a uma etapa anterior com opção já marcada, pressionar <kbd>Enter</kbd> agora confirma a seleção e avança ("Next ↵" / "Submit") em vez de desselecionar a opção;
   - Mantém <kbd>Space</kbd> e cliques como alternadores de marcação e preserva o comportamento de toggle estritamente em perguntas de múltipla escolha.
+- **Envio configurável de mensagens com Enter ou Cmd/Ctrl+Enter (`#41770`):**
+  - Adiciona o ajuste "Send messages with Enter" em *Settings → Chat → Behavior*; quando desligado, <kbd>Enter</kbd> insere quebra de linha e <kbd>Cmd+Enter</kbd> / <kbd>Ctrl+Enter</kbd> dispara a mensagem, mantendo a composição de IMEs e a seleção de slash-commands intactas sem submissões prematuras.
+- **Alimentação da barra de limites com eventos `rate_limit_event` do Claude no chat (`#41762`):**
+  - Conecta os frames `rate_limit_event` recebidos pelo adaptador stream-json do Claude diretamente ao `RateLimitService.ingestLiveClaudeRateLimits`, mantendo as cotas de 5h, semanais e Fable em tempo real no Native Chat sem requisições HTTP adicionais à Anthropic.
 
 ## O que fazer
 
+- Adicionar opção para alternar o envio de mensagens entre Enter e Cmd/Ctrl+Enter (`#41770`).
+- Alimentar a barra de cotas do Claude em tempo real com eventos `rate_limit_event` das mensagens de chat (`#41762`).
 - Adotar o visualizador lightbox com navegação por setas para galerias de imagens no chat (`#41642`, resolve `#41641`).
 - Incorporar o avanço com tecla Enter em cards de perguntas com seleção prévia (`#41635`).
 - Rotear pré-visualizações de PRs em chats de pastas avulsas através de repositórios locais existentes no mesmo host GitHub (`#41359`).

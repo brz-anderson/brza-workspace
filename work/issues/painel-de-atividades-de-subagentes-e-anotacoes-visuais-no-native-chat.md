@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40935, #39649, #39606, #39276 e as issues #41008, #39619 tratam de imagens geradas no chat, badges de modelo/effort de subagentes e isolamento de status.
+description: Os PRs #41766, #40935, #39649 trazem modelo, ferramenta corrente e resultado de subagentes no chat, além de imagens geradas e isolamento de status.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40935`](https://github.com/stablyai/orca/pull/40935),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41766`](https://github.com/stablyai/orca/pull/41766),
+[`stablyai/orca#40935`](https://github.com/stablyai/orca/pull/40935),
 [`stablyai/orca#39649`](https://github.com/stablyai/orca/pull/39649) (resolve Issue [`#39619`](https://github.com/stablyai/orca/issues/39619)),
 [`stablyai/orca#39606`](https://github.com/stablyai/orca/pull/39606) (resolve Issue [`#37379`](https://github.com/stablyai/orca/issues/37379)),
 [`stablyai/orca#39276`](https://github.com/stablyai/orca/pull/39276) (Issue [`#39275`](https://github.com/stablyai/orca/issues/39275)),
@@ -119,9 +120,14 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - **Exibição de modelo e nível de esforço de subagentes no painel (`#41008`):**
   - Propõe exibir badge compacto (ex.: `Opus · high`) ao lado da contagem de tokens na linha de cada subagente ativo no
     painel de agentes, extraindo a informação de `.claude/projects/.../subagents/agent-<id>.meta.json` e dos cabeçalhos de mensagens.
+- **Exibição de modelo, ferramenta corrente e resultado de subagentes no chat (`#41766`):**
+  - Expande as linhas de subagentes no Native Chat ("Kicked off N subagents") e Mobile: adiciona pill com modelo e nível de esforço (`Opus 5.5 · High`, `GPT-5.5 · XHigh`), linha secundária com a ferramenta ativa (ex.: `Read: src/auth/session.ts`) e, ao concluir, o texto do resultado final;
+  - Adiciona hover card com role (`General purpose`, `Explore`), modelo, esforço, estado, tempo decorrido, tokens e prévia do texto;
+  - Estende `NativeChatSubagentEntry` com campos opcionais `agentType`, `model`, `effort`, `operation` e `lastMessage` reconciliados do registro de child-work de Claude e Codex.
 
 ## O que fazer
 
+- Exibir modelo, ferramenta ativa e resultado final de cada subagente nas linhas de subagentes do Native Chat e Mobile (`#41766`), com pills e hover card informativo.
 - Integrar imagens geradas ao cartão da resposta final no chat nativo (`#40935`), evitando perdas e duplicações.
 - Adotar badges de identificação de modelo e esforço de raciocínio de subagentes no painel de agentes (`#41008`).
 - Adotar a supressão de textos de harness em títulos de abas do Claude (`#39606`).

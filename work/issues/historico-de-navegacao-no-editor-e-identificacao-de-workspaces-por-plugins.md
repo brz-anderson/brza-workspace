@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40743, #40345, #39162 e as issues #40492, #40343, #39177 trazem listagem de agentes por workspace, foco de terminal por plugins e autocompletion.
+description: Os PRs #41768, #41767, #40743, #40345 trazem ordenação MRU de abas, abertura direta e menu hover de links Markdown, e API de plugins.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,9 @@ tags:
 
 # Histórico de navegação no editor e identificação de workspaces por plugins
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40743`](https://github.com/stablyai/orca/pull/40743) (resolve Issue [`#40742`](https://github.com/stablyai/orca/issues/40742)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41768`](https://github.com/stablyai/orca/pull/41768),
+[`stablyai/orca#41767`](https://github.com/stablyai/orca/pull/41767),
+[`stablyai/orca#40743`](https://github.com/stablyai/orca/pull/40743) (resolve Issue [`#40742`](https://github.com/stablyai/orca/issues/40742)),
 [`stablyai/orca#40345`](https://github.com/stablyai/orca/pull/40345) (resolve Issue [`#40343`](https://github.com/stablyai/orca/issues/40343)),
 [`stablyai/orca#39162`](https://github.com/stablyai/orca/pull/39162) e das issues
 [`stablyai/orca#40492`](https://github.com/stablyai/orca/issues/40492),
@@ -53,6 +55,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40743`](https://github.com
    A API de plugins (`agents.list`) retornava exclusivamente os agentes do workspace ativo no momento. Extensões e pontes
    externas (como Stream Deck, hubs de monitoramento ou scripts de orquestração) ficavam cegas em relação a agentes em execução
    em outros workspaces e não dispunham de método para focar diretamente a aba/painel do terminal de um agente alvo (`terminal.focus`).
+8. **Desorganização da barra de abas e dificuldade de localizar abas ativas (`#41768`):**
+   Em workspaces com dezenas de abas abertas, a ordenação estritamente manual ou estática força o desenvolvedor a caçar
+   abas frequentemente usadas ao longo da faixa horizontal, sem opção de manter as abas mais ativas à frente.
+9. **Abertura indireta de URLs e menu obstrutivo ao clicar em links Markdown (`#41767`):**
+   Clicar em um link em documentos Markdown visuais abria um popover de menu em vez de navegar diretamente, exigindo cliques
+   adicionais para abrir no navegador embutido ou no navegador do sistema.
 
 ## O que o upstream implementa
 
@@ -83,9 +91,18 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40743`](https://github.com
   - Modifica o ciclo de ativação de workspaces em repouso para que a inspeção passiva (abertura de arquivo, diff no Source Control,
     leitura de notas) restaure apenas o sistema de arquivos virtual sem instanciar processos PTY ou terminais automáticos até que
     o usuário interaja explicitamente com o console ou inicie uma ação de execução.
+- **Ordenação de abas por uso mais recente (MRU) (`#41768`):**
+  - Adiciona o modo opcional *Settings → General → Tabs → Tab bar order: Manual / Most recently used*;
+  - Promove abas não fixadas para a frente ao digitar no terminal, enviar prompt de chat ou navegar via atalhos de teclado (Ctrl+Tab, teclado numérico), preservando a ordem de abas pinadas e sem reshuffle indesejado por ativação de ponteiro ou logs de background.
+- **Navegação direta em links Markdown, clique médio para navegador externo e menu no hover (`#41767`):**
+  - Clique direto com o botão esquerdo abre a URL diretamente no navegador interno do Orca;
+  - Clique com o botão do meio abre no navegador padrão do sistema operacional;
+  - Hover sobre o link exibe menu contextual com copiar link, editar URL, desvincular e duplo clique para selecionar todo o texto da URL.
 
 ## O que fazer
 
+- Adicionar ordenação opcional de abas por mais recentemente usadas (MRU) (`#41768`).
+- Adotar navegação direta em links Markdown com suporte a clique médio para navegador externo e menu contextual em hover (`#41767`).
 - Adotar `agents.list({ workspaceId? })` e `terminal.focus({ terminalId })` na API de plugins (`#40743`) para controle externo de agentes.
 - Adotar o hook `editor.inlineCompletion` para habilitar plugins de completude de código via IA em ghost text no Monaco (`#40345`).
 - Expor `id` e `path` absoluto do workspace em `workspace.readContext` e no evento `workspace.changed` (`#40492`).

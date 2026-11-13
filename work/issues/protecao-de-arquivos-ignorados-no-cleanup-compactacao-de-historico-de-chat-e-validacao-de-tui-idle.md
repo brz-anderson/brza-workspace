@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41765, #41760, #41483, #41480, #41457 trazem varreduras offline rápidas, runner automático em background e proteção de worktrees no cleanup.
+description: Os PRs #41858, #41835, #41833, #41765, #41760 trazem recuperação de cleanup em servidores, cancelamento de varredura local e arquivamento de worktrees.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,10 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41765`](https://github.com/stablyai/orca/pull/41765),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41858`](https://github.com/stablyai/orca/pull/41858) (resolve Issue STA-15099),
+[`stablyai/orca#41835`](https://github.com/stablyai/orca/pull/41835) (resolve Issue STA-15114),
+[`stablyai/orca#41833`](https://github.com/stablyai/orca/pull/41833),
+[`stablyai/orca#41765`](https://github.com/stablyai/orca/pull/41765),
 [`stablyai/orca#41760`](https://github.com/stablyai/orca/pull/41760),
 [`stablyai/orca#41483`](https://github.com/stablyai/orca/pull/41483),
 [`stablyai/orca#41480`](https://github.com/stablyai/orca/pull/41480),
@@ -59,6 +62,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41765`](https://github.com
    - Em repositórios com dezenas de worktrees, a checagem demorava mais de 20s e corria o risco de expirar antes de concluir.
 9. **Ausência de automação em segundo plano para aplicação de regras de limpeza de workspaces (`#41760`):**
    - A limpeza de workspaces exigia abertura manual do diálogo de cleanup a partir da barra de status, acumulando branches mesclados, checkouts inativos e diretórios órfãos ao longo do tempo.
+10. **Falha na exclusão de workspaces e travamento de cleanup em servidores pareados e headless (`#41858`, STA-15099):**
+    - Ao excluir workspaces hospedados por servidores pareados ou `orca serve`, o processo fechava terminais e recusava a deleção porque a lista durável de exclusões pendentes só era carregada na inicialização do desktop, deixando pastas e linhas órfãs presas na interface sem recuperação após reinício;
+    - Além disso, cancelamentos de pré-checagem em desligamentos do host não protegiam checkouts e WSL sofria com timeouts prematuros de 30s.
+11. **Varreduras locais de arquivos ignorados continuavam executando após fechar prévia de deleção (`#41835`, STA-15114):**
+    - O fechamento ou retargeting do diálogo de exclusão de workspace abortava a requisição remota, mas o canal local descartava o sinal de cancelamento, mantendo múltiplos processos `git ls-files` concorrentes enfileirados em segundo plano consumindo CPU e I/O desnecessariamente.
+12. **Perda permanente de histórico e metadados ao remover worktrees para liberar espaço em disco (`#41833`):**
+    - A única forma de recuperar espaço em disco era excluir o workspace completamente, apagando anotações, comentários, PRs vinculados e linhagem da árvore de trabalho, sem um mecanismo para arquivar apenas o checkout e restaurá-lo sob demanda.
 
 ## O que o upstream propõe e implementa
 
@@ -95,9 +105,20 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41765`](https://github.com
 9. **Execução automática de regras de cleanup de workspace em background por host (`#41760`):**
    - Implementa o `WorkspaceCleanupRunner` com ciclo de avaliação compartilhada (`evaluateWorkspaceCleanup`), disparado 2 minutos após o boot, a cada hora e 10s após alterações de regras;
    - Executa isoladamente no host/processo dono do repositório (desktop local, orcad de SSH ou WSL), revalidando evidências (pins, drafts não salvos, terminais abertos, daemons e arquivos dirty) imediatamente antes da remoção segura via `queueWorkspaceDelete`.
+10. **Resiliência e recuperação de exclusão de workspaces em servidores pareados e headless (`#41858`, STA-15099):**
+    - Carrega a tabela de exclusões duráveis pendentes tanto no desktop quanto na inicialização de instâncias servidoras (`orca serve`/orcad);
+    - Valida o armazenamento de deleção antes de parar terminais, oculta a linha da visualização imediatamente, preserva o caminho e branch até o término do expurgo e retoma limpezas incompletas após reinício do host, sem limite rígido de 30s no WSL.
+11. **Cancelamento imediato de varreduras locais de arquivos ignorados (`#41835`, STA-15114):**
+    - Conecta o `AbortController` ao canal local `getRuntimeWorktreeAtRiskLocalFiles`, interrompendo prontamente chamadas a `git ls-files` e comparações em disco assim que o diálogo de confirmação é fechado ou redirecionado.
+12. **Mecanismo de arquivamento e restauração de worktrees (`#41833`):**
+    - Implementa `worktree.archive`, apagando o diretório de checkout para liberar espaço em disco enquanto preserva o branch, metadados (`WorktreeMeta.archivedCheckout`), notas e histórico;
+    - Implementa `worktree.restore`, recriando o worktree a partir do branch preservado com reconstituição de symlinks e cópias de `.worktreeinclude`.
 
 ## O que fazer
 
+- Adotar a recuperação durável de exclusão de workspaces e suporte a cleanup seguro em servidores (`#41858`, STA-15099).
+- Propagar o cancelamento de varreduras de arquivos ignorados no fechamento da prévia de exclusão (`#41835`, STA-15114).
+- Incorporar o backend de arquivamento e restauração sob demanda de checkouts de worktrees (`#41833`).
 - Adotar a varredura offline rápida de cleanup (`#41765`), eliminando lazy fetches do Git e acelerando o cálculo de merges e squashes.
 - Incorporar o runner de background de cleanup de workspaces (`#41760`) com revalidação estrita de evidências e proteção contra deleção acidental.
 - Adotar a tabela durável de cleanup com ocultação imediata de workspaces em remoção (`#41483`).

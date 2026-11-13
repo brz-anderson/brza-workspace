@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41770, #41762, #41642, #41635, #41359 trazem envio configurável com Enter/Cmd+Enter, medidor de cota Claude via rate_limit_event e galeria de imagens.
+description: Os PRs #41800, #41776, #41770, #41762, #41642 trazem visualizador amplo de imagens de chat, rastreamento de perguntas assíncronas e envio com Enter configurável.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,9 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41770`](https://github.com/stablyai/orca/pull/41770),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41800`](https://github.com/stablyai/orca/pull/41800) (resolve Issue [`#41781`](https://github.com/stablyai/orca/issues/41781)),
+[`stablyai/orca#41776`](https://github.com/stablyai/orca/pull/41776) (resolve Issue [`#41353`](https://github.com/stablyai/orca/issues/41353)),
+[`stablyai/orca#41770`](https://github.com/stablyai/orca/pull/41770),
 [`stablyai/orca#41762`](https://github.com/stablyai/orca/pull/41762),
 [`stablyai/orca#41642`](https://github.com/stablyai/orca/pull/41642) (resolve Issue [`#41641`](https://github.com/stablyai/orca/issues/41641)),
 [`stablyai/orca#41635`](https://github.com/stablyai/orca/pull/41635),
@@ -127,6 +129,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41770`](https://github.com
 24. **Barra de limites de uso do Claude estática ou desatualizada no Native Chat (`#41762`):**
     A barra de cotas do Claude no chat dependia unicamente de chamadas a `/api/oauth/usage`. Com tokens de inferência direta (`CLAUDE_CODE_OAUTH_TOKEN`)
     ou logins ociosos, o endpoint falhava e a barra exibia alerta ⚠️ e valores desatualizados, mesmo com chats ativos recebendo metadados de limite por streaming.
+25. **Falta de navegação contínua entre imagens da conversa no visualizador ampliado (`#41800`, resolve `#41781`):**
+    Ao clicar em uma imagem ou captura de tela no chat, o modal abria apenas aquela imagem isolada. O usuário precisava
+    fechar a prévia, rolar a conversa para achar o próximo anexo e clicar novamente, tornando a revisão de múltiplos mockups exaustiva.
+26. **Perda de indicador de atenção para perguntas assíncronas não respondidas no chat (`#41776`, resolve `#41353`):**
+    Quando um agente fazia uma pergunta assíncrona ao operador e continuava executando outras tarefas, a projeção de atenção da sessão
+    descartava a pendência, fazendo o chat parecer não exigir resposta humana até que o turno inteiro se encerrasse.
 
 ## O que o upstream implementa
 
@@ -210,9 +218,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41770`](https://github.com
   - Adiciona o ajuste "Send messages with Enter" em *Settings → Chat → Behavior*; quando desligado, <kbd>Enter</kbd> insere quebra de linha e <kbd>Cmd+Enter</kbd> / <kbd>Ctrl+Enter</kbd> dispara a mensagem, mantendo a composição de IMEs e a seleção de slash-commands intactas sem submissões prematuras.
 - **Alimentação da barra de limites com eventos `rate_limit_event` do Claude no chat (`#41762`):**
   - Conecta os frames `rate_limit_event` recebidos pelo adaptador stream-json do Claude diretamente ao `RateLimitService.ingestLiveClaudeRateLimits`, mantendo as cotas de 5h, semanais e Fable em tempo real no Native Chat sem requisições HTTP adicionais à Anthropic.
+- **Navegação contínua entre imagens da conversa em visualizador ampliado (`#41800`, resolve `#41781`):**
+  - Transforma o `PanZoomImageDialog` em um visualizador contínuo com setas laterais de navegação, atalhos de teclado <kbd>←</kbd> e <kbd>→</kbd> e contador de posição (ex.: "3 / 12");
+  - Constrói a lista ordenada de imagens diretamente da projeção do transcript da conversa (incluindo anexos, capturas de ferramentas e imagens Markdown), contornando a virtualização de mensagens montadas na UI.
+- **Rastreamento de atenção para perguntas assíncronas no chat nativo (`#41776`, resolve `#41353`):**
+  - Inclui mensagens de perguntas assíncronas pendentes na projeção compartilhada de atenção da sessão (`session attention`), mantendo o indicador de necessidade de input ativo mesmo enquanto o agente executa outras tarefas em background até a resposta ser submetida.
 
 ## O que fazer
 
+- Adotar o visualizador contínuo de imagens do chat com setas de navegação e atalhos de teclado (`#41800`, resolve `#41781`).
+- Rastrear perguntas assíncronas não respondidas na projeção de atenção da sessão (`#41776`, resolve `#41353`).
 - Adicionar opção para alternar o envio de mensagens entre Enter e Cmd/Ctrl+Enter (`#41770`).
 - Alimentar a barra de cotas do Claude em tempo real com eventos `rate_limit_event` das mensagens de chat (`#41762`).
 - Adotar o visualizador lightbox com navegação por setas para galerias de imagens no chat (`#41642`, resolve `#41641`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41768, #41767, #40743, #40345 trazem ordenação MRU de abas, abertura direta e menu hover de links Markdown, e API de plugins.
+description: Os PRs #41786, #41828, #41768, #41767 trazem abertura por clique único/duplo no explorer, Quick Open com Unicode NFC e ordenação MRU de abas.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,9 @@ tags:
 
 # Histórico de navegação no editor e identificação de workspaces por plugins
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41768`](https://github.com/stablyai/orca/pull/41768),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41786`](https://github.com/stablyai/orca/pull/41786) (resolve Issue [`#41783`](https://github.com/stablyai/orca/issues/41783)),
+[`stablyai/orca#41828`](https://github.com/stablyai/orca/pull/41828) (resolve Issue [`#41827`](https://github.com/stablyai/orca/issues/41827)),
+[`stablyai/orca#41768`](https://github.com/stablyai/orca/pull/41768),
 [`stablyai/orca#41767`](https://github.com/stablyai/orca/pull/41767),
 [`stablyai/orca#40743`](https://github.com/stablyai/orca/pull/40743) (resolve Issue [`#40742`](https://github.com/stablyai/orca/issues/40742)),
 [`stablyai/orca#40345`](https://github.com/stablyai/orca/pull/40345) (resolve Issue [`#40343`](https://github.com/stablyai/orca/issues/40343)),
@@ -61,6 +63,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41768`](https://github.com
 9. **Abertura indireta de URLs e menu obstrutivo ao clicar em links Markdown (`#41767`):**
    Clicar em um link em documentos Markdown visuais abria um popover de menu em vez de navegar diretamente, exigindo cliques
    adicionais para abrir no navegador embutido ou no navegador do sistema.
+10. **Abertura acidental de arquivos ao navegar e selecionar itens no explorador de arquivos (`#41786`, resolve `#41783`):**
+    O file explorer abria imediatamente uma aba de pré-visualização a cada clique simples, substituindo a prévia corrente e
+    dificultando a navegação de usuários acostumados ao padrão de duplo clique para abertura definitiva de arquivos.
+11. **Falha na busca de arquivos com caracteres acentuados ou coreano no Quick Open (`#41828`, resolve `#41827`):**
+    O Quick Open realizava comparações estritas de unidades de código sem normalização Unicode. Arquivos salvos em forma
+    decomposta NFD (padrão em capturas de tela e downloads no macOS) não eram encontrados ao digitar o nome em forma composta NFC.
 
 ## O que o upstream implementa
 
@@ -98,9 +106,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41768`](https://github.com
   - Clique direto com o botão esquerdo abre a URL diretamente no navegador interno do Orca;
   - Clique com o botão do meio abre no navegador padrão do sistema operacional;
   - Hover sobre o link exibe menu contextual com copiar link, editar URL, desvincular e duplo clique para selecionar todo o texto da URL.
+- **Modo configurável de abertura por clique simples ou duplo no file explorer (`#41786`, resolve `#41783`):**
+  - Adiciona o ajuste *Appearance → Window & sidebar → Advanced → File explorer → Open files with: Single click / Double click*;
+  - Em *Double click*, um clique simples apenas seleciona o item na árvore e duplo clique abre a aba permanente do editor, mantendo expansão e atalhos de teclado intactos.
+- **Normalização Unicode NFC no Quick Open e menções de arquivos (`#41828`, resolve `#41827`):**
+  - Normaliza tanto a consulta quanto os caminhos candidatos para forma composta NFC em `quick-open-path-search.ts`, permitindo encontrar nomes com caracteres acentuados ou coreano gravados em NFD no macOS sem afetar o path retornado.
 
 ## O que fazer
 
+- Adicionar configuração de abertura de arquivos por clique simples ou duplo no explorer (`#41786`, resolve `#41783`).
+- Aplicar normalização Unicode NFC na busca de caminhos do Quick Open e do seletor `@` (`#41828`, resolve `#41827`).
 - Adicionar ordenação opcional de abas por mais recentemente usadas (MRU) (`#41768`).
 - Adotar navegação direta em links Markdown com suporte a clique médio para navegador externo e menu contextual em hover (`#41767`).
 - Adotar `agents.list({ workspaceId? })` e `terminal.focus({ terminalId })` na API de plugins (`#40743`) para controle externo de agentes.

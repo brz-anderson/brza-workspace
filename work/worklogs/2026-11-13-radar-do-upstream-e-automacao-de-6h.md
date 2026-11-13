@@ -8,6 +8,7 @@ completed: 2026-11-13
 tags:
   - tooling
 refs:
+  - issue:alocacao-de-chats-sob-host-independente-admissao-de-git-e-cache-de-modelos
   - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
   - issue:controle-de-agentes-e-chats-pela-cli-por-id-de-sessao-e-rotulagem-de-contas
   - issue:historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins
@@ -15,7 +16,10 @@ refs:
   - issue:preservar-o-dono-do-painel-do-antigravity-em-subagentes-aninhados
   - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
+  - issue:retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal
   - issue:seguranca-de-hooks-em-worktrees-e-integridade-de-setup-em-automacoes
+  - issue:seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio
+  - issue:workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh
 ---
 
 # Radar de issues e PRs do upstream e automação de 6h (00h, 06h, 12h e 18h BRT)
@@ -72,4 +76,29 @@ refs:
      adicionado o PR `#41823` (aprovação de comandos de setup pré-criação inspecionando o manifesto da branch base de origem, eliminando alertas falsos de divergência de comandos).
    - [Preservar o dono do painel do Antigravity em subagentes aninhados](../issues/preservar-o-dono-do-painel-do-antigravity-em-subagentes-aninhados.md):
      adicionado o PR `#41806` / Issue `#41857` (ignorar hooks de agentes filhos para proteger a sessão líder do painel contra falsos status `done` e notificações indevidas).
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-13)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-13T09:00:00Z` e `2026-11-13T15:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Alocação de chats locais sob host independente, admissão de Git e cache de modelos](../issues/alocacao-de-chats-sob-host-independente-admissao-de-git-e-cache-de-modelos.md):
+     rastreia o PR `#41976` (resolve STA-13482 — cache durável de catálogo de modelos por executável/configuração, eliminando sondagens repetidas de 2s e timeouts do ACP),
+     PR `#41948` (varredura bounded em páginas de 256 itens para retenção do Session History FTS, prevenindo retenção de lock e lentidão no startup do SQLite),
+     PR `#41946` (resolve Issue `#41934` — método RPC `session.tabs.scroll` para rolagem programática de abas visíveis de terminal e chat via CLI e periféricos),
+     PR `#41927` (resolve STA-14967 — admissão e cotas de leitura Git com priorização para comandos interativos durante rajadas de criação de worktrees) e
+     PR `#41917` (migração de chats locais macOS e agentes para host independente "Orca Agents" / `BrzA Agents`, isolando memória e processos do app Electron).
+3. **Atualização de 5 issues existentes em `work/issues/`:**
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionado o PR `#41979` (resolve Issue `#41975` — marcação atômica de lido `markAsRead` ao responder perguntas de workers no `answerQuestion`, eliminando chamadas repetitivas de coordenação).
+   - [Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal](../issues/retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal.md):
+     adicionado o PR `#41980` (preservação durável do histórico salvo de terminal pelo processo em background após reconnect e sleep, impedindo perda de buffer de 5k para 1k linhas).
+   - [Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório](../issues/seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio.md):
+     adicionado o PR `#41930` (resolve Issue `#41929` — reativação completa via `activateAndRevealWorktree` ao abrir workspace pelo branch picker, eliminando telas em branco).
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionado o PR `#41955` (importação estruturada de transcrições do Kimi Code via `session_index.jsonl` e adoção transparente de conversas de CLI pelo Native Chat).
+   - [Workers de plugins em hosts remotos e gerenciamento CLI de SSH](../issues/workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh.md):
+     adicionado o PR `#41910` (evento reativo `worktreeRowsChanged` com deltas de catálogo para servidores pareados e feeds móveis, reduzindo latência de atualização para ~2s sem varreduras totais).
+
 

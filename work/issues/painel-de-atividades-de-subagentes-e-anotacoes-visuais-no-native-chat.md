@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41766, #40935, #39649 trazem modelo, ferramenta corrente e resultado de subagentes no chat, além de imagens geradas e isolamento de status.
+description: Os PRs #41955, #41766, #40935, #39649 trazem importação de transcripts do Kimi Code, modelo/ferramenta de subagentes no chat e imagens geradas.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41766`](https://github.com/stablyai/orca/pull/41766),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41955`](https://github.com/stablyai/orca/pull/41955),
+[`stablyai/orca#41766`](https://github.com/stablyai/orca/pull/41766),
 [`stablyai/orca#40935`](https://github.com/stablyai/orca/pull/40935),
 [`stablyai/orca#39649`](https://github.com/stablyai/orca/pull/39649) (resolve Issue [`#39619`](https://github.com/stablyai/orca/issues/39619)),
 [`stablyai/orca#39606`](https://github.com/stablyai/orca/pull/39606) (resolve Issue [`#37379`](https://github.com/stablyai/orca/issues/37379)),
@@ -80,6 +81,10 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     do modelo e esforço de raciocínio de cada subagente. Quando agentes customizados ou chamadas dinâmicas utilizavam modelos
     discrepantes do pai (ex.: subagente executando em Opus no esforço high em sessão pai Sonnet), o operador ficava no escuro sobre
     os parâmetros de execução e custos correspondentes.
+13. **Incompatibilidade para importar transcrições do Kimi Code e adotar conversas iniciadas via CLI (`#41955`):**
+    Sessões e transcrições geradas pela CLI do Kimi Code permaneciam isoladas no filesystem, impossibilitando que desenvolvedores
+    adotassem essas conversas dentro do Native Chat no desktop para continuar a interação com histórico estruturado,
+    ferramental gráfico e inspeção de passos.
 
 ## O que o upstream implementa
 
@@ -124,9 +129,13 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
   - Expande as linhas de subagentes no Native Chat ("Kicked off N subagents") e Mobile: adiciona pill com modelo e nível de esforço (`Opus 5.5 · High`, `GPT-5.5 · XHigh`), linha secundária com a ferramenta ativa (ex.: `Read: src/auth/session.ts`) e, ao concluir, o texto do resultado final;
   - Adiciona hover card com role (`General purpose`, `Explore`), modelo, esforço, estado, tempo decorrido, tokens e prévia do texto;
   - Estende `NativeChatSubagentEntry` com campos opcionais `agentType`, `model`, `effort`, `operation` e `lastMessage` reconciliados do registro de child-work de Claude e Codex.
+- **Importação de transcrições Kimi Code e adoção de conversas CLI (`#41955`):**
+  - Implementa `kimi-transcript-import.ts` e parseador de eventos de conversas CLI do Kimi Code (`session_index.jsonl`), convertendo turnos, chamadas de ferramenta e raciocínio em mensagens nativas estruturadas;
+  - Adiciona suporte no fluxo `structured-agent-cli-conversation-adoption.ts` para que sessões CLI ativas ou salvas do Kimi Code sejam importadas ou adotadas pelo Native Chat com reconciliação transparente de estado.
 
 ## O que fazer
 
+- Suportar importação de transcrições e adoção de conversas CLI do Kimi Code no Native Chat (`#41955`), permitindo transição contínua entre terminal e UI nativa.
 - Exibir modelo, ferramenta ativa e resultado final de cada subagente nas linhas de subagentes do Native Chat e Mobile (`#41766`), com pills e hover card informativo.
 - Integrar imagens geradas ao cartão da resposta final no chat nativo (`#40935`), evitando perdas e duplicações.
 - Adotar badges de identificação de modelo e esforço de raciocínio de subagentes no painel de agentes (`#41008`).

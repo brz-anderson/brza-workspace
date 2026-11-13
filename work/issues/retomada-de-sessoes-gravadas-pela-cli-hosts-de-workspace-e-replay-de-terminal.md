@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41206, #41183, #41248, #41247 e a issue #41184 trazem retomada de sessões pela CLI, escolha de host de workspace e replay de terminal.
+description: Os PRs #41980, #41206, #41183, #41248, #41247 trazem preservação durável de histórico de terminal após reconnect/sleep, retomada de sessões pela CLI e replay confiável.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,8 @@ tags:
 
 # Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41206`](https://github.com/stablyai/orca/pull/41206) (resolve Issue [`#41204`](https://github.com/stablyai/orca/issues/41204)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#41980`](https://github.com/stablyai/orca/pull/41980),
+[`stablyai/orca#41206`](https://github.com/stablyai/orca/pull/41206) (resolve Issue [`#41204`](https://github.com/stablyai/orca/issues/41204)),
 [`stablyai/orca#41183`](https://github.com/stablyai/orca/pull/41183),
 [`stablyai/orca#41248`](https://github.com/stablyai/orca/pull/41248),
 [`stablyai/orca#41247`](https://github.com/stablyai/orca/pull/41247) e da issue
@@ -42,6 +43,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41206`](https://github.com
 5. **Invisibilidade do workspace ativo no Studio a partir da CLI (`#41184`):**
    - Scripts de workflow e integrações externas via CLI não possuíam forma de consultar qual workspace está visível no monitor
      ou qual janela de host remoto está em foco pelo operador, dificultando orquestrações conscientes de contexto.
+6. **Perda e truncamento do histórico de terminal ao reconectar ou suspender o processo (`#41980`):**
+   - Ao reiniciar o Orca ou reabrir abas de terminal suspensas, históricos longos (ex.: 5.000 linhas) encolhiam drasticamente
+     para ~1.000 linhas se o comando redesenhasse a última linha ou caso o buffer em memória sofresse overflow;
+   - Leituras de tela podiam substituir o log salvo por cópias truncadas em tempo de execução, perdendo o histórico intermediário.
 
 ## O que o upstream propõe e implementa
 
@@ -60,9 +65,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41206`](https://github.com
    - Bloqueia a captura de snapshots em posições intermediárias, registrando apenas em pontos de repouso de saída do terminal.
 5. **Relatório de workspace focado na janela via CLI (`#41184`):**
    - Exposição via RPC e CLI do estado de visualização ativa entre múltiplos hosts pareados.
+6. **Preservação durável do histórico de terminal pelo processo em background (`#41980`):**
+   - Transfere para o processo gerenciador do terminal a responsabilidade exclusiva de gravar a saída em ordem sem reescritas truncadas;
+   - Salva o histórico retido antes de rotacionar logs de saída e valida a leitura durável no disco antes de suspender comandos em ciclos de Sleep/Wake.
 
 ## O que fazer
 
+- Preservar o histórico completo de terminais através do processo de background em reconexões e suspensões (`#41980`).
 - Incorporar a descoberta e reativação in-place de sessões gravadas de agentes (`orca agent sessions` e `orca agent resume`)
   para eliminar a proliferação de abas em automações contínuas (`#41206`).
 - Adotar a seleção de host por preferências configuradas no `Run on` (`#41183`).

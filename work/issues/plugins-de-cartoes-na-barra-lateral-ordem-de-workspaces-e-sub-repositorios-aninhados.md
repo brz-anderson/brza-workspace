@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40597, #40604, #40603, #40334, #40323 trazem grupos em Pinned, Move to top, Workspaces antes de abas no Cmd+J e fixação de projetos.
+description: Os PRs #42085, #42057, #40597, #40604, #40603 trazem painéis de plugins como páginas, editores de diff customizados, grupos em Pinned e Move to top.
 scope:
   - brza-studio
   - workspace
@@ -17,7 +17,10 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40597`](https://github.com/stablyai/orca/pull/40597) (fecha Issue [`#39620`](https://github.com/stablyai/orca/issues/39620)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42085`](https://github.com/stablyai/orca/pull/42085) (resolve Issue [`#42080`](https://github.com/stablyai/orca/issues/42080)),
+[`stablyai/orca#42057`](https://github.com/stablyai/orca/pull/42057),
+[`stablyai/orca#42068`](https://github.com/stablyai/orca/pull/42068),
+[`stablyai/orca#40597`](https://github.com/stablyai/orca/pull/40597) (fecha Issue [`#39620`](https://github.com/stablyai/orca/issues/39620)),
 [`stablyai/orca#40604`](https://github.com/stablyai/orca/pull/40604) (resolve Issue [`#40392`](https://github.com/stablyai/orca/issues/40392)),
 [`stablyai/orca#40603`](https://github.com/stablyai/orca/pull/40603) (resolve Issue [`#40397`](https://github.com/stablyai/orca/issues/40397)),
 [`stablyai/orca#40334`](https://github.com/stablyai/orca/pull/40334) (resolve Issue [`#40333`](https://github.com/stablyai/orca/issues/40333)),
@@ -170,9 +173,18 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40597`](https://github.com
     - Desabilitado quando o item já é o primeiro da lista, reutilizando o fluxo consolidado de ordenação e persistência do drag commit.
 36. **Workspaces à frente de abas abertas na busca digitada da Jump Palette (`#40603`, resolve `#40397`):**
     - Ao digitar qualquer busca no Cmd+J, a seção de Workspaces é sempre posicionada antes de Open Tabs (`!hasQuery`), facilitando o retorno rápido a workspaces (inclusive suspensos) com destaque e navegação por teclado instantâneos.
+37. **Painéis de plugins como páginas de navegação principal da sidebar (`#42085`, resolve `#42080`):**
+    - Permite que plugins registrem uma entrada na barra de navegação superior esquerda (ao lado de Tasks, Automations e Orca Mobile), abrindo o painel em largura total como página dedicada em vez de aba secundária na barra lateral direita.
+38. **Editores customizados de plugins em abas de diff de arquivo único (`#42057`):**
+    - Permite que arquivos tratados por plugins (ex.: diagramas BPMN, esquemas de dados, mockups) ofereçam sua própria visualização gráfica de diff diretamente na aba de comparação de alterações do Source Control, lado a lado com o diff textual padrão.
+39. **Popovers de plugins pertencentes ao host na barra de status (`#42068`):**
+    - Proposta de RFC para que plugins declarem itens interativos de status bar cujos dados e popovers pertençam ao daemon do host onde o workspace executa.
 
 ## O que fazer
 
+- Suportar abertura de painéis de plugins como páginas dedicadas na navegação principal (`#42085`, resolve `#42080`).
+- Oferecer editores customizados de plugins em abas de diff de arquivo único no Source Control (`#42057`).
+- Avaliar a especificação de status-bar popovers pertencentes ao host para plugins (`#42068`).
 - Adotar grupos nomeados e colapsáveis para workspaces na seção Pinned (`#40597`).
 - Adicionar o atalho/ação "Move to top" no menu de cabeçalho de projetos (`#40604`).
 - Posicionar Workspaces à frente de Open Tabs na busca digitada da Jump Palette (`#40603`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41800, #41776, #41770, #41762, #41642 trazem visualizador amplo de imagens de chat, rastreamento de perguntas assíncronas e envio com Enter configurável.
+description: Os PRs #42129, #42095, #42092, #42067, #41800 trazem pill de side chat no composer, imagens inline, links de PR e abertura de links por middle-click.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,12 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41800`](https://github.com/stablyai/orca/pull/41800) (resolve Issue [`#41781`](https://github.com/stablyai/orca/issues/41781)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42129`](https://github.com/stablyai/orca/pull/42129) (resolve Issue [`#41908`](https://github.com/stablyai/orca/issues/41908)),
+[`stablyai/orca#42095`](https://github.com/stablyai/orca/pull/42095),
+[`stablyai/orca#42092`](https://github.com/stablyai/orca/pull/42092) (resolve Issue [`#42091`](https://github.com/stablyai/orca/issues/42091)),
+[`stablyai/orca#42067`](https://github.com/stablyai/orca/pull/42067) (resolve Issue [`#42059`](https://github.com/stablyai/orca/issues/42059)),
+[`stablyai/orca#42131`](https://github.com/stablyai/orca/pull/42131),
+[`stablyai/orca#41800`](https://github.com/stablyai/orca/pull/41800) (resolve Issue [`#41781`](https://github.com/stablyai/orca/issues/41781)),
 [`stablyai/orca#41776`](https://github.com/stablyai/orca/pull/41776) (resolve Issue [`#41353`](https://github.com/stablyai/orca/issues/41353)),
 [`stablyai/orca#41770`](https://github.com/stablyai/orca/pull/41770),
 [`stablyai/orca#41762`](https://github.com/stablyai/orca/pull/41762),
@@ -135,6 +140,14 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41800`](https://github.com
 26. **Perda de indicador de atenção para perguntas assíncronas não respondidas no chat (`#41776`, resolve `#41353`):**
     Quando um agente fazia uma pergunta assíncrona ao operador e continuava executando outras tarefas, a projeção de atenção da sessão
     descartava a pendência, fazendo o chat parecer não exigir resposta humana até que o turno inteiro se encerrasse.
+27. **Falta de indicação visual e disparos acidentais ao compor side chats no chat nativo (`#42129`, resolve `#41908`):**
+    Ao digitar `/btw` ou `/side` para abrir uma conversa paralela, o composer exibia apenas texto plano, sem confirmação clara de que o envio bifurcaria o fluxo em um side chat.
+28. **Links diretos de imagem exibidos como URLs textuais em vez de imagens renderizadas (`#42095`):**
+    Imagens referenciadas como links isolados em Markdown ou respostas de ferramentas apareciam como hiperlinks secos, exigindo clique para abrir no navegador em vez de exibição visual inline.
+29. **Ausência de atalho "Open in Orca" para links de Pull Request do GitHub (`#42092`, resolve `#42091`):**
+    Ao interagir com links de PRs no chat ou navegador interno, não havia ação de menu para abrir diretamente o workspace ou o branch correspondente no Orca/BrzA Studio.
+30. **Clique com botão do meio (middle-click) não abria links no terminal (`#42067`, resolve `#42059`):**
+    A ação de reivindicação (`claimAction`) no terminal estava configurada apenas para o botão principal do mouse, ignorando cliques com o botão do meio padrão de ambientes Unix.
 
 ## O que o upstream implementa
 
@@ -223,9 +236,24 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41800`](https://github.com
   - Constrói a lista ordenada de imagens diretamente da projeção do transcript da conversa (incluindo anexos, capturas de ferramentas e imagens Markdown), contornando a virtualização de mensagens montadas na UI.
 - **Rastreamento de atenção para perguntas assíncronas no chat nativo (`#41776`, resolve `#41353`):**
   - Inclui mensagens de perguntas assíncronas pendentes na projeção compartilhada de atenção da sessão (`session attention`), mantendo o indicador de necessidade de input ativo mesmo enquanto o agente executa outras tarefas em background até a resposta ser submetida.
+- **Pill visual de Side chat no composer para `/btw` e `/side` (`#42129`, resolve `#41908`):**
+  - Converte prefixos digitados `/btw ` ou `/side ` no início do rascunho em uma pill visual compacta **Side chat** (estilo skill-pill com ícone `GitFork`), confirmando graficamente que a mensagem abrirá uma conversa paralela bifurcada.
+- **Renderização inline de links avulsos de imagens (`#42095`):**
+  - Trata URLs diretas e links Markdown standalone para imagens renderizando o elemento visual correspondente na mensagem, eliminando links textuais secos.
+- **Ação "Open in Orca" para links de GitHub PR (`#42092`, resolve `#42091`):**
+  - Adiciona a ação "Open in Orca" em menus de contexto e visualizadores de links de Pull Request do GitHub, abrindo diretamente o workspace e o branch correspondente.
+- **Abertura de links no terminal via middle-click (`#42067`, resolve `#42059`):**
+  - Corrige a ação `claimAction` no terminal, armando o listener também para o botão 1 (clique do meio / roda do mouse), permitindo abrir links de terminal sem depender exclusivamente do clique primário.
+- **Destaque de sintaxe para YAML frontmatter em Markdown (`#42131`):**
+  - Habilita suporte a blocos de frontmatter YAML no parser do editor de Markdown, renderizando delimitadores `---` e metadados com coloração sintática dedicada.
 
 ## O que fazer
 
+- Adotar a pill visual de Side chat no composer para prefixos `/btw` e `/side` (`#42129`, resolve `#41908`).
+- Exibir imagens de links avulsos diretamente na conversa do chat nativo (`#42095`).
+- Adicionar ação "Open in Orca" para links de Pull Request do GitHub (`#42092`, resolve `#42091`).
+- Suportar abertura de links de terminal com o botão do meio do mouse (`#42067`, resolve `#42059`).
+- Adotar o realce de sintaxe de frontmatter YAML no editor de Markdown (`#42131`).
 - Adotar o visualizador contínuo de imagens do chat com setas de navegação e atalhos de teclado (`#41800`, resolve `#41781`).
 - Rastrear perguntas assíncronas não respondidas na projeção de atenção da sessão (`#41776`, resolve `#41353`).
 - Adicionar opção para alternar o envio de mensagens entre Enter e Cmd/Ctrl+Enter (`#41770`).

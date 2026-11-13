@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41858, #41835, #41833, #41765, #41760 trazem recuperação de cleanup em servidores, cancelamento de varredura local e arquivamento de worktrees.
+description: Os PRs #42055, #42039, #41858, #41835, #41833, #41765, #41760 trazem página de cleanup em Settings, regras por projeto, recuperação em servidores e arquivamento de worktrees.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,9 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41858`](https://github.com/stablyai/orca/pull/41858) (resolve Issue STA-15099),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42055`](https://github.com/stablyai/orca/pull/42055),
+[`stablyai/orca#42039`](https://github.com/stablyai/orca/pull/42039),
+[`stablyai/orca#41858`](https://github.com/stablyai/orca/pull/41858) (resolve Issue STA-15099),
 [`stablyai/orca#41835`](https://github.com/stablyai/orca/pull/41835) (resolve Issue STA-15114),
 [`stablyai/orca#41833`](https://github.com/stablyai/orca/pull/41833),
 [`stablyai/orca#41765`](https://github.com/stablyai/orca/pull/41765),
@@ -69,6 +71,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41858`](https://github.com
     - O fechamento ou retargeting do diálogo de exclusão de workspace abortava a requisição remota, mas o canal local descartava o sinal de cancelamento, mantendo múltiplos processos `git ls-files` concorrentes enfileirados em segundo plano consumindo CPU e I/O desnecessariamente.
 12. **Perda permanente de histórico e metadados ao remover worktrees para liberar espaço em disco (`#41833`):**
     - A única forma de recuperar espaço em disco era excluir o workspace completamente, apagando anotações, comentários, PRs vinculados e linhagem da árvore de trabalho, sem um mecanismo para arquivar apenas o checkout e restaurá-lo sob demanda.
+13. **Ausência de interface visual para gerenciar regras de limpeza e execuções imediatas (`#42039`):**
+    - As regras de cleanup e o runner em background existiam apenas na camada de serviço ou CLI, sem uma tela dedicada nas configurações para visualizar o que foi liberado, escolher regras ativas e disparar limpezas manuais com prévia.
+14. **Incapacidade de ajustar ou desativar regras de limpeza por projeto individual (`#42055`):**
+    - Repositórios com dinâmicas e criticidades distintas seguiam rigidamente a política global, sem suporte em *Project Settings* para desativar a automação ou definir regras customizadas por projeto.
 
 ## O que o upstream propõe e implementa
 
@@ -113,9 +119,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41858`](https://github.com
 12. **Mecanismo de arquivamento e restauração de worktrees (`#41833`):**
     - Implementa `worktree.archive`, apagando o diretório de checkout para liberar espaço em disco enquanto preserva o branch, metadados (`WorktreeMeta.archivedCheckout`), notas e histórico;
     - Implementa `worktree.restore`, recriando o worktree a partir do branch preservado com reconstituição de symlinks e cópias de `.worktreeinclude`.
+13. **Página de configurações Workspace Cleanup com regras e ação imediata (`#42039`):**
+    - Adiciona a tela *Settings > Workspace Cleanup*, permitindo configurar regras de exclusão (merged, unchanged, inactive e avançadas de automação);
+    - Exibe linha de status com o resultado do último ciclo (workspaces removidos e bytes liberados) e previsão do próximo;
+    - Inclui o botão **Clean up now** (`workspaceCleanup.runNow`), apresentando listagem de workspaces a serem removidos imediatamente e permitindo desmarcar individualmente qualquer um deles.
+14. **Regras de cleanup por projeto em Project Settings (`#42055`):**
+    - Adiciona a seção *Workspace cleanup* na página de configurações do projeto, permitindo selecionar entre `Use global` (herda regras globais), `Off` (desativa cleanup no projeto) ou `Custom` (regras específicas por repositório com overrides individuais).
 
 ## O que fazer
 
+- Adotar a página de configurações *Settings > Workspace Cleanup* com regras visuais, botão 'Clean up now' e prévia de exclusões iminentes (`#42039`).
+- Adotar a configuração de regras de cleanup por projeto em *Project Settings* (`#42055`).
 - Adotar a recuperação durável de exclusão de workspaces e suporte a cleanup seguro em servidores (`#41858`, STA-15099).
 - Propagar o cancelamento de varreduras de arquivos ignorados no fechamento da prévia de exclusão (`#41835`, STA-15114).
 - Incorporar o backend de arquivamento e restauração sob demanda de checkouts de worktrees (`#41833`).

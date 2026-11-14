@@ -13,7 +13,10 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42254`](https://github.com/stablyai/orca/pull/42254),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42305`](https://github.com/stablyai/orca/pull/42305) (resolve Issue [`#42099`](https://github.com/stablyai/orca/issues/42099)),
+[`stablyai/orca#42307`](https://github.com/stablyai/orca/pull/42307),
+[`stablyai/orca#42287`](https://github.com/stablyai/orca/pull/42287) (resolve Issue [`#42286`](https://github.com/stablyai/orca/issues/42286)),
+[`stablyai/orca#42254`](https://github.com/stablyai/orca/pull/42254),
 [`stablyai/orca#41955`](https://github.com/stablyai/orca/pull/41955),
 [`stablyai/orca#41766`](https://github.com/stablyai/orca/pull/41766),
 [`stablyai/orca#40935`](https://github.com/stablyai/orca/pull/40935),
@@ -90,6 +93,12 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     Ao inspecionar um subagente dentro de uma conversa, o aplicativo guardava o registro de qual subagente estava aberto.
     Quando a aba de chat era fechada, esse registro continuava retido em memória até o reinício do aplicativo, acumulando
     vazamentos sutis em sessões de longa duração.
+15. **Ausência da barra de subagentes ativos no mobile para chats baseados em terminal (`#42305`, resolve `#42099`):**
+    No cliente mobile, chats orientados a terminal ou com subagentes delegados não exibiam a barra horizontal compacta de subagentes ativos, impedindo acompanhar workers em tempo real pelo smartphone.
+16. **Perda ou reexecução espúria de perguntas interativas após reinicialização do app (`#42307`):**
+    Perguntas pendentes de agentes interativos sofriam reinvocação ou disparavam novas requisições de modelo caso o app fosse reiniciado antes da resposta do usuário.
+17. **Divergência na identificação de versão pontual do Claude no banner (`#42287`, resolve `#42286`):**
+    O banner do chat truncava versões minoritárias pontuais do Claude (ex.: Opus 5.5 caindo incorretamente para Opus 5), gerando confusão sobre a real versão do modelo em execução.
 
 ## O que o upstream implementa
 
@@ -139,9 +148,18 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
   - Adiciona suporte no fluxo `structured-agent-cli-conversation-adoption.ts` para que sessões CLI ativas ou salvas do Kimi Code sejam importadas ou adotadas pelo Native Chat com reconciliação transparente de estado.
 - **Descarte de referências de subagentes ao fechar abas de chat (`#42254`):**
   - Limpa imediatamente o mapa `activeSubagentByTab` ao fechar uma aba de chat, liberando referências em memória de subagentes abertos.
+- **Barra de subagentes ativos no mobile para chats em terminal (`#42305`, resolve `#42099`):**
+  - Renderiza a faixa de subagentes ativos também no cliente mobile para sessões baseadas em terminal, mantendo paridade com o chat estruturado.
+- **Persistência estável de perguntas pendentes através de reinicializações (`#42307`):**
+  - Restaura o estado de perguntas de escolha ou texto interativo sem disparar nova inferência ou acordar precocemente o agente antes da entrada do usuário.
+- **Correspondência exata de versão do modelo Claude no banner (`#42287`, resolve `#42286`):**
+  - Ajusta a regex de parse do modelo para reconhecer com precisão versões pontuais completas (exibindo `Claude Opus 5.5` em vez de simplificar para `Opus 5`).
 
 ## O que fazer
 
+- Exibir barra de subagentes ativos no mobile para chats de terminal (`#42305`, resolve `#42099`).
+- Preservar perguntas pendentes em reinicializações sem disparos espúrios de modelo (`#42307`).
+- Exibir versão pontual exata do modelo Claude no banner (`#42287`, resolve `#42286`).
 - Descartar referências e estado de subagentes abertos imediatamente ao fechar a respectiva aba de chat (`#42254`).
 - Suportar importação de transcrições e adoção de conversas CLI do Kimi Code no Native Chat (`#41955`), permitindo transição contínua entre terminal e UI nativa.
 - Exibir modelo, ferramenta ativa e resultado final de cada subagente nas linhas de subagentes do Native Chat e Mobile (`#41766`), com pills e hover card informativo.

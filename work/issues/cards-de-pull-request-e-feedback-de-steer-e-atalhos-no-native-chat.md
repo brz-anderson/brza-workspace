@@ -13,7 +13,10 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42129`](https://github.com/stablyai/orca/pull/42129) (resolve Issue [`#41908`](https://github.com/stablyai/orca/issues/41908)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42335`](https://github.com/stablyai/orca/pull/42335),
+[`stablyai/orca#42278`](https://github.com/stablyai/orca/pull/42278),
+[`stablyai/orca#42271`](https://github.com/stablyai/orca/pull/42271),
+[`stablyai/orca#42129`](https://github.com/stablyai/orca/pull/42129) (resolve Issue [`#41908`](https://github.com/stablyai/orca/issues/41908)),
 [`stablyai/orca#42095`](https://github.com/stablyai/orca/pull/42095),
 [`stablyai/orca#42092`](https://github.com/stablyai/orca/pull/42092) (resolve Issue [`#42091`](https://github.com/stablyai/orca/issues/42091)),
 [`stablyai/orca#42067`](https://github.com/stablyai/orca/pull/42067) (resolve Issue [`#42059`](https://github.com/stablyai/orca/issues/42059)),
@@ -148,6 +151,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42129`](https://github.com
     Ao interagir com links de PRs no chat ou navegador interno, não havia ação de menu para abrir diretamente o workspace ou o branch correspondente no Orca/BrzA Studio.
 30. **Clique com botão do meio (middle-click) não abria links no terminal (`#42067`, resolve `#42059`):**
     A ação de reivindicação (`claimAction`) no terminal estava configurada apenas para o botão principal do mouse, ignorando cliques com o botão do meio padrão de ambientes Unix.
+31. **Ocultação da resposta anterior do assistente ao injetar mensagens de steer mid-turn (`#42335`):**
+    Quando o usuário enviava uma intervenção de *steer* no meio de um turno, o colapso visual do turno concluído ocultava a resposta que o assistente já havia produzido logo antes do steer, fazendo parecer que a resposta fora descartada.
+32. **Falta de visibilidade do modelo e nível de raciocínio no seletor do composer (`#42278`):**
+    O botão de escolha de modelo na barra do composer não informava no tooltip o nome completo do modelo e o nível de esforço de raciocínio configurado (ex.: `high`, `medium`), exigindo abrir o dropdown a cada checagem.
+33. **Acionamento manual e ausência de seletor nativo de alvos para `/review` do Codex (`#42271`):**
+    Usuários que desejavam revisar alterações com o Codex tinham que formular prompts manuais complexos no chat em vez de dispor de um comando nativo `/review` com seletor de quatro escopos (branch atual, commits não enviados, staging ou arquivos específicos) e instruções adicionais.
 
 ## O que o upstream implementa
 
@@ -246,9 +255,18 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42129`](https://github.com
   - Corrige a ação `claimAction` no terminal, armando o listener também para o botão 1 (clique do meio / roda do mouse), permitindo abrir links de terminal sem depender exclusivamente do clique primário.
 - **Destaque de sintaxe para YAML frontmatter em Markdown (`#42131`):**
   - Habilita suporte a blocos de frontmatter YAML no parser do editor de Markdown, renderizando delimitadores `---` e metadados com coloração sintática dedicada.
+- **Preservação visível da resposta do assistente anterior a mensagem de steer (`#42335`):**
+  - Mantém a resposta textual do assistente imediatamente anterior a uma intervenção de steer visível mesmo em turnos concluídos e colapsados, garantindo rastreabilidade do raciocínio pré-intervenção.
+- **Tooltip detalhado com modelo e esforço de raciocínio no botão do composer (`#42278`):**
+  - Exibe o nome completo do modelo e o nível de esforço de raciocínio ativo ao passar o cursor sobre o botão de modelo no rodapé do composer.
+- **Comando `/review` nativo com seletor de escopo para Codex (`#42271`):**
+  - Adiciona suporte nativo ao comando `/review` no composer do Codex com um seletor visual de 4 alvos (branch atual, commits não enviados, staging ou arquivos selecionados) e campo para instruções personalizadas de revisão.
 
 ## O que fazer
 
+- Preservar visível a resposta do assistente anterior a mensagens de steer em turnos finalizados (`#42335`).
+- Exibir nome do modelo e esforço de raciocínio no tooltip do botão de modelo (`#42278`).
+- Suportar o comando `/review` com seletor de 4 escopos para o Codex (`#42271`).
 - Adotar a pill visual de Side chat no composer para prefixos `/btw` e `/side` (`#42129`, resolve `#41908`).
 - Exibir imagens de links avulsos diretamente na conversa do chat nativo (`#42095`).
 - Adicionar ação "Open in Orca" para links de Pull Request do GitHub (`#42092`, resolve `#42091`).

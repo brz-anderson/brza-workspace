@@ -14,7 +14,10 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42122`](https://github.com/stablyai/orca/pull/42122) (resolve STA-15102),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42338`](https://github.com/stablyai/orca/pull/42338) (resolve Issue [`#42103`](https://github.com/stablyai/orca/issues/42103)),
+[`stablyai/orca#42264`](https://github.com/stablyai/orca/pull/42264) (resolve Issue [`#19166`](https://github.com/stablyai/orca/issues/19166)),
+[`stablyai/orca#42284`](https://github.com/stablyai/orca/pull/42284) (resolve Issue [`#42230`](https://github.com/stablyai/orca/issues/42230)),
+[`stablyai/orca#42122`](https://github.com/stablyai/orca/pull/42122) (resolve STA-15102),
 [`stablyai/orca#42114`](https://github.com/stablyai/orca/pull/42114),
 [`stablyai/orca#42112`](https://github.com/stablyai/orca/pull/42112),
 [`stablyai/orca#42111`](https://github.com/stablyai/orca/pull/42111),
@@ -24,7 +27,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42122`](https://github.com
 [`stablyai/orca#41702`](https://github.com/stablyai/orca/pull/41702),
 [`stablyai/orca#41729`](https://github.com/stablyai/orca/pull/41729) (resolve Issue [`#41726`](https://github.com/stablyai/orca/issues/41726)) e
 [`stablyai/orca#41754`](https://github.com/stablyai/orca/pull/41754) (resolve Issue [`#40838`](https://github.com/stablyai/orca/issues/40838)),
-além das issues [`stablyai/orca#42103`](https://github.com/stablyai/orca/issues/42103) e [`stablyai/orca#42084`](https://github.com/stablyai/orca/issues/42084).
+além da issue [`stablyai/orca#42084`](https://github.com/stablyai/orca/issues/42084).
 
 ## O problema
 
@@ -53,8 +56,12 @@ além das issues [`stablyai/orca#42103`](https://github.com/stablyai/orca/issues
    - Como agentes frequentemente continuam executando tarefas em background após `worker_done` (ex.: observando CI), o reuso falhava com `agent_readiness: timeout` após 60s em vez de entregar a instrução no correio do agente.
 9. **Estado inconsistente e ausência do nome do agente em falhas de binding no reuse-start (`#42112`, `#42111`):**
    - Quando um início de reuso de worker falhava antes da conclusão do binding, o registro marcava o worker como iniciado incorretamente e omitia o nome do agente reutilizado nos metadados.
-10. **Omissão do objeto `run` e perda de acesso ao coordenador na saída concisa `--json` (`#42103`):**
+10. **Omissão do objeto `run` e perda de acesso ao coordenador na saída concisa `--json` (`#42338`, resolve `#42103`):**
     - A versão 1.4.258 removeu o nó `run` da saída concisa de `run-show`, `run-current` e `run-use`, impossibilitando que scripts de CLI obtenham o `coordinator_handle` sem exigir o despejo `--full`.
+11. **Bloqueio no comando `worker-release` quando o terminal PTY do worker já encerrou (`#42264`, resolve `#19166`):**
+    - Se o terminal do worker saísse prematuramente ou fosse fechado sem emitir um código de saída capturado pelo orchestrator, o comando `worker-release` falhava com erro de terminal indisponível, deixando o worker em estado zumbi no banco.
+12. **Falta de identificadores de sessão de chat vinculados ao worker no output JSON (`#42284`, resolve `#42230`):**
+    - Scripts que coordenavam múltiplos workers a partir do chat não conseguiam correlacionar a sessão de chat que solicitou o worker (`creatorOrcaSessionId`) nem a sessão atribuída a ele (`assigneeOrcaSessionId`).
 
 ## O que o upstream implementa
 
@@ -81,13 +88,21 @@ além das issues [`stablyai/orca#42103`](https://github.com/stablyai/orca/issues
    - Permite que `worker-start --terminal` despache a tarefa subsequente diretamente na caixa de correio do agente ativo, dispensando a espera por `tui-idle` e prevenindo falsos timeouts de 60s em workers que monitoram processos pós-turno.
 9. **Resiliência e nomeação em falhas pré-binding de reuse-starts (`#42112`, `#42111`):**
    - Trata abortos antes do binding marcando a tarefa como nunca iniciada e preservando o identificador e nome do agente reutilizado nos registros.
+10. **Preservação de `run` e `coordinator_handle` na saída concisa `--json` (`#42338`, resolve `#42103`):**
+    - Restaura o objeto `run` com `coordinator_handle` no JSON compacto retornado por `run-show`, `run-current` e `run-use`.
+11. **Liberação resiliente de workers com terminal fechado em `worker-release` (`#42264`, resolve `#19166`):**
+    - Permite que o comando `worker-release` conclua a liberação com sucesso mesmo se o terminal PTY do worker já tiver saído ou sido destruído.
+12. **Exposição de `creatorOrcaSessionId` e `assigneeOrcaSessionId` no JSON de workers (`#42284`, resolve `#42230`):**
+    - Expõe os IDs de sessão de chat vinculados ao criador e ao destinatário do worker na resposta `--full`.
 
 ## O que fazer
 
+- Adotar a preservação do nó `run` e `coordinator_handle` no output conciso `--json` (`#42338`, resolve `#42103`).
+- Suportar a liberação resiliente em `worker-release` de workers cujo terminal PTY já encerrou (`#42264`, resolve `#19166`).
+- Expor `creatorOrcaSessionId` e `assigneeOrcaSessionId` nos metadados completos de workers (`#42284`, resolve `#42230`).
 - Adotar a consulta compacta do pull-loop sem temporary sets no SQLite (`#42122`, resolve STA-15102).
 - Permitir reutilização de workers mid-turn via correio direto sem esperar `tui-idle` (`#42114`).
 - Adotar tratamento consistente e preservação de nome em falhas pré-binding de reuse-starts (`#42112`, `#42111`).
-- Preservar o nó `run` e o identificador do coordenador no output conciso `--json` de comandos de orquestração (`#42103`).
 - Marcar perguntas de workers automaticamente como lidas no ato da resposta (`#41979`, resolve `#41975`).
 - Adotar o ciclo de retenção e limpeza periódica do banco `orchestration.db` (`#41757`, resolve `#41756`).
 - Implementar o despertar automático de coordenadores em repouso diante de mensagens de workers (`#41746`).

@@ -20,7 +20,7 @@ tags:
 
 # PLN-026: brza sessions e meeting-runner funcionam na cloud
 
-- **Retomar:** O P7 fechou em 2026-11-14 no `a066d3932d2f0bbd70886bcd1c28531ed9fdc43f`, PR https://github.com/brz-anderson/brza-workflow/pull/2, branch `builder/pln-026-pr-b` nascida da master porque `builder/pln-026-pr-a` não está no origin. O próximo ato de código é o rebase quando o PR A existir. O P8 não começa nesta sessão: espera a R2.2. P9 e P10 ficam de fora. As horas do frontmatter continuam 0 e 28 (X5).
+- **Retomar:** O P7 fechou em 2026-11-14 no `a066d3932d2f0bbd70886bcd1c28531ed9fdc43f`, com o conserto do review no `92575d1f3824f7c293e2699020203b899a0895e7`, PR https://github.com/brz-anderson/brza-workflow/pull/2, branch `builder/pln-026-pr-b` nascida da master porque `builder/pln-026-pr-a` não está no origin. O próximo ato de código é o rebase quando o PR A existir. O P8 não começa nesta sessão: espera a R2.2. P9 e P10 ficam de fora. As horas do frontmatter continuam 0 e 28 (X5).
 
 ## Pedido
 
@@ -364,7 +364,7 @@ Repo: `brza-workflow`, PR separado, depois da prova. Risco ao Studio: nenhum enq
 - [x] **2.** O comando do D1, com esse id no `--resume`, sai 0 e imprime JSON. Sem `--force`. Revisor leva `--mode ask`. O `send` repete workspace, modelo e modo (X3).
 - [x] **3.** O contrato do módulo isolado exige `open` e `send` no `CloudRuntime` quando há chave e binário. O teste do P3 ainda não está nesta branch (X2).
 
-**Evidência:** `a066d3932d2f0bbd70886bcd1c28531ed9fdc43f` em `builder/pln-026-pr-b`, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2). Prova no pod, modelo `grok-4.7-low`: open rc 0, `session_id` `4225329a-7beb-4d46-b345-dacf95228db2`, result `P7-OK`, 2956 ms, tokens 13127/33/5376/0/29; send rc 0, o mesmo id, result `P7-OK`, 4222 ms, tokens 162/124/18432/0/120. Custo `ausente` nos dois. Disco sem a chave. X1–X5 no [O P7 do PLN-026 abre e retoma o turno na cloud](../../work/worklogs/2026-11-14-pln026-pr-b.md). Executado: — h (X5).
+**Evidência:** `a066d3932d2f0bbd70886bcd1c28531ed9fdc43f` e `92575d1f3824f7c293e2699020203b899a0895e7` em `builder/pln-026-pr-b`, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2). Prova no pod, modelo `grok-4.7-low`: open rc 0, `session_id` `4225329a-7beb-4d46-b345-dacf95228db2`, result `P7-OK`, 2956 ms, tokens 13127/33/5376/0/29; send rc 0, o mesmo id, result `P7-OK`, 4222 ms, tokens 162/124/18432/0/120. Custo `ausente` nos dois. Disco sem a chave. O `92575d1` faz o `send` sem persona e workspace falhar antes do `agent`, e mata o grupo do processo em qualquer erro do `communicate`. X1–X5 no [O P7 do PLN-026 abre e retoma o turno na cloud](../../work/worklogs/2026-11-14-pln026-pr-b.md). Executado: — h (X5).
 
 ### P8 — A reunião e a ata
 

@@ -3,7 +3,7 @@ status: in_progress
 phase: execution
 origin: request
 description: O brza sessions e a meeting-runner funcionam na cloud pela porta AgentRuntime, com reunião real e ata.
-ready: "P7 provado no pod; o PR A (P1–P6) ainda não está no origin; o P8 espera a Rodada 2"
+ready: "P8 smoke provado no pod; o PR A (P1–P6) ainda não está no origin; P9 e P10 ficam de fora"
 estimate_h: 28
 executed_h: 0
 remaining_h: 28
@@ -20,7 +20,7 @@ tags:
 
 # PLN-026: brza sessions e meeting-runner funcionam na cloud
 
-- **Retomar:** O P7 fechou em 2026-11-14 no `a066d3932d2f0bbd70886bcd1c28531ed9fdc43f`, com o conserto do review no `92575d1f3824f7c293e2699020203b899a0895e7`, PR https://github.com/brz-anderson/brza-workflow/pull/2, branch `builder/pln-026-pr-b` nascida da master porque `builder/pln-026-pr-a` não está no origin. O próximo ato de código é o rebase quando o PR A existir. O P8 não começa nesta sessão: espera a R2.2. P9 e P10 ficam de fora. As horas do frontmatter continuam 0 e 28 (X5).
+- **Retomar:** O P8 fechou em 2026-11-14. A R2.2 saiu smoke: 2 personas, 1 rodada, e não conta para a promoção da meeting-runner. A ata está em [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). O `CloudRuntime` usado é o `92575d1f3824f7c293e2699020203b899a0895e7`. O próximo ato de código no workflow é o rebase quando o PR A existir. P9 e P10 ficam de fora. As horas do frontmatter continuam 0 e 28 (X5).
 
 ## Pedido
 
@@ -75,7 +75,7 @@ tags:
 - **`CURSOR_CONVERSATION_ID` definida, com prefixo `bc-`.** Conferido neste pod em 2026-11-14 (comprimento 39). Sem ela, o degrau 1 não tem run para listar e o P1 para.
 - **`BRZA_CURSOR_API_KEY` presente no pod da prova do P7** (comprimento 102; o valor não foi gravado). O P1, o P2 e o P5 não precisam dela. Sem a chave ou sem o binário `agent`, o `open` não é declarado. A chave entra como segredo com esse nome (R3.2). O wrapper copia para `CURSOR_API_KEY` só no processo filho. Não vai em `--api-key`, no `env.sh` nem no repo.
 - **O binário `agent` 2026.11.13-eacade1 está neste pod**, em `~/.local/bin/agent` (o `cursor-agent` é o mesmo arquivo). `agent --help` sai 0 e lista `-p`, `--output-format`, `--model`, `--workspace`, `--trust`, `--resume` e `--force`. `agent status` sai 0 com "Not logged in". `agent models` sai 1 pedindo autenticação. Um pod novo não herda o binário: a instalação é `curl https://cursor.com/install -fsS | bash`.
-- **A skill `meeting-runner` não está nesta branch.** Está em `origin/workstream/playground` no SHA `03c9579d56fb2304a48821e2c6978e0514cd7df3`, em `.claude/skills/meeting-runner/`. O P8 roda esses scripts a partir de um worktree só de leitura dessa ref, sem merge na master e sem copiar a skill para cá.
+- **A skill `meeting-runner` está nesta branch desde o P8 (X6).** A origem é `origin/workstream/playground` no SHA `03c9579d56fb2304a48821e2c6978e0514cd7df3`. O D4 pedia um worktree só de leitura; a ordem do P8 trouxe a skill, e o `skillkit` de que ela importa (X7). O transporte studio continua o padrão. Não houve merge na master.
 
 ## Entrevista
 
@@ -374,11 +374,11 @@ Estimado: 3 h · Executado: — h
 
 Repo da ata: `brza-workspace`, branch `builder/bob-the-builder`, sem PR. Risco ao Studio: nenhum; o runtime forçado é `cloud` e o socket não existe neste pod. Desfazer: apagar o worklog da reunião num commit nesta branch e não declarar a reunião feita. Depende do P7 e da R2.2.
 
-- [ ] **1.** Worktree só de leitura de `origin/workstream/playground` em `03c9579d`.
-- [ ] **2.** `launch_persona.py` abre as personas pelo `brza sessions` já com `open` declarado.
-- [ ] **3.** A ata está em `work/worklogs/` desta branch, com o marcador da rodada, e o commit foi para `builder/bob-the-builder`.
+- [x] **1.** A skill veio de `origin/workstream/playground` `03c9579d56fb2304a48821e2c6978e0514cd7df3` para esta branch (`61658f02461b7cc2d2c8362ec1b91015e30e5020`), com o `skillkit` (`fd476c8fd52cc53ecb21f5374d0821bb141534bb`). X6 e X7.
+- [x] **2.** `--transport cloud` abre com `CloudRuntime.open` e manda a rodada com `send`, repetindo persona e workspace. O checkout é o `92575d1f3824f7c293e2699020203b899a0895e7`. Sem a flag, o `brza sessions` segue igual. Testes com `agent` falso.
+- [x] **3.** A ata smoke está em `work/worklogs/`, com `<!-- fim-rodada-1 -->` e a marca SMOKE. Não conta para a promoção. O commit é nesta branch, sem PR.
 
-**Evidência:** —
+**Evidência:** `bf9710f09c6d580f05899d06a3a2a73e3ffbf3d4` nesta branch. Prova no pod, modelo `grok-4.7-low`, 2026-11-14 17:17:10–17:18:34 UTC, duração da rodada 82640 ms. Arquiteto `03906c4f-fb04-4cc4-b8a1-f00a329c8f44`, send 4445 ms, tokens 288/236/18432/0/143, posição manter. Revisor `--mode ask` `de2b0a59-022f-409d-a39e-c8f27175bc72`, send 11223 ms, tokens 513/553/18688/0/401, posição trocar. Custo `ausente`. Disco sem a chave. X6–X8 no [O P8 do PLN-026 roda a reunião smoke na cloud](../../work/worklogs/2026-11-14-pln026-p8.md). Executado: — h (X5).
 
 ### P9 — `GROK_HOME` pela regra do Studio
 
@@ -425,6 +425,10 @@ Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter 
   [A abertura do PLN-026 ficou na branch do Bob](../../work/worklogs/2026-11-14-pln026-abertura.md)
 - 2026-11-14 — PLN-026 P7: `open` e `send` no `CloudRuntime`, prova no pod e PR 2. O PR A não estava no origin. P8, P9 e P10 não foram tocados.
   [O P7 do PLN-026 abre e retoma o turno na cloud](../../work/worklogs/2026-11-14-pln026-pr-b.md)
+- 2026-11-14 — PLN-026 P8: transporte `cloud` na meeting-runner e a reunião smoke, com ata. Não conta para a promoção. P9 e P10 não foram tocados.
+  [O P8 do PLN-026 roda a reunião smoke na cloud](../../work/worklogs/2026-11-14-pln026-p8.md)
+- 2026-11-14 — ata da reunião smoke do P8, marcada SMOKE.
+  [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md)
 
 ## Fechamento
 

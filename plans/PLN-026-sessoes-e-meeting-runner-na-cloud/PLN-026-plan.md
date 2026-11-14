@@ -3,10 +3,10 @@ status: in_progress
 phase: execution
 origin: request
 description: O brza sessions e a meeting-runner funcionam na cloud pela porta AgentRuntime, com reunião real e ata.
-ready: "P1–P8 têm evidência e as caixas seguem abertas até o merge; P9 e P10 ficam de fora"
+ready: "P1–P8 têm evidência e nenhuma caixa fecha antes do merge. P7 e P8 estão implementados, aguardando merge, no e07fd47. P9 e P10 ficam de fora"
 estimate_h: 28
-executed_h: 0
-remaining_h: 28
+executed_h: 1.7
+remaining_h: 26.3
 priority: high
 scope:
   - brza-workflow
@@ -20,7 +20,7 @@ tags:
 
 # PLN-026: brza sessions e meeting-runner funcionam na cloud
 
-- **Retomar:** Nenhum passo está concluído antes do merge. A prova do P8 está na ata [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). O módulo canônico da porta é o `packages/client/bin/cloud_runtime.py` do [brza-workflow#3](https://github.com/brz-anderson/brza-workflow/pull/3). O [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2) rebaseia sobre ele e traz `open` e `send`. O primeiro `agent -p` não leva `--resume`; o id é o `session_id` do JSON. P9 e P10 ficam de fora. As horas do frontmatter continuam 0 e 28 (X5).
+- **Retomar:** Nenhum passo está concluído antes do merge. P7 e P8 estão implementados e aguardam o merge. A prova do P8 está na ata [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). O runtime único é `packages/client/bin/cloud_runtime.py` em `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b`, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2), rebaseado em `bc89dda14be5d4df39c0d01e3627f5054ec3c2b5` (`builder/pln-026-pr-a`). O primeiro `agent -p` não leva `--resume`; o id é o `session_id` do JSON. O transporte lê `BRZA_WORKFLOW_DIR` e não fixa branch. P9 e P10 ficam de fora. `executed_h` 1,7 pelo relógio entre `52184ee` (16:11:00Z) e `e07fd47` (17:54:25Z).
 
 ## Pedido
 
@@ -222,10 +222,10 @@ Dois arquivos novos. O agregador escolhe o adaptador e repassa. `StudioRuntime` 
 O `open`, depois da prova, é um processo por persona:
 
 ```text
-agent -p --output-format json --model <id> --workspace <dir> --trust --resume <chatId>
+agent -p --output-format json --model <id> --workspace <dir> --trust
 ```
 
-Revisor acrescenta `--mode ask`. O `<chatId>` é o da persona, obtido de `agent create-chat` na primeira abertura e reusado nas seguintes. Sem `--force` e sem `--api-key`. O `--workspace` é o checkout absoluto da reunião. O wrapper do filho exporta `CURSOR_API_KEY` a partir de `BRZA_CURSOR_API_KEY` e não põe essa variável no processo pai (R3.2). A prova que declara a capacidade é esse comando saindo 0.
+O primeiro turno não leva `--resume` nem chama `create-chat`. O id é o `session_id` do JSON desse turno. Os seguintes acrescentam `--resume <session_id>`. Revisor acrescenta `--mode ask`. Sem `--force` e sem `--api-key`. O `--workspace` é o checkout absoluto da reunião. O wrapper do filho exporta `CURSOR_API_KEY` a partir de `BRZA_CURSOR_API_KEY`, tira `BRZA_CURSOR_API_KEY` do filho e não põe `CURSOR_API_KEY` no processo pai (R3.2). A prova que declara a capacidade é esse comando saindo 0.
 
 O degrau 2, com a mesma chave no filho, acrescenta `list` de outras runs, `read` do transcript e `usage` com origem `api`. É o P10.
 
@@ -360,11 +360,11 @@ Repo: `brza-workflow`, PR separado, depois da prova. Risco ao Studio: nenhum enq
 
 **Decisão da sala (R3.2, 2026-11-14).** A chave entra como segredo `BRZA_CURSOR_API_KEY`. Nomes `CURSOR_*` podem ser recusados em agentes da cloud. O wrapper do participante faz `CURSOR_API_KEY="$BRZA_CURSOR_API_KEY"` só no ambiente do processo filho. A chave nunca vai em `--api-key`, no `env.sh` (que só aceita `GIT_*`) nem no repo.
 
-- [ ] **1.** Com `BRZA_CURSOR_API_KEY` no segredo, o filho recebe `CURSOR_API_KEY` e o primeiro turno devolve um id. O processo pai não fica com `CURSOR_API_KEY`. O argv não contém `--api-key`. O id é o `session_id` do JSON do `agent -p` (X1).
-- [ ] **2.** O comando do D1, com esse id no `--resume`, sai 0 e imprime JSON. Sem `--force`. Revisor leva `--mode ask`. O `send` repete workspace, modelo e modo (X3).
-- [ ] **3.** O contrato do módulo isolado exige `open` e `send` no `CloudRuntime` quando há chave e binário. O teste do P3 ainda não está nesta branch (X2).
+- implementado, aguardando merge. **1.** Com `BRZA_CURSOR_API_KEY` no segredo, o filho recebe `CURSOR_API_KEY` e o primeiro turno devolve um id. O processo pai não fica com `CURSOR_API_KEY`. O argv não contém `--api-key`. O id é o `session_id` do JSON do `agent -p`.
+- implementado, aguardando merge. **2.** O comando do D1, com esse id no `--resume`, sai 0 e imprime JSON. Sem `--force`. Revisor leva `--mode ask`. O `send` de outro processo relê workspace, modelo e modo do `persona.json`.
+- implementado, aguardando merge. **3.** `open` e `send` entram em `capabilities()` só com chave e binário `agent`. O `ContractTest` do PR A roda contra `StudioRuntime` e `CloudRuntime`. `test_open_argv_is_agent_p_without_force` segue passando.
 
-**Evidência:** em PR, caixa aberta até o merge. `a066d3932d2f0bbd70886bcd1c28531ed9fdc43f` e `92575d1f3824f7c293e2699020203b899a0895e7` em `builder/pln-026-pr-b`, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2). Prova no pod, modelo `grok-4.7-low`: open rc 0, `session_id` `4225329a-7beb-4d46-b345-dacf95228db2`, result `P7-OK`, 2956 ms, tokens 13127/33/5376/0/29; send rc 0, o mesmo id, result `P7-OK`, 4222 ms, tokens 162/124/18432/0/120. Custo `ausente` nos dois. Disco sem a chave. O `92575d1` faz o `send` sem persona e workspace falhar antes do `agent`, e mata o grupo do processo em qualquer erro do `communicate`. X1–X5 no [O P7 do PLN-026 abre e retoma o turno na cloud](../../work/worklogs/2026-11-14-pln026-pr-b.md). Executado: — h (X5).
+**Evidência:** em PR, sem caixa marcada. `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b` em `builder/pln-026-pr-b`, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2), sobre `bc89dda14be5d4df39c0d01e3627f5054ec3c2b5`. Prova no pod, modelo `grok-4.7-low`, modo `ask`, send de outro processo: open rc 0, `session_id` `2cc17cfa-ac1c-4e3b-b710-de38049cd9f2`, result `P7-OK`, 2064 ms, tokens 17613/34/1152/0/30; send rc 0, o mesmo id, result `P7-OK`, 3931 ms, tokens 233/180/18688/0/176. Custo `ausente`. `leak_count` 0. O `session_id` foi aceito pelo `--resume` e o contexto ficou. Detalhe no [O P7 do PLN-026 abre e retoma o turno na cloud](../../work/worklogs/2026-11-14-pln026-pr-b.md). Executado: 1,7 h no plano, critério no Retomar.
 
 ### P8 — A reunião e a ata
 
@@ -374,11 +374,11 @@ Estimado: 3 h · Executado: — h
 
 Repo da ata: `brza-workspace`, branch `builder/bob-the-builder`, sem PR. Risco ao Studio: nenhum; o runtime forçado é `cloud` e o socket não existe neste pod. Desfazer: apagar o worklog da reunião num commit nesta branch e não declarar a reunião feita. Depende do P7 e da R2.2.
 
-- [ ] **1.** A skill veio de `origin/workstream/playground` `03c9579d56fb2304a48821e2c6978e0514cd7df3` para esta branch (`61658f02461b7cc2d2c8362ec1b91015e30e5020`), com o `skillkit` (`fd476c8fd52cc53ecb21f5374d0821bb141534bb`). X6 e X7.
-- [ ] **2.** `--transport cloud` abre com `CloudRuntime.open` e manda a rodada com `send`, repetindo persona e workspace. O checkout é o `92575d1f3824f7c293e2699020203b899a0895e7`. Sem a flag, o `brza sessions` segue igual. Testes com `agent` falso.
-- [ ] **3.** A ata smoke está em `work/worklogs/`, com `<!-- fim-rodada-1 -->` e a marca SMOKE. Não conta para a promoção. O commit é nesta branch, sem PR.
+- implementado, aguardando merge. **1.** A skill veio de `origin/workstream/playground` `03c9579d56fb2304a48821e2c6978e0514cd7df3` para esta branch (`61658f02461b7cc2d2c8362ec1b91015e30e5020`), com o `skillkit` (`fd476c8fd52cc53ecb21f5374d0821bb141534bb`).
+- implementado, aguardando merge. **2.** `--transport cloud` abre com `CloudRuntime.open(spec)` e manda a rodada com `send(session_id, prompt)`. O checkout vem de `BRZA_WORKFLOW_DIR` e o módulo é `packages/client/bin/cloud_runtime.py`. Sem a variável, a mensagem pede para defini-la. Sem a flag, o `brza sessions` segue igual.
+- implementado, aguardando merge. **3.** A ata smoke está em `work/worklogs/`, com `<!-- fim-rodada-1 -->` e a marca SMOKE. Não conta para a promoção. O commit é nesta branch, sem PR.
 
-**Evidência:** em PR, caixa aberta até o merge. `bf9710f09c6d580f05899d06a3a2a73e3ffbf3d4` nesta branch. Prova no pod, modelo `grok-4.7-low`, 2026-11-14 17:17:10–17:18:34 UTC, duração da rodada 82640 ms. Arquiteto `03906c4f-fb04-4cc4-b8a1-f00a329c8f44`, send 4445 ms, tokens 288/236/18432/0/143, posição manter. Revisor `--mode ask` `de2b0a59-022f-409d-a39e-c8f27175bc72`, send 11223 ms, tokens 513/553/18688/0/401, posição trocar. Custo `ausente`. Disco sem a chave. X6–X8 no [O P8 do PLN-026 roda a reunião smoke na cloud](../../work/worklogs/2026-11-14-pln026-p8.md). Executado: — h (X5).
+**Evidência:** em PR, sem caixa marcada. A ata smoke segue em `bf9710f09c6d580f05899d06a3a2a73e3ffbf3d4`. O transporte desta nota aponta para `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b`. Prova nova no pod, uma persona Revisor em `ask`: open 2779 ms, `session_id` `e80ab013-fce2-4d3a-ab2b-ac9773f2e729`, tokens 13413/79/5376/0/77; send da rodada 1819 ms, tokens 326/40/18688/0/36; send frio de outro processo 2047 ms, o mesmo id, result `P7-OK`, tokens 232/73/18944/0/69. Custo `ausente`. `leak_count` 0. Marcador `<!-- fim-rodada-1 -->`. A smoke anterior está no [O P8 do PLN-026 roda a reunião smoke na cloud](../../work/worklogs/2026-11-14-pln026-p8.md).
 
 ### P9 — `GROK_HOME` pela regra do Studio
 

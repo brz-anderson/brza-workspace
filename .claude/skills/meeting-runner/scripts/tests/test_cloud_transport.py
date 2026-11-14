@@ -23,13 +23,12 @@ FAKE = r'''#!/usr/bin/env python3
 import json, os, sys
 from pathlib import Path
 key = os.environ.get("CURSOR_API_KEY") or ""
-brza = os.environ.get("BRZA_CURSOR_API_KEY") or ""
 capture = Path(os.environ["BRZA_FAKE_CAPTURE"])
 argv = sys.argv
 record = {
     "argv": argv,
-    "key_matches": bool(key) and key == brza,
     "cursor_key_set": bool(key),
+    "brza_absent": "BRZA_CURSOR_API_KEY" not in os.environ,
 }
 with capture.open("a", encoding="utf-8") as handle:
     handle.write(json.dumps(record, ensure_ascii=False) + "\n")
@@ -120,7 +119,7 @@ class CloudTransportTest(unittest.TestCase):
             "HOME": str(self.tmp / "home"),
             "BRZA_FAKE_CAPTURE": str(self.capture),
             "BRZA_CURSOR_API_KEY": SECRET,
-            "BRZA_WORKFLOW": WORKFLOW,
+            "BRZA_WORKFLOW_DIR": WORKFLOW,
         }
         base.update(extra)
         base.pop("CURSOR_API_KEY", None)
@@ -147,7 +146,7 @@ class CloudTransportTest(unittest.TestCase):
 
     def test_cloud_runtime_is_imported_from_the_workflow_checkout(self):
         module = cloud_transport.load_cloud_runtime(cloud_transport.workflow_checkout(self.env()))
-        self.assertTrue(str(module.__file__).endswith("packages/client/cloud_runtime.py"))
+        self.assertTrue(str(module.__file__).endswith("packages/client/bin/cloud_runtime.py"))
         self.assertIn("brza-workflow", str(module.__file__))
         skill_copy = Path(cloud_transport.__file__).with_name("cloud_runtime.py")
         self.assertFalse(skill_copy.exists())
@@ -176,7 +175,7 @@ class CloudTransportTest(unittest.TestCase):
         self.assertIn("--resume", reviewer_send)
         self.assertNotIn("--api-key", architect_open + reviewer_send)
         self.assertNotIn("--force", architect_open)
-        self.assertTrue(all(call["key_matches"] for call in calls))
+        self.assertTrue(all(call["cursor_key_set"] and call["brza_absent"] for call in calls))
         self.assertNotIn("CURSOR_API_KEY", self.env())
         text = self.ata.read_text()
         lines = text.splitlines()
@@ -198,16 +197,25 @@ class CloudTransportTest(unittest.TestCase):
             self.assertTrue(home.is_dir(), home)
             self.assertEqual(files_with(home, SECRET), [])
         module = cloud_transport.load_cloud_runtime(WORKFLOW)
-        cold = module.CloudRuntime(env=self.env(), log_path=str(self.log), timeout_s=5)
+        cold = module.CloudRuntime(env=self.env(), log_path=str(self.log), timeout_s=5, keep_home=True)
         try:
-            with self.assertRaises(module.CloudTurnError) as caught:
-                cold.send("sess-0", "de novo")
+            cold.send("sess-0", "de novo")
         finally:
             cold.close()
+        resumed = self.flags(self.calls()[-1])
+        self.assertEqual(resumed[resumed.index("--resume") + 1], "sess-0")
+        self.assertEqual(resumed[resumed.index("--workspace") + 1], str(self.tmp / "workspace"))
+        self.assertNotIn("--mode", resumed)
+        self.assertEqual(len(self.calls()), 5)
+
+    def test_missing_workflow_dir_names_the_variable_and_no_branch(self):
+        env = self.env()
+        env.pop("BRZA_WORKFLOW_DIR")
+        with self.assertRaises(cloud_transport.CloudTransportError) as caught:
+            cloud_transport.workflow_checkout(env)
         message = str(caught.exception)
-        self.assertIn("persona", message)
-        self.assertIn("workspace", message)
-        self.assertEqual(len(self.calls()), 4)
+        self.assertIn("BRZA_WORKFLOW_DIR", message)
+        self.assertNotIn("builder/", message)
 
     def test_missing_key_fails_with_an_actionable_message(self):
         err = io.StringIO()

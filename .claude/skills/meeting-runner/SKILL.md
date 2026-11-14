@@ -63,11 +63,11 @@ e o id do provedor; a medição e a espera leem dele, também depois do fechamen
 
 **O transporte `cloud` é opt-in** (`--transport cloud`). Sem a flag, o parágrafo acima vale inteiro. Com a flag,
 `launch_persona.py $R --transport cloud --round N` abre cada persona com `CloudRuntime.open` e manda a rodada com `send`.
-O módulo é `packages/client/cloud_runtime.py` do checkout `builder/pln-026-pr-b` do `brza-workflow`
-(`92575d1f3824f7c293e2699020203b899a0895e7`), importado pelo caminho do repositório, sem cópia. O `send` repete
-`persona` e `workspace`. O home da persona fica em `~/.local/share/brza/cloud-runtime/<persona>`. O `agent -p` volta
+O módulo é `packages/client/bin/cloud_runtime.py` do checkout apontado por `BRZA_WORKFLOW_DIR`,
+importado pelo caminho, sem cópia e sem branch fixa. `open` recebe o spec e `send` recebe o `session_id` e o
+prompt. O home da persona fica em `~/.local/share/brza/cloud-runtime/<persona>`. O `agent -p` volta
 síncrono e a ata recebe `<!-- fim-rodada-N -->`. Sem `BRZA_CURSOR_API_KEY` ou sem `agent` no PATH, a chamada falha e
-diz o que falta.
+diz o que falta. Sem `BRZA_WORKFLOW_DIR`, a mensagem diz para definir essa variável.
 
 O **manifesto** `reuniao.json` (nome, slug, papel, runtime, modelo, esforço, sessão, fallback de cada persona, mais o
 tema, a pasta da reunião e o molde do caminho dos worklogs) é a fonte única da abertura, das tabelas e do painel; o

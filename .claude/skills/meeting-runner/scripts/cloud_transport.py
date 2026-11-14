@@ -7,13 +7,14 @@ Este módulo só entra com `--transport cloud`. Cada persona abre com
 síncrono. A ata da coordenação ganha o marcador `<!-- fim-rodada-N -->`.
 
 O `cloud_runtime.py` é importado de `BRZA_WORKFLOW_DIR`, pelo caminho
-`packages/client/bin/cloud_runtime.py`. Não há cópia na skill e o texto não
-fixa branch. `open` recebe o spec e `send` recebe `session_id` e o prompt. O `close`
-apaga o home da persona.
+`packages/client/bin/cloud_runtime.py`, junto com a porta `agent_runtime`. Não há
+cópia na skill e o texto não fixa branch. `open` recebe o spec e `send` recebe
+`session_id` e o prompt. O `close` apaga o home da persona.
 """
 import importlib.util
 import json
 import os
+import subprocess
 import sys
 import time
 import unicodedata
@@ -45,12 +46,8 @@ def round_marker(n):
     return MARKER_TEMPLATE.format(n=int(n))
 
 
-def workspace_root():
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
-
-
 def workflow_checkout(env=None):
-    """O checkout do brza-workflow indicado por `BRZA_WORKFLOW_DIR`."""
+    """O checkout do brza-workflow. Só `BRZA_WORKFLOW_DIR` aponta o caminho."""
     env = os.environ if env is None else env
     root = (env.get("BRZA_WORKFLOW_DIR") or "").strip()
     if not root:
@@ -58,6 +55,10 @@ def workflow_checkout(env=None):
             "runtime cloud: defina BRZA_WORKFLOW_DIR com o caminho do checkout do "
             "brza-workflow que contém packages/client/bin/cloud_runtime.py. "
             "O arquivo não é copiado para a skill.")
+    if not os.path.isdir(root):
+        raise CloudTransportError(
+            f"runtime cloud: BRZA_WORKFLOW_DIR={root} não é um diretório. "
+            "Aponte para o checkout do brza-workflow.")
     if not os.path.isfile(os.path.join(root, "packages", "client", "bin", "cloud_runtime.py")):
         raise CloudTransportError(
             f"runtime cloud: {root} não contém packages/client/bin/cloud_runtime.py. "
@@ -65,20 +66,67 @@ def workflow_checkout(env=None):
     return root
 
 
-def load_cloud_runtime(checkout):
-    """Importa a porta pelo caminho do checkout, sem copiar o arquivo."""
-    bin_dir = os.path.join(checkout, "packages", "client", "bin")
-    repo_bin = os.path.join(checkout, "bin")
-    for entry in (repo_bin, bin_dir):
-        if entry not in sys.path:
-            sys.path.insert(0, entry)
-    path = os.path.join(bin_dir, "cloud_runtime.py")
-    spec = importlib.util.spec_from_file_location("brza_cloud_runtime", path)
+def _exec_module(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
     if spec is None or spec.loader is None:
         raise CloudTransportError(f"runtime cloud: não consegui importar {path}.")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def load_cloud_runtime(checkout):
+    """Importa a porta e o módulo pelo caminho do checkout, sem copiar o arquivo."""
+    bindir = os.path.join(checkout, "packages", "client", "bin")
+    runtime_bin = os.path.join(checkout, "bin")
+    port_path = os.path.join(bindir, "agent_runtime.py")
+    path = os.path.join(bindir, "cloud_runtime.py")
+    runtime_path = os.path.join(runtime_bin, "brza_runtime.py")
+    if not os.path.isfile(port_path):
+        raise CloudTransportError(
+            "runtime cloud: não achei a porta agent_runtime em "
+            f"{port_path}. BRZA_WORKFLOW_DIR precisa do checkout com "
+            "packages/client/bin/agent_runtime.py.")
+    if not os.path.isfile(path):
+        raise CloudTransportError(
+            f"runtime cloud: não achei {path}. BRZA_WORKFLOW_DIR precisa do checkout "
+            "com packages/client/bin/cloud_runtime.py.")
+    if not os.path.isfile(runtime_path):
+        raise CloudTransportError(
+            f"runtime cloud: não achei {runtime_path}. A porta agent_runtime importa esse módulo. "
+            "BRZA_WORKFLOW_DIR precisa do checkout completo do brza-workflow.")
+    for directory in (runtime_bin, bindir):
+        if directory not in sys.path:
+            sys.path.insert(0, directory)
+    port = _exec_module("agent_runtime", port_path)
+    if "open" not in getattr(port, "CAPABILITIES", ()):
+        raise CloudTransportError(
+            "runtime cloud: a porta agent_runtime não declara a capacidade open. "
+            f"O checkout é {checkout}.")
+    module = _exec_module("cloud_runtime", path)
+    runtime_cls = getattr(module, "CloudRuntime", None)
+    if runtime_cls is None or not callable(getattr(runtime_cls, "open", None)):
+        raise CloudTransportError(
+            "runtime cloud: packages/client/bin/cloud_runtime.py não expõe a capacidade open. "
+            f"O checkout é {checkout}.")
+    return module
+
+
+def workflow_sha(checkout):
+    """O SHA do checkout enquanto o módulo não está na master do workflow."""
+    try:
+        sha = subprocess.check_output(
+            ["git", "-C", checkout, "rev-parse", "HEAD"],
+            text=True, stderr=subprocess.DEVNULL).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    on_master = subprocess.call(
+        ["git", "-C", checkout, "cat-file", "-e", "origin/master:packages/client/bin/cloud_runtime.py"],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0
+    if on_master:
+        return None
+    return sha or None
 
 
 def _fold(text):
@@ -113,6 +161,8 @@ def require_critic_mode(persona):
 
 def refuse_if_undeclared(runtime, capability):
     """Sem chave ou sem `agent`, a mensagem nomeia a capacidade e o que falta."""
+    if capability in runtime.capabilities():
+        return
     hinted = getattr(runtime, "_require_turn", None)
     if hinted is not None:
         hinted(capability)
@@ -202,7 +252,7 @@ def _row(persona, turn_name, turn):
     }
 
 
-def render_header(reuniao):
+def render_header(reuniao, workflow_sha=None):
     title = reuniao.get("ata_titulo") or f"Reunião {reuniao.get('id') or 'cloud'}"
     lines = [
         "---",
@@ -219,6 +269,12 @@ def render_header(reuniao):
         lines.extend([
             "**SMOKE.** Esta reunião não conta para a promoção da meeting-runner. "
             "As duas posições ficam registradas. O modelo padrão não muda por causa dela.",
+            "",
+        ])
+    if workflow_sha:
+        lines.extend([
+            f"CloudRuntime: `{workflow_sha}` em `packages/client/bin/cloud_runtime.py`, "
+            "ainda fora da master do brza-workflow.",
             "",
         ])
     note = reuniao.get("ata_nota")
@@ -264,7 +320,7 @@ def render_round(n, records, wall_ms, failure=None):
     return "\n".join(lines)
 
 
-def write_minutes(path, reuniao, n, records, wall_ms, failure=None):
+def write_minutes(path, reuniao, n, records, wall_ms, failure=None, workflow_sha=None):
     folder = os.path.dirname(path)
     if folder:
         os.makedirs(folder, exist_ok=True)
@@ -277,15 +333,17 @@ def write_minutes(path, reuniao, n, records, wall_ms, failure=None):
             handle.write(sep + block)
         return
     with open(path, "w", encoding="utf-8") as handle:
-        header = render_header(reuniao)
+        header = render_header(reuniao, workflow_sha=workflow_sha)
         if not header.endswith("\n\n"):
             header = header.rstrip("\n") + "\n\n"
         handle.write(header + block)
 
 
 def make_runtime(env, log_path, timeout_s):
-    module = load_cloud_runtime(workflow_checkout(env))
-    return module.CloudRuntime(env=env, log_path=log_path, timeout_s=timeout_s)
+    checkout = workflow_checkout(env)
+    module = load_cloud_runtime(checkout)
+    runtime = module.CloudRuntime(env=env, log_path=log_path, timeout_s=timeout_s)
+    return runtime, workflow_sha(checkout)
 
 
 def _runtime_failure(exc):
@@ -293,11 +351,12 @@ def _runtime_failure(exc):
         "CapabilityError", "CloudTurnError", "CloudRuntimeError", "MissingCapability", "BrzaError")
 
 
-def _fail_mid_round(path, reuniao, n, records, started, persona, exc):
+def _fail_mid_round(path, reuniao, n, records, started, persona, exc, workflow_sha=None):
     """Grava as falas já feitas e o erro. A rodada incompleta não leva o marcador."""
     wall_ms = int((time.monotonic() - started) * 1000)
     nome = persona.get("nome") or "?"
-    write_minutes(path, reuniao, n, records, wall_ms, failure=(nome, str(exc)))
+    write_minutes(path, reuniao, n, records, wall_ms, failure=(nome, str(exc)),
+                  workflow_sha=workflow_sha)
     print(f"{nome}: {exc}", file=sys.stderr)
     code = getattr(exc, "returncode", 1)
     return code if code else 1
@@ -329,11 +388,12 @@ def run_round(reuniao, personas, root, n, dry=False, out=print, sessions_fn=None
         workspace = cloud_workspace(reuniao)
         path = minutes_path(reuniao, root)
         os.makedirs(workspace, exist_ok=True)
+        used_sha = None
         if runtime is None:
             timeout = reuniao.get("timeout_s", 240) if timeout_s is None else timeout_s
             if log_path is None:
                 log_path = reuniao.get("log")
-            runtime = make_runtime(env, log_path, timeout)
+            runtime, used_sha = make_runtime(env, log_path, timeout)
         runtime_ready = True
         refuse_if_undeclared(runtime, "open")
         refuse_if_undeclared(runtime, "send")
@@ -357,13 +417,15 @@ def run_round(reuniao, personas, root, n, dry=False, out=print, sessions_fn=None
                 prior.append(f"{persona['nome']}:\n{sent.result}")
                 out(f"{persona['nome']}: {sent.session_id} · {sent.duration_ms} ms · custo {_cost(sent)}")
             except CloudTransportError as exc:
-                return _fail_mid_round(path, reuniao, n, records, started, persona, exc)
+                return _fail_mid_round(
+                    path, reuniao, n, records, started, persona, exc, workflow_sha=used_sha)
             except Exception as exc:
                 if not _runtime_failure(exc):
                     raise
-                return _fail_mid_round(path, reuniao, n, records, started, persona, exc)
+                return _fail_mid_round(
+                    path, reuniao, n, records, started, persona, exc, workflow_sha=used_sha)
         wall_ms = int((time.monotonic() - started) * 1000)
-        write_minutes(path, reuniao, n, records, wall_ms)
+        write_minutes(path, reuniao, n, records, wall_ms, workflow_sha=used_sha)
         out(f"ata: {path}")
         out(round_marker(n))
         return 0

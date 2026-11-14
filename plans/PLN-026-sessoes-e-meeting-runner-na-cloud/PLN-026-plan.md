@@ -173,7 +173,7 @@ A ADR-003 (autor Linus, status Proposta) não tem arquivo neste repositório. El
 - A porta é `AgentRuntime`, com `capabilities`, `list` e `read` obrigatórias, e `usage`, `open` e `send` opcionais.
 - Capacidade não declarada falha com rc diferente de 0 e a mensagem nomeia o runtime e a capacidade.
 - Os adaptadores são `StudioRuntime` e `CloudRuntime`.
-- `CloudRuntime.open` é um `agent -p` por persona, com `--resume <chatId>`, sem `--force`. Revisor roda com `--mode ask`.
+- `CloudRuntime.open` é um `agent -p` por persona, sem `--resume` no primeiro turno e sem `--force`. O id é o `session_id` do JSON. O turno seguinte acrescenta `--resume`. Revisor roda com `--mode ask`.
 
 ### O que este desenho assume
 
@@ -219,7 +219,7 @@ Dois arquivos novos. O agregador escolhe o adaptador e repassa. `StudioRuntime` 
 
 `usage`, quando passar a existir, preenche cada métrica com a origem (`hook`, `note`, `api` ou `ausente`). O valor ausente é a string `ausente`, nunca `0`.
 
-O `open`, depois da prova, é um processo por persona:
+O `open`, depois da prova, é um processo por persona. O primeiro turno não leva `--resume` e não chama `create-chat`:
 
 ```text
 agent -p --output-format json --model <id> --workspace <dir> --trust
@@ -433,11 +433,15 @@ Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter 
   [O PR A do PLN-026 levou o degrau 1](../../work/worklogs/2026-11-14-pln026-pr-a.md)
 - 2026-11-14 — segunda ata smoke do P8, depois da revisão xhigh, marcada SMOKE.
   [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md)
+- 2026-11-14 — R1 do PR A: help, porta, tokens, chave e o gate da sentinela. As caixas seguem abertas.
+  [O PR A do PLN-026 levou o degrau 1](../../work/worklogs/2026-11-14-pln026-pr-a.md)
 
 ## Revisões
 
 - [REV-028: a revisão xhigh R2 do P8 do PLN-026](../../work/reviews/REV-028-pln026-p8-r2.md) — 2026-11-14, 7 achados, triagem corrigir.
 - [REV-pln026-pr-b R2: a revisão xhigh R2 do PR 2 do PLN-026](../../work/reviews/2026-11-14-REV-pln026-pr-b-r2.md) — 2026-11-14, achados 1 a 4 e os gates 2 e 3, triagem corrigir.
+- 2026-11-14 — R1 do PR A, sobre `bc89dda`. Os achados corrigidos estão na branch; o gate da chave está em `ed7d91b`. A R2 não foi feita.
+  [R1 do PR A do PLN-026](../../work/reviews/2026-11-14-REV-pln026-pr-a-r1.md)
 
 ## Fechamento
 

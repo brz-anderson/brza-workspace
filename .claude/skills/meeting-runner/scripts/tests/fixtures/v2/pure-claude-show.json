@@ -1,0 +1,193 @@
+{
+  "id": "e5378767-e3eb-4fa1-b21c-535a591b49e1",
+  "ok": true,
+  "result": {
+    "dispatch": {
+      "id": "ctx_ab0fa42d1e9a",
+      "runId": "run_7ec4f06af9d7",
+      "taskId": "task_f82ca8f37528",
+      "task_id": "task_f82ca8f37528",
+      "contractVersion": 1,
+      "assigneeHandle": "structworker_e7b81877-bb6f-4591-aaf8-da41c3c257df",
+      "assigneePaneKey": "structured-agent-session-4c71586a-b184-4633-81e6-2e3e1e31fe1a:869383b3-94f8-4985-a8ac-b5b5d6ada952",
+      "processIncarnation": "structured:4c71586a-b184-4633-81e6-2e3e1e31fe1a",
+      "capabilityRevokedAt": "2026-11-09T15:53:56.116Z",
+      "retryOfDispatchId": null,
+      "creatorDispatchId": "ctx_f0b0d3dbd714",
+      "followUpOf": null,
+      "hostScope": {
+        "kind": "local",
+        "hostId": "local"
+      },
+      "status": "completed",
+      "failureCount": 0,
+      "lastFailure": null,
+      "terminationReason": null,
+      "depth": 2,
+      "dispatchedAt": "2026-11-09 15:53:37",
+      "completedAt": "2026-11-09T15:53:56.116Z",
+      "createdAt": "2026-11-09 15:53:37",
+      "lastHeartbeatAt": null
+    },
+    "worker": {
+      "dispatchId": "ctx_ab0fa42d1e9a",
+      "runtimeEpoch": "c536614d-ea9d-4977-89d2-9fc2dc51595e",
+      "state": "succeeded",
+      "stage": "settled",
+      "worktreeId": "15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit",
+      "agentTerminalHandle": "structworker_e7b81877-bb6f-4591-aaf8-da41c3c257df",
+      "setupState": "not_applicable",
+      "effects": [
+        {
+          "kind": "worktree",
+          "action": "reused",
+          "id": "15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit"
+        },
+        {
+          "kind": "setup",
+          "action": "not_applicable",
+          "state": "not_applicable"
+        },
+        {
+          "kind": "terminal",
+          "role": "agent",
+          "action": "created",
+          "id": "structworker_e7b81877-bb6f-4591-aaf8-da41c3c257df",
+          "surface": "background"
+        },
+        {
+          "kind": "dispatch_input",
+          "role": "agent",
+          "id": "structworker_e7b81877-bb6f-4591-aaf8-da41c3c257df",
+          "state": "accepted"
+        }
+      ],
+      "residualResources": [
+        {
+          "kind": "terminal",
+          "role": "agent",
+          "action": "created",
+          "id": "structworker_e7b81877-bb6f-4591-aaf8-da41c3c257df",
+          "surface": "background"
+        }
+      ],
+      "startOptions": {
+        "worktree": "path:/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit",
+        "mode": {
+          "mode": "structured",
+          "preferred": "structured",
+          "reason": "user_default",
+          "detail": "Started a structured chat session worker, the default for new agent tabs in your settings."
+        },
+        "resolvedWorktreeId": "15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit",
+        "name": null,
+        "repo": null,
+        "baseBranch": null,
+        "terminal": null,
+        "agent": "claude",
+        "launch": {
+          "requested": {
+            "agent": "claude",
+            "model": null,
+            "effort": null
+          },
+          "effective": {
+            "agent": "claude",
+            "model": null,
+            "effort": null
+          }
+        },
+        "timeoutMs": 60000,
+        "setup": "not_applicable",
+        "setupSource": "existing_worktree"
+      },
+      "lastError": null,
+      "createdAt": "2026-11-09 15:53:37",
+      "updatedAt": "2026-11-09T15:53:56.116Z"
+    },
+    "projection": {
+      "id": "ctx_ab0fa42d1e9a",
+      "dispatchId": "ctx_ab0fa42d1e9a",
+      "taskId": "task_f82ca8f37528",
+      "runId": "run_7ec4f06af9d7",
+      "role": "worker",
+      "parent": null,
+      "provider": null,
+      "host": {
+        "kind": "local",
+        "id": "local"
+      },
+      "workspace": {
+        "id": "15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit",
+        "kind": "folder_or_worktree"
+      },
+      "stage": {
+        "worker": "succeeded",
+        "dispatch": "completed",
+        "detail": "settled",
+        "activity": "unknown"
+      },
+      "outcome": "succeeded",
+      "liveness": {
+        "verdict": "unverifiable",
+        "reason": "missing_status"
+      },
+      "evidence": {
+        "durable": true,
+        "liveStatus": "unavailable",
+        "lastObservedAt": null
+      },
+      "resource": {
+        "state": "owned",
+        "id": "wtr_e662b24f7e65",
+        "ownerDispatchId": "ctx_ab0fa42d1e9a",
+        "releaseState": "not_requested",
+        "terminalState": "reclaimable"
+      },
+      "autoReleaseAt": "2026-11-09T15:55:56Z",
+      "nextAction": {
+        "kind": "none",
+        "argv": []
+      },
+      "attention": {
+        "categories": [
+          "unverifiable",
+          "root_completion"
+        ],
+        "requiresAction": true
+      }
+    },
+    "terminal": null,
+    "observation": {
+      "status": "live",
+      "exactWorker": true,
+      "addressable": true
+    },
+    "terminalResource": {
+      "id": "wtr_e662b24f7e65",
+      "ownershipState": "owned",
+      "releaseState": "not_requested",
+      "retainedReason": null,
+      "terminalHandle": "structworker_e7b81877-bb6f-4591-aaf8-da41c3c257df",
+      "worktreeId": "15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit",
+      "endpointId": "c536614d-ea9d-4977-89d2-9fc2dc51595e",
+      "endpointIncarnation": "structured:4c71586a-b184-4633-81e6-2e3e1e31fe1a",
+      "originDispatchId": "ctx_ab0fa42d1e9a",
+      "ownerDispatchId": "ctx_ab0fa42d1e9a",
+      "releaseRequestedAt": null,
+      "releaseCompletedAt": null,
+      "releaseError": null,
+      "recoveryAttemptCount": 0,
+      "lastRecoveryAt": null,
+      "autoReleaseAt": "2026-11-09T15:55:56Z",
+      "archive": {
+        "source": null,
+        "status": null
+      }
+    },
+    "autoReleaseAt": "2026-11-09T15:55:56Z"
+  },
+  "_meta": {
+    "runtimeId": "c536614d-ea9d-4977-89d2-9fc2dc51595e"
+  }
+}

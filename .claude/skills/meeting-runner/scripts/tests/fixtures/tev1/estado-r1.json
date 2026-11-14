@@ -1,0 +1,311 @@
+{
+  "reuniao": {
+    "id": "reuniao-tev1",
+    "tema": "Onde o tev1 local entra nos fluxos: CLI, Studio, MCP, meeting-runner, plan-runner e migration-runner",
+    "decisor": "Anderson",
+    "fim": "00h00"
+  },
+  "rodada": {
+    "n": 1,
+    "total_previsto": null,
+    "titulo": "opinião independente: onde o tev1 entra (duração: ~12 min; Balança e Faro: ~15 min)",
+    "aberta": "21:20:22",
+    "prazo": null,
+    "fechada": "21:33:22",
+    "gerado": "21:35:17",
+    "tem_voto": false,
+    "custo_rotulo": "da rodada",
+    "participantes": [
+      "Balança",
+      "Ferrolho",
+      "Bitola",
+      "Fagulha",
+      "Faro",
+      "Lida"
+    ]
+  },
+  "personas": [
+    {
+      "nome": "Balança",
+      "papel": "Cética medidora",
+      "sessao": "tev1-balanca",
+      "runtime": "Grok",
+      "modelo": "grok-4.7",
+      "esforco": "xhigh",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-balanca.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:33:22",
+      "latencia_s": 781,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 76.0,
+      "confianca_fonte": "placar",
+      "confianca_r1": 76.0,
+      "posicao": "O tev1 não filtra gatilho: em 6 sim reais, 3 erros, e o limiar que os tira esvazia o uso.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 22
+    },
+    {
+      "nome": "Ferrolho",
+      "papel": "Guardião da falha silenciosa",
+      "sessao": "tev1-ferrolho",
+      "runtime": "Codex",
+      "modelo": "gpt-6.1-terra",
+      "esforco": "medium",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-ferrolho.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:21:35",
+      "latencia_s": 64,
+      "latencia_fonte": "turno",
+      "confianca": 80.0,
+      "confianca_fonte": "placar",
+      "confianca_r1": 80.0,
+      "posicao": "Classificação útil começa em sombra; nenhum erro caro pode desaparecer sem revisão.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": null,
+      "tokens": {
+        "entrada": 306180,
+        "cache": 255104,
+        "saida": 3043
+      },
+      "janela": true,
+      "medicao": "medida",
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 18
+    },
+    {
+      "nome": "Bitola",
+      "papel": "Arquiteta de integração",
+      "sessao": "tev1-bitola",
+      "runtime": "Grok",
+      "modelo": "grok-4.6",
+      "esforco": "high",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-bitola.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:23:05",
+      "latencia_s": 163,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 78.0,
+      "confianca_fonte": "confianca-linha",
+      "confianca_r1": null,
+      "posicao": "Cliente único no MCP; tally e layer primeiro; Studio e CLI só envelopam.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 18
+    },
+    {
+      "nome": "Fagulha",
+      "papel": "Provocadora",
+      "sessao": "tev1-fagulha",
+      "runtime": "Grok",
+      "modelo": "grok-4.7-build-fast",
+      "esforco": "low",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-fagulha.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:22:03",
+      "latencia_s": 101,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 75.8,
+      "confianca_fonte": "placar",
+      "confianca_r1": 75.8,
+      "posicao": "Sombra no fato rodado, no voto livre e no diálogo; o caro só vê a dúvida.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 34
+    },
+    {
+      "nome": "Faro",
+      "papel": "Pesquisador",
+      "sessao": "tev1-faro",
+      "runtime": "Antigravity",
+      "modelo": null,
+      "esforco": null,
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-faro.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:25:18",
+      "latencia_s": 296,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 88.8,
+      "confianca_fonte": "placar",
+      "confianca_r1": 88.8,
+      "posicao": "Classificador local em cascata para auditoria de fatos, roteamento MCP e TUI do Studio, calibrado.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 29
+    },
+    {
+      "nome": "Lida",
+      "papel": "Voz do mantenedor com pouco tempo",
+      "sessao": "tev1-lida",
+      "runtime": "Claude",
+      "modelo": "claude-haiku-5-5",
+      "esforco": "low",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-lida.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:21:25",
+      "latencia_s": 46,
+      "latencia_fonte": "turno",
+      "confianca": 60.2,
+      "confianca_fonte": "placar",
+      "confianca_r1": 60.2,
+      "posicao": "o `tev1` deve decidir só o que ninguém precisa ver, e o resto fica com o Haiku ou com a regra.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": null,
+      "nota_rodada": null,
+      "custo_usd": 0.02,
+      "tokens": null,
+      "janela": true,
+      "medicao": "medida",
+      "medicao_aviso": null,
+      "fatos_lidos": null,
+      "linha": 25
+    }
+  ],
+  "sala": {
+    "media": 74.0,
+    "mediana": 76.0,
+    "n": 5,
+    "faixa": [
+      60.2,
+      80.0
+    ],
+    "total": 6,
+    "media_todas": 76.5,
+    "mediana_todas": 77.0,
+    "n_todas": 6,
+    "antigravity": {
+      "media": 88.8,
+      "n": 1,
+      "nomes": [
+        "Faro"
+      ],
+      "fora_da_media": true
+    },
+    "revisor": null,
+    "revisor_nota": "revisor independente só na proposta",
+    "diferenca_revisor": null
+  },
+  "avisos": [],
+  "medicoes": [
+    {
+      "tipo": "medido",
+      "quem": "coordenação",
+      "texto": "tev1 ~96 ms (50 palavras) a ~745 ms (1.400); fila única: 8 chamadas ~1,85 s em qualquer paralelismo; >2.048 tokens = HTTP 400 — tev1_bench.out"
+    },
+    {
+      "tipo": "medido",
+      "quem": "coordenação",
+      "texto": "voto de célula: regex None em 4 de 98; tev1 lê 22 de 37 'apoio' como 'ressalva' — material/coord/voto_cells.out"
+    },
+    {
+      "tipo": "conferido",
+      "quem": "coordenação",
+      "texto": "Balança: gatilho acerta 3 de 6 sim e 15 de 17 não em 23 pares reais — material/balanca/resultados.json"
+    },
+    {
+      "tipo": "medido",
+      "quem": "coordenação",
+      "texto": "pergunta 'evento' sai sim em 23 de 23 pares: não discrimina — material/coord/evento.out"
+    },
+    {
+      "tipo": "lido",
+      "quem": "coordenação",
+      "texto": "a evidência de cada fato auditado é apagada: sem corpus para pré-filtro nem LoRA — fact_audit.py:430"
+    },
+    {
+      "tipo": "conferido",
+      "quem": "coordenação",
+      "texto": "resolver: 7 resoluções, 6 Haiku + 1 fallback, média 13,5 s; nunca pelo tev1 — measurements.jsonl, eventos route"
+    }
+  ],
+  "sintese": [
+    "Todos: nada decide sozinho no começo; sombra e log antes, o caminho de hoje intacto.",
+    "Um cliente só, extraído do _tev1 do resolver; a disputa é módulo do MCP ou verbo brza classify (D1).",
+    "O gatilho perde 3 de 6 'sim' reais (M11); como filtro não serve, como alarme cobre metade.",
+    "A reserva do voto é rara (4/98, M5) e a auditoria não guarda evidência (M8): o primeiro uso está em disputa (D2).",
+    "Régua, Studio e retreino em disputa (D3–D5); o título do terminal, cota e gate ficam fora (C5)."
+  ],
+  "decisoes": [
+    {
+      "pergunta": "Onde mora o cliente do tev1: módulo do brza_mcp, verbo brza classify, ou os dois?",
+      "quem": [
+        "Bitola",
+        "Fagulha",
+        "Ferrolho"
+      ],
+      "recomendacao": null,
+      "votos": null
+    },
+    {
+      "pergunta": "Qual o primeiro uso a ligar depois da sombra?",
+      "quem": [
+        "Balança",
+        "Bitola",
+        "Lida",
+        "Faro"
+      ],
+      "recomendacao": null,
+      "votos": null
+    }
+  ],
+  "custos_coordenacao": {
+    "coordenacao_usd": null,
+    "revisor_usd": null,
+    "ate": null
+  }
+}

@@ -1,0 +1,62 @@
+{
+ "id": "reuniao-ci-no-chat",
+ "tema": "Resultados de CI no chat e disparo automático de agentes em falhas de PR: o porte e a ordem",
+ "decisor": "Anderson",
+ "fim": "14h20",
+ "data": "2026-11-09",
+ "checkout": ".worktrees/playground",
+ "dir": ".sessions/reuniao-ci-no-chat",
+ "worklog": "work/worklogs/2026-11-09-reuniao-ci-no-chat-{slug}.md",
+ "briefing": "briefing.md",
+ "personas": [
+  {
+   "nome": "Prumo",
+   "slug": "prumo",
+   "papel": "Cético medidor",
+   "sessao": "ci-prumo",
+   "runtime": "claude",
+   "modelo": "claude-opus-5-5",
+   "esforco": "xhigh",
+   "prompt": "prompt-prumo.txt",
+   "fallback": {
+    "runtime": "claude",
+    "modelo": "claude-sonnet-5-5",
+    "esforco": "high"
+   },
+   "dispatch_id": "ctx_80fad49a44fd",
+   "claude_session": "cd289115-4fab-49e4-bc30-58247c2cfe74"
+  },
+  {
+   "nome": "Trava",
+   "slug": "trava",
+   "papel": "Guardião de contenção",
+   "sessao": "ci-trava",
+   "runtime": "grok",
+   "modelo": "grok-4.7",
+   "esforco": "medium",
+   "prompt": "prompt-trava.txt",
+   "fallback": {
+    "runtime": "claude",
+    "modelo": "claude-sonnet-5-5",
+    "esforco": "high"
+   },
+   "dispatch_id": "ctx_f7391bdf18a4"
+  },
+  {
+   "nome": "Relance",
+   "slug": "relance",
+   "papel": "Voz do mantenedor com pouco tempo",
+   "sessao": "ci-relance",
+   "runtime": "antigravity",
+   "modelo": "-",
+   "esforco": "-",
+   "prompt": "prompt-relance.txt",
+   "fallback": {
+    "runtime": "claude",
+    "modelo": "claude-haiku-5-5",
+    "esforco": "low"
+   },
+   "dispatch_id": "ctx_b079c8a8d319"
+  }
+ ]
+}

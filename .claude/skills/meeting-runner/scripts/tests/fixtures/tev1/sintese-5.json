@@ -1,0 +1,20 @@
+{
+ "sala": {"revisor": 78, "revisor_nota": "revisor independente na v4 (60 na v2)"},
+ "medicoes": [
+  {"tipo": "medido", "quem": "coordenação", "texto": "teto com texto real: 5.000 caracteres passam, 6.000 dão HTTP 400 (2.153 tokens) — material/coord/teto.out"},
+  {"tipo": "medido", "quem": "revisor", "texto": "467 dos 494 fatos pendentes são inferido, sem saída gravada — fact_outcome.py --pending"},
+  {"tipo": "conferido", "quem": "revisor", "texto": "10 dos 11 achados da v2 resolvidos na v4; 6 novos, 3 mudam o desenho, aplicados na v5 — material/revisor-v4.md"}
+ ],
+ "sintese": [
+  "Sala 82,8 na v4 (5/6), mediana 86; revisor 78; diferença +4,8: sem contraprova.",
+  "A v5 fecha os achados A–F do revisor: casa do módulo no core/, run citado, probe do layer na fase 3.",
+  "Fase 0 primeiro: parar de perder o texto que a auditoria e o resolver jogam fora.",
+  "Lida em 68: a política de texto (R2.2) ainda não decidida trava a fase 0.",
+  "PLN-019 criado, 14 h estimadas, 17 perguntas prontas para a entrevista."
+ ],
+ "decisoes": [
+  {"pergunta": "R2.2 — quanto tempo o texto fica em disco?", "quem": ["Balança", "Fagulha", "Faro", "Ferrolho", "Lida"], "recomendacao": "até a pergunta passar ou falhar a régua, teto de 180 dias", "votos": null},
+  {"pergunta": "R2.6 — onde mora o módulo de gravação?", "quem": ["Bitola"], "recomendacao": "no core/ do brza-workflow, ao lado do measure.py", "votos": null}
+ ],
+ "custos_coordenacao": {"coordenacao_usd": 10.29, "revisor_usd": 2.86, "ate": "22:01:00"}
+}

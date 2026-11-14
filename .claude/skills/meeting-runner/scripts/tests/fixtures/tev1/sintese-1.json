@@ -1,0 +1,22 @@
+{
+ "sala": {"revisor": null, "revisor_nota": "revisor independente só na proposta"},
+ "medicoes": [
+  {"tipo": "medido", "quem": "coordenação", "texto": "tev1 ~96 ms (50 palavras) a ~745 ms (1.400); fila única: 8 chamadas ~1,85 s em qualquer paralelismo; >2.048 tokens = HTTP 400 — tev1_bench.out"},
+  {"tipo": "medido", "quem": "coordenação", "texto": "voto de célula: regex None em 4 de 98; tev1 lê 22 de 37 'apoio' como 'ressalva' — material/coord/voto_cells.out"},
+  {"tipo": "conferido", "quem": "coordenação", "texto": "Balança: gatilho acerta 3 de 6 sim e 15 de 17 não em 23 pares reais — material/balanca/resultados.json"},
+  {"tipo": "medido", "quem": "coordenação", "texto": "pergunta 'evento' sai sim em 23 de 23 pares: não discrimina — material/coord/evento.out"},
+  {"tipo": "lido", "quem": "coordenação", "texto": "a evidência de cada fato auditado é apagada: sem corpus para pré-filtro nem LoRA — fact_audit.py:430"},
+  {"tipo": "conferido", "quem": "coordenação", "texto": "resolver: 7 resoluções, 6 Haiku + 1 fallback, média 13,5 s; nunca pelo tev1 — measurements.jsonl, eventos route"}
+ ],
+ "sintese": [
+  "Todos: nada decide sozinho no começo; sombra e log antes, o caminho de hoje intacto.",
+  "Um cliente só, extraído do _tev1 do resolver; a disputa é módulo do MCP ou verbo brza classify (D1).",
+  "O gatilho perde 3 de 6 'sim' reais (M11); como filtro não serve, como alarme cobre metade.",
+  "A reserva do voto é rara (4/98, M5) e a auditoria não guarda evidência (M8): o primeiro uso está em disputa (D2).",
+  "Régua, Studio e retreino em disputa (D3–D5); o título do terminal, cota e gate ficam fora (C5)."
+ ],
+ "decisoes": [
+  {"pergunta": "Onde mora o cliente do tev1: módulo do brza_mcp, verbo brza classify, ou os dois?", "quem": ["Bitola", "Fagulha", "Ferrolho"], "recomendacao": null, "votos": null},
+  {"pergunta": "Qual o primeiro uso a ligar depois da sombra?", "quem": ["Balança", "Bitola", "Lida", "Faro"], "recomendacao": null, "votos": null}
+ ]
+}

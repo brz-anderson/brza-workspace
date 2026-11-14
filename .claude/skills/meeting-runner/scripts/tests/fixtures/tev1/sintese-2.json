@@ -1,0 +1,21 @@
+{
+ "sala": {"revisor": null, "revisor_nota": "revisor independente só na proposta"},
+ "medicoes": [
+  {"tipo": "medido", "quem": "coordenação", "texto": "layer do resolver em 252 tarefas reais, sem o papel: 39% de acerto; general-purpose 22%; diz 'alta' em 216/252 — material/coord/layer2.out"},
+  {"tipo": "medido", "quem": "coordenação", "texto": "ordem invertida: layer segue em 'alta' (229/252); evento com 'nao' primeiro acerta 7/17 'não' (era 0) — material/coord/ordem.out"},
+  {"tipo": "medido", "quem": "coordenação", "texto": "corte de tarefa sem corpus: 39 turnos com prompt_head, 28 marcos task — measurements.jsonl"},
+  {"tipo": "conferido", "quem": "coordenação", "texto": "Balança: pasta fact-audit vazia às 21:38 — confere com fact_audit.py:430"}
+ ],
+ "sintese": [
+  "6/6: módulo Classifier.ask extraído do _tev1 + verbo fino brza classify (D1c).",
+  "6/6: nada liga antes da tabela por pergunta; o plano começa gravando (D2e).",
+  "A fase 0 guarda o que a auditoria apaga, e o tally grava os pares voto × M# como candidatos.",
+  "O layer do resolver diz 'alta' em 86% das tarefas curtas (M13); toda pergunta nova passa por probe (P6).",
+  "Dissenso: Faro quer régua conformal (n ≥ 50) e o Studio já; Lida não quer retreino."
+ ],
+ "decisoes": [
+  {"pergunta": "A fase 0 grava o texto do state (com retenção) ou só o hash?", "quem": ["Ferrolho", "Faro"], "recomendacao": null, "votos": null},
+  {"pergunta": "A régua é FN 0 com n ≥ 30 na classe cara, ou conformal com n ≥ 50?", "quem": ["Balança", "Faro"], "recomendacao": null, "votos": null},
+  {"pergunta": "O retreino fica como evolução aberta ou sai do plano?", "quem": ["Lida", "Faro"], "recomendacao": null, "votos": null}
+ ]
+}

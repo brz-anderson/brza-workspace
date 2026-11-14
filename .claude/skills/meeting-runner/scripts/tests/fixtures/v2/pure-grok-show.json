@@ -1,0 +1,191 @@
+{
+  "id": "fb9b5780-91ed-4088-bf3f-ff077f2d09bd",
+  "ok": true,
+  "result": {
+    "dispatch": {
+      "id": "ctx_6bb3a52e3ab6",
+      "runId": "run_7ec4f06af9d7",
+      "taskId": "task_a398f6b57a89",
+      "task_id": "task_a398f6b57a89",
+      "contractVersion": 1,
+      "assigneeHandle": "structworker_ed7c08df-e13b-4eb4-a0f8-3b42c450fa14",
+      "assigneePaneKey": "structured-agent-session-39bfff09-2d0c-4977-9a3e-14bcbeeb15bb:8963e559-1583-4a95-ba04-0432b8ae9602",
+      "processIncarnation": "structured:39bfff09-2d0c-4977-9a3e-14bcbeeb15bb",
+      "capabilityRevokedAt": null,
+      "retryOfDispatchId": null,
+      "creatorDispatchId": "ctx_f0b0d3dbd714",
+      "followUpOf": null,
+      "hostScope": {
+        "kind": "local",
+        "hostId": "local"
+      },
+      "status": "dispatched",
+      "failureCount": 0,
+      "lastFailure": null,
+      "terminationReason": null,
+      "depth": 2,
+      "dispatchedAt": "2026-11-09 15:53:41",
+      "completedAt": null,
+      "createdAt": "2026-11-09 15:53:41",
+      "lastHeartbeatAt": null
+    },
+    "worker": {
+      "dispatchId": "ctx_6bb3a52e3ab6",
+      "runtimeEpoch": "c536614d-ea9d-4977-89d2-9fc2dc51595e",
+      "state": "ready",
+      "stage": "input_accepted",
+      "worktreeId": "15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit",
+      "agentTerminalHandle": "structworker_ed7c08df-e13b-4eb4-a0f8-3b42c450fa14",
+      "setupState": "not_applicable",
+      "effects": [
+        {
+          "kind": "worktree",
+          "action": "reused",
+          "id": "15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit"
+        },
+        {
+          "kind": "setup",
+          "action": "not_applicable",
+          "state": "not_applicable"
+        },
+        {
+          "kind": "terminal",
+          "role": "agent",
+          "action": "created",
+          "id": "structworker_ed7c08df-e13b-4eb4-a0f8-3b42c450fa14",
+          "surface": "background"
+        },
+        {
+          "kind": "dispatch_input",
+          "role": "agent",
+          "id": "structworker_ed7c08df-e13b-4eb4-a0f8-3b42c450fa14",
+          "state": "accepted"
+        }
+      ],
+      "residualResources": [
+        {
+          "kind": "terminal",
+          "role": "agent",
+          "action": "created",
+          "id": "structworker_ed7c08df-e13b-4eb4-a0f8-3b42c450fa14",
+          "surface": "background"
+        }
+      ],
+      "startOptions": {
+        "worktree": "path:/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit",
+        "mode": {
+          "mode": "structured",
+          "preferred": "structured",
+          "reason": "user_default",
+          "detail": "Started a structured chat session worker, the default for new agent tabs in your settings."
+        },
+        "resolvedWorktreeId": "15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit",
+        "name": null,
+        "repo": null,
+        "baseBranch": null,
+        "terminal": null,
+        "agent": "grok",
+        "launch": {
+          "requested": {
+            "agent": "grok",
+            "model": null,
+            "effort": null
+          },
+          "effective": {
+            "agent": "grok",
+            "model": null,
+            "effort": null
+          }
+        },
+        "timeoutMs": 60000,
+        "setup": "not_applicable",
+        "setupSource": "existing_worktree"
+      },
+      "lastError": null,
+      "createdAt": "2026-11-09 15:53:41",
+      "updatedAt": "2026-11-09 15:53:41"
+    },
+    "projection": {
+      "id": "ctx_6bb3a52e3ab6",
+      "dispatchId": "ctx_6bb3a52e3ab6",
+      "taskId": "task_a398f6b57a89",
+      "runId": "run_7ec4f06af9d7",
+      "role": "worker",
+      "parent": null,
+      "provider": null,
+      "host": {
+        "kind": "local",
+        "id": "local"
+      },
+      "workspace": {
+        "id": "15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit",
+        "kind": "folder_or_worktree"
+      },
+      "stage": {
+        "worker": "ready",
+        "dispatch": "dispatched",
+        "detail": "input_accepted",
+        "activity": "unknown"
+      },
+      "outcome": "in_progress",
+      "liveness": {
+        "verdict": "unverifiable",
+        "reason": "missing_status"
+      },
+      "evidence": {
+        "durable": true,
+        "liveStatus": "unavailable",
+        "lastObservedAt": null
+      },
+      "resource": {
+        "state": "owned",
+        "id": "wtr_91c30359aae7",
+        "ownerDispatchId": "ctx_6bb3a52e3ab6",
+        "releaseState": "not_requested",
+        "terminalState": "active"
+      },
+      "nextAction": {
+        "kind": "none",
+        "argv": []
+      },
+      "attention": {
+        "categories": [
+          "unverifiable"
+        ],
+        "requiresAction": true
+      }
+    },
+    "terminal": null,
+    "observation": {
+      "status": "live",
+      "exactWorker": true,
+      "addressable": true
+    },
+    "terminalResource": {
+      "id": "wtr_91c30359aae7",
+      "ownershipState": "owned",
+      "releaseState": "not_requested",
+      "retainedReason": null,
+      "terminalHandle": "structworker_ed7c08df-e13b-4eb4-a0f8-3b42c450fa14",
+      "worktreeId": "15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit",
+      "endpointId": "c536614d-ea9d-4977-89d2-9fc2dc51595e",
+      "endpointIncarnation": "structured:39bfff09-2d0c-4977-9a3e-14bcbeeb15bb",
+      "originDispatchId": "ctx_6bb3a52e3ab6",
+      "ownerDispatchId": "ctx_6bb3a52e3ab6",
+      "releaseRequestedAt": null,
+      "releaseCompletedAt": null,
+      "releaseError": null,
+      "recoveryAttemptCount": 0,
+      "lastRecoveryAt": null,
+      "autoReleaseAt": null,
+      "archive": {
+        "source": null,
+        "status": null
+      }
+    },
+    "autoReleaseAt": null
+  },
+  "_meta": {
+    "runtimeId": "c536614d-ea9d-4977-89d2-9fc2dc51595e"
+  }
+}

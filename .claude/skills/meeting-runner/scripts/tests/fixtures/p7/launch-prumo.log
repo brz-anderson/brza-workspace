@@ -1,0 +1,7 @@
+$ brza orchestration worker-start --spec-file /Users/andepb/Projects/brza-workspace/.worktrees/playground/.sessions/reuniao-ci-no-chat/prompt-prumo.txt --agent claude --model claude-opus-5-5 --effort xhigh --worktree path:/Users/andepb/Projects/brza-workspace/.worktrees/playground --json
+rc=0
+--- stdout
+{"ok":true,"result":{"dispatchId":"ctx_80fad49a44fd","taskId":"task_9198c64aae76","runId":"run_fe70b351bc36","state":"ready","agent":"claude","model":"claude-opus-5-5","effort":"xhigh","mode":"structured","terminal":"structworker_271da48e-9b93-4ac7-a4d3-6af0dda6e5e0","workspace":"15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/playground","next":"Orca wakes you when workers report; end your turn when you're done."}}
+
+--- stderr
+

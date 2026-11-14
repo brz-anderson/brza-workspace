@@ -1,0 +1,7 @@
+$ brza orchestration worker-start --spec-file /Users/andepb/Projects/brza-workspace/.worktrees/playground/.sessions/reuniao-ci-no-chat/prompt-trava.txt --agent grok --model grok-4.7 --effort medium --worktree path:/Users/andepb/Projects/brza-workspace/.worktrees/playground --json
+rc=0
+--- stdout
+{"ok":true,"result":{"dispatchId":"ctx_f7391bdf18a4","taskId":"task_2b6c81a7c883","runId":"run_fe70b351bc36","state":"ready","agent":"grok","model":"grok-4.7","effort":"medium","mode":"structured","terminal":"structworker_8eb69fd3-cdf8-4a05-b021-bf8d4d892bd3","workspace":"15bf3484-9a53-4397-89f3-81ceedb6750e::/Users/andepb/Projects/brza-workspace/.worktrees/playground","next":"Orca wakes you when workers report; end your turn when you're done."}}
+
+--- stderr
+

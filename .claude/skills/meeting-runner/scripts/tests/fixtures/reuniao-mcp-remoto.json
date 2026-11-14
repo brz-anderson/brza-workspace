@@ -1,0 +1,11 @@
+{"id": "reuniao-mcp-remoto", "tema": "MCP remoto e sessões Cloud", "decisor": "Anderson", "fim": "22h15",
+ "data": "2026-11-07", "checkout": ".worktrees/playground", "dir": ".sessions/reuniao-mcp-remoto",
+ "worklog": "work/worklogs/2026-11-07-reuniao-mcp-remoto-{slug}.md",
+ "personas": [
+  {"nome": "Muralha", "slug": "muralha", "papel": "Arquiteta de Rede e Segurança", "sessao": "mcp-muralha", "runtime": "claude", "modelo": "opus-5.5", "esforco": "high", "prompt": "prompt-muralha.txt", "fallback": {"runtime": "claude", "modelo": "sonnet-5.5", "esforco": "medium"}},
+  {"nome": "Régua", "slug": "regua", "papel": "Cético que mede", "sessao": "mcp-regua", "runtime": "codex", "modelo": "gpt-6-astra", "esforco": "xhigh", "prompt": "prompt-regua.txt"},
+  {"nome": "Atalho", "slug": "atalho", "papel": "Engenheiro Pragmático", "sessao": "mcp-atalho", "runtime": "codex", "modelo": "gpt-6.1-terra", "esforco": "medium", "prompt": "prompt-atalho.txt"},
+  {"nome": "Salto", "slug": "salto", "papel": "Provocador", "sessao": "mcp-salto", "runtime": "grok", "modelo": "grok-4.7-build-fast", "esforco": "low", "prompt": "prompt-salto.txt"},
+  {"nome": "Plantão", "slug": "plantao", "papel": "Usuário cansado", "sessao": "mcp-plantao", "runtime": "claude", "modelo": "haiku-5.5", "esforco": "low", "prompt": "prompt-plantao.txt"},
+  {"nome": "Cartógrafo", "slug": "cartografo", "papel": "Especialista em Runtimes", "sessao": "mcp-cartografo", "runtime": "antigravity", "modelo": "-", "esforco": "-", "prompt": "prompt-cartografo.txt"}
+ ]}

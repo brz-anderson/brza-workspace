@@ -3,7 +3,7 @@ status: in_progress
 phase: execution
 origin: request
 description: O brza sessions e a meeting-runner funcionam na cloud pela porta AgentRuntime, com reunião real e ata.
-ready: "P1–P8 têm evidência e nenhuma caixa fecha antes do merge. P7 e P8 estão implementados, aguardando merge, no d45b7d8. P9 e P10 ficam de fora"
+ready: "P1–P8 têm evidência e nenhuma caixa fecha antes do merge. P7 e P8 estão implementados, aguardando merge, no 0252410. P9 e P10 ficam de fora"
 estimate_h: 28
 executed_h: 1.7
 remaining_h: 26.3
@@ -20,7 +20,7 @@ tags:
 
 # PLN-026: brza sessions e meeting-runner funcionam na cloud
 
-- **Retomar:** Nenhum passo está concluído antes do merge. P7 e P8 estão implementados e aguardam o merge. A passagem do `92575d1` está na ata [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). A prova do `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b` está na ata [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md). O runtime único é `packages/client/bin/cloud_runtime.py` em `d45b7d82e1db33b07004e3bf36addec5871c7c15`, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2), rebaseado em `2a0580d6cb07d2a4d50ff086016b96ec775dbf8b` (`builder/pln-026-pr-a`). O primeiro `agent -p` não leva `--resume`; o id é o `session_id` do JSON. O transporte lê `BRZA_WORKFLOW_DIR` e não fixa branch. P9 e P10 ficam de fora. `executed_h` 1,7 pelo relógio entre `52184ee` (16:11:00Z) e `e07fd47` (17:54:25Z).
+- **Retomar:** Nenhum passo está concluído antes do merge. P7 e P8 estão implementados e aguardam o merge. A passagem do `92575d1` está na ata [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). A prova do `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b` está na ata [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md). O runtime único é `packages/client/bin/cloud_runtime.py` em `d45b7d82e1db33b07004e3bf36addec5871c7c15`, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2), rebaseado em `2a0580d6cb07d2a4d50ff086016b96ec775dbf8b` (`builder/pln-026-pr-a`). O primeiro `agent -p` não leva `--resume`; o id é o `session_id` do JSON. O transporte lê `BRZA_WORKFLOW_DIR` e não fixa branch. P9 e P10 ficam de fora. `executed_h` 1,7 pelo relógio entre `52184ee` (16:11:00Z) e `e07fd47` (17:54:25Z). A revisão final está em [REV-pln026-final: a revisão xhigh final dos PRs 3 e 2 do PLN-026](../../work/reviews/2026-11-14-REV-pln026-final.md). A correção do home da CLI e do `--mode` é `02524107e6f8af022da2526ec465a7df43c7bc26`.
 
 ## Pedido
 
@@ -444,6 +444,7 @@ Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter 
 
 - [REV-028: a revisão xhigh R2 do P8 do PLN-026](../../work/reviews/REV-028-pln026-p8-r2.md) — 2026-11-14, 7 achados, triagem corrigir.
 - [REV-pln026-pr-b R2: a revisão xhigh R2 do PR 2 do PLN-026](../../work/reviews/2026-11-14-REV-pln026-pr-b-r2.md) — 2026-11-14, achados 1 a 4 e os gates 2 e 3, triagem corrigir.
+- [REV-pln026-final: a revisão xhigh final dos PRs 3 e 2 do PLN-026](../../work/reviews/2026-11-14-REV-pln026-final.md) — 2026-11-14, PR #3 aprovar, PR #2 aprovar com correções, A1 e A2 corrigidos em `0252410`.
 - 2026-11-14 — R1 do PR A, sobre `bc89dda`. Os achados corrigidos estão na branch; o gate da chave está em `ed7d91b`. A R2 não foi feita.
   [R1 do PR A do PLN-026](../../work/reviews/2026-11-14-REV-pln026-pr-a-r1.md)
 

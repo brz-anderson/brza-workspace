@@ -3,7 +3,7 @@ status: open
 phase: design
 origin: request
 description: A norma e o brza note passam a aceitar builder/<nome> como workstream pessoal de um Builder, com autor próprio do agente.
-ready: "não — R1.6 (rótulo da medição) segue em aberto; P4 não roda antes"
+ready: sim
 estimate_h: 18.5
 executed_h: 0
 remaining_h: 18.5
@@ -20,7 +20,7 @@ tags:
 
 # PLN-024: Norma aceita o prefixo builder/ (workstream pessoal de Builder)
 
-- **Retomar:** plano aberto em 2026-11-14, nenhum passo executado. R1.5 fechou no manifesto `.brza/builders/<nome>.toml`. O próximo ato é a resposta de Anderson à R1.6; P1 e P5 podem começar quando ele pedir. P4 espera a R1.6.
+- **Retomar:** plano aberto em 2026-11-14, nenhum passo executado. R1.1 a R1.6 estão fechadas. O próximo ato é o P1, quando Anderson pedir.
 
 ## Pedido
 
@@ -81,7 +81,11 @@ Respondida em 2026-11-14, na mensagem que autorizou abrir este plano.
 
    **Decidido em 2026-11-14 —** a identidade fica num manifesto versionado `.brza/builders/<nome>.toml` no brza-workspace, com o schema na norma. A config do worktree passa a ser só gerada, a partir desse arquivo. Contexto: o Builder sobrescreve o autor git fixado no `.claude/settings.json` do workspace (`GIT_AUTHOR_NAME` e `GIT_AUTHOR_EMAIL` de brz-anderson). Commit em `workstream/*` continua com esse autor do `settings.json`.
 
-6. **O rótulo da medição.** A investigação perguntou se o hook grava `builder/<nome>` enquanto o índice guarda o nome curto mais `kind`. Esta mensagem não escolheu. **Não fechou.**
+6. **O rótulo da medição.** Opções que estavam em aberto:
+   - o hook grava `builder/<nome>` e o índice guarda o nome curto mais `kind` (recomendada) — custo: a mesma frente tem duas grafias, a do log e a do índice; se paga: no primeiro `--by-workstream`, que separa Builder das outras frentes sem mudar o `summarize_measurements.py`;
+   - o hook grava só o nome curto — custo: o resumo diário não distingue a classe; se paga: nunca, se a pergunta do resumo for quais frentes são de Builder.
+
+   **Decidido em 2026-11-14 —** a medição grava `builder/<nome>`. O índice continua com o nome curto e o `kind`.
 
 ## Desenho
 
@@ -92,6 +96,7 @@ Respondida em 2026-11-14, na mensagem que autorizou abrir este plano.
 - **R1.3:** commit em `builder/<nome>` usa o autor do agente. O do Bob é `Bob The Builder <bob@brza.dev>`. `workstream/*` permanece com brz-anderson.
 - **R1.4:** este plano não cria a frente do Bob nem mexe em `brza sessions`.
 - **R1.5:** a identidade versionada é `.brza/builders/<nome>.toml`, com o schema na norma. A config do worktree só é gerada e sobrescreve o autor do `.claude/settings.json`.
+- **R1.6:** a medição grava `builder/<nome>`. O índice guarda o nome curto e o `kind`.
 
 ### Terreno
 
@@ -149,11 +154,14 @@ Nenhum passo daqui roda `brza note builder bob-the-builder` nem edita `packages/
 
 Cada Builder tem um arquivo versionado `.brza/builders/<nome>.toml` no brza-workspace. O schema desse arquivo fica na norma (o `core/`, que o `brza sync` leva à `master`). O arquivo em si não é config de worktree: `brza note builder` gera, no worktree, a config local de autor a partir do toml, e essa config sobrescreve o autor fixado no `.claude/settings.json` só para a branch `builder/<nome>`. O toml do Bob, com `Bob The Builder <bob@brza.dev>`, não nasce neste plano.
 
-### Em aberto
+### D6 — O rótulo da medição — `core/.claude/hooks/measure.py` (P4)
 
-1. **O rótulo da medição (R1.6).** Opções:
-   - o hook grava `builder/<nome>` e o índice guarda o nome curto mais `kind` (recomendado) — custo: a mesma frente tem duas grafias, a do log e a do índice; se paga: no primeiro `--by-workstream`, que separa Builder das outras frentes sem mudar o `summarize_measurements.py`;
-   - o hook grava só o nome curto — custo: o resumo diário não distingue a classe; se paga: nunca, se a pergunta do resumo for "quais frentes são de Builder".
+- **Origem:** R1.6
+- **Contexto:** o índice usa o nome curto mais `kind`. O resumo diário lê a string que o hook grava e não lista branches.
+
+#### Como fica
+
+Numa branch `builder/<nome>`, a linha de medição grava `workstream` como `builder/<nome>`. O índice não usa essa string: continua com o nome curto e o `kind`. O `summarize_measurements.py` não muda. `workstream/<nome>` continua gravando só `<nome>`.
 
 ## Passos
 
@@ -190,13 +198,12 @@ Estimado: 2 h · Executado: — h
 
 ### P4 — Medição e trava do `/compact`
 
-Executa D2 · executor: sessão no `brza-workflow`
+Executa D2 e D6 · executor: sessão no `brza-workflow`
 
 Estimado: 2 h · Executado: — h
 
-- [ ] Não começa antes da R1.6. `core/.claude/hooks/measure.py` e `packages/mcp/brza_mcp/telemetry.py` passam a reconhecer `builder/`. O `compact_guard.py` acompanha, porque usa `resolve_workstream`.
-- [ ] Se a R1.6 ficar na recomendada, a string gravada na medição é `builder/<nome>`. O índice não usa essa string.
-- [ ] Testes: `tests/hooks/test_measure_workstream.py`, `tests/hooks/test_compact_guard.py`, `tests/mcp/test_mcp_telemetry.py`.
+- [ ] `core/.claude/hooks/measure.py` e `packages/mcp/brza_mcp/telemetry.py` reconhecem `builder/`. A string gravada na medição é `builder/<nome>`. O índice não usa essa string. O `compact_guard.py` acompanha, porque usa `resolve_workstream`.
+- [ ] Testes: `tests/hooks/test_measure_workstream.py`, `tests/hooks/test_compact_guard.py`, `tests/mcp/test_mcp_telemetry.py`. A branch `builder/bob` mede `builder/bob`; `workstream/studio` continua medindo `studio`.
 - [ ] Desfazer: reverter o commit. Evidência esperada: branch `builder/bob` volta a medir como ausente, e o `/compact` manual deixa de olhar o worktree dela.
 
 ### P5 — O autor do agente no `brza note commit`
@@ -248,7 +255,7 @@ Estimado: 0.5 h · Executado: — h
 
 ## Worklogs
 
-- 2026-11-14 — R1.1 a R1.5 fechadas; R1.6 em aberto; P1–P8 escritos e nenhum executado. O link do worklog de 9 de novembro passou a apontar o PLN-017 no GitHub.
+- 2026-11-14 — R1.1 a R1.6 fechadas; P1–P8 escritos e nenhum executado. A medição grava `builder/<nome>`. O link do worklog de 9 de novembro passou a apontar o PLN-017 no GitHub.
   [O PLN-024 do prefixo builder/ foi aberto](../../work/worklogs/2026-11-14-plano-do-prefixo-builder.md)
 
 ## Fechamento

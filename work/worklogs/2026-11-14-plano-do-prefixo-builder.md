@@ -17,8 +17,10 @@ O `brza note plan-open prefixo-builder` no worktree `workstream/workspace` reser
 
 A branch local `builder/bob-the-builder` tinha sido apagada nesta sessão. Anderson pediu para recriá-la. Ela voltou a partir da `master` atual (`3903230`), sem upstream e sem push. Não é a frente deste plano.
 
-Em seguida Anderson fechou a R1.5: a identidade de cada Builder fica no manifesto versionado `.brza/builders/<nome>.toml`, com o schema na norma. A config do worktree passa a ser só gerada e sobrescreve o autor git fixado no `.claude/settings.json` do workspace. A R1.6 continua aberta. O link quebrado de [PLN-017/P5: o brza shot lê visualBaseCss e mantém o literal antigo](2026-11-09-pln-017-p5-brza-shot.md) passou a apontar o PLN-017 na branch `workstream/playground` no GitHub. O resto desse worklog não mudou.
+Em seguida Anderson fechou a R1.5: a identidade de cada Builder fica no manifesto versionado `.brza/builders/<nome>.toml`, com o schema na norma. A config do worktree passa a ser só gerada e sobrescreve o autor git fixado no `.claude/settings.json` do workspace. O link quebrado de [PLN-017/P5: o brza shot lê visualBaseCss e mantém o literal antigo](2026-11-09-pln-017-p5-brza-shot.md) passou a apontar o PLN-017 na branch `workstream/playground` no GitHub. O resto desse worklog não mudou.
+
+Anderson fechou a R1.6: a medição grava `builder/<nome>`. O índice continua com o nome curto e o `kind`. Nenhum P foi executado.
 
 ## O que ficou
 
-A resposta de Anderson à R1.6 (rótulo `builder/<nome>` na medição ou só o nome curto). P4 espera essa resposta. P1 e P5 já podem ser pedidos. A criação de `builder/bob-the-builder` pelo `brza note builder` e o plano do Cursor ficam para outro PLN.
+P1 é o próximo passo, quando Anderson pedir. A criação de `builder/bob-the-builder` pelo `brza note builder` e o plano do Cursor ficam para outro PLN.

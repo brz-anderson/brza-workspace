@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41216, #40953, #40616, #40564, #40550, #40923 trazem guarda de cartões MCP, alerta de janela ocupada, auth MCP e cache.
+description: Os PRs #42222, #42224, #42219, #41216, #40953 trazem gerenciamento de servidores MCP via /mcp no chat (desktop e mobile), cards de sign-in e guarda interativa.
 scope:
   - brza-studio
   - brza-workflow
@@ -15,7 +15,10 @@ tags:
 
 # Autenticação MCP no chat, alerta de turnos ativos e cache de orquestração
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41216`](https://github.com/stablyai/orca/pull/41216),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42222`](https://github.com/stablyai/orca/pull/42222),
+[`stablyai/orca#42224`](https://github.com/stablyai/orca/pull/42224),
+[`stablyai/orca#42219`](https://github.com/stablyai/orca/pull/42219),
+[`stablyai/orca#41216`](https://github.com/stablyai/orca/pull/41216),
 [`stablyai/orca#40953`](https://github.com/stablyai/orca/pull/40953) (resolve Issue [`#40640`](https://github.com/stablyai/orca/issues/40640)),
 [`stablyai/orca#40616`](https://github.com/stablyai/orca/pull/40616) (resolve Issue [`#38962`](https://github.com/stablyai/orca/issues/38962), relacionado a [`#39920`](https://github.com/stablyai/orca/issues/39920) e [`#38190`](https://github.com/stablyai/orca/issues/38190)),
 [`stablyai/orca#40564`](https://github.com/stablyai/orca/pull/40564),
@@ -51,6 +54,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41216`](https://github.com
 6. **Alerta espúrio do Factory Droid por hook `PermissionRequest` não suportado (`#40612`, `#40607`):**
    O instalador registrava o hook `PermissionRequest` em `~/.factory/settings.json`, evento não suportado pelo Droid que
    fazia o `droid doctor` acusar advertência de integridade de forma contínua.
+7. **Ausência de painel de gerenciamento de servidores MCP (/mcp) no chat nativo desktop e mobile (`#42222`, `#42224`):**
+   Operadores em sessões Claude ou Codex no Native Chat precisavam abrir o terminal para verificar a lista de servidores MCP,
+   reconectar serviços caídos ou habilitar/desabilitar integrações específicas sem suporte a visualização mobile.
+8. **Recusa automática de solicitações de sign-in web exigidas por servidores MCP (`#42219`):**
+   Quando agentes ou servidores MCP requisitavam autenticação do usuário através de URLs web externas, o chat recusava a
+   solicitação por falta de um cartão interativo com a URL de autenticação e botão "Open" correspondente.
 
 ## O que o upstream implementa e corrige
 
@@ -74,10 +83,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41216`](https://github.com
   - Implementa a guarda de segurança `requireStartupDialog` no envio de respostas de cartões interativos para a PTY do Claude: relê a tela headless imediatamente antes de enviar sequências de setas/Enter e recusa o envio se o destaque na tela tiver mudado ou se a tela repintou, impedindo aprovações acidentais em opções divergentes;
   - Adiciona suporte nativo a cartões para o diálogo multi-servidor `.mcp.json` do Claude 2.1.322 ("N new MCP servers found") com ações "Enable selected" e "Reject all";
   - Substitui o payload JSON bruto no pill do dashboard de agentes por um resumo legível com o título ou questão da espera interativa (`interactivePromptLabel`).
+- **Gerenciamento de servidores MCP (/mcp) no chat desktop e mobile (`#42222`, `#42224`):**
+  - Implementa o painel `/mcp` em conversas Claude e Codex, permitindo listar servidores conectados, autenticar via sign-in, reconectar instâncias com falha e ligar/desligar servidores diretamente na interface gráfica, sem alternar para o terminal;
+  - Traz paridade total ao aplicativo móvel com drawer dedicado de servidores MCP.
+- **Cartão interativo para solicitações de sign-in de agentes/MCP (`#42219`):**
+  - Renderiza cartões visuais dedicados quando um agente solicita autenticação web, exibindo a URL do serviço e um botão "Open" para abrir o fluxo no navegador e completar o sign-in.
 
 ## O que fazer no BrzA Studio
 
-1. Adotar a guarda de consentimento `requireStartupDialog` e o suporte a cartões de múltiplos servidores MCP (`#41216`).
+1. Adotar o painel de gerenciamento de servidores MCP via `/mcp` no desktop e mobile (`#42222`, `#42224`).
+2. Implementar cartões de solicitação de sign-in web para servidores MCP e agentes (`#42219`).
+3. Adotar a guarda de consentimento `requireStartupDialog` e o suporte a cartões de múltiplos servidores MCP (`#41216`).
 2. Incorporar a barra de ferramentas de controle de MCP e comandos Claude (`#40616`) no composer do Native Chat.
 3. Adotar a indexação e cache de fatos de orquestração (`#40564`) para eliminar gargalos de SQLite no Studio.
 4. Adotar o diálogo de proteção de fechamento de janela com chats em andamento (`#40640`).

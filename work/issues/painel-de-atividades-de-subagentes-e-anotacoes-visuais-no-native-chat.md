@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41955, #41766, #40935, #39649 trazem importação de transcripts do Kimi Code, modelo/ferramenta de subagentes no chat e imagens geradas.
+description: Os PRs #42254, #41955, #41766, #40935, #39649 trazem limpeza de subagente ao fechar aba, importação de Kimi Code e subagentes no chat.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41955`](https://github.com/stablyai/orca/pull/41955),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42254`](https://github.com/stablyai/orca/pull/42254),
+[`stablyai/orca#41955`](https://github.com/stablyai/orca/pull/41955),
 [`stablyai/orca#41766`](https://github.com/stablyai/orca/pull/41766),
 [`stablyai/orca#40935`](https://github.com/stablyai/orca/pull/40935),
 [`stablyai/orca#39649`](https://github.com/stablyai/orca/pull/39649) (resolve Issue [`#39619`](https://github.com/stablyai/orca/issues/39619)),
@@ -85,6 +86,10 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     Sessões e transcrições geradas pela CLI do Kimi Code permaneciam isoladas no filesystem, impossibilitando que desenvolvedores
     adotassem essas conversas dentro do Native Chat no desktop para continuar a interação com histórico estruturado,
     ferramental gráfico e inspeção de passos.
+14. **Retenção de memória de subagentes após o fechamento da aba de chat (`#42254`):**
+    Ao inspecionar um subagente dentro de uma conversa, o aplicativo guardava o registro de qual subagente estava aberto.
+    Quando a aba de chat era fechada, esse registro continuava retido em memória até o reinício do aplicativo, acumulando
+    vazamentos sutis em sessões de longa duração.
 
 ## O que o upstream implementa
 
@@ -132,9 +137,12 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - **Importação de transcrições Kimi Code e adoção de conversas CLI (`#41955`):**
   - Implementa `kimi-transcript-import.ts` e parseador de eventos de conversas CLI do Kimi Code (`session_index.jsonl`), convertendo turnos, chamadas de ferramenta e raciocínio em mensagens nativas estruturadas;
   - Adiciona suporte no fluxo `structured-agent-cli-conversation-adoption.ts` para que sessões CLI ativas ou salvas do Kimi Code sejam importadas ou adotadas pelo Native Chat com reconciliação transparente de estado.
+- **Descarte de referências de subagentes ao fechar abas de chat (`#42254`):**
+  - Limpa imediatamente o mapa `activeSubagentByTab` ao fechar uma aba de chat, liberando referências em memória de subagentes abertos.
 
 ## O que fazer
 
+- Descartar referências e estado de subagentes abertos imediatamente ao fechar a respectiva aba de chat (`#42254`).
 - Suportar importação de transcrições e adoção de conversas CLI do Kimi Code no Native Chat (`#41955`), permitindo transição contínua entre terminal e UI nativa.
 - Exibir modelo, ferramenta ativa e resultado final de cada subagente nas linhas de subagentes do Native Chat e Mobile (`#41766`), com pills e hover card informativo.
 - Integrar imagens geradas ao cartão da resposta final no chat nativo (`#40935`), evitando perdas e duplicações.

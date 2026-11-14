@@ -437,6 +437,8 @@ Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter 
   [O PR A do PLN-026 levou o degrau 1](../../work/worklogs/2026-11-14-pln026-pr-a.md)
 - 2026-11-14 — `## Decisões` aponta as 13 notas da auditoria. Desvio de autoria do `c21d290`, sem reescrever histórico.
   [O PLN-026 aponta as treze decisões da auditoria](../../work/worklogs/2026-11-14-pln026-decisoes-backlink.md)
+- 2026-11-14 — ata smoke final contra `61e47ed`, com o PR #3 em `ed7d91b`. Não conta para a promoção.
+  [A reunião smoke final do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-final-coordenacao.md)
 
 ## Revisões
 

@@ -16,6 +16,8 @@ refs:
   - issue:conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes
   - issue:cursor-no-chat-via-acp-previa-de-links-de-imagem-bifurcacao-resiliente-e-leitura-por-voz
   - issue:isolamento-de-artefatos-temporarios-de-chat-e-estudio-de-temas-via-cli
+  - issue:janela-unificada-de-fork-cross-host-e-botao-compartilhado-de-envio-de-notas
+  - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
   - issue:retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal
@@ -111,3 +113,33 @@ refs:
    - [Abertura de agentes no Chat UI pela CLI e superfície chat na orquestração](../issues/abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao.md):
      adicionados o PR `#41354` (resolve Issue `#41351` — explicitação nos recibos de CLI de que lançamentos independentes não reportam automaticamente),
      e o PR `#42309` (resolve Issue `#42308` — suporte nativo ao agente terminal `loop` com rota `/hook/loop` para status e retomada de sessão).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-14)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-14T15:00:00Z` e `2026-11-14T21:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Janela unificada de Fork cross-host e botão compartilhado de envio de notas](../issues/janela-unificada-de-fork-cross-host-e-botao-compartilhado-de-envio-de-notas.md):
+     rastreia o PR `#42437` (resolve Issue `#42436` — diálogo unificado de Fork no desktop e mobile suportando destinos cross-host via extensão de protocolo `ai-vault.chat-fork-import.v1` e forks sem créditos remotos a partir do resumo local),
+     o PR `#42482` (componente compartilhado `SendNotesButton` unificando toolbar de Changes, cabeçalho de diff, Source Control, markdown preview e comentários de PR, com menu Copy/Clear notes),
+     o PR `#42476` (configuração `closeUnpinnedEditorTabsOnFocusLoss` para fechar abas limpas e não fixadas ao perder o foco do editor e atalho `Mod+Alt+Shift+P` para alternar fixação),
+     e o PR `#42466` (indicação cromática de saúde de cotas por percentual consumido no status bar/roster e alternador Used/Left).
+3. **Atualização de 6 issues existentes em `work/issues/`:**
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados o PR `#42455` (slide-up sheet para subagentes no chat pane sem desmontar ou rolar a conversa pai) e
+     o PR `#42448` (suporte e renderização visual de subagentes no Pi Native Chat).
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionados o PR `#42460` (resolve Issue `#41961` — suporte a variantes completas do Gemini 4 como Hydrogen, Carbon e Argon, esforços estendidos `xhigh` e `max`, e fallback resiliente) e
+     o PR `#42464` (suporte ao runtime gerenciado e chat nativo do Antigravity no Windows).
+   - [Cartões de Pull Request, feedback de Steer e atalhos no Native Chat](../issues/cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat.md):
+     adicionados o PR `#42459` (exibição de estado explícito `waiting` / "waiting on you" para perguntas assíncronas no Codex) e
+     o PR `#42445` (resolve Issue `#42187` — comando `/new` no composer de Codex como alias funcional de `/clear`).
+   - [Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal](../issues/retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal.md):
+     adicionados o PR `#42484` (resolve Issue `#42470` — retries automáticos com backoff em probes SSH com encerramento prematuro de conexão por ProxyCommand) e
+     o PR `#42481` (classificação diagnóstica detalhada de saída de terminais no log do daemon).
+   - [Isolamento de artefatos temporários de chat e estúdio de temas via CLI](../issues/isolamento-de-artefatos-temporarios-de-chat-e-estudio-de-temas-via-cli.md):
+     adicionados o PR `#42479` (isenção de arquivos de diário `.journal`, WAL e SHM da exclusão automática de 7 dias) e
+     o PR `#42418` (resolve Issue `#42413` — descarte seguro e reconstrução automática de entradas corrompidas no cache de fontes de uso sem travar varreduras).
+   - [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):
+     adicionado o PR `#42472` (resolve Issue `#42408` — eliminação de falsos alertas "Needs attention · You edited this copy" em skills embutidas renomeadas através de verificação canônica e digests de release).

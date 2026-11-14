@@ -20,7 +20,7 @@ tags:
 
 # PLN-026: brza sessions e meeting-runner funcionam na cloud
 
-- **Retomar:** Nenhum passo está concluído antes do merge. P7 e P8 estão implementados e aguardam o merge. A prova do P8 está na ata [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). O runtime único é `packages/client/bin/cloud_runtime.py` em `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b`, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2), rebaseado em `bc89dda14be5d4df39c0d01e3627f5054ec3c2b5` (`builder/pln-026-pr-a`). O primeiro `agent -p` não leva `--resume`; o id é o `session_id` do JSON. O transporte lê `BRZA_WORKFLOW_DIR` e não fixa branch. P9 e P10 ficam de fora. `executed_h` 1,7 pelo relógio entre `52184ee` (16:11:00Z) e `e07fd47` (17:54:25Z).
+- **Retomar:** Nenhum passo está concluído antes do merge. P7 e P8 estão implementados e aguardam o merge. A passagem do `92575d1` está na ata [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). A prova do `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b` está na ata [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md). O runtime único é `packages/client/bin/cloud_runtime.py` nesse SHA, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2), rebaseado em `bc89dda14be5d4df39c0d01e3627f5054ec3c2b5` (`builder/pln-026-pr-a`). O primeiro `agent -p` não leva `--resume`; o id é o `session_id` do JSON. O transporte lê `BRZA_WORKFLOW_DIR` e não fixa branch. P9 e P10 ficam de fora. `executed_h` 1,7 pelo relógio entre `52184ee` (16:11:00Z) e `e07fd47` (17:54:25Z).
 
 ## Pedido
 
@@ -378,7 +378,7 @@ Repo da ata: `brza-workspace`, branch `builder/bob-the-builder`, sem PR. Risco a
 - implementado, aguardando merge. **2.** `--transport cloud` abre com `CloudRuntime.open(spec)` e manda a rodada com `send(session_id, prompt)`. O checkout vem de `BRZA_WORKFLOW_DIR` e o módulo é `packages/client/bin/cloud_runtime.py`. Sem a variável, a mensagem pede para defini-la. Sem a flag, o `brza sessions` segue igual.
 - implementado, aguardando merge. **3.** As atas smoke estão em `work/worklogs/`, com `<!-- fim-rodada-1 -->` e a marca SMOKE. Não contam para a promoção. O commit é nesta branch, sem PR.
 
-**Evidência:** em PR, sem caixa marcada. A ata smoke segue em `bf9710f09c6d580f05899d06a3a2a73e3ffbf3d4`. O transporte desta nota aponta para `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b`. Prova nova no pod, uma persona Revisor em `ask`: open 2779 ms, `session_id` `e80ab013-fce2-4d3a-ab2b-ac9773f2e729`, tokens 13413/79/5376/0/77; send da rodada 1819 ms, tokens 326/40/18688/0/36; send frio de outro processo 2047 ms, o mesmo id, result `P7-OK`, tokens 232/73/18944/0/69. Custo `ausente`. `leak_count` 0. Marcador `<!-- fim-rodada-1 -->`. A smoke anterior está no [O P8 do PLN-026 roda a reunião smoke na cloud](../../work/worklogs/2026-11-14-pln026-p8.md). X8: a rodada contra `a066d39` foi descartada e não é a ata gravada. A segunda prova, com as duas personas, está em [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md). Executado: — h (X5).
+**Evidência:** em PR, sem caixa marcada. A ata da passagem do `92575d1` está em `9c20c76680d0ba589b4e2b2d422fff8c9595e60d`, [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). O transporte desta nota aponta para `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b`. A prova desse SHA, com as duas personas, está em [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md). X8: a rodada contra `a066d39` foi descartada e não é a ata gravada. O probe `e80ab013` saiu da evidência: o JSONL não está no worklog. Custo `ausente`. `leak_count` 0. Marcador `<!-- fim-rodada-1 -->`. O detalhe está no [O P8 do PLN-026 roda a reunião smoke na cloud](../../work/worklogs/2026-11-14-pln026-p8.md). Executado: — h (X5).
 
 ### P9 — `GROK_HOME` pela regra do Studio
 
@@ -433,6 +433,10 @@ Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter 
   [O PR A do PLN-026 levou o degrau 1](../../work/worklogs/2026-11-14-pln026-pr-a.md)
 - 2026-11-14 — segunda ata smoke do P8, depois da revisão xhigh, marcada SMOKE.
   [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md)
+
+## Revisões
+
+- [REV-028: a revisão xhigh R2 do P8 do PLN-026](../../work/reviews/REV-028-pln026-p8-r2.md) — 2026-11-14, 7 achados, triagem corrigir.
 
 ## Fechamento
 

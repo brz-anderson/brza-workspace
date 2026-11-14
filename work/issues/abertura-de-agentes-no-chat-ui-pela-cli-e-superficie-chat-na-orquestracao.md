@@ -17,7 +17,9 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#31595`](https://github.com/stablyai/orca/pull/31595),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42309`](https://github.com/stablyai/orca/pull/42309) (resolve Issue [`#42308`](https://github.com/stablyai/orca/issues/42308)),
+[`stablyai/orca#41354`](https://github.com/stablyai/orca/pull/41354) (resolve Issue [`#41351`](https://github.com/stablyai/orca/issues/41351)),
+[`stablyai/orca#31595`](https://github.com/stablyai/orca/pull/31595),
 [`stablyai/orca#37710`](https://github.com/stablyai/orca/pull/37710),
 [`stablyai/orca#38001`](https://github.com/stablyai/orca/pull/38001) e
 [`stablyai/orca#37984`](https://github.com/stablyai/orca/pull/37984), além das issues
@@ -43,6 +45,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#31595`](https://github.com
    prévio persistido em disco.
 5. **Comportamento inadequado ao dividir painel de Chat UI (`#37984`):** acionar split horizontal/vertical a partir de uma
    aba de Chat UI tentava clonar uma sessão de chat vazia sem agente, em vez de abrir um terminal shell adjacente para apoio.
+6. **Expectativa implícita de reporte em lançamentos independentes de agentes pela CLI (`#41354`, resolve `#41351`):**
+   Ao abrir chats ou terminais para outros agentes via `orca agent launch` ou `worktree create --agent`, os recibos retornavam
+   `journaled` / `structured`. Usuários e scripts esperavam que o agente reportasse automaticamente o encerramento do trabalho,
+   mas essas sessões eram independentes e não possuíam canal de retorno de coordenação.
+7. **Ausência de suporte ao agente de terminal `loop` no catálogo e ciclo de vida (`#42309`, resolve `#42308`):**
+   O agente `loop` executava como terminal comum, sem exibição de status no card de workspace, sem alertas de intervenção humana e sem suporte a retomada de sessão (`loop --session <id>`).
 
 ## O que o upstream propõe e implementa
 
@@ -60,8 +68,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#31595`](https://github.com
   de trabalho, proporcionando ergonomia natural de desenvolvimento sem duplicar sessões de IA desnecessariamente.
 - **Na issue `#37701`:** propõe `orchestration worker-start ... [--surface chat|terminal]` com eco no receipt (`surface`,
   `terminal` handle), garantindo paridade entre workers e agentes isolados.
+- **No PR `#41354` (resolve `#41351`):** explicita nos recibos de lançamento CLI `reporting: { automatic: false, guideCommand: "orca skills get orchestration" }`, esclarecendo que sessões independentes não reportam e direcionando para o fluxo supervisionado de workers.
+- **No PR `#42309` (resolve `#42308`):** integra o agente terminal `loop` com normalização de eventos via rota `/hook/loop`, status em tempo real no workspace card e retomada de sessão com `loop --session <id>`.
 
 ## O que fazer
 
-Portar o PR `#31595` (apoiado no PR `#38063`) para o `brza-studio`, habilitando a transição transparente entre o modo
-terminal e o Native Chat sem duplicação de abas, além de adotar `--command-agent` / `--view-mode chat` no `brza-workflow`.
+- Portar o PR `#31595` (apoiado no PR `#38063`) para o `brza-studio`, habilitando a transição transparente entre o modo
+  terminal e o Native Chat sem duplicação de abas, além de adotar `--command-agent` / `--view-mode chat` no `brza-workflow`.
+- Explicitar metadados e orientações de reporte em lançamentos independentes de agentes pela CLI (`#41354`, resolve `#41351`).
+- Suportar o agente `loop` com hooks nativos e retomada de sessão (`#42309`, resolve `#42308`).

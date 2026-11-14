@@ -13,7 +13,11 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42335`](https://github.com/stablyai/orca/pull/42335),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42409`](https://github.com/stablyai/orca/pull/42409) (resolve Issue [`#42407`](https://github.com/stablyai/orca/issues/42407)),
+[`stablyai/orca#42372`](https://github.com/stablyai/orca/pull/42372) (resolve Issue [`#40700`](https://github.com/stablyai/orca/issues/40700)),
+[`stablyai/orca#42370`](https://github.com/stablyai/orca/pull/42370),
+[`stablyai/orca#42359`](https://github.com/stablyai/orca/pull/42359),
+[`stablyai/orca#42335`](https://github.com/stablyai/orca/pull/42335),
 [`stablyai/orca#42278`](https://github.com/stablyai/orca/pull/42278),
 [`stablyai/orca#42271`](https://github.com/stablyai/orca/pull/42271),
 [`stablyai/orca#42129`](https://github.com/stablyai/orca/pull/42129) (resolve Issue [`#41908`](https://github.com/stablyai/orca/issues/41908)),
@@ -157,6 +161,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42335`](https://github.com
     O botão de escolha de modelo na barra do composer não informava no tooltip o nome completo do modelo e o nível de esforço de raciocínio configurado (ex.: `high`, `medium`), exigindo abrir o dropdown a cada checagem.
 33. **Acionamento manual e ausência de seletor nativo de alvos para `/review` do Codex (`#42271`):**
     Usuários que desejavam revisar alterações com o Codex tinham que formular prompts manuais complexos no chat em vez de dispor de um comando nativo `/review` com seletor de quatro escopos (branch atual, commits não enviados, staging ou arquivos específicos) e instruções adicionais.
+34. **Ausência de linhagem visual explícita para conversas bifurcadas via `/fork` (`#42370`):**
+    Conversas originadas de um `/fork` apareciam com títulos idênticos ou sem referência à sessão de origem, dificultando identificar a ramificação na barra de abas e no histórico.
+35. **Necessidade de abrir manualmente cada execução de ferramenta durante o trabalho do agente (`#42372`, resolve `#40700`):**
+    Desenvolvedores que acompanham o raciocínio e os passos de ferramentas do agente precisavam clicar repetidamente para expandir cada ferramenta gerada durante o turno.
+36. **Comportamento incorreto de Ctrl+A e Ctrl+E em mensagens multilinha no composer no macOS (`#42409`, resolve `#42407`):**
+    Ao redigir rascunhos multilinha com <kbd>Shift+Enter</kbd>, pressionar <kbd>Ctrl+A</kbd> ou <kbd>Ctrl+E</kbd> no macOS saltava para o início da primeira linha ou fim da última linha do rascunho inteiro, em vez de atuar na linha corrente do cursor como no sistema nativo.
 
 ## O que o upstream implementa
 
@@ -261,9 +271,21 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42335`](https://github.com
   - Exibe o nome completo do modelo e o nível de esforço de raciocínio ativo ao passar o cursor sobre o botão de modelo no rodapé do composer.
 - **Comando `/review` nativo com seletor de escopo para Codex (`#42271`):**
   - Adiciona suporte nativo ao comando `/review` no composer do Codex com um seletor visual de 4 alvos (branch atual, commits não enviados, staging ou arquivos selecionados) e campo para instruções personalizadas de revisão.
+- **Identificação de linhagem de forks com prefixo e pill visual (`#42370`):**
+  - Aplica o prefixo `Fork:` no nome da conversa bifurcada e exibe o aviso/pill `Forked from <sessão>` em abas, histórico de sessões e linha do tempo do chat nativo.
+- **Opção de expansão automática de ferramentas em execução (`#42372`, resolve `#40700`):**
+  - Adiciona o ajuste **Auto expand tools** em *Settings → Chat UI → Behavior*, que mantém as linhas de ferramentas abertas em tempo real enquanto o turno roda, preservando colapsos efetuados manualmente pelo usuário.
+- **Alinhamento de Ctrl+A e Ctrl+E às linhas de parágrafo no composer no macOS (`#42409`, resolve `#42407`):**
+  - Corrige a extensão de teclado no ProseMirror para que <kbd>Ctrl+A</kbd> e <kbd>Ctrl+E</kbd> no macOS naveguem até as quebras de linha (<kbd>Shift+Enter</kbd>) mais próximas em vez de pular para o início/fim absoluto do rascunho.
+- **Refinamento tipográfico do chat nativo (`#42359`):**
+  - Ajusta o espaçamento de entrelinhas, margens de blocos de código e legibilidade geral de prosa nas respostas.
 
 ## O que fazer
 
+- Marcar conversas bifurcadas com prefixo `Fork:` e pill `Forked from` (`#42370`).
+- Adicionar opção `Auto expand tools` para acompanhamento de ferramentas em tempo real (`#42372`, resolve `#40700`).
+- Corrigir limites de linha com <kbd>Ctrl+A</kbd> e <kbd>Ctrl+E</kbd> no composer no macOS (`#42409`, resolve `#42407`).
+- Adotar o polimento tipográfico na renderização de texto do Native Chat (`#42359`).
 - Preservar visível a resposta do assistente anterior a mensagens de steer em turnos finalizados (`#42335`).
 - Exibir nome do modelo e esforço de raciocínio no tooltip do botão de modelo (`#42278`).
 - Suportar o comando `/review` com seletor de 4 escopos para o Codex (`#42271`).

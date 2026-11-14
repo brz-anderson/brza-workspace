@@ -191,6 +191,23 @@ class CloudTransportTest(unittest.TestCase):
         self.assertNotIn(SECRET.encode(), self.ata.read_bytes())
         self.assertNotIn(SECRET.encode(), self.log.read_bytes())
         self.assertNotIn(SECRET.encode(), self.capture.read_bytes())
+        self.assertEqual(
+            architect_send[architect_send.index("--workspace") + 1], str(self.tmp / "workspace"))
+        for nome in ("Arquiteto", "Revisor"):
+            home = self.tmp / "home" / ".local" / "share" / "brza" / "cloud-runtime" / nome
+            self.assertTrue(home.is_dir(), home)
+            self.assertEqual(files_with(home, SECRET), [])
+        module = cloud_transport.load_cloud_runtime(WORKFLOW)
+        cold = module.CloudRuntime(env=self.env(), log_path=str(self.log), timeout_s=5)
+        try:
+            with self.assertRaises(module.CloudTurnError) as caught:
+                cold.send("sess-0", "de novo")
+        finally:
+            cold.close()
+        message = str(caught.exception)
+        self.assertIn("persona", message)
+        self.assertIn("workspace", message)
+        self.assertEqual(len(self.calls()), 4)
 
     def test_missing_key_fails_with_an_actionable_message(self):
         err = io.StringIO()

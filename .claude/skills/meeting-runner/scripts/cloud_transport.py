@@ -8,6 +8,10 @@ síncrono. A ata da coordenação ganha o marcador `<!-- fim-rodada-N -->`.
 
 O `cloud_runtime.py` é importado do checkout do `brza-workflow` na branch
 `builder/pln-026-pr-b`, pelo caminho do repositório. Não há cópia na skill.
+O `send` repete `persona` e `workspace`: sem memória do processo, o
+`CloudRuntime` recusa o turno antes de chamar o `agent`. O home da persona
+fica em `~/.local/share/brza/cloud-runtime/<persona>` e sobrevive ao `close`;
+a chave não fica nesse diretório.
 """
 import importlib.util
 import json
@@ -231,7 +235,10 @@ def write_minutes(path, reuniao, n, records, wall_ms):
             handle.write(sep + block)
         return
     with open(path, "w", encoding="utf-8") as handle:
-        handle.write(render_header(reuniao) + block)
+        header = render_header(reuniao)
+        if not header.endswith("\n\n"):
+            header = header.rstrip("\n") + "\n\n"
+        handle.write(header + block)
 
 
 def make_runtime(env, log_path, timeout_s):
@@ -277,6 +284,7 @@ def run_round(reuniao, personas, root, n, dry=False, out=print, sessions_fn=None
             opened = runtime.open(
                 persona["nome"], model, workspace, mode, open_prompt(reuniao, persona))
             records.append(_row(persona, "open", opened))
+            # persona e workspace vão sempre: um send sem memória não herda o bucket.
             sent = runtime.send(
                 opened.session_id, send_prompt(reuniao, persona, n, root, prior),
                 persona=persona["nome"], model=model, workspace=workspace, mode=mode)

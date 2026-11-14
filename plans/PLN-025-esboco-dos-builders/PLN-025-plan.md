@@ -22,7 +22,7 @@ tags:
 
 # PLN-025: Cada execução de Builder deixa métrica, nota e persona calibrável
 
-- **Retomar:** P1 feito em 2026-11-14. R1.1 a R1.4 decididas nas recomendações. O próximo ato é o P2, quando Anderson pedir. Nenhum outro passo executado.
+- **Retomar:** P1 feito em 2026-11-14. O P2 está em PR aprovado na revisão e aguarda o merge de Anderson: [PR 1](https://github.com/brz-anderson/brza-workflow/pull/1), branch `cursor/pln-025-feedbacks-f7d0`, HEAD `2245460`. O passo continua desmarcado. A prova está em [A execução do P2 do PLN-025 ficou no PR do gênero feedbacks](../../work/worklogs/2026-11-14-pln025-p2-feedbacks.md). Depois do merge, o próximo ato é marcar o P2. P3 não começou.
 
 ## Pedido
 
@@ -274,7 +274,7 @@ Executa D2 · executor: sessão no `brza-workflow`
 Estimado: 3 h · Executado: — h
 
 - [ ] `work/feedbacks/` em `core/work/README.md` e em `GENRES` / `STATELESS_GENRES` de `core/.claude/skills/notes-checker/scripts/check_notes.py`, com as cinco seções, `model`, `effort` e `result`.
-- [ ] Norma e script no mesmo commit do `brza-workflow`, numa branch nova e por PR, como o PLN-024 já manda para código de lá. A branch não existe ainda: nasce quando Anderson pedir o P2. Um caso em `tests/notes-checker/run.py` que falha se a seção some.
+- [ ] Norma e script no mesmo commit do `brza-workflow`, numa branch nova e por PR, como o PLN-024 já manda para código de lá. O trabalho está no [PR 1](https://github.com/brz-anderson/brza-workflow/pull/1) e a prova está em [A execução do P2 do PLN-025 ficou no PR do gênero feedbacks](../../work/worklogs/2026-11-14-pln025-p2-feedbacks.md). O passo segue aberto até o merge. Um caso em `tests/notes-checker/run.py` que falha se a seção some.
 - [ ] Desfazer: reverter esse commit. A nota sem seção volta a passar, e o gênero some da tabela. Quem faz é a sessão no `brza-workflow`.
 
 ### P3 — O agregador da execução
@@ -328,6 +328,8 @@ Estimado: 0.5 h · Executado: — h
   [O PLN-025 do esboço dos Builders foi aberto](../../work/worklogs/2026-11-14-esboco-dos-builders.md)
 - 2026-11-14 — R1.1 a R1.4 decididas nas recomendações. D1–D4 fechados. P1 feito. `ready: sim`, `phase: execution`. P2 não começou.
   [O PLN-025 do esboço dos Builders foi aberto](../../work/worklogs/2026-11-14-esboco-dos-builders.md)
+- 2026-11-14 — P2 executado no PR 1 do `brza-workflow`, revisado e corrigido. O passo segue desmarcado até o merge.
+  [A execução do P2 do PLN-025 ficou no PR do gênero feedbacks](../../work/worklogs/2026-11-14-pln025-p2-feedbacks.md)
 
 ## Fechamento
 

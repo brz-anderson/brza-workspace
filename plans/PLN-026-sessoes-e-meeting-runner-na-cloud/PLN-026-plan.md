@@ -3,7 +3,7 @@ status: open
 phase: design
 origin: request
 description: O brza sessions e a meeting-runner funcionam na cloud pela porta AgentRuntime, com reunião real e ata.
-ready: "não — falta CURSOR_API_KEY para provar o open e para a reunião; a Rodada 2 não foi respondida"
+ready: "não — falta BRZA_CURSOR_API_KEY para provar o open e para a reunião; a Rodada 2 não foi respondida"
 estimate_h: 28
 executed_h: 0
 remaining_h: 28
@@ -20,11 +20,11 @@ tags:
 
 # PLN-026: brza sessions e meeting-runner funcionam na cloud
 
-- **Retomar:** Aberto em 2026-11-14 na branch `builder/bob-the-builder`, sem linha no índice (o `brza note plan-open` recusou `builder/*`). O próximo ato é a Rodada 2. O P1 pode começar quando Anderson pedir; o P7 e o P8 esperam a chave e a Rodada 2.
+- **Retomar:** Aberto em 2026-11-14 na branch `builder/bob-the-builder`, sem linha no índice (o `brza note plan-open` recusou `builder/*`). A ADR-003 saiu do repo (R3.1). O próximo ato é a Rodada 2. O P1 pode começar quando Anderson pedir; o P7 e o P8 esperam `BRZA_CURSOR_API_KEY` e a Rodada 2.
 
 ## Pedido
 
-- **Origem:** pedido da sala BrzA Cloud Builders em 2026-11-14, com aprovação do Anderson, nesta sessão cloud. Inverte a R1.4 do [PLN-024: Norma aceita o prefixo builder/ (workstream pessoal de Builder)](../PLN-024-prefixo-builder/PLN-024-plan.md). O desenho vigente é a [ADR-003: Porta única `AgentRuntime` para o `brza sessions` e a `meeting-runner`](../../arquitetura/adr/ADR-003-porta-agent-runtime.md), que incorpora a ADR-002. A medição de execução encosta no [PLN-025: Cada execução de Builder deixa métrica, nota e persona calibrável](../PLN-025-esboco-dos-builders/PLN-025-plan.md). A reunião de hoje usa a skill do [PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat](../PLN-017-a-reuniao-multiagente-como-fluxo-replicavel/PLN-017-plan.md), que vive em `origin/workstream/playground`.
+- **Origem:** pedido da sala BrzA Cloud Builders em 2026-11-14, com aprovação do Anderson, nesta sessão cloud. Inverte a R1.4 do [PLN-024: Norma aceita o prefixo builder/ (workstream pessoal de Builder)](../PLN-024-prefixo-builder/PLN-024-plan.md). O desenho vigente é a ADR-003, autor Linus, status Proposta, que incorpora a ADR-002 e não tem arquivo neste repositório. A medição de execução encosta no [PLN-025: Cada execução de Builder deixa métrica, nota e persona calibrável](../PLN-025-esboco-dos-builders/PLN-025-plan.md). A reunião de hoje usa a skill do [PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat](../PLN-017-a-reuniao-multiagente-como-fluxo-replicavel/PLN-017-plan.md), que vive em `origin/workstream/playground`.
 
 "R1, aceite: (1) `brza sessions list --json` sai 0 sem o socket do Studio e traz a run atual com id `bc-`; (2) `brza sessions diag-cloud --agent cursor --dry-run` sai 0, imprime `abriria` e não chama worker-start; (3) `brza doctor --env` passa; (4) a execução aparece no `--by-execution` (PLN-025 P3) com custo e tokens marcados como ausentes, nunca zero, quando não há chave."
 
@@ -52,7 +52,7 @@ tags:
 - **Executar os passos nesta sessão.** O plano abre; cada passo espera pedido explícito de Anderson.
 - **Pull request nesta sessão.** Os PRs previstos ficam na lista abaixo e nascem na sessão que executar o código.
 - **Editar o `brza-studio`.** O `StudioRuntime` encapsula o cliente que já existe. Mudança no app só se a regressão do P4 não couber no `brza-workflow`.
-- **Texto próprio da ADR-002.** A ADR-003 a incorpora. O arquivo copiado permanece Proposta até a frase do Anderson.
+- **Arquivo da ADR-003 neste repositório.** Artefato de arquiteto não entra em PR nem no repo. A citação pelo número e o resumo das regras ficam no Desenho. A ADR-002 também não ganha arquivo.
 - **Degrau 2 como entrega de hoje.** O P10 está no plano e é o primeiro corte da janela.
 - **Reserva manual do índice.** Ninguém edita `.brza/index.jsonl` à mão. A R2.3 trata do número.
 
@@ -68,12 +68,12 @@ tags:
 - **Capacidade fora do conjunto falha com rc diferente de 0** e a mensagem nomeia o runtime e a capacidade.
 - **Métrica que não existe sai `ausente`.** Zero ficaria parecendo medida.
 - **O default de `user_data()` no macOS permanece** `~/Library/Application Support/brza-studio`.
-- **O commit desta abertura usa Anderson Pereira,** como o pedido desta sessão mandou. O PLN-024/R1.3, sem passo executado, prevê `Bob The Builder <bob@brza.dev>` para os commits seguintes da branch.
+- **Commit em `builder/*` usa `Bob The Builder <bob@brza.dev>`.** Decisão do Anderson em 2026-11-14 (R3.3). O `52184ee` permanece com Anderson Pereira. Não se reescreve.
 
 ## Pré-requisitos
 
 - **`CURSOR_CONVERSATION_ID` definida, com prefixo `bc-`.** Conferido neste pod em 2026-11-14 (comprimento 39). Sem ela, o degrau 1 não tem run para listar e o P1 para.
-- **`CURSOR_API_KEY` ausente neste pod.** O P1, o P2 e o P5 não precisam dela. O P7 e o P8 param e o `open` não é declarado. A chave entra no ambiente da sessão que provar, nunca no git.
+- **`BRZA_CURSOR_API_KEY` ausente neste pod.** O P1, o P2 e o P5 não precisam dela. O P7 e o P8 param e o `open` não é declarado. A chave entra como segredo com esse nome (R3.2). O wrapper copia para `CURSOR_API_KEY` só no processo filho. Não vai em `--api-key`, no `env.sh` nem no repo.
 - **O binário `agent` 2026.11.13-eacade1 está neste pod**, em `~/.local/bin/agent` (o `cursor-agent` é o mesmo arquivo). `agent --help` sai 0 e lista `-p`, `--output-format`, `--model`, `--workspace`, `--trust`, `--resume` e `--force`. `agent status` sai 0 com "Not logged in". `agent models` sai 1 pedindo autenticação. Um pod novo não herda o binário: a instalação é `curl https://cursor.com/install -fsS | bash`.
 - **A skill `meeting-runner` não está nesta branch.** Está em `origin/workstream/playground` no SHA `03c9579d56fb2304a48821e2c6978e0514cd7df3`, em `.claude/skills/meeting-runner/`. O P8 roda esses scripts a partir de um worktree só de leitura dessa ref, sem merge na master e sem copiar a skill para cá.
 
@@ -141,9 +141,39 @@ Respondida em 2026-11-14, na sala BrzA Cloud Builders, com aprovação do Anders
    - cortar também o P4 — custo: a ADR não dá o adaptador por aceito sem a suíte; se paga: nunca, num PR para a master;
    - não cortar nada — custo: a meta das 19h afirma o que não coube; se paga: nunca.
 
+### Rodada 3 — a ADR fora do repo, a chave e o autor (enviada 2026-11-14)
+
+**Apresentado antes:** o `52184ee` gravou `arquitetura/adr/ADR-003-porta-agent-runtime.md` e saiu com autor Anderson Pereira. Nomes `CURSOR_*` podem ser recusados em agentes da cloud. O `env.sh` só aceita `GIT_*`.
+
+Respondida em 2026-11-14, pedido do Anderson nesta sessão.
+
+1. **Onde mora a ADR-003.** Opções:
+   - citação pelo número no plano, sem arquivo no repo (a escolhida) — custo: o texto integral fica fora do git; se paga: agora, porque artefato de arquiteto não entra em PR nem no repo;
+   - manter o arquivo em `arquitetura/adr/` — custo: o PR e o repo passam a carregar o artefato; se paga: nunca, com a regra desta mensagem.
+
+   **Decidido — sem arquivo.** Citação: ADR-003, autor Linus, status Proposta. O resumo das regras está no Desenho.
+
+2. **Como a chave chega ao participante.** Opções:
+   - segredo `BRZA_CURSOR_API_KEY`, e o wrapper faz `CURSOR_API_KEY="$BRZA_CURSOR_API_KEY"` só no ambiente do processo filho (a escolhida) — custo: uma variável a mais no wrapper; se paga: no P7, quando o agente da cloud aceitar o segredo;
+   - `CURSOR_API_KEY` direto no ambiente do agente — custo: o nome `CURSOR_*` pode ser recusado; se paga: nunca, se a cloud recusar o prefixo;
+   - `--api-key` na linha de comando ou linha no `env.sh` — custo: a chave aparece no argv ou num arquivo que só deve ter `GIT_*`; se paga: nunca.
+
+   **Decidido — `BRZA_CURSOR_API_KEY` no wrapper, só no filho.** A chave não vai em `--api-key`, no `env.sh` nem no repo.
+
+3. **Autor dos commits em `builder/*`.** Opções:
+   - `Bob The Builder <bob@brza.dev>` daqui para a frente, sem reescrever o `52184ee` (a escolhida) — custo: o primeiro commit fica com outro autor; se paga: neste commit;
+   - reescrever o `52184ee` — custo: reescreve história já publicada; se paga: nunca, com o pedido desta mensagem.
+
+   **Decidido — Bob daqui para a frente.** O `52184ee` permanece com Anderson Pereira.
+
 ## Desenho
 
-O texto durável é a ADR-003, copiada com status Proposta. Aqui fica o que os passos executam.
+A ADR-003 (autor Linus, status Proposta) não tem arquivo neste repositório. Ela incorpora a ADR-002. Os passos executam este resumo:
+
+- A porta é `AgentRuntime`, com `capabilities`, `list` e `read` obrigatórias, e `usage`, `open` e `send` opcionais.
+- Capacidade não declarada falha com rc diferente de 0 e a mensagem nomeia o runtime e a capacidade.
+- Os adaptadores são `StudioRuntime` e `CloudRuntime`.
+- `CloudRuntime.open` é um `agent -p` por persona, com `--resume <chatId>`, sem `--force`. Revisor roda com `--mode ask`.
 
 ### O que este desenho assume
 
@@ -178,26 +208,26 @@ O texto durável é a ADR-003, copiada com status Proposta. Aqui fica o que os p
 
 ### D1 — A porta `AgentRuntime` — `brza-workflow` (P1, P3, P4, P7, P9, P10)
 
-- **Origem:** R1.2, R1.5
-- **Contexto:** dois consumidores com o mesmo buraco. A ADR fixa o contrato; o degrau 1 não precisa de segredo.
+- **Origem:** R1.2, R1.5, R3.1
+- **Contexto:** dois consumidores com o mesmo buraco. O resumo da ADR-003 fixa o contrato; o degrau 1 não precisa de segredo.
 
 #### Como fica
 
 Dois arquivos novos. O agregador escolhe o adaptador e repassa. `StudioRuntime` chama o código que hoje está em `brza-sessions` e em `brza_runtime.rpc`, sem mudar o default de `user_data()`.
 
-`CloudRuntime` no degrau 1 declara só `list`. `list` devolve um `SessionRecord` com `id` igual a `CURSOR_CONVERSATION_ID`, `source: cloud`, `agent: cursor`, `status: running`. `read`, `usage`, `open` e `send` não estão no conjunto: a chamada sai com rc diferente de 0 e a mensagem contém `cloud` e o nome da capacidade. Nada é escrito no JSON de abas. Nenhuma variável `ORCA_*` é criada.
+`CloudRuntime` no degrau 1 declara `capabilities`, `list` e `read`. `list` devolve um `SessionRecord` com `id` igual a `CURSOR_CONVERSATION_ID`, `source: cloud`, `agent: cursor`, `status: running`. `read` devolve ausente, com a marca `ausente`, porque o transcript ainda não está na máquina. `usage`, `open` e `send` ficam de fora do conjunto até serem provados: a chamada sai com rc diferente de 0 e a mensagem contém `cloud` e o nome da capacidade. Nada é escrito no JSON de abas. Nenhuma variável `ORCA_*` é criada.
 
 `usage`, quando passar a existir, preenche cada métrica com a origem (`hook`, `note`, `api` ou `ausente`). O valor ausente é a string `ausente`, nunca `0`.
 
-O `open`, depois da prova, monta:
+O `open`, depois da prova, é um processo por persona:
 
 ```text
 agent -p --output-format json --model <id> --workspace <dir> --trust --resume <chatId>
 ```
 
-O `<chatId>` é o da persona, obtido de `agent create-chat` na primeira abertura e reusado nas seguintes. Sem `--force`. O `--workspace` é o checkout absoluto da reunião. A prova que declara a capacidade é esse comando saindo 0 com a chave no ambiente.
+Revisor acrescenta `--mode ask`. O `<chatId>` é o da persona, obtido de `agent create-chat` na primeira abertura e reusado nas seguintes. Sem `--force` e sem `--api-key`. O `--workspace` é o checkout absoluto da reunião. O wrapper do filho exporta `CURSOR_API_KEY` a partir de `BRZA_CURSOR_API_KEY` e não põe essa variável no processo pai (R3.2). A prova que declara a capacidade é esse comando saindo 0.
 
-O degrau 2, com `CURSOR_API_KEY`, acrescenta `list` de outras runs, `read` do transcript e `usage` com origem `api`. É o P10.
+O degrau 2, com a mesma chave no filho, acrescenta `list` de outras runs, `read` do transcript e `usage` com origem `api`. É o P10.
 
 `GROK_HOME`, quando o runtime escolhido for `grok`, resolve como `resolveGrokHomeDir`: diretório absoluto da variável, ou `~/.grok`. É o P9. O caminho `agent` não lê essa variável.
 
@@ -272,8 +302,8 @@ Estimado: 2 h · Executado: — h
 
 Repo: `brza-workflow`, no mesmo PR. Risco ao Studio: nenhum no caminho studio. Desfazer: reverter o commit.
 
-- [ ] **1.** Teste que falha: `--runtime cloud` em `read` sai diferente de 0 e a mensagem contém `cloud` e `read`.
-- [ ] **2.** O mesmo para `usage`, `open` e `send` enquanto não forem declarados.
+- [ ] **1.** Teste que falha: `--runtime cloud` em `read` sai 0 e o campo de transcript é `ausente`.
+- [ ] **2.** `usage`, `open` e `send`, enquanto não forem declarados, saem diferentes de 0 e a mensagem contém `cloud` e o nome da capacidade.
 - [ ] **3.** Rodar o teste.
 
 **Evidência:** —
@@ -322,15 +352,17 @@ Repo: `brza-workflow`, no mesmo PR ou num PR empilhado se o P3 do PLN-025 já es
 
 ### P7 — Provar o `open` e só então declará-lo
 
-Executa D1 · executor: sessão no `brza-workflow`, no pod com a chave
+Executa D1 · executor: sessão no `brza-workflow`, no pod com o segredo
 
 Estimado: 3 h · Executado: — h
 
-Repo: `brza-workflow`, PR separado, depois da prova. Risco ao Studio: nenhum enquanto a capacidade só existe no `CloudRuntime`. Desfazer: tirar `open` do conjunto e reverter o commit. Sem a chave, o passo para e a capacidade continua de fora.
+Repo: `brza-workflow`, PR separado, depois da prova. Risco ao Studio: nenhum enquanto a capacidade só existe no `CloudRuntime`. Desfazer: tirar `open` do conjunto e reverter o commit. Sem `BRZA_CURSOR_API_KEY`, o passo para e a capacidade continua de fora.
 
-- [ ] **1.** Com `CURSOR_API_KEY` no ambiente, `agent create-chat` devolve um id.
-- [ ] **2.** O comando do D1, com esse id, sai 0 e imprime JSON. Sem `--force`.
-- [ ] **3.** O contrato passa a exigir `open` no `CloudRuntime` e a ausência dele continua falhando no teste do P3 até este commit.
+**Decisão da sala (R3.2, 2026-11-14).** A chave entra como segredo `BRZA_CURSOR_API_KEY`. Nomes `CURSOR_*` podem ser recusados em agentes da cloud. O wrapper do participante faz `CURSOR_API_KEY="$BRZA_CURSOR_API_KEY"` só no ambiente do processo filho. A chave nunca vai em `--api-key`, no `env.sh` (que só aceita `GIT_*`) nem no repo.
+
+- [ ] **1.** Com `BRZA_CURSOR_API_KEY` no segredo, o filho recebe `CURSOR_API_KEY` e `agent create-chat` devolve um id. O processo pai não fica com `CURSOR_API_KEY`. O argv não contém `--api-key`.
+- [ ] **2.** O comando do D1, com esse id, sai 0 e imprime JSON. Sem `--force`. Revisor leva `--mode ask`.
+- [ ] **3.** O contrato passa a exigir `open` no `CloudRuntime`. Até este commit, `open` continua falhando no teste do P3.
 
 **Evidência:** —
 
@@ -367,7 +399,7 @@ Executa D1 · executor: sessão no `brza-workflow`
 
 Estimado: 4 h · Executado: — h
 
-Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter o commit. Primeiro corte da janela. Sem chave, não começa.
+Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter o commit. Primeiro corte da janela. Sem `BRZA_CURSOR_API_KEY`, não começa. O filho usa o mesmo wrapper do P7.
 
 - [ ] **1.** `list` de outra run, `read` do transcript e `usage` com origem `api`, cada um com teste que falha antes.
 - [ ] **2.** Campo sem dado na resposta continua `ausente`.
@@ -389,12 +421,8 @@ Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter 
 
 ## Worklogs
 
-- 2026-11-14 — abertura: branch, inventário, probe do `agent`, ADR-003 e este plano. A Rodada 2 ficou sem resposta. Nenhum passo executado.
+- 2026-11-14 — abertura: branch, inventário, probe do `agent` e este plano. A Rodada 2 ficou sem resposta. R3.1 tirou a ADR-003 do repo. R3.2 fixou `BRZA_CURSOR_API_KEY`. Nenhum passo executado.
   [A abertura do PLN-026 ficou na branch do Bob](../../work/worklogs/2026-11-14-pln026-abertura.md)
-
-## Documentação
-
-- [ADR-003: Porta única `AgentRuntime` para o `brza sessions` e a `meeting-runner`](../../arquitetura/adr/ADR-003-porta-agent-runtime.md) — copiada nesta abertura, status Proposta.
 
 ## Fechamento
 

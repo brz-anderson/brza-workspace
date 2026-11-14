@@ -9,9 +9,14 @@ tags:
   - tooling
 refs:
   - issue:alocacao-de-chats-sob-host-independente-admissao-de-git-e-cache-de-modelos
+  - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
   - issue:autenticacao-mcp-no-chat-alerta-de-turnos-ativos-e-cache-de-orquestracao
+  - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
+  - issue:conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes
   - issue:cursor-no-chat-via-acp-previa-de-links-de-imagem-bifurcacao-resiliente-e-leitura-por-voz
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
+  - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
+  - issue:retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal
   - issue:seguranca-macos-remocao-de-allow-dyld-environment-variables-dos-entitlements
 ---
 
@@ -45,3 +50,33 @@ refs:
      adicionados o PR `#42253` (I/O assíncrono para leitura e gravação de conexões de servidores remotos fora da thread principal),
      o PR `#42247` (isolamento de slots de descoberta de modelos para impedir que CLIs travadas bloqueiem outros agentes) e
      o PR `#42189` (gravação assíncrona fora da thread principal para armazenamento de extensões do navegador).
+
+### 2. Ciclo de 6h (06:00 BRT / 09:00 UTC em 2026-11-14)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-14T03:00:00Z` e `2026-11-14T09:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Conectores de linhagem na sidebar, cores de grupos de projeto e isolamento de extensões em perfis](../issues/conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes.md):
+     rastreia o PR `#42312` (árvore visual com conectores de linhagem `├`, `╰` na sidebar para child workspaces aninhados),
+     PR `#42303` (suporte a cores de grupos de projeto com linhas verticais contínuas estilo thread de e-mail),
+     PR `#42324` (resolve Issue `#41906` — suspensão de background workers e alarmes de extensões em perfis de navegador inativos, eliminando churn ocioso de 2-4 GB de RAM),
+     e o PR `#42261` (manutenção do posicionamento e estabilidade do menu de contexto de abas na sidebar durante a exclusão de outra aba).
+3. **Atualização de 4 issues existentes em `work/issues/`:**
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionados o PR `#42338` (resolve Issue `#42103` — restauração do objeto `run` com `coordinator_handle` na saída concisa `--json` de `run-show`, `run-current` e `run-use`),
+     o PR `#42264` (resolve Issue `#19166` — liberação resiliente em `worker-release` mesmo quando o terminal PTY do worker já tiver encerrado ou sido fechado),
+     e o PR `#42284` (resolve Issue `#42230` — exposição de `creatorOrcaSessionId` e `assigneeOrcaSessionId` no JSON de workers).
+   - [Cartões de Pull Request, feedback de Steer e atalhos no Native Chat](../issues/cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat.md):
+     adicionados o PR `#42335` (preservação visível da resposta do assistente anterior a uma mensagem de steer em turnos concluídos e colapsados),
+     o PR `#42278` (exibição de modelo e nível de esforço de raciocínio no tooltip do botão de modelo no composer),
+     e o PR `#42271` (comando `/review` nativo do Codex com seletor de 4 escopos de revisão e instruções personalizadas).
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionados o PR `#42323` (resolve Issue `#42116` — hook `PreToolUse` emitindo `decision: allow` em vez de `ask` para ferramentas auto-aprovadas ou com política `always-proceed`),
+     e o PR `#42282` (resolve Issue `#42280` — derivação de opções de esforço de raciocínio para modelos agrupados a partir de `availableModels` no cliente ACP).
+   - [Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal](../issues/retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal.md):
+     adicionado o PR `#42290` (resolve Issue `#42289` — retenção do bookmark de retomada de agentes restaurados em falhas prematuras de boot, impedindo conversão espúria da aba em shell plano).
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados o PR `#42305` (resolve Issue `#42099` — faixa horizontal de subagentes ativos no mobile para chats em terminal),
+     o PR `#42307` (preservação estável de perguntas pendentes em reinicializações do app sem disparos duplicados de modelo),
+     e o PR `#42287` (resolve Issue `#42286` — correspondência exata de versão pontual do modelo Claude no banner).

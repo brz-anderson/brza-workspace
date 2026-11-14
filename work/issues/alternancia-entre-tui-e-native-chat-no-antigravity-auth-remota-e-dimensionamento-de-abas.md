@@ -15,7 +15,9 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40986`](https://github.com/stablyai/orca/pull/40986) (resolve Issue [`#40984`](https://github.com/stablyai/orca/issues/40984)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42323`](https://github.com/stablyai/orca/pull/42323) (resolve Issue [`#42116`](https://github.com/stablyai/orca/issues/42116)),
+[`stablyai/orca#42282`](https://github.com/stablyai/orca/pull/42282) (resolve Issue [`#42280`](https://github.com/stablyai/orca/issues/42280)),
+[`stablyai/orca#40986`](https://github.com/stablyai/orca/pull/40986) (resolve Issue [`#40984`](https://github.com/stablyai/orca/issues/40984)),
 [`stablyai/orca#40980`](https://github.com/stablyai/orca/pull/40980) (resolve Issue [`#40979`](https://github.com/stablyai/orca/issues/40979)),
 [`stablyai/orca#40867`](https://github.com/stablyai/orca/pull/40867) (resolve Issue [`#40865`](https://github.com/stablyai/orca/issues/40865)),
 [`stablyai/orca#40912`](https://github.com/stablyai/orca/pull/40912),
@@ -67,6 +69,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40986`](https://github.com
 11. **Bloqueio de envio e seleção no primeiro chat de um novo worktree (`#40912`):**
     O primeiro chat aberto em um novo worktree travava o composer e a escolha de modelos enquanto o runtime do agente inicializava,
     forçando o desenvolvedor a aguardar o término do bootstrap para redigir o primeiro prompt.
+12. **Bloqueio indevido de ferramentas em modo sempre permitido pelo hook `PreToolUse` (`#42323`, resolve `#42116`):**
+    O hook de permissão de ferramentas pré-execução (`PreToolUse`) emitia por padrão a resposta `ask` em vez de `decision: allow`, interceptando indevidamente ferramentas já configuradas com flag `always-proceed` ou auto-aprovadas.
+13. **Ausência de opções de esforço de raciocínio para modelos agrupados no ACP (`#42282`, resolve `#42280`):**
+    O client ACP não derivava corretamente a lista de opções de raciocínio (*reasoning effort*) a partir do nó `availableModels`, fazendo com que modelos com capacidades graduadas de raciocínio ficassem travados na configuração padrão.
 
 ## O que o upstream implementa e corrige
 
@@ -106,15 +112,21 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40986`](https://github.com
   - Consulta dinamicamente a CLI host `agy` para alimentar o picker de criação de novo chat com todos os modelos disponíveis.
 - **Composer e seletor desbloqueados no primeiro chat de novos worktrees (`#40912`):**
   - Permite digitar, enviar mensagens e selecionar modelos imediatamente no primeiro chat de um worktree, enfileirando o prompt até o término da inicialização do runtime.
+- **Hook `PreToolUse` emitindo `decision: allow` para ferramentas auto-aprovadas (`#42323`, resolve `#42116`):**
+  - Corrige a resposta do hook de autorização prévia de ferramentas para retornar `decision: allow` em vez de `ask` quando a ferramenta estiver configurada com política permissiva ou `always-proceed`, impedindo diálogos de aprovação bloqueantes desnecessários.
+- **Derivação de opções de esforço de raciocínio a partir de `availableModels` no ACP (`#42282`, resolve `#42280`):**
+  - Extrai dinamicamente as opções suportadas de reasoning effort para modelos agrupados a partir dos metadados de `availableModels` do servidor ACP, habilitando a graduação de raciocínio na UI do chat.
 
 ## O que fazer no BrzA Studio
 
 1. Habilitar a alternância entre TUI e Native Chat para o Antigravity (`#40201`), permitindo alternar via `⌘⇧J` entre a interface de linha de comando e o chat estruturado sem perder o processo ativo.
-2. Adotar a descoberta de skills do Antigravity no menu slash (`/`) do Native Chat (`#40986`).
-3. Implementar a injeção de regras `AGENTS.md` e `GEMINI.md` via `_meta.antigravity.systemPrompt.append` nas sessões ACP (`#40867`).
-4. Habilitar a descoberta dinâmica de modelos da CLI `agy` (`#40980`) e o composer desbloqueado no primeiro chat de novos worktrees (`#40912`).
-5. Adotar o `AgentSignInCard` com túnel de callback de autenticação (`#40228`) para inicialização de Claude e Codex em servidores remotos e SSH sem atrito.
-6. Incorporar os controles de dimensionamento de abas (`tabSizing`, `tabSizingMinWidth`, `tabSizingMaxWidth`) em `Settings → General → Navigation` (`#40229`).
-7. Incluir o fluxo guiado de instalação de agentes a partir do chat (`#40208`).
-8. Sincronizar os seletores de modelo de configurações e criação de workspace com o catálogo dinâmico da conta do host (`#40175`).
-9. Incorporar as otimizações de memória para sessões com muitos subagentes (`#40171`) e a reconciliação de tarefas pendentes via transcript (`#40183`).
+2. Emitir `decision: allow` no hook `PreToolUse` para ferramentas auto-aprovadas (`#42323`, resolve `#42116`).
+3. Derivar opções de esforço de raciocínio dinamicamente a partir de `availableModels` no cliente ACP (`#42282`, resolve `#42280`).
+4. Adotar a descoberta de skills do Antigravity no menu slash (`/`) do Native Chat (`#40986`).
+5. Implementar a injeção de regras `AGENTS.md` e `GEMINI.md` via `_meta.antigravity.systemPrompt.append` nas sessões ACP (`#40867`).
+6. Habilitar a descoberta dinâmica de modelos da CLI `agy` (`#40980`) e o composer desbloqueado no primeiro chat de novos worktrees (`#40912`).
+7. Adotar o `AgentSignInCard` com túnel de callback de autenticação (`#40228`) para inicialização de Claude e Codex em servidores remotos e SSH sem atrito.
+8. Incorporar os controles de dimensionamento de abas (`tabSizing`, `tabSizingMinWidth`, `tabSizingMaxWidth`) em `Settings → General → Navigation` (`#40229`).
+9. Incluir o fluxo guiado de instalação de agentes a partir do chat (`#40208`).
+10. Sincronizar os seletores de modelo de configurações e criação de workspace com o catálogo dinâmico da conta do host (`#40175`).
+11. Incorporar as otimizações de memória para sessões com muitos subagentes (`#40171`) e a reconciliação de tarefas pendentes via transcript (`#40183`).

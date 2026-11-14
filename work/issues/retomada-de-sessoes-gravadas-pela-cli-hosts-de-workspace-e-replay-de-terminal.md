@@ -14,7 +14,8 @@ tags:
 
 # Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41980`](https://github.com/stablyai/orca/pull/41980),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42290`](https://github.com/stablyai/orca/pull/42290) (resolve Issue [`#42289`](https://github.com/stablyai/orca/issues/42289)),
+[`stablyai/orca#41980`](https://github.com/stablyai/orca/pull/41980),
 [`stablyai/orca#41206`](https://github.com/stablyai/orca/pull/41206) (resolve Issue [`#41204`](https://github.com/stablyai/orca/issues/41204)),
 [`stablyai/orca#41183`](https://github.com/stablyai/orca/pull/41183),
 [`stablyai/orca#41248`](https://github.com/stablyai/orca/pull/41248),
@@ -47,6 +48,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41980`](https://github.com
    - Ao reiniciar o Orca ou reabrir abas de terminal suspensas, históricos longos (ex.: 5.000 linhas) encolhiam drasticamente
      para ~1.000 linhas se o comando redesenhasse a última linha ou caso o buffer em memória sofresse overflow;
    - Leituras de tela podiam substituir o log salvo por cópias truncadas em tempo de execução, perdendo o histórico intermediário.
+7. **Perda do bookmark de retomada de agentes quando o processo falha na inicialização (`#42290`, resolve `#42289`):**
+   - Quando um agente restaurado encontrava erro ou falhava imediatamente no arranque do processo, o sistema descartava o registro de retomada (*resume bookmark*) e convertia a aba em um shell comum desvinculado, impedindo novas tentativas de restauração.
 
 ## O que o upstream propõe e implementa
 
@@ -68,9 +71,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41980`](https://github.com
 6. **Preservação durável do histórico de terminal pelo processo em background (`#41980`):**
    - Transfere para o processo gerenciador do terminal a responsabilidade exclusiva de gravar a saída em ordem sem reescritas truncadas;
    - Salva o histórico retido antes de rotacionar logs de saída e valida a leitura durável no disco antes de suspender comandos em ciclos de Sleep/Wake.
+7. **Retenção do bookmark de retomada em falhas de boot de agentes (`#42290`, resolve `#42289`):**
+   - Mantém o bookmark de retomada e o registro do agente intactos na aba mesmo se o processo morrer durante a inicialização, permitindo reexecutar a retomada sem converter o painel em shell comum.
 
 ## O que fazer
 
+- Reter o bookmark de retomada de agentes em falhas prematuras de inicialização (`#42290`, resolve `#42289`).
 - Preservar o histórico completo de terminais através do processo de background em reconexões e suspensões (`#41980`).
 - Incorporar a descoberta e reativação in-place de sessões gravadas de agentes (`orca agent sessions` e `orca agent resume`)
   para eliminar a proliferação de abas em automações contínuas (`#41206`).

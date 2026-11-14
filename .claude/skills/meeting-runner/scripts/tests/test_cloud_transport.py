@@ -48,6 +48,8 @@ if applies and behavior == "timeout":
     time.sleep(30)
 if "--resume" in argv:
     session = argv[argv.index("--resume") + 1]
+    if os.environ.get("BRZA_FAKE_MISMATCH") == "1":
+        session = session + "-other"
     result = "Posição: manter o grok-4.7-low nesta smoke."
     duration = 55
 else:
@@ -157,9 +159,11 @@ class CloudTransportTest(unittest.TestCase):
         self.assertEqual(cloud_transport.round_marker(1), "<!-- fim-rodada-1 -->")
 
     def test_cloud_runtime_is_imported_from_the_workflow_checkout(self):
-        module = cloud_transport.load_cloud_runtime(cloud_transport.workflow_checkout(self.env()))
-        self.assertTrue(str(module.__file__).endswith("packages/client/bin/cloud_runtime.py"))
-        self.assertIn("brza-workflow", str(module.__file__))
+        checkout = cloud_transport.workflow_checkout(self.env())
+        module = cloud_transport.load_cloud_runtime(checkout)
+        self.assertEqual(
+            Path(module.__file__).resolve(),
+            (Path(checkout) / "packages" / "client" / "bin" / "cloud_runtime.py").resolve())
         skill_copy = Path(cloud_transport.__file__).with_name("cloud_runtime.py")
         self.assertFalse(skill_copy.exists())
 
@@ -198,6 +202,13 @@ class CloudTransportTest(unittest.TestCase):
             text)
         self.assertIn("`sess-0`", text)
         self.assertIn("`sess-1`", text)
+        def turn_id(nome, turn):
+            row = next(line for line in lines if line.startswith(f"| {nome} | {turn} |"))
+            return row.split("`")[1]
+
+        for nome in ("Arquiteto", "Revisor"):
+            self.assertEqual(turn_id(nome, "open"), turn_id(nome, "send"))
+        self.assertNotEqual(turn_id("Arquiteto", "open"), turn_id("Revisor", "open"))
         self.assertIn("ausente", text)
         self.assertIn("Posição: manter o grok-4.7-low nesta smoke.", text)
         self.assertIn("Posição: manter o grok-4.7-low nesta smoke.", reviewer_send[-1])
@@ -408,6 +419,148 @@ class CloudTransportTest(unittest.TestCase):
         self.assertNotEqual(rc, 0)
         self.assertIn("open", err.getvalue())
         self.assertFalse(self.capture.exists())
+
+    def _restore_modules(self, saved):
+        for name, module in saved.items():
+            if module is None:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = module
+
+    def test_port_without_open_fails_before_the_agent(self):
+        root = self.tmp / "wf-port"
+        bindir = root / "packages" / "client" / "bin"
+        bindir.mkdir(parents=True)
+        (root / "bin").mkdir()
+        (root / "bin" / "brza_runtime.py").write_text(
+            "class BrzaError(Exception):\n    pass\n", encoding="utf-8")
+        (bindir / "agent_runtime.py").write_text(
+            "CAPABILITIES = ('list', 'read', 'usage', 'send')\n", encoding="utf-8")
+        (bindir / "cloud_runtime.py").write_text(
+            "import os\n"
+            "from pathlib import Path\n"
+            "class CloudRuntime:\n"
+            "    def __init__(self, env=None, log_path=None, timeout_s=180, keep_home=False):\n"
+            "        pass\n"
+            "    def capabilities(self):\n"
+            "        return ('open', 'send')\n"
+            "    def open(self, spec):\n"
+            "        Path(os.environ['BRZA_FAKE_CAPTURE']).write_text('called\\n', encoding='utf-8')\n"
+            "        raise AssertionError('open')\n"
+            "    def close(self):\n"
+            "        pass\n",
+            encoding="utf-8")
+        saved = {name: sys.modules.get(name) for name in ("agent_runtime", "brza_runtime", "cloud_runtime")}
+        err = io.StringIO()
+        try:
+            with contextlib.redirect_stderr(err):
+                rc = cloud_transport.run_round(
+                    self.reuniao, self.reuniao["personas"], str(self.tmp), 1,
+                    env=self.env(BRZA_WORKFLOW_DIR=str(root)), log_path=str(self.log), timeout_s=5)
+        finally:
+            self._restore_modules(saved)
+        self.assertNotEqual(rc, 0)
+        message = err.getvalue()
+        self.assertIn("open", message)
+        self.assertIn("porta", message)
+        self.assertFalse(self.capture.exists())
+        self.assertFalse(self.ata.exists())
+
+    def test_send_session_id_must_match_the_open(self):
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            rc = cloud_transport.run_round(
+                self.reuniao, self.reuniao["personas"], str(self.tmp), 1,
+                env=self.env(BRZA_FAKE_MISMATCH="1"), log_path=str(self.log), timeout_s=5,
+                out=lambda _line: None)
+        self.assertNotEqual(rc, 0)
+        text = self.ata.read_text()
+        self.assertNotIn("<!-- fim-rodada-", text)
+        stderr = err.getvalue()
+        self.assertIn("Arquiteto", stderr)
+        self.assertIn("session_id", stderr)
+        self.assertEqual(len(self.calls()), 2)
+
+    def _git(self, repo, *args):
+        subprocess.run(
+            ["git", "-C", str(repo), "-c", "user.name=Bob The Builder",
+             "-c", "user.email=bob@brza.dev", *args],
+            check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    def _stub_sources(self):
+        runtime = (
+            "class Turn:\n"
+            "    def __init__(self, session_id, result):\n"
+            "        self.session_id = session_id\n"
+            "        self.duration_ms = 1\n"
+            "        self.result = result\n"
+            "        self.usage = {}\n"
+            "        self.measurement = {}\n"
+            "class CloudRuntime:\n"
+            "    def __init__(self, env=None, log_path=None, timeout_s=180, keep_home=False):\n"
+            "        self.n = 0\n"
+            "    def capabilities(self):\n"
+            "        return ('open', 'send')\n"
+            "    def open(self, spec):\n"
+            "        self.n += 1\n"
+            "        return Turn(f'stub-{self.n}', 'pronto')\n"
+            "    def send(self, session_id, prompt):\n"
+            "        return Turn(session_id, 'Posição: manter')\n"
+            "    def close(self):\n"
+            "        return None\n"
+        )
+        return {
+            "bin/brza_runtime.py": "class BrzaError(Exception):\n    pass\n",
+            "packages/client/bin/agent_runtime.py": "CAPABILITIES = ('list', 'read', 'usage', 'open', 'send')\n",
+            "packages/client/bin/cloud_runtime.py": runtime,
+        }
+
+    def _commit_stub(self, repo, names):
+        sources = self._stub_sources()
+        for name in names:
+            path = repo / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(sources[name], encoding="utf-8")
+        self._git(repo, "add", ".")
+        self._git(repo, "commit", "-m", "stub")
+
+    def test_sha_is_recorded_only_when_the_module_is_absent_from_origin_master(self):
+        cases = (("on", True), ("off", False))
+        for label, on_master in cases:
+            with self.subTest(on_master=on_master):
+                self.capture.unlink(missing_ok=True)
+                self.ata.unlink(missing_ok=True)
+                repo = self.tmp / f"wf-sha-{label}"
+                repo.mkdir()
+                self._git(repo, "init")
+                base = ("bin/brza_runtime.py", "packages/client/bin/agent_runtime.py")
+                self._commit_stub(repo, base)
+                self._git(repo, "update-ref", "refs/remotes/origin/master", "HEAD")
+                if not on_master:
+                    self._commit_stub(repo, base + ("packages/client/bin/cloud_runtime.py",))
+                else:
+                    self._commit_stub(repo, ("packages/client/bin/cloud_runtime.py",))
+                    self._git(repo, "update-ref", "refs/remotes/origin/master", "HEAD")
+                saved = {name: sys.modules.get(name) for name in ("agent_runtime", "brza_runtime", "cloud_runtime")}
+                err = io.StringIO()
+                try:
+                    with contextlib.redirect_stderr(err):
+                        rc = cloud_transport.run_round(
+                            self.reuniao, self.reuniao["personas"], str(self.tmp), 1,
+                            env=self.env(BRZA_WORKFLOW_DIR=str(repo)),
+                            log_path=str(self.log), timeout_s=5, out=lambda _line: None)
+                finally:
+                    self._restore_modules(saved)
+                self.assertEqual(rc, 0, err.getvalue())
+                text = self.ata.read_text()
+                sha = subprocess.check_output(
+                    ["git", "-C", str(repo), "rev-parse", "HEAD"], text=True).strip()
+                if on_master:
+                    self.assertNotIn("CloudRuntime:", text)
+                    self.assertNotIn(sha, text)
+                else:
+                    self.assertIn(f"CloudRuntime: `{sha}`", text)
+                self.assertFalse(self.capture.exists())
 
 
 if __name__ == "__main__":

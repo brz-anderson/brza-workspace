@@ -265,7 +265,7 @@ A sessão que Anderson pedir abre um worktree só de leitura de `origin/workstre
 
 ## Passos
 
-### P1 — Listar a run da cloud sem o socket
+### P1 — Listar a run da cloud sem o socket — em PR
 
 Executa D1 · executor: sessão no `brza-workflow`
 
@@ -278,9 +278,9 @@ Repo: `brza-workflow`, PR para a `master`. Risco ao Studio: nenhum, se o caminho
 - [ ] **3.** O mesmo teste mostra que o JSON de abas não foi escrito e que o ambiente não ganhou `ORCA_*`.
 - [ ] **4.** Commit no `brza-workflow`.
 
-**Evidência:** —
+**Evidência:** em PR, [brza-workflow#3](https://github.com/brz-anderson/brza-workflow/pull/3), commit `2dc77ac`. O teste `CloudPortTest.test_list_json_without_the_socket_returns_the_cloud_run_and_writes_nothing` passa. As caixas seguem abertas até o merge.
 
-### P2 — O dry-run que imprime `abriria`
+### P2 — O dry-run que imprime `abriria` — em PR
 
 Executa D2 · executor: sessão no `brza-workflow`
 
@@ -292,9 +292,9 @@ Repo: `brza-workflow`, no mesmo PR do P1. Risco ao Studio: a recusa de `--agent 
 - [ ] **2.** Implementar o verbo em cima do argv do D1, sem executar.
 - [ ] **3.** Rodar o teste.
 
-**Evidência:** —
+**Evidência:** em PR, [brza-workflow#3](https://github.com/brz-anderson/brza-workflow/pull/3), commit `2dc77ac`. O teste `CloudPortTest.test_diag_cloud_dry_run_prints_abriria_and_does_not_start_a_worker` passa. As caixas seguem abertas até o merge.
 
-### P3 — Capacidade ausente falha nomeando runtime e capacidade
+### P3 — Capacidade ausente falha nomeando runtime e capacidade — em PR
 
 Executa D1 · executor: sessão no `brza-workflow`
 
@@ -306,9 +306,9 @@ Repo: `brza-workflow`, no mesmo PR. Risco ao Studio: nenhum no caminho studio. D
 - [ ] **2.** `usage`, `open` e `send`, enquanto não forem declarados, saem diferentes de 0 e a mensagem contém `cloud` e o nome da capacidade.
 - [ ] **3.** Rodar o teste.
 
-**Evidência:** —
+**Evidência:** em PR, [brza-workflow#3](https://github.com/brz-anderson/brza-workflow/pull/3), commit `2dc77ac`. `read` sai 0 com `transcript: ausente`. `usage`, `open` e `send` saem 1 e a mensagem nomeia `cloud` e a capacidade. As caixas seguem abertas até o merge.
 
-### P4 — `StudioRuntime` e a suíte de contrato
+### P4 — `StudioRuntime` e a suíte de contrato — em PR
 
 Executa D1 · executor: sessão no `brza-workflow`
 
@@ -320,9 +320,9 @@ Repo: `brza-workflow`, no mesmo PR. Risco ao Studio: o comportamento no Mac pode
 - [ ] **2.** A suíte de contrato roda contra os dois adaptadores.
 - [ ] **3.** `tests/cli/test_brza_sessions.py` passa, inclusive a recusa de `--agent cursor` quando o runtime é o studio.
 
-**Evidência:** —
+**Evidência:** em PR, [brza-workflow#3](https://github.com/brz-anderson/brza-workflow/pull/3), commit `2dc77ac`. A suíte de contrato passa nos dois adaptadores. A expectativa de `test_unknown_agent_is_refused_before_any_side_effect` não foi editada. As caixas seguem abertas até o merge.
 
-### P5 — `brza doctor --env` sai 0
+### P5 — `brza doctor --env` sai 0 — em PR
 
 Executa D2 · executor: sessão no `brza-workflow`
 
@@ -334,9 +334,9 @@ Repo: `brza-workflow`, no mesmo PR. Risco ao Studio: `brza doctor` sem a flag pe
 - [ ] **2.** Implementar `--env` sem mudar o rc do doctor sem flag.
 - [ ] **3.** Neste pod, `brza doctor --env` sai 0.
 
-**Evidência:** —
+**Evidência:** em PR, [brza-workflow#3](https://github.com/brz-anderson/brza-workflow/pull/3), commit `903bf7d`. No pod, `brza doctor --env` saiu 0. Socket ausente só deixa de ser erro com `CURSOR_CONVERSATION_ID`. Sem a variável, o teste `DoctorTest.test_env_without_cloud_and_without_socket_is_an_error` exige `ERRO`. As caixas seguem abertas até o merge.
 
-### P6 — Custo e tokens ausentes no `--by-execution`
+### P6 — Custo e tokens ausentes no `--by-execution` — em PR
 
 Executa D3 · executor: sessão no `brza-workflow`
 
@@ -348,7 +348,7 @@ Repo: `brza-workflow`, no mesmo PR ou num PR empilhado se o P3 do PLN-025 já es
 - [ ] **2.** Implementar no agregador que o PLN-025/D1 já descreve.
 - [ ] **3.** O teste passa e a saída da execução sem chave não contém `0` nesses dois campos.
 
-**Evidência:** —
+**Evidência:** em PR, [brza-workflow#3](https://github.com/brz-anderson/brza-workflow/pull/3), commit `e1dd29f`. `ByExecutionTest` passa. No pod, a linha da run é `custo=ausente (ausente)  tokens=ausente (ausente)`. As caixas seguem abertas até o merge.
 
 ### P7 — Provar o `open` e só então declará-lo
 
@@ -429,6 +429,8 @@ Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter 
   [O P8 do PLN-026 roda a reunião smoke na cloud](../../work/worklogs/2026-11-14-pln026-p8.md)
 - 2026-11-14 — ata da reunião smoke do P8, marcada SMOKE.
   [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md)
+- 2026-11-14 — P1 a P6 em PR, sem merge. As caixas seguem abertas.
+  [O PR A do PLN-026 levou o degrau 1](../../work/worklogs/2026-11-14-pln026-pr-a.md)
 
 ## Fechamento
 

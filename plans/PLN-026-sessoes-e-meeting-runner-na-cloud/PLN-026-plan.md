@@ -1,9 +1,9 @@
 ---
-status: open
-phase: design
+status: in_progress
+phase: execution
 origin: request
 description: O brza sessions e a meeting-runner funcionam na cloud pela porta AgentRuntime, com reunião real e ata.
-ready: "não — falta BRZA_CURSOR_API_KEY para provar o open e para a reunião; a Rodada 2 não foi respondida"
+ready: "P7 provado no pod; o PR A (P1–P6) ainda não está no origin; o P8 espera a Rodada 2"
 estimate_h: 28
 executed_h: 0
 remaining_h: 28
@@ -20,7 +20,7 @@ tags:
 
 # PLN-026: brza sessions e meeting-runner funcionam na cloud
 
-- **Retomar:** Aberto em 2026-11-14 na branch `builder/bob-the-builder`, sem linha no índice (o `brza note plan-open` recusou `builder/*`). A ADR-003 saiu do repo (R3.1). O próximo ato é a Rodada 2. O P1 pode começar quando Anderson pedir; o P7 e o P8 esperam `BRZA_CURSOR_API_KEY` e a Rodada 2.
+- **Retomar:** O P7 fechou em 2026-11-14 no `a066d3932d2f0bbd70886bcd1c28531ed9fdc43f`, PR https://github.com/brz-anderson/brza-workflow/pull/2, branch `builder/pln-026-pr-b` nascida da master porque `builder/pln-026-pr-a` não está no origin. O próximo ato de código é o rebase quando o PR A existir. O P8 não começa nesta sessão: espera a R2.2. P9 e P10 ficam de fora. As horas do frontmatter continuam 0 e 28 (X5).
 
 ## Pedido
 
@@ -73,7 +73,7 @@ tags:
 ## Pré-requisitos
 
 - **`CURSOR_CONVERSATION_ID` definida, com prefixo `bc-`.** Conferido neste pod em 2026-11-14 (comprimento 39). Sem ela, o degrau 1 não tem run para listar e o P1 para.
-- **`BRZA_CURSOR_API_KEY` ausente neste pod.** O P1, o P2 e o P5 não precisam dela. O P7 e o P8 param e o `open` não é declarado. A chave entra como segredo com esse nome (R3.2). O wrapper copia para `CURSOR_API_KEY` só no processo filho. Não vai em `--api-key`, no `env.sh` nem no repo.
+- **`BRZA_CURSOR_API_KEY` presente no pod da prova do P7** (comprimento 102; o valor não foi gravado). O P1, o P2 e o P5 não precisam dela. Sem a chave ou sem o binário `agent`, o `open` não é declarado. A chave entra como segredo com esse nome (R3.2). O wrapper copia para `CURSOR_API_KEY` só no processo filho. Não vai em `--api-key`, no `env.sh` nem no repo.
 - **O binário `agent` 2026.11.13-eacade1 está neste pod**, em `~/.local/bin/agent` (o `cursor-agent` é o mesmo arquivo). `agent --help` sai 0 e lista `-p`, `--output-format`, `--model`, `--workspace`, `--trust`, `--resume` e `--force`. `agent status` sai 0 com "Not logged in". `agent models` sai 1 pedindo autenticação. Um pod novo não herda o binário: a instalação é `curl https://cursor.com/install -fsS | bash`.
 - **A skill `meeting-runner` não está nesta branch.** Está em `origin/workstream/playground` no SHA `03c9579d56fb2304a48821e2c6978e0514cd7df3`, em `.claude/skills/meeting-runner/`. O P8 roda esses scripts a partir de um worktree só de leitura dessa ref, sem merge na master e sem copiar a skill para cá.
 
@@ -360,11 +360,11 @@ Repo: `brza-workflow`, PR separado, depois da prova. Risco ao Studio: nenhum enq
 
 **Decisão da sala (R3.2, 2026-11-14).** A chave entra como segredo `BRZA_CURSOR_API_KEY`. Nomes `CURSOR_*` podem ser recusados em agentes da cloud. O wrapper do participante faz `CURSOR_API_KEY="$BRZA_CURSOR_API_KEY"` só no ambiente do processo filho. A chave nunca vai em `--api-key`, no `env.sh` (que só aceita `GIT_*`) nem no repo.
 
-- [ ] **1.** Com `BRZA_CURSOR_API_KEY` no segredo, o filho recebe `CURSOR_API_KEY` e `agent create-chat` devolve um id. O processo pai não fica com `CURSOR_API_KEY`. O argv não contém `--api-key`.
-- [ ] **2.** O comando do D1, com esse id, sai 0 e imprime JSON. Sem `--force`. Revisor leva `--mode ask`.
-- [ ] **3.** O contrato passa a exigir `open` no `CloudRuntime`. Até este commit, `open` continua falhando no teste do P3.
+- [x] **1.** Com `BRZA_CURSOR_API_KEY` no segredo, o filho recebe `CURSOR_API_KEY` e o primeiro turno devolve um id. O processo pai não fica com `CURSOR_API_KEY`. O argv não contém `--api-key`. O id é o `session_id` do JSON do `agent -p` (X1).
+- [x] **2.** O comando do D1, com esse id no `--resume`, sai 0 e imprime JSON. Sem `--force`. Revisor leva `--mode ask`. O `send` repete workspace, modelo e modo (X3).
+- [x] **3.** O contrato do módulo isolado exige `open` e `send` no `CloudRuntime` quando há chave e binário. O teste do P3 ainda não está nesta branch (X2).
 
-**Evidência:** —
+**Evidência:** `a066d3932d2f0bbd70886bcd1c28531ed9fdc43f` em `builder/pln-026-pr-b`, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2). Prova no pod, modelo `grok-4.7-low`: open rc 0, `session_id` `4225329a-7beb-4d46-b345-dacf95228db2`, result `P7-OK`, 2956 ms, tokens 13127/33/5376/0/29; send rc 0, o mesmo id, result `P7-OK`, 4222 ms, tokens 162/124/18432/0/120. Custo `ausente` nos dois. Disco sem a chave. X1–X5 no [O P7 do PLN-026 abre e retoma o turno na cloud](../../work/worklogs/2026-11-14-pln026-pr-b.md). Executado: — h (X5).
 
 ### P8 — A reunião e a ata
 
@@ -423,6 +423,8 @@ Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter 
 
 - 2026-11-14 — abertura: branch, inventário, probe do `agent` e este plano. A Rodada 2 ficou sem resposta. R3.1 tirou a ADR-003 do repo. R3.2 fixou `BRZA_CURSOR_API_KEY`. Nenhum passo executado.
   [A abertura do PLN-026 ficou na branch do Bob](../../work/worklogs/2026-11-14-pln026-abertura.md)
+- 2026-11-14 — PLN-026 P7: `open` e `send` no `CloudRuntime`, prova no pod e PR 2. O PR A não estava no origin. P8, P9 e P10 não foram tocados.
+  [O P7 do PLN-026 abre e retoma o turno na cloud](../../work/worklogs/2026-11-14-pln026-pr-b.md)
 
 ## Fechamento
 

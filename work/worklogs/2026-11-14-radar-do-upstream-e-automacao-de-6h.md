@@ -8,12 +8,14 @@ completed: 2026-11-14
 tags:
   - tooling
 refs:
+  - issue:abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao
   - issue:alocacao-de-chats-sob-host-independente-admissao-de-git-e-cache-de-modelos
   - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
   - issue:autenticacao-mcp-no-chat-alerta-de-turnos-ativos-e-cache-de-orquestracao
   - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
   - issue:conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes
   - issue:cursor-no-chat-via-acp-previa-de-links-de-imagem-bifurcacao-resiliente-e-leitura-por-voz
+  - issue:isolamento-de-artefatos-temporarios-de-chat-e-estudio-de-temas-via-cli
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
   - issue:retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal
@@ -80,3 +82,32 @@ refs:
      adicionados o PR `#42305` (resolve Issue `#42099` — faixa horizontal de subagentes ativos no mobile para chats em terminal),
      o PR `#42307` (preservação estável de perguntas pendentes em reinicializações do app sem disparos duplicados de modelo),
      e o PR `#42287` (resolve Issue `#42286` — correspondência exata de versão pontual do modelo Claude no banner).
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-14)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-14T09:00:00Z` e `2026-11-14T15:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Isolamento de artefatos temporários de chat e estúdio de temas via CLI](../issues/isolamento-de-artefatos-temporarios-de-chat-e-estudio-de-temas-via-cli.md):
+     rastreia o PR `#42410` (resolve Issue `#42404` — introdução de `ORCA_CHAT_TEMP_DIR` vs `ORCA_CHAT_SCRATCH_DIR`, ciclo de vida e comando `reclaim-chat-temp` para purga de builds descartáveis após 7 dias, e comando `storage:overview`),
+     PR `#42360` (estúdio de temas ao vivo via CLI com `orca theme` e skills para validação de contraste/conformidade e preview sem reiniciar),
+     PR `#42349` (suporte a temas definirem cor de seleção de texto no editor de código),
+     e o PR `#42347` (herança consistente do tema ativo da aplicação em janelas pop-out).
+3. **Atualização de 5 issues existentes em `work/issues/`:**
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionado o PR `#42357` (resolve Issue `#42356` — sincronização de títulos contextuais de resumo da conversa do Antigravity para abas de terminal).
+   - [Cartões de Pull Request, feedback de Steer e atalhos no Native Chat](../issues/cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat.md):
+     adicionados o PR `#42370` (marcador visual de forks com prefixo `Fork:` no título e pill / notice row `Forked from <session>`),
+     o PR `#42372` (resolve Issue `#40700` — configuração `Auto expand tools` para expandir execuções de ferramentas em tempo real preservando colapso manual),
+     o PR `#42409` (resolve Issue `#42407` — correção de <kbd>Ctrl+A</kbd> e <kbd>Ctrl+E</kbd> no composer no macOS para navegar dentro da linha criada com Shift+Enter),
+     e o PR `#42359` (polimento tipográfico do chat nativo).
+   - [Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal](../issues/retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal.md):
+     adicionados o PR `#42391` (resgate de agentes ociosos em sleep usando checkpoint live salvo para evitar degradação em shell plano),
+     o PR `#42374` (resolve Issue `#40658` — divisão direcional de terminal via CLI com `--direction up|down|left|right`),
+     e o PR `#42368` (simplificação do diálogo de fechamento de terminais em execução).
+   - [Conectores de linhagem na sidebar, cores de grupos de projeto e isolamento de extensões em perfis](../issues/conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes.md):
+     adicionado o PR `#42346` (resolve Issue `#42345` — rodapé expansível `Sleeping (N)` na sidebar para acordar workspaces adormecidos sem desativar o filtro "Hide sleeping").
+   - [Abertura de agentes no Chat UI pela CLI e superfície chat na orquestração](../issues/abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao.md):
+     adicionados o PR `#41354` (resolve Issue `#41351` — explicitação nos recibos de CLI de que lançamentos independentes não reportam automaticamente),
+     e o PR `#42309` (resolve Issue `#42308` — suporte nativo ao agente terminal `loop` com rota `/hook/loop` para status e retomada de sessão).

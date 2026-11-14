@@ -23,6 +23,8 @@ O desenho reaproveita o hook em `measure.py`, a telemetria `route`, o `brza quot
 
 O `brza-workflow` não foi editado. A branch `builder/bob-the-builder` não foi tocada.
 
+Anderson respondeu a R1 em 2026-11-14 e aceitou as quatro recomendações. A nota fica em `work/feedbacks/`. O catálogo fica em `.brza/personas.toml`, e o manifesto só aponta e sobrescreve. O relatório sugere, e ele decide em rodada. Sem hook, a nota é a fonte; o script lê o log do Claude quando existir e deixa custo e tokens vazios em Grok e no cloud. D1 a D4 passaram a decisão. P1 está feito. O plano está `ready: sim` e `phase: execution`. P2 não rodou. O `brza-workflow` continua intocado.
+
 ## O que ficou
 
-A resposta da R1. Sem ela, nenhum P roda. Os números do ciclo (3, 2 e 5) ficam para uma R2, quando houver notas.
+O P2, quando Anderson pedir. Os números do ciclo (3, 2 e 5) ficam para uma R2, quando houver notas.

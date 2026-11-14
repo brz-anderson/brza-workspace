@@ -1,9 +1,9 @@
 ---
-status: open
-phase: interview
+status: in_progress
+phase: execution
 origin: request
 description: O esboço dos Builders mede cada execução, guarda a nota de feedback e deixa a persona com modelo Grok e alternativa quando houver crédito.
-ready: "não — aguarda a resposta de Anderson à R1; nenhum passo executa antes"
+ready: sim
 estimate_h: 12.5
 executed_h: 0
 remaining_h: 12.5
@@ -22,7 +22,7 @@ tags:
 
 # PLN-025: Cada execução de Builder deixa métrica, nota e persona calibrável
 
-- **Retomar:** aberto em 2026-11-14. A R1 foi enviada e ainda não tem resposta. Nenhum passo executado. O próximo ato é a resposta de Anderson à R1.
+- **Retomar:** P1 feito em 2026-11-14. R1.1 a R1.4 decididas nas recomendações. O próximo ato é o P2, quando Anderson pedir. Nenhum outro passo executado.
 
 ## Pedido
 
@@ -58,7 +58,7 @@ tags:
 ## Pré-requisitos
 
 - **O log `.measurements/measurements.jsonl` e o `summarize_measurements.py` existem** no `brza-workflow`. Sem o log, o P3 para e o campo da execução fica só na nota.
-- **A R1 respondida.** Sem ela, `ready` continua não, e P2–P6 não começam. Resposta diferente da recomendada reescreve o `D` antes do passo.
+- **A R1 respondida em 2026-11-14**, nas quatro recomendações. P2–P6 podem começar quando Anderson pedir o passo.
 
 ## Entrevista
 
@@ -66,33 +66,44 @@ tags:
 
 **Apresentado antes:** o hook de medição já grava, num turno Claude, modelo, esforço, duração, tokens, custo estimado, chamadas de ferramenta e rodadas (`core/.claude/hooks/measure.py:487-507`). A tabela de preço só tem modelos Claude (`measure.py:56-67`); Grok sai com custo vazio. A telemetria `route` grava a decisão de modelo e esforço (`packages/mcp/brza_mcp/telemetry.py:80-91`). O `brza quota` lê janelas de uso (`accounts.py:327`). A policy já tem três papéis por runtime, e no Grok o architect é `grok-4.7` com `xhigh`, o executor com `high` e o consultant com `low` (`policy.py:36-38`). A escada do `grok-4.7` é `low`, `medium`, `high`, `xhigh` (`runtimes.py:32`). Não há diretório de eval nas skills do `brza-workflow` nem deste workspace; a prova delas hoje é o teste de ouro e o `tests/notes-checker/run.py`. O [PLN-023: O plano novo do playground mostra a pendência, o dono e quem pode executar](../PLN-023-gates-do-plano/PLN-023-plan.md) fecha o gate na tarefa (`Autorizado`, `Pendente`, `Pronto`), e o código desse gate não foi escrito. O canvas "Ambiente replicável e isolado dos Builders" (2026-11-14) lista nove passos sem a letra E. Este plano chama de E1 a E8 os oito primeiros, como no pedido, e de E9 a comparação do `doctor` entre o Mac e a cloud. As personas encostam no E3, o schema do manifesto. Esta sessão foi lançada em `grok-4.7` com esforço `high` depois de `claude-opus-5-5` com esforço `high` recusado com "Buy credits or switch to a Grok model".
 
-Aguardando Anderson. Enviada em 2026-11-14, nesta sessão.
+Respondida em 2026-11-14, nesta sessão. Anderson aceitou as quatro recomendações.
 
 1. **Onde a nota de feedback vive.** Opções:
    - gênero novo `work/feedbacks/`, uma nota por execução, sem `status`, nome `AAAA-MM-DD-<assunto>.md` (recomendada) — custo: uma seção no `work/README.md` e uma regra no `check_notes.py`, no mesmo commit do `brza-workflow`; se paga: no primeiro relatório, que filtra nota sem ler o worklog inteiro;
    - seção `## Feedback do modelo` dentro do worklog da tarefa — custo: zero gênero novo, e o checador passa a exigir as cinco seções nesse worklog; se paga: agora, se a execução e o diário forem sempre o mesmo arquivo;
    - memória `type: feedback`, que o `--by-workstream` já conta — custo: fica fora do git como nota e o checador não vê o molde; se paga: nunca, se a pergunta for a nota existir e o checker validar.
 
+   **Decidido em 2026-11-14 — a recomendada.** "A nota de feedback fica num gênero novo, `work/feedbacks/`, com uma nota por execução." O P2 grava o gênero. A seção no worklog e a memória `feedback` ficam de fora.
+
 2. **Onde o catálogo de personas vive.** Opções:
    - arquivo versionado `.brza/personas.toml` no brza-workspace, schema na norma, e o `.brza/builders/<nome>.toml` só aponta e sobrescreve (recomendada) — custo: um arquivo e o schema, ao lado do E3; se paga: quando o segundo Builder nascer, sem copiar as seis personas;
    - seção `[personas]` dentro de cada manifesto — custo: uma cópia por Builder, cobrada em toda mudança de padrão; se paga: se cada Builder tiver catálogo próprio de verdade;
    - estender `policy.roles` no `brza.toml` — custo: mistura cota e roteamento com o tipo de tarefa; se paga: se as seis personas couberem nas três camadas que já existem.
+
+   **Decidido em 2026-11-14 — a recomendada.** "O catálogo de personas fica em `.brza/personas.toml` no brza-workspace, com o schema na norma. O manifesto só aponta para o catálogo e sobrescreve o que precisar."
 
 3. **Quem aplica o ajuste de modelo e esforço.** Opções:
    - o relatório sugere e Anderson decide em rodada; o toml só muda com a frase dele (recomendada) — custo: uma rodada por ciclo; se paga: na primeira vez que um limiar dispararia sozinho e estaria errado;
    - o script grava a troca e Anderson revê depois — custo: o catálogo muda sem frase, cobrado na sessão seguinte que ler o padrão velho; se paga: se o ciclo for frequente e a rodada atrasar a correção;
    - ninguém muda até haver um número mínimo de notas, e esse número fica para a R2 — custo: o padrão espera a amostra; se paga: enquanto a única execução for esta sessão.
 
+   **Decidido em 2026-11-14 — a recomendada.** "O relatório sugere o ajuste e o Anderson decide em rodada." O toml não muda sem essa frase. Os números 3, 2 e 5 continuam hipótese, para a R2.
+
 4. **De onde a execução no Cursor cloud tira custo e tokens.** Opções:
    - a nota é a fonte quando não há hook; o script lê o log Claude quando ele existe e deixa custo e tokens vazios no Grok e no cloud (recomendada) — custo: a nota carrega modelo, esforço, recusa e resultado; se paga: nesta sessão, que não passa pelo `measure.py`;
    - esperar um hook do Cursor para medir cloud — custo: o esboço não mede estas sessões até o hook existir; se paga: se esse hook entrar no E6;
    - um jsonl novo, escrito pelo agente — custo: um segundo log ao lado de `.measurements/`; se paga: nunca, porque o resumo já lê um log só.
 
+   **Decidido em 2026-11-14 — a recomendada.** "A nota é a fonte quando não há hook. O script lê o log do Claude quando ele existir e deixa custo e tokens vazios nas sessões Grok e cloud." O script é a flag do D1. A2 fica descartada.
+
 ## Desenho
 
 ### O que este desenho assume
 
-- **Nada da R1 está decidido.** O que segue é a recomendação, para a rodada ver o artefato. Cada item aponta a pergunta. Resposta diferente reescreve o item no lugar.
+- **R1.1:** a nota é o gênero `work/feedbacks/`, uma por execução.
+- **R1.2:** o catálogo é `.brza/personas.toml` no brza-workspace, com o schema na norma. O manifesto aponta e sobrescreve.
+- **R1.3:** o relatório sugere. Anderson decide em rodada. O toml só muda com a frase dele.
+- **R1.4:** sem hook, a nota é a fonte. Com log Claude, o script lê esse log. Custo e tokens ficam vazios em Grok e no cloud.
 - **R1.6 do PLN-024, ainda não executada:** quando a branch for `builder/<nome>`, a medição gravará `builder/<nome>`. Este plano não muda o hook; o relatório lê o rótulo que o hook gravar.
 - **O E3 não foi executado.** O catálogo aponta o manifesto; não cria o toml do Bob.
 
@@ -129,18 +140,18 @@ Aguardando Anderson. Enviada em 2026-11-14, nesta sessão.
 
 ### D1 — Uma execução no resumo que já existe — `core/scripts/summarize_measurements.py` (P3)
 
-- **Origem:** R1.4, ainda aberta. A recomendação é a opção 1.
+- **Origem:** R1.4
 - **Contexto:** o pedido lista campos que o hook já tem e campos que ninguém grava (tipo da tarefa, retrabalho, correção pedida, resultado). Um segundo log dividiria o resumo.
 
 #### As alternativas
 
-##### A1 — Flag no resumo (recomendada)
+##### A1 — Flag no resumo
 
 - **Custo:** um modo a mais no arquivo que já agrega o jsonl. · **Se paga:** no primeiro `--by-execution`, que reusa o parser. · **Reabre:** se a nota e o log precisarem de um programa só deles.
 
 ##### A2 — Script novo que relê o jsonl
 
-- **Custo:** outro leitor do mesmo arquivo, cobrado em toda mudança de campo. · **Se paga:** se o resumo não puder importar a nota sem misturar tarefa e execução. · **Reabre:** a flag, se a duplicação aparecer no primeiro teste.
+**Descartada.** Anderson aceitou a recomendação em 2026-11-14: o script lê o log que já existe. Um segundo leitor cobraria a mesma mudança duas vezes.
 
 #### Como fica
 
@@ -159,20 +170,16 @@ Aguardando Anderson. Enviada em 2026-11-14, nesta sessão.
 
 Execução sem hook, como esta sessão no Cursor cloud, aparece se houver nota. Custo e tokens ficam vazios.
 
-#### Em aberto
-
-- **A1 ou A2.** A recomendação está acima. Cabe na resposta da R1, em texto, se for a A2.
-
 ### D2 — A nota de feedback — `work/feedbacks/` (P2, P6)
 
-- **Origem:** R1.1, ainda aberta. A recomendação é o gênero novo.
+- **Origem:** R1.1
 - **Contexto:** o worklog é o diário da tarefa. A memória `feedback` já conta correção e não tem molde. O checador só valida gênero que está na tabela.
 
 #### Como fica
 
 Pasta `work/feedbacks/`, gênero `feedback`, sem `status`, no mesmo grupo de `worklog` e `note`. Nome `AAAA-MM-DD-<assunto>.md`. Frontmatter com `scope`, `builder`, `task_type`, `model`, `effort`, `result` (`done`, `refused` ou `partial`) e `session` quando houver id. Cinco seções, nesta ordem: `## Pedido`, `## Escolha`, `## Erro`, `## Esforço`, `## Próxima vez`.
 
-O `check_notes.py` ganha o gênero na tabela e recusa nota sem uma dessas seções, com `result` fora dos três valores, ou com `model` e `effort` vazios. A norma e o script mudam no mesmo commit. Até a R1.1, o exemplo vive neste plano e não vira arquivo: pasta desconhecida não é gênero.
+O `check_notes.py` ganha o gênero na tabela e recusa nota sem uma dessas seções, com `result` fora dos três valores, ou com `model` e `effort` vazios. A norma e o script mudam no mesmo commit, no P2. O exemplo continua neste plano até o P6: a pasta ainda não é gênero no checador.
 
 #### Exemplo desta sessão
 
@@ -213,7 +220,7 @@ Desenho de plano no Cursor cloud, sem crédito extra, começa em `grok-4.7` com 
 
 ### D3 — O catálogo de personas — `.brza/personas.toml` (P4)
 
-- **Origem:** R1.2, ainda aberta. A recomendação é o arquivo único.
+- **Origem:** R1.2
 - **Contexto:** seis tipos de tarefa não cabem nos três papéis da policy sem perder o revisor, o medidor e o operador. O modelo padrão tem de ser Grok, porque o cloud sem crédito recusou o Opus. A alternativa fica no catálogo para o dia em que o launch passar.
 
 #### Como fica
@@ -233,13 +240,9 @@ Identificador em inglês. O esforço padrão está na escada do `grok-4.7`. A co
 
 O `operator` com crédito continua em Grok e só sobe o esforço: a tarefa é procedimento, e a família não muda.
 
-#### Em aberto
-
-- **R1.2.** As três casas do catálogo estão na entrevista. A tabela acima é o conteúdo da casa recomendada.
-
 ### D4 — O ciclo que sugere e não grava — o mesmo resumo (P5)
 
-- **Origem:** R1.3, ainda aberta. A recomendação é Anderson decidir.
+- **Origem:** R1.3
 - **Contexto:** um limiar com número, nesta amostra de uma sessão, seria chute. A forma do ciclo cabe agora; o número que dispara sozinho fica para quando houver notas.
 
 #### Como fica
@@ -252,7 +255,7 @@ O relatório roda quando Anderson pedir, e de novo a cada cinco notas novas de f
 
 #### Em aberto
 
-- **R1.3**, quem decide. **R2**, os números 3, 2 e 5, depois das primeiras notas.
+- **R2**, os números 3, 2 e 5, depois das primeiras notas. Quem decide já é a R1.3.
 
 ## Passos
 
@@ -260,7 +263,9 @@ O relatório roda quando Anderson pedir, e de novo a cada cinco notas novas de f
 
 Executa a entrevista · executor: Anderson
 
-- [ ] Responder as quatro perguntas. Resposta em texto livre volta como opção na rodada seguinte. O `D` da pergunta respondida é reescrito no lugar antes de qualquer passo de código.
+- [x] Responder as quatro perguntas. Resposta em texto livre volta como opção na rodada seguinte. O `D` da pergunta respondida é reescrito no lugar antes de qualquer passo de código.
+
+**Evidência:** Anderson, em 2026-11-14, nesta sessão: "aceitando todas as recomendações", com as quatro frases em R1.1 a R1.4.
 
 ### P2 — O gênero da nota e o checador
 
@@ -268,9 +273,9 @@ Executa D2 · executor: sessão no `brza-workflow`
 
 Estimado: 3 h · Executado: — h
 
-- [ ] Seguir a opção escolhida na R1.1. Na recomendada: `work/feedbacks/` em `core/work/README.md` e em `GENRES` / `STATELESS_GENRES` de `check_notes.py`, com as cinco seções, `model`, `effort` e `result`.
-- [ ] Norma e script no mesmo commit. Um caso em `tests/notes-checker/run.py` que falha se a seção some.
-- [ ] Desfazer: reverter o commit. A nota sem seção volta a passar, e o gênero some da tabela.
+- [ ] `work/feedbacks/` em `core/work/README.md` e em `GENRES` / `STATELESS_GENRES` de `core/.claude/skills/notes-checker/scripts/check_notes.py`, com as cinco seções, `model`, `effort` e `result`.
+- [ ] Norma e script no mesmo commit do `brza-workflow`, numa branch nova e por PR, como o PLN-024 já manda para código de lá. A branch não existe ainda: nasce quando Anderson pedir o P2. Um caso em `tests/notes-checker/run.py` que falha se a seção some.
+- [ ] Desfazer: reverter esse commit. A nota sem seção volta a passar, e o gênero some da tabela. Quem faz é a sessão no `brza-workflow`.
 
 ### P3 — O agregador da execução
 
@@ -288,7 +293,7 @@ Executa D3 · executor: sessão no `brza-workflow` para o schema, e sessão nest
 
 Estimado: 3 h · Executado: — h
 
-- [ ] O schema na norma, no commit do `core/`. O `.brza/personas.toml` neste workspace, com a tabela do D3, na casa que a R1.2 escolher.
+- [ ] O schema na norma, no commit do `core/`. O `.brza/personas.toml` neste workspace, com a tabela do D3.
 - [ ] Um teste lê o esforço de cada persona e confere com `runtimes.efforts('grok', model)`. Fora da escada, o teste falha.
 - [ ] A chave `personas` no manifesto fica citada no schema e só é gravada no toml de um Builder quando o PLN-024 ou o E3 criar esse arquivo.
 - [ ] Desfazer: reverter os dois commits. O schema deixa de citar personas.
@@ -315,11 +320,13 @@ Estimado: 0.5 h · Executado: — h
 ## Regressão
 
 - **`--by-workstream` e `--by-task` continuam com a mesma saída** para um log que já passa nos testes de `test_summarize_measurements.py`.
-- **Nota antiga continua válida.** A regra nova só olha `work/feedbacks/` ou, se a R1.1 escolher a seção, o worklog que tiver o marcador. O `tests/notes-checker/run.py` dos casos que já existem permanece verde.
+- **Nota antiga continua válida.** A regra nova só olha `work/feedbacks/`. O `tests/notes-checker/run.py` dos casos que já existem permanece verde.
 
 ## Worklogs
 
 - 2026-11-14 — R1 enviada, D1–D4 como recomendação, P1–P6 escritos e nenhum executado. Parou na resposta da R1.
+  [O PLN-025 do esboço dos Builders foi aberto](../../work/worklogs/2026-11-14-esboco-dos-builders.md)
+- 2026-11-14 — R1.1 a R1.4 decididas nas recomendações. D1–D4 fechados. P1 feito. `ready: sim`, `phase: execution`. P2 não começou.
   [O PLN-025 do esboço dos Builders foi aberto](../../work/worklogs/2026-11-14-esboco-dos-builders.md)
 
 ## Fechamento

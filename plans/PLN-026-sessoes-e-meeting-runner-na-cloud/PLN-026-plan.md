@@ -435,6 +435,8 @@ Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter 
   [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md)
 - 2026-11-14 — R1 do PR A: help, porta, tokens, chave e o gate da sentinela. As caixas seguem abertas.
   [O PR A do PLN-026 levou o degrau 1](../../work/worklogs/2026-11-14-pln026-pr-a.md)
+- 2026-11-14 — `## Decisões` aponta as 13 notas da auditoria. Desvio de autoria do `c21d290`, sem reescrever histórico.
+  [O PLN-026 aponta as treze decisões da auditoria](../../work/worklogs/2026-11-14-pln026-decisoes-backlink.md)
 
 ## Revisões
 
@@ -442,6 +444,22 @@ Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter 
 - [REV-pln026-pr-b R2: a revisão xhigh R2 do PR 2 do PLN-026](../../work/reviews/2026-11-14-REV-pln026-pr-b-r2.md) — 2026-11-14, achados 1 a 4 e os gates 2 e 3, triagem corrigir.
 - 2026-11-14 — R1 do PR A, sobre `bc89dda`. Os achados corrigidos estão na branch; o gate da chave está em `ed7d91b`. A R2 não foi feita.
   [R1 do PR A do PLN-026](../../work/reviews/2026-11-14-REV-pln026-pr-a-r1.md)
+
+## Decisões
+
+- [O que é "o equivalente" do `brza note check` na branch do Bob?](../../work/decisions/pln026-justificativa-checador-ou-o-equivalente.md) — aberta, gatilho MEET-002 às 19h30.
+- [Onde o executor lê "os critérios de aceite que estão no fim" da ADR-003, se ela não tem arquivo?](../../work/decisions/pln026-justificativa-criterios-da-adr-003-fora-do-repo.md) — aberta, gatilho MEET-002 às 19h30.
+- [Que assinatura a "interface mínima compatível com a porta" do P7 devia ter?](../../work/decisions/pln026-justificativa-interface-minima-compativel.md) — aberta, gatilho MEET-002 às 19h30.
+- [O "pode seguir com o plano até a entrega" libera os passos do PLN-026 de uma vez ou um a um?](../../work/decisions/pln026-justificativa-liberacao-ate-a-entrega.md) — aberta, gatilho MEET-002 às 19h30.
+- [O que conta como "medido, registrado, revisado e avaliado" no PLN-026?](../../work/decisions/pln026-justificativa-medido-registrado-revisado-avaliado.md) — aberta, gatilho MEET-002 às 19h30.
+- [Quais são as "normas novas" que o PR A devia rodar nas notas reais?](../../work/decisions/pln026-justificativa-normas-novas.md) — aberta, gatilho MEET-002 às 19h30.
+- [Uma reunião SMOKE conta como o entregável das 19h do PLN-026?](../../work/decisions/pln026-justificativa-o-que-conta-como-entregavel.md) — aberta, gatilho MEET-002 às 19h30.
+- ["O PR ou os PRs pra master" vale para quais repositórios?](../../work/decisions/pln026-justificativa-prs-para-a-master.md) — aberta, gatilho MEET-002 às 19h30.
+- [O Bob pode decidir uma rodada do PLN-026 sozinho?](../../work/decisions/pln026-justificativa-quem-fecha-a-rodada-2.md) — aberta, gatilho MEET-002 às 19h30.
+- [O primeiro turno do `open` leva `--resume <chatId>` ou não?](../../work/decisions/pln026-justificativa-resume-no-primeiro-turno.md) — aberta, gatilho MEET-002 às 19h30.
+- [Por que o brief do PR A deu a Rodada 2 como fechada enquanto o plano dizia "não respondida"?](../../work/decisions/pln026-justificativa-rodada-2-dada-como-fechada.md) — aberta, gatilho MEET-002 às 19h30.
+- [O que é "o código seguro" quando o plano conflita com o código?](../../work/decisions/pln026-justificativa-siga-o-codigo-seguro.md) — aberta, gatilho MEET-002 às 19h30.
+- [Por que o brief do P8 mandou copiar a meeting-runner para a branch, se o D4 pedia worktree só de leitura?](../../work/decisions/pln026-justificativa-skill-copiada-contra-o-d4.md) — aberta, gatilho MEET-002 às 19h30.
 
 ## Fechamento
 

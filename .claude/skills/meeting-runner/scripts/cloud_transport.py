@@ -413,6 +413,11 @@ def run_round(reuniao, personas, root, n, dry=False, out=print, sessions_fn=None
                 records.append(_row(persona, "open", opened))
                 sent = runtime.send(
                     opened.session_id, send_prompt(reuniao, persona, n, root, prior))
+                if sent.session_id != opened.session_id:
+                    raise CloudTransportError(
+                        f"runtime cloud: a persona {persona.get('nome') or '?'} devolveu no send "
+                        f"o session_id {sent.session_id}, diferente do open {opened.session_id}.",
+                        returncode=1)
                 records.append(_row(persona, "send", sent))
                 prior.append(f"{persona['nome']}:\n{sent.result}")
                 out(f"{persona['nome']}: {sent.session_id} · {sent.duration_ms} ms · custo {_cost(sent)}")

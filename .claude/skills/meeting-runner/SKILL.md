@@ -16,8 +16,10 @@ description: >-
 Duas reuniões de 2026-11-07 (Carvão em Brasa, MCP remoto) provaram que personas diversas destrincham os fatos e levam
 decisões mais maduras a Anderson, mas deixaram 15 de 32 itens do protocolo implícitos e custaram quatro rodadas no tema
 errado, duas personas na cota do Codex e a conta de médias errada. Esta skill fixa o fluxo e os números, para a próxima
-reunião rodar sem improviso. Estado: **v1, protótipo** — vive na branch `workstream/playground` e vai ao `core/` do
-`brza-workflow` depois de duas reuniões sem desvio de fluxo (PLN-017/R2.1). A primeira reunião pela skill (P7,
+reunião rodar sem improviso. Estado: **v1, protótipo** — a cópia nesta branch veio de `origin/workstream/playground` no SHA
+`03c9579d56fb2304a48821e2c6978e0514cd7df3` (PLN-026 P8) e vai ao `core/` do
+`brza-workflow` depois de duas reuniões sem desvio de fluxo (PLN-017/R2.1). A reunião smoke de 2026-11-14
+não conta para essa promoção. A primeira reunião pela skill (P7,
 2026-11-09) teve 19 desvios e não conta; as correções deles estão nos passos abaixo, marcadas `(X…)`.
 
 ## Quem é quem
@@ -40,6 +42,7 @@ reunião rodar sem improviso. Estado: **v1, protótipo** — vive na branch `wor
 | a rodada de decisão, o worklog da coordenação, o encerramento | `references/closing.md` |
 | o que dizer no chat, o ruído do host e o ciclo do painel | `references/narration.md` |
 | abrir as personas | `$S/launch_persona.py $R` |
+| abrir a rodada na cloud | `$S/launch_persona.py $R --transport cloud --round N` |
 | enviar a rodada N | `$S/launch_persona.py $R --send todas --round N` |
 | esperar o fim da rodada | `$S/wait_round.py N --reuniao $R [--personas …]` |
 | pedir o encerramento, conferir o aceite, forçar | `$S/launch_persona.py $R --close`, `--status --wait-settled 180`, `--stop <persona>` |
@@ -52,11 +55,17 @@ reunião rodar sem improviso. Estado: **v1, protótipo** — vive na branch `wor
 (abaixo, `$S`); a raiz padrão dos scripts é a do git, e o manifesto é `.sessions/<reuniao>/reuniao.json` (`$R`). Os
 caminhos relativos do manifesto resolvem contra essa raiz.
 
-**O transporte é o `brza sessions` v2** (PLN-017 P4a/P4b, `brza-workflow@db6bd28`): o `launch_persona.py` e o
+**O transporte padrão é o `brza sessions` v2** (PLN-017 P4a/P4b, `brza-workflow@db6bd28`): o `launch_persona.py` e o
 `wait_round.py` só traduzem o manifesto para os verbos dele (`open`, `send`, `wait`, `close`) e narram a saída. Quem abre o
 worker, anexa o protocolo da rodada, lê a mailbox do Run sem consumi-la e decide o que é fechado é o CLI. O mapa
 `.sessions/sessions.jsonl` da raiz comum do git guarda, por nome, o Dispatch, o Run, o remetente, a coordenação, o modelo
 e o id do provedor; a medição e a espera leem dele, também depois do fechamento automático.
+
+**O transporte `cloud` é opt-in** (`--transport cloud`). Sem a flag, o parágrafo acima vale inteiro. Com a flag,
+`launch_persona.py $R --transport cloud --round N` abre cada persona com `CloudRuntime.open` e manda a rodada com `send`.
+O módulo é `packages/client/cloud_runtime.py` do checkout `builder/pln-026-pr-b` do `brza-workflow`, importado pelo
+caminho do repositório, sem cópia. O `agent -p` volta síncrono e a ata recebe `<!-- fim-rodada-N -->`. Sem
+`BRZA_CURSOR_API_KEY` ou sem `agent` no PATH, a chamada falha e diz o que falta.
 
 O **manifesto** `reuniao.json` (nome, slug, papel, runtime, modelo, esforço, sessão, fallback de cada persona, mais o
 tema, a pasta da reunião e o molde do caminho dos worklogs) é a fonte única da abertura, das tabelas e do painel; o

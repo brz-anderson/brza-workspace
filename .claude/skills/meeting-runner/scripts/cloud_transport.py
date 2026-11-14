@@ -6,12 +6,11 @@ Este módulo só entra com `--transport cloud`. Cada persona abre com
 `CloudRuntime.open` e recebe a rodada com `send`. O `agent -p` volta
 síncrono. A ata da coordenação ganha o marcador `<!-- fim-rodada-N -->`.
 
-O `cloud_runtime.py` é importado do checkout do `brza-workflow` na branch
-`builder/pln-026-pr-b`, pelo caminho do repositório. Não há cópia na skill.
-O `send` repete `persona` e `workspace`: sem memória do processo, o
-`CloudRuntime` recusa o turno antes de chamar o `agent`. O home da persona
-fica em `~/.local/share/brza/cloud-runtime/<persona>` e sobrevive ao `close`;
-a chave não fica nesse diretório.
+O `cloud_runtime.py` é importado de `BRZA_WORKFLOW_DIR`, pelo caminho
+`packages/client/bin/cloud_runtime.py`. Não há cópia na skill e o texto não
+fixa branch. `open` recebe o spec e `send` recebe `session_id` e o prompt. O
+runtime nasce com `keep_home` para um send de outro processo achar o
+`persona.json`.
 """
 import importlib.util
 import json
@@ -51,25 +50,29 @@ def workspace_root():
 
 
 def workflow_checkout(env=None):
-    """O checkout do brza-workflow que tem `packages/client/cloud_runtime.py`."""
+    """O checkout do brza-workflow indicado por `BRZA_WORKFLOW_DIR`."""
     env = os.environ if env is None else env
-    candidates = []
-    if env.get("BRZA_WORKFLOW"):
-        candidates.append(env["BRZA_WORKFLOW"])
-    candidates.append(os.path.join(os.path.dirname(workspace_root()), "brza-workflow"))
-    for root in candidates:
-        if os.path.isfile(os.path.join(root, "packages", "client", "cloud_runtime.py")):
-            return root
-    raise CloudTransportError(
-        "runtime cloud: não achei packages/client/cloud_runtime.py. "
-        "Faça checkout da branch builder/pln-026-pr-b no brza-workflow "
-        "ao lado deste repositório, ou exporte BRZA_WORKFLOW com esse caminho. "
-        "O arquivo não é copiado para a skill.")
+    root = (env.get("BRZA_WORKFLOW_DIR") or "").strip()
+    if not root:
+        raise CloudTransportError(
+            "runtime cloud: defina BRZA_WORKFLOW_DIR com o caminho do checkout do "
+            "brza-workflow que contém packages/client/bin/cloud_runtime.py. "
+            "O arquivo não é copiado para a skill.")
+    if not os.path.isfile(os.path.join(root, "packages", "client", "bin", "cloud_runtime.py")):
+        raise CloudTransportError(
+            f"runtime cloud: {root} não contém packages/client/bin/cloud_runtime.py. "
+            "Aponte BRZA_WORKFLOW_DIR para o checkout do workflow.")
+    return root
 
 
 def load_cloud_runtime(checkout):
-    """Importa o módulo pelo caminho do checkout, sem copiar o arquivo."""
-    path = os.path.join(checkout, "packages", "client", "cloud_runtime.py")
+    """Importa a porta pelo caminho do checkout, sem copiar o arquivo."""
+    bin_dir = os.path.join(checkout, "packages", "client", "bin")
+    repo_bin = os.path.join(checkout, "bin")
+    for entry in (repo_bin, bin_dir):
+        if entry not in sys.path:
+            sys.path.insert(0, entry)
+    path = os.path.join(bin_dir, "cloud_runtime.py")
     spec = importlib.util.spec_from_file_location("brza_cloud_runtime", path)
     if spec is None or spec.loader is None:
         raise CloudTransportError(f"runtime cloud: não consegui importar {path}.")
@@ -85,7 +88,16 @@ def persona_mode(persona):
 
 def refuse_if_undeclared(runtime, capability):
     """Sem chave ou sem `agent`, a mensagem nomeia a capacidade e o que falta."""
-    runtime.require(capability)
+    hinted = getattr(runtime, "_require_turn", None)
+    if hinted is not None:
+        hinted(capability)
+        return
+    module = sys.modules.get(runtime.__class__.__module__)
+    require = getattr(module, "require_capability", None) if module else None
+    if require is None:
+        runtime.require(capability)
+        return
+    require(runtime, capability)
 
 
 def minutes_path(reuniao, root):
@@ -243,11 +255,12 @@ def write_minutes(path, reuniao, n, records, wall_ms):
 
 def make_runtime(env, log_path, timeout_s):
     module = load_cloud_runtime(workflow_checkout(env))
-    return module.CloudRuntime(env=env, log_path=log_path, timeout_s=timeout_s)
+    return module.CloudRuntime(env=env, log_path=log_path, timeout_s=timeout_s, keep_home=True)
 
 
 def _runtime_failure(exc):
-    return exc.__class__.__name__ in ("CapabilityError", "CloudTurnError", "CloudRuntimeError")
+    return exc.__class__.__name__ in (
+        "CapabilityError", "CloudTurnError", "CloudRuntimeError", "MissingCapability", "BrzaError")
 
 
 def run_round(reuniao, personas, root, n, dry=False, out=print, sessions_fn=None,
@@ -281,13 +294,15 @@ def run_round(reuniao, personas, root, n, dry=False, out=print, sessions_fn=None
         for persona in personas:
             mode = persona_mode(persona)
             model = persona_model(persona, reuniao)
-            opened = runtime.open(
-                persona["nome"], model, workspace, mode, open_prompt(reuniao, persona))
+            opened = runtime.open({
+                "persona": persona["nome"],
+                "model": model,
+                "workspace": workspace,
+                "mode": mode,
+                "prompt": open_prompt(reuniao, persona),
+            })
             records.append(_row(persona, "open", opened))
-            # persona e workspace vão sempre: um send sem memória não herda o bucket.
-            sent = runtime.send(
-                opened.session_id, send_prompt(reuniao, persona, n, root, prior),
-                persona=persona["nome"], model=model, workspace=workspace, mode=mode)
+            sent = runtime.send(opened.session_id, send_prompt(reuniao, persona, n, root, prior))
             records.append(_row(persona, "send", sent))
             prior.append(f"{persona['nome']}:\n{sent.result}")
             out(f"{persona['nome']}: {sent.session_id} · {sent.duration_ms} ms · custo {_cost(sent)}")

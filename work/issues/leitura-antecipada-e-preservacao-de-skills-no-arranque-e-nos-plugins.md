@@ -15,7 +15,8 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com/stablyai/orca/pull/40812),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42472`](https://github.com/stablyai/orca/pull/42472) (resolve Issue [`#42408`](https://github.com/stablyai/orca/issues/42408)),
+[`stablyai/orca#40812`](https://github.com/stablyai/orca/pull/40812),
 [`stablyai/orca#40788`](https://github.com/stablyai/orca/pull/40788) (resolve Issue [`#40785`](https://github.com/stablyai/orca/issues/40785)),
 [`stablyai/orca#40214`](https://github.com/stablyai/orca/pull/40214) (resolve Issue [`#40181`](https://github.com/stablyai/orca/issues/40181)),
 [`stablyai/orca#35220`](https://github.com/stablyai/orca/pull/35220),
@@ -56,6 +57,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com
    O hook `useNativeChatSkills` armazenava o resultado de varreduras bem-sucedidas em `paneDiscoveryCache` sem tempo de expiração
    nem invalidação ao reabrir o seletor. Quando uma nova skill era instalada ou linkada simbolicamente em `~/.agents/skills/`,
    o chat existente continuava afirmando que a ferramenta não existia até a reinicialização da janela do app.
+9. **Falso aviso "Needs attention · You edited this copy" em skills embutidas renomeadas (`#42472`, resolve `#42408`):**
+   A renomeação de skills bundled (como `orca-computer-use` vs `computer-use`) fazia o verificador de integridade comparar o nome da pasta com o catálogo antigo de lançamentos. Como o identificador divergia, o app disparava falsos alertas de "You edited this copy", ocultava atualizações limpas e não informava qual arquivo ou caminho havia supostamente sido modificado.
 
 ## O que os PRs fazem
 
@@ -74,6 +77,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com
   do plugin para carregar arquivos de agentes e skills embutidos.
 - **Issue `#41017`:** propõe limitar o snapshot em `paneDiscoveryCache` ao período em que o seletor está visível, consultando
   o runtime novamente ao reabrir o picker para detectar skills recém-instaladas sem precisar de watchers em background.
+- **PR `#42472` (resolve `#42408`):** resolve nomes canônicos e aliases de skills embutidas contra o registro de digests de lançamento, reconhece symlinks e paths canônicos e exibe o caminho exato do arquivo modificado no card de aviso caso haja edição real.
 
 ## O que fazer
 
@@ -84,3 +88,4 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40812`](https://github.com
 3. Adotar a ordenação determinística de caminhos no cálculo de identidade de pacotes de skills (`#40812`).
 4. Exibir dicas de argumentos (`argument-hint`) no seletor de comandos/skills do chat (`#40788`).
 5. Invalidar o cache do seletor de skills ao fechar ou reabrir o picker no Native Chat (`#41017`).
+6. Eliminar falsos alertas de edição em skills embutidas renomeadas através da resolução de nomes canônicos e digests de lançamento (`#42472`, resolve `#42408`).

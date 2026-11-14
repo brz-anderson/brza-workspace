@@ -13,7 +13,9 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42305`](https://github.com/stablyai/orca/pull/42305) (resolve Issue [`#42099`](https://github.com/stablyai/orca/issues/42099)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42455`](https://github.com/stablyai/orca/pull/42455),
+[`stablyai/orca#42448`](https://github.com/stablyai/orca/pull/42448),
+[`stablyai/orca#42305`](https://github.com/stablyai/orca/pull/42305) (resolve Issue [`#42099`](https://github.com/stablyai/orca/issues/42099)),
 [`stablyai/orca#42307`](https://github.com/stablyai/orca/pull/42307),
 [`stablyai/orca#42287`](https://github.com/stablyai/orca/pull/42287) (resolve Issue [`#42286`](https://github.com/stablyai/orca/issues/42286)),
 [`stablyai/orca#42254`](https://github.com/stablyai/orca/pull/42254),
@@ -99,6 +101,10 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     Perguntas pendentes de agentes interativos sofriam reinvocação ou disparavam novas requisições de modelo caso o app fosse reiniciado antes da resposta do usuário.
 17. **Divergência na identificação de versão pontual do Claude no banner (`#42287`, resolve `#42286`):**
     O banner do chat truncava versões minoritárias pontuais do Claude (ex.: Opus 5.5 caindo incorretamente para Opus 5), gerando confusão sobre a real versão do modelo em execução.
+18. **Substituição da tela inteira de chat ao inspecionar subagentes (`#42455`):**
+    Clicar em um subagente na barra ou transcrição trocava toda a conversa principal pela visualização do subagente, ocultando o contexto da conversa pai, perdendo a posição de rolagem e bloqueando o rascunho ativo no composer.
+19. **Invisibilidade de subagentes nas conversas do Pi Native Chat (`#42448`):**
+    Enquanto Claude e Codex exibiam subagentes e ferramentas delegadas de forma visual, o agente Pi não renderizava a presença de subagentes no chat nativo.
 
 ## O que o upstream implementa
 
@@ -154,9 +160,18 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
   - Restaura o estado de perguntas de escolha ou texto interativo sem disparar nova inferência ou acordar precocemente o agente antes da entrada do usuário.
 - **Correspondência exata de versão do modelo Claude no banner (`#42287`, resolve `#42286`):**
   - Ajusta a regex de parse do modelo para reconhecer com precisão versões pontuais completas (exibindo `Claude Opus 5.5` em vez de simplificar para `Opus 5`).
+- **Abertura de subagentes em painel deslizante (*slide-up sheet*) dentro do chat (`#42455`):**
+  - Em vez de substituir toda a página de conversa, clicar em um subagente abre um painel modal deslizante ocupando 80% do painel de chat, com cantos arredondados e scrim suave sobre a conversa pai;
+  - Mantém o chat principal, sua posição de rolagem e o rascunho do composer montados e intactos por baixo;
+  - Exibe cabeçalho contextual com link de retorno hierárquico, seletor de subagentes aninhados, status, tokens, tempo e botão Stop;
+  - Fecha facilmente com <kbd>Esc</kbd>, clique no scrim ou no botão fechar, retornando o foco diretamente para a linha de origem.
+- **Suporte a subagentes no Pi Native Chat (`#42448`):**
+  - Habilita a detecção e renderização visual de subagentes também em conversas estruturadas conduzidas pelo agente Pi.
 
 ## O que fazer
 
+- Abrir subagentes em sheet deslizante sobre o chat nativo preservando o contexto pai (`#42455`).
+- Renderizar subagentes no Pi Native Chat (`#42448`).
 - Exibir barra de subagentes ativos no mobile para chats de terminal (`#42305`, resolve `#42099`).
 - Preservar perguntas pendentes em reinicializações sem disparos espúrios de modelo (`#42307`).
 - Exibir versão pontual exata do modelo Claude no banner (`#42287`, resolve `#42286`).

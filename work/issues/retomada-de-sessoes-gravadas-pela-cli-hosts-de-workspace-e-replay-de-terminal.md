@@ -14,7 +14,9 @@ tags:
 
 # Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42391`](https://github.com/stablyai/orca/pull/42391),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42484`](https://github.com/stablyai/orca/pull/42484) (resolve Issue [`#42470`](https://github.com/stablyai/orca/issues/42470)),
+[`stablyai/orca#42481`](https://github.com/stablyai/orca/pull/42481),
+[`stablyai/orca#42391`](https://github.com/stablyai/orca/pull/42391),
 [`stablyai/orca#42374`](https://github.com/stablyai/orca/pull/42374) (resolve Issue [`#40658`](https://github.com/stablyai/orca/issues/40658)),
 [`stablyai/orca#42368`](https://github.com/stablyai/orca/pull/42368),
 [`stablyai/orca#42290`](https://github.com/stablyai/orca/pull/42290) (resolve Issue [`#42289`](https://github.com/stablyai/orca/issues/42289)),
@@ -59,6 +61,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42391`](https://github.com
    - O comando `orca terminal split` suportava apenas divisões implícitas à direita ou abaixo, sem permitir posicionar painéis de monitoramento ou status acima ou à esquerda do terminal de trabalho sem arrastar manualmente com o mouse.
 10. **Avisos verbosos e redundantes no diálogo de fechamento de terminais em execução (`#42368`):**
     - O diálogo de confirmação continha parágrafos explicativos de cancelamento de sleep e duplicação do título da aba, tornando a confirmação lenta e poluída visualmente.
+11. **Falha espúria em sondas SSH por encerramento de conexão antes do handshake (`#42484`, resolve `#42470`):**
+    - Sondas de conectividade SSH com servidores remotos e hosts de workspace falhavam intermitentemente quando o `ProxyCommand` encerrava o túnel precocemente (`Connection closed by UNKNOWN port 65535`), sem tentativas automáticas de repetição (*retries*).
+12. **Falta de granularidade no log de encerramento de terminais pelo daemon (`#42481`):**
+    - O daemon registrava saídas de processo de terminal com código de status genérico 0, ocultando se o término decorreu de saída normal (`exited`), sinal do sistema (`signaled`) ou ação do usuário (`operator_close`).
 
 ## O que o upstream propõe e implementa
 
@@ -88,9 +94,15 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42391`](https://github.com
    - Estende `orca terminal split --direction up|down|left|right` na CLI e RPC compartilhado, permitindo posicionar o novo painel acima ou à esquerda do terminal ativo com propagação consistente de proporções e layout sincronizado.
 10. **Diálogo conciso de fechamento de terminais em execução (`#42368`):**
     - Remove textos explicativos redundantes de retomada e labels repetidos no `CloseTerminalDialog`, focando a confirmação na ação direta de parada do processo.
+11. **Retry automático com backoff em sondas SSH com erro transitório de ProxyCommand (`#42484`, resolve `#42470`):**
+    - Adiciona lógica de novas tentativas com retardo em probes de verificação SSH ao detectar encerramentos precoces do túnel proxy antes da resposta do daemon.
+12. **Classificação estruturada da razão de término de terminais (`#42481`):**
+    - Emite eventos de diagnóstico detalhados registrando a causa exata do fim do terminal (`exited`, `signaled`, `operator_close` e sinais POSIX recebidos).
 
 ## O que fazer
 
+- Adicionar retries resilientes para probes SSH com encerramento de ProxyCommand (`#42484`, resolve `#42470`).
+- Registrar causas estruturadas de encerramento de terminais nos logs do daemon (`#42481`).
 - Resgatar agentes ociosos em sleep usando o checkpoint live salvo para evitar regressão para shell plano (`#42391`).
 - Permitir divisões de terminal direcionais (`up`, `down`, `left`, `right`) via CLI e RPC (`#42374`, resolve `#40658`).
 - Simplificar o diálogo de fechamento de terminais ativos com cópia enxuta (`#42368`).

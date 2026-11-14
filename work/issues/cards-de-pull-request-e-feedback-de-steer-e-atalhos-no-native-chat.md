@@ -13,7 +13,9 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42409`](https://github.com/stablyai/orca/pull/42409) (resolve Issue [`#42407`](https://github.com/stablyai/orca/issues/42407)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42459`](https://github.com/stablyai/orca/pull/42459),
+[`stablyai/orca#42445`](https://github.com/stablyai/orca/pull/42445) (resolve Issue [`#42187`](https://github.com/stablyai/orca/issues/42187)),
+[`stablyai/orca#42409`](https://github.com/stablyai/orca/pull/42409) (resolve Issue [`#42407`](https://github.com/stablyai/orca/issues/42407)),
 [`stablyai/orca#42372`](https://github.com/stablyai/orca/pull/42372) (resolve Issue [`#40700`](https://github.com/stablyai/orca/issues/40700)),
 [`stablyai/orca#42370`](https://github.com/stablyai/orca/pull/42370),
 [`stablyai/orca#42359`](https://github.com/stablyai/orca/pull/42359),
@@ -279,8 +281,15 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42409`](https://github.com
   - Corrige a extensão de teclado no ProseMirror para que <kbd>Ctrl+A</kbd> e <kbd>Ctrl+E</kbd> no macOS naveguem até as quebras de linha (<kbd>Shift+Enter</kbd>) mais próximas em vez de pular para o início/fim absoluto do rascunho.
 - **Refinamento tipográfico do chat nativo (`#42359`):**
   - Ajusta o espaçamento de entrelinhas, margens de blocos de código e legibilidade geral de prosa nas respostas.
+- **Exibição de estado "waiting on you" para perguntas assíncronas no Codex (`#42459`):**
+  - Quando um agente Codex emite uma pergunta assíncrona (`request_user_input_async`) e aguarda retorno, a barra de status do chat exibe explicitamente `waiting` ("waiting on you"), evitando a falsa impressão de inatividade ou travamento.
+- **Comando `/new` para iniciar nova conversa limpa no Codex (`#42445`, resolve `#42187`):**
+  - Registra o comando `/new` no composer de Codex como alias funcional de `/clear`, iniciando imediatamente uma conversa limpa.
 
 ## O que fazer
+
+- Exibir estado explícito "waiting on you" para perguntas assíncronas abertas no Codex (`#42459`).
+- Suportar o comando `/new` como alias de nova conversa no composer do Codex (`#42445`, resolve `#42187`).
 
 - Marcar conversas bifurcadas com prefixo `Fork:` e pill `Forked from` (`#42370`).
 - Adicionar opção `Auto expand tools` para acompanhamento de ferramentas em tempo real (`#42372`, resolve `#40700`).

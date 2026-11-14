@@ -10,11 +10,14 @@ Uso:
 `--root` padrão: o topo do repositório git do cwd (`git rev-parse --show-toplevel`; sem git, o cwd); o manifesto relativo
 resolve contra ele. Rodar da raiz do worktree, da pasta da reunião ou da pasta da skill dá o mesmo resultado.
 
-O transporte é do `brza sessions` v2 (PLN-017 R6/P4a): a persona é um worker do Orca aberto por `worker-start` DENTRO do
+O transporte padrão é o `brza sessions` v2 (PLN-017 R6/P4a): a persona é um worker do Orca aberto por `worker-start` DENTRO do
 `brza sessions <nome>`, que grava Nome, Dispatch, Run, remetente, coordenação, modelo, esforço e o id do provedor no mapa
 (`.sessions/sessions.jsonl`). Este script NÃO chama `brza orchestration worker-start|send|check|worker-release|worker-stop|
 worker-keep-open`; a única chamada direta ao `brza orchestration` é a LEITURA `worker-show --dispatch <id> --full` do
 `--status`. O `--via` antigo saiu: aceita só `sessions` (o padrão).
+
+`--transport cloud` é opt-in e não passa pelo `brza sessions`: abre com `CloudRuntime.open` e manda a rodada com `send`
+(`cloud_transport.py`). Sem a flag, o fluxo abaixo não muda.
 
 ABRIR: uma persona de cada vez, na ordem do manifesto, NUNCA em paralelo (a primeira abertura cria o Run, e as outras
 entram nele). Por persona: `brza sessions <sessao> --agent <runtime> --checkout <abs> --prompt-file <prompt> --title <t>
@@ -54,6 +57,7 @@ import time
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
 import _kit  # noqa: E402,F401
+import cloud_transport  # noqa: E402
 import common  # noqa: E402
 import sessions_map  # noqa: E402
 from skillkit import sessions_cli  # noqa: E402
@@ -416,11 +420,14 @@ def status(escolhidas, root, sessions=None, espera=0, brza_fn=None, out=print, c
 
 # ---------------------------------------------------------------- CLI
 
-def main(argv=None, *, sessions_fn=None, brza_fn=None, out=print, clock=time.time, sleep=time.sleep):
+def main(argv=None, *, sessions_fn=None, brza_fn=None, out=print, clock=time.time, sleep=time.sleep,
+         env=None, log_path=None, timeout_s=None):
     ap = argparse.ArgumentParser(description="Abre, envia, fecha e confere as personas da reunião pelo brza sessions v2.")
     ap.add_argument("reuniao")
     ap.add_argument("personas", nargs="*", help="nome, slug ou sessão; `todas` ou nada = todas")
     ap.add_argument("--via", default="sessions", help="só `sessions` (as vias antigas saíram)")
+    ap.add_argument("--transport", default="studio", choices=("studio", "cloud"),
+                    help="studio (padrão, brza sessions) ou cloud (CloudRuntime)")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--close", action="store_true", help="brza sessions close (pede worker_done; closing NÃO é fechada)")
     ap.add_argument("--release", action="store_true", help="alias de --close")
@@ -435,6 +442,13 @@ def main(argv=None, *, sessions_fn=None, brza_fn=None, out=print, clock=time.tim
     ap.add_argument("--sessions", help="arquivo do mapa (padrão: .sessions/sessions.jsonl da raiz comum do git)")
     ap.add_argument("--root", help="padrão: o topo do repositório git do cwd")
     a = ap.parse_args(argv)
+    if cloud_transport.choose_transport(a.transport) == "cloud":
+        try:
+            return cloud_transport.run_cli(
+                a, sessions_fn=sessions_fn, out=out, env=env, log_path=log_path, timeout_s=timeout_s)
+        except cloud_transport.CloudTransportError as exc:
+            print(str(exc), file=sys.stderr)
+            return exc.returncode
     if a.via != "sessions":
         if a.via in VIAS_REMOVIDAS:
             print(VIA_REMOVIDA, file=sys.stderr)

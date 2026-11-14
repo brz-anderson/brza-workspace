@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41976, #41948, #41946, #41927 e #41917 trazem alocação de chats locais sob host independente, admissão e cotas de leitura Git, cache de modelos por executável e rolagem programática.
+description: Os PRs #42253, #42247, #42189, #41976, #41948 trazem I/O assíncrono de conexões de servidores e extensões, isolamento de probes de modelos e chats sob host independente.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,10 @@ tags:
 
 # Alocação de chats locais sob host independente, admissão de Git e cache de modelos
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41976`](https://github.com/stablyai/orca/pull/41976) (resolve STA-13482),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42253`](https://github.com/stablyai/orca/pull/42253),
+[`stablyai/orca#42247`](https://github.com/stablyai/orca/pull/42247),
+[`stablyai/orca#42189`](https://github.com/stablyai/orca/pull/42189),
+[`stablyai/orca#41976`](https://github.com/stablyai/orca/pull/41976) (resolve STA-13482),
 [`stablyai/orca#41948`](https://github.com/stablyai/orca/pull/41948),
 [`stablyai/orca#41946`](https://github.com/stablyai/orca/pull/41946) (resolve Issue [`#41934`](https://github.com/stablyai/orca/issues/41934)),
 [`stablyai/orca#41927`](https://github.com/stablyai/orca/pull/41927) (resolve STA-14967) e
@@ -41,6 +44,15 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41976`](https://github.com
    Clientes locais, utilitários de CLI, painéis de plugins e dispositivos externos (como stream decks ou rotaries) não dispunham
    de um método RPC dedicado para rolar programaticamente abas de terminal, logs ou visualizações de chat ativas, forçando
    interações frágeis baseadas em teclas simuladas.
+6. **Travamentos no loop de eventos por leitura/gravação síncrona de servidores remotos salvos (`#42253`):**
+   O aplicativo lia e salvava repetidamente arquivos de configuração de servidores SSH/pareados na thread principal do processo
+   desktop e do daemon do servidor, congelando a interface gráfica quando operações de disco local ou rede apresentavam lentidão.
+7. **Bloqueio de descoberta de modelos para todos os agentes por travamento em uma CLI (`#42247`):**
+   Durante checagens de catálogos de modelos, se dois comandos de agentes demorassem a responder ou congelassem, todas as vagas
+   compartilhadas de descoberta eram consumidas, impedindo que outros agentes e contas carregassem seus modelos.
+8. **I/O síncrono de extensões bloqueando o processo principal (`#42189`):**
+   Extensões do navegador que gravavam configurações via `chrome.storage.sync` ou regras de bloqueio via `declarativeNetRequest`
+   forçavam gravações em disco síncronas com dupla confirmação na thread principal, travando a renderização do app.
 
 ## O que o upstream implementa
 
@@ -59,9 +71,18 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41976`](https://github.com
 - **Método RPC `session.tabs.scroll` para rolagem programática (`#41946`, resolve `#41934`):**
   - Expõe endpoint RPC `session.tabs.scroll` suportando deslocamentos direcionais e absolutos em abas visíveis de terminal e chat;
   - Permite controle fluido via CLI, scripts de automação e integrações de hardware.
+- **I/O assíncrono para leitura e gravação de servidores salvos (`#42253`):**
+  - Move as operações de leitura e gravação de servidores pareados para workers fora da thread principal do desktop e servidor, impedindo que I/O lento congele a UI.
+- **Isolamento de probes de modelos para evitar bloqueio global (`#42247`):**
+  - Garante que probes demorados ou travados em uma CLI de agente não monopolizem os slots de descoberta, permitindo que outros agentes e contas obtenham suas listas normalmente.
+- **Gravação em background de armazenamento de extensões do navegador (`#42189`):**
+  - Desacopla as gravações de `chrome.storage.sync` e `declarativeNetRequest` do processo principal, eliminando travamentos de renderização causados por extensões.
 
 ## O que fazer
 
+- Mover leitura e escrita de servidores salvos para fora da thread principal (`#42253`).
+- Isolar probes de modelos de agentes para que travamentos em uma CLI não impeçam descoberta dos demais (`#42247`).
+- Deslocar a persistência de configurações de extensões do navegador para background I/O (`#42189`).
 - Adotar a separação de chats e agentes sob o host independente (`#41917`), alinhando o `brza-studio` ao modelo de isolamento de memória de subprocessos.
 - Incorporar o controle de admissão e filas de leitura Git (`#41927`) nas rotinas de criação e clone de workspaces do `brza-workflow`.
 - Adotar o cache persistente de modelos por executável (`#41976`) para acelerar a inicialização de agentes e conexões ACP.

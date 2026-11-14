@@ -1,0 +1,313 @@
+{
+  "reuniao": {
+    "id": "reuniao-tev1",
+    "tema": "Onde o tev1 local entra nos fluxos: CLI, Studio, MCP, meeting-runner, plan-runner e migration-runner",
+    "decisor": "Anderson",
+    "fim": "00h00"
+  },
+  "rodada": {
+    "n": 5,
+    "total_previsto": null,
+    "titulo": "a confiança na v4",
+    "aberta": "21:57:13",
+    "prazo": "22:02",
+    "fechada": "21:58:54",
+    "gerado": "22:09:23",
+    "tem_voto": false,
+    "custo_rotulo": "da rodada",
+    "participantes": [
+      "Balança",
+      "Ferrolho",
+      "Bitola",
+      "Fagulha",
+      "Faro",
+      "Lida"
+    ]
+  },
+  "personas": [
+    {
+      "nome": "Balança",
+      "papel": "Cética medidora",
+      "sessao": "tev1-balanca",
+      "runtime": "Grok",
+      "modelo": "grok-4.7",
+      "esforco": "xhigh",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-balanca.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:58:50",
+      "latencia_s": 97,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 82.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 76.0,
+      "posicao": "A v4 fecha os furos do revisor. 76 vira 82; a fase 2b ainda não tem número.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 9.5,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M3",
+        "M20"
+      ],
+      "linha": 194
+    },
+    {
+      "nome": "Ferrolho",
+      "papel": "Guardião da falha silenciosa",
+      "sessao": "tev1-ferrolho",
+      "runtime": "Codex",
+      "modelo": "gpt-6.1-terra",
+      "esforco": "medium",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-ferrolho.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:57:45",
+      "latencia_s": 31,
+      "latencia_fonte": "turno",
+      "confianca": 88.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 80.0,
+      "posicao": "A v4 corrige os bloqueios principais; retenção e limite de entrada ainda precisam de precisão.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 8.3,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": {
+        "entrada": 493125,
+        "cache": 481792,
+        "saida": 844
+      },
+      "janela": true,
+      "medicao": "medida",
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M3",
+        "M20"
+      ],
+      "linha": 187
+    },
+    {
+      "nome": "Bitola",
+      "papel": "Arquiteta de integração",
+      "sessao": "tev1-bitola",
+      "runtime": "Grok",
+      "modelo": "grok-4.6",
+      "esforco": "high",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-bitola.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:58:21",
+      "latencia_s": 68,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 90.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": null,
+      "posicao": "v4 corrige as fases e o portão; falta a casa do módulo de gravação.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 8.8,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M3",
+        "M20"
+      ],
+      "linha": 205
+    },
+    {
+      "nome": "Fagulha",
+      "papel": "Provocadora",
+      "sessao": "tev1-fagulha",
+      "runtime": "Grok",
+      "modelo": "grok-4.7-build-fast",
+      "esforco": "low",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-fagulha.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:57:44",
+      "latencia_s": 31,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 86.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 75.8,
+      "posicao": "A v4 acerta: grava primeiro e tira o layer; a ordem espera o replay.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 8.5,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M3",
+        "M20"
+      ],
+      "linha": 217
+    },
+    {
+      "nome": "Faro",
+      "papel": "Pesquisador",
+      "sessao": "tev1-faro",
+      "runtime": "Antigravity",
+      "modelo": null,
+      "esforco": null,
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-faro.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:58:54",
+      "latencia_s": 101,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 96.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 88.8,
+      "posicao": "A v4 sanou as falhas estruturais da v2, blindou a fase 0 e formalizou o dissenso de calibração.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 7.0,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M3",
+        "M20"
+      ],
+      "linha": 216
+    },
+    {
+      "nome": "Lida",
+      "papel": "Voz do mantenedor com pouco tempo",
+      "sessao": "tev1-lida",
+      "runtime": "Claude",
+      "modelo": "claude-haiku-5-5",
+      "esforco": "low",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-lida.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:57:47",
+      "latencia_s": 33,
+      "latencia_fonte": "turno",
+      "confianca": 68.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 60.2,
+      "posicao": "A v4 corrige o que o revisor achou, mas ainda não fixa a política de texto, e sem ela a fase 0 não…",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 7.8,
+      "nota_rodada": 3,
+      "custo_usd": 0.09,
+      "tokens": null,
+      "janela": true,
+      "medicao": "medida",
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M3",
+        "M20"
+      ],
+      "linha": 320
+    }
+  ],
+  "sala": {
+    "media": 82.8,
+    "mediana": 86.0,
+    "n": 5,
+    "faixa": [
+      68.0,
+      90.0
+    ],
+    "total": 6,
+    "media_todas": 85.0,
+    "mediana_todas": 87.0,
+    "n_todas": 6,
+    "antigravity": {
+      "media": 96.0,
+      "n": 1,
+      "nomes": [
+        "Faro"
+      ],
+      "fora_da_media": true
+    },
+    "revisor": 78,
+    "revisor_nota": "revisor independente na v4 (60 na v2)",
+    "diferenca_revisor": 4.8
+  },
+  "avisos": [],
+  "medicoes": [
+    {
+      "tipo": "medido",
+      "quem": "coordenação",
+      "texto": "teto com texto real: 5.000 caracteres passam, 6.000 dão HTTP 400 (2.153 tokens) — material/coord/teto.out"
+    },
+    {
+      "tipo": "medido",
+      "quem": "revisor",
+      "texto": "467 dos 494 fatos pendentes são inferido, sem saída gravada — fact_outcome.py --pending"
+    },
+    {
+      "tipo": "conferido",
+      "quem": "revisor",
+      "texto": "10 dos 11 achados da v2 resolvidos na v4; 6 novos, 3 mudam o desenho, aplicados na v5 — material/revisor-v4.md"
+    }
+  ],
+  "sintese": [
+    "Sala 82,8 na v4 (5/6), mediana 86; revisor 78; diferença +4,8: sem contraprova.",
+    "A v5 fecha os achados A–F do revisor: casa do módulo no core/, run citado, probe do layer na fase 3.",
+    "Fase 0 primeiro: parar de perder o texto que a auditoria e o resolver jogam fora.",
+    "Lida em 68: a política de texto (R2.2) ainda não decidida trava a fase 0.",
+    "PLN-019 criado, 14 h estimadas, 17 perguntas prontas para a entrevista."
+  ],
+  "decisoes": [
+    {
+      "pergunta": "R2.2 — quanto tempo o texto fica em disco?",
+      "quem": [
+        "Balança",
+        "Fagulha",
+        "Faro",
+        "Ferrolho",
+        "Lida"
+      ],
+      "recomendacao": "até a pergunta passar ou falhar a régua, teto de 180 dias",
+      "votos": null
+    },
+    {
+      "pergunta": "R2.6 — onde mora o módulo de gravação?",
+      "quem": [
+        "Bitola"
+      ],
+      "recomendacao": "no core/ do brza-workflow, ao lado do measure.py",
+      "votos": null
+    }
+  ],
+  "custos_coordenacao": {
+    "coordenacao_usd": 10.29,
+    "revisor_usd": 2.86,
+    "ate": "22:01:00"
+  }
+}

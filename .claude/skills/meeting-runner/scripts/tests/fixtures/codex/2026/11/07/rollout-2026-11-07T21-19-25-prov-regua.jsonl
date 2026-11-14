@@ -1,0 +1,9 @@
+{"timestamp": "2026-11-08T00:19:25.800Z", "type": "event_msg", "payload": {"type": "task_started", "turn_id": "t1"}}
+{"timestamp": "2026-11-08T00:19:32.000Z", "type": "event_msg", "payload": {"type": "token_count", "info": null}}
+{"timestamp": "2026-11-08T00:19:40.000Z", "type": "event_msg", "payload": {"type": "token_count", "info": {"total_token_usage": {"input_tokens": 100, "cached_input_tokens": 50, "output_tokens": 10}}}}
+{"timestamp": "2026-11-08T00:21:00.000Z", "type": "event_msg", "payload": {"type": "task_complete", "turn_id": "t1"}}
+{"timestamp": "2026-11-08T00:28:13.000Z", "type": "event_msg", "payload": {"type": "task_started", "turn_id": "t2"}}
+{"timestamp": "2026-11-08T00:28:20.000Z", "type": "event_msg", "payload": {"type": "token_count", "info": null}}
+{"timestamp": "2026-11-08T00:30:30.000Z", "type": "event_msg", "payload": {"type": "token_count", "info": {"total_token_usage": {"input_tokens": 700, "cached_input_tokens": 600, "output_tokens": 60}}}}
+{"timestamp": "2026-11-08T00:30:31.000Z", "type": "event_msg", "payload": {"type": "token_count", "info": null}}
+{"timestamp": "2026-11-08T00:30:48.000Z", "type": "event_msg", "payload": {"type": "task_complete", "turn_id": "t2"}}

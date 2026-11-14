@@ -1,0 +1,325 @@
+{
+  "reuniao": {
+    "id": "reuniao-tev1",
+    "tema": "Onde o tev1 local entra nos fluxos: CLI, Studio, MCP, meeting-runner, plan-runner e migration-runner",
+    "decisor": "Anderson",
+    "fim": "00h00"
+  },
+  "rodada": {
+    "n": 4,
+    "total_previsto": null,
+    "titulo": "a confiança final",
+    "aberta": "21:47:07",
+    "prazo": "21:53",
+    "fechada": "21:49:18",
+    "gerado": "21:50:13",
+    "tem_voto": false,
+    "custo_rotulo": "da rodada",
+    "participantes": [
+      "Balança",
+      "Ferrolho",
+      "Bitola",
+      "Fagulha",
+      "Faro",
+      "Lida"
+    ]
+  },
+  "personas": [
+    {
+      "nome": "Balança",
+      "papel": "Cética medidora",
+      "sessao": "tev1-balanca",
+      "runtime": "Grok",
+      "modelo": "grok-4.7",
+      "esforco": "xhigh",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-balanca.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:49:18",
+      "latencia_s": 132,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 76.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 76.0,
+      "posicao": "O plano grava e não decide. A ordem do M17 deixa a taxa-base fora do topo.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 9.5,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M16",
+        "M17",
+        "M18",
+        "M19"
+      ],
+      "linha": 171
+    },
+    {
+      "nome": "Ferrolho",
+      "papel": "Guardião da falha silenciosa",
+      "sessao": "tev1-ferrolho",
+      "runtime": "Codex",
+      "modelo": "gpt-6.1-terra",
+      "esforco": "medium",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-ferrolho.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:47:40",
+      "latencia_s": 32,
+      "latencia_fonte": "turno",
+      "confianca": 82.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 80.0,
+      "posicao": "Apoio o plano com sombra protegida; a ordem visível exige comparação antes do uso.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 8.3,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": {
+        "entrada": 445047,
+        "cache": 438656,
+        "saida": 1198
+      },
+      "janela": true,
+      "medicao": "medida",
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M17",
+        "M18",
+        "M19",
+        "M8",
+        "M11",
+        "M13"
+      ],
+      "linha": 164
+    },
+    {
+      "nome": "Bitola",
+      "papel": "Arquiteta de integração",
+      "sessao": "tev1-bitola",
+      "runtime": "Grok",
+      "modelo": "grok-4.6",
+      "esforco": "high",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-bitola.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:48:12",
+      "latencia_s": 65,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 88.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": null,
+      "posicao": "Folha e portão entram; linha zero antes do módulo; ordem M17 no painel.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 8.8,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M17",
+        "M18",
+        "M19"
+      ],
+      "linha": 182
+    },
+    {
+      "nome": "Fagulha",
+      "papel": "Provocadora",
+      "sessao": "tev1-fagulha",
+      "runtime": "Grok",
+      "modelo": "grok-4.7-build-fast",
+      "esforco": "low",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-fagulha.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:47:35",
+      "latencia_s": 29,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 85.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 75.8,
+      "posicao": "O plano serve: grava o que se perde e mostra a ordem; nada decide ainda.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 8.5,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M16",
+        "M17",
+        "M18",
+        "M19"
+      ],
+      "linha": 192
+    },
+    {
+      "nome": "Faro",
+      "papel": "Pesquisador",
+      "sessao": "tev1-faro",
+      "runtime": "Antigravity",
+      "modelo": null,
+      "esforco": null,
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-faro.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:48:42",
+      "latencia_s": 95,
+      "latencia_fonte": "≈ mtime",
+      "confianca": 93.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 88.8,
+      "posicao": "Plano v2 empiricamente sólido: valor imediato via ordenação e corpus durável antes de decidir.",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 7.0,
+      "nota_rodada": 3,
+      "custo_usd": null,
+      "tokens": null,
+      "janela": null,
+      "medicao": null,
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M16",
+        "M17",
+        "M18",
+        "M19"
+      ],
+      "linha": 192
+    },
+    {
+      "nome": "Lida",
+      "papel": "Voz do mantenedor com pouco tempo",
+      "sessao": "tev1-lida",
+      "runtime": "Claude",
+      "modelo": "claude-haiku-5-5",
+      "esforco": "low",
+      "worklog": "work/worklogs/2026-11-09-reuniao-tev1-lida.md",
+      "estado": "respondeu",
+      "respondeu_as": "21:47:34",
+      "latencia_s": 26,
+      "latencia_fonte": "turno",
+      "confianca": 70.0,
+      "confianca_fonte": "plano",
+      "confianca_r1": 60.2,
+      "posicao": "Confio mais no cliente e na linha zero, e menos no plano inteiro: ele ganhou manutenção (catálogo,…",
+      "posicao_fonte": "posicao",
+      "voto": null,
+      "voto_por_proposta": null,
+      "virada": null,
+      "virada_antes": null,
+      "nota_colegas": 7.8,
+      "nota_rodada": 3,
+      "custo_usd": 0.05,
+      "tokens": null,
+      "janela": true,
+      "medicao": "medida",
+      "medicao_aviso": null,
+      "fatos_lidos": [
+        "M17",
+        "M18"
+      ],
+      "linha": 280
+    }
+  ],
+  "sala": {
+    "media": 80.2,
+    "mediana": 82.0,
+    "n": 5,
+    "faixa": [
+      70.0,
+      88.0
+    ],
+    "total": 6,
+    "media_todas": 82.3,
+    "mediana_todas": 83.5,
+    "n_todas": 6,
+    "antigravity": {
+      "media": 93.0,
+      "n": 1,
+      "nomes": [
+        "Faro"
+      ],
+      "fora_da_media": true
+    },
+    "revisor": null,
+    "revisor_nota": "revisor independente na v2, em curso",
+    "diferenca_revisor": null
+  },
+  "avisos": [],
+  "medicoes": [
+    {
+      "tipo": "conferido",
+      "quem": "coordenação",
+      "texto": "6/6 marcadores fim-rodada-4; confiança do plano inteiro pela linha 'O plano inteiro' — tally.py 4"
+    }
+  ],
+  "sintese": [
+    "Sala 80,2 (5/6), mediana 82; Antigravity 93 à parte; Lida 70 pela manutenção que o plano ganhou.",
+    "A tabela de fases da v2 põe o cliente antes da linha zero: corrige-se na v3 (Bitola, Fagulha).",
+    "Retenção: até a pergunta passar ou falhar a régua, não 30 dias (Balança, Fagulha, Faro); política antes (Ferrolho).",
+    "O painel da sugestão: marcar 'não calibrado, n_sim = 6', lista inteira; esperar uma semana de sombra (Lida, Ferrolho).",
+    "Dois escritores no estado-rN.json sem contrato (Bitola): o tally grava num arquivo próprio."
+  ],
+  "decisoes": [
+    {
+      "pergunta": "Retenção do texto do state: até a régua, 90 dias ou 30 dias?",
+      "quem": [
+        "Balança",
+        "Fagulha",
+        "Faro",
+        "Ferrolho"
+      ],
+      "recomendacao": null,
+      "votos": null
+    },
+    {
+      "pergunta": "A sugestão no painel entra na próxima reunião ou depois de uma semana de sombra?",
+      "quem": [
+        "Bitola",
+        "Fagulha",
+        "Lida",
+        "Ferrolho"
+      ],
+      "recomendacao": null,
+      "votos": null
+    },
+    {
+      "pergunta": "Autoriza a linha zero no resolver antes de extrair o módulo?",
+      "quem": [
+        "Bitola",
+        "Lida"
+      ],
+      "recomendacao": null,
+      "votos": null
+    }
+  ],
+  "custos_coordenacao": {
+    "coordenacao_usd": null,
+    "revisor_usd": null,
+    "ate": null
+  }
+}

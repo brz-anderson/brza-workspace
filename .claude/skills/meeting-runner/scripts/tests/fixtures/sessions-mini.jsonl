@@ -1,0 +1,6 @@
+{"event": "open", "at": "2026-11-07T21:19:25-03:00", "name": "mcp-muralha", "chat": "claude_x"}
+{"event": "session", "at": "2026-11-07T21:19:26-03:00", "name": "mcp-muralha", "provider_session": "claude-aaa", "claude_session": "claude-aaa"}
+{"event": "session", "at": "2026-11-07T21:19:26-03:00", "name": "mcp-regua", "provider_session": "prov-regua"}
+{"event": "session", "at": "2026-11-07T21:19:26-03:00", "name": "mcp-atalho", "provider_session": "prov-atalho"}
+{"event": "session", "at": "2026-11-07T21:19:26-03:00", "name": "mcp-plantao", "provider_session": "claude-bbb", "claude_session": "claude-bbb"}
+{"event": "session", "at": "2026-11-07T21:19:26-03:00", "name": "mcp-salto", "provider_session": "grok-sss"}

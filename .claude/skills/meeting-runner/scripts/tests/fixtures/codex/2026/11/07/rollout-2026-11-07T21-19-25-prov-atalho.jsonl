@@ -1,0 +1,5 @@
+{"timestamp": "2026-11-08T00:19:25.800Z", "type": "event_msg", "payload": {"type": "task_started", "turn_id": "a1"}}
+{"timestamp": "2026-11-08T00:19:40.000Z", "type": "event_msg", "payload": {"type": "token_count", "info": {"total_token_usage": {"input_tokens": 20, "cached_input_tokens": 10, "output_tokens": 2}}}}
+{"timestamp": "2026-11-08T00:20:00.000Z", "type": "event_msg", "payload": {"type": "task_complete", "turn_id": "a1"}}
+{"timestamp": "2026-11-08T00:28:13.000Z", "type": "event_msg", "payload": {"type": "task_started", "turn_id": "a2"}}
+{"timestamp": "2026-11-08T00:29:00.000Z", "type": "event_msg", "payload": {"type": "task_complete", "turn_id": "a2", "error": {"message": "You've hit your usage limit."}}}

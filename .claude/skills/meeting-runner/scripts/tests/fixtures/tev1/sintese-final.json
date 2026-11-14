@@ -1,0 +1,32 @@
+{
+  "titulo": "O tev1 nos fluxos: o que se mediu e para onde vai",
+  "conclusao": "A conclusão medida: nenhuma pergunta está pronta para o tev1 decidir sozinho. O primeiro uso é parar de perder o texto que a auditoria apaga e o resolver descarta; o valor visível cedo é a ordem, nunca a decisão.",
+  "classificacao": [
+    {"uso": "Parar de perder o texto", "frente": "hook da auditoria · resolver do MCP", "hoje": "fase 0", "fato": "cada auditoria apaga um parágrafo (52 em 9,4 dias); o task vai ao lixo"},
+    {"uso": "Gatilho como ordem visível", "frente": "meeting-runner · painel", "hoje": "após replay", "fato": "os 3 primeiros acertam (AUC 0,74); a taxa-base fica na cauda"},
+    {"uso": "Gatilho como decisão (rodada extra)", "frente": "meeting-runner", "hoje": "sombra", "fato": "perde 3 de 6 \"sim\" reais; ~10 reuniões até n = 30"},
+    {"uso": "layer do resolver", "frente": "MCP", "hoje": "reprovado", "fato": "\"alta\" em 86% das tarefas; 22% de acerto no caso real"},
+    {"uso": "Diálogo de startup · \"é plano?\"", "frente": "Studio · plan-runner · close-task", "hoje": "evolução", "fato": "sem volume medido; sem corpus (49 turnos)"},
+    {"uso": "Título do terminal, cota, gate", "frente": "Studio · MCP", "hoje": "fora", "fato": "latência de ms; regra numérica; 0 usos"}
+  ],
+  "barras": [
+    {"rotulo": "Gatilho: \"não\" verdadeiros", "detalhe": "23 pares reais de 2 reuniões", "valor": 15, "maximo": 17, "texto": "15/17", "tom": "ok"},
+    {"rotulo": "Gatilho: \"sim\" verdadeiros", "detalhe": "os perdidos são de taxa-base (0 PRs)", "valor": 3, "maximo": 6, "texto": "3/6", "tom": "ruim"},
+    {"rotulo": "layer, papel sem tabela", "detalhe": "60 tarefas general-purpose", "valor": 22, "maximo": 100, "texto": "22%", "tom": "ruim"},
+    {"rotulo": "Ordem do gatilho (AUC)", "detalhe": "0,5 = sorte · 1,0 = perfeito", "valor": 0.74, "maximo": 1, "texto": "0,74"}
+  ],
+  "fases": [
+    {"nome": "Parar de perder", "estimado": "~3 h", "rotulo": "fase 0"},
+    {"nome": "Cliente único", "estimado": "~3 h", "rotulo": "fase 1"},
+    {"nome": "Probes e sombra", "estimado": "~5 h", "rotulo": "fase 2"},
+    {"nome": "Ordem no painel", "estimado": "~1 h", "rotulo": "fase 2b"},
+    {"nome": "Corpus", "estimado": "semanas", "rotulo": "fase 3"},
+    {"nome": "Calibração", "estimado": "~2 h", "rotulo": "fase 4"},
+    {"nome": "Primeiro uso", "estimado": "a medir", "rotulo": "fase 5"}
+  ],
+  "proxima_rodada": [
+    {"pergunta": "R2.2 · Quanto tempo o texto fica em disco?", "recomendacao": "até a pergunta passar ou falhar a régua, teto de 180 dias"},
+    {"pergunta": "R2.1 · Onde mora o cliente?", "recomendacao": "módulo folha brza_mcp/classify.py + verbo brza classify"}
+  ],
+  "rodape": "17 perguntas em 4 rodadas · nada decidido além do gate."
+}

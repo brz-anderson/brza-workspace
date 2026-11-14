@@ -1,0 +1,479 @@
+#!/usr/bin/env python3
+r"""wait_round.py: espera as personas entregarem a rodada N e narra cada chegada, sobre o `brza sessions wait`.
+
+Uso:
+    wait_round.py <N> --reuniao reuniao.json [--root DIR] [--timeout SEG] [--source {sessions,marker}]
+                  [--sessions ARQUIVO] [--once] [--personas NOME ...]
+                  [--poll SEG] [--sessions-state "cmd" | --no-state | --list-json arquivo]     # estes dois, só no marker
+                  [--publish-dir DIR] [--no-panel]                                              # o painel, só no sessions
+
+`--source sessions` (padrão; `mailbox` é alias): a espera é do `brza sessions wait <sessoes…> --any --timeout <t> --json`
+(PLN-017 R6/R7), que lê o Run do mapa com `--all` e `--peek --wait`, sem consumir a caixa da coordenação. O fim de rodada é
+a mensagem `status` da persona com `round_id` e `dispatchId` do envio, que o v2 já converte em `done`. O worklog continua
+sendo o registro: chegada pelo v2 sem o marcador `<!-- fim-rodada-N -->` na última linha sai como
+`⚠ <nome> avisou o fim da rodada N mas o worklog não termina no marcador`. `--source marker` mantém o modo de arquivo
+(só o marcador), para chat sem Dispatch.
+
+O RELÓGIO é o do mapa: a rodada começa no `at` do `last_send` de cada sessão (para a R1, o `at` do `open`, cujo
+`operation` é o `round_id` inicial), e não no início do script. O PRAZO: lê `(duração: ~M min)` da primeira linha de
+`rodada-N.md`; sem `--timeout`, o limite é `max(M min + 120 s, 180 s)` contado do início da rodada (nunca encerra antes da
+duração anunciada); sem duração anunciada, o de antes (180 s até a primeira chegada; depois 2 x a mediana das latências,
+mínimo 180 s). `--timeout` explícito conta do início do script. Cada chamada do `wait` leva `min(180, o que falta)`; sem
+chegada em 180 s, a linha de status se repete (a narração de 3 min). `--once`: uma chamada com `--timeout 0`.
+`--personas` restringe a espera ao subconjunto da rodada. O `state` de quem falta (o campo `pending[].state` do v2) entra
+na linha final; `--no-state` o tira.
+
+Saída, uma linha por chegada:
+    R2 · 2/3 — entregaram Prumo, Trava; faltam Relance (Antigravity, 5 min)
+
+OS EVENTOS que o `wait` devolve (o Run INTEIRO, sem `createdAt`; os ids já narrados ficam em `<dir da reunião>/eventos-vistos.json`,
+lido e gravado a cada invocação, e só o evento novo é classificado e narrado; dedupe pelo `id`): contam para a persona quando `from` é o `sender` do mapa ou o
+`payload.dispatchId|dispatch_id` é o `dispatch` do mapa; evento de outro Dispatch do mesmo Run é ignorado.
+`escalation` "Worker stopped without reporting" (ou `payload.stopReason == "finished"`) é ruído previsto do fim de turno
+sem `worker_done`: não imprime por evento, e o fim leva UMA linha com a contagem. `question`, `blocked`,
+`decision_gate` e outro `escalation` viram `⚠ <nome> enviou <tipo>: <assunto>`; `worker_done` de persona antes do
+encerramento vira `⚠ <nome> enviou worker_done antes do encerramento`; `status` não imprime nada. Desfecho `failed`
+(`✗ <nome> falhou (<latency_source>)`) e `blocked` (`⚠ <nome> está blocked: leia com brza sessions read <sessao> --last`)
+contam como fim da persona e levam o rc a 1. Erro do v2 (`{"error": …}`, como "nenhum send registrado") imprime
+`erro do brza sessions wait: …` e sai 1: não cai para o marcador em silêncio.
+
+Termina com 0 (todas chegaram), 2 no limite (quem falta, com o `state` do v2) ou 1 (erro ou desfecho failed/blocked,
+também quando o limite chega com uma delas já registrada).
+O PAINEL sai daqui, e não da memória da coordenação (`--source sessions`): o script roda, EM PROCESSO (importa o
+`panel.py`), o equivalente a `panel.py collect N` + `panel.py render` e imprime a linha `::orca-visual{file="…" title="…"}`
+numa linha própria, logo depois da linha de narração do momento:
+  - na ABERTURA, antes da primeira espera (imprime antes a linha de status `R2 · 0/3`); não com `--once`;
+  - a cada lote de chegadas narradas (uma publicação por chamada do `wait`, depois da última linha do lote), sem PNG;
+  - no FIM — todas chegaram ou o limite —, no lugar do painel de chegada daquele momento, com o `--closed` na hora da
+    última chegada (sem chegada, a do limite). Com `--once` o fim é só o painel de chegada, sem PNG.
+`--opened` é o início da rodada que o script já calcula pelo mapa (o `at` do `last_send`/`open`), em ISO com fuso. Depois do
+painel do fim sai `janela: --opened <ISO> --closed <ISO>`, pronta para colar no `panel.py publish N` da republicação com a
+síntese (o `publish` aceita ISO nos dois). Os painéis de abertura e
+de chegada levam `--closed` na hora do momento, para o custo ser o da janela e não o total da sessão.
+O PNG só na abertura e no fim, em `<pasta da reunião>/painel-rN.png` (o mesmo caminho nas duas; o do fim vence), e o
+caminho sai numa linha `png: <caminho>` para a coordenação conferir pela imagem; falha do Chrome vira `⚠ painel: …`.
+Destino: `--publish-dir`, padrão `$ORCA_CHAT_SCRATCH_DIR`; sem os dois, o HTML vai para a pasta da reunião e uma linha
+`⚠ painel: …` avisa UMA vez (o chat não abre arquivo ali). O nome do arquivo é fixo na rodada (`<id>-rN-<hash>.html`), e a
+republicação cai no mesmo arquivo. O `estado-rN.json` também é regravado na pasta da reunião. `--personas` vira os
+`participantes` do painel. `--no-panel` desliga tudo. O painel NUNCA derruba a espera nem muda o rc: qualquer erro vira
+`⚠ painel: <erro>` e a espera segue. Depois de escrever o `sintese-N.json`, republique com `panel.py publish N`.
+
+Funções puras para teste: `scan`, `status_line`, `compute_timeout`, `calc_limite`, `classifica_evento`, `run` (que recebe
+`wait_fn(sessoes, timeout_s) -> (rc, dict)`).
+"""
+import argparse
+import json
+import os
+import re
+import shlex
+import statistics
+import subprocess
+import sys
+import time
+from datetime import datetime
+
+AQUI = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, AQUI)
+import _kit  # noqa: E402,F401
+import common  # noqa: E402
+import sessions_map  # noqa: E402
+from skillkit import sessions_cli  # noqa: E402
+
+BRZA = os.environ.get("BRZA_BIN", "brza")
+MARCADOR = re.compile(r"^<!-- fim-rodada-(\d+) -->$")
+RUNTIME_NOME = {"claude": "Claude", "codex": "Codex", "grok": "Grok", "antigravity": "Antigravity"}
+STATUS_A_CADA = 180
+ATENCAO = {"question", "blocked", "decision_gate", "escalation"}
+RUIDO_ASSUNTO = "worker stopped without reporting"
+
+
+def last_marker(path):
+    """N do marcador que é a última linha não vazia do arquivo; None se não for ou se o arquivo não existe."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            texto = common.corta_medida(f.read())  # o anexo do `brza note commit` (`## Medida`, `## Custo da tarefa`) vem depois do marcador e não invalida
+        linhas = [l.rstrip() for l in texto.split("\n") if l.strip()]  # marcador recuado não vale (o `tally.py` também recusa)
+    except OSError:
+        return None
+    m = MARCADOR.match(linhas[-1]) if linhas else None
+    return int(m.group(1)) if m else None
+
+
+def worklog_path(reuniao, p):
+    return reuniao["worklog"].format(slug=p.get("slug") or p["nome"].lower(), nome=p["nome"], sessao=p.get("sessao", ""))
+
+
+def scan(reuniao, n, root):
+    """{nome: entregou?} pela última linha de cada worklog."""
+    out = {}
+    for p in reuniao["personas"]:
+        m = last_marker(os.path.join(root, worklog_path(reuniao, p)))
+        out[p["nome"]] = m is not None and m >= n
+    return out
+
+
+def _lista(itens):
+    return itens[0] if len(itens) == 1 else ", ".join(itens[:-1]) + " e " + itens[-1]
+
+
+def status_line(n, reuniao, chegaram, elapsed_s, states=None):
+    """`R2 · 4/6 — entregaram A, B; faltam C (Grok, 5 min) e D (Codex, 5 min)`.
+
+    `chegaram` é a lista de nomes na ordem de chegada; `states` ({nome: state}) acrescenta o state de quem falta."""
+    pessoas = {p["nome"]: p for p in reuniao["personas"]}
+    faltam = [nome for nome in pessoas if nome not in chegaram]
+    total = len(pessoas)
+    if not faltam:
+        return f"R{n} · {total}/{total} — todos entregaram: {', '.join(chegaram)}"
+    itens = []
+    for nome in faltam:
+        detalhe = [RUNTIME_NOME.get((pessoas[nome].get("runtime") or "").lower(), pessoas[nome].get("runtime") or "?")]
+        if elapsed_s >= 60:
+            detalhe.append(f"{int(elapsed_s // 60)} min")
+        if states is not None:
+            detalhe.append(f"state {states.get(pessoas[nome].get('sessao')) or '?'}")
+        itens.append(f"{nome} ({', '.join(detalhe)})")
+    entregaram = f"entregaram {', '.join(chegaram)}; " if chegaram else ""
+    return f"R{n} · {len(chegaram)}/{total} — {entregaram}faltam {_lista(itens)}"
+
+
+def compute_timeout(latencias):
+    """180 s até a primeira chegada; depois 2 x a mediana das latências, no mínimo 180 s."""
+    if not latencias:
+        return 180.0
+    return max(180.0, 2 * statistics.median(latencias))
+
+
+def calc_limite(duracao_min, latencias):
+    """O limite (s) contado do início da rodada, sem `--timeout`: com duração anunciada, `max(duração + 120 s, 180 s)`;
+    sem ela, `compute_timeout`."""
+    if duracao_min:
+        return max(duracao_min * 60 + 120.0, 180.0)
+    return compute_timeout(latencias)
+
+
+def fetch_states(reuniao, list_json=None, cmd=None):
+    """{sessao: state} de `brza sessions list --json`; {} se o comando ou o JSON falhar (só o modo marker). A sobrescrita
+    do manifesto (`claude_session`/`provider_session` da persona) acha a sessão pela linha do `list` que traz o id."""
+    ps = reuniao["personas"]
+    ids = {p.get("sessao"): {p.get("claude_session"), p.get("provider_session")} for p in ps}
+    return sessions_cli.list_states([p.get("sessao") for p in ps], list_json=list_json, cmd=cmd, ids=ids)
+
+
+raiz_padrao = common.raiz_padrao
+
+
+def wait_argv(sessoes, timeout_s):
+    """O argv (sem o `brza sessions`) do `wait`: `wait <sessoes…> --any --timeout <t> --json`."""
+    return sessions_cli.wait_argv(sessoes, timeout_s)
+
+
+def wait_brza(sessoes, timeout_s):
+    """O padrão do `wait_fn`: `brza sessions wait <sessoes…> --any --timeout <t> --json`; (rc, dict).
+    `brza` ausente ou saída que não é JSON vira rc 127 e `{"error": …}`."""
+    return sessions_cli.wait_brza(sessoes, timeout_s)
+
+
+def _dispatch_do_evento(ev):
+    pl = ev.get("payload") if isinstance(ev.get("payload"), dict) else {}
+    return pl.get("dispatchId") or pl.get("dispatch_id")
+
+
+def dono_do_evento(ev, personas, entradas):
+    """A persona dona do evento: `from` igual ao `sender` do mapa ou o dispatch do payload igual ao `dispatch` do mapa."""
+    remetente = ev.get("from") or ev.get("from_handle")
+    d = _dispatch_do_evento(ev)
+    for p in personas:
+        e = entradas.get(p.get("sessao")) or {}
+        disp = sessions_map.dispatch_of(p, entradas)
+        if (remetente and e.get("sender") and remetente == e["sender"]) or (d and disp and d == disp):
+            return p
+    return None
+
+
+def classifica_evento(ev):
+    """'ruido' | 'atencao' | 'worker_done' | 'status' | 'outro' para um evento do `wait`."""
+    tipo = str(ev.get("type") or "").lower().replace("-", "_")
+    pl = ev.get("payload") if isinstance(ev.get("payload"), dict) else {}
+    if tipo == "escalation" and (str(ev.get("subject") or "").strip().lower() == RUIDO_ASSUNTO
+                                 or pl.get("stopReason") == "finished"):
+        return "ruido"
+    if tipo in ATENCAO:
+        return "atencao"
+    if tipo == "worker_done":
+        return "worker_done"
+    if tipo == "status":
+        return "status"
+    return "outro"
+
+
+def carrega_vistos(path):
+    """Os ids de evento já narrados em invocações anteriores (`eventos-vistos.json`); vazio sem arquivo ou com JSON ruim."""
+    if not path:
+        return set()
+    try:
+        with open(path, encoding="utf-8") as f:
+            dado = json.load(f)
+    except (OSError, ValueError):
+        return set()
+    return {str(x) for x in dado} if isinstance(dado, list) else set()
+
+
+def grava_vistos(path, vistos):
+    """Grava os ids vistos de forma atômica (arquivo temporário e `os.replace`)."""
+    if not path:
+        return
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    tmp = f"{path}.{os.getpid()}.tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(sorted(vistos), f, ensure_ascii=False)
+    os.replace(tmp, path)
+
+
+def inicio_da_rodada(personas, entradas):
+    """O `at` do `last_send` mais recente das personas (epoch), ou None sem nenhum; o relógio é o do mapa."""
+    ts = [sessions_map.epoch(((entradas.get(p.get("sessao")) or {}).get("last_send") or {}).get("at")) for p in personas]
+    ts = [t for t in ts if t is not None]
+    return max(ts) if ts else None
+
+
+def iso_local(epoch):
+    """ISO com fuso local de um epoch (`2026-11-09T21:20:22-03:00`): o `--opened` e o `--closed` do `panel.py`. Leva a data,
+    para a rodada que atravessa a meia-noite não medir 24 h para trás."""
+    return datetime.fromtimestamp(epoch).astimezone().isoformat(timespec="seconds")
+
+
+def run(reuniao, n, root, *, timeout=None, poll=5.0, once=False, state_fn=None, clock=None, sleep=None,
+        out=None, source="marker", wait_fn=None, entradas=None, personas=None, duracao=None, com_state=True,
+        vistos_path=None, painel_fn=None):
+    """O laço da espera. `clock` (epoch), `sleep`, `out` e `wait_fn` se injetam nos testes. Devolve 0, 2 ou 1.
+
+    `source="marker"` (o padrão da biblioteca; o da linha de comando é `sessions`) é o modo de arquivo; `sessions` usa `wait_fn(sessoes, timeout_s) -> (rc, dict)` (padrão
+    `wait_brza`). `personas` restringe a espera ao subconjunto; `duracao` é a duração anunciada, em minutos.
+
+    `painel_fn(fase, opened, closed) -> [linhas]` (só no `sessions`) publica o painel: `fase` é `abertura`, `chegada` ou
+    `fim`; `opened` e `closed` são ISO com fuso. As linhas que ele devolve saem depois da linha de narração; exceção dele
+    vira `⚠ painel: <erro>` e a espera segue, com o mesmo rc."""
+    out = out or (lambda s: print(s, flush=True))
+    clock, sleep = clock or time.time, sleep or time.sleep
+    todas = [p for p in reuniao["personas"] if not personas or p["nome"] in personas or p.get("sessao") in personas]
+    rsub = {**reuniao, "personas": todas}
+    if source == "marker":
+        return _run_marker(rsub, n, root, timeout, poll, once, state_fn, clock, sleep, out)
+    wait_fn = wait_fn or wait_brza
+    entradas = entradas if entradas is not None else {}
+    t0 = clock()
+    ini = inicio_da_rodada(todas, entradas)
+    ini = ini if ini is not None else t0
+    vistos = carrega_vistos(vistos_path)
+    chegaram, latencias, ruido = [], [], 0
+    falhou = False
+    states = {}
+    pessoas = {p["nome"]: p for p in todas}
+    por_sessao = {p["sessao"]: p for p in todas}
+
+    ultima_chegada = [None]
+
+    def painel(fase):
+        if painel_fn is None:
+            return
+        agora_p = clock()
+        closed = ultima_chegada[0] if fase == "fim" and ultima_chegada[0] is not None else agora_p
+        try:
+            for linha in painel_fn(fase, iso_local(ini), iso_local(closed)) or []:
+                out(linha)
+            if fase == "fim":
+                out(f"janela: --opened {iso_local(ini)} --closed {iso_local(closed)}")
+        except Exception as e:  # o painel nunca derruba a espera nem muda o rc
+            out(f"⚠ painel: {e}")
+
+    def fim(rc):
+        if ruido:
+            out(f'ruído previsto: {ruido} avisos "Worker stopped without reporting" '
+                '(fim de turno sem worker_done entre rodadas); não responda')
+        return rc
+
+    if painel_fn is not None and not once:
+        out(status_line(n, rsub, chegaram, clock() - ini))
+        painel("abertura")
+    while True:
+        pendentes = [p for p in todas if p["nome"] not in chegaram]
+        agora = clock()
+        limite_abs = (t0 + timeout) if timeout is not None else (ini + calc_limite(duracao, latencias))
+        espera = 0 if once else max(0.0, min(float(STATUS_A_CADA), limite_abs - agora))
+        rc, dado = wait_fn([p["sessao"] for p in pendentes], espera)
+        if "error" in dado and "done" not in dado:
+            out(f"erro do brza sessions wait: {dado['error']}")
+            return fim(1)
+        agora = clock()
+        nova, novos_vistos = False, False
+        for ev in dado.get("events") or []:
+            chave = ev.get("id") or json.dumps(ev, sort_keys=True, ensure_ascii=False)
+            if chave in vistos:
+                continue
+            dono = dono_do_evento(ev, reuniao["personas"], entradas)
+            if dono is not None and dono not in todas:
+                continue   # persona da reunião FORA desta rodada: fica para a próxima invocação que a inclua
+            vistos.add(chave)
+            novos_vistos = True
+            p = dono
+            if p is None:
+                continue
+            classe = classifica_evento(ev)
+            tipo = str(ev.get("type") or "").lower().replace("-", "_")
+            if classe == "ruido":
+                ruido += 1
+            elif classe == "atencao":
+                out(f"⚠ {p['nome']} enviou {tipo}: {ev.get('subject') or ''}")
+            elif classe == "worker_done":
+                out(f"⚠ {p['nome']} enviou worker_done antes do encerramento")
+        if novos_vistos:
+            grava_vistos(vistos_path, vistos)
+            novos_vistos = False
+        for row in dado.get("done") or []:
+            p = por_sessao.get(row.get("name"))
+            if p is None or p["nome"] in chegaram:
+                continue
+            desfecho = row.get("outcome")
+            chegaram.append(p["nome"])
+            ultima_chegada[0] = agora
+            if isinstance(row.get("latency_s"), (int, float)):
+                latencias.append(float(row["latency_s"]))
+            nova = True
+            lat = f" ({p['nome']}: {int(round(row['latency_s']))} s)" if isinstance(row.get("latency_s"), (int, float)) else ""
+            if desfecho == "failed":
+                out(f"✗ {p['nome']} falhou ({row.get('latency_source') or '?'})")
+                falhou = True
+            elif desfecho == "blocked":
+                out(f"⚠ {p['nome']} está blocked: leia com brza sessions read {p['sessao']} --last")
+                falhou = True
+            elif desfecho != "done":
+                out(f"⚠ {p['nome']} terminou com {desfecho}: leia com brza sessions read {p['sessao']} --last")
+                falhou = True
+            else:
+                m = last_marker(os.path.join(root, worklog_path(reuniao, p)))
+                if (m or 0) < n:
+                    out(f"⚠ {p['nome']} avisou o fim da rodada {n} mas o worklog não termina no marcador")
+            out(status_line(n, rsub, chegaram, agora - ini) + lat)
+        for q in dado.get("pending") or []:
+            if q.get("name") in por_sessao:
+                states[q["name"]] = q.get("state")
+        if len(chegaram) == len(todas):
+            painel("chegada" if once else "fim")
+            return fim(1 if falhou else 0)
+        limite_abs = (t0 + timeout) if timeout is not None else (ini + calc_limite(duracao, latencias))
+        if once or agora >= limite_abs:
+            out(status_line(n, rsub, chegaram, agora - ini, (states or None) if com_state else None))
+            painel("chegada" if once else "fim")
+            return fim(1 if falhou else 2)
+        if not nova:
+            out(status_line(n, rsub, chegaram, agora - ini))
+        else:
+            painel("chegada")
+
+
+def _run_marker(reuniao, n, root, timeout, poll, once, state_fn, clock, sleep, out):
+    """O modo de arquivo: o marcador `<!-- fim-rodada-N -->` como última linha do worklog."""
+    t0 = clock()
+    chegaram, latencias, ultima_linha = [], [], t0
+    while True:
+        agora = clock()
+        atual = scan(reuniao, n, root)
+        for p in reuniao["personas"]:
+            nome = p["nome"]
+            if atual.get(nome) and nome not in chegaram:
+                chegaram.append(nome)
+                latencias.append(agora - t0)
+                out(status_line(n, reuniao, chegaram, agora - t0))
+                ultima_linha = agora
+        if len(chegaram) == len(reuniao["personas"]):
+            return 0
+        if once:
+            out(status_line(n, reuniao, chegaram, agora - t0, state_fn() if state_fn else None))
+            return 2
+        limite = timeout if timeout is not None else compute_timeout(latencias)
+        if agora - t0 >= limite:
+            out(status_line(n, reuniao, chegaram, agora - t0, state_fn() if state_fn else None))
+            return 2
+        if agora - ultima_linha >= STATUS_A_CADA:
+            out(status_line(n, reuniao, chegaram, agora - t0))
+            ultima_linha = agora
+        sleep(poll)
+
+
+def monta_painel_fn(reuniao, n, root, *, publish_dir=None, participantes=None, sessions=None, panel_mod=None):
+    """O `painel_fn` da linha de comando: publica o painel pelo `panel.py`, em processo. Devolve as linhas a imprimir
+    (`::orca-visual…` e, na abertura e no fim, `png: …`); o aviso de destino sai uma vez."""
+    avisado = [False]
+
+    def painel_fn(fase, opened, closed):
+        pm = panel_mod
+        if pm is None:
+            import panel as pm  # noqa: E402  (importa aqui: o import que falha vira `⚠ painel`, e não derruba o script)
+        pasta = pm.pasta_da_reuniao(reuniao, root)
+        destino, padrao = pm.resolve_publish_dir(publish_dir, pasta)
+        linhas = []
+        if padrao and not avisado[0]:
+            avisado[0] = True
+            linhas.append(f"⚠ painel: sem --publish-dir nem ORCA_CHAT_SCRATCH_DIR; o HTML fica em {destino} e o chat não o abre")
+        png = os.path.join(pasta, f"painel-r{n}.png") if fase in ("abertura", "fim") else None
+        r = pm.publica_rodada(reuniao, n, root, publish_dir=destino, png=png, opened=opened, closed=closed,
+                              participantes=participantes, sessions=sessions)
+        linhas.append(r["linha"])
+        if r["png"]:
+            linhas.append(f"png: {r['png']}")
+        elif r["png_erro"]:
+            linhas.append(f"⚠ painel: {r['png_erro']}")
+        return linhas
+    return painel_fn
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description="Espera o fim da rodada pelo brza sessions wait (ou pelo marcador do worklog).")
+    ap.add_argument("n", type=int)
+    ap.add_argument("--reuniao", required=True)
+    ap.add_argument("--root", help="padrão: o topo do repositório git do cwd")
+    ap.add_argument("--timeout", type=float)
+    ap.add_argument("--poll", type=float, help="segundos entre leituras do marcador (padrão 5; só no --source marker)")
+    ap.add_argument("--source", choices=("sessions", "mailbox", "marker"), default="sessions",
+                    help="`mailbox` é alias de `sessions`")
+    ap.add_argument("--sessions", help="mapa de sessões (padrão: .sessions/sessions.jsonl da raiz comum do git)")
+    ap.add_argument("--sessions-state", help="comando que imprime o JSON do `brza sessions list --json` (marker)")
+    ap.add_argument("--no-state", action="store_true")
+    ap.add_argument("--list-json", help="arquivo com o JSON do list (para teste)")
+    ap.add_argument("--once", action="store_true")
+    ap.add_argument("--personas", nargs="+", metavar="NOME", help="só estas personas (nome, slug ou sessão)")
+    ap.add_argument("--publish-dir", help="onde publicar o painel (padrão: $ORCA_CHAT_SCRATCH_DIR; sem ele, a pasta da reunião)")
+    ap.add_argument("--no-panel", action="store_true", help="não publica o painel (só no --source sessions)")
+    a = ap.parse_args(argv)
+    a.root = os.path.abspath(a.root) if a.root else raiz_padrao()
+    path = a.reuniao if os.path.isabs(a.reuniao) or not os.path.isfile(os.path.join(a.root, a.reuniao)) \
+        else os.path.join(a.root, a.reuniao)
+    with open(path, encoding="utf-8") as f:
+        reuniao = json.load(f)
+    if not any(os.path.isfile(os.path.join(a.root, worklog_path(reuniao, p))) for p in reuniao["personas"]):
+        print(f"aviso: nenhum worklog existe ainda sob {a.root}; se a raiz está certa, as personas ainda não gravaram",
+              file=sys.stderr)
+    nomes = None
+    if a.personas:
+        try:
+            nomes = {p["nome"] for p in common.resolver_personas(reuniao, a.personas)}
+        except ValueError as e:
+            print(str(e), file=sys.stderr)
+            return 2
+    source = "sessions" if a.source == "mailbox" else a.source
+    state_fn = None if a.no_state or source == "sessions" else (lambda: fetch_states(reuniao, a.list_json, a.sessions_state))
+    entradas = sessions_map.load_map(a.root, a.sessions) if source == "sessions" else {}
+    _, _, duracao = common.cabecalho_rodada(os.path.join(a.root, reuniao.get("dir", "."), f"rodada-{a.n}.md"))
+    painel_fn = None
+    if source == "sessions" and not a.no_panel:
+        painel_fn = monta_painel_fn(reuniao, a.n, a.root, publish_dir=a.publish_dir, sessions=a.sessions,
+                                    participantes=sorted(nomes, key=[p["nome"] for p in reuniao["personas"]].index)
+                                    if nomes else None)
+    return run(reuniao, a.n, a.root, timeout=a.timeout, poll=a.poll or 5.0, once=a.once, state_fn=state_fn,
+               source=source, entradas=entradas, personas=nomes, duracao=duracao, com_state=not a.no_state,
+               painel_fn=painel_fn, vistos_path=os.path.join(a.root, reuniao.get("dir", "."), "eventos-vistos.json"))
+
+
+if __name__ == "__main__":
+    sys.exit(main())

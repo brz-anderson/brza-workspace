@@ -1,0 +1,15 @@
+{
+ "posicoes": {"Prumo": "(fora da R3) A desde a R2: 0 PRs, não se constrói nem a sombra."},
+ "medicoes": [
+  {"tipo": "conferido", "quem": "coordenação", "texto": "Trava refez M6/M6b: gh pr list brza-studio → []; --owner=anderson-fixfy → 8 PRs, 7 do fixfy-claude"},
+  {"tipo": "conferido", "quem": "coordenação", "texto": "Revisor F1 confere: --author=@me esconde a conta de agente — gh search prs --owner"}
+ ],
+ "sintese": [
+  "3/3 votam A: o visual chega no merge de tag; o automático vira desenho low com gatilho por dono e conta.",
+  "Trava e Relance viraram de B para A ao ler M6/M6b; B (sombra) contra nas duas: mediria zero.",
+  "Ressalvas: gatilho por --owner em todas as contas (Trava); um comando só no sync (Relance)."
+ ],
+ "decisoes": [
+  {"pergunta": "O automático: A, com o gatilho por dono e conta conferido a cada sync?", "quem": ["Prumo", "Trava", "Relance"], "recomendacao": "A (3/3)", "votos": null}
+ ]
+}

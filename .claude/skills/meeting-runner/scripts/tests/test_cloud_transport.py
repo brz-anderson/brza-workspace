@@ -20,7 +20,7 @@ SECRET = "brza-test-key-not-real"
 WORKFLOW = str(Path(cloud_transport.workspace_root()).parent / "brza-workflow")
 
 FAKE = r'''#!/usr/bin/env python3
-import json, os, sys
+import json, os, sys, time
 from pathlib import Path
 key = os.environ.get("CURSOR_API_KEY") or ""
 capture = Path(os.environ["BRZA_FAKE_CAPTURE"])
@@ -36,6 +36,12 @@ home = Path(os.environ["HOME"])
 cursor = home / ".config" / "cursor"
 cursor.mkdir(parents=True, exist_ok=True)
 (cursor / "auth.json").write_text(json.dumps({"apiKey": key}))
+prompt = argv[-1] if argv else ""
+fail_on = os.environ.get("BRZA_FAKE_FAIL_PERSONA") or ""
+behavior = os.environ.get("BRZA_FAKE_BEHAVIOR") or "ok"
+applies = (not fail_on) or (fail_on in prompt)
+if applies and behavior == "timeout":
+    time.sleep(30)
 if "--resume" in argv:
     session = argv[argv.index("--resume") + 1]
     result = "Posição: manter o grok-4.7-low nesta smoke."
@@ -47,9 +53,10 @@ else:
     session = f"sess-{n}"
     result = "pronto"
     duration = 40
+is_error = bool(applies and behavior == "error")
 print(json.dumps({
     "type": "result",
-    "is_error": False,
+    "is_error": is_error,
     "duration_ms": duration,
     "result": result,
     "session_id": session,
@@ -180,7 +187,10 @@ class CloudTransportTest(unittest.TestCase):
         text = self.ata.read_text()
         lines = text.splitlines()
         self.assertEqual(lines[-1], "<!-- fim-rodada-1 -->")
-        self.assertIn("**SMOKE.**", text)
+        self.assertIn(
+            "**SMOKE.** Esta reunião não conta para a promoção da meeting-runner. "
+            "As duas posições ficam registradas. O modelo padrão não muda por causa dela.",
+            text)
         self.assertIn("`sess-0`", text)
         self.assertIn("`sess-1`", text)
         self.assertIn("ausente", text)
@@ -267,6 +277,82 @@ class CloudTransportTest(unittest.TestCase):
                 log_path=str(self.log), timeout_s=5)
         self.assertEqual(rc, 0, err.getvalue())
         self.assertTrue(self.ata.is_file())
+        self.assertEqual(self.ata.read_text().splitlines()[-1], "<!-- fim-rodada-1 -->")
+        self.assertIn(
+            "As duas posições ficam registradas. O modelo padrão não muda por causa dela.",
+            self.ata.read_text())
+
+    def _personas(self, rows):
+        reuniao = dict(self.reuniao)
+        reuniao["personas"] = rows
+        return reuniao
+
+    def test_mid_round_is_error_omits_the_marker_and_returns_nonzero(self):
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            rc = cloud_transport.run_round(
+                self.reuniao, self.reuniao["personas"], str(self.tmp), 1,
+                env=self.env(BRZA_FAKE_BEHAVIOR="error", BRZA_FAKE_FAIL_PERSONA="Revisor"),
+                log_path=str(self.log), timeout_s=5, out=lambda _line: None)
+        self.assertNotEqual(rc, 0)
+        text = self.ata.read_text()
+        self.assertNotIn("<!-- fim-rodada-", text)
+        self.assertNotIn(cloud_transport.round_marker(1), text)
+        self.assertIn("Posição: manter o grok-4.7-low nesta smoke.", text)
+        self.assertIn("A persona Revisor falhou:", text)
+        self.assertIn("is_error", text)
+        self.assertIn("Revisor", err.getvalue())
+        self.assertEqual(len(self.calls()), 3)
+
+    def test_mid_round_timeout_omits_the_marker_and_names_the_persona(self):
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            rc = cloud_transport.run_round(
+                self.reuniao, self.reuniao["personas"], str(self.tmp), 1,
+                env=self.env(BRZA_FAKE_BEHAVIOR="timeout", BRZA_FAKE_FAIL_PERSONA="Revisor"),
+                log_path=str(self.log), timeout_s=1, out=lambda _line: None)
+        self.assertNotEqual(rc, 0)
+        text = self.ata.read_text()
+        self.assertNotIn("<!-- fim-rodada-", text)
+        self.assertIn("Posição: manter o grok-4.7-low nesta smoke.", text)
+        self.assertIn("A persona Revisor falhou:", text)
+        self.assertIn("timeout", text)
+        stderr = err.getvalue()
+        self.assertIn("Revisor", stderr)
+        self.assertIn("timeout", stderr)
+
+    def test_critic_role_without_ask_fails_before_the_agent(self):
+        cases = (
+            ("Fiscal", "crítica", None),
+            ("Ana", "revisor", "agent"),
+        )
+        for nome, papel, modo in cases:
+            with self.subTest(nome=nome, papel=papel, modo=modo):
+                self.capture.unlink(missing_ok=True)
+                self.ata.unlink(missing_ok=True)
+                persona = {"nome": nome, "slug": nome.lower(), "papel": papel, "modelo": "grok-4.7-low"}
+                if modo:
+                    persona["modo"] = modo
+                err = io.StringIO()
+                with contextlib.redirect_stderr(err):
+                    rc = cloud_transport.run_round(
+                        self._personas([persona]), [persona], str(self.tmp), 1,
+                        env=self.env(), log_path=str(self.log), timeout_s=5)
+                self.assertNotEqual(rc, 0)
+                self.assertIn(nome, err.getvalue())
+                self.assertIn("ask", err.getvalue())
+                self.assertFalse(self.capture.exists())
+                self.assertFalse(self.ata.exists())
+
+    def test_reviewer_name_with_proposer_role_still_calls_the_agent(self):
+        persona = {"nome": "Revisor", "slug": "revisor", "papel": "propõe", "modelo": "grok-4.7-low"}
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            rc = cloud_transport.run_round(
+                self._personas([persona]), [persona], str(self.tmp), 1,
+                env=self.env(), log_path=str(self.log), timeout_s=5, out=lambda _line: None)
+        self.assertEqual(rc, 0, err.getvalue())
+        self.assertEqual(len(self.calls()), 2)
         self.assertEqual(self.ata.read_text().splitlines()[-1], "<!-- fim-rodada-1 -->")
 
 

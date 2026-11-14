@@ -8,15 +8,15 @@ síncrono. A ata da coordenação ganha o marcador `<!-- fim-rodada-N -->`.
 
 O `cloud_runtime.py` é importado de `BRZA_WORKFLOW_DIR`, pelo caminho
 `packages/client/bin/cloud_runtime.py`. Não há cópia na skill e o texto não
-fixa branch. `open` recebe o spec e `send` recebe `session_id` e o prompt. O
-runtime nasce com `keep_home` para um send de outro processo achar o
-`persona.json`.
+fixa branch. `open` recebe o spec e `send` recebe `session_id` e o prompt. O `close`
+apaga o home da persona.
 """
 import importlib.util
 import json
 import os
 import sys
 import time
+import unicodedata
 
 TOKEN_FIELDS = ("input", "output", "cache_read", "cache_write", "reasoning")
 MARKER_TEMPLATE = "<!-- fim-rodada-{n} -->"
@@ -81,9 +81,34 @@ def load_cloud_runtime(checkout):
     return module
 
 
+def _fold(text):
+    normalized = unicodedata.normalize("NFKD", text or "")
+    return "".join(ch for ch in normalized if not unicodedata.combining(ch)).casefold()
+
+
 def persona_mode(persona):
-    """`ask` no revisor; o resto abre como `agent`, e o CLI não recebe `--mode`."""
+    """`ask` quando o manifesto diz; o resto abre como `agent`, e o CLI não recebe `--mode`."""
     return persona.get("modo") or "agent"
+
+
+def role_is_critic(persona):
+    """O papel decide. O nome da persona não entra."""
+    words = _fold(persona.get("papel")).replace("/", " ").replace("-", " ").split()
+    return any(word.strip(".,;:()[]") in {"critica", "critico", "revisor", "revisora"}
+               or word.startswith("critic") or word.startswith("revisor") for word in words)
+
+
+def require_critic_mode(persona):
+    """Papel de crítica sem `modo: ask` para antes do `agent`."""
+    if not role_is_critic(persona):
+        return
+    if _fold(persona.get("modo")) == "ask":
+        return
+    nome = persona.get("nome") or "?"
+    raise CloudTransportError(
+        f"runtime cloud: a persona {nome} tem papel de crítica e precisa de modo ask. "
+        "O agent não foi chamado.",
+        returncode=1)
 
 
 def refuse_if_undeclared(runtime, capability):
@@ -192,7 +217,8 @@ def render_header(reuniao):
     ]
     if reuniao.get("smoke"):
         lines.extend([
-            "**SMOKE.** Esta reunião não conta para a promoção da meeting-runner.",
+            "**SMOKE.** Esta reunião não conta para a promoção da meeting-runner. "
+            "As duas posições ficam registradas. O modelo padrão não muda por causa dela.",
             "",
         ])
     note = reuniao.get("ata_nota")
@@ -209,8 +235,8 @@ def render_header(reuniao):
     return "\n".join(lines)
 
 
-def render_round(n, records, wall_ms):
-    """A rodada e, na última linha, o marcador."""
+def render_round(n, records, wall_ms, failure=None):
+    """A rodada. O marcador só entra quando a rodada termina sem falha."""
     lines = [
         f"## Rodada {n}",
         "",
@@ -225,20 +251,24 @@ def render_round(n, records, wall_ms):
             f"| {row['nome']} | {row['turn']} | `{row['session_id']}` | {row['duration_ms']} | "
             f"{tokens['input']} | {tokens['output']} | {tokens['cache_read']} | "
             f"{tokens['cache_write']} | {tokens['reasoning']} | {row['cost']} |")
-    lines.extend(["", "## Falas", ""])
-    for row in records:
-        if row["turn"] != "send":
-            continue
-        lines.extend([f"### {row['nome']}", "", row["result"].rstrip(), ""])
-    lines.extend([round_marker(n), ""])
+    speeches = [row for row in records if row["turn"] == "send"]
+    if speeches:
+        lines.extend(["", "## Falas", ""])
+        for row in speeches:
+            lines.extend([f"### {row['nome']}", "", row["result"].rstrip(), ""])
+    if failure:
+        nome, message = failure
+        lines.extend(["", "## Erro", "", f"A persona {nome} falhou: {message}", ""])
+        return "\n".join(lines)
+    lines.extend(["", round_marker(n), ""])
     return "\n".join(lines)
 
 
-def write_minutes(path, reuniao, n, records, wall_ms):
+def write_minutes(path, reuniao, n, records, wall_ms, failure=None):
     folder = os.path.dirname(path)
     if folder:
         os.makedirs(folder, exist_ok=True)
-    block = render_round(n, records, wall_ms)
+    block = render_round(n, records, wall_ms, failure=failure)
     if os.path.isfile(path):
         with open(path, encoding="utf-8") as handle:
             existing = handle.read()
@@ -255,7 +285,7 @@ def write_minutes(path, reuniao, n, records, wall_ms):
 
 def make_runtime(env, log_path, timeout_s):
     module = load_cloud_runtime(workflow_checkout(env))
-    return module.CloudRuntime(env=env, log_path=log_path, timeout_s=timeout_s, keep_home=True)
+    return module.CloudRuntime(env=env, log_path=log_path, timeout_s=timeout_s)
 
 
 def _runtime_failure(exc):
@@ -263,9 +293,25 @@ def _runtime_failure(exc):
         "CapabilityError", "CloudTurnError", "CloudRuntimeError", "MissingCapability", "BrzaError")
 
 
+def _fail_mid_round(path, reuniao, n, records, started, persona, exc):
+    """Grava as falas já feitas e o erro. A rodada incompleta não leva o marcador."""
+    wall_ms = int((time.monotonic() - started) * 1000)
+    nome = persona.get("nome") or "?"
+    write_minutes(path, reuniao, n, records, wall_ms, failure=(nome, str(exc)))
+    print(f"{nome}: {exc}", file=sys.stderr)
+    code = getattr(exc, "returncode", 1)
+    return code if code else 1
+
+
 def run_round(reuniao, personas, root, n, dry=False, out=print, sessions_fn=None,
               env=None, log_path=None, timeout_s=None, runtime=None):
     """Abre cada persona e manda a rodada. `sessions_fn` é do Studio e não é chamado."""
+    try:
+        for persona in personas:
+            require_critic_mode(persona)
+    except CloudTransportError as exc:
+        print(str(exc), file=sys.stderr)
+        return exc.returncode if exc.returncode else 1
     if dry:
         workspace = cloud_workspace(reuniao)
         for persona in personas:
@@ -278,6 +324,7 @@ def run_round(reuniao, personas, root, n, dry=False, out=print, sessions_fn=None
         return 0
     own_runtime = runtime is None
     started = time.monotonic()
+    runtime_ready = False
     try:
         workspace = cloud_workspace(reuniao)
         path = minutes_path(reuniao, root)
@@ -287,25 +334,34 @@ def run_round(reuniao, personas, root, n, dry=False, out=print, sessions_fn=None
             if log_path is None:
                 log_path = reuniao.get("log")
             runtime = make_runtime(env, log_path, timeout)
+        runtime_ready = True
         refuse_if_undeclared(runtime, "open")
         refuse_if_undeclared(runtime, "send")
         records = []
         prior = []
         for persona in personas:
-            mode = persona_mode(persona)
-            model = persona_model(persona, reuniao)
-            opened = runtime.open({
-                "persona": persona["nome"],
-                "model": model,
-                "workspace": workspace,
-                "mode": mode,
-                "prompt": open_prompt(reuniao, persona),
-            })
-            records.append(_row(persona, "open", opened))
-            sent = runtime.send(opened.session_id, send_prompt(reuniao, persona, n, root, prior))
-            records.append(_row(persona, "send", sent))
-            prior.append(f"{persona['nome']}:\n{sent.result}")
-            out(f"{persona['nome']}: {sent.session_id} · {sent.duration_ms} ms · custo {_cost(sent)}")
+            try:
+                mode = persona_mode(persona)
+                model = persona_model(persona, reuniao)
+                opened = runtime.open({
+                    "persona": persona["nome"],
+                    "model": model,
+                    "workspace": workspace,
+                    "mode": mode,
+                    "prompt": open_prompt(reuniao, persona),
+                })
+                records.append(_row(persona, "open", opened))
+                sent = runtime.send(
+                    opened.session_id, send_prompt(reuniao, persona, n, root, prior))
+                records.append(_row(persona, "send", sent))
+                prior.append(f"{persona['nome']}:\n{sent.result}")
+                out(f"{persona['nome']}: {sent.session_id} · {sent.duration_ms} ms · custo {_cost(sent)}")
+            except CloudTransportError as exc:
+                return _fail_mid_round(path, reuniao, n, records, started, persona, exc)
+            except Exception as exc:
+                if not _runtime_failure(exc):
+                    raise
+                return _fail_mid_round(path, reuniao, n, records, started, persona, exc)
         wall_ms = int((time.monotonic() - started) * 1000)
         write_minutes(path, reuniao, n, records, wall_ms)
         out(f"ata: {path}")
@@ -313,14 +369,15 @@ def run_round(reuniao, personas, root, n, dry=False, out=print, sessions_fn=None
         return 0
     except CloudTransportError as exc:
         print(str(exc), file=sys.stderr)
-        return exc.returncode
+        return exc.returncode if exc.returncode else 1
     except Exception as exc:
         if not _runtime_failure(exc):
             raise
         print(str(exc), file=sys.stderr)
-        return getattr(exc, "returncode", 1)
+        code = getattr(exc, "returncode", 1)
+        return code if code else 1
     finally:
-        if own_runtime and runtime is not None:
+        if own_runtime and runtime_ready and runtime is not None:
             runtime.close()
 
 

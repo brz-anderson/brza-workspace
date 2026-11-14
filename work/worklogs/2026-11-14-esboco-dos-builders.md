@@ -23,8 +23,10 @@ O desenho reaproveita o hook em `measure.py`, a telemetria `route`, o `brza quot
 
 O `brza-workflow` não foi editado. A branch `builder/bob-the-builder` não foi tocada.
 
-Anderson respondeu a R1 em 2026-11-14 e aceitou as quatro recomendações. A nota fica em `work/feedbacks/`. O catálogo fica em `.brza/personas.toml`, e o manifesto só aponta e sobrescreve. O relatório sugere, e ele decide em rodada. Sem hook, a nota é a fonte; o script lê o log do Claude quando existir e deixa custo e tokens vazios em Grok e no cloud. D1 a D4 passaram a decisão. P1 está feito. O plano está `ready: sim` e `phase: execution`. P2 não rodou. O `brza-workflow` continua intocado.
+Anderson respondeu a R1 em 2026-11-14 e aceitou as quatro recomendações. A nota fica em `work/feedbacks/`. O catálogo fica em `.brza/personas.toml`, e o manifesto só aponta e sobrescreve. O relatório sugere, e ele decide em rodada. Sem hook, a nota é a fonte; o script lê o log do Claude quando existir e deixa custo e tokens vazios em Grok e no cloud. D1 a D4 passaram a decisão. P1 está feito. O plano está `ready: sim` e `phase: execution`.
+
+A execução do P2 é outro assunto e tem arquivo próprio: [A execução do P2 do PLN-025 ficou no PR do gênero feedbacks](2026-11-14-pln025-p2-feedbacks.md). O PR está aprovado na revisão e aguarda o merge. O passo continua desmarcado.
 
 ## O que ficou
 
-O P2, quando Anderson pedir. Os números do ciclo (3, 2 e 5) ficam para uma R2, quando houver notas.
+O merge do PR do P2, por Anderson. Os números do ciclo (3, 2 e 5) ficam para uma R2, quando houver notas.

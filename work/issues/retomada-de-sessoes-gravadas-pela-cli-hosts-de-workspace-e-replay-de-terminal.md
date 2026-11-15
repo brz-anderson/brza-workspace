@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42651, #42614, #42555, #42580, #41980, #41206 e as issues #40329, #30621, #42619 trazem fechamento de abas via CLI por tab-id, unificação do histórico do Codex (~/.codex), retenção de sessão e replay durável.
+description: Os PRs #42806, #42791, #42770, #42651, #42614, #42555, #42580, #41980, #41206 e as issues #42769, #42761, #40329, #30621, #42619 trazem foco imediato de terminal pela sidebar, saída compacta em CLI --json, retomada de sleep de agentes, fechamento de abas via CLI e rascunhos remotos SSH.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,12 @@ tags:
 
 # Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42651`](https://github.com/stablyai/orca/pull/42651) (resolve Issue [`#40329`](https://github.com/stablyai/orca/issues/40329)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42806`](https://github.com/stablyai/orca/pull/42806),
+[`stablyai/orca#42791`](https://github.com/stablyai/orca/pull/42791),
+[`stablyai/orca#42770`](https://github.com/stablyai/orca/pull/42770),
+além das issues [`stablyai/orca#42769`](https://github.com/stablyai/orca/issues/42769) e
+[`stablyai/orca#42761`](https://github.com/stablyai/orca/issues/42761),
+bem como dos PRs [`stablyai/orca#42651`](https://github.com/stablyai/orca/pull/42651) (resolve Issue [`#40329`](https://github.com/stablyai/orca/issues/40329)),
 [`stablyai/orca#42614`](https://github.com/stablyai/orca/pull/42614) (resolve Issue [`#30621`](https://github.com/stablyai/orca/issues/30621)),
 [`stablyai/orca#42555`](https://github.com/stablyai/orca/pull/42555) (resolve Issue [`#42553`](https://github.com/stablyai/orca/issues/42553)),
 [`stablyai/orca#42580`](https://github.com/stablyai/orca/pull/42580) (resolve Issue [`#35719`](https://github.com/stablyai/orca/issues/35719)),
@@ -83,6 +88,14 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42651`](https://github.com
     - A separação de diretórios por perfil gerava duplicação maciça de arquivos `.jsonl` em `~/.codex` e inconsistência no histórico compartilhado de conversas.
 18. **Telas congeladas em hosts de terminal legados (`#42619`):**
     - Falhas de sincronização causavam congelamento da saída do terminal em hosts com versões desatualizadas do daemon.
+19. **Perda de foco e clique extra para digitar no terminal ao selecionar workspace na barra lateral (`#42806`, `#42770`):**
+    - Ao clicar na linha de um workspace na barra lateral, o workspace abria mas o cursor não era posicionado no terminal ativo, exigindo um clique adicional dentro da área do terminal antes de poder digitar.
+20. **Saída JSON multilinha e presença de campos nulos em comandos de listagem da CLI (`#42791`):**
+    - Comandos como `orca terminal list --json` e `orca worktree list --json` imprimiam JSON formatado com indentação e incluíam propriedades nulas, dificultando o consumo por pipes em scripts e automações leves.
+21. **Abas acordadas de sleep do Claude Code sem disparo do comando de resume (`#42769`):**
+    - Ao acordar abas suspensas de agentes Claude Code, a sessão do terminal era reiniciada sem o envio do comando de retomada (`--resume`), fazendo com que o agente inicializasse um prompt limpo e perdesse o histórico contextual prévio.
+22. **Rascunhos sujos de editor em sessões SSH remotas impedindo o encerramento do host (`#42761`):**
+    - Buffers modificados e não salvos no editor interno sob conexões SSH remotas bloqueavam o desligamento gracioso do host sem alertar o usuário nem persistir o estado, travando o encerramento da conexão.
 
 ## O que o upstream propõe e implementa
 
@@ -131,9 +144,21 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42651`](https://github.com
     - Unifica o armazenamento de sessões e histórico conversacional do Codex entre diferentes contas e perfis através de junctions e links simbólicos, eliminando arquivos `.jsonl` redundantes e divergências de estado.
 18. **Mitigação de telas congeladas em hosts de terminal legados (`#42619`):**
     - Detecta e recupera a transmissão de saída de tela em hosts remotos que executam versões anteriores do daemon de terminal, prevenindo congelamentos de buffer.
+19. **Foco e ativação imediata do terminal ativo ao clicar no workspace na barra lateral (`#42806`, `#42770`):**
+    - Ao selecionar um workspace na sidebar, transfere imediatamente o foco do cursor para o painel de terminal ativo na aba visível, permitindo digitação instantânea sem clique extra.
+20. **Serialização JSON compacta em linha única sem campos nulos na CLI (`#42791`):**
+    - Formata a saída de `--json` em uma linha compacta e omite campos com valor nulo em listagens de terminais e worktrees.
+21. **Correção de disparo automático de resume para abas acordadas de Claude Code (`#42769`):**
+    - Garante que a retomada de abas acordadas despache consistentemente o comando de resume preservando o ID de sessão do provedor.
+22. **Gestão de rascunhos sujos de editor em sessões SSH remotas (`#42761`):**
+    - Trata rascunhos não salvos em hosts SSH remotos antes de desconectar, permitindo descarte limpo ou salvamento atômico sem travar o desligamento do host.
 
 ## O que fazer
 
+- Focar diretamente o terminal ativo ao selecionar workspace na barra lateral (`#42806`, `#42770`).
+- Compactar saída de comandos `--json` em linha única sem campos nulos (`#42791`).
+- Garantir execução do comando de resume ao acordar abas do Claude Code (`#42769`).
+- Desobstruir desligamento de hosts SSH remotos com rascunhos de editor (`#42761`).
 - Implementar o comando `orca terminal close --tab-id <tabId>` com proteção `terminal_tab_live` (`#42651`, resolve `#40329`).
 - Adotar o compartilhamento de `~/.codex` entre perfis sem duplicação de dados (`#42614`, resolve `#30621`).
 - Mitigar o congelamento de buffers em hosts de terminal legados (`#42619`).

@@ -11,6 +11,7 @@ refs:
   - issue:agente-kiro-no-native-chat-janela-flutuante-e-enderecamento-de-workspaces
   - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
   - issue:aprovacao-de-planos-abc-feedback-de-revisao-inline-e-resiliencia-de-composer-no-chat
+  - issue:avaliacao-comparativa-de-agentes-via-cli-e-revisao-de-diff-com-ia-no-source-control
   - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
   - issue:conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes
   - issue:consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks
@@ -22,6 +23,7 @@ refs:
   - issue:redesenho-de-cartoes-de-resposta-progresso-por-etapas-e-fila-de-mensagens
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
   - issue:retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal
+  - issue:servidor-mcp-stdio-na-cli-e-otimizacoes-de-captura-no-computer-use
   - issue:worktrees-com-clones-copy-on-write-prompt-inicial-de-workspace-e-ack-seletivo-de-inbox
 ---
 
@@ -136,3 +138,35 @@ refs:
      o PR `#42743` (formato seguro de exec hook para caminhos com espaços no Windows),
      o PR `#42725` (resolve Issue `#42724` — contenção visual de grandes custos nos tiles de Stats & Usage),
      e a Issue `#42675` (eliminação da espera de 2.1s de SIGKILL no fechamento de terminais zsh interativos).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-15)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-15T15:00:00Z` e `2026-11-15T21:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 2 novas issues priorizadas em `work/issues/`:**
+   - `priority: high` — [Avaliação comparativa de agentes via CLI, revisão de diff com IA e notas de worktree](../issues/avaliacao-comparativa-de-agentes-via-cli-e-revisao-de-diff-com-ia-no-source-control.md):
+     rastreia o PR `#42804` (resolve Issue `#42794` — criação e avaliação competitiva best-of-N com `orca worktree create --agents <lista>` e juiz automático com `orca worktree compare`),
+     o PR `#42811` (resolve Issue `#42800` — ação "Review changes with AI" no menu `⋯` do Source Control gerando notas inline no diff com severidades `[critical]`, `[major]`, `[minor]`),
+     e o PR `#42796` (resolve Issue `#11777` — grupo de comandos `orca worktree notes list|add|clear` para anotações programáticas em linhas de diff via CLI).
+   - `priority: high` — [Servidor MCP stdio na CLI, otimizações de captura no Computer Use e automação de documentação](../issues/servidor-mcp-stdio-na-cli-e-otimizacoes-de-captura-no-computer-use.md):
+     rastreia o PR `#42808` (resolve Issue `#13079` — servidor MCP stdio nativo via subcomando `orca mcp` expondo 11 ferramentas essenciais de worktrees, terminais e repositórios para agentes externos),
+     o PR `#42801` (flags `--format`, `--quality`, `--max-width` e `--max-height` em `orca computer screenshot`, reduzindo payloads de visão em até 85%),
+     e o PR `#42809` (resolve Issue `#42799` — template de automação interna `docs-weekly-audit` para refresh semanal de documentação contra mudanças na CLI).
+3. **Atualização de 4 issues existentes em `work/issues/`:**
+   - [Consumo de recursos em agentes: reaper de LSP e overhead de hooks](../issues/consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks.md):
+     adicionados o PR `#42760` (substituição de supervisores Electron por workers nativos leves no Native Chat, economizando ~7 GB de RAM em 150 chats),
+     e o PR `#42807` (limpeza de runtimes gerenciados obsoletos no boot do daemon e compressão gzip streaming de caches de telemetria do Codex/OpenCode/Muse).
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionada a Issue `#42759` (investigação do bug de omissão de modelos não-Gemini no seletor do Antigravity Chat por filtro estrito de `clientInfo` no `agy_acp_server.par`, propondo declaração alinhada à CLI `agy acp`).
+   - [Aprovação de planos A/B/C, feedback de revisão inline e resiliência de composer no Native Chat](../issues/aprovacao-de-planos-abc-feedback-de-revisao-inline-e-resiliencia-de-composer-no-chat.md):
+     adicionados o PR `#42789` (envio correto de resposta `skip` ao pular etapas em cartões de perguntas interativas),
+     o PR `#42784` (identificação dinâmica do modelo Claude a partir da resposta mais recente no cabeçalho fixo),
+     o PR `#42783` (tolerância e compatibilidade retroativa de esquemas JSONL contra downgrade de versão),
+     o PR `#42776` (enfileiramento estrito de intenções de Steer atrás de inserções ativas),
+     e o PR `#42775` (suporte a comandos slash e restauração confiável de modo de chat/terminal para OpenCode).
+   - [Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal](../issues/retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal.md):
+     adicionados os PRs `#42806` e `#42770` (foco imediato e ativação de digitação direta no terminal ativo ao selecionar workspace na barra lateral),
+     o PR `#42791` (serialização JSON compacta em uma linha sem campos nulos nas listagens de terminal e worktree da CLI),
+     a Issue `#42769` (correção no envio automático de comando de resume para abas acordadas de sleep do Claude Code),
+     e a Issue `#42761` (tratamento de rascunhos sujos de editor em conexões SSH remotas impedindo o encerramento do host).

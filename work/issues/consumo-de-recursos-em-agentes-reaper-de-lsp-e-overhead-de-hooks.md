@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42686, #42743, #42725, #42660, #42655 e as issues #42724, #42675 trazem descarte de abas ociosas no serve, exec hooks seguros no Windows e fechamento ágil de terminais.
+description: Os PRs #42807, #42760, #42686, #42743, #42725, #42660, #42655 e as issues #42724, #42675 trazem supervisores nativos leves para Native Chat, limpeza de runtimes no boot, compressão de caches de uso, descarte de abas ociosas e fechamento ágil de terminais.
 scope:
   - brza-studio
   - tools-kit
@@ -14,7 +14,9 @@ tags:
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42686`](https://github.com/stablyai/orca/pull/42686),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42807`](https://github.com/stablyai/orca/pull/42807),
+[`stablyai/orca#42760`](https://github.com/stablyai/orca/pull/42760),
+[`stablyai/orca#42686`](https://github.com/stablyai/orca/pull/42686),
 [`stablyai/orca#42743`](https://github.com/stablyai/orca/pull/42743),
 [`stablyai/orca#42725`](https://github.com/stablyai/orca/pull/42725) (resolve Issue [`#42724`](https://github.com/stablyai/orca/issues/42724)),
 [`stablyai/orca#42660`](https://github.com/stablyai/orca/pull/42660) (resolve Issue [`#19116`](https://github.com/stablyai/orca/issues/19116)),
@@ -51,9 +53,19 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
    Quando o Claude era instalado em caminhos contendo espaços no Windows, o formato legado de invocação de hook falhava por erro de citação de linha de comando.
 9. **Atraso de ~2.1s no fechamento de terminais e estouro de tiles de custos (`#42675`, `#42725`, resolve `#42724`):**
    O fechamento de terminais interativos zsh aguardava desnecessariamente 2.1s de grace period de SIGKILL porque o zsh ignora SIGTERM por padrão; em Stats & Usage, valores altos de custos transbordavam seus cartões visuais.
+10. **Overhead de memória com supervisores Electron no Native Chat (`#42760`):**
+    Cada aba de chat nativo instanciada no Electron subia um processo supervisor completo com runtime web, consumindo ~46 MiB de RSS por sessão. Em ambientes com dezenas ou centenas de chats históricos (ex.: 150 abas), isso acumulava mais de 7 GB de RSS desperdiçados em background.
+11. **Runtimes gerenciados obsoletos acumulando espaço em disco e sidecars de cache sem compressão (`#42807`):**
+    Versões antigas de runtimes baixados pelo daemon permaneciam indefinidamente na máquina após upgrades, ocupando gigabytes em disco; além disso, sidecars de histórico de uso e telemetria de modelos (Codex, OpenCode, Muse) eram gravados como JSON plano não comprimido.
 
 ## O que o upstream propõe e implementa
 
+- **Substituição de supervisores Electron por agentes nativos leves no Native Chat (`#42760`):**
+  - Converte os supervisores de sessão do Native Chat de processos Electron render para workers nativos enxutos;
+  - Reduz o consumo de RSS de ~46 MiB/chat para menos de 1.8 MiB/chat (economia de mais de 7 GB de RAM em instalações com 150 chats).
+- **Limpeza de runtimes obsoletos no boot e compressão gzip de sidecars (`#42807`):**
+  - Implementa rotina de inicialização no daemon para expurgar runtimes gerenciados órfãos ou de versões anteriores que não estão em uso ativo por nenhum worktree;
+  - Aplica compressão streaming gzip transparente aos sidecars de telemetria e cache de uso de tokens do Codex, OpenCode e Muse, reduzindo a pegada em disco em até 80%.
 - **Idle reaper com watchdog para o Agent LSP Bridge (`#38189`):**
   - Implementa monitoramento de documentos abertos e tráfego em ambas as direções;
   - Encerra automaticamente instâncias do TypeScript LSP após `ORCA_TS_LSP_IDLE_MS` (padrão de 1 hora) sem tráfego e
@@ -84,6 +96,8 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Substituir supervisores Electron por workers nativos leves no Native Chat (`#42760`).
+- Implementar purga de runtimes gerenciados obsoletos no boot do daemon e compressão gzip de caches de telemetria (`#42807`).
 - Descarregar automaticamente abas ociosas de navegador no `brza serve` e restaurá-las sob demanda (`#42686`).
 - Adotar o formato seguro de exec hook para caminhos de executáveis no Windows (`#42743`).
 - Conter valores grandes de custos nos cartões de Stats & Usage (`#42725`, resolve `#42724`).

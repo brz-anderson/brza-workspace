@@ -15,7 +15,8 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42506`](https://github.com/stablyai/orca/pull/42506),
+Rastreado da issue aberta no upstream [`stablyai/orca#42759`](https://github.com/stablyai/orca/issues/42759) e dos PRs
+[`stablyai/orca#42506`](https://github.com/stablyai/orca/pull/42506),
 [`stablyai/orca#42460`](https://github.com/stablyai/orca/pull/42460) (resolve Issue [`#41961`](https://github.com/stablyai/orca/issues/41961)),
 [`stablyai/orca#42464`](https://github.com/stablyai/orca/pull/42464),
 [`stablyai/orca#42357`](https://github.com/stablyai/orca/pull/42357) (resolve Issue [`#42356`](https://github.com/stablyai/orca/issues/42356)),
@@ -89,6 +90,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42506`](https://github.com
     Sessões de agentes longas abertas no terminal sofriam crash ao acionar "Continue in Chat UI", corrompendo o registro de sessão e impossibilitando a retomada em ambos os modos.
 19. **Impossibilidade de escolher dinamicamente a conta em novos lançamentos (`#42506`):**
     Usuários com múltiplas contas e perfis de Claude ou Codex ficavam restritos à conta ativa global do host, sem poder selecionar a conta alvo diretamente no lançamento de novos chats ou terminais.
+20. **Ocultação de modelos não-Gemini no Antigravity Chat por filtro estrito de `clientInfo` (`#42759`):**
+    O servidor `agy_acp_server.par` do Antigravity filtra os modelos disponíveis com base no campo `clientInfo` transmitido durante o handshake ACP. Quando acionado pelo Native Chat embutido do Studio, apenas modelos Gemini são expostos no seletor, ocultando modelos como Claude Opus 4.5, Sonnet 5.5 e GPT-OSS 120B autorizados na conta corporativa, que funcionam normalmente na CLI `agy acp`.
 
 ## O que o upstream implementa e corrige
 
@@ -145,6 +148,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42506`](https://github.com
   - Introduz o seletor visual em `dynamic-account-launch-setting.tsx` e suporte na CLI via `--account`.
 - **Validação resiliente de credenciais do Antigravity contra falsos timeouts de keyring (`#42512`):**
   - Verifica ativamente a disponibilidade de sessões autenticadas via `antigravityHostAcpReady()` em vez de abortar cegamente pela simples existência do marcador `antigravity-keyring-unavailable`.
+- **Alinhamento de `clientInfo` para exibição de modelos multi-provedor no Antigravity ACP (`#42759`):**
+  - Identifica que o servidor `agy_acp_server.par` restringe o retorno de modelos a apenas Gemini quando `clientInfo.name` identifica a UI do Studio;
+  - Sugere configurar `clientInfo` de modo análogo ao cliente CLI autônomo para liberar modelos adicionais configurados na conta (Claude Opus/Sonnet 5.5, GPT-OSS).
 
 ## O que fazer no BrzA Studio
 
@@ -165,3 +171,4 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42506`](https://github.com
 15. Incluir o fluxo guiado de instalação de agentes a partir do chat (`#40208`).
 16. Sincronizar os seletores de modelo de configurações e criação de workspace com o catálogo dinâmico da conta do host (`#40175`).
 17. Incorporar as otimizações de memória para sessões com muitos subagentes (`#40171`) e a reconciliação de tarefas pendentes via transcript (`#40183`).
+18. Ajustar a declaração de `clientInfo` na conexão ACP com o Antigravity para expor modelos multi-provedor (Claude, GPT-OSS) autorizados (`#42759`).

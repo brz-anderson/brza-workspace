@@ -13,7 +13,9 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42459`](https://github.com/stablyai/orca/pull/42459),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42579`](https://github.com/stablyai/orca/pull/42579) (resolve Issue [`#42059`](https://github.com/stablyai/orca/issues/42059)),
+[`stablyai/orca#42544`](https://github.com/stablyai/orca/pull/42544),
+[`stablyai/orca#42459`](https://github.com/stablyai/orca/pull/42459),
 [`stablyai/orca#42445`](https://github.com/stablyai/orca/pull/42445) (resolve Issue [`#42187`](https://github.com/stablyai/orca/issues/42187)),
 [`stablyai/orca#42409`](https://github.com/stablyai/orca/pull/42409) (resolve Issue [`#42407`](https://github.com/stablyai/orca/issues/42407)),
 [`stablyai/orca#42372`](https://github.com/stablyai/orca/pull/42372) (resolve Issue [`#40700`](https://github.com/stablyai/orca/issues/40700)),
@@ -285,9 +287,15 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42459`](https://github.com
   - Quando um agente Codex emite uma pergunta assíncrona (`request_user_input_async`) e aguarda retorno, a barra de status do chat exibe explicitamente `waiting` ("waiting on you"), evitando a falsa impressão de inatividade ou travamento.
 - **Comando `/new` para iniciar nova conversa limpa no Codex (`#42445`, resolve `#42187`):**
   - Registra o comando `/new` no composer de Codex como alias funcional de `/clear`, iniciando imediatamente uma conversa limpa.
+- **Abertura precisa de links no terminal via middle-click sem colar seleção (`#42579`, resolve `#42059`):**
+  - Corrige o listener de clique intermediário (botão 1 / roda) para abrir URLs, caminhos de arquivo, links OSC 8 e identificadores de terminal sem acionar a colagem do buffer primário no macOS e Linux; mantém a colagem em cliques fora de links.
+- **Ação rápida "Use ⌘K for Search" para perfis de atalhos existentes (`#42544`):**
+  - Oferece atalho de um clique nas configurações de keybindings para reatribuir instantaneamente <kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd> para a busca global sem requerer reconfiguração manual tecla por tecla.
 
 ## O que fazer
 
+- Abrir links no terminal no middle-click sem interceptação espúria de paste no macOS/Linux (`#42579`, resolve `#42059`).
+- Adicionar ação de um clique para configurar <kbd>⌘K</kbd> para busca nos perfis de teclado (`#42544`).
 - Exibir estado explícito "waiting on you" para perguntas assíncronas abertas no Codex (`#42459`).
 - Suportar o comando `/new` como alias de nova conversa no composer do Codex (`#42445`, resolve `#42187`).
 

@@ -3,7 +3,7 @@ scope:
   - brza-studio
   - brza-workflow
   - brza-cli
-description: Os PRs #42479, #42418, #42410, #42360, #42349 e #42347 trazem retenção de diários, resiliência de cache de uso, separação de builds temporários e estúdio de temas via CLI.
+description: Os PRs #42563, #42536, #42479, #42418, #42410, #42360, #42349 trazem publicação de temas via CLI, legibilidade de seleções desfocadas, retenção de diários e estúdio de temas.
 opened: 2026-11-14
 status: open
 priority: high
@@ -34,6 +34,10 @@ Rastreia melhorias críticas de ciclo de vida de arquivos em chats de agentes, c
    - Isenta arquivos de diário (`.journal`, WAL, SHM) e bancos relacionais locais da política de expiração automática de 7 dias de arquivos temporários, evitando corrupção de sessões arquivadas e mantendo a integridade histórica.
 6. **Descarte e regeneração automática de caches corrompidos de uso de tokens ([PR #42418](https://github.com/stablyai/orca/pull/42418) — resolve [Issue #42413](https://github.com/stablyai/orca/issues/42413)):**
    - Ao detectar entradas malformadas ou corrompidas no cache de leitura de fontes de uso (`readUsageSourceCache`), o sistema descarta com segurança a entrada inválida e a reconstrói em vez de propagar exceções e travar permanentemente as varreduras de telemetria em Codex, OpenCode e Muse.
+7. **Publicação e compartilhamento de temas no GitHub via CLI ([PR #42563](https://github.com/stablyai/orca/pull/42563)):**
+   - Adiciona `orca theme publish` para empacotar e publicar um tema salvo no GitHub com validação de contraste prévia, exibição do plano de publicação e execução estritamente sob confirmação com `--yes`.
+8. **Legibilidade de seleções de texto em editores desfocados ([PR #42536](https://github.com/stablyai/orca/pull/42536)):**
+   - Mantém o contraste de seleção de texto nítido no editor de código mesmo quando a janela ou aba perde o foco, usando contraste adaptativo de primeiro plano e fundo.
 
 ## Impacto no BrzA Studio
 

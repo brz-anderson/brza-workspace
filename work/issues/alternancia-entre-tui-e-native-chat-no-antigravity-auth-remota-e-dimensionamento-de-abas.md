@@ -15,7 +15,8 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42460`](https://github.com/stablyai/orca/pull/42460) (resolve Issue [`#41961`](https://github.com/stablyai/orca/issues/41961)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42506`](https://github.com/stablyai/orca/pull/42506),
+[`stablyai/orca#42460`](https://github.com/stablyai/orca/pull/42460) (resolve Issue [`#41961`](https://github.com/stablyai/orca/issues/41961)),
 [`stablyai/orca#42464`](https://github.com/stablyai/orca/pull/42464),
 [`stablyai/orca#42357`](https://github.com/stablyai/orca/pull/42357) (resolve Issue [`#42356`](https://github.com/stablyai/orca/issues/42356)),
 [`stablyai/orca#42323`](https://github.com/stablyai/orca/pull/42323) (resolve Issue [`#42116`](https://github.com/stablyai/orca/issues/42116)),
@@ -82,6 +83,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42460`](https://github.com
     O mapeamento de modelos do Antigravity restringia a seleção aos modelos pré-definidos antigos (Gemini 3 Pro/Flash), omitindo variantes como Gemini 4 Hydrogen, Carbon e Argon, além de não suportar níveis de raciocínio profundo (`xhigh` e `max`), resultando em erros ou quedas para configurações padrão.
 16. **Inoperância do runtime e chat nativo do Antigravity no Windows (`#42464`):**
     O runtime gerenciado e as rotas de IPC do Antigravity no desktop assumiam caminhos e sinais POSIX, impedindo a inicialização do daemon ACP e a alternância para chat nativo no Windows.
+17. **Falso fallback para prompt de download de 337 MB no Antigravity Chat por cooldown do chaveiro (`#42512`):**
+    Quando `agy` registrava um timeout temporário de 5s no chaveiro do sistema durante o boot, deixava o arquivo `antigravity-keyring-unavailable` no cache. O app interpretava isso como ausência definitiva de credencial em vez de respeitar o cooldown ou validar que `agy acp` estava ativo e autenticado, forçando o prompt de download desnecessário do runtime gerenciado de 337 MB.
+18. **Crash e perda irrecuperável de sessão ao alternar de terminal para chat (`#42589`):**
+    Sessões de agentes longas abertas no terminal sofriam crash ao acionar "Continue in Chat UI", corrompendo o registro de sessão e impossibilitando a retomada em ambos os modos.
+19. **Impossibilidade de escolher dinamicamente a conta em novos lançamentos (`#42506`):**
+    Usuários com múltiplas contas e perfis de Claude ou Codex ficavam restritos à conta ativa global do host, sem poder selecionar a conta alvo diretamente no lançamento de novos chats ou terminais.
 
 ## O que o upstream implementa e corrige
 
@@ -133,20 +140,28 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42460`](https://github.com
   - Aprimora o parse de `agy models` com retenção de preferências de esforço por modelo e fallback resiliente via backend do host em fases de pré-descoberta.
 - **Suporte a chat UI e runtime gerenciado do Antigravity no Windows (`#42464`):**
   - Adapta caminhos de sockets nomeados, tratamento de processos filhos e normalização de caminhos de arquivos para Windows.
+- **Seletor dinâmico de conta para Claude e Codex no lançamento (`#42506`):**
+  - Permite escolher qual perfil ou conta autenticada (`claude-accounts` ou `codex-accounts`) utilizar ao instanciar cada novo chat ou terminal;
+  - Introduz o seletor visual em `dynamic-account-launch-setting.tsx` e suporte na CLI via `--account`.
+- **Validação resiliente de credenciais do Antigravity contra falsos timeouts de keyring (`#42512`):**
+  - Verifica ativamente a disponibilidade de sessões autenticadas via `antigravityHostAcpReady()` em vez de abortar cegamente pela simples existência do marcador `antigravity-keyring-unavailable`.
 
 ## O que fazer no BrzA Studio
 
 1. Habilitar a alternância entre TUI e Native Chat para o Antigravity (`#40201`), permitindo alternar via `⌘⇧J` entre a interface de linha de comando e o chat estruturado sem perder o processo ativo.
-2. Incorporar o catálogo expandido de modelos Gemini 4 e esforços `xhigh`/`max` para Antigravity (`#42460`, resolve `#41961`).
-3. Suportar o runtime gerenciado e chat nativo do Antigravity no Windows (`#42464`).
-4. Sincronizar títulos de resumo da conversa do Antigravity com as abas de terminal (`#42357`, resolve `#42356`).
-5. Emitir `decision: allow` no hook `PreToolUse` para ferramentas auto-aprovadas (`#42323`, resolve `#42116`).
-6. Derivar opções de esforço de raciocínio dinamicamente a partir de `availableModels` no cliente ACP (`#42282`, resolve `#42280`).
-7. Adotar a descoberta de skills do Antigravity no menu slash (`/`) do Native Chat (`#40986`).
-8. Implementar a injeção de regras `AGENTS.md` e `GEMINI.md` via `_meta.antigravity.systemPrompt.append` nas sessões ACP (`#40867`).
-9. Habilitar a descoberta dinâmica de modelos da CLI `agy` (`#40980`) e o composer desbloqueado no primeiro chat de novos worktrees (`#40912`).
-10. Adotar o `AgentSignInCard` com túnel de callback de autenticação (`#40228`) para inicialização de Claude e Codex em servidores remotos e SSH sem atrito.
-11. Incorporar os controles de dimensionamento de abas (`tabSizing`, `tabSizingMinWidth`, `tabSizingMaxWidth`) em `Settings → General → Navigation` (`#40229`).
-12. Incluir o fluxo guiado de instalação de agentes a partir do chat (`#40208`).
-13. Sincronizar os seletores de modelo de configurações e criação de workspace com o catálogo dinâmico da conta do host (`#40175`).
-14. Incorporar as otimizações de memória para sessões com muitos subagentes (`#40171`) e a reconciliação de tarefas pendentes via transcript (`#40183`).
+2. Incorporar a seleção dinâmica de conta no lançamento de Claude e Codex (`#42506`).
+3. Eliminar o falso fallback para o runtime gerenciado no Antigravity Chat validando `antigravityHostAcpReady` em vez do marcador temporário de keyring (`#42512`).
+4. Blindar o chaveamento TUI ↔ Chat contra crashes irrecuperáveis de sessão (`#42589`).
+5. Incorporar o catálogo expandido de modelos Gemini 4 e esforços `xhigh`/`max` para Antigravity (`#42460`, resolve `#41961`).
+6. Suportar o runtime gerenciado e chat nativo do Antigravity no Windows (`#42464`).
+7. Sincronizar títulos de resumo da conversa do Antigravity com as abas de terminal (`#42357`, resolve `#42356`).
+8. Emitir `decision: allow` no hook `PreToolUse` para ferramentas auto-aprovadas (`#42323`, resolve `#42116`).
+9. Derivar opções de esforço de raciocínio dinamicamente a partir de `availableModels` no cliente ACP (`#42282`, resolve `#42280`).
+10. Adotar a descoberta de skills do Antigravity no menu slash (`/`) do Native Chat (`#40986`).
+11. Implementar a injeção de regras `AGENTS.md` e `GEMINI.md` via `_meta.antigravity.systemPrompt.append` nas sessões ACP (`#40867`).
+12. Habilitar a descoberta dinâmica de modelos da CLI `agy` (`#40980`) e o composer desbloqueado no primeiro chat de novos worktrees (`#40912`).
+13. Adotar o `AgentSignInCard` com túnel de callback de autenticação (`#40228`) para inicialização de Claude e Codex em servidores remotos e SSH sem atrito.
+14. Incorporar os controles de dimensionamento de abas (`tabSizing`, `tabSizingMinWidth`, `tabSizingMaxWidth`) em `Settings → General → Navigation` (`#40229`).
+15. Incluir o fluxo guiado de instalação de agentes a partir do chat (`#40208`).
+16. Sincronizar os seletores de modelo de configurações e criação de workspace com o catálogo dinâmico da conta do host (`#40175`).
+17. Incorporar as otimizações de memória para sessões com muitos subagentes (`#40171`) e a reconciliação de tarefas pendentes via transcript (`#40183`).

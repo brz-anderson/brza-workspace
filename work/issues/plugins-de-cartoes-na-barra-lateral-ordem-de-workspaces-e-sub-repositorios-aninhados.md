@@ -17,7 +17,8 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42085`](https://github.com/stablyai/orca/pull/42085) (resolve Issue [`#42080`](https://github.com/stablyai/orca/issues/42080)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42558`](https://github.com/stablyai/orca/pull/42558) (relacionado a [`#41707`](https://github.com/stablyai/orca/issues/41707) e [`#28300`](https://github.com/stablyai/orca/issues/28300)),
+[`stablyai/orca#42085`](https://github.com/stablyai/orca/pull/42085) (resolve Issue [`#42080`](https://github.com/stablyai/orca/issues/42080)),
 [`stablyai/orca#42057`](https://github.com/stablyai/orca/pull/42057),
 [`stablyai/orca#42068`](https://github.com/stablyai/orca/pull/42068),
 [`stablyai/orca#40597`](https://github.com/stablyai/orca/pull/40597) (fecha Issue [`#39620`](https://github.com/stablyai/orca/issues/39620)),
@@ -179,9 +180,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42085`](https://github.com
     - Permite que arquivos tratados por plugins (ex.: diagramas BPMN, esquemas de dados, mockups) ofereçam sua própria visualização gráfica de diff diretamente na aba de comparação de alterações do Source Control, lado a lado com o diff textual padrão.
 39. **Popovers de plugins pertencentes ao host na barra de status (`#42068`):**
     - Proposta de RFC para que plugins declarem itens interativos de status bar cujos dados e popovers pertençam ao daemon do host onde o workspace executa.
+40. **Ícones SVG customizados para painéis de plugins e herança tipográfica (`#42558`, `#42575`):**
+    - Permite que painéis de plugins utilizem arquivos SVG relativos ao plugin como ícone da activity-bar; o host valida os arquivos de tamanho delimitado e os serve com restrição de segurança, desenhando-os na sidebar como máscara monocromática com fallback gracioso;
+    - Propaga a família tipográfica do Studio para os frames dos plugins através da variável CSS `--orca-font-family`.
 
 ## O que fazer
 
+- Suportar ícones SVG customizados na activity-bar para painéis de plugins e herança de fonte (`#42558`, `#42575`).
 - Suportar abertura de painéis de plugins como páginas dedicadas na navegação principal (`#42085`, resolve `#42080`).
 - Oferecer editores customizados de plugins em abas de diff de arquivo único no Source Control (`#42057`).
 - Avaliar a especificação de status-bar popovers pertencentes ao host para plugins (`#42068`).

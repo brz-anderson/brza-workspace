@@ -14,7 +14,8 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42338`](https://github.com/stablyai/orca/pull/42338) (resolve Issue [`#42103`](https://github.com/stablyai/orca/issues/42103)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42535`](https://github.com/stablyai/orca/pull/42535) (resolve Issue [`#42148`](https://github.com/stablyai/orca/issues/42148)),
+[`stablyai/orca#42338`](https://github.com/stablyai/orca/pull/42338) (resolve Issue [`#42103`](https://github.com/stablyai/orca/issues/42103)),
 [`stablyai/orca#42264`](https://github.com/stablyai/orca/pull/42264) (resolve Issue [`#19166`](https://github.com/stablyai/orca/issues/19166)),
 [`stablyai/orca#42284`](https://github.com/stablyai/orca/pull/42284) (resolve Issue [`#42230`](https://github.com/stablyai/orca/issues/42230)),
 [`stablyai/orca#42122`](https://github.com/stablyai/orca/pull/42122) (resolve STA-15102),
@@ -62,6 +63,8 @@ além da issue [`stablyai/orca#42084`](https://github.com/stablyai/orca/issues/4
     - Se o terminal do worker saísse prematuramente ou fosse fechado sem emitir um código de saída capturado pelo orchestrator, o comando `worker-release` falhava com erro de terminal indisponível, deixando o worker em estado zumbi no banco.
 12. **Falta de identificadores de sessão de chat vinculados ao worker no output JSON (`#42284`, resolve `#42230`):**
     - Scripts que coordenavam múltiplos workers a partir do chat não conseguiam correlacionar a sessão de chat que solicitou o worker (`creatorOrcaSessionId`) nem a sessão atribuída a ele (`assigneeOrcaSessionId`).
+13. **Aceite inadvertido de relatórios vazios em `worker_done` (`#42535`, resolve `#42148`):**
+    - Quando um script de worker falhava ao ler o arquivo de relatório (ex.: `cat missing-file` vazio), o comando `orchestration send --type worker_done` aceitava `--body ""` como se o corpo tivesse sido omitido, concluindo a tarefa prematuramente e perdendo o relatório de execução.
 
 ## O que o upstream implementa
 
@@ -94,9 +97,12 @@ além da issue [`stablyai/orca#42084`](https://github.com/stablyai/orca/issues/4
     - Permite que o comando `worker-release` conclua a liberação com sucesso mesmo se o terminal PTY do worker já tiver saído ou sido destruído.
 12. **Exposição de `creatorOrcaSessionId` e `assigneeOrcaSessionId` no JSON de workers (`#42284`, resolve `#42230`):**
     - Expõe os IDs de sessão de chat vinculados ao criador e ao destinatário do worker na resposta `--full`.
+13. **Rejeição de relatórios vazios ou whitespace em `worker_done` (`#42535`, resolve `#42148`):**
+    - Valida `--body` na CLI e parâmetros de envio no RPC para rejeitar corpos vazios em `worker_done`, retornando `invalid_argument` e mantendo a tarefa aberta para reenvio sem perda de relatórios.
 
 ## O que fazer
 
+- Rejeitar relatórios vazios em `worker_done` para impedir conclusão prematura sem sumário (`#42535`, resolve `#42148`).
 - Adotar a preservação do nó `run` e `coordinator_handle` no output conciso `--json` (`#42338`, resolve `#42103`).
 - Suportar a liberação resiliente em `worker-release` de workers cujo terminal PTY já encerrou (`#42264`, resolve `#19166`).
 - Expor `creatorOrcaSessionId` e `assigneeOrcaSessionId` nos metadados completos de workers (`#42284`, resolve `#42230`).

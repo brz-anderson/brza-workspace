@@ -3,7 +3,7 @@ scope:
   - brza-studio
   - brza-workflow
   - workspace
-description: Os PRs #42346, #42312, #42303, #42324 e #42261 trazem conectores de linhagem na sidebar, cores de grupos, rodapé de sleeping e alívio de memória em perfis.
+description: Os PRs #42574, #42346, #42312, #42303, #42324 e #42261 trazem timer de prompt cache condicional, conectores de linhagem, cores de grupos e alívio de memória.
 opened: 2026-11-14
 status: open
 priority: high
@@ -31,6 +31,9 @@ Rastreia melhorias de ergonomia visual na árvore de workspaces e grupos de proj
 5. **Rodapé expansível de workspaces adormecidos na sidebar ([PR #42346](https://github.com/stablyai/orca/pull/42346) — resolve [Issue #42345](https://github.com/stablyai/orca/issues/42345)):**
    - Quando o filtro "Hide sleeping" estiver ativado, exibe uma linha de rodapé discreta `Sleeping (N)` ao final da lista de workspaces.
    - Ao expandir o rodapé, o usuário pode clicar diretamente em qualquer workspace adormecido para acordá-lo e torná-lo ativo, sem precisar desativar e reativar o filtro global na barra lateral.
+6. **Contagem regressiva de prompt cache apenas após requisições ([PR #42574](https://github.com/stablyai/orca/pull/42574) — resolve [Issue #42556](https://github.com/stablyai/orca/issues/42556)):**
+   - O indicador e cronômetro de expiração de cache de prompt na sidebar passa a iniciar estritamente após a conclusão de uma requisição real de IA, evitando acionamentos espúrios e alarmes falsos quando um painel entra em repouso sem chamadas efetuadas.
+   - Trata refinamentos na diferenciação entre famílias de child workspaces abertos e pais colapsados ([Issue #42534](https://github.com/stablyai/orca/issues/42534)) e filtro para ocultar projetos que são pastas locais sem Git ([Issue #42530](https://github.com/stablyai/orca/issues/42530)).
 
 ## Impacto no BrzA Studio
 

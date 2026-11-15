@@ -14,7 +14,10 @@ tags:
 
 # Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42484`](https://github.com/stablyai/orca/pull/42484) (resolve Issue [`#42470`](https://github.com/stablyai/orca/issues/42470)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42555`](https://github.com/stablyai/orca/pull/42555) (resolve Issue [`#42553`](https://github.com/stablyai/orca/issues/42553)),
+[`stablyai/orca#42580`](https://github.com/stablyai/orca/pull/42580) (resolve Issue [`#35719`](https://github.com/stablyai/orca/issues/35719)),
+[`stablyai/orca#42504`](https://github.com/stablyai/orca/pull/42504),
+[`stablyai/orca#42484`](https://github.com/stablyai/orca/pull/42484) (resolve Issue [`#42470`](https://github.com/stablyai/orca/issues/42470)),
 [`stablyai/orca#42481`](https://github.com/stablyai/orca/pull/42481),
 [`stablyai/orca#42391`](https://github.com/stablyai/orca/pull/42391),
 [`stablyai/orca#42374`](https://github.com/stablyai/orca/pull/42374) (resolve Issue [`#40658`](https://github.com/stablyai/orca/issues/40658)),
@@ -65,6 +68,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42484`](https://github.com
     - Sondas de conectividade SSH com servidores remotos e hosts de workspace falhavam intermitentemente quando o `ProxyCommand` encerrava o túnel precocemente (`Connection closed by UNKNOWN port 65535`), sem tentativas automáticas de repetição (*retries*).
 12. **Falta de granularidade no log de encerramento de terminais pelo daemon (`#42481`):**
     - O daemon registrava saídas de processo de terminal com código de status genérico 0, ocultando se o término decorreu de saída normal (`exited`), sinal do sistema (`signaled`) ou ação do usuário (`operator_close`).
+13. **Invisibilidade e falta de acompanhamento do painel focado via CLI (`#42555`, resolve `#42553`):**
+    - Ferramentas e automações externas não conseguiam determinar qual painel de terminal estava em foco no workspace ativo nem acompanhar mudanças de foco sem realizar polling ineficiente de todo o inventário PTY.
+14. **Acúmulo de estado de sessão e placeholders de workspaces excluídos (`#42580`, resolve `#35719`):**
+    - Workspaces deletados deixavam para trás milhares de linhas de layouts, abas, scrollback e placeholders vazios no arquivo de sessão, inflando o perfil em megabytes e degradando o tempo de salvamento contínuo.
+15. **Travamento de statusline do Claude no Windows em stdin infinito (`#42504`):**
+    - Atualizações abandonadas da linha de status do Claude no Windows mantinham o processo bloqueado aguardando leitura de `stdin` sem teto de timeout, acumulando processos zumbis.
 
 ## O que o upstream propõe e implementa
 
@@ -98,11 +107,22 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42484`](https://github.com
     - Adiciona lógica de novas tentativas com retardo em probes de verificação SSH ao detectar encerramentos precoces do túnel proxy antes da resposta do daemon.
 12. **Classificação estruturada da razão de término de terminais (`#42481`):**
     - Emite eventos de diagnóstico detalhados registrando a causa exata do fim do terminal (`exited`, `signaled`, `operator_close` e sinais POSIX recebidos).
+13. **Consulta e acompanhamento em tempo real do painel de terminal focado via CLI (`#42555`, resolve `#42553`):**
+    - Adiciona o atributo `focused: boolean` em `orca terminal list --json` (verdadeiro para o painel ativo na aba de terminal visível do workspace ativo);
+    - Introduz o comando `orca terminal watch-focus [--json]`, que monitora via RPC long-poll e emite o identificador do painel focado a cada transição sem polling contínuo.
+14. **Limpeza profunda de estado de sessão de workspaces excluídos (`#42580`, resolve `#35719`):**
+    - Remove todas as abas salvas, layouts, scrollback e registros de retomada de workspaces apagados;
+    - Deixa de recriar placeholders vazios e elimina 65% das linhas do arquivo de sessão em perfis pesados, acelerando as rotinas de salvamento.
+15. **Delimitação de leitura em stdin no statusline do Claude no Windows (`#42504`):**
+    - Aplica limites de tempo à leitura de entrada para permitir que processos de atualização órfãos terminem adequadamente.
 
 ## O que fazer
 
+- Implementar o acompanhamento do terminal focado via CLI com `orca terminal watch-focus` e flag `focused` em listagens (`#42555`, resolve `#42553`).
+- Aplicar a limpeza profunda de estado de sessão e eliminação de placeholders de workspaces excluídos (`#42580`, resolve `#35719`).
 - Adicionar retries resilientes para probes SSH com encerramento de ProxyCommand (`#42484`, resolve `#42470`).
 - Registrar causas estruturadas de encerramento de terminais nos logs do daemon (`#42481`).
+- Delimitar o tempo de leitura de stdin no statusline do Claude no Windows (`#42504`).
 - Resgatar agentes ociosos em sleep usando o checkpoint live salvo para evitar regressão para shell plano (`#42391`).
 - Permitir divisões de terminal direcionais (`up`, `down`, `left`, `right`) via CLI e RPC (`#42374`, resolve `#40658`).
 - Simplificar o diálogo de fechamento de terminais ativos com cópia enxuta (`#42368`).

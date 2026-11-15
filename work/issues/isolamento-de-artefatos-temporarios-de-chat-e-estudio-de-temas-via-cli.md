@@ -3,7 +3,7 @@ scope:
   - brza-studio
   - brza-workflow
   - brza-cli
-description: Os PRs #42563, #42536, #42479, #42418, #42410, #42360, #42349 trazem publicação de temas via CLI, legibilidade de seleções desfocadas, retenção de diários e estúdio de temas.
+description: Os PRs #42623, #42612, #42563, #42536, #42479, #42418, #42410, #42360 trazem publicação de temas via CLI, motor unificado de contraste, espécime dark/light e estúdio de temas.
 opened: 2026-11-14
 status: open
 priority: high
@@ -38,6 +38,10 @@ Rastreia melhorias críticas de ciclo de vida de arquivos em chats de agentes, c
    - Adiciona `orca theme publish` para empacotar e publicar um tema salvo no GitHub com validação de contraste prévia, exibição do plano de publicação e execução estritamente sob confirmação com `--yes`.
 8. **Legibilidade de seleções de texto em editores desfocados ([PR #42536](https://github.com/stablyai/orca/pull/42536)):**
    - Mantém o contraste de seleção de texto nítido no editor de código mesmo quando a janela ou aba perde o foco, usando contraste adaptativo de primeiro plano e fundo.
+9. **Motor unificado de contraste com sonda pura de cores ([PR #42612](https://github.com/stablyai/orca/pull/42612)):**
+   - Implementa motor determinístico de contraste de cores sem dependências externas pesadas, com sonda direta de luminância relativa e tabela de validação integrada para WCAG AA/AAA na CLI e na UI.
+10. **Espécime comparativo de ambos os modos (dark/light) e alertas de coerência na CLI ([PR #42623](https://github.com/stablyai/orca/pull/42623)):**
+    - Adiciona ferramenta de espécime visual em `orca theme specimen` para renderizar componentes em ambos os modos claro e escuro simultaneamente, emitindo alertas imediatos de perda de legibilidade ou deriva de tokens.
 
 ## Impacto no BrzA Studio
 

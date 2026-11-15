@@ -11,6 +11,9 @@ refs:
   - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
   - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
   - issue:conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes
+  - issue:consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks
+  - issue:cursor-no-chat-via-acp-previa-de-links-de-imagem-bifurcacao-resiliente-e-leitura-por-voz
+  - issue:integracao-nativa-do-devin-no-chat-respostas-a-mensagens-especificas-e-abertura-de-arquivos-alterados
   - issue:isolamento-de-artefatos-temporarios-de-chat-e-estudio-de-temas-via-cli
   - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
   - issue:redesenho-de-cartoes-de-resposta-progresso-por-etapas-e-fila-de-mensagens
@@ -56,3 +59,36 @@ refs:
      e a Issue `#42575` (propagação da família tipográfica do Studio para frames de plugins via variável CSS `--orca-font-family`).
    - [Conectores de linhagem na sidebar, cores de grupos de projeto e isolamento de extensões em perfis](../issues/conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes.md):
      adicionado o PR `#42574` (resolve Issue `#42556` — início do cronômetro de expiração de cache de prompt do Claude na sidebar restrito aos momentos posteriores ao envio real de requisições de IA).
+
+### 2. Ciclo de 6h (06:00 BRT / 09:00 UTC em 2026-11-15)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-15T03:00:00Z` e `2026-11-15T09:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Integração nativa do Devin no chat, respostas a mensagens específicas e abertura de arquivos alterados](../issues/integracao-nativa-do-devin-no-chat-respostas-a-mensagens-especificas-e-abertura-de-arquivos-alterados.md):
+     rastreia o PR `#42598` (resolve Issue `#30791` — integração do Devin como agente estruturado ACP com migração *in-place* de sessões de terminal, mapeamento de `run_subagent` no roster e geração de títulos e texto *one-shot* via `devin --print`),
+     o PR `#42650` (resposta direta com citação a mensagens específicas com faixa "Replying to …", citação de até 500 caracteres, salto de rolagem e botão dedicado de rewind),
+     e o PR `#42647` (abertura direta de arquivos HTML no navegador integrado com auto-refresh e visualização direta de Markdown a partir de cartões de resumo do chat e visualizadores de diffs do Source Control).
+3. **Atualização de 5 issues existentes em `work/issues/`:**
+   - [Cursor no Chat via ACP, prévia de links de imagem, bifurcação resiliente e leitura por voz](../issues/cursor-no-chat-via-acp-previa-de-links-de-imagem-bifurcacao-resiliente-e-leitura-por-voz.md):
+     adicionados o PR `#42654` (resolve Issue `#42653` — síntese e leitura de respostas em voz alta no cliente mobile usando a voz nativa do smartphone),
+     o PR `#42646` (resolve Issue `#42645` — visualização em tela cheia de blocos de código com rotulagem automática de cercas sem linguagem no mobile),
+     o PR `#42639` (resolve Issue `#42631` — Context Sheet unificado no mobile para câmera direta, fotos recentes e arquivos do workspace),
+     o PR `#42590` (rastreamento e reabertura correta de conversas do OpenCode após movimentação de pastas de projetos),
+     e a Issue `#42602` (prevenção de seletor TUI indevido em `/models` do OpenCode no app móvel).
+   - [Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal](../issues/retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal.md):
+     adicionados o PR `#42651` (resolve Issue `#40329` — novo comando `orca terminal close --tab-id <tabId>` para fechamento programático seguro de abas de terminais já inativos/mortos com proteção `terminal_tab_live`),
+     o PR `#42614` (resolve Issue `#30621` — compartilhamento unificado do histórico do Codex em `~/.codex` entre todas as contas via links/junctions sem duplicação de dados),
+     e a Issue `#42619` (mitigação de travamentos de sincronização e telas congeladas em hosts de terminal legados).
+   - [Isolamento de artefatos temporários de chat e estúdio de temas via CLI](../issues/isolamento-de-artefatos-temporarios-de-chat-e-estudio-de-temas-via-cli.md):
+     adicionados o PR `#42612` (motor determinístico e unificado de contraste de cores com sonda pura de luminância e tabela de conformidade WCAG integradas na CLI e UI),
+     e o PR `#42623` (ferramenta `orca theme specimen` para inspeção comparativa de componentes em modos claro e escuro simultaneamente com alertas de coerência e contraste).
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados o PR `#42658` (resolve Issue `#42657` — preservação da extensão correta registrada por plugins no primeiro salvamento "Save as" de arquivos gerados),
+     a Issue `#42632` (persistência e execução contínua de painéis de plugins em background na sidebar ao alternar de aba),
+     e o PR `#42638` (relacionado a `#42637` — estabilização de subpastas `source.path` combinadas com workers assíncronos em plugins).
+   - [Consumo de recursos em agentes: reaper de LSP e overhead de hooks](../issues/consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks.md):
+     adicionados o PR `#42660` (resolve Issue `#19116` — suspensão de loops de renderização e descarregamento de memória GPU para abas não observadas no `orca serve`),
+     o PR `#42655` (dreno imediato de entrada e saída rápida de hooks executados fora do contexto de automação do Orca),
+     e a Issue `#42601` (desativação limpa e tratamento de hooks órfãos de python3 após remoção do aplicativo).

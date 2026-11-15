@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41980, #41206, #41183, #41248, #41247 trazem preservação durável de histórico de terminal após reconnect/sleep, retomada de sessões pela CLI e replay confiável.
+description: Os PRs #42651, #42614, #42555, #42580, #41980, #41206 e as issues #40329, #30621, #42619 trazem fechamento de abas via CLI por tab-id, unificação do histórico do Codex (~/.codex), retenção de sessão e replay durável.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,9 @@ tags:
 
 # Retomada de sessões gravadas pela CLI, hosts de workspace e replay de terminal
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42555`](https://github.com/stablyai/orca/pull/42555) (resolve Issue [`#42553`](https://github.com/stablyai/orca/issues/42553)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42651`](https://github.com/stablyai/orca/pull/42651) (resolve Issue [`#40329`](https://github.com/stablyai/orca/issues/40329)),
+[`stablyai/orca#42614`](https://github.com/stablyai/orca/pull/42614) (resolve Issue [`#30621`](https://github.com/stablyai/orca/issues/30621)),
+[`stablyai/orca#42555`](https://github.com/stablyai/orca/pull/42555) (resolve Issue [`#42553`](https://github.com/stablyai/orca/issues/42553)),
 [`stablyai/orca#42580`](https://github.com/stablyai/orca/pull/42580) (resolve Issue [`#35719`](https://github.com/stablyai/orca/issues/35719)),
 [`stablyai/orca#42504`](https://github.com/stablyai/orca/pull/42504),
 [`stablyai/orca#42484`](https://github.com/stablyai/orca/pull/42484) (resolve Issue [`#42470`](https://github.com/stablyai/orca/issues/42470)),
@@ -27,7 +29,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42555`](https://github.com
 [`stablyai/orca#41206`](https://github.com/stablyai/orca/pull/41206) (resolve Issue [`#41204`](https://github.com/stablyai/orca/issues/41204)),
 [`stablyai/orca#41183`](https://github.com/stablyai/orca/pull/41183),
 [`stablyai/orca#41248`](https://github.com/stablyai/orca/pull/41248),
-[`stablyai/orca#41247`](https://github.com/stablyai/orca/pull/41247) e da issue
+[`stablyai/orca#41247`](https://github.com/stablyai/orca/pull/41247), além das issues
+[`stablyai/orca#42619`](https://github.com/stablyai/orca/issues/42619) e
 [`stablyai/orca#41184`](https://github.com/stablyai/orca/issues/41184).
 
 ## O problema
@@ -74,6 +77,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42555`](https://github.com
     - Workspaces deletados deixavam para trás milhares de linhas de layouts, abas, scrollback e placeholders vazios no arquivo de sessão, inflando o perfil em megabytes e degradando o tempo de salvamento contínuo.
 15. **Travamento de statusline do Claude no Windows em stdin infinito (`#42504`):**
     - Atualizações abandonadas da linha de status do Claude no Windows mantinham o processo bloqueado aguardando leitura de `stdin` sem teto de timeout, acumulando processos zumbis.
+16. **Impossibilidade de fechar abas de terminais já parados via CLI sem interação manual (`#42651`, resolve `#40329`):**
+    - Automações externas e scripts de limpeza não podiam fechar abas de terminais mortos/finalizados sem intervenção gráfica do usuário, acumulando abas inativas.
+17. **Fragmentação e deriva do histórico do Codex entre múltiplas contas (`#42614`, resolve `#30621`):**
+    - A separação de diretórios por perfil gerava duplicação maciça de arquivos `.jsonl` em `~/.codex` e inconsistência no histórico compartilhado de conversas.
+18. **Telas congeladas em hosts de terminal legados (`#42619`):**
+    - Falhas de sincronização causavam congelamento da saída do terminal em hosts com versões desatualizadas do daemon.
 
 ## O que o upstream propõe e implementa
 
@@ -115,8 +124,19 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42555`](https://github.com
     - Deixa de recriar placeholders vazios e elimina 65% das linhas do arquivo de sessão em perfis pesados, acelerando as rotinas de salvamento.
 15. **Delimitação de leitura em stdin no statusline do Claude no Windows (`#42504`):**
     - Aplica limites de tempo à leitura de entrada para permitir que processos de atualização órfãos terminem adequadamente.
+16. **Comando `orca terminal close --tab-id <tabId>` para fechar abas inativas via CLI (`#42651`, resolve `#40329`):**
+    - Permite fechar abas de terminais já finalizados programaticamente através do seu identificador de aba (`--tab-id`);
+    - Valida o estado do processo subjacente e recusa com segurança o fechamento de terminais ainda vivos (`terminal_tab_live`), protegendo processos em andamento contra interrupções acidentais.
+17. **Compartilhamento unificado do histórico do Codex (`~/.codex`) via links sem duplicação (`#42614`, resolve `#30621`):**
+    - Unifica o armazenamento de sessões e histórico conversacional do Codex entre diferentes contas e perfis através de junctions e links simbólicos, eliminando arquivos `.jsonl` redundantes e divergências de estado.
+18. **Mitigação de telas congeladas em hosts de terminal legados (`#42619`):**
+    - Detecta e recupera a transmissão de saída de tela em hosts remotos que executam versões anteriores do daemon de terminal, prevenindo congelamentos de buffer.
 
 ## O que fazer
+
+- Implementar o comando `orca terminal close --tab-id <tabId>` com proteção `terminal_tab_live` (`#42651`, resolve `#40329`).
+- Adotar o compartilhamento de `~/.codex` entre perfis sem duplicação de dados (`#42614`, resolve `#30621`).
+- Mitigar o congelamento de buffers em hosts de terminal legados (`#42619`).
 
 - Implementar o acompanhamento do terminal focado via CLI com `orca terminal watch-focus` e flag `focused` em listagens (`#42555`, resolve `#42553`).
 - Aplicar a limpeza profunda de estado de sessão e eliminação de placeholders de workspaces excluídos (`#42580`, resolve `#35719`).

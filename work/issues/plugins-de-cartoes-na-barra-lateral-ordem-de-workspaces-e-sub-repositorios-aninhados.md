@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42085, #42057, #40597, #40604, #40603 trazem painéis de plugins como páginas, editores de diff customizados, grupos em Pinned e Move to top.
+description: Os PRs #42658, #42638, #42558, #42085, #42057 e issues #42657, #42632 trazem extensão em Save as de plugins, persistência de painéis em background e SVG customizado.
 scope:
   - brza-studio
   - workspace
@@ -17,7 +17,9 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42558`](https://github.com/stablyai/orca/pull/42558) (relacionado a [`#41707`](https://github.com/stablyai/orca/issues/41707) e [`#28300`](https://github.com/stablyai/orca/issues/28300)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42658`](https://github.com/stablyai/orca/pull/42658) (resolve Issue [`#42657`](https://github.com/stablyai/orca/issues/42657)),
+[`stablyai/orca#42638`](https://github.com/stablyai/orca/pull/42638) (relacionado a [`#42637`](https://github.com/stablyai/orca/issues/42637)),
+[`stablyai/orca#42558`](https://github.com/stablyai/orca/pull/42558) (relacionado a [`#41707`](https://github.com/stablyai/orca/issues/41707) e [`#28300`](https://github.com/stablyai/orca/issues/28300)),
 [`stablyai/orca#42085`](https://github.com/stablyai/orca/pull/42085) (resolve Issue [`#42080`](https://github.com/stablyai/orca/issues/42080)),
 [`stablyai/orca#42057`](https://github.com/stablyai/orca/pull/42057),
 [`stablyai/orca#42068`](https://github.com/stablyai/orca/pull/42068),
@@ -70,6 +72,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42558`](https://github.com
 [`#38214`](https://github.com/stablyai/orca/issues/38214),
 [`#38112`](https://github.com/stablyai/orca/issues/38112),
 [`#38017`](https://github.com/stablyai/orca/issues/38017),
+[`#42632`](https://github.com/stablyai/orca/issues/42632),
 [`#18401`](https://github.com/stablyai/orca/issues/18401),
 [`#15323`](https://github.com/stablyai/orca/issues/15323) e
 [`#37761`](https://github.com/stablyai/orca/issues/37761).
@@ -183,9 +186,18 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42558`](https://github.com
 40. **Ícones SVG customizados para painéis de plugins e herança tipográfica (`#42558`, `#42575`):**
     - Permite que painéis de plugins utilizem arquivos SVG relativos ao plugin como ícone da activity-bar; o host valida os arquivos de tamanho delimitado e os serve com restrição de segurança, desenhando-os na sidebar como máscara monocromática com fallback gracioso;
     - Propaga a família tipográfica do Studio para os frames dos plugins através da variável CSS `--orca-font-family`.
+41. **Preservação de extensões de arquivos não salvos de plugins no primeiro salvamento (`#42658`, resolve `#42657`):**
+    - Garante que arquivos gerados dinamicamente por plugins (como `.excalidraw` ou diagramas) mantenham sua extensão correta no diálogo inicial de "Save as", impedindo regressão indesejada para texto plano `.txt`.
+42. **Persistência de painéis de plugins ativos em background na sidebar (`#42632`):**
+    - Mantém painéis de plugins que reproduzem mídia ou realizam tarefas contínuas vivos em segundo plano mesmo quando outra aba da sidebar for ativada, prevenindo interrupção de reprodução de mídia.
+43. **Coexistência de subpastas `source.path` e hooks de worker em plugins (`#42638`, relacionado a `#42637`):**
+    - Estabiliza a resolução de caminhos de arquivos em plugins que combinam subpastas customizadas de código com ganchos de execução assíncrona em workers.
 
 ## O que fazer
 
+- Preservar a extensão correta de arquivos de plugins no primeiro salvamento (`#42658`, resolve `#42657`).
+- Manter a execução de painéis de plugins em background na alternância de abas da sidebar (`#42632`).
+- Suportar subpastas `source.path` e hooks de workers em plugins (`#42638`, `#42637`).
 - Suportar ícones SVG customizados na activity-bar para painéis de plugins e herança de fonte (`#42558`, `#42575`).
 - Suportar abertura de painéis de plugins como páginas dedicadas na navegação principal (`#42085`, resolve `#42080`).
 - Oferecer editores customizados de plugins em abas de diff de arquivo único no Source Control (`#42057`).

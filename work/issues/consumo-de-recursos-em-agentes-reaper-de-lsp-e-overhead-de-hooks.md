@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38189, #38180 e #38199 do upstream reduzem drasticamente o consumo de memória e processos de agentes via idle reaper para servidores TypeScript LSP e otimização de hooks do Claude.
+description: Os PRs #42660, #42655, #38189, #38180 e issues #19116, #42601 reduzem o consumo de memória e GPU via suspensão de abas no serve, dreno de hooks e reaper de LSP.
 scope:
   - brza-studio
   - tools-kit
@@ -14,12 +14,12 @@ tags:
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38189`](https://github.com/stablyai/orca/pull/38189) (Issue
-[`#38188`](https://github.com/stablyai/orca/issues/38188)),
-[`stablyai/orca#38180`](https://github.com/stablyai/orca/pull/38180) (Issue
-[`#38179`](https://github.com/stablyai/orca/issues/38179)) e
-[`stablyai/orca#38199`](https://github.com/stablyai/orca/pull/38199) (Issue
-[`#38181`](https://github.com/stablyai/orca/issues/38181)).
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42660`](https://github.com/stablyai/orca/pull/42660) (resolve Issue [`#19116`](https://github.com/stablyai/orca/issues/19116)),
+[`stablyai/orca#42655`](https://github.com/stablyai/orca/pull/42655),
+[`stablyai/orca#38189`](https://github.com/stablyai/orca/pull/38189) (Issue [`#38188`](https://github.com/stablyai/orca/issues/38188)),
+[`stablyai/orca#38180`](https://github.com/stablyai/orca/pull/38180) (Issue [`#38179`](https://github.com/stablyai/orca/issues/38179)),
+[`stablyai/orca#38199`](https://github.com/stablyai/orca/pull/38199) (Issue [`#38181`](https://github.com/stablyai/orca/issues/38181)) e da issue
+[`stablyai/orca#42601`](https://github.com/stablyai/orca/issues/42601).
 
 ## O problema
 
@@ -35,6 +35,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38189`](https://github.com
 3. **Evicção indevida do binário do runtime Node em servidores `orcad` (`#38199`, `#38181`):** a rotina de limpeza de cache de
    artefatos (`pruneOrcadArtifactCache`) removia erroneamente a pasta `runtimes/`, quebrando execuções remotas subsequentes
    com erro `ENOENT` ao tentar disparar o binário `node`.
+4. **Consumo contínuo de CPU e GPU por abas de navegador não observadas no `orca serve` (`#42660`, resolve `#19116`):**
+   Abas do navegador embutido abertas em segundo plano continuavam renderizando frames e executando loops visuais mesmo sem foco ou visibilidade, retendo centenas de megabytes de memória GPU.
+5. **Sobrecarga de hooks de agentes disparados sem contexto Orca ativo (`#42655`):**
+   Comandos executados fora do contexto de automação do Orca disparavam rotinas completas de inspeção de hooks antes do leitor de eventos, gerando lentidão e saídas bloqueantes desnecessárias.
+6. **Disparos zumbis de hooks por chamadas órfãs de python3 após desinstalação (`#42601`):**
+   Hooks residuais configurados no ambiente do usuário continuavam invocando `python3` ciclicamente mesmo após a remoção ou encerramento do app principal.
 
 ## O que o upstream propõe e implementa
 
@@ -52,8 +58,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38189`](https://github.com
   - Reduz de 17 para 7 processos no macOS (e para 6 no Linux), preservando byte a byte as mensagens entregues ao servidor de hooks.
 - **Proteção da pasta de runtimes no orcad (`#38199`):**
   - Exclui explicitamente o diretório `runtimes/` da política de evicção do cache de artefatos.
+- **Suspensão de renderização e liberação de GPU em abas inativas do `orca serve` (`#42660`, resolve `#19116`):**
+  - Pausa o renderizador contínuo e descarrega texturas de memória de vídeo para abas do navegador que não estão ativamente visíveis na interface remota, economizando ciclos de GPU e memória RAM sob concorrência.
+- **Dreno rápido e saída limpa de hooks fora do contexto Orca (`#42655`):**
+  - Detecta antecipadamente a ausência de variáveis de ambiente e sockets de controle do Orca, drenando a entrada e saindo com status 0 instantaneamente sem processamento pesado.
+- **Tratamento de hooks órfãos de python3 (`#42601`):**
+  - Desativa com segurança hooks obsoletos ao detectar ausência do executável principal ou flags de desinstalação.
 
 ## O que fazer
 
-Portar a redução de overhead de hooks (`#38180`) e o reaper de LSP ocioso (`#38189`) para o `brza-studio`, assegurando que
-workflows com dezenas de agentes concorrentes não degradem a CPU nem esgotem a memória da máquina de desenvolvimento.
+- Portar a redução de overhead de hooks (`#38180`) e o reaper de LSP ocioso (`#38189`) para o `brza-studio`.
+- Aplicar a suspensão de renderização e liberação de GPU em abas não observadas do `orca serve` (`#42660`, resolve `#19116`).
+- Adotar a saída rápida de hooks sem contexto Orca ativo (`#42655`).
+- Prevenir a execução zumbi de hooks órfãos de python3 (`#42601`).

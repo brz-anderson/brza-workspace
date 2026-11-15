@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42122, #42114, #42112, #42111, #41979, #41757, #41746, #41702, #41729 trazem otimização do pull-loop, reuso de worker mid-turn e baixa de perguntas.
+description: Os PRs #42747, #42708, #42707, #42535, #42122 e as issues #42732, #42731, #42719 trazem filtro --run em orchestration inbox, prompts respondidos mid-tool, paginação de workers e terminais coordenadores ocultos.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,10 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42535`](https://github.com/stablyai/orca/pull/42535) (resolve Issue [`#42148`](https://github.com/stablyai/orca/issues/42148)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42747`](https://github.com/stablyai/orca/pull/42747) (resolve Issue [`#42732`](https://github.com/stablyai/orca/issues/42732)),
+[`stablyai/orca#42708`](https://github.com/stablyai/orca/pull/42708),
+[`stablyai/orca#42707`](https://github.com/stablyai/orca/pull/42707),
+[`stablyai/orca#42535`](https://github.com/stablyai/orca/pull/42535) (resolve Issue [`#42148`](https://github.com/stablyai/orca/issues/42148)),
 [`stablyai/orca#42338`](https://github.com/stablyai/orca/pull/42338) (resolve Issue [`#42103`](https://github.com/stablyai/orca/issues/42103)),
 [`stablyai/orca#42264`](https://github.com/stablyai/orca/pull/42264) (resolve Issue [`#19166`](https://github.com/stablyai/orca/issues/19166)),
 [`stablyai/orca#42284`](https://github.com/stablyai/orca/pull/42284) (resolve Issue [`#42230`](https://github.com/stablyai/orca/issues/42230)),
@@ -28,7 +31,11 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42535`](https://github.com
 [`stablyai/orca#41702`](https://github.com/stablyai/orca/pull/41702),
 [`stablyai/orca#41729`](https://github.com/stablyai/orca/pull/41729) (resolve Issue [`#41726`](https://github.com/stablyai/orca/issues/41726)) e
 [`stablyai/orca#41754`](https://github.com/stablyai/orca/pull/41754) (resolve Issue [`#40838`](https://github.com/stablyai/orca/issues/40838)),
-além da issue [`stablyai/orca#42084`](https://github.com/stablyai/orca/issues/42084).
+além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues/42731),
+[`stablyai/orca#42719`](https://github.com/stablyai/orca/issues/42719),
+[`stablyai/orca#42733`](https://github.com/stablyai/orca/issues/42733),
+[`stablyai/orca#42734`](https://github.com/stablyai/orca/issues/42734) e
+[`stablyai/orca#42084`](https://github.com/stablyai/orca/issues/42084).
 
 ## O problema
 
@@ -65,6 +72,16 @@ além da issue [`stablyai/orca#42084`](https://github.com/stablyai/orca/issues/4
     - Scripts que coordenavam múltiplos workers a partir do chat não conseguiam correlacionar a sessão de chat que solicitou o worker (`creatorOrcaSessionId`) nem a sessão atribuída a ele (`assigneeOrcaSessionId`).
 13. **Aceite inadvertido de relatórios vazios em `worker_done` (`#42535`, resolve `#42148`):**
     - Quando um script de worker falhava ao ler o arquivo de relatório (ex.: `cat missing-file` vazio), o comando `orchestration send --type worker_done` aceitava `--body ""` como se o corpo tivesse sido omitido, concluindo a tarefa prematuramente e perdendo o relatório de execução.
+14. **Listagem indiscriminada de todas as caixas postais da máquina em `orchestration inbox` (`#42747`, resolve `#42732`):**
+    - O comando `orca orchestration inbox` listava todas as mailboxes da máquina por padrão sem expor o parâmetro `--run`, embora o backend RPC já oferecesse suporte a filtragem por Run.
+15. **Prompts de terminal aprovados não marcados como respondidos durante a execução de ferramentas (`#42708`):**
+    - Enquanto a ferramenta aprovada pelo usuário ainda estava em execução, o prompt interativo continuava aparecendo como pendente no orquestrador, arriscando duplicidade de aprovação.
+16. **Truncamento de leituras de workers de chat e perda de projeção de frota (`#42707`):**
+    - Leituras massivas de mensagens de workers saturavam buffers em consultas não paginadas, corrompendo a projeção consolidada da frota de agentes.
+17. **Refugos indevidos de `decision_gate` entregues como mensagens `[HIGH]` (`#42731`):**
+    - Quando um `decision_gate` era rejeitado por um agente não-atribuído, a recusa era persistida e entregue ao coordenador com rótulo urgente `[HIGH] "Rejected decision_gate"`, gerando alarmes falsos.
+18. **Poluição de abas com terminais coordenadores de Runs e saídas JSON inchadas (`#42719`, `#42733`, `#42734`):**
+    - Execuções de automação criavam abas de terminal visíveis obrigatórias para coordenadores; saídas de `worktree ps/list --json` despejavam ~0.5 MB (~130k tokens) de campos nulos e duplicados sem visão concisa; e recibos de `worker-start` omitiam o caminho do worktree e título da tarefa.
 
 ## O que o upstream implementa
 
@@ -99,9 +116,23 @@ além da issue [`stablyai/orca#42084`](https://github.com/stablyai/orca/issues/4
     - Expõe os IDs de sessão de chat vinculados ao criador e ao destinatário do worker na resposta `--full`.
 13. **Rejeição de relatórios vazios ou whitespace em `worker_done` (`#42535`, resolve `#42148`):**
     - Valida `--body` na CLI e parâmetros de envio no RPC para rejeitar corpos vazios em `worker_done`, retornando `invalid_argument` e mantendo a tarefa aberta para reenvio sem perda de relatórios.
+14. **Suporte a `--run` em `orchestration inbox` (`#42747`, resolve `#42732`):**
+    - Expõe a flag `--run <runId>` na CLI `orca orchestration inbox` e encaminha o filtro ao backend RPC, permitindo inspecionar apenas a caixa postal vinculada à execução ativa.
+15. **Contabilização de prompt aprovado como respondido durante ferramenta em execução (`#42708`):**
+    - Marca prompts interativos como respondidos no ato da aprovação para que não reapareçam como pendentes durante a execução de ferramentas lentas.
+16. **Paginação de leituras de workers de chat e projeção estável de frota (`#42707`):**
+    - Aplica paginação eficiente na recuperação de mensagens de workers antes de aplicar limites rígidos, mantendo a consistência da projeção agregada da frota de agentes.
+17. **Terminais coordenadores ocultos e compactação de payloads (`#42719`, `#42731`, `#42733`, `#42734`):**
+    - Introduz modo de terminal coordenador sem aba dedicada no editor para orquestrações autônomas;
+    - Descarta notificações urgentes para decisões recusadas por terceiros;
+    - Reduz em mais de 70% o payload JSON de `worktree ps/list` omitindo campos redundantes e expõe o worktree e título nos recibos de `worker-start`.
 
 ## O que fazer
 
+- Adicionar o parâmetro `--run` em `brza orchestration inbox` para filtrar caixas postais por execução (`#42747`, resolve `#42732`).
+- Marcar prompts de terminal aprovados como respondidos durante a execução da ferramenta (`#42708`).
+- Adotar a paginação de leituras de workers de chat e projeção estável de frota (`#42707`).
+- Suportar terminais coordenadores ocultos em execuções de orquestração (`#42719`) e compactar saídas de worktree (`#42733`, `#42734`).
 - Rejeitar relatórios vazios em `worker_done` para impedir conclusão prematura sem sumário (`#42535`, resolve `#42148`).
 - Adotar a preservação do nó `run` e `coordinator_handle` no output conciso `--json` (`#42338`, resolve `#42103`).
 - Suportar a liberação resiliente em `worker-release` de workers cujo terminal PTY já encerrou (`#42264`, resolve `#19166`).

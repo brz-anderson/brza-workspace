@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42660, #42655, #38189, #38180 e issues #19116, #42601 reduzem o consumo de memória e GPU via suspensão de abas no serve, dreno de hooks e reaper de LSP.
+description: Os PRs #42686, #42743, #42725, #42660, #42655 e as issues #42724, #42675 trazem descarte de abas ociosas no serve, exec hooks seguros no Windows e fechamento ágil de terminais.
 scope:
   - brza-studio
   - tools-kit
@@ -14,11 +14,15 @@ tags:
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42660`](https://github.com/stablyai/orca/pull/42660) (resolve Issue [`#19116`](https://github.com/stablyai/orca/issues/19116)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42686`](https://github.com/stablyai/orca/pull/42686),
+[`stablyai/orca#42743`](https://github.com/stablyai/orca/pull/42743),
+[`stablyai/orca#42725`](https://github.com/stablyai/orca/pull/42725) (resolve Issue [`#42724`](https://github.com/stablyai/orca/issues/42724)),
+[`stablyai/orca#42660`](https://github.com/stablyai/orca/pull/42660) (resolve Issue [`#19116`](https://github.com/stablyai/orca/issues/19116)),
 [`stablyai/orca#42655`](https://github.com/stablyai/orca/pull/42655),
 [`stablyai/orca#38189`](https://github.com/stablyai/orca/pull/38189) (Issue [`#38188`](https://github.com/stablyai/orca/issues/38188)),
 [`stablyai/orca#38180`](https://github.com/stablyai/orca/pull/38180) (Issue [`#38179`](https://github.com/stablyai/orca/issues/38179)),
-[`stablyai/orca#38199`](https://github.com/stablyai/orca/pull/38199) (Issue [`#38181`](https://github.com/stablyai/orca/issues/38181)) e da issue
+[`stablyai/orca#38199`](https://github.com/stablyai/orca/pull/38199) (Issue [`#38181`](https://github.com/stablyai/orca/issues/38181)),
+além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues/42675) e
 [`stablyai/orca#42601`](https://github.com/stablyai/orca/issues/42601).
 
 ## O problema
@@ -41,6 +45,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42660`](https://github.com
    Comandos executados fora do contexto de automação do Orca disparavam rotinas completas de inspeção de hooks antes do leitor de eventos, gerando lentidão e saídas bloqueantes desnecessárias.
 6. **Disparos zumbis de hooks por chamadas órfãs de python3 após desinstalação (`#42601`):**
    Hooks residuais configurados no ambiente do usuário continuavam invocando `python3` ciclicamente mesmo após a remoção ou encerramento do app principal.
+7. **Retenção contínua de memória por abas ociosas no `orca serve` (`#42686`):**
+   Abas abertas no navegador remoto permaneciam alocadas em memória indefinidamente mesmo após horas de inatividade, sem descarregamento automático de processos filhos.
+8. **Falhas na execução de hooks do Claude no Windows com espaços em caminhos de executáveis (`#42743`):**
+   Quando o Claude era instalado em caminhos contendo espaços no Windows, o formato legado de invocação de hook falhava por erro de citação de linha de comando.
+9. **Atraso de ~2.1s no fechamento de terminais e estouro de tiles de custos (`#42675`, `#42725`, resolve `#42724`):**
+   O fechamento de terminais interativos zsh aguardava desnecessariamente 2.1s de grace period de SIGKILL porque o zsh ignora SIGTERM por padrão; em Stats & Usage, valores altos de custos transbordavam seus cartões visuais.
 
 ## O que o upstream propõe e implementa
 
@@ -64,9 +74,20 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42660`](https://github.com
   - Detecta antecipadamente a ausência de variáveis de ambiente e sockets de controle do Orca, drenando a entrada e saindo com status 0 instantaneamente sem processamento pesado.
 - **Tratamento de hooks órfãos de python3 (`#42601`):**
   - Desativa com segurança hooks obsoletos ao detectar ausência do executável principal ou flags de desinstalação.
+- **Descarte e restauração transparente de abas ociosas no `orca serve` (`#42686`):**
+  - Descarrega processos de abas do navegador remoto após período configurável de inatividade, restaurando a página sob demanda no primeiro acesso sem perder cookies nem contexto.
+- **Formato seguro de exec hook para caminhos com espaços no Windows (`#42743`):**
+  - Adota chamada estruturada em array de argumentos para hooks do Claude no Windows, eliminando falhas de quoting e caminhos com espaços.
+- **Confinamento de custos em Stats & Usage e sinal de encerramento de terminal (`#42725`, `#42675`, resolve `#42724`):**
+  - Ajusta a tipografia e contenção em tiles de custos grandes para evitar quebra de layout;
+  - Trata o sinal de fechamento de terminais zsh para evitar esperar o timeout de 2.1s de SIGKILL.
 
 ## O que fazer
 
+- Descarregar automaticamente abas ociosas de navegador no `brza serve` e restaurá-las sob demanda (`#42686`).
+- Adotar o formato seguro de exec hook para caminhos de executáveis no Windows (`#42743`).
+- Conter valores grandes de custos nos cartões de Stats & Usage (`#42725`, resolve `#42724`).
+- Eliminar a espera desnecessária de 2.1s no fechamento de terminais zsh (`#42675`).
 - Portar a redução de overhead de hooks (`#38180`) e o reaper de LSP ocioso (`#38189`) para o `brza-studio`.
 - Aplicar a suspensão de renderização e liberação de GPU em abas não observadas do `orca serve` (`#42660`, resolve `#19116`).
 - Adotar a saída rápida de hooks sem contexto Orca ativo (`#42655`).

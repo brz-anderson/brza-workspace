@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39256, #39106, #39569 e as issues #39704, #38825 trazem projeções SQLite no chat nativo, URLs no terminal e submenu na busca de agentes.
+description: Os PRs #42738, #39256, #39106, #39569 e as issues #42730, #42673 trazem retomada de sessões no menu de agentes (+), projeções SQLite no chat e URLs no terminal.
 scope:
   - brza-studio
   - workspace
@@ -13,11 +13,13 @@ tags:
 
 # Projeções SQLite de Native Chat, submenu de agentes e links no terminal
 
-Rastreado do PR aberto no upstream [`stablyai/orca#39256`](https://github.com/stablyai/orca/pull/39256),
-do PR [`stablyai/orca#39106`](https://github.com/stablyai/orca/pull/39106) (resolve Issue [`#39105`](https://github.com/stablyai/orca/issues/39105)),
-do PR [`stablyai/orca#39569`](https://github.com/stablyai/orca/pull/39569),
-do PR [`stablyai/orca#37778`](https://github.com/stablyai/orca/pull/37778),
-além das issues [`stablyai/orca#39704`](https://github.com/stablyai/orca/issues/39704) e
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42738`](https://github.com/stablyai/orca/pull/42738) (resolve Issue [`#42730`](https://github.com/stablyai/orca/issues/42730)),
+[`stablyai/orca#39256`](https://github.com/stablyai/orca/pull/39256),
+[`stablyai/orca#39106`](https://github.com/stablyai/orca/pull/39106) (resolve Issue [`#39105`](https://github.com/stablyai/orca/issues/39105)),
+[`stablyai/orca#39569`](https://github.com/stablyai/orca/pull/39569),
+[`stablyai/orca#37778`](https://github.com/stablyai/orca/pull/37778),
+além das issues [`stablyai/orca#42673`](https://github.com/stablyai/orca/issues/42673),
+[`stablyai/orca#39704`](https://github.com/stablyai/orca/issues/39704) e
 [`stablyai/orca#38825`](https://github.com/stablyai/orca/issues/38825).
 
 ## O problema
@@ -44,9 +46,15 @@ além das issues [`stablyai/orca#39704`](https://github.com/stablyai/orca/issues
 6. **Abas de terminal presas em "Reattaching terminal" em clientes desktop pareados (`#38825`):**
    Ao abrir novos terminais a partir de um cliente desktop secundário pareado com o host de desenvolvimento, o handshake de
    reattach falhava, retendo as abas em estado de espera infinito enquanto clientes iPhone e locais funcionavam.
+7. **Ausência de atalho para retomar sessões anteriores no menu de lançamento `+` (`#42738`, resolve `#42730`):**
+   O menu `+` permitia apenas iniciar novas conversas. Para retomar um histórico anterior, o usuário precisava navegar até o painel lateral de agentes ou abrir um chat vazio e digitar `/resume`, que substituía a aba ativa; além disso, faltava suporte a sessões do DSH Harness (`.dsh`) (`#42673`).
 
 ## O que o upstream implementa
 
+- **Ação "Resume session…" no painel de configuração de agentes do menu `+` (`#42738`, resolve `#42730`):**
+  - Adiciona o botão "Resume session…" sob as opções de inicialização (Launch chat / Launch terminal) no painel de cada agente no menu `+`;
+  - Abre diretamente o diálogo de histórico de sessões do workspace ativo já pré-filtrado para o agente selecionado, permitindo restaurar a sessão em uma nova aba com o botão ▶ sem substituir a conversa corrente;
+  - Suporta localização em todos os idiomas suportados (`agentPicker.resumeSession`).
 - **Projeções persistidas em SQLite para Native Chat (`#39256`):**
   - Substitui o journal volátil em memória por projeções tipadas persistidas diretamente no SQLite do host;
   - Utiliza um único gravador assíncrono em segundo plano (*background writer*), procedimentos de leitura delimitados
@@ -67,6 +75,7 @@ além das issues [`stablyai/orca#39704`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Incorporar o botão "Resume session…" no painel de configuração do menu de lançamento `+` (`#42738`, resolve `#42730`) e suporte a sessões DSH Harness (`#42673`).
 - Acompanhar a fusão das projeções SQLite de Native Chat (`#39256`) e planejar a migração do armazenamento de conversas no `brza-studio`.
 - Incorporar a priorização de links HTTP sobre arquivos locais no terminal (`#39106`), eliminando falsos erros de `File not found`.
 - Adotar o submenu unificado em hover para configuração de agentes na pesquisa rápida (`#39569`).

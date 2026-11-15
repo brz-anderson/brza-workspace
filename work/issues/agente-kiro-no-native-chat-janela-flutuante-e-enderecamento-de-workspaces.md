@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40858, #39769, #39733, #39722, #39692 trazem terminais remotos no Floating Workspace, agente Kiro via ACP e janela destacada.
+description: Os PRs #42739, #42741, #42737, #40858, #39769 e issues #42721, #13302 trazem janelas satélite de workspace multijanela (popouts), terminais remotos no Floating Workspace e agente Kiro via ACP.
 scope:
   - brza-studio
   - workspace
@@ -14,12 +14,16 @@ tags:
 
 # Agente Kiro no Native Chat, janela flutuante e endereçamento de workspaces
 
-Rastreado do PR aberto no upstream [`stablyai/orca#40858`](https://github.com/stablyai/orca/pull/40858) (resolve Issue [`#13302`](https://github.com/stablyai/orca/issues/13302)),
-do PR [`stablyai/orca#39769`](https://github.com/stablyai/orca/pull/39769) (resolve Issue [`#30095`](https://github.com/stablyai/orca/issues/30095)),
-do PR [`stablyai/orca#39733`](https://github.com/stablyai/orca/pull/39733),
-do PR [`stablyai/orca#39722`](https://github.com/stablyai/orca/pull/39722) (atendendo à Issue [`#22167`](https://github.com/stablyai/orca/issues/22167)),
-do PR [`stablyai/orca#39692`](https://github.com/stablyai/orca/pull/39692) e
-do PR [`stablyai/orca#39741`](https://github.com/stablyai/orca/pull/39741) (resolve Issue [`#39728`](https://github.com/stablyai/orca/issues/39728)).
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42739`](https://github.com/stablyai/orca/pull/42739),
+[`stablyai/orca#42741`](https://github.com/stablyai/orca/pull/42741),
+[`stablyai/orca#42737`](https://github.com/stablyai/orca/pull/42737),
+[`stablyai/orca#40858`](https://github.com/stablyai/orca/pull/40858) (resolve Issue [`#13302`](https://github.com/stablyai/orca/issues/13302)),
+[`stablyai/orca#39769`](https://github.com/stablyai/orca/pull/39769) (resolve Issue [`#30095`](https://github.com/stablyai/orca/issues/30095)),
+[`stablyai/orca#39733`](https://github.com/stablyai/orca/pull/39733),
+[`stablyai/orca#39722`](https://github.com/stablyai/orca/pull/39722) (atendendo à Issue [`#22167`](https://github.com/stablyai/orca/issues/22167)),
+[`stablyai/orca#39692`](https://github.com/stablyai/orca/pull/39692) e
+[`stablyai/orca#39741`](https://github.com/stablyai/orca/pull/39741) (resolve Issue [`#39728`](https://github.com/stablyai/orca/issues/39728)),
+além da issue [`stablyai/orca#42721`](https://github.com/stablyai/orca/issues/42721).
 
 ## O problema
 
@@ -46,9 +50,23 @@ do PR [`stablyai/orca#39741`](https://github.com/stablyai/orca/pull/39741) (reso
 6. **Confinamento de terminais em Floating Workspaces exclusivamente ao host local (`#40858`, resolve `#13302`):**
    No painel do Floating Workspace, o menu "+" permitia abrir apenas novos terminais e agentes locais. Para trabalhar em um
    servidor pareado, o usuário era obrigado a alternar o servidor ativo de todo o aplicativo.
+7. **Ausência de janelas satélite (*popout windows*) multijanela para terminais ativos (`#42739`, `#42721`):**
+   O aplicativo mantinha todos os terminais confinados à janela mestre do Electron; ao tentar destacar abas para fluxos multimonitor, não havia proteção IPC contra concorrência de autoria de sessão nem preservação de PTYs vivos durante ciclos de popout/dock, além da impossibilidade de resetar a geometria de janelas flutuantes descalibradas.
+8. **Perda de escopo de workspace em abas de navegador sidecar (`#42741`, `#42737`):**
+   Abas do navegador sidecar abertas em segundo plano perdiam a atribuição do seu respectivo `worktreeId` no Electron e no `orcad`, causando falhas de isolamento e contexto de execução.
 
 ## O que o upstream implementa
 
+- **Janelas satélite de workspace multijanela (*Workspace Popout Windows*) (`#42739`):**
+  - Implementa suporte a janelas satélite destacadas para terminais ativos sob a flag experimental `experimentalWorkspacePopout`;
+  - Ação de contexto "Move to New Window" em abas de terminal com PTYs;
+  - Preserva o processo PTY vivo na janela mestre durante ciclos de popout e dock sem reinicialização de shell nem perda de histórico;
+  - Partição Chromium isolada (`persist:orca-workspace-popout`) com bloqueio estrito de permissões web e guarda STRIDE no IPC (rejeição de sync de janelas e patches de sessão por renderers satélites);
+  - Recuperação automática de janelas fora da tela ao desconectar monitores e restauração limpa após sleep/wake do sistema operacional.
+- **Redefinição de layout do Floating Workspace (`#42721`):**
+  - Adiciona comando e ação para resetar a posição e o tamanho da janela flutuante para as dimensões padrão do layout.
+- **Preservação de escopo de workspace em abas de navegador sidecar (`#42741`, `#42737`):**
+  - Relata explicitamente o `worktreeId` e mantém o contexto de isolamento em abas de navegador sidecar gerenciadas pelo Electron e pelo daemon `orcad`.
 - **Integração do Kiro no Native Chat via ACP (`#39769`):**
   - Adiciona o Kiro como agente de primeira classe no Native Chat através de `kiro-cli chat --acp --protocol-version 3`;
   - Suporta seleção de modelos suportados pelo Kiro e 6 níveis de reasoning effort (Default, Low, Medium, High, Extra High, Max);
@@ -75,5 +93,8 @@ do PR [`stablyai/orca#39741`](https://github.com/stablyai/orca/pull/39741) (reso
 - Integrar o Kiro como agente selecionável no Native Chat via ACP com seletor de esforço (`#39769`).
 - Adotar a regra unificada `resolveEnclosingWorkspace`, a flag `--parent-environment` e a proteção contra auto-remoção de worktrees na CLI (`#39733`).
 - Avaliar e portar a janela independente para terminais de Floating Workspaces (`#39722`).
+- Adotar as janelas satélite de workspace (*Workspace Popout Satellite Windows*) com guarda STRIDE no IPC e sobrevida de PTYs (`#42739`).
+- Adicionar ação de redefinição de layout do Floating Workspace (`#42721`).
+- Preservar a titularidade de escopo de workspace em abas de navegador sidecar (`#42741`, `#42737`).
 - Habilitar o clique no nome do branch sob o composer de chat para acionar o seletor de branches (`#39692`).
 - Garantir que o `brza serve` suporte pareamento correto em binds fixados de rede/Tailscale (`#39741`).

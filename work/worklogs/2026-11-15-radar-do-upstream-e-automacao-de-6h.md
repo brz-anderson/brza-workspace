@@ -8,7 +8,9 @@ completed: 2026-11-15
 tags:
   - tooling
 refs:
+  - issue:agente-kiro-no-native-chat-janela-flutuante-e-enderecamento-de-workspaces
   - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
+  - issue:aprovacao-de-planos-abc-feedback-de-revisao-inline-e-resiliencia-de-composer-no-chat
   - issue:cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat
   - issue:conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes
   - issue:consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks
@@ -16,9 +18,11 @@ refs:
   - issue:integracao-nativa-do-devin-no-chat-respostas-a-mensagens-especificas-e-abertura-de-arquivos-alterados
   - issue:isolamento-de-artefatos-temporarios-de-chat-e-estudio-de-temas-via-cli
   - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
+  - issue:projecoes-sqlite-de-native-chat-submenu-de-agentes-e-links-no-terminal
   - issue:redesenho-de-cartoes-de-resposta-progresso-por-etapas-e-fila-de-mensagens
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
   - issue:retomada-de-sessoes-gravadas-pela-cli-hosts-de-workspace-e-replay-de-terminal
+  - issue:worktrees-com-clones-copy-on-write-prompt-inicial-de-workspace-e-ack-seletivo-de-inbox
 ---
 
 # Radar de issues e PRs do upstream e automação de 6h (00h, 06h, 12h e 18h BRT)
@@ -92,3 +96,43 @@ refs:
      adicionados o PR `#42660` (resolve Issue `#19116` — suspensão de loops de renderização e descarregamento de memória GPU para abas não observadas no `orca serve`),
      o PR `#42655` (dreno imediato de entrada e saída rápida de hooks executados fora do contexto de automação do Orca),
      e a Issue `#42601` (desativação limpa e tratamento de hooks órfãos de python3 após remoção do aplicativo).
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-15)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-15T09:00:00Z` e `2026-11-15T15:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de 1 nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Aprovação de planos A/B/C, feedback de revisão inline e resiliência de composer no Native Chat](../issues/aprovacao-de-planos-abc-feedback-de-revisao-inline-e-resiliencia-de-composer-no-chat.md):
+     rastreia o PR `#42740` (resolve Issue `#42736` — aprovação de planos com opções estruturadas A/B/C: `allowAcceptEdits`, `allow`, `deny`, atalhos `1`/`2`/`3`, caixa inline "Other" para revisão via <kbd>⌘Enter</kbd> / <kbd>Ctrl+Enter</kbd> e recibos `<opção> · <feedback>`),
+     o PR `#42695` (preservação do rascunho de mensagem e estado do composer em reconexões e troca de abas),
+     o PR `#42710` (pausa automática de chats ocultos em segundo plano para aceleração de troca de abas),
+     o PR `#42704` (resolve Issue `#42701` — retentativa automática com backoff em erros transitórios `-32603` de RPC em `session/load` e `session/resume`),
+     o PR `#42705` (resolve Issue `#42703` — logs de recusa de parada de chat em repouso de workspace),
+     a Issue `#42706` (enfileiramento resiliente de inserção imediata/Steer sem bloqueio de navegação),
+     e a Issue `#42720` (reabertura de abas de chat fechadas via <kbd>⌘Shift+T</kbd> / <kbd>Ctrl+Shift+T</kbd>).
+3. **Atualização de 4 issues existentes em `work/issues/`:**
+   - [Agente Kiro no Native Chat, janela flutuante e endereçamento de workspaces](../issues/agente-kiro-no-native-chat-janela-flutuante-e-enderecamento-de-workspaces.md):
+     adicionados o PR `#42739` (janelas satélite de workspace multijanela sob a flag `experimentalWorkspacePopout`, sobrevida de PTY na janela principal entre popout/dock, guarda STRIDE no IPC e recuperação multi-monitor),
+     a Issue `#42721` (ação para redefinir a geometria e tamanho do Floating Workspace para o layout padrão),
+     e os PRs `#42741` e `#42737` (preservação de titularidade de escopo de workspace em abas de navegador sidecar Electron e no `orcad`).
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionados o PR `#42747` (resolve Issue `#42732` — flag `--run` na CLI `orca orchestration inbox` para filtrar por Run ativo),
+     o PR `#42708` (contabilização atômica de prompt aprovado durante execução da ferramenta vinculada),
+     o PR `#42707` (paginação de leituras de workers de chat e projeção estável de frota),
+     a Issue `#42731` (descarte de alarmes falsos para recusas de `decision_gate` por não-atribuídos),
+     a Issue `#42719` (terminais coordenadores ocultos para execuções de orquestração),
+     e as Issues `#42733` e `#42734` (redução de 70% no payload JSON de `worktree ps/list` e inclusão de worktree/título em recibos de `worker-start`).
+   - [Projeções SQLite de Native Chat, submenu de agentes e links no terminal](../issues/projecoes-sqlite-de-native-chat-submenu-de-agentes-e-links-no-terminal.md):
+     adicionados o PR `#42738` (resolve Issue `#42730` — ação direta "Resume session…" no painel de configuração do menu `+` de novos agentes com pré-filtragem da sessão e retomada com ▶),
+     e a Issue `#42673` (suporte à importação e retomada de sessões do DSH Harness `.dsh`).
+   - [Worktrees com clones Copy-on-Write, prompt inicial de workspace e ack seletivo de inbox](../issues/worktrees-com-clones-copy-on-write-prompt-inicial-de-workspace-e-ack-seletivo-de-inbox.md):
+     adicionados o PR `#42709` (bloqueio de criação de workspace tentando mesclar branch base já ativo em outro checkout),
+     o PR `#42689` (resolve Issue `#42684` — arquivos de texto sem título com escopo de projeto fora da árvore git),
+     a Issue `#42681` (configuração para ocultar a estrela de worktree primário e indentação visual profunda),
+     e a Issue `#42718` (correção de escopo de servidor em abas criadas com `--worktree`).
+   - [Consumo de recursos em agentes: reaper de LSP e overhead de hooks](../issues/consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks.md):
+     adicionados o PR `#42686` (descarte automático de abas ociosas de navegador no `orca serve` com restauração transparente sob demanda),
+     o PR `#42743` (formato seguro de exec hook para caminhos com espaços no Windows),
+     o PR `#42725` (resolve Issue `#42724` — contenção visual de grandes custos nos tiles de Stats & Usage),
+     e a Issue `#42675` (eliminação da espera de 2.1s de SIGKILL no fechamento de terminais zsh interativos).

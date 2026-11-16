@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42129, #42095, #42092, #42067, #41800 trazem pill de side chat no composer, imagens inline, links de PR e abertura de links por middle-click.
+description: Os PRs #43119, #43124, #43060, #43141, #43093, #42579, #42129 trazem exibição de aprovadores em Checks, arquivos alterados colapsáveis e menções drag-and-drop.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,12 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42579`](https://github.com/stablyai/orca/pull/42579) (resolve Issue [`#42059`](https://github.com/stablyai/orca/issues/42059)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43119`](https://github.com/stablyai/orca/pull/43119) (resolve Issue [`#43114`](https://github.com/stablyai/orca/issues/43114)),
+[`stablyai/orca#43124`](https://github.com/stablyai/orca/pull/43124) (resolve Issue [`#43122`](https://github.com/stablyai/orca/issues/43122)),
+[`stablyai/orca#43060`](https://github.com/stablyai/orca/pull/43060) (resolve Issue [`#43059`](https://github.com/stablyai/orca/issues/43059)),
+[`stablyai/orca#43141`](https://github.com/stablyai/orca/pull/43141),
+[`stablyai/orca#43093`](https://github.com/stablyai/orca/pull/43093),
+[`stablyai/orca#42579`](https://github.com/stablyai/orca/pull/42579) (resolve Issue [`#42059`](https://github.com/stablyai/orca/issues/42059)),
 [`stablyai/orca#42544`](https://github.com/stablyai/orca/pull/42544),
 [`stablyai/orca#42459`](https://github.com/stablyai/orca/pull/42459),
 [`stablyai/orca#42445`](https://github.com/stablyai/orca/pull/42445) (resolve Issue [`#42187`](https://github.com/stablyai/orca/issues/42187)),
@@ -171,8 +176,27 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42579`](https://github.com
     Desenvolvedores que acompanham o raciocínio e os passos de ferramentas do agente precisavam clicar repetidamente para expandir cada ferramenta gerada durante o turno.
 36. **Comportamento incorreto de Ctrl+A e Ctrl+E em mensagens multilinha no composer no macOS (`#42409`, resolve `#42407`):**
     Ao redigir rascunhos multilinha com <kbd>Shift+Enter</kbd>, pressionar <kbd>Ctrl+A</kbd> ou <kbd>Ctrl+E</kbd> no macOS saltava para o início da primeira linha ou fim da última linha do rascunho inteiro, em vez de atuar na linha corrente do cursor como no sistema nativo.
+37. **Falta de visibilidade de aprovadores e revisores pendentes no painel de Checks (`#43119`, resolve `#43114`):**
+    O painel de Checks do Pull Request indicava apenas o estado consolidado da branch, sem especificar quem já aprovou o PR e quem ainda está pendente de revisão.
+38. **Inchaço visual de mensagens com listas longas de arquivos modificados por turno (`#43124`, resolve `#43122`):**
+    Turnos em que o agente editava dezenas de arquivos renderizavam listas verticais quilométricas no corpo do chat nativo, exigindo rolagem extensa para ler o raciocínio e a resposta.
+39. **Dificuldade de mencionar agentes secundários da barra lateral no chat (`#43060`, resolve `#43059`):**
+    Para convocar ou referenciar outro agente no chat (`@agente`), o operador precisava digitar o identificador manualmente, sem suporte a arrastar o agente da lista lateral diretamente para o composer.
+40. **Colisão entre envios do chat e texto pendente no terminal do agente (`#43141`):**
+    Quando o usuário enviava mensagens pelo chat nativo enquanto o terminal associado ao agente possuía texto residual ou incompleto na linha de prompt, as entradas se misturavam gerando comandos corrompidos.
 
 ## O que o upstream implementa
+
+- **Exibição detalhada de aprovadores e revisores no painel Checks (`#43119`, resolve `#43114`):**
+  - Mostra explicitamente os avatares e nomes de quem aprovou e quem ainda está com revisão pendente no cartão do Checks.
+- **Resumo retrátil de arquivos modificados por turno (`#43124`, resolve `#43122`):**
+  - Agrupa listas longas de arquivos editados em cada turno sob um disclosure colapsável (\"N files changed\"), despoluindo o fluxo da conversa.
+- **Menção de agentes por drag-and-drop da barra lateral (`#43060`, resolve `#43059`):**
+  - Permite arrastar qualquer cartão de agente da lista lateral diretamente para a caixa de mensagem do chat, inserindo a menção estruturada correspondente.
+- **Isolamento de envios de chat contra texto residual no terminal (`#43141`):**
+  - Limpa ou preserva adequadamente o buffer de entrada do terminal, impedindo que textos parciais se fundam a despachos do chat.
+- **Despacho de correio de outros agentes como ponteiro leve com aprovação de ações (`#43093`):**
+  - Transmite notificações de correio inter-agentes como referências leves e permite que o operador aprove ações que haviam sido negadas.
 
 - **Preservação de respostas a mensagens Steer fora do fold de turno (`#40823`, resolve `#40819`):**
   - Identifica mensagens de usuário cujo ID de turno é herdado de um turno já em execução (steer) e mantém a primeira resposta
@@ -294,6 +318,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42579`](https://github.com
 
 ## O que fazer
 
+- Exibir quem aprovou e quem ainda está pendente de revisão no painel de Checks (`#43119`, resolve `#43114`).
+- Agrupar listas longas de arquivos modificados por turno em resumos colapsáveis (`#43124`, resolve `#43122`).
+- Suportar menção de agentes via drag & drop da barra lateral para o composer (`#43060`, resolve `#43059`).
+- Isolar envios de chat para não misturar com linhas incompletas no terminal do agente (`#43141`).
 - Abrir links no terminal no middle-click sem interceptação espúria de paste no macOS/Linux (`#42579`, resolve `#42059`).
 - Adicionar ação de um clique para configurar <kbd>⌘K</kbd> para busca nos perfis de teclado (`#42544`).
 - Exibir estado explícito "waiting on you" para perguntas assíncronas abertas no Codex (`#42459`).

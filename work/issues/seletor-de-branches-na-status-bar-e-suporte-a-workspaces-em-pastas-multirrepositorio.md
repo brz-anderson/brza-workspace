@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41930, #39999, #39977, #39779, #39637 trazem ativação consistente de workspace pelo branch picker, source control mobile em pastas e seletores de projetos.
+description: Os PRs #43157, #43121, #41930, #39999, #39977 trazem sugestão de checkouts existentes na localização de projetos, folder workspaces pinados na sidebar e atalhos.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,11 @@ tags:
 
 # Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41930`](https://github.com/stablyai/orca/pull/41930) (resolve Issue [`#41929`](https://github.com/stablyai/orca/issues/41929)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43157`](https://github.com/stablyai/orca/pull/43157) (resolve Issue [`#43156`](https://github.com/stablyai/orca/issues/43156)),
+[`stablyai/orca#43121`](https://github.com/stablyai/orca/pull/43121),
+[`stablyai/orca#43113`](https://github.com/stablyai/orca/pull/43113),
+[`stablyai/orca#33600`](https://github.com/stablyai/orca/pull/33600),
+[`stablyai/orca#41930`](https://github.com/stablyai/orca/pull/41930) (resolve Issue [`#41929`](https://github.com/stablyai/orca/issues/41929)),
 [`stablyai/orca#39999`](https://github.com/stablyai/orca/pull/39999),
 [`stablyai/orca#39977`](https://github.com/stablyai/orca/pull/39977),
 [`stablyai/orca#39779`](https://github.com/stablyai/orca/pull/39779) (resolve Issue [`#39777`](https://github.com/stablyai/orca/issues/39777)),
@@ -32,54 +36,64 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41930`](https://github.com
 
 ## O problema
 
-1. **Incapacidade de anexar worktrees existentes a folder workspaces via CLI (`#39018`):**
+1. **Atrito ao configurar a localização de projetos em novos hosts (`#43157`, resolve `#43156`):**
+   Ao vincular um projeto existente a um host pareado ou servidor SSH, o usuário precisava digitar manualmente o caminho do diretório ou navegar por uma janela genérica de seleção, mesmo quando já existiam checkouts válidos do repositório no host remoto.
+2. **Ocultação e filtragem incorreta de folder workspaces na barra lateral (`#43121`, `#33600`):**
+   Workspaces de pasta (*folder workspaces*) fixados com pin não eram destacados devidamente na barra lateral, e projetos distintos misturavam suas pastas de trabalho filhas sem aplicar a filtragem por projeto selecionado.
+3. **Incapacidade de anexar worktrees existentes a folder workspaces via CLI (`#39018`):**
    Ao tentar anexar um worktree existente a um folder workspace pai com `orca worktree set --parent-worktree folder:<id>`,
    o comando era rejeitado ("Folder parents are accepted only by orca worktree create"). Além disso, rodar `--parent-worktree active`
    a partir do próprio terminal do folder workspace falhava com "No Orca-managed worktree contains the current directory".
-2. **Colisão de sufixo numérico na criação sequencial de worktrees (`#39000`, resolve `#38931`):**
+4. **Colisão de sufixo numérico na criação sequencial de worktrees (`#39000`, resolve `#38931`):**
    O gerador automático de sufixos reciclava o número `-100` após `-99`, colidindo com branches locais já existentes e
    abortando a criação de novos worktrees com erro fatal.
-3. **Falta de API protegida para remoção de branches locais integrados (`#38955`):**
+5. **Falta de API protegida para remoção de branches locais integrados (`#38955`):**
    A limpeza automatizada de branches após merge exigia invocações diretas de git sem validação de checkout ou barreiras
    de integridade com worktrees ativos.
-4. **Invisibilidade e atrito para alternar branches no desktop (`#38869`, `#38836`):**
+6. **Invisibilidade e atrito para alternar branches no desktop (`#38869`, `#38836`):**
    O nome do branch ativo não ficava exposto na barra de status inferior. Para trocar de branch no desktop, o desenvolvedor
    era forçado a abrir um terminal manual, pois a interface só oferecia opções de "criar novo worktree". Além disso, o
    cabeçalho do painel de Source Control não permitia alternar ou derivar branches no mesmo checkout, ignorando as novas
    validações de segurança introduzidas no upstream (`#38744`).
-5. **Controle de versão cego em workspaces de pasta multirrepositório (`#38831`):**
+7. **Controle de versão cego em workspaces de pasta multirrepositório (`#38831`):**
    Ao abrir uma pasta que agrupa múltiplos repositórios ou worktrees vinculados (*folder workspace*), o painel de Source
    Control exibia apenas uma mensagem estática de "No Git repository found", obrigando o desenvolvedor a navegar para cada
    worktree filho individualmente para verificar alterações pendentes, diffs ou realizar commits.
-6. **Ausência de aninhamento visual de workspaces sob pastas na sidebar e mobile (`#38904`, `#38875`):**
+8. **Ausência de aninhamento visual de workspaces sob pastas na sidebar e mobile (`#38904`, `#38875`):**
    Projetos multirrepositório não agrupavam seus worktrees filhos de maneira hierárquica na barra lateral do desktop nem
    no cliente móvel, poluindo a lista de workspaces planos.
-7. **Ocultação indevida de workspace ao remover subdiretório `.git` aninhado (`#38830`):**
+9. **Ocultação indevida de workspace ao remover subdiretório `.git` aninhado (`#38830`):**
    A deleção acidental de um repositório `.git` aninhado desanexava todo o workspace pai e ocultava as abas de agentes ativos.
-8. **Dificuldade de inicialização de worktrees em pastas multirrepositório vazias (`#39575`):**
-   Ao abrir uma pasta com repositórios Git mas sem worktrees anexados, os painéis de Source Control, Attached Worktrees
-   e PR Checks exibiam apenas mensagens estáticas de "No attached worktrees yet" sem ação para criar o primeiro checkout.
-9. **Criação de árvores de pastas vazias com espaço inicial em repositórios (`#39572`, `#39545`):**
-   Ao colar um caminho com espaço inicial (ex.: `" /Users/user/dev"`) nas configurações de Workspace Directory, o caminho não era
-   sanitizado antes da validação. Como o Node `posix.isAbsolute` retorna `false` para caminhos iniciados por espaço, o Orca tratava a
-   rota como relativa e criava pastas `" <repo>/ /Users/user/dev"` em todos os repositórios registrados.
-10. **Incompatibilidade de seletores `path:` e `name:` com Folder Workspaces na CLI (`#39637`):**
+10. **Dificuldade de inicialização de worktrees em pastas multirrepositório vazias (`#39575`):**
+    Ao abrir uma pasta com repositórios Git mas sem worktrees anexados, os painéis de Source Control, Attached Worktrees
+    e PR Checks exibiam apenas mensagens estáticas de "No attached worktrees yet" sem ação para criar o primeiro checkout.
+11. **Criação de árvores de pastas vazias com espaço inicial em repositórios (`#39572`, `#39545`):**
+    Ao colar um caminho com espaço inicial (ex.: `" /Users/user/dev"`) nas configurações de Workspace Directory, o caminho não era
+    sanitizado antes da validação. Como o Node `posix.isAbsolute` retorna `false` para caminhos iniciados por espaço, o Orca tratava a
+    rota como relativa e criava pastas `" <repo>/ /Users/user/dev"` em todos os repositórios registrados.
+12. **Incompatibilidade de seletores `path:` e `name:` com Folder Workspaces na CLI (`#39637`):**
     Agentes e comandos da CLI podiam referenciar folder workspaces apenas pelo identificador literal `folder:<id>`, pois seletores
     como `path:` e `name:` buscavam exclusivamente Git worktrees em repositórios. Além disso, o comando `worktree ps` unificava
     indevidamente linhas de workspaces com mesmo ID em hosts distintos (ex.: `local` e `ssh:server`).
-11. **Ausência de Source Control de pastas multirrepositório no app mobile (`#39999`):**
+13. **Ausência de Source Control de pastas multirrepositório no app mobile (`#39999`):**
     O cliente mobile não conseguia inspecionar status de controle de versão nem branches alterados em folder workspaces,
     restringindo a visualização de diffs e commits pendentes a repositórios Git isolados.
-12. **Incapacidade de renomear projetos pelo menu da barra lateral (`#39977`):**
+14. **Incapacidade de renomear projetos pelo menu da barra lateral (`#39977`):**
     Não havia ação rápida no cabeçalho de projetos na barra lateral para renomear projetos/workspaces de forma intuitiva,
     exigindo edições manuais em arquivos de configuração ou recadastramento.
-13. **Janela em branco ao abrir workspace de outra branch pelo seletor de branches (`#41930`, resolve `#41929`):**
+15. **Janela em branco ao abrir workspace de outra branch pelo seletor de branches (`#41930`, resolve `#41929`):**
     Ao selecionar "Open workspace" para uma branch que pertencia a outro workspace cujas abas haviam sido fechadas, a ação
     invocava apenas a mutação interna `setActiveWorktree`. Como não passava pelo ciclo de ativação do usuário, a tela permanecia
     completamente em branco até o operador clicar manualmente na linha correspondente na barra lateral.
 
 ## O que o upstream implementa e corrige
 
+- **Sugestão de checkouts existentes na definição de pasta de projeto (`#43157`, resolve `#43156`):**
+  - Ao configurar a localização de um projeto em um host, inspeciona o sistema de arquivos e sugere checkouts Git existentes compatíveis com o repositório, permitindo vinculação imediata em 1 clique sem digitação de caminhos.
+- **Exibição correta de folder workspaces pinados e filtragem por projeto (`#43121`, `#33600`):**
+  - Mantém pastas fixadas visíveis no topo da seção de workspaces e filtra a árvore de pastas respeitando estritamente o projeto selecionado.
+- **Recolhimento e ocultação de projetos movidos (`#43113`):**
+  - Permite aos desenvolvedores colapsar e ocultar referências a projetos que foram movidos de caminho.
 - **Resolução unificada de seletores para Worktrees e Folder Workspaces (`#39637`):**
   - Implementa `resolveWorkspaceCandidate` suportando `path:` e `name:` para pastas de trabalho, sob o opt-in `matchFolderWorkspaces`
     (capability `workspace-selector.folder-match.v1`) em `worktree.show`, `worktree.set` e `worktree.create`;
@@ -111,28 +125,25 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41930`](https://github.com
 - **Hierarquia de pastas e linhagem cross-machine (`#38904`, `#38875`):**
   - Aninha workspaces sob a pasta pai na barra lateral do desktop e mobile com resolução persistente na criação.
 - **Busca combinada de projetos e hosts nos seletores de workspace (`#39779`, resolve `#39777`):**
-  - Introduz o matcher compartilhado `project-host-query`, permitindo digitar `<host> <projeto>` (ex.: `box orca`) nos drawers
-    de seleção de projetos e no quick-pick do cliente móvel, além do combobox de projetos no desktop;
-  - Atualiza simultaneamente o projeto e o host de execução (*Run on*) em uma única seleção rápida.
+  - Introduz o matcher compartilhado `project-host-query`, permitindo digitar `<host> <projeto>` nos drawers de seleção e no desktop.
 - **Source Control de folder workspaces no cliente móvel (`#39999`):**
-  - Expõe as alterações, diffs e arquivos modificados de projetos de pasta multirrepositório no aplicativo móvel;
-  - Permite inspecionar o status de cada repositório Git vinculado diretamente pelo celular sem necessidade de acessar sessões de terminal.
+  - Expõe as alterações, diffs e arquivos modificados de projetos de pasta multirrepositório no aplicativo móvel.
 - **Renomeação de projeto no menu do cabeçalho da barra lateral (`#39977`):**
-  - Inclui a opção "Rename project" no menu de opções do cabeçalho de projeto da barra lateral;
-  - Abre modal direto para atualizar o nome amigável do projeto/workspace e propaga a alteração para a lista de projetos e histórico.
+  - Inclui a opção "Rename project" no menu de opções do cabeçalho de projeto da barra lateral.
 - **Abertura de workspace pelo branch picker com reativação completa (`#41930`, resolve `#41929`):**
-  - Altera a ação "Open workspace" no branch picker para utilizar `activateAndRevealWorktree(id, { navigationIntent: 'user-open' })`;
-  - Garante que a abertura restabeleça abas padrão (shell ou chat nativo), desperte agentes em sleep mode e registre a visita, evitando janelas em branco quando as abas anteriores haviam sido fechadas.
+  - Assegura que a ação "Open workspace" reative abas e restaure processos em repouso.
 
 ## O que fazer no BrzA Studio
 
-1. Adotar os comandos CLI de vinculação de worktrees a pastas (`#39018`), permitindo reorganizar worktrees sob pastas de projeto.
-2. Incorporar a correção de sufixos numéricos (`#39000`) e a exclusão segura de branches (`#38955`).
-3. Integrar o `BranchStatusSegment` na barra de status do `brza-studio` (`#38869`).
-4. Adotar o botão "Create worktree" nos painéis vazios de pastas multirrepositório (`#39575`).
-5. Aplicar sanitização e `.trim()` em todos os campos de diretório de workspace para evitar criação de pastas acidentais (`#39572`).
-6. Suportar seletores unificados `path:` e `name:` para folder workspaces na CLI e separar instâncias por host no `worktree ps` (`#39637`).
-7. Integrar a busca combinada de projetos e hosts (`project-host-query`, `#39779`) nos modais de criação de workspace.
-8. Expor a visão de Source Control para folder workspaces no cliente móvel (`#39999`).
-9. Incluir a ação "Rename project" no menu de contexto de projeto da sidebar (`#39977`).
-10. Adotar a ativação completa via `activateAndRevealWorktree` na abertura de workspaces a partir do branch picker (`#41930`, resolve `#41929`).
+1. Sugerir checkouts existentes ao configurar a localização de um projeto no host (`#43157`, resolve `#43156`).
+2. Garantir renderização de folder workspaces fixados no topo da barra lateral e filtragem por projeto (`#43121`, `#33600`).
+3. Adotar os comandos CLI de vinculação de worktrees a pastas (`#39018`), permitindo reorganizar worktrees sob pastas de projeto.
+4. Incorporar a correção de sufixos numéricos (`#39000`) e a exclusão segura de branches (`#38955`).
+5. Integrar o `BranchStatusSegment` na barra de status do `brza-studio` (`#38869`).
+6. Adotar o botão "Create worktree" nos painéis vazios de pastas multirrepositório (`#39575`).
+7. Aplicar sanitização e `.trim()` em todos os campos de diretório de workspace para evitar criação de pastas acidentais (`#39572`).
+8. Suportar seletores unificados `path:` e `name:` para folder workspaces na CLI e separar instâncias por host no `worktree ps` (`#39637`).
+9. Integrar a busca combinada de projetos e hosts (`project-host-query`, `#39779`) nos modais de criação de workspace.
+10. Expor a visão de Source Control para folder workspaces no cliente móvel (`#39999`).
+11. Incluir a ação "Rename project" no menu de contexto de projeto da sidebar (`#39977`).
+12. Adotar a ativação completa via `activateAndRevealWorktree` na abertura de workspaces a partir do branch picker (`#41930`, resolve `#41929`).

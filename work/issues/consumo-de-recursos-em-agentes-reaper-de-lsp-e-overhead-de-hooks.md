@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43004, #42964, #42935, #42889, #42890 trazem cache de processos macOS, heap de 768 MB no session scanner contra OOM, aprovação única de hooks e desinstalação limpa.
+description: Os PRs #43081, #43106, #43090, #43142, #43164, #43129, #43004, #42964 trazem supressão de hooks fora do app, resumo de tokens, reaper de PTYs e isolamento de I/O.
 scope:
   - brza-studio
   - tools-kit
@@ -14,7 +14,13 @@ tags:
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43004`](https://github.com/stablyai/orca/pull/43004),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43081`](https://github.com/stablyai/orca/pull/43081) (Issue [`#43095`](https://github.com/stablyai/orca/issues/43095)),
+[`stablyai/orca#43106`](https://github.com/stablyai/orca/pull/43106) (resolve Issue [`#43104`](https://github.com/stablyai/orca/issues/43104)),
+[`stablyai/orca#43090`](https://github.com/stablyai/orca/pull/43090) (resolve Issue [`#40261`](https://github.com/stablyai/orca/issues/40261)),
+[`stablyai/orca#43142`](https://github.com/stablyai/orca/pull/43142),
+[`stablyai/orca#43164`](https://github.com/stablyai/orca/pull/43164),
+[`stablyai/orca#43129`](https://github.com/stablyai/orca/pull/43129) (resolve Issue [`#40636`](https://github.com/stablyai/orca/issues/40636)),
+[`stablyai/orca#43004`](https://github.com/stablyai/orca/pull/43004),
 [`stablyai/orca#42964`](https://github.com/stablyai/orca/pull/42964) (resolve Issue [`#42921`](https://github.com/stablyai/orca/issues/42921)),
 [`stablyai/orca#42935`](https://github.com/stablyai/orca/pull/42935),
 [`stablyai/orca#42889`](https://github.com/stablyai/orca/pull/42889) (resolve Issue [`#42601`](https://github.com/stablyai/orca/issues/42601)),
@@ -72,9 +78,32 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
     Para verificar os nomes e estados de janelas de terminal ativas no macOS, o app realizava frequentes varreduras completas da árvore de processos do sistema operacional, gerando consumo elevado de CPU e lentidão sob concorrência.
 16. **Diálogos repetitivos de aprovação de setup hooks no app móvel (`#42935`):**
     No cliente móvel, cada inicialização de workspace exigia reaprovação dos scripts de setup de `orca.yaml`, sem mecanismo de persistência de aprovação única.
+17. **Disparos custosos de processos por hooks fora do app e chamadas repetidas a `ps` (`#43081`, `#43095`):**
+    Comandos executados fora do aplicativo disparavam scripts de hooks gerenciados que iniciavam múltiplos processos `ps` no macOS, sobrecarregando agentes de Endpoint Security.
+18. **Explosão de chamadas à API `count_tokens` na retomada de sessões do Claude (`#43106`, resolve `#43104`):**
+    Ao retomar uma conversa, o relatório de contexto disparava uma requisição separada de `count_tokens` por ferramenta e item, estourando gateways e limitadores de taxa da Anthropic.
+19. **Processos PTY de agentes desacoplados nunca recolhidos pelo daemon ativo (`#43090`, resolve `#40261`):**
+    Quando agentes terminavam sua execução mas o PTY permanecia desacoplado, o daemon ativo não realizava o reap dos processos zumbis, acumulando descritores de arquivo.
+20. **Reconstrução completa da lista de conversas do AI Vault a cada 20s (`#43142`):**
+    A sincronização de títulos recriava a lista integral de sessões periodicamente, gerando pausas de GC e contenção de I/O desnecessárias.
+21. **Leituras de fingerprint Git bloqueando a pool principal de I/O do runtime (`#43164`):**
+    Operações lentas de verificação de integridade Git no repositório consumiam threads da libuv pool, atrasando respostas RPC de status do daemon.
+22. **Sondagens redundantes de PATH no Windows para agentes desabilitados (`#43129`, resolve `#40636`):**
+    O runtime verificava executáveis no disco para agentes que haviam sido desabilitados nas configurações, gerando I/O lento no Windows.
 
 ## O que o upstream propõe e implementa
 
+- **Supressão de scripts de hook fora de painéis Orca (`#43081`):**
+  - Ignora scripts de hook quando o comando não é originado de painéis gerenciados, cortando chamadas repetidas de `ps` no macOS.
+- **Resumo de uso de contexto eliminando `count_tokens` repetidos (`#43106`, resolve `#43104`):**
+  - Requisita resumo agregado de contexto em chamada única ao retomar sessões do Claude, estancando sobrecargas na API da Anthropic.
+- **Reaper automático de PTYs desacoplados no daemon (`#43090`, resolve `#40261`):**
+  - Varre e encerra processos PTY órfãos de agentes desacoplados periodicamente.
+- **Sincronização incremental de títulos no AI Vault (`#43142`):**
+  - Atualiza apenas itens modificados sem reconstruir a lista a cada 20 segundos.
+- **Isolamento de leituras de fingerprint Git (`#43164`):**
+  - Executa verificações de fingerprint em worker dedicado fora da pool principal da libuv.
+- **Supressão de sondagem de PATH para agentes desativados (`#43129`, resolve `#40636`).**
 - **Elevação do heap do scanner de sessões do AI Vault para 768 MB e ajuste configurável (`#42964`, resolve `#42921`):**
   - Aumenta o limite padrão de heap para 768 MB no processo auxiliar de indexação do AI Vault e expõe configuração para permitir ajuste manual em workspaces massivos, eliminando crashes de OOM.
 - **Cache de nomes de terminal no macOS reduzindo consultas ao processo do sistema (`#43004`):**
@@ -123,6 +152,12 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Suprimir execuções de scripts de hook fora de painéis gerenciados e reduzir invocações a `ps` (`#43081`, `#43095`).
+- Adotar resumo de contexto de tokens para Claude em retomadas de sessão para eliminar estouro de gateways (`#43106`, resolve `#43104`).
+- Implementar o reaper de PTYs desacoplados no daemon (`#43090`, resolve `#40261`).
+- Eliminar reconstruções periódicas da lista de conversas no AI Vault a cada 20s (`#43142`).
+- Isolar leituras de fingerprint Git fora da thread pool principal do runtime (`#43164`).
+- Suspender sondagens de executáveis no PATH no Windows para agentes desativados (`#43129`, resolve `#40636`).
 - Elevar o heap do scanner de sessões do AI Vault para 768 MB configuráveis (`#42964`, resolve `#42921`).
 - Cachear nomes de terminal verificados no macOS para mitigar chamadas contínuas à tabela de processos (`#43004`).
 - Permitir aprovação única de hooks de setup `orca.yaml` no mobile (`#42935`).

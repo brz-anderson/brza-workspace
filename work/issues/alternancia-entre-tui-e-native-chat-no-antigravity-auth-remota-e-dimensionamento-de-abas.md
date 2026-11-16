@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42933, #42940, #42847, #42896, #40986, #40980 trazem modos Orchestrator e auto/plan nativos no Antigravity, IDs UUID em agentes, Antigravity no Windows via host ACP e toggle TUI/Chat.
+description: Os PRs #43049, #43101, #42933, #42940, #42847 e as issues #43154, #43155 trazem flags remotas e SSH headless no Antigravity, medição de uso no AI Vault e correção de follow-up.
 scope:
   - brza-studio
   - workspace
@@ -15,12 +15,14 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42933`](https://github.com/stablyai/orca/pull/42933),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43049`](https://github.com/stablyai/orca/pull/43049),
+[`stablyai/orca#43101`](https://github.com/stablyai/orca/pull/43101),
+[`stablyai/orca#42933`](https://github.com/stablyai/orca/pull/42933),
 [`stablyai/orca#42940`](https://github.com/stablyai/orca/pull/42940),
 [`stablyai/orca#42847`](https://github.com/stablyai/orca/pull/42847) (resolve Issue [`#40321`](https://github.com/stablyai/orca/issues/40321)),
-[`stablyai/orca#42896`](https://github.com/stablyai/orca/pull/42896),
-[`stablyai/orca#42506`](https://github.com/stablyai/orca/pull/42506),
-além da issue [`stablyai/orca#42759`](https://github.com/stablyai/orca/issues/42759),
+além das issues [`stablyai/orca#43154`](https://github.com/stablyai/orca/issues/43154),
+[`stablyai/orca#43155`](https://github.com/stablyai/orca/issues/43155),
+[`stablyai/orca#42759`](https://github.com/stablyai/orca/issues/42759),
 [`stablyai/orca#42460`](https://github.com/stablyai/orca/pull/42460) (resolve Issue [`#41961`](https://github.com/stablyai/orca/issues/41961)),
 [`stablyai/orca#42464`](https://github.com/stablyai/orca/pull/42464),
 [`stablyai/orca#42357`](https://github.com/stablyai/orca/pull/42357) (resolve Issue [`#42356`](https://github.com/stablyai/orca/issues/42356)),
@@ -104,9 +106,21 @@ além da issue [`stablyai/orca#42759`](https://github.com/stablyai/orca/issues/4
     O Antigravity era tratado apenas como agente executor pontual no chat, sem capacidade de operar no modo Orchestrator (coordenando tarefas de múltiplos subagentes) ou alternar entre os modos de execução nativos de plano (`plan`) e autônomo (`auto`), limitando pipelines complexos que utilizam o harness de ferramentas do Gemini.
 24. **Identificadores de novos agentes heterogêneos e propensos a colisões (`#42940`):**
     Agentes recém-instanciados utilizavam formatos variados de ID derivados de timestamps ou prefixos locais, dificultando rastreabilidade consistente entre sessões de orquestração e logs.
+25. **Falta de suporte a flags de agente remoto e execução headless SSH/WSL no Antigravity (`#43049`):**
+    O Antigravity só podia ser invocado em sessões locais com terminal gráfico interativo, falhando em deploys remotos via SSH headless ou em distribuições WSL sem display gráfico.
+26. **Subnotificação de métricas de uso e estimativas de API do Antigravity no AI Vault (`#43101`):**
+    O AI Vault não media nem estimava os custos de tokens das conversas do Antigravity, registrando zero ou valores nulos nos relatórios de uso.
+27. **Erro "tModel: model is empty" ao resumir conversas do Antigravity (`#43154`, `#43155`):**
+    Ao executar follow-up ou retomar uma sessão prévia (`agy --conversation <id>`), o comando omitia a flag de modelo original ou configurada em Default Args, resultando no erro fatal `tModel: model is empty` e falhas repetidas 502.
 
 ## O que o upstream implementa e corrige
 
+- **Flags remotas e execução headless em SSH/WSL para Antigravity (`#43049`):**
+  - Permite invocar Antigravity em servidores remotos sem interface gráfica, repassando flags e argumentos headless de forma transparente.
+- **Relatório e medição de uso do Antigravity no AI Vault (`#43101`):**
+  - Mede tokens consumidos por sessões do Antigravity e estima custos nos relatórios do AI Vault.
+- **Preservação de flag de modelo em follow-up e retomada de conversas (`#43154`):**
+  - Assegura que `agy --conversation <id>` receba o modelo original ou configurado em Default Args, eliminando o erro `tModel: model is empty`.
 - **Suporte ao modo Orchestrator e modos auto/plan no Antigravity (`#42933`):**
   - Implementa capacidade nativa para o Antigravity assumir o papel de coordenador/orquestrador, despachando subagentes e avaliando tarefas estruturadas;
   - Introduz os seletores de modo de execução nativos `plan` (modo somente plano sem execução direta de mutações) e `auto` (execução contínua autônoma com aprovações por checkpoint);
@@ -177,9 +191,12 @@ além da issue [`stablyai/orca#42759`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer no BrzA Studio
 
-1. Habilitar o modo Orchestrator e os modos de execução nativos auto/plan para o Antigravity (`#42933`).
-2. Adotar IDs no formato UUID puro para agentes recém-instanciados (`#42940`).
-3. Habilitar a alternância entre TUI e Native Chat para o Antigravity (`#40201`), permitindo alternar via `⌘⇧J` entre a interface de linha de comando e o chat estruturado sem perder o processo ativo.
+1. Habilitar flags remotas e execução headless do Antigravity em SSH e WSL (`#43049`).
+2. Exibir métricas reais e estimativas de uso do Antigravity no AI Vault (`#43101`).
+3. Preservar o parâmetro de modelo ao resumir conversas antigas do Antigravity (`#43154`).
+4. Habilitar o modo Orchestrator e os modos de execução nativos auto/plan para o Antigravity (`#42933`).
+5. Adotar IDs no formato UUID puro para agentes recém-instanciados (`#42940`).
+6. Habilitar a alternância entre TUI e Native Chat para o Antigravity (`#40201`), permitindo alternar via `⌘⇧J` entre a interface de linha de comando e o chat estruturado sem perder o processo ativo.
 4. Incorporar a seleção dinâmica de conta no lançamento de Claude e Codex (`#42506`).
 5. Eliminar o falso fallback para o runtime gerenciado no Antigravity Chat validando `antigravityHostAcpReady` em vez do marcador temporário de keyring (`#42512`).
 6. Blindar o chaveamento TUI ↔ Chat contra crashes irrecuperáveis de sessão (`#42589`).

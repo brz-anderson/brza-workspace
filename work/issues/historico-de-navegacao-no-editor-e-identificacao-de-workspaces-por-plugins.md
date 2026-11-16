@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43132, #41132, #43111, #43094, #43144, #43137, #41786 trazem navegação por Cmd/Ctrl+Click em imports, git change indicators no gutter, destaque sintático VS Code e contagem de palavras.
+description: Os PRs #43253, #43181, #43132, #41132, #43111, #43094, #43144, #43137, #41786 trazem terminador de linha do host (CRLF/LF), expurgo de abas fechadas em partições, navegação por Cmd/Ctrl+Click e indicadores Git.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,9 @@ tags:
 
 # Histórico de navegação no editor e identificação de workspaces por plugins
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43132`](https://github.com/stablyai/orca/pull/43132) (resolve Issue [`#43130`](https://github.com/stablyai/orca/issues/43130)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43253`](https://github.com/stablyai/orca/pull/43253) (resolve Issue [`#43216`](https://github.com/stablyai/orca/issues/43216)),
+[`stablyai/orca#43181`](https://github.com/stablyai/orca/pull/43181),
+[`stablyai/orca#43132`](https://github.com/stablyai/orca/pull/43132) (resolve Issue [`#43130`](https://github.com/stablyai/orca/issues/43130)),
 [`stablyai/orca#41132`](https://github.com/stablyai/orca/pull/41132),
 [`stablyai/orca#43111`](https://github.com/stablyai/orca/pull/43111) e
 [`stablyai/orca#43103`](https://github.com/stablyai/orca/pull/43103) (ambos atendem Issue [`#43100`](https://github.com/stablyai/orca/issues/43100)),
@@ -69,6 +71,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43132`](https://github.com
   - Mantém em cache o estado visual (scroll, posição do viewport e zoom) de visualizadores customizados de extensões durante a troca de abas.
 - **Método `raiseWindow` na API de plugins (`#43137`, resolve `#43136`):**
   - Expõe a opção `raiseWindow: true` em `terminal.focus` e `workspace.open`, trazendo a janela ativa do app para o topo na área de trabalho.
+- **Terminador de linha nativo do host e configuração End of Line (`#43253`, resolve `#43216`):**
+  - Novos arquivos criados no editor passam a utilizar o terminador de linha nativo do host onde o workspace reside (CRLF no Windows, LF no macOS e Linux/WSL), com introdução da configuração `files.eol` em *Settings › Editor*.
+- **Expurgo de linhas de arquivos fechados em partições de múltiplos hosts (`#43181`):**
+  - Ao fechar um arquivo, remove imediatamente seus registros de arquivos abertos de todas as partições de hosts, evitando vazamentos de estado e buffers fantasmas no editor.
 - **Histórico de navegação no editor (`#39162`):**
   - Implementa `editor.navigateBack` (<kbd>⌘[</kbd> / <kbd>Alt+Left</kbd>) e `editor.navigateForward` (<kbd>⌘]</kbd> / <kbd>Alt+Right</kbd>) mantendo pilha de posições do cursor.
 - **Hook `editor.inlineCompletion` para sugestões de ghost text (`#40345`):**
@@ -82,6 +88,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43132`](https://github.com
 - Incorporar os indicadores visuais de alteração Git no gutter do Monaco (`#41132`).
 - Aplicar o realce sintático de palavras-chave de controle idêntico ao VS Code (`#43111`, `#43103`).
 - Adicionar o contador de palavras para documentos e seleções no rodapé do editor (`#43094`).
+- Adotar o terminador de linha do host para novos arquivos com suporte a `files.eol` (`#43253`, resolve `#43216`).
+- Expurgo atômico de registros de arquivos fechados nas partições de host do editor (`#43181`).
 - Preservar viewport e scroll de custom editors de plugins na alternância de abas (`#43144`).
 - Suportar `raiseWindow` nas chamadas de plugins para focar a janela do app (`#43137`).
 - Integrar os atalhos de histórico de navegação (`editor.navigateBack` / `editor.navigateForward`) no Studio (`#39162`).

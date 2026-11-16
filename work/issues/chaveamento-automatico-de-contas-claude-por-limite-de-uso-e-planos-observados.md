@@ -3,22 +3,26 @@ priority: high
 tags:
   - auth
   - tooling
-description: Os PRs #43135, #43145, #43105, #43087, #43118, #42856, #42917, #42891 trazem fixação de contas por worktree, retenção de conversas, chaveamento inteligente por cota e planos observados.
+description: Os PRs #43190, #43135, #43145, #43105, #43087, #43118, #43223, #42856, #42917, #42891 trazem contas por workspace no Codex, import de ~/.codex, filtros de tokens em stats, fixação de contas por worktree e chaveamento por cota.
 ---
 
 # Chaveamento automático de contas Claude por limite de uso, planos observados e resgate de cota
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43135`](https://github.com/stablyai/orca/pull/43135) (resolve Issue [`#9496`](https://github.com/stablyai/orca/issues/9496)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43190`](https://github.com/stablyai/orca/pull/43190),
+[`stablyai/orca#43135`](https://github.com/stablyai/orca/pull/43135) (resolve Issue [`#9496`](https://github.com/stablyai/orca/issues/9496)),
 [`stablyai/orca#43145`](https://github.com/stablyai/orca/pull/43145),
 [`stablyai/orca#43105`](https://github.com/stablyai/orca/pull/43105),
 [`stablyai/orca#43087`](https://github.com/stablyai/orca/pull/43087),
 [`stablyai/orca#43118`](https://github.com/stablyai/orca/pull/43118),
+[`stablyai/orca#43223`](https://github.com/stablyai/orca/pull/43223) (resolve Issue [`#43222`](https://github.com/stablyai/orca/issues/43222)),
 [`stablyai/orca#42856`](https://github.com/stablyai/orca/pull/42856),
 [`stablyai/orca#42917`](https://github.com/stablyai/orca/pull/42917),
 [`stablyai/orca#42891`](https://github.com/stablyai/orca/pull/42891) (resolve Issue [`#42887`](https://github.com/stablyai/orca/issues/42887)),
 [`stablyai/orca#37943`](https://github.com/stablyai/orca/pull/37943),
 [`stablyai/orca#37998`](https://github.com/stablyai/orca/pull/37998),
-além das issues [`stablyai/orca#42899`](https://github.com/stablyai/orca/issues/42899) e
+[`stablyai/orca#23228`](https://github.com/stablyai/orca/pull/23228),
+além das issues [`stablyai/orca#43214`](https://github.com/stablyai/orca/issues/43214),
+[`stablyai/orca#42899`](https://github.com/stablyai/orca/issues/42899) e
 [`stablyai/orca#42887`](https://github.com/stablyai/orca/issues/42887).
 
 ## O problema
@@ -62,13 +66,24 @@ além das issues [`stablyai/orca#42899`](https://github.com/stablyai/orca/issues
   - Detecta e exibe o tipo de plano ativo (Free, Pro, Team, Enterprise) junto a cada conta nos seletores e na tela de gerenciamento de contas do Claude e Codex.
 - **Exibição e resgate de resets de cota no menu de uso (`#42891`, resolve `#42887`):**
   - Expõe o botão para resgate direto de resets de limite de uso no menu de contexto de contas, permitindo restaurar a capacidade operacional com um clique.
+- **Contas Codex dedicadas por workspace e importação de `~/.codex` (`#43190`):**
+  - Permite configurar contas Codex individuais por workspace, suportando importação direta do ambiente e credenciais existentes em `~/.codex`.
+- **Alternância de tipos de tokens no gráfico de uso diário (`#43223`, resolve `#43222`):**
+  - Permite clicar nos itens da legenda do gráfico de estatísticas diárias para ocultar ou exibir categorias específicas de tokens (input, output, cache read, cache write), facilitando o diagnóstico de custos de prompt cache.
+- **Proteção contra ocultação de sessões ao alternar para OpenCode gerenciado (`#43214`):**
+  - Assegura que alternar para uma conta gerenciada do OpenCode não oculte silenciosamente sessões pré-existentes do usuário.
+- **Perguntar e memorizar conta do Claude por projeto no primeiro arranque (`#23228`):**
+  - Solicita a conta preferida na inicialização de novos projetos e persiste a associação automaticamente para as sessões subsequentes.
 
 ## O que fazer
 
-- Permitir a fixação de worktrees a contas específicas de Claude e Codex (`#43135`, resolve `#9496`).
+- Permitir a fixação de worktrees a contas específicas de Claude e Codex (`#43135`, resolve `#9496`), com suporte a importação de credenciais locais de `~/.codex` (`#43190`).
 - Retirar riscos de perda de mensagens em trocas de conta retendo envios até a prontidão da nova conta (`#43145`).
 - Preservar o histórico de conversas pertencentes a contas removidas (`#43118`).
 - Implementar o chaveamento automático de contas no BrzA Studio para Claude quando o limite de 100% for atingido (`#42856`).
 - Exibir a categoria de plano associada a cada conta salva nas preferências de contas (`#42917`).
 - Integrar a ação de resgate de reset de limite de uso no menu de contas (`#42891`, resolve `#42887`).
 - Assegurar atribuição correta de métricas de telemetria por conta lida (`#43087`).
+- Habilitar filtro interativo por tipo de token na legenda do gráfico de uso em *Stats* (`#43223`, resolve `#43222`).
+- Preservar visibilidade de sessões pré-existentes ao configurar contas gerenciadas do OpenCode (`#43214`).
+- Permitir fixação interativa da conta de projeto no primeiro arranque com persistência de contexto (`#23228`).

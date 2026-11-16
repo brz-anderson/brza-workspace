@@ -19,6 +19,7 @@ refs:
   - issue:historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins
   - issue:ler-e-enviar-mensagens-a-chats-pela-cli-e-expor-native-chat-aos-plugins
   - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
+  - issue:proveniencia-de-dispatch-perfil-estrito-de-coordenador-e-politica-de-ferramentas
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
   - issue:seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio
   - issue:servidor-mcp-stdio-na-cli-e-otimizacoes-de-captura-no-computer-use
@@ -153,3 +154,52 @@ refs:
      o PR `#43142` (eliminação de rebuilds a cada 20s na lista de títulos do AI Vault),
      o PR `#43164` (isolamento de leituras de fingerprint Git fora da libuv pool principal) e
      o PR `#43129` (resolve Issue `#40636` — suspensão de sondagens de PATH no Windows para agentes desabilitados).
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-16)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e issues abertos criados ou
+   atualizados entre `2026-11-16T15:00:00Z` e `2026-11-16T21:00:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Criação de nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Proveniência de dispatch, perfil estrito de coordenador e política de ferramentas por chat](../issues/proveniencia-de-dispatch-perfil-estrito-de-coordenador-e-politica-de-ferramentas.md):
+     rastreia o PR `#43234` (resolve Issue `#43224` — exibição da conta real do provedor atribuída a cada worker em `worker-show`),
+     a Issue `#43229` (rastreamento de proveniência de requisição `requested_by` na tabela de despachos do `orchestration.db`),
+     a Issue `#43230` (perfil estrito `coordinator-only` imposto pelo host, bloqueando mutações diretas em arquivos e restringindo coordenadores a tarefas de planejamento e delegação),
+     a Issue `#43227` (metadados operacionais de hora de início, nível de esforço e última atividade no comando conciso `worker-list`),
+     a Issue `#43226` (padronização de recibos de aquisição de conta para chats e workers do Codex),
+     a Issue `#43225` (política declarativa de ferramentas por sessão de chat estruturado: ferramentas permitidas/bloqueadas, strict MCP e max turns),
+     a Issue `#43203` (desengasgo de continuadores de worker pausados pós-recuperação de erro),
+     a Issue `#43201` (títulos legíveis de tarefas em abas de terminal de workers e cards de notificação) e
+     a Issue `#43194` (atribuição do nome de exibição de plugins em e-mails da orquestração).
+3. **Atualização de 6 issues existentes em `work/issues/`:**
+   - [Chaveamento automático de contas Claude por limite de uso, planos observados e resgate de cota](../issues/chaveamento-automatico-de-contas-claude-por-limite-de-uso-e-planos-observados.md):
+     adicionados o PR `#43190` (suporte a contas dedicadas do Codex por workspace e importação de credenciais locais de `~/.codex`),
+     o PR `#43223` (resolve Issue `#43222` — alternância interativa de tipos de tokens no gráfico de uso diário por clique na legenda),
+     a Issue `#43214` (prevenção contra ocultação de sessões pré-existentes ao configurar contas gerenciadas do OpenCode) e
+     o PR `#23228` (modal de memorização de conta do Claude por projeto no primeiro arranque).
+   - [Git Blame inline na linha do cursor, rebase pelo Source Control e suporte a submódulos](../issues/git-blame-na-linha-do-cursor-e-rebase-pelo-source-control.md):
+     adicionado o PR `#43191` (`feat(explorer): show Git changes inside submodules` — indicadores e badges visuais de arquivos modificados em submódulos no explorador de arquivos).
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionados o PR `#43217` (preservação do modelo resolvido e flags de esforço de raciocínio na receita de lançamento de retomada de sessão) e
+     a Issue `#43183` (diagnóstico e contenção de engasgos de 40–55s no ACP durante retries de erro de saída de modelo).
+   - [Histórico de navegação no editor e identificação de workspaces por plugins](../issues/historico-de-navegacao-no-editor-e-identificacao-de-workspaces-por-plugins.md):
+     adicionados o PR `#43253` (resolve Issue `#43216` — adoção do terminador de linha nativo do host CRLF/LF para novos arquivos com configuração `files.eol`) e
+     o PR `#43181` (expurgo atômico de registros de arquivos fechados em partições de hosts no editor).
+   - [Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório](../issues/seletor-de-branches-na-status-bar-e-suporte-a-workspaces-em-pastas-multirrepositorio.md):
+     adicionados o PR `#43171` (preservação de nomes de branch separados por barras em novos workspaces),
+     o PR `#43193` (opção para fixar novos workspaces diretamente na criação) e
+     os PRs `#43244` e `#43044` (abertura do seletor de pastas de projeto no último diretório navegado e adjacente aos projetos locais recentes).
+   - [Cartões de Pull Request, feedback de Steer e atalhos no Native Chat](../issues/cards-de-pull-request-e-feedback-de-steer-e-atalhos-no-native-chat.md):
+     adicionados o PR `#43198` (configuração para desligar corretor ortográfico no composer de chat),
+     o PR `#43241` (envio do texto citado em notas Markdown disparadas do chat),
+     o PR `#43109` (atalho em 1 clique para transferir chat em pastas WSL recusadas para o host WSL configurado),
+     o PR `#42784` (leitura do modelo do Claude a partir da resposta mais recente após o scroll do frame inicial) e
+     a Issue `#43197` (indicador de progresso e tempo decorrido para tool calls de longa duração).
+   - [Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):
+     adicionados o PR `#43245` (exclusão atômica do journal legado de chat no SQLite após confirmação de integridade no novo store) e
+     o PR `#38128` (resiliência na exclusão de worktrees contra falhas de autorização de caminho no teardown de watchers).
+   - [Workers de plugins em hosts remotos e gerenciamento CLI de SSH](../issues/workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh.md):
+     adicionados o PR `#43252` (listagem de hosts SSH sob a linha de hooks e caminhos encurtados no desinstalador),
+     o PR `#43174` (criação de workspaces vinculados a receitas de ambiente via CLI com `--on recipe:<id>`) e
+     a Issue `#43189` (injeção de variáveis de ambiente de sessão `SSH_AUTH_SOCK` e `XDG_RUNTIME_DIR` em workers de plugins).
+

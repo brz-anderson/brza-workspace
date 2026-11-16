@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43049, #43101, #42933, #42940, #42847 e as issues #43154, #43155 trazem flags remotas e SSH headless no Antigravity, medição de uso no AI Vault e correção de follow-up.
+description: Os PRs #43217, #43049, #43101, #42933, #42940, #42847 e as issues #43183, #43154, #43155 trazem preservação de modelo/esforço no resume, contenção de stalls, flags remotas e SSH headless no Antigravity.
 scope:
   - brza-studio
   - workspace
@@ -15,12 +15,14 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43049`](https://github.com/stablyai/orca/pull/43049),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43217`](https://github.com/stablyai/orca/pull/43217),
+[`stablyai/orca#43049`](https://github.com/stablyai/orca/pull/43049),
 [`stablyai/orca#43101`](https://github.com/stablyai/orca/pull/43101),
 [`stablyai/orca#42933`](https://github.com/stablyai/orca/pull/42933),
 [`stablyai/orca#42940`](https://github.com/stablyai/orca/pull/42940),
 [`stablyai/orca#42847`](https://github.com/stablyai/orca/pull/42847) (resolve Issue [`#40321`](https://github.com/stablyai/orca/issues/40321)),
-além das issues [`stablyai/orca#43154`](https://github.com/stablyai/orca/issues/43154),
+além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues/43183),
+[`stablyai/orca#43154`](https://github.com/stablyai/orca/issues/43154),
 [`stablyai/orca#43155`](https://github.com/stablyai/orca/issues/43155),
 [`stablyai/orca#42759`](https://github.com/stablyai/orca/issues/42759),
 [`stablyai/orca#42460`](https://github.com/stablyai/orca/pull/42460) (resolve Issue [`#41961`](https://github.com/stablyai/orca/issues/41961)),
@@ -112,9 +114,15 @@ além das issues [`stablyai/orca#43154`](https://github.com/stablyai/orca/issues
     O AI Vault não media nem estimava os custos de tokens das conversas do Antigravity, registrando zero ou valores nulos nos relatórios de uso.
 27. **Erro "tModel: model is empty" ao resumir conversas do Antigravity (`#43154`, `#43155`):**
     Ao executar follow-up ou retomar uma sessão prévia (`agy --conversation <id>`), o comando omitia a flag de modelo original ou configurada em Default Args, resultando no erro fatal `tModel: model is empty` e falhas repetidas 502.
+28. **Perda de flags de modelo e esforço no resume e congelamento de 40–55s em erros de saída (`#43217`, `#43183`):**
+    Ao retomar uma sessão do Antigravity por meio da receita de launch, os parâmetros resolvidos de modelo e nível de esforço de raciocínio eram descartados, voltando para os defaults (`#43217`). Além disso, durante erros de saída do modelo em chamadas ACP, a interface permanecia travada em "Sending..." ou "Working" por até 55 segundos durante tentativas silenciosas de retry e reinicialização de ~7.5s, sem feedback ao usuário (`#43183`).
 
 ## O que o upstream implementa e corrige
 
+- **Preservação de modelo e esforço na receita de retomada do Antigravity (`#43217`):**
+  - Mantém o modelo resolvido e as flags de reasoning effort na receita de lançamento de retomada de sessão (`resume launch recipe`), assegurando coerência no raciocínio ao dar prosseguimento a chats existentes.
+- **Detecção de stalls em erros de saída e timeouts transparentes no ACP (`#43183`):**
+  - Trata falhas de saída de modelo de forma explícita com mensagem imediata de erro em vez de engasgar a UI em retries opacos de 50s.
 - **Flags remotas e execução headless em SSH/WSL para Antigravity (`#43049`):**
   - Permite invocar Antigravity em servidores remotos sem interface gráfica, repassando flags e argumentos headless de forma transparente.
 - **Relatório e medição de uso do Antigravity no AI Vault (`#43101`):**
@@ -216,3 +224,5 @@ além das issues [`stablyai/orca#43154`](https://github.com/stablyai/orca/issues
 20. Ajustar a declaração de `clientInfo` na conexão ACP com o Antigravity para expor modelos multi-provedor (Claude, GPT-OSS) autorizados (`#42759`).
 21. Permitir o Antigravity Native Chat no Windows usando a CLI host `agy acp` (`#42847`, resolve `#40321`).
 22. Assegurar remoção correta de tokens Enterprise e isolamento de `ELECTRON_RUN_AS_NODE` (`#42896`).
+23. Reter modelo e flags de esforço de raciocínio na receita de retomada do Antigravity (`#43217`).
+24. Mitigar congelamentos de 55s no ACP exibindo erros de saída imediatamente (`#43183`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43119, #43124, #43060, #43141, #43093, #42579, #42129 trazem exibição de aprovadores em Checks, arquivos alterados colapsáveis e menções drag-and-drop.
+description: Os PRs #43198, #43241, #43109, #42784, #43119, #43124, #43060 e a issue #43197 trazem desativação de corretor no composer, progresso de tool calls, notas markdown e cards de PRs.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,11 +13,16 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43119`](https://github.com/stablyai/orca/pull/43119) (resolve Issue [`#43114`](https://github.com/stablyai/orca/issues/43114)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43198`](https://github.com/stablyai/orca/pull/43198),
+[`stablyai/orca#43241`](https://github.com/stablyai/orca/pull/43241),
+[`stablyai/orca#43109`](https://github.com/stablyai/orca/pull/43109),
+[`stablyai/orca#42784`](https://github.com/stablyai/orca/pull/42784),
+[`stablyai/orca#43119`](https://github.com/stablyai/orca/pull/43119) (resolve Issue [`#43114`](https://github.com/stablyai/orca/issues/43114)),
 [`stablyai/orca#43124`](https://github.com/stablyai/orca/pull/43124) (resolve Issue [`#43122`](https://github.com/stablyai/orca/issues/43122)),
 [`stablyai/orca#43060`](https://github.com/stablyai/orca/pull/43060) (resolve Issue [`#43059`](https://github.com/stablyai/orca/issues/43059)),
 [`stablyai/orca#43141`](https://github.com/stablyai/orca/pull/43141),
 [`stablyai/orca#43093`](https://github.com/stablyai/orca/pull/43093),
+além da issue [`stablyai/orca#43197`](https://github.com/stablyai/orca/issues/43197),
 [`stablyai/orca#42579`](https://github.com/stablyai/orca/pull/42579) (resolve Issue [`#42059`](https://github.com/stablyai/orca/issues/42059)),
 [`stablyai/orca#42544`](https://github.com/stablyai/orca/pull/42544),
 [`stablyai/orca#42459`](https://github.com/stablyai/orca/pull/42459),
@@ -187,6 +192,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43119`](https://github.com
 
 ## O que o upstream implementa
 
+- **Configuração para desativar corretor ortográfico no composer (`#43198`):**
+  - Adiciona o ajuste `chat.spellcheck` em *Settings › Chat*, permitindo desativar sublinhados vermelhos de verificação ortográfica ao redigir prompts com código, identificadores e termos técnicos.
+- **Envio do texto citado em notas Markdown (`#43241`):**
+  - Assegura que toda nota Markdown disparada a partir do chat envie o texto citado original junto ao conteúdo da nota.
+- **Redirecionamento em 1 clique para host WSL em chat de pastas WSL recusadas (`#43109`):**
+  - Quando um chat é aberto em uma pasta WSL a partir do Windows local e recusado pelo daemon, exibe um botão de atalho em 1 clique para transferir a sessão diretamente para o host WSL configurado.
+- **Nomeação do modelo Claude a partir da resposta mais recente (`#42784`):**
+  - Resolve a perda do nome do modelo do Claude quando o frame inicial de inicialização sai do viewport da janela, lendo o modelo diretamente dos metadados das respostas mais recentes.
+- **Indicadores de progresso visual para tool calls demoradas (`#43197`):**
+  - Exibe spinner pulsante, tempo de execução decorrido e status da etapa para ferramentas longas (testes, builds, downloads).
 - **Exibição detalhada de aprovadores e revisores no painel Checks (`#43119`, resolve `#43114`):**
   - Mostra explicitamente os avatares e nomes de quem aprovou e quem ainda está com revisão pendente no cartão do Checks.
 - **Resumo retrátil de arquivos modificados por turno (`#43124`, resolve `#43122`):**
@@ -318,6 +333,11 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43119`](https://github.com
 
 ## O que fazer
 
+- Incluir a opção `chat.spellcheck` para desativar corretor ortográfico no composer (`#43198`).
+- Enviar o texto citado em notas Markdown disparadas a partir de conversas (`#43241`).
+- Oferecer o atalho de 1 clique para transferir chat de pastas WSL para o host WSL configurado (`#43109`).
+- Nomear o modelo do Claude dinamicamente pela resposta mais recente (`#42784`).
+- Exibir indicador de progresso e tempo decorrido para tool calls de longa duração (`#43197`).
 - Exibir quem aprovou e quem ainda está pendente de revisão no painel de Checks (`#43119`, resolve `#43114`).
 - Agrupar listas longas de arquivos modificados por turno em resumos colapsáveis (`#43124`, resolve `#43122`).
 - Suportar menção de agentes via drag & drop da barra lateral para o composer (`#43060`, resolve `#43059`).

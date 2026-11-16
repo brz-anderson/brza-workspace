@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42984, #42997, #42898, #41910, #40589 trazem customização de pasta de dados/servidor fora da home SSH, parâmetro branchName em workspace.create e comando orca host add.
+description: Os PRs #43252, #43174, #42984, #42997, #42898 e a issue #43189 trazem hosts SSH no desinstalador, criação de workspaces com --on recipe:<id> e injeção de ambiente de sessão em workers.
 scope:
   - brza-studio
   - workspace
@@ -18,9 +18,12 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `parcial` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42984`](https://github.com/stablyai/orca/pull/42984),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43252`](https://github.com/stablyai/orca/pull/43252),
+[`stablyai/orca#43174`](https://github.com/stablyai/orca/pull/43174),
+[`stablyai/orca#42984`](https://github.com/stablyai/orca/pull/42984),
 [`stablyai/orca#42997`](https://github.com/stablyai/orca/pull/42997),
 [`stablyai/orca#42898`](https://github.com/stablyai/orca/pull/42898) (resolve Issue [`#37826`](https://github.com/stablyai/orca/issues/37826)),
+além da issue [`stablyai/orca#43189`](https://github.com/stablyai/orca/issues/43189),
 [`stablyai/orca#41910`](https://github.com/stablyai/orca/pull/41910),
 [`stablyai/orca#40589`](https://github.com/stablyai/orca/pull/40589) (resolve Issue [`#38342`](https://github.com/stablyai/orca/issues/38342)),
 [`stablyai/orca#38774`](https://github.com/stablyai/orca/pull/38774) (Issues [`#37826`](https://github.com/stablyai/orca/issues/37826) e [`#37949`](https://github.com/stablyai/orca/issues/37949)),
@@ -99,9 +102,18 @@ além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues
 - **Registro explícito de máquinas SSH via CLI com `orca host add` (`#42898`, resolve `#37826`):**
   - Adiciona o subcomando `orca host add --name <label> --hostname <host> [--user <user>] [--port <port>] [--identity-file <path>] [--proxy-jump <spec>] [--environment <env>]`;
   - Persiste a configuração do alvo remoto no runtime selecionado e retorna seu seletor utilizável (`--host ssh:<id>`), viabilizando automações externas de infraestrutura.
+- **Listagem de hosts SSH sob a linha de hooks e caminhos encurtados no uninstall (`#43252`):**
+  - O assistente de desinstalação profunda passa a listar servidores SSH associados sob a linha de hooks e encurta os caminhos de dados do Orca, facilitando a visualização e limpeza completa.
+- **Criação de workspaces baseados em receitas via CLI (`#43174`):**
+  - Permite criar workspaces associados a ambientes de receitas através do comando `orca workspace create --on recipe:<id>`, agilizando o provisionamento reprodutível de ambientes de desenvolvimento.
+- **Injeção de variáveis de ambiente de sessão em workers de plugins (`#43189`):**
+  - Propaga variáveis vitais do ambiente gráfico e de sessão (`XDG_RUNTIME_DIR`, `DBUS_SESSION_BUS_ADDRESS`, `SSH_AUTH_SOCK`) para o processo de workers de plugins, prevenindo falhas em helpers de credenciais Git.
 
 ## O que fazer
 
+- Suportar a criação de workspaces referenciando receitas de ambiente com `--on recipe:<id>` (`#43174`).
+- Propagar variáveis de ambiente de sessão (`SSH_AUTH_SOCK`, `XDG_RUNTIME_DIR`) para workers de plugins (`#43189`).
+- Listar hosts SSH e encurtar caminhos no fluxo de desinstalação profunda (`#43252`).
 - Suportar a realocação configurável do servidor e pasta de dados do daemon remoto para fora da home do usuário SSH (`#42984`).
 - Permitir configuração do nome da branch na API de plugins `workspace.create` (`#42997`).
 - Implementar `brza host add` (`#42898`, resolve `#37826`) na CLI para permitir cadastramento programático de instâncias SSH remotas.

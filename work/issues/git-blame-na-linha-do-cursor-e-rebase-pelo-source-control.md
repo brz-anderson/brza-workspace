@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42982, #42949, #42997 e a issue #42924 trazem git blame inline na linha do cursor no editor, rebase direto a partir do base branch no Source Control e suporte a submódulos Git.
+description: Os PRs #43191, #42982, #42949, #42997 e a issue #42924 trazem alterações Git dentro de submódulos no Explorer, git blame inline na linha do cursor no editor, rebase direto a partir do base branch no Source Control e suporte a submódulos Git.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,8 @@ tags:
 
 # Git Blame inline na linha do cursor, rebase pelo Source Control e suporte a submódulos
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42982`](https://github.com/stablyai/orca/pull/42982),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43191`](https://github.com/stablyai/orca/pull/43191),
+[`stablyai/orca#42982`](https://github.com/stablyai/orca/pull/42982),
 [`stablyai/orca#42949`](https://github.com/stablyai/orca/pull/42949),
 [`stablyai/orca#42997`](https://github.com/stablyai/orca/pull/42997) e
 da issue [`stablyai/orca#42924`](https://github.com/stablyai/orca/issues/42924).
@@ -43,10 +44,13 @@ da issue [`stablyai/orca#42924`](https://github.com/stablyai/orca/issues/42924).
    - Estende a API de plugins permitindo que `workspace.create` receba a propriedade `branchName` explícita, assegurando que o novo worktree seja inicializado no branch correto sem necessidade de renomeação manual subsequente.
 4. **Rastreamento de arquitetura para submódulos Git (`#42924`):**
    - Mapeia os requisitos para suporte completo a `git submodule` em workspaces gerenciados, incluindo checkout recursivo automático na criação de worktrees e visualização unificada de status no Source Control.
+5. **Visualização de modificações Git dentro de submódulos no Explorer (`#43191`):**
+   - O explorador de arquivos e a árvore de diretórios do workspace passam a inspecionar o status de repositórios Git aninhados (submódulos), exibindo badges de arquivos modificados, adicionados ou não rastreados dentro das pastas de submódulos.
 
 ## O que fazer no BrzA Studio
 
 - Adotar a anotação de Git blame na linha do cursor no editor do Studio (`#42982`), com renderização sutil e painel de detalhes do commit.
 - Integrar a ação de rebase direto na linha da branch base na visualização de Source Control (`#42949`).
 - Expor o parâmetro `branchName` na chamada `workspace.create` dos plugins e extensões do Studio (`#42997`).
+- Exibir indicadores de alteração Git dentro de pastas de submódulos no Explorer (`#43191`).
 - Planejar e incorporar a gestão recursiva de submódulos Git na criação de worktrees e painel de Source Control (`#42924`).

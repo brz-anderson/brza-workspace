@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43015, #43000, #42959, #42943, #42877, #42905 trazem exclusão de chats Orca/Codex/Claude Code ao remover workspace, restauração de rascunhos de workspaces e seções de cleanup.
+description: Os PRs #43245, #38128, #43015, #43000, #42959, #42943, #42877 trazem exclusão do journal legado de chat após migração, remoção resiliente de worktrees e limpeza atômica.
 scope:
   - brza-studio
   - workspace
@@ -14,12 +14,15 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43015`](https://github.com/stablyai/orca/pull/43015),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43245`](https://github.com/stablyai/orca/pull/43245),
+[`stablyai/orca#38128`](https://github.com/stablyai/orca/pull/38128),
+[`stablyai/orca#43015`](https://github.com/stablyai/orca/pull/43015),
 [`stablyai/orca#43000`](https://github.com/stablyai/orca/pull/43000),
 [`stablyai/orca#42959`](https://github.com/stablyai/orca/pull/42959),
 [`stablyai/orca#42943`](https://github.com/stablyai/orca/pull/42943),
 [`stablyai/orca#42877`](https://github.com/stablyai/orca/pull/42877),
 [`stablyai/orca#42905`](https://github.com/stablyai/orca/pull/42905),
+além da issue [`stablyai/orca#42611`](https://github.com/stablyai/orca/issues/42611),
 além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/42909) e dos PRs
 [`stablyai/orca#42055`](https://github.com/stablyai/orca/pull/42055),
 [`stablyai/orca#42039`](https://github.com/stablyai/orca/pull/42039),
@@ -145,6 +148,10 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
   - Inclui o botão **Clean up now** (`workspaceCleanup.runNow`), apresentando listagem de workspaces a serem removidos imediatamente e permitindo desmarcar individualmente qualquer um deles.
 - **Regras de cleanup por projeto em Project Settings (`#42055`):**
   - Adiciona a seção *Workspace cleanup* na página de configurações do projeto, permitindo selecionar entre `Use global` (herda regras globais), `Off` (desativa cleanup no projeto) ou `Custom` (regras específicas por repositório com overrides individuais).
+- **Exclusão do journal legado de chat após migração validada (`#43245`):**
+  - Remove fisicamente o antigo diário de chat em disco após verificar que o novo armazenamento incorporou todas as mensagens e revisões, recuperando espaço em disco automaticamente.
+- **Resiliência na remoção de worktrees com teardown de watcher desautorizado (`#38128`):**
+  - Assegura que falhas de autorização de caminho durante a desativação de file watchers não bloqueiem nem abortem a exclusão de worktrees.
 - **Exclusão de histórico de agentes ao remover workspaces (`#42877`):**
   - Introduz a configuração opt-in `deleteAgentHistoryWithWorkspace` em *Settings › Workspaces*;
   - Ao excluir um workspace com o toggle ativo, varre e exclui transcrições, arquivos `.jsonl.zst`, rollouts do Codex e registros do `agent-session-domain.db` vinculados a ele, além de oferecer um botão para expurgo retroativo de histórico órfão;
@@ -155,6 +162,8 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Expurgo seguro do journal antigo de chat após confirmação de integridade no novo store (`#43245`).
+- Não interromper a exclusão de worktrees quando o teardown de watchers perder autorização de caminho (`#38128`).
 - Implementar exclusão granular de chats do Claude Code, Codex e Orca Chat vinculados a workspaces removidos (`#42959`, `#43000`, `#43015`).
 - Preservar e reabrir rascunhos de arquivos não salvos de workspaces que desapareceram externamente (`#42943`).
 - Adotar a exclusão segura de histórico de agentes vinculados a workspaces removidos (`#42877`).

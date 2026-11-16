@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42898, #41910, #40589, #38774 e as issues #37788, #37826, #37949, #38347 trazem comando orca host add na CLI para registro explícito de alvos SSH, painéis de plugins e orca host rm.
+description: Os PRs #42984, #42997, #42898, #41910, #40589 trazem customização de pasta de dados/servidor fora da home SSH, parâmetro branchName em workspace.create e comando orca host add.
 scope:
   - brza-studio
   - workspace
@@ -18,7 +18,9 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `parcial` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42898`](https://github.com/stablyai/orca/pull/42898) (resolve Issue [`#37826`](https://github.com/stablyai/orca/issues/37826)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42984`](https://github.com/stablyai/orca/pull/42984),
+[`stablyai/orca#42997`](https://github.com/stablyai/orca/pull/42997),
+[`stablyai/orca#42898`](https://github.com/stablyai/orca/pull/42898) (resolve Issue [`#37826`](https://github.com/stablyai/orca/issues/37826)),
 [`stablyai/orca#41910`](https://github.com/stablyai/orca/pull/41910),
 [`stablyai/orca#40589`](https://github.com/stablyai/orca/pull/40589) (resolve Issue [`#38342`](https://github.com/stablyai/orca/issues/38342)),
 [`stablyai/orca#38774`](https://github.com/stablyai/orca/pull/38774) (Issues [`#37826`](https://github.com/stablyai/orca/issues/37826) e [`#37949`](https://github.com/stablyai/orca/issues/37949)),
@@ -64,9 +66,17 @@ além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues
    alterações de status, branches e novos worktrees em daemons remotos, gerando latência de vários segundos e tráfego redundante.
 9. **Ausência de comando na CLI para registro explícito de novos hosts SSH (`#42898`, resolve `#37826`):**
    Embora a CLI contasse com `orca host list` e `orca host rm`, não havia subcomando correspondente para cadastrar programaticamente novas máquinas remotas por agentes de IA ou scripts de provisionamento.
+10. **Armazenamento rígido de dados e servidor do daemon no `$HOME` remoto (`#42984`):**
+    Em ambientes de servidores SSH corporativos com quota de disco reduzida em `/home` ou com sistemas de arquivos montados via NFS/Kerberos restritos, o daemon exigia residir em `~/.orca`, causando falhas por estouro de cota de armazenamento e impedindo redirecionamento para partições de alta performance (como `/opt` ou `/scratch`).
+11. **Falta de controle explícito do nome do branch em criações via plugins (`#42997`):**
+    A API de extensões e plugins `workspace.create` não aceitava o parâmetro de branch customizado, obrigando pós-processamento via comandos Git manuais.
 
 ## O caminho proposto no upstream
 
+- **Realocação configurável de servidor e dados fora do home SSH (`#42984`):**
+  - Permite configurar o diretório base de instalação do daemon remoto (`serverPath`) e dados através de flags de conexão e variáveis de ambiente no host, permitindo direcionar o armazenamento para discos ou volumes montados dedicados.
+- **Configuração de branch em `workspace.create` para plugins (`#42997`):**
+  - Expõe `branchName` como parâmetro opcional na API `workspace.create`, permitindo que automações definam a branch no momento da criação do workspace.
 - **Deltas reativos de catálogo via `worktreeRowsChanged` (`#41910`):**
   - Implementa evento `worktreeRowsChanged` emitido pelo daemon de servidor pareado contendo apenas as linhas de catálogo modificadas;
   - Clientes conectados e feeds remotos sincronizam atualizações em ~2s sem necessidade de varredura total.
@@ -92,6 +102,8 @@ além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Suportar a realocação configurável do servidor e pasta de dados do daemon remoto para fora da home do usuário SSH (`#42984`).
+- Permitir configuração do nome da branch na API de plugins `workspace.create` (`#42997`).
 - Implementar `brza host add` (`#42898`, resolve `#37826`) na CLI para permitir cadastramento programático de instâncias SSH remotas.
 - Adotar o evento reativo `worktreeRowsChanged` (`#41910`) para atualização contínua e rápida de catálogo de worktrees em servidores pareados e feeds móveis.
 - Adotar a sessão remota de painéis de plugins via `plugins.panelSession` (`#40589`) para que painéis de plugins na barra lateral reflitam com fidelidade os dados do host onde o workspace ativo está hospedado.

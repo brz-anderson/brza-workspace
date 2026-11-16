@@ -13,6 +13,7 @@ refs:
   - issue:chaveamento-automatico-de-contas-claude-por-limite-de-uso-e-planos-observados
   - issue:consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks
   - issue:execucao-em-lote-no-computer-use-e-protecao-de-digitacao-segura
+  - issue:git-blame-na-linha-do-cursor-e-rebase-pelo-source-control
   - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
   - issue:servidor-mcp-stdio-na-cli-e-otimizacoes-de-captura-no-computer-use
@@ -61,3 +62,36 @@ refs:
      e o PR `#42890` (política de aprovação única *Always trust* para comandos de setup em `orca.yaml` por repositório).
    - [Servidor MCP stdio na CLI, métricas com orca stats usage e automação de documentação](../issues/servidor-mcp-stdio-na-cli-e-otimizacoes-de-captura-no-computer-use.md):
      adicionado o PR `#42812` (resolve Issue `#41618` — subcomando `orca stats usage` e RPC `stats.usage` para consumo direto e conciso de métricas agregadas de tokens e custos estimados por modelo e projeto).
+
+### 2. Ciclo de 6h (06:00 BRT / 09:00 UTC em 2026-11-16)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados PRs e issues abertos criados ou atualizados entre `2026-11-16T03:00:00Z` e `2026-11-16T09:00:00Z`, comparando com as notas existentes em `work/issues/` e o índice `.brza/index.jsonl`.
+2. **Criação de nova issue priorizada em `work/issues/`:**
+   - `priority: high` — [Git Blame inline na linha do cursor, rebase pelo Source Control e suporte a submódulos](../issues/git-blame-na-linha-do-cursor-e-rebase-pelo-source-control.md):
+     rastreia o PR `#42982` (`feat(editor): git blame for the cursor line` — exibe autor, tempo relativo e mensagem de commit na linha ativa sob o cursor no editor com atualização assíncrona),
+     o PR `#42949` (`feat(source-control): rebase from the base-branch row` — ação assistida de rebase direto na linha da branch base no painel Source Control),
+     o PR `#42997` (`feat(plugins): let workspace.create set the branch name` — permissão para que plugins e rotinas de orquestração especifiquem `branchName` na criação de workspaces),
+     e a Issue `#42924` (demanda e arquitetura para suporte nativo de primeira classe a submódulos Git nos workspaces gerenciados).
+3. **Atualização de 5 issues rastreadas em `work/issues/`:**
+   - [Aprovação de planos A/B/C, feedback de revisão inline e resiliência de composer no Native Chat](../issues/aprovacao-de-planos-abc-feedback-de-revisao-inline-e-resiliencia-de-composer-no-chat.md):
+     adicionados o PR `#42975` (permite selecionar o modelo a ser utilizado no próximo turno enquanto o agente ainda está processando o turno atual),
+     o PR `#42981` (`fix(acp): keep saved chats retryable after temporary restore failures` — mantém chats salvos passíveis de retry após falhas transitórias de conexão ACP),
+     o PR `#43020` (`fix(native-chat): resend a subscriber's snapshot when its capture was abandoned` — retransmissão de snapshots para subscritores de chat quando capturas prévias foram abandonadas),
+     o PR `#43007` (`fix(native-chat): an upgrade no longer reopens closed chats or copies unchanged ones` — protege contra reabertura acidental de abas encerradas em atualizações do app),
+     e o PR `#42942` (espaçamento vertical padronizado sobre a action row de resposta).
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionados o PR `#42933` (`feat(antigravity): support Orchestrator mode and native auto/plan execution modes` — suporte ao Antigravity atuar no papel de Orchestrator e alternar entre modos de execução nativos `plan` e `auto`)
+     e o PR `#42940` (padronização de IDs de novos agentes como UUIDs puros).
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionado o PR `#43016` (`fix(orchestration): keep a refused escalation or decision_gate out of the recipient's mailbox` — isolamento de solicitações de escalation ou decision_gate recusadas fora da caixa postal do destinatário original).
+   - [Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):
+     adicionados o PR `#42959` (configuração dedicada para exclusão de chats do Claude Code vinculados a workspaces removidos),
+     o PR `#43000` (exclusão de histórico do Codex junto ao workspace),
+     o PR `#43015` (exclusão de conversas do Orca Chat com histórico ao remover workspace),
+     e o PR `#42943` (`fix(workspaces): reopen unsaved editor drafts for workspaces that vanished while closed` — preservação e reabertura de buffers não salvos de workspaces que desapareceram externamente com o app fechado).
+   - [Workers de plugins em hosts remotos e gerenciamento CLI de SSH](../issues/workers-de-plugins-em-hosts-remotos-e-gerenciamento-cli-de-ssh.md):
+     adicionado o PR `#42984` (`feat(ssh): let the host move Orca's server and data out of the login home` — suporte para realocação de dados e servidor do daemon para fora do `$HOME` do usuário SSH via config/ambiente).
+   - [Consumo de recursos em agentes: reaper de LSP e overhead de hooks](../issues/consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks.md):
+     adicionados o PR `#42964` (resolve Issue `#42921` — elevação do heap do scanner de sessões do AI Vault para 768 MB configuráveis para estancar crashes de OOM),
+     o PR `#43004` (cache de nomes de terminal no macOS reduzindo varreduras caras na tabela de processos),
+     e o PR `#42935` (aprovação única e durável de setup hooks de `orca.yaml` no cliente móvel).

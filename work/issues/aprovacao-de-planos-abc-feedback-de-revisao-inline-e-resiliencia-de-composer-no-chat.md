@@ -4,12 +4,17 @@ tags:
   - chat
   - tooling
   - design
-description: Os PRs #42907, #42895, #42789, #42784, #42783, #42776, #42775, #42740 e as issues #22316, #42609 trazem sugestões de próximo prompt do Claude no composer vazio, suporte ao Hermes Agent via ACP e planos A/B/C.
+description: Os PRs #43020, #43007, #42981, #42975, #42942, #42907, #42895, #42789 trazem escolha do próximo modelo durante execução, retry em falha de restauração ACP, snapshots resilientes e planos A/B/C.
 ---
 
 # Aprovação de planos A/B/C, feedback de revisão inline e resiliência de composer no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42907`](https://github.com/stablyai/orca/pull/42907) (Issues [`#22316`](https://github.com/stablyai/orca/issues/22316) e [`#42609`](https://github.com/stablyai/orca/issues/42609)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43020`](https://github.com/stablyai/orca/pull/43020),
+[`stablyai/orca#43007`](https://github.com/stablyai/orca/pull/43007),
+[`stablyai/orca#42981`](https://github.com/stablyai/orca/pull/42981),
+[`stablyai/orca#42975`](https://github.com/stablyai/orca/pull/42975),
+[`stablyai/orca#42942`](https://github.com/stablyai/orca/pull/42942),
+[`stablyai/orca#42907`](https://github.com/stablyai/orca/pull/42907) (Issues [`#22316`](https://github.com/stablyai/orca/issues/22316) e [`#42609`](https://github.com/stablyai/orca/issues/42609)),
 [`stablyai/orca#42895`](https://github.com/stablyai/orca/pull/42895),
 [`stablyai/orca#42789`](https://github.com/stablyai/orca/pull/42789),
 [`stablyai/orca#42784`](https://github.com/stablyai/orca/pull/42784),
@@ -54,9 +59,29 @@ além das issues [`stablyai/orca#42706`](https://github.com/stablyai/orca/issues
     No terminal Claude Code, o modelo sugere automaticamente a próxima ação lógica no prompt vazio usando seu cache de prompts. No Native Chat do Studio, o composer ficava vazio exibindo apenas o placeholder estático genérico, perdendo produtividade no encadeamento de tarefas.
 14. **Incompatibilidade para rodar o Hermes Agent no Native Chat via ACP (`#42895`):**
     O Hermes Agent (0.23+) estava limitado ao uso em terminal TUI, sem capacidade de rodar na interface estruturada de chat com cartões de aprovação de edições/comandos e seletor de raciocínio sobre seu servidor ACP nativo.
+15. **Impossibilidade de selecionar o modelo do próximo turno enquanto o agente está trabalhando (`#42975`):**
+    Quando um agente estava executando um turno longo, o seletor de modelo ficava desabilitado ou congelado. O usuário não podia escolher um modelo diferente para a próxima mensagem com antecedência, precisando esperar a conclusão do turno para alterar o seletor antes de enviar o novo prompt.
+16. **Bloqueio irrecuperável de chats salvos após falhas temporárias de restauração ACP (`#42981`):**
+    Quando ocorria uma falha temporária ao restaurar um chat salvo via ACP (por exemplo, timeout ou host temporariamente ocupado), o chat entrava em estado permanente de erro sem opção de tentar novamente (*retry*), forçando o descarte da sessão.
+17. **Perda de snapshot de visualização de subscritores quando a captura era abandonada (`#43020`):**
+    Se a captura do snapshot de um assinante era abortada ou abandonada no meio do processo de conexão, o sistema não retransmitia o snapshot subsequente, deixando a aba em tela branca ou desatualizada.
+18. **Reabertura indevida de chats fechados e duplicação em upgrades do aplicativo (`#43007`):**
+    Ao atualizar a versão do aplicativo, abas de chat que já haviam sido encerradas pelo usuário eram reabertas acidentalmente, e conversas inalteradas eram duplicadas.
+19. **Espaçamento inconsistente acima da linha de ações de resposta (`#42942`):**
+    Variações na renderização vertical geravam quebras de layout e desalinhamento visual imediatamente acima da barra de ações de resposta (*answer action row*).
 
 ## O que o upstream implementa
 
+- **Seleção antecipada do próximo modelo durante processamento (`#42975`):**
+  - Permite alterar o modelo no seletor enquanto o agente está ativo; a alteração é armazenada como preferência para o próximo turno sem abortar nem perturbar a execução em curso.
+- **Chats salvos passíveis de retentativa após falha de restauração ACP (`#42981`):**
+  - Mantém o botão de retry disponível para chats com falhas transitórias de restauração, permitindo recuperar a sessão sem recriá-la.
+- **Re-envio automático de snapshots abandonados para subscritores (`#43020`):**
+  - Detecta quando a captura de um snapshot para um assinante de chat foi abandonada e reenvia o snapshot atualizado na próxima emissão de estado.
+- **Preservação fiel do estado de fechamento de chats em upgrades (`#43007`):**
+  - Ajusta a rotina de migração e upgrade para não reabrir chats fechados nem copiar arquivos de conversas que não sofreram alterações.
+- **Espaçamento padronizado acima da barra de ações de resposta (`#42942`):**
+  - Uniformiza a margem superior da action row em todas as densidades de tela e temas.
 - **Tratamento robusto de pulo em perguntas interativas (`#42789`):**
   - Garante envio de sinal padronizado `skip` estruturado no protocolo quando o operador opta por pular um cartão de perguntas.
 - **Identificação dinâmica do modelo Claude a partir da última resposta (`#42784`):**
@@ -95,6 +120,11 @@ além das issues [`stablyai/orca#42706`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Habilitar a escolha do próximo modelo durante o processamento do turno atual (`#42975`).
+- Manter chats salvos passíveis de retry após falhas de restauração ACP (`#42981`).
+- Re-enviar snapshots abandonados de subscritores para prevenir telas em branco (`#43020`).
+- Proteger o estado de fechamento de abas em upgrades do app (`#43007`).
+- Uniformizar o espaçamento vertical sobre a barra de ações de resposta (`#42942`).
 - Implementar o ghost text com sugestões de próximo prompt do Claude no composer vazio (`#42907`, Issues `#22316`, `#42609`).
 - Adicionar o Hermes Agent à lista de agentes suportados no Native Chat sobre seu protocolo ACP (`#42895`).
 - Padronizar respostas de skip em cartões de perguntas interativas (`#42789`).

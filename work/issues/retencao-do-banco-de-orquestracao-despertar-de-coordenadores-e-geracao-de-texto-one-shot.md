@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42839, #42747, #42708, #42707, #42535, #42122 e as issues #42852, #42732, #42731, #42719 trazem expurgo de cópias de chat com auto_vacuum incremental no orchestration.db, parada roteada de workers remotos e filtro --run.
+description: Os PRs #43016, #42839, #42747, #42708, #42707 trazem contenção de recusas de escalation/decision_gate fora da mailbox, expurgo de cópias de chat no orchestration.db e parada de workers remotos.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,8 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42839`](https://github.com/stablyai/orca/pull/42839) (resolve STA-15101),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43016`](https://github.com/stablyai/orca/pull/43016),
+[`stablyai/orca#42839`](https://github.com/stablyai/orca/pull/42839) (resolve STA-15101),
 [`stablyai/orca#42747`](https://github.com/stablyai/orca/pull/42747) (resolve Issue [`#42732`](https://github.com/stablyai/orca/issues/42732)),
 [`stablyai/orca#42708`](https://github.com/stablyai/orca/pull/42708),
 [`stablyai/orca#42707`](https://github.com/stablyai/orca/pull/42707),
@@ -79,8 +80,8 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Enquanto a ferramenta aprovada pelo usuário ainda estava em execução, o prompt interativo continuava aparecendo como pendente no orquestrador, arriscando duplicidade de aprovação.
 16. **Truncamento de leituras de workers de chat e perda de projeção de frota (`#42707`):**
     - Leituras massivas de mensagens de workers saturavam buffers em consultas não paginadas, corrompendo a projeção consolidada da frota de agentes.
-17. **Refugos indevidos de `decision_gate` entregues como mensagens `[HIGH]` (`#42731`):**
-    - Quando um `decision_gate` era rejeitado por um agente não-atribuído, a recusa era persistida e entregue ao coordenador com rótulo urgente `[HIGH] "Rejected decision_gate"`, gerando alarmes falsos.
+17. **Refugos indevidos de `decision_gate` e escalações entregues na mailbox do destinatário (`#42731`, `#43016`):**
+    - Quando um `decision_gate` ou escalação de permissão era recusada por um agente ou autoridade não-atribuída, a recusa era persistida e despachada para a caixa de correio do destinatário original como mensagem de erro urgente, gerando falsos positivos e poluindo o fluxo da conversa.
 18. **Poluição de abas com terminais coordenadores de Runs e saídas JSON inchadas (`#42719`, `#42733`, `#42734`):**
     - Execuções de automação criavam abas de terminal visíveis obrigatórias para coordenadores; saídas de `worktree ps/list --json` despejavam ~0.5 MB (~130k tokens) de campos nulos e duplicados sem visão concisa; e recibos de `worker-start` omitiam o caminho do worktree e título da tarefa.
 19. **Inchaço do banco `orchestration.db` por cópias estáticas redundantes de chat e falta de auto_vacuum incremental (`#42839`, resolve STA-15101):**
@@ -89,55 +90,55 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Quando um worker era iniciado em um host remoto pareado a partir de outro host, a solicitação de Stop/Close pelo host receptor não era roteada de volta ao host de origem (*home-routed*), deixando o processo do worker rodando indefinidamente na máquina remota.
 
 ## O que o upstream implementa
-   - Implementa uma rotina horária de limpeza (com execução inicial 1 minuto após o boot) que deleta Runs resolvidos e não tocados pelo período de `orchestrationRunRetentionHours` (padrão 24 horas; 0 desativa a retenção);
-   - Executa a deleção em transações isoladas `BEGIN IMMEDIATE` com yield para o event loop, preservando cuidadosamente Runs com Tasks pendentes, despachos ativos, workers vivos, perguntas abertas ou coordenadores ainda ativos.
-2. **Despertar automático de coordenadores em repouso ao receber correio (`#41746`):**
-   - Acorda automaticamente o processo PTY e a sessão do agente coordenador quando novas mensagens (como `worker_done`, respostas de perguntas ou resultados de tarefas) entram em sua caixa de correio (`wakeSleptCoordinatorForMail`);
-   - Garante que a entrega de mensagens ocorra imediatamente sem depender de foco manual do usuário no workspace.
-3. **Detecção e notificação de inatividade prolongada de workers mid-turn (`#41702`):**
-   - Varre a cada minuto os workers em execução e detecta ausência de progresso real (hooks, status reports ou streaming) por mais de 15 minutos (ou 60 minutos se uma ferramenta longa estiver rodando);
-   - Envia uma mensagem informativa discreta ao coordenador avisando que o worker está quieto há X minutos e qual ferramenta está ativa, sem interromper ou matar prematuramente o processo do worker.
-4. **Comando CLI `orca text generate` e RPC `text.generate` para respostas sem ferramentas (`#41729`, resolve `#41726`):**
-   - Introduz o método RPC `text.generate` e o comando CLI `orca text generate --agent <id> (--prompt <text> | --prompt-file <path|->) [--model] [--effort] [--timeout-ms] [--json]`;
-   - Executa a inferência em um diretório temporário isolado descartável, desativando ferramentas (`--tools ""`) e hooks pesados, reutilizando a autenticação local do agente selecionado para fornecer respostas rápidas e limpas.
-5. **Suporte a entrada por stdin e arquivo em `terminal send` (`#41754`, resolve `#40838`):**
-   - Estende o comando com as opções `terminal send --text -` (leitura via stdin até EOF) e `--text-file <path>` (leitura de arquivo UTF-8);
-   - Preserva quebras de linha e caracteres de controle, mantendo prompts confidenciais fora da lista de processos do SO.
-6. **Marcação atômica de pergunta como lida ao submeter resposta (`#41979`, resolve `#41975`):**
-   - Executa `markAsRead([question.message_id])` dentro da mesma transação em `answerQuestion`, eliminando a necessidade de consultas `orchestration check` subsequentes para limpar mensagens já respondidas.
-7. **Consulta otimizada do pull-loop sem tabela temporária (`#42122`, resolve STA-15102):**
-   - Reformula a checagem de pull em uma única consulta SQL compacta, unificando estados de link e verificação de home conversation sem construir temporary sets no SQLite.
-8. **Reutilização imediata de workers mid-turn via entrega em mailbox (`#42114`):**
-   - Permite que `worker-start --terminal` despache a tarefa subsequente diretamente na caixa de correio do agente ativo, dispensando a espera por `tui-idle` e prevenindo falsos timeouts de 60s em workers que monitoram processos pós-turno.
-9. **Resiliência e nomeação em falhas pré-binding de reuse-starts (`#42112`, `#42111`):**
-   - Trata abortos antes do binding marcando a tarefa como nunca iniciada e preservando o identificador e nome do agente reutilizado nos registros.
-10. **Preservação de `run` e `coordinator_handle` na saída concisa `--json` (`#42338`, resolve `#42103`):**
-    - Restaura o objeto `run` com `coordinator_handle` no JSON compacto retornado por `run-show`, `run-current` e `run-use`.
-11. **Liberação resiliente de workers com terminal fechado em `worker-release` (`#42264`, resolve `#19166`):**
-    - Permite que o comando `worker-release` conclua a liberação com sucesso mesmo se o terminal PTY do worker já tiver saído ou sido destruído.
-12. **Exposição de `creatorOrcaSessionId` e `assigneeOrcaSessionId` no JSON de workers (`#42284`, resolve `#42230`):**
-    - Expõe os IDs de sessão de chat vinculados ao criador e ao destinatário do worker na resposta `--full`.
-13. **Rejeição de relatórios vazios ou whitespace em `worker_done` (`#42535`, resolve `#42148`):**
-    - Valida `--body` na CLI e parâmetros de envio no RPC para rejeitar corpos vazios em `worker_done`, retornando `invalid_argument` e mantendo a tarefa aberta para reenvio sem perda de relatórios.
-14. **Suporte a `--run` em `orchestration inbox` (`#42747`, resolve `#42732`):**
-    - Expõe a flag `--run <runId>` na CLI `orca orchestration inbox` e encaminha o filtro ao backend RPC, permitindo inspecionar apenas a caixa postal vinculada à execução ativa.
-15. **Contabilização de prompt aprovado como respondido durante ferramenta em execução (`#42708`):**
-    - Marca prompts interativos como respondidos no ato da aprovação para que não reapareçam como pendentes durante a execução de ferramentas lentas.
-16. **Paginação de leituras de workers de chat e projeção estável de frota (`#42707`):**
-    - Aplica paginação eficiente na recuperação de mensagens de workers antes de aplicar limites rígidos, mantendo a consistência da projeção agregada da frota de agentes.
-17. **Terminais coordenadores ocultos e compactação de payloads (`#42719`, `#42731`, `#42733`, `#42734`):**
-    - Introduz modo de terminal coordenador sem aba dedicada no editor para orquestrações autônomas;
-    - Descarta notificações urgentes para decisões recusadas por terceiros;
-    - Reduz em mais de 70% o payload JSON de `worktree ps/list` omitindo campos redundantes e expõe o worktree e título nos recibos de `worker-start`.
-18. **Expurgo de cópias resolvidas de chat e auto_vacuum incremental com botão de reclaim (`#42839`, resolve STA-15101):**
-    - Converte cópias de chat de workers em referências leves (`{ chatRef: { sessionId, ... } }`) assim que o Run é concluído há mais de 24h, liberando até 99% do volume ocupado por outputs arquivados;
-    - Cria novos bancos com `auto_vacuum = INCREMENTAL` e devolve páginas livres ao sistema operacional periodicamente;
-    - Adiciona a seção *Settings › Agent orchestration › Orchestration storage* com medição de espaço e o botão **Reclaim space**, executando limpeza e `VACUUM` atômico durante reinicialização segura.
-19. **Roteamento doméstico para parada de workers federados remotos (`#42852`):**
-    - Garante que eventos de encerramento (`stop` / `close`) de workers federados sejam roteados para o host criador original, finalizando adequadamente o processo remoto.
+
+- **Isolamento de escalações e decision gates recusados fora da mailbox (`#43016`):**
+  - Assegura que solicitações de escalation ou decision_gate recusadas não sejam injetadas na caixa postal do destinatário, registrando o encerramento da decisão apenas nos metadados de governança da tarefa.
+- **Expurgo de cópias resolvidas de chat e auto_vacuum incremental com botão de reclaim (`#42839`, resolve STA-15101):**
+  - Converte cópias de chat de workers em referências leves (`{ chatRef: { sessionId, ... } }`) assim que o Run é concluído há mais de 24h, liberando até 99% do volume ocupado por outputs arquivados;
+  - Cria novos bancos com `auto_vacuum = INCREMENTAL` e devolve páginas livres ao sistema operacional periodicamente;
+  - Adiciona a seção *Settings › Agent orchestration › Orchestration storage* com medição de espaço e o botão **Reclaim space**, executando limpeza e `VACUUM` atômico durante reinicialização segura.
+- **Roteamento doméstico para parada de workers federados remotos (`#42852`):**
+  - Garante que eventos de encerramento (`stop` / `close`) de workers federados sejam roteados para o host criador original, finalizando adequadamente o processo remoto.
+- **Suporte a `--run` em `orchestration inbox` (`#42747`, resolve `#42732`):**
+  - Expõe a flag `--run <runId>` na CLI `orca orchestration inbox` e encaminha o filtro ao backend RPC, permitindo inspecionar apenas a caixa postal vinculada à execução ativa.
+- **Contabilização de prompt aprovado como respondido durante ferramenta em execução (`#42708`):**
+  - Marca prompts interativos como respondidos no ato da aprovação para que não reapareçam como pendentes durante a execução de ferramentas lentas.
+- **Paginação de leituras de workers de chat e projeção estável de frota (`#42707`):**
+  - Aplica paginação eficiente na recuperação de mensagens de workers antes de aplicar limites rígidos, mantendo a consistência da projeção agregada da frota de agentes.
+- **Terminais coordenadores ocultos e compactação de payloads (`#42719`, `#42731`, `#42733`, `#42734`):**
+  - Introduz modo de terminal coordenador sem aba dedicada no editor para orquestrações autônomas;
+  - Descarta notificações urgentes para decisões recusadas por terceiros;
+  - Reduz em mais de 70% o payload JSON de `worktree ps/list` omitindo campos redundantes e expõe o worktree e título nos recibos de `worker-start`.
+- **Rejeição de relatórios vazios ou whitespace em `worker_done` (`#42535`, resolve `#42148`):**
+  - Valida `--body` na CLI e parâmetros de envio no RPC para rejeitar corpos vazios em `worker_done`, retornando `invalid_argument` e mantendo a tarefa aberta para reenvio sem perda de relatórios.
+- **Preservação de `run` e `coordinator_handle` na saída concisa `--json` (`#42338`, resolve `#42103`):**
+  - Restaura o objeto `run` com `coordinator_handle` no JSON compacto retornado por `run-show`, `run-current` e `run-use`.
+- **Liberação resiliente de workers com terminal fechado em `worker-release` (`#42264`, resolve `#19166`):**
+  - Permite que o comando `worker-release` conclua a liberação com sucesso mesmo se o terminal PTY do worker já tiver saído ou sido destruído.
+- **Exposição de `creatorOrcaSessionId` e `assigneeOrcaSessionId` no JSON de workers (`#42284`, resolve `#42230`):**
+  - Expõe os IDs de sessão de chat vinculados ao criador e ao destinatário do worker na resposta `--full`.
+- **Consulta otimizada do pull-loop sem tabela temporária (`#42122`, resolve STA-15102):**
+  - Reformula a checagem de pull em uma única consulta SQL compacta, unificando estados de link e verificação de home conversation sem construir temporary sets no SQLite.
+- **Reutilização imediata de workers mid-turn via entrega em mailbox (`#42114`):**
+  - Permite que `worker-start --terminal` despache a tarefa subsequente diretamente na caixa de correio do agente ativo, dispensando a espera por `tui-idle` e prevenindo falsos timeouts de 60s em workers que monitoram processos pós-turno.
+- **Resiliência e nomeação em falhas pré-binding de reuse-starts (`#42112`, `#42111`):**
+  - Trata abortos antes do binding marcando a tarefa como nunca iniciada e preservando o identificador e nome do agente reutilizado nos registros.
+- **Marcação atômica de pergunta como lida ao submeter resposta (`#41979`, resolve `#41975`):**
+  - Executa `markAsRead([question.message_id])` dentro da mesma transação em `answerQuestion`, eliminando a necessidade de consultas `orchestration check` subsequentes para limpar mensagens já respondidas.
+- **Ciclo de retenção e limpeza do banco `orchestration.db` (`#41757`, resolve `#41756`):**
+  - Implementa rotina horária de limpeza (com execução inicial 1 minuto após o boot) que deleta Runs resolvidos e não tocados pelo período de retenção configurado.
+- **Despertar automático de coordenadores em repouso (`#41746`):**
+  - Acorda automaticamente o processo PTY e a sessão do agente coordenador quando novas mensagens entram em sua caixa postal.
+- **Monitor de inatividade mid-turn de workers (`#41702`):**
+  - Detecta ausência de progresso real por mais de 15 minutos e envia aviso discreto ao coordenador.
+- **Comando CLI `orca text generate` e RPC `text.generate` (`#41729`, resolve `#41726`):**
+  - Executa inferência one-shot rápida sem ferramentas em diretório temporário isolado.
+- **Suporte a stdin e arquivo em `terminal send` (`#41754`, resolve `#40838`):**
+  - Permite envio seguro de payloads longos sem expor argumentos em `ps`.
 
 ## O que fazer
 
+- Manter escalações e decision gates recusados fora da caixa postal do destinatário (`#43016`).
 - Adotar o expurgo de cópias resolvidas de chat e `auto_vacuum = INCREMENTAL` no `orchestration.db` com ação 'Reclaim space' (`#42839`, resolve STA-15101).
 - Rotear ordens de parada de workers federados remotos ao host de origem (`#42852`).
 - Adicionar o parâmetro `--run` em `brza orchestration inbox` para filtrar caixas postais por execução (`#42747`, resolve `#42732`).

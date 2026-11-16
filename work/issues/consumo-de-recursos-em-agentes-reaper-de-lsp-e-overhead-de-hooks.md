@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42889, #42890, #42807, #42760, #42686 e a issue #42601 trazem desinstalação limpa de hooks/CLI com orca uninstall, aprovação de orca.yaml por repositório e supervisores nativos.
+description: Os PRs #43004, #42964, #42935, #42889, #42890 trazem cache de processos macOS, heap de 768 MB no session scanner contra OOM, aprovação única de hooks e desinstalação limpa.
 scope:
   - brza-studio
   - tools-kit
@@ -14,7 +14,10 @@ tags:
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42889`](https://github.com/stablyai/orca/pull/42889) (resolve Issue [`#42601`](https://github.com/stablyai/orca/issues/42601)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43004`](https://github.com/stablyai/orca/pull/43004),
+[`stablyai/orca#42964`](https://github.com/stablyai/orca/pull/42964) (resolve Issue [`#42921`](https://github.com/stablyai/orca/issues/42921)),
+[`stablyai/orca#42935`](https://github.com/stablyai/orca/pull/42935),
+[`stablyai/orca#42889`](https://github.com/stablyai/orca/pull/42889) (resolve Issue [`#42601`](https://github.com/stablyai/orca/issues/42601)),
 [`stablyai/orca#42890`](https://github.com/stablyai/orca/pull/42890),
 [`stablyai/orca#42807`](https://github.com/stablyai/orca/pull/42807),
 [`stablyai/orca#42760`](https://github.com/stablyai/orca/pull/42760),
@@ -63,9 +66,21 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
     Ao desinstalar o Studio ou apagar o aplicativo, hooks injetados nas configurações de agentes (`~/.claude`, `~/.codex`, `~/.gemini`), binários na `PATH`, serviços do `orca serve` e scripts em `~/.orca/agent-hooks` permaneciam órfãos gerando erros em terminais independentes.
 13. **Prompts repetitivos a cada alteração no `orca.yaml` do repositório (`#42890`):**
     Qualquer edição nos comandos de setup do `orca.yaml` (ex.: novo passo no branch `main`) disparava nova caixa de diálogo de aprovação de segurança para todos os usuários em cada criação de worktree, mesmo em repositórios corporativos já confiados.
+14. **Falhas de Out of Memory (OOM) no AI Vault ao varrer históricos grandes (`#42964`, resolve `#42921`):**
+    A varredura e indexação de sessões históricas de múltiplos agentes em `ai-vault` operava com limite rígido padrão de heap (128-256 MB) no processo de background. Em workspaces com semanas de histórico e centenas de transcrições, o processo sofria crash de OOM e interrompia a catalogação de conversas.
+15. **Sobrecarga contínua de consultas à tabela de processos no macOS (`#43004`):**
+    Para verificar os nomes e estados de janelas de terminal ativas no macOS, o app realizava frequentes varreduras completas da árvore de processos do sistema operacional, gerando consumo elevado de CPU e lentidão sob concorrência.
+16. **Diálogos repetitivos de aprovação de setup hooks no app móvel (`#42935`):**
+    No cliente móvel, cada inicialização de workspace exigia reaprovação dos scripts de setup de `orca.yaml`, sem mecanismo de persistência de aprovação única.
 
 ## O que o upstream propõe e implementa
 
+- **Elevação do heap do scanner de sessões do AI Vault para 768 MB e ajuste configurável (`#42964`, resolve `#42921`):**
+  - Aumenta o limite padrão de heap para 768 MB no processo auxiliar de indexação do AI Vault e expõe configuração para permitir ajuste manual em workspaces massivos, eliminando crashes de OOM.
+- **Cache de nomes de terminal no macOS reduzindo consultas ao processo do sistema (`#43004`):**
+  - Implementa cache local em memória dos nomes de terminais verificados, reduzindo drasticamente as invocações à tabela de processos (`sysctl`/`ps`) no macOS.
+- **Aprovação única persistente de hooks de setup no cliente móvel (`#42935`):**
+  - Implementa retenção de aprovação de hooks `orca.yaml` no cliente móvel, evitando prompts repetitivos a cada sincronização.
 - **Substituição de supervisores Electron por agentes nativos leves no Native Chat (`#42760`):**
   - Converte os supervisores de sessão do Native Chat de processos Electron render para workers nativos enxutos;
   - Reduz o consumo de RSS de ~46 MiB/chat para menos de 1.8 MiB/chat (economia de mais de 7 GB de RAM em instalações com 150 chats).
@@ -108,6 +123,9 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Elevar o heap do scanner de sessões do AI Vault para 768 MB configuráveis (`#42964`, resolve `#42921`).
+- Cachear nomes de terminal verificados no macOS para mitigar chamadas contínuas à tabela de processos (`#43004`).
+- Permitir aprovação única de hooks de setup `orca.yaml` no mobile (`#42935`).
 - Implementar o comando `brza uninstall` e a seção de desinstalação limpa em *Settings › Advanced* (`#42889`, resolve `#42601`).
 - Adotar a política de confiança de setup por repositório (*Always trust*) em `orca.yaml` (`#42890`).
 - Substituir supervisores Electron por workers nativos leves no Native Chat (`#42760`).

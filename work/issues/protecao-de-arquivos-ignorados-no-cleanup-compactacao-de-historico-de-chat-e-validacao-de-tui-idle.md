@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42877, #42905, #42055, #42039, #41858, #41835 e a issue #42909 trazem exclusão de histórico de agentes ao remover workspace, seções manual/automática em cleanup e regras no orca.yaml.
+description: Os PRs #43015, #43000, #42959, #42943, #42877, #42905 trazem exclusão de chats Orca/Codex/Claude Code ao remover workspace, restauração de rascunhos de workspaces e seções de cleanup.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,11 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42877`](https://github.com/stablyai/orca/pull/42877),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43015`](https://github.com/stablyai/orca/pull/43015),
+[`stablyai/orca#43000`](https://github.com/stablyai/orca/pull/43000),
+[`stablyai/orca#42959`](https://github.com/stablyai/orca/pull/42959),
+[`stablyai/orca#42943`](https://github.com/stablyai/orca/pull/42943),
+[`stablyai/orca#42877`](https://github.com/stablyai/orca/pull/42877),
 [`stablyai/orca#42905`](https://github.com/stablyai/orca/pull/42905),
 além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/42909) e dos PRs
 [`stablyai/orca#42055`](https://github.com/stablyai/orca/pull/42055),
@@ -82,66 +86,77 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Ao deletar um workspace, o histórico conversacional de agentes (Claude, Codex, Antigravity, OpenCode, Hermes) permanecia intacto em `~/.claude`, `~/.codex` e `agent-session-domain.db`, ocupando até dezenas de gigabytes em perfis consolidados.
 16. **Falta de separação visual entre cleanup manual e automático nas configurações (`#42905`, Issue `#42909`):**
     - As regras de limpeza automática ficavam misturadas com os gatilhos manuais na interface, gerando confusão sobre quais worktrees seriam expurgados automaticamente em background e impedindo a definição declarativa de pastas regeneráveis em `orca.yaml`.
+17. **Retenção de histórico de conversas específicas do Claude Code, Codex e Orca Chat após deleção (`#42959`, `#43000`, `#43015`):**
+    - A política genérica de deleção não contemplava granularidade por agente: chats do Claude Code (`#42959`), histórico estruturado do Codex (`#43000`) e conversas nativas do Orca Chat (`#43015`) deixavam resíduos em diferentes diretórios de perfil.
+18. **Perda de rascunhos de editor não salvos quando workspaces desaparecem com o app fechado (`#42943`):**
+    - Se um workspace ou branch fosse removido externamente (ex.: por script ou git worktree prune) enquanto o aplicativo estava fechado, ao reabrir o app os buffers com rascunhos de edição pendentes eram descartados silenciosamente sem opção de recuperação.
 
 ## O que o upstream propõe e implementa
 
-1. **Varredura at-risk de arquivos ignorados antes de remover worktrees (`#41446`):**
-   - Implementa `readWorktreeAtRiskLocalFiles`, listando arquivos com `git ls-files -o -i --exclude-standard --directory`;
-   - Descarta pastas regeneráveis (`node_modules`, `dist`, `.venv`, `.next`, `target`, `vendor`), symlinks e arquivos idênticos
-     aos do checkout principal (como `.env` padrão replicado pelo setup);
-   - Apresenta aviso explícito no modal de exclusão e na barra lateral ("Ignored files will be lost: .env, local/"), bloqueando
-     a deleção automática sem confirmação prévia do operador.
-2. **Compactação contínua de histórico de chat mantendo apenas primeiro e último registro (`#41392`):**
-   - Adiciona um gatilho de esquema (`journal_outcome_item_supersede`) que apaga imediatamente a revisão anterior assim que uma
-     nova revisão do mesmo item é gravada, estabilizando o custo por escrita em O(1);
-   - Roda uma rotina de compactação em thread de worker dedicada 2 minutos após o arranque, paginada em 64 registros com duty cycle de 10%,
-     reduzindo a base de itens pela metade sem impacto no loop de eventos principal e reutilizando páginas liberadas no SQLite.
-3. **Corroboração de marcador de composer para instâncias do Claude identificadas por título (`#41366`):**
-   - Estende a exigência do marcador de entrada `❯` para qualquer painel identificado como Claude interativo via título OSC (`paintAgent`);
-   - Ignora comandos que executam em modo print (`-p`, `--output-format json`) ou pipelines com pagers (`less`, `more`), assegurando
-     que ferramentas de automação e orquestração nunca enviem prompts antes do composer interativo estar pronto.
-4. **Desativação de refetch de badges do Linear por evento de foco (`#41384`):**
-   - Remove os listeners de foco de janela para badges montados, atualizando detalhes apenas na montagem ou via notificação
-     específica pós-escrita de ferramentas locais, reduzindo requisições em 83,3%.
-5. **Ocultação imediata de linha na UI e persistência de cleanup em tabela durável (`#41483`):**
-   - Registra exclusões em tabela durável (`worktree-removal-table.ts`) e oculta a linha da visualização imediatamente (`removal-visibility.ts`);
-   - Em reinicializações do app com remoções pendentes, o processo retoma o cleanup de arquivos e do registro Git sem intervenção manual.
-6. **Proprietário único de listagem de worktrees por repositório (`#41480`):**
-   - Cria modelo centralizado por repositório e runtime Git, unificando os acessos da barra lateral e do catálogo de runtime;
-   - Reutiliza leituras em andamento para requisições concorrentes e invalida o cache apenas diante de mutações ou eventos estruturais do watcher.
-7. **Restrição de atalhos de exclusão de workspace à seleção da barra lateral (`#41457`):**
-   - Vincula o listener de teclado de exclusão estritamente ao container da barra lateral quando focado (`use-sidebar-workspace-delete-keyboard.ts`);
-   - Garante que teclas pressionadas no terminal ou editor nunca acionem a caixa de confirmação de exclusão.
-8. **Varredura offline 4x mais rápida de cleanup de workspaces (`#41765`):**
-   - Executa as checagens de merge e provas Git com `GIT_NO_LAZY_FETCH=1` e `GIT_ALLOW_PROTOCOL=none`, impedindo fetches acidentais de rede em clones parciais;
-   - Memoiza referências base (`createWorkspaceCleanupRepoRefs`) por repositório durante a varredura e otimiza a busca de squashes (`git log --name-only --no-renames` + `patch-id` apenas para commits com conjunto idêntico de arquivos tocados), reduzindo o tempo de varredura de ~23s para ~5s.
-9. **Execução automática de regras de cleanup de workspace em background por host (`#41760`):**
-   - Implementa o `WorkspaceCleanupRunner` com ciclo de avaliação compartilhada (`evaluateWorkspaceCleanup`), disparado 2 minutos após o boot, a cada hora e 10s após alterações de regras;
-   - Executa isoladamente no host/processo dono do repositório (desktop local, orcad de SSH ou WSL), revalidando evidências (pins, drafts não salvos, terminais abertos, daemons e arquivos dirty) imediatamente antes da remoção segura via `queueWorkspaceDelete`.
-10. **Resiliência e recuperação de exclusão de workspaces em servidores pareados e headless (`#41858`, STA-15099):**
-    - Carrega a tabela de exclusões duráveis pendentes tanto no desktop quanto na inicialização de instâncias servidoras (`orca serve`/orcad);
-    - Valida o armazenamento de deleção antes de parar terminais, oculta a linha da visualização imediatamente, preserva o caminho e branch até o término do expurgo e retoma limpezas incompletas após reinício do host, sem limite rígido de 30s no WSL.
-11. **Cancelamento imediato de varreduras locais de arquivos ignorados (`#41835`, STA-15114):**
-    - Conecta o `AbortController` ao canal local `getRuntimeWorktreeAtRiskLocalFiles`, interrompendo prontamente chamadas a `git ls-files` e comparações em disco assim que o diálogo de confirmação é fechado ou redirecionado.
-12. **Mecanismo de arquivamento e restauração de worktrees (`#41833`):**
-    - Implementa `worktree.archive`, apagando o diretório de checkout para liberar espaço em disco enquanto preserva o branch, metadados (`WorktreeMeta.archivedCheckout`), notas e histórico;
-    - Implementa `worktree.restore`, recriando o worktree a partir do branch preservado com reconstituição de symlinks e cópias de `.worktreeinclude`.
-13. **Página de configurações Workspace Cleanup com regras e ação imediata (`#42039`):**
-    - Adiciona a tela *Settings > Workspace Cleanup*, permitindo configurar regras de exclusão (merged, unchanged, inactive e avançadas de automação);
-    - Exibe linha de status com o resultado do último ciclo (workspaces removidos e bytes liberados) e previsão do próximo;
-    - Inclui o botão **Clean up now** (`workspaceCleanup.runNow`), apresentando listagem de workspaces a serem removidos imediatamente e permitindo desmarcar individualmente qualquer um deles.
-14. **Regras de cleanup por projeto em Project Settings (`#42055`):**
-    - Adiciona a seção *Workspace cleanup* na página de configurações do projeto, permitindo selecionar entre `Use global` (herda regras globais), `Off` (desativa cleanup no projeto) ou `Custom` (regras específicas por repositório com overrides individuais).
-15. **Exclusão de histórico de agentes ao remover workspaces (`#42877`):**
-    - Introduz a configuração opt-in `deleteAgentHistoryWithWorkspace` em *Settings › Workspaces*;
-    - Ao excluir um workspace com o toggle ativo, varre e exclui transcrições, arquivos `.jsonl.zst`, rollouts do Codex e registros do `agent-session-domain.db` vinculados a ele, além de oferecer um botão para expurgo retroativo de histórico órfão;
-    - Preserva sessões ativas e arquivos tocados nas últimas 24 horas como medida de segurança.
-16. **Seções distintas de Cleanup Manual e Automático e regras no `orca.yaml` (`#42905`, Issue `#42909`):**
-    - Reorganiza *Settings › Workspace Cleanup* em dois blocos claros com validação explícita de regras;
-    - Permite declarar pastas regeneráveis (ex.: caches de build ou pastas `target/`) no `orca.yaml` do projeto para limpeza automática segura.
+- **Configurações dedicadas para exclusão granular de chats com o workspace (`#42959`, `#43000`, `#43015`):**
+  - Adiciona toggles granulares em *Settings › Workspaces* para remover chats do Claude Code (`#42959`), histórico do Codex (`#43000`) e conversas nativas do Orca Chat (`#43015`) junto com o workspace;
+  - Limpa caches de sessão associados sem afetar workspaces ativos ou históricos compartilhados.
+- **Recuperação e reabertura de rascunhos de editor para workspaces desaparecidos (`#42943`):**
+  - Preserva os rascunhos não salvos do editor caso o workspace associado tenha desaparecido enquanto o aplicativo estava fechado, reabrindo os buffers em abas de rascunho recuperadas para salvar em outro local.
+- **Varredura at-risk de arquivos ignorados antes de remover worktrees (`#41446`):**
+  - Implementa `readWorktreeAtRiskLocalFiles`, listando arquivos com `git ls-files -o -i --exclude-standard --directory`;
+  - Descarta pastas regeneráveis (`node_modules`, `dist`, `.venv`, `.next`, `target`, `vendor`), symlinks e arquivos idênticos
+    aos do checkout principal (como `.env` padrão replicado pelo setup);
+  - Apresenta aviso explícito no modal de exclusão e na barra lateral ("Ignored files will be lost: .env, local/"), bloqueando
+    a deleção automática sem confirmação prévia do operador.
+- **Compactação contínua de histórico de chat mantendo apenas primeiro e último registro (`#41392`):**
+  - Adiciona um gatilho de esquema (`journal_outcome_item_supersede`) que apaga imediatamente a revisão anterior assim que uma
+    nova revisão do mesmo item é gravada, estabilizando o custo por escrita em O(1);
+  - Roda uma rotina de compactação em thread de worker dedicada 2 minutos após o arranque, paginada em 64 registros com duty cycle de 10%,
+    reduzindo a base de itens pela metade sem impacto no loop de eventos principal e reutilizando páginas liberadas no SQLite.
+- **Corroboração de marcador de composer para instâncias do Claude identificadas por título (`#41366`):**
+  - Estende a exigência do marcador de entrada `❯` para qualquer painel identificado como Claude interativo via título OSC (`paintAgent`);
+  - Ignora comandos que executam em modo print (`-p`, `--output-format json`) ou pipelines com pagers (`less`, `more`), assegurando
+    que ferramentas de automação e orquestração nunca enviem prompts antes do composer interativo estar pronto.
+- **Desativação de refetch de badges do Linear por evento de foco (`#41384`):**
+  - Remove os listeners de foco de janela para badges montados, atualizando detalhes apenas na montagem ou via notificação
+    específica pós-escrita de ferramentas locais, reduzindo requisições em 83,3%.
+- **Ocultação imediata de linha na UI e persistência de cleanup em tabela durável (`#41483`):**
+  - Registra exclusões em tabela durável (`worktree-removal-table.ts`) e oculta a linha da visualização imediatamente (`removal-visibility.ts`);
+  - Em reinicializações do app com remoções pendentes, o processo retoma o cleanup de arquivos e do registro Git sem intervenção manual.
+- **Proprietário único de listagem de worktrees por repositório (`#41480`):**
+  - Cria modelo centralizado por repositório e runtime Git, unificando os acessos da barra lateral e do catálogo de runtime;
+  - Reutiliza leituras em andamento para requisições concorrentes e invalida o cache apenas diante de mutações ou eventos estruturais do watcher.
+- **Restrição de atalhos de exclusão de workspace à seleção da barra lateral (`#41457`):**
+  - Vincula o listener de teclado de exclusão estritamente ao container da barra lateral quando focado (`use-sidebar-workspace-delete-keyboard.ts`);
+  - Garante que teclas pressionadas no terminal ou editor nunca acionem a caixa de confirmação de exclusão.
+- **Varredura offline 4x mais rápida de cleanup de workspaces (`#41765`):**
+  - Executa as checagens de merge e provas Git com `GIT_NO_LAZY_FETCH=1` e `GIT_ALLOW_PROTOCOL=none`, impedindo fetches acidentais de rede em clones parciais;
+  - Memoiza referências base (`createWorkspaceCleanupRepoRefs`) por repositório durante a varredura e otimiza a busca de squashes (`git log --name-only --no-renames` + `patch-id` apenas para commits com conjunto idêntico de arquivos tocados), reduzindo o tempo de varredura de ~23s para ~5s.
+- **Execução automática de regras de cleanup de workspace em background por host (`#41760`):**
+  - Implementa o `WorkspaceCleanupRunner` com ciclo de avaliação compartilhada (`evaluateWorkspaceCleanup`), disparado 2 minutos após o boot, a cada hora e 10s após alterações de regras;
+  - Executa isoladamente no host/processo dono do repositório (desktop local, orcad de SSH ou WSL), revalidando evidências (pins, drafts não salvos, terminais abertos, daemons e arquivos dirty) imediatamente antes da remoção segura via `queueWorkspaceDelete`.
+- **Resiliência e recuperação de exclusão de workspaces em servidores pareados e headless (`#41858`, STA-15099):**
+  - Carrega a tabela de exclusões duráveis pendentes tanto no desktop quanto na inicialização de instâncias servidoras (`orca serve`/orcad);
+  - Valida o armazenamento de deleção antes de parar terminais, oculta a linha da visualização imediatamente, preserva o caminho e branch até o término do expurgo e retoma limpezas incompletas após reinício do host, sem limite rígido de 30s no WSL.
+- **Cancelamento imediato de varreduras locais de arquivos ignorados (`#41835`, STA-15114):**
+  - Conecta o `AbortController` ao canal local `getRuntimeWorktreeAtRiskLocalFiles`, interrompendo prontamente chamadas a `git ls-files` e comparações em disco assim que o diálogo de confirmação é fechado ou redirecionado.
+- **Mecanismo de arquivamento e restauração de worktrees (`#41833`):**
+  - Implementa `worktree.archive`, apagando o diretório de checkout para liberar espaço em disco enquanto preserva o branch, metadados (`WorktreeMeta.archivedCheckout`), notas e histórico;
+  - Implementa `worktree.restore`, recriando o worktree a partir do branch preservado com reconstituição de symlinks e cópias de `.worktreeinclude`.
+- **Página de configurações Workspace Cleanup com regras e ação imediata (`#42039`):**
+  - Adiciona a tela *Settings > Workspace Cleanup*, permitindo configurar regras de exclusão (merged, unchanged, inactive e avançadas de automação);
+  - Exibe linha de status com o resultado do último ciclo (workspaces removidos e bytes liberados) e previsão do próximo;
+  - Inclui o botão **Clean up now** (`workspaceCleanup.runNow`), apresentando listagem de workspaces a serem removidos imediatamente e permitindo desmarcar individualmente qualquer um deles.
+- **Regras de cleanup por projeto em Project Settings (`#42055`):**
+  - Adiciona a seção *Workspace cleanup* na página de configurações do projeto, permitindo selecionar entre `Use global` (herda regras globais), `Off` (desativa cleanup no projeto) ou `Custom` (regras específicas por repositório com overrides individuais).
+- **Exclusão de histórico de agentes ao remover workspaces (`#42877`):**
+  - Introduz a configuração opt-in `deleteAgentHistoryWithWorkspace` em *Settings › Workspaces*;
+  - Ao excluir um workspace com o toggle ativo, varre e exclui transcrições, arquivos `.jsonl.zst`, rollouts do Codex e registros do `agent-session-domain.db` vinculados a ele, além de oferecer um botão para expurgo retroativo de histórico órfão;
+  - Preserva sessões ativas e arquivos tocados nas últimas 24 horas como medida de segurança.
+- **Seções distintas de Cleanup Manual e Automático e regras no `orca.yaml` (`#42905`, Issue `#42909`):**
+  - Reorganiza *Settings › Workspace Cleanup* em dois blocos claros com validação explícita de regras;
+  - Permite declarar pastas regeneráveis (ex.: caches de build ou pastas `target/`) no `orca.yaml` do projeto para limpeza automática segura.
 
 ## O que fazer
 
+- Implementar exclusão granular de chats do Claude Code, Codex e Orca Chat vinculados a workspaces removidos (`#42959`, `#43000`, `#43015`).
+- Preservar e reabrir rascunhos de arquivos não salvos de workspaces que desapareceram externamente (`#42943`).
 - Adotar a exclusão segura de histórico de agentes vinculados a workspaces removidos (`#42877`).
 - Separar visualmente as seções de cleanup manual e automático nas preferências (`#42905`).
 - Adotar a página de configurações *Settings > Workspace Cleanup* com regras visuais, botão 'Clean up now' e prévia de exclusões iminentes (`#42039`).

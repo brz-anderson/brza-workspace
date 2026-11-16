@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42807, #42760, #42686, #42743, #42725, #42660, #42655 e as issues #42724, #42675 trazem supervisores nativos leves para Native Chat, limpeza de runtimes no boot, compressão de caches de uso, descarte de abas ociosas e fechamento ágil de terminais.
+description: Os PRs #42889, #42890, #42807, #42760, #42686 e a issue #42601 trazem desinstalação limpa de hooks/CLI com orca uninstall, aprovação de orca.yaml por repositório e supervisores nativos.
 scope:
   - brza-studio
   - tools-kit
@@ -14,7 +14,9 @@ tags:
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42807`](https://github.com/stablyai/orca/pull/42807),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42889`](https://github.com/stablyai/orca/pull/42889) (resolve Issue [`#42601`](https://github.com/stablyai/orca/issues/42601)),
+[`stablyai/orca#42890`](https://github.com/stablyai/orca/pull/42890),
+[`stablyai/orca#42807`](https://github.com/stablyai/orca/pull/42807),
 [`stablyai/orca#42760`](https://github.com/stablyai/orca/pull/42760),
 [`stablyai/orca#42686`](https://github.com/stablyai/orca/pull/42686),
 [`stablyai/orca#42743`](https://github.com/stablyai/orca/pull/42743),
@@ -57,6 +59,10 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
     Cada aba de chat nativo instanciada no Electron subia um processo supervisor completo com runtime web, consumindo ~46 MiB de RSS por sessão. Em ambientes com dezenas ou centenas de chats históricos (ex.: 150 abas), isso acumulava mais de 7 GB de RSS desperdiçados em background.
 11. **Runtimes gerenciados obsoletos acumulando espaço em disco e sidecars de cache sem compressão (`#42807`):**
     Versões antigas de runtimes baixados pelo daemon permaneciam indefinidamente na máquina após upgrades, ocupando gigabytes em disco; além disso, sidecars de histórico de uso e telemetria de modelos (Codex, OpenCode, Muse) eram gravados como JSON plano não comprimido.
+12. **Resíduos persistentes de hooks, CLI e serviços de background após desinstalação (`#42889`, resolve `#42601`):**
+    Ao desinstalar o Studio ou apagar o aplicativo, hooks injetados nas configurações de agentes (`~/.claude`, `~/.codex`, `~/.gemini`), binários na `PATH`, serviços do `orca serve` e scripts em `~/.orca/agent-hooks` permaneciam órfãos gerando erros em terminais independentes.
+13. **Prompts repetitivos a cada alteração no `orca.yaml` do repositório (`#42890`):**
+    Qualquer edição nos comandos de setup do `orca.yaml` (ex.: novo passo no branch `main`) disparava nova caixa de diálogo de aprovação de segurança para todos os usuários em cada criação de worktree, mesmo em repositórios corporativos já confiados.
 
 ## O que o upstream propõe e implementa
 
@@ -93,9 +99,17 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - **Confinamento de custos em Stats & Usage e sinal de encerramento de terminal (`#42725`, `#42675`, resolve `#42724`):**
   - Ajusta a tipografia e contenção em tiles de custos grandes para evitar quebra de layout;
   - Trata o sinal de fechamento de terminais zsh para evitar esperar o timeout de 2.1s de SIGKILL.
+- **Desinstalação limpa via UI e CLI (`#42889`, resolve `#42601`):**
+  - Adiciona o grupo *Settings › Advanced › Uninstall Orca* e o comando `orca uninstall [--yes] [--json]`;
+  - Varre e remove atomicamente todos os hooks instalados nas configs de agentes, scripts em `~/.orca`, binários na PATH e serviços em background, mantendo os dados e projetos do usuário intactos.
+- **Aprovação única de `orca.yaml` por repositório (*Always trust*) (`#42890`):**
+  - Reformula o diálogo de confirmação de setup em três opções explícitas (*Always trust*, *Run once*, *Don't run*);
+  - *Always trust* grava a confiança a nível de repositório, permitindo que futuras alterações no `orca.yaml` sejam executadas sem novos diálogos de confirmação.
 
 ## O que fazer
 
+- Implementar o comando `brza uninstall` e a seção de desinstalação limpa em *Settings › Advanced* (`#42889`, resolve `#42601`).
+- Adotar a política de confiança de setup por repositório (*Always trust*) em `orca.yaml` (`#42890`).
 - Substituir supervisores Electron por workers nativos leves no Native Chat (`#42760`).
 - Implementar purga de runtimes gerenciados obsoletos no boot do daemon e compressão gzip de caches de telemetria (`#42807`).
 - Descarregar automaticamente abas ociosas de navegador no `brza serve` e restaurá-las sob demanda (`#42686`).

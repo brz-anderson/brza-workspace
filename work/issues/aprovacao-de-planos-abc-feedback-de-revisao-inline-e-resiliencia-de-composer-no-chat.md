@@ -4,12 +4,14 @@ tags:
   - chat
   - tooling
   - design
-description: Os PRs #42789, #42784, #42783, #42776, #42775, #42740, #42695, #42710, #42704, #42705 e as issues #42736, #42706, #42720 trazem aprovação de planos A/B/C com feedback inline, skip robusto em perguntas, Steer resiliente, OpenCode slash e tolerância a downgrade.
+description: Os PRs #42907, #42895, #42789, #42784, #42783, #42776, #42775, #42740 e as issues #22316, #42609 trazem sugestões de próximo prompt do Claude no composer vazio, suporte ao Hermes Agent via ACP e planos A/B/C.
 ---
 
 # Aprovação de planos A/B/C, feedback de revisão inline e resiliência de composer no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42789`](https://github.com/stablyai/orca/pull/42789),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42907`](https://github.com/stablyai/orca/pull/42907) (Issues [`#22316`](https://github.com/stablyai/orca/issues/22316) e [`#42609`](https://github.com/stablyai/orca/issues/42609)),
+[`stablyai/orca#42895`](https://github.com/stablyai/orca/pull/42895),
+[`stablyai/orca#42789`](https://github.com/stablyai/orca/pull/42789),
 [`stablyai/orca#42784`](https://github.com/stablyai/orca/pull/42784),
 [`stablyai/orca#42783`](https://github.com/stablyai/orca/pull/42783),
 [`stablyai/orca#42776`](https://github.com/stablyai/orca/pull/42776),
@@ -48,6 +50,10 @@ além das issues [`stablyai/orca#42706`](https://github.com/stablyai/orca/issues
     Quando comandos de Steer eram despachados enquanto o usuário digitava no composer ou ferramentas estavam executando inserções ativas, mensagens colidiam fora de ordem.
 12. **Falta de suporte a comandos slash e restauração de modo para OpenCode (`#42775`):**
     Chats do OpenCode não tinham suporte a comandos de barra (`/`) e perdiam a preferência de modo (TUI vs Native Chat) na restauração de sessões.
+13. **Ausência de sugestões do próximo prompt (*ghost text*) no composer do Claude (`#42907`, Issues `#22316`, `#42609`):**
+    No terminal Claude Code, o modelo sugere automaticamente a próxima ação lógica no prompt vazio usando seu cache de prompts. No Native Chat do Studio, o composer ficava vazio exibindo apenas o placeholder estático genérico, perdendo produtividade no encadeamento de tarefas.
+14. **Incompatibilidade para rodar o Hermes Agent no Native Chat via ACP (`#42895`):**
+    O Hermes Agent (0.23+) estava limitado ao uso em terminal TUI, sem capacidade de rodar na interface estruturada de chat com cartões de aprovação de edições/comandos e seletor de raciocínio sobre seu servidor ACP nativo.
 
 ## O que o upstream implementa
 
@@ -81,9 +87,16 @@ além das issues [`stablyai/orca#42706`](https://github.com/stablyai/orca/issues
   - Enfileira comandos de inserção imediata em background, liberando o usuário para alternar livremente entre conversas.
 - **Atalho universal de reabertura de abas de chat (`#42720`):**
   - Habilita <kbd>⌘Shift+T</kbd> / <kbd>Ctrl+Shift+T</kbd> para restaurar a última aba de chat nativo fechada na sessão.
+- **Sugestões de próximo prompt no composer vazio do Claude (`#42907`, Issues `#22316`, `#42609`):**
+  - Captura as sugestões de prompt geradas pelo Claude Code após cada turno e renderiza como texto fantasma (*ghost text*) no composer vazio;
+  - Permite aceitar com <kbd>Tab</kbd> ou <kbd>→</kbd> preenchendo o rascunho sem enviar imediatamente, e pausa a geração de sugestões quando a aba perde a visibilidade.
+- **Suporte ao Hermes Agent no Native Chat via servidor ACP (`#42895`):**
+  - Habilita o Hermes Agent na interface estruturada de chat com streaming de respostas, cartões de aprovação de edições e comandos no modo Ask, comandos `/compact` e redação de `stderr`.
 
 ## O que fazer
 
+- Implementar o ghost text com sugestões de próximo prompt do Claude no composer vazio (`#42907`, Issues `#22316`, `#42609`).
+- Adicionar o Hermes Agent à lista de agentes suportados no Native Chat sobre seu protocolo ACP (`#42895`).
 - Padronizar respostas de skip em cartões de perguntas interativas (`#42789`).
 - Exibir dinamicamente o modelo Claude da resposta mais recente no cabeçalho fixo (`#42784`).
 - Garantir resiliência de transcripts JSONL contra downgrade de versão (`#42783`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42747, #42708, #42707, #42535, #42122 e as issues #42732, #42731, #42719 trazem filtro --run em orchestration inbox, prompts respondidos mid-tool, paginação de workers e terminais coordenadores ocultos.
+description: Os PRs #42839, #42747, #42708, #42707, #42535, #42122 e as issues #42852, #42732, #42731, #42719 trazem expurgo de cópias de chat com auto_vacuum incremental no orchestration.db, parada roteada de workers remotos e filtro --run.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,8 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42747`](https://github.com/stablyai/orca/pull/42747) (resolve Issue [`#42732`](https://github.com/stablyai/orca/issues/42732)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42839`](https://github.com/stablyai/orca/pull/42839) (resolve STA-15101),
+[`stablyai/orca#42747`](https://github.com/stablyai/orca/pull/42747) (resolve Issue [`#42732`](https://github.com/stablyai/orca/issues/42732)),
 [`stablyai/orca#42708`](https://github.com/stablyai/orca/pull/42708),
 [`stablyai/orca#42707`](https://github.com/stablyai/orca/pull/42707),
 [`stablyai/orca#42535`](https://github.com/stablyai/orca/pull/42535) (resolve Issue [`#42148`](https://github.com/stablyai/orca/issues/42148)),
@@ -82,10 +83,12 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Quando um `decision_gate` era rejeitado por um agente não-atribuído, a recusa era persistida e entregue ao coordenador com rótulo urgente `[HIGH] "Rejected decision_gate"`, gerando alarmes falsos.
 18. **Poluição de abas com terminais coordenadores de Runs e saídas JSON inchadas (`#42719`, `#42733`, `#42734`):**
     - Execuções de automação criavam abas de terminal visíveis obrigatórias para coordenadores; saídas de `worktree ps/list --json` despejavam ~0.5 MB (~130k tokens) de campos nulos e duplicados sem visão concisa; e recibos de `worker-start` omitiam o caminho do worktree e título da tarefa.
+19. **Inchaço do banco `orchestration.db` por cópias estáticas redundantes de chat e falta de auto_vacuum incremental (`#42839`, resolve STA-15101):**
+    - O banco de orquestração acumulava cópias integrais de chats de workers resolvidos (~120 KB por cópia em milhares de tarefas), atingindo mais de 1.6 GB com centenas de megabytes de espaço interno desperdiçado, sem capacidade de redução automática de tamanho físico em disco.
+20. **Falha na parada e fechamento de workers federados iniciados remotamente (`#42852`):**
+    - Quando um worker era iniciado em um host remoto pareado a partir de outro host, a solicitação de Stop/Close pelo host receptor não era roteada de volta ao host de origem (*home-routed*), deixando o processo do worker rodando indefinidamente na máquina remota.
 
 ## O que o upstream implementa
-
-1. **Expurgo periódico e retenção configurável no banco de orquestração (`#41757`, resolve `#41756`):**
    - Implementa uma rotina horária de limpeza (com execução inicial 1 minuto após o boot) que deleta Runs resolvidos e não tocados pelo período de `orchestrationRunRetentionHours` (padrão 24 horas; 0 desativa a retenção);
    - Executa a deleção em transações isoladas `BEGIN IMMEDIATE` com yield para o event loop, preservando cuidadosamente Runs com Tasks pendentes, despachos ativos, workers vivos, perguntas abertas ou coordenadores ainda ativos.
 2. **Despertar automático de coordenadores em repouso ao receber correio (`#41746`):**
@@ -126,9 +129,17 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Introduz modo de terminal coordenador sem aba dedicada no editor para orquestrações autônomas;
     - Descarta notificações urgentes para decisões recusadas por terceiros;
     - Reduz em mais de 70% o payload JSON de `worktree ps/list` omitindo campos redundantes e expõe o worktree e título nos recibos de `worker-start`.
+18. **Expurgo de cópias resolvidas de chat e auto_vacuum incremental com botão de reclaim (`#42839`, resolve STA-15101):**
+    - Converte cópias de chat de workers em referências leves (`{ chatRef: { sessionId, ... } }`) assim que o Run é concluído há mais de 24h, liberando até 99% do volume ocupado por outputs arquivados;
+    - Cria novos bancos com `auto_vacuum = INCREMENTAL` e devolve páginas livres ao sistema operacional periodicamente;
+    - Adiciona a seção *Settings › Agent orchestration › Orchestration storage* com medição de espaço e o botão **Reclaim space**, executando limpeza e `VACUUM` atômico durante reinicialização segura.
+19. **Roteamento doméstico para parada de workers federados remotos (`#42852`):**
+    - Garante que eventos de encerramento (`stop` / `close`) de workers federados sejam roteados para o host criador original, finalizando adequadamente o processo remoto.
 
 ## O que fazer
 
+- Adotar o expurgo de cópias resolvidas de chat e `auto_vacuum = INCREMENTAL` no `orchestration.db` com ação 'Reclaim space' (`#42839`, resolve STA-15101).
+- Rotear ordens de parada de workers federados remotos ao host de origem (`#42852`).
 - Adicionar o parâmetro `--run` em `brza orchestration inbox` para filtrar caixas postais por execução (`#42747`, resolve `#42732`).
 - Marcar prompts de terminal aprovados como respondidos durante a execução da ferramenta (`#42708`).
 - Adotar a paginação de leituras de workers de chat e projeção estável de frota (`#42707`).

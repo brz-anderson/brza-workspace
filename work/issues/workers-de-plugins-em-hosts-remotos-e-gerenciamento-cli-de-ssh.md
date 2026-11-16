@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41910, #40589, #38774 e as issues #37788, #37826, #37949, #38347 e #38673 trazem painéis de plugins no host pareado, deltas de catálogo em servidores pareados, orca host rm na CLI e correções remotas.
+description: Os PRs #42898, #41910, #40589, #38774 e as issues #37788, #37826, #37949, #38347 trazem comando orca host add na CLI para registro explícito de alvos SSH, painéis de plugins e orca host rm.
 scope:
   - brza-studio
   - workspace
@@ -18,7 +18,8 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `parcial` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41910`](https://github.com/stablyai/orca/pull/41910),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42898`](https://github.com/stablyai/orca/pull/42898) (resolve Issue [`#37826`](https://github.com/stablyai/orca/issues/37826)),
+[`stablyai/orca#41910`](https://github.com/stablyai/orca/pull/41910),
 [`stablyai/orca#40589`](https://github.com/stablyai/orca/pull/40589) (resolve Issue [`#38342`](https://github.com/stablyai/orca/issues/38342)),
 [`stablyai/orca#38774`](https://github.com/stablyai/orca/pull/38774) (Issues [`#37826`](https://github.com/stablyai/orca/issues/37826) e [`#37949`](https://github.com/stablyai/orca/issues/37949)),
 além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues/38673),
@@ -61,6 +62,8 @@ além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues
 8. **Latência e sobrecarga de polling de catálogo de worktrees em servidores pareados (`#41910`):**
    Clientes pareados e feeds móveis dependiam de varreduras completas (`worktree.ps`) repetidas a intervalos fixos para detectar
    alterações de status, branches e novos worktrees em daemons remotos, gerando latência de vários segundos e tráfego redundante.
+9. **Ausência de comando na CLI para registro explícito de novos hosts SSH (`#42898`, resolve `#37826`):**
+   Embora a CLI contasse com `orca host list` e `orca host rm`, não havia subcomando correspondente para cadastrar programaticamente novas máquinas remotas por agentes de IA ou scripts de provisionamento.
 
 ## O caminho proposto no upstream
 
@@ -83,9 +86,13 @@ além das issues [`stablyai/orca#38673`](https://github.com/stablyai/orca/issues
   - Limpeza de processos zumbis de `orca serve` e aplicação estrita de `IdentitiesOnly`.
 - **Comunicação de plugins host-cliente (`#38343`):**
   - Relay leve de mensagens entre o worker no host e o plugin pareado no cliente desktop.
+- **Registro explícito de máquinas SSH via CLI com `orca host add` (`#42898`, resolve `#37826`):**
+  - Adiciona o subcomando `orca host add --name <label> --hostname <host> [--user <user>] [--port <port>] [--identity-file <path>] [--proxy-jump <spec>] [--environment <env>]`;
+  - Persiste a configuração do alvo remoto no runtime selecionado e retorna seu seletor utilizável (`--host ssh:<id>`), viabilizando automações externas de infraestrutura.
 
 ## O que fazer
 
+- Implementar `brza host add` (`#42898`, resolve `#37826`) na CLI para permitir cadastramento programático de instâncias SSH remotas.
 - Adotar o evento reativo `worktreeRowsChanged` (`#41910`) para atualização contínua e rápida de catálogo de worktrees em servidores pareados e feeds móveis.
 - Adotar a sessão remota de painéis de plugins via `plugins.panelSession` (`#40589`) para que painéis de plugins na barra lateral reflitam com fidelidade os dados do host onde o workspace ativo está hospedado.
 - Implementar `brza host rm` (`#38774`) na CLI do `brza`, permitindo ciclo de vida completo de servidores em automações.

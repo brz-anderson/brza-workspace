@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40986, #40980, #40867, #40201 trazem skills no picker do Antigravity, injeção de regras GEMINI/AGENTS, modelos dinâmicos e toggle TUI/Chat.
+description: Os PRs #42847, #42896, #40986, #40980, #40867, #40201 trazem Antigravity Chat no Windows via host ACP, correção de remoção de token Enterprise, skills no picker e toggle TUI/Chat.
 scope:
   - brza-studio
   - workspace
@@ -15,8 +15,10 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado da issue aberta no upstream [`stablyai/orca#42759`](https://github.com/stablyai/orca/issues/42759) e dos PRs
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42847`](https://github.com/stablyai/orca/pull/42847) (resolve Issue [`#40321`](https://github.com/stablyai/orca/issues/40321)),
+[`stablyai/orca#42896`](https://github.com/stablyai/orca/pull/42896),
 [`stablyai/orca#42506`](https://github.com/stablyai/orca/pull/42506),
+além da issue [`stablyai/orca#42759`](https://github.com/stablyai/orca/issues/42759),
 [`stablyai/orca#42460`](https://github.com/stablyai/orca/pull/42460) (resolve Issue [`#41961`](https://github.com/stablyai/orca/issues/41961)),
 [`stablyai/orca#42464`](https://github.com/stablyai/orca/pull/42464),
 [`stablyai/orca#42357`](https://github.com/stablyai/orca/pull/42357) (resolve Issue [`#42356`](https://github.com/stablyai/orca/issues/42356)),
@@ -92,6 +94,10 @@ Rastreado da issue aberta no upstream [`stablyai/orca#42759`](https://github.com
     Usuários com múltiplas contas e perfis de Claude ou Codex ficavam restritos à conta ativa global do host, sem poder selecionar a conta alvo diretamente no lançamento de novos chats ou terminais.
 20. **Ocultação de modelos não-Gemini no Antigravity Chat por filtro estrito de `clientInfo` (`#42759`):**
     O servidor `agy_acp_server.par` do Antigravity filtra os modelos disponíveis com base no campo `clientInfo` transmitido durante o handshake ACP. Quando acionado pelo Native Chat embutido do Studio, apenas modelos Gemini são expostos no seletor, ocultando modelos como Claude Opus 4.5, Sonnet 5.5 e GPT-OSS 120B autorizados na conta corporativa, que funcionam normalmente na CLI `agy acp`.
+21. **Ausência de suporte ao Antigravity Native Chat no Windows por falta de pacote gerenciado (`#42847`, resolve `#40321`):**
+    No Windows, o Antigravity caía forçosamente para o terminal porque não havia pacote pré-empacotado gerenciado do servidor ACP para a plataforma, mesmo quando o usuário já possuía a CLI `agy.exe acp` instalada e compatível no host.
+22. **Exclusão de token incorreto em falha de login do Gemini Enterprise e vazamento de `ELECTRON_RUN_AS_NODE` (`#42896`):**
+    Se uma nova conexão ACP falhava ao autenticar com Gemini Enterprise, a rotina de limpeza apagava `acp_token.json` (login pessoal) deixando para trás o `acp_business_token.json` inutilizado; além disso, a variável de ambiente `ELECTRON_RUN_AS_NODE=1` vazava no macOS e Linux para comandos executados pelo servidor gerenciado, quebrando execuções de comandos Electron.
 
 ## O que o upstream implementa e corrige
 
@@ -151,6 +157,11 @@ Rastreado da issue aberta no upstream [`stablyai/orca#42759`](https://github.com
 - **Alinhamento de `clientInfo` para exibição de modelos multi-provedor no Antigravity ACP (`#42759`):**
   - Identifica que o servidor `agy_acp_server.par` restringe o retorno de modelos a apenas Gemini quando `clientInfo.name` identifica a UI do Studio;
   - Sugere configurar `clientInfo` de modo análogo ao cliente CLI autônomo para liberar modelos adicionais configurados na conta (Claude Opus/Sonnet 5.5, GPT-OSS).
+- **Habilitação do Antigravity Native Chat no Windows via host ACP (`#42847`, resolve `#40321`):**
+  - Permite que o Studio utilize diretamente o backend do host (`agy.exe acp`) no Windows mesmo sem pacote gerenciado pré-empacotado, liberando o chat estruturado nativo na plataforma.
+- **Correção de remoção de tokens de autenticação e contenção de `ELECTRON_RUN_AS_NODE` (`#42896`):**
+  - Passa o tipo de conta exato (pessoal vs business) para a rotina de verificação, garantindo que falhas em contas Gemini Enterprise apaguem apenas `acp_business_token.json`;
+  - Restringe `ELECTRON_RUN_AS_NODE=1` estritamente ao ambiente Windows onde o helper precisa, eliminando vazamento para subprocessos no macOS e Linux.
 
 ## O que fazer no BrzA Studio
 
@@ -159,7 +170,7 @@ Rastreado da issue aberta no upstream [`stablyai/orca#42759`](https://github.com
 3. Eliminar o falso fallback para o runtime gerenciado no Antigravity Chat validando `antigravityHostAcpReady` em vez do marcador temporário de keyring (`#42512`).
 4. Blindar o chaveamento TUI ↔ Chat contra crashes irrecuperáveis de sessão (`#42589`).
 5. Incorporar o catálogo expandido de modelos Gemini 4 e esforços `xhigh`/`max` para Antigravity (`#42460`, resolve `#41961`).
-6. Suportar o runtime gerenciado e chat nativo do Antigravity no Windows (`#42464`).
+6. Suportar o runtime gerenciado e chat nativo do Antigravity no Windows (`#42464`, `#42847`, resolve `#40321`).
 7. Sincronizar títulos de resumo da conversa do Antigravity com as abas de terminal (`#42357`, resolve `#42356`).
 8. Emitir `decision: allow` no hook `PreToolUse` para ferramentas auto-aprovadas (`#42323`, resolve `#42116`).
 9. Derivar opções de esforço de raciocínio dinamicamente a partir de `availableModels` no cliente ACP (`#42282`, resolve `#42280`).
@@ -172,3 +183,5 @@ Rastreado da issue aberta no upstream [`stablyai/orca#42759`](https://github.com
 16. Sincronizar os seletores de modelo de configurações e criação de workspace com o catálogo dinâmico da conta do host (`#40175`).
 17. Incorporar as otimizações de memória para sessões com muitos subagentes (`#40171`) e a reconciliação de tarefas pendentes via transcript (`#40183`).
 18. Ajustar a declaração de `clientInfo` na conexão ACP com o Antigravity para expor modelos multi-provedor (Claude, GPT-OSS) autorizados (`#42759`).
+19. Permitir o Antigravity Native Chat no Windows usando a CLI host `agy acp` (`#42847`, resolve `#40321`).
+20. Assegurar remoção correta de tokens Enterprise e isolamento de `ELECTRON_RUN_AS_NODE` (`#42896`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43245, #38128, #43015, #43000, #42959, #42943, #42877 trazem exclusão do journal legado de chat após migração, remoção resiliente de worktrees e limpeza atômica.
+description: Os PRs #43532, #43525, #43498, #43245, #38128 e a issue #43523 trazem cards agrupados no cleanup, heap e liberação de memória no AI Vault e remoção de worktrees externos.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,10 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43245`](https://github.com/stablyai/orca/pull/43245),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43532`](https://github.com/stablyai/orca/pull/43532) (resolve Issue [`#43368`](https://github.com/stablyai/orca/issues/43368)),
+[`stablyai/orca#43525`](https://github.com/stablyai/orca/pull/43525) (resolve Issue [`#43523`](https://github.com/stablyai/orca/issues/43523)),
+[`stablyai/orca#43498`](https://github.com/stablyai/orca/pull/43498),
+[`stablyai/orca#43245`](https://github.com/stablyai/orca/pull/43245),
 [`stablyai/orca#38128`](https://github.com/stablyai/orca/pull/38128),
 [`stablyai/orca#43015`](https://github.com/stablyai/orca/pull/43015),
 [`stablyai/orca#43000`](https://github.com/stablyai/orca/pull/43000),
@@ -93,9 +96,21 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - A política genérica de deleção não contemplava granularidade por agente: chats do Claude Code (`#42959`), histórico estruturado do Codex (`#43000`) e conversas nativas do Orca Chat (`#43015`) deixavam resíduos em diferentes diretórios de perfil.
 18. **Perda de rascunhos de editor não salvos quando workspaces desaparecem com o app fechado (`#42943`):**
     - Se um workspace ou branch fosse removido externamente (ex.: por script ou git worktree prune) enquanto o aplicativo estava fechado, ao reabrir o app os buffers com rascunhos de edição pendentes eram descartados silenciosamente sem opção de recuperação.
+19. **Interface monolítica de Workspace Cleanup sem cartões agrupados nem progresso em background (`#43498`):**
+    - O modal de limpeza de workspace exibia uma lista única plana sem agrupar ações por repositório ou separar etapas de confirmação e deleção, e travava a interface visual sem oferecer card de progresso em background durante expurgos extensos.
+20. **Vazamento de metadados em streaming e falta de dimensionamento de heap no scanner do AI Vault (`#43525`, resolve `#43523`):**
+    - Sessões transmitidas no AI Vault retinham metadados indefinidamente na memória durante indexações prolongadas, e a ausência de controle de heap no scanner gerava esgotamento de memória (OOM).
+21. **Falha e pedidos indevidos de reautorização ao remover worktrees externos irmãos (`#43532`, resolve `#43368`):**
+    - Ao tentar remover worktrees localizados em pastas irmãs fora da raiz primária, o processo falhava ou insistia em diálogos redundantes de reautorização de sistema de arquivos.
 
 ## O que o upstream propõe e implementa
 
+- **Cartões agrupados, confirmação em passos e card de progresso em background no Workspace Cleanup (`#43498`):**
+  - Agrupa os cartões de worktree por repositório, introduz etapas distintas para confirmação e deleção e exibe cartão de progresso não obstrutivo em segundo plano.
+- **Liberação de metadados de sessões transmitidas e controle de heap no scanner do AI Vault (`#43525`, resolve `#43523`):**
+  - Libera prontamente os metadados retidos após processamento e parametriza o heap do scanner para conter o footprint de memória na indexação.
+- **Remoção de worktrees externos irmãos sem reautorização (`#43532`, resolve `#43368`):**
+  - Permite expurgar caminhos de worktrees irmãos registrados externamente sem requisições espúrias de autorização de sistema.
 - **Configurações dedicadas para exclusão granular de chats com o workspace (`#42959`, `#43000`, `#43015`):**
   - Adiciona toggles granulares em *Settings › Workspaces* para remover chats do Claude Code (`#42959`), histórico do Codex (`#43000`) e conversas nativas do Orca Chat (`#43015`) junto com o workspace;
   - Limpa caches de sessão associados sem afetar workspaces ativos ou históricos compartilhados.
@@ -162,6 +177,9 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Adotar interface de cartões agrupados e card de progresso em background para Workspace Cleanup (`#43498`).
+- Incorporar liberação imediata de metadados e configuração de heap no scanner do AI Vault (`#43525`, resolve `#43523`).
+- Habilitar remoção de worktrees irmãos externos sem disparar erros de reautorização (`#43532`, resolve `#43368`).
 - Expurgo seguro do journal antigo de chat após confirmação de integridade no novo store (`#43245`).
 - Não interromper a exclusão de worktrees quando o teardown de watchers perder autorização de caminho (`#38128`).
 - Implementar exclusão granular de chats do Claude Code, Codex e Orca Chat vinculados a workspaces removidos (`#42959`, `#43000`, `#43015`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43351, #43319, #43171, #43193 e as issues #43373, #43384 trazem faixas alternadas na sidebar, densidade vertical compacta, renomeação de branch e menus de contexto de projeto.
+description: Os PRs #43488, #43493, #43351, #43319 e as issues #43487, #43443, #43373 trazem nome do worktree no explorer, botões de novo arquivo/pasta e drive letters no WSL.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,10 @@ tags:
 
 # Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43351`](https://github.com/stablyai/orca/pull/43351) (resolve Issue [`#43373`](https://github.com/stablyai/orca/issues/43373)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43488`](https://github.com/stablyai/orca/pull/43488) (resolve Issue [`#43487`](https://github.com/stablyai/orca/issues/43487)),
+[`stablyai/orca#43493`](https://github.com/stablyai/orca/pull/43493),
+além da issue [`stablyai/orca#43443`](https://github.com/stablyai/orca/issues/43443),
+[`stablyai/orca#43351`](https://github.com/stablyai/orca/pull/43351) (resolve Issue [`#43373`](https://github.com/stablyai/orca/issues/43373)),
 [`stablyai/orca#43319`](https://github.com/stablyai/orca/pull/43319),
 [`stablyai/orca#43171`](https://github.com/stablyai/orca/pull/43171),
 [`stablyai/orca#43193`](https://github.com/stablyai/orca/pull/43193),
@@ -93,9 +96,21 @@ além das issues [`stablyai/orca#43384`](https://github.com/stablyai/orca/issues
     Ao selecionar "Open workspace" para uma branch que pertencia a outro workspace cujas abas haviam sido fechadas, a ação
     invocava apenas a mutação interna `setActiveWorktree`. Como não passava pelo ciclo de ativação do usuário, a tela permanecia
     completamente em branco até o operador clicar manualmente na linha correspondente na barra lateral.
+16. **Falta de identificação do worktree no cabeçalho do File Explorer (`#43488`, resolve `#43487`):**
+    Ao navegar por múltiplos worktrees, o cabeçalho do explorador de arquivos mostrava apenas o nome da pasta raiz sem explicitar a qual branch ou worktree os arquivos abertos pertenciam.
+17. **Ausência de botões rápidos de criação de arquivos e pastas no File Explorer (`#43443`):**
+    A barra de ferramentas do explorador de arquivos não continha botões diretos "New File" e "New Folder", forçando o uso repetitivo do menu de contexto.
+18. **Falha ao mover projetos sob letras de drive mapeadas no WSL (`#43493`):**
+    Projetos salvos em caminhos mapeados por letras de drive no subsistema Linux falhavam ao serem movidos ou organizados por causa de discrepâncias na normalização de caminhos.
 
 ## O que o upstream implementa e corrige
 
+- **Nome do worktree no cabeçalho do File Explorer (`#43488`, resolve `#43487`):**
+  - Exibe o nome do worktree corrente no topo do painel do explorador de arquivos, facilitando a identificação imediata do contexto de branch ativo.
+- **Botões "New File" e "New Folder" na barra do File Explorer (`#43443`):**
+  - Adiciona botões de ação rápida para criação de novo arquivo e nova pasta na toolbar do explorador.
+- **Movimentação de projetos em unidades de drive mapeadas no WSL (`#43493`):**
+  - Trata caminhos com letras de unidade Windows mapeadas para o ambiente WSL na rotina de mover projetos.
 - **Sugestão de checkouts existentes na definição de pasta de projeto (`#43157`, resolve `#43156`):**
   - Ao configurar a localização de um projeto em um host, inspeciona o sistema de arquivos e sugere checkouts Git existentes compatíveis com o repositório, permitindo vinculação imediata em 1 clique sem digitação de caminhos.
 - **Exibição correta de folder workspaces pinados e filtragem por projeto (`#43121`, `#33600`):**
@@ -173,3 +188,6 @@ além das issues [`stablyai/orca#43384`](https://github.com/stablyai/orca/issues
 16. Expor a visão de Source Control para folder workspaces no cliente móvel (`#39999`).
 17. Incluir a ação "Rename project" no menu de contexto de projeto da sidebar (`#39977`).
 18. Adotar a ativação completa via `activateAndRevealWorktree` na abertura de workspaces a partir do branch picker (`#41930`, resolve `#41929`).
+19. Exibir o nome do worktree ativo no cabeçalho do File Explorer (`#43488`, resolve `#43487`).
+20. Adicionar botões de "New File" e "New Folder" na toolbar do File Explorer (`#43443`).
+21. Suportar movimentação de projetos hospedados sob unidades mapeadas de WSL (`#43493`).

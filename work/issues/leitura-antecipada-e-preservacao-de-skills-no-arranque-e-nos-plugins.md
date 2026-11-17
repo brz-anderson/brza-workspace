@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40812, #40788, #40214, #35220 e a issue #41017 tratam de invalidação de cache de skills, hashes de pacotes, hints de argumentos e leitura antecipada.
+description: Os PRs #43436, #40812, #40788, #40214, #35220 e as issues #43418, #41017 tratam de escopos de skills no chat, nomes em registros e hashes de pacotes.
 scope:
   - brza-studio
 priority: high
@@ -15,7 +15,8 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42472`](https://github.com/stablyai/orca/pull/42472) (resolve Issue [`#42408`](https://github.com/stablyai/orca/issues/42408)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43436`](https://github.com/stablyai/orca/pull/43436),
+[`stablyai/orca#42472`](https://github.com/stablyai/orca/pull/42472) (resolve Issue [`#42408`](https://github.com/stablyai/orca/issues/42408)),
 [`stablyai/orca#40812`](https://github.com/stablyai/orca/pull/40812),
 [`stablyai/orca#40788`](https://github.com/stablyai/orca/pull/40788) (resolve Issue [`#40785`](https://github.com/stablyai/orca/issues/40785)),
 [`stablyai/orca#40214`](https://github.com/stablyai/orca/pull/40214) (resolve Issue [`#40181`](https://github.com/stablyai/orca/issues/40181)),
@@ -23,6 +24,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42472`](https://github.com
 [`stablyai/orca#36897`](https://github.com/stablyai/orca/pull/36897),
 [`stablyai/orca#37659 (MERGED no upstream; não está no fork)`](https://github.com/stablyai/orca/pull/37659) e
 [`stablyai/orca#19680`](https://github.com/stablyai/orca/pull/19680), além das issues
+[`stablyai/orca#43418`](https://github.com/stablyai/orca/issues/43418),
 [`stablyai/orca#41017`](https://github.com/stablyai/orca/issues/41017),
 [`stablyai/orca#14690`](https://github.com/stablyai/orca/issues/14690),
 [`stablyai/orca#37875`](https://github.com/stablyai/orca/issues/37875) e
@@ -59,9 +61,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42472`](https://github.com
    o chat existente continuava afirmando que a ferramenta não existia até a reinicialização da janela do app.
 9. **Falso aviso "Needs attention · You edited this copy" em skills embutidas renomeadas (`#42472`, resolve `#42408`):**
    A renomeação de skills bundled (como `orca-computer-use` vs `computer-use`) fazia o verificador de integridade comparar o nome da pasta com o catálogo antigo de lançamentos. Como o identificador divergia, o app disparava falsos alertas de "You edited this copy", ocultava atualizações limpas e não informava qual arquivo ou caminho havia supostamente sido modificado.
+10. **Descarte de escopos de skills no seletor `/` do Native Chat (`#43436`):**
+    Ao filtrar e selecionar skills pelo menu de barra (`/`) no chat nativo, os escopos associados (projeto, workspace ou usuário)
+    eram descartados na transição para o input do chat, impedindo que a execução resolvesse a localização correta da skill.
+11. **Falha na instalação por discrepância entre nome no registro bundled e repositório comunitário (`#43418`):**
+    O comando `skills install` falhava ao tentar instalar `computer-use` porque o catálogo interno usava o nome curto,
+    enquanto o repositório comunitário hospeda sob `orca-computer-use`, tornando a instalação impossível via CLI.
 
 ## O que os PRs fazem
 
+- **PR `#43436`:** retém deterministamente os escopos de cada skill (`scope`) ao selecioná-la no picker de barra (`/`) do Native Chat, mantendo o contexto de resolução intacto.
+- **Issue `#43418`:** propõe alinhar o identificador do catálogo bundled (`computer-use`) com o nome canônico do repositório comunitário (`orca-computer-use`) para permitir instalação direta sem erros de resolução.
 - **PR `#40812`:** ordena deterministamente os caminhos completos dos manifestos antes de computar o hash de identidade do pacote de skills, evitando discrepâncias entre sistemas de arquivos.
 - **PR `#40788` (resolve `#40785`):** preserva e renderiza `argument-hint` no dropdown de seleção do Native Chat para skills do Claude Code e ferramentas de sessão.
 - **PR `#40214` (resolve `#40181`):** compara o digest atual e os digests lançados especificamente para o arquivo `SKILL.md`,
@@ -89,3 +99,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42472`](https://github.com
 4. Exibir dicas de argumentos (`argument-hint`) no seletor de comandos/skills do chat (`#40788`).
 5. Invalidar o cache do seletor de skills ao fechar ou reabrir o picker no Native Chat (`#41017`).
 6. Eliminar falsos alertas de edição em skills embutidas renomeadas através da resolução de nomes canônicos e digests de lançamento (`#42472`, resolve `#42408`).
+7. Preservar os escopos de contexto de cada skill ao selecioná-la no picker de barra (`/`) do Native Chat (`#43436`).
+8. Harmonizar o catálogo bundled de skills (`computer-use`) com o nome no repositório comunitário (`orca-computer-use`) no CLI de instalação (`#43418`).

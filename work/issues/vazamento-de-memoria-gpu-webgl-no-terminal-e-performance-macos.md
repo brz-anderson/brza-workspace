@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #39465, #39445, #38861 e as issues #39579, #39405, #38120 corrigem travamento modal no macOS, vazamento de portas Mach, sobrecarga de ps e GPU WebGL.
+description: Os PRs #43465, #39465, #39445, #38861 e as issues #43464, #39579, #39405, #38120 corrigem vazamento de memória GPU WebGL, travamento modal no macOS e portas Mach.
 scope:
   - brza-studio
   - tooling
@@ -13,7 +13,8 @@ tags:
 
 # Vazamento de memória GPU WebGL no terminal e performance no macOS
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39465`](https://github.com/stablyai/orca/pull/39465) (Issue [`#39405`](https://github.com/stablyai/orca/issues/39405)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43465`](https://github.com/stablyai/orca/pull/43465) (resolve Issue [`#43464`](https://github.com/stablyai/orca/issues/43464)),
+[`stablyai/orca#39465`](https://github.com/stablyai/orca/pull/39465) (Issue [`#39405`](https://github.com/stablyai/orca/issues/39405)),
 [`stablyai/orca#39445`](https://github.com/stablyai/orca/pull/39445),
 [`stablyai/orca#38861`](https://github.com/stablyai/orca/pull/38861) (Issue
 [`stablyai/orca#38860`](https://github.com/stablyai/orca/issues/38860)),
@@ -62,9 +63,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39465`](https://github.com
    O loop de eventos é bloqueado em `-[NSAlert runModal]` indefinidamente, paralisando o runtime por completo:
    `orca status` sofre timeout, conexões móveis e remotas ficam inacessíveis e comandos de quit são cancelados com erro `-128`,
    permanecendo travado silenciosamente por dezenas de horas até a emissão manual de `kill -KILL`.
+10. **Crescimento descontrolado de memória no `Orca Helper (GPU)` ao atingir atlas de 4096² (`#43465`, resolve `#43464`):**
+    Em sessões interativas prolongadas no macOS com terminais emitindo saídas TUI ricas e fontes com muitos glifos,
+    o processo auxiliar de GPU (`Orca Helper (GPU)`) acumulava até 6 GB de memória gráfica retida por não liberar texturas
+    WebGL antigas quando as páginas do atlas de glifos se expandiam até 4096 × 4096 pixels.
 
 ## O que o upstream propõe e implementa
 
+- **Reconstrução de renderizadores WebGL ao atingir página de 4096² no atlas (`#43465`, resolve `#43464`):**
+  - Reconstrói os renderizadores `WebglRenderer` e descarta texturas do contexto anterior assim que uma página do glyph atlas atinge 4096² pixels;
+  - Descarrega texturas acumuladas e evita que o processo de aceleração de hardware continue expandindo o consumo de VRAM indefinidamente.
 - **Cache de layout de teclado no macOS e invalidação por TIS notification (`#39465`):**
   - Armazena em cache no processo principal o último snapshot de layout obtido com sucesso;
   - Descarta o cache e incrementa a época somente quando o sistema emitir `com.apple.Carbon.TISNotifySelectedKeyboardInputSourceChanged`,
@@ -99,3 +107,4 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39465`](https://github.com
 - Utilizar a execução direta de `ps` sem shell intermediário no monitor de recursos (`#39445`).
 - Impedir que exceções não capturadas no processo principal abram diálogos modais bloqueantes (`NSAlert runModal`) no macOS,
   tratando `setTypeOfService EINVAL` e implementando watchdog de autorrecuperação quando a thread principal travar (`#39579`).
+- Adotar a reconstrução dos renderizadores `WebglRenderer` ao alcançar páginas de 4096² no atlas (`#43465`), estancando o acúmulo de até 6 GB no processo de GPU.

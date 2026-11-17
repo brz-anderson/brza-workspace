@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43388, #43393, #41015, #40870 e as issues #43387, #41009 trazem execução em 1 clique de comandos shell ! sugeridos por agentes, foco no split ativo e comandos ! no chat.
+description: Os PRs #43479, #43431, #42651, #43388, #43393 e as issues #43387, #41009 trazem divisão de abas em todas as direções, encerramento forçado de terminais via CLI e comandos shell ! no chat.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,10 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43388`](https://github.com/stablyai/orca/pull/43388) (resolve Issue [`#43387`](https://github.com/stablyai/orca/issues/43387)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43479`](https://github.com/stablyai/orca/pull/43479),
+[`stablyai/orca#43431`](https://github.com/stablyai/orca/pull/43431),
+[`stablyai/orca#42651`](https://github.com/stablyai/orca/pull/42651),
+[`stablyai/orca#43388`](https://github.com/stablyai/orca/pull/43388) (resolve Issue [`#43387`](https://github.com/stablyai/orca/issues/43387)),
 [`stablyai/orca#43393`](https://github.com/stablyai/orca/pull/43393),
 [`stablyai/orca#41015`](https://github.com/stablyai/orca/pull/41015) (resolve Issue [`#41010`](https://github.com/stablyai/orca/issues/41010)),
 [`stablyai/orca#40870`](https://github.com/stablyai/orca/pull/40870) (resolve Issue [`#40868`](https://github.com/stablyai/orca/issues/40868)),
@@ -67,9 +70,21 @@ além da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/4
     Quando um painel de terminal era restaurado a frio após a terminação inesperada de um agente, os modos de rastreamento de mouse
     e foco (`\e[?1000h`, `\e[?1002h`, etc.) permaneciam ativados no PTY, fazendo com que movimentos do mouse ou cliques
     injetassem sequências brutas como `^[[<35;20;10M` no prompt do shell.
+11. **Falta de flexibilidade para mover abas para splits em qualquer direção (`#43431`):**
+    O comando de mover aba para divisão não permitia associar atalhos direcionais customizados para cada sentido cardeal (esquerda, direita, acima ou abaixo).
+12. **Processos de terminal persistindo ao fechar aba via CLI se a janela não confirmar (`#43479`):**
+    Ao invocar o comando de fechamento de terminal via CLI, caso a janela não confirmasse o fechamento por estar ocupada ou em segundo plano, o processo do terminal continuava vivo consumindo recursos.
+13. **Ausência de suporte CLI para fechar aba de terminal parada por ID (`#42651`):**
+    Não havia instrução CLI para localizar e encerrar diretamente abas de terminais já parados indicando seu identificador único.
 
 ## O que o upstream implementa e corrige
 
+- **Atalhos customizáveis para mover abas para splits em todas as direções (`#43431`):**
+  - Torna a ação `Move Tab to Split` configurável com direções explícitas (esquerda, direita, cima e baixo) no mapa de atalhos.
+- **Encerramento forçado de processos de terminal no fechamento CLI sem confirmação (`#43479`):**
+  - Interrompe o processo PTY subjacente diretamente caso a janela da aplicação não confirme o fechamento da aba.
+- **Fechamento de abas paradas via CLI por ID (`#42651`):**
+  - Adiciona suporte no CLI para fechar abas de terminais parados fornecendo o ID da aba correspondente.
 - **Execução inline de comandos shell `!` diretamente no Chat UI (`#40620`, estende `#40432`):**
   - Implementa modo shell inline acionado por `!` no composer do chat;
   - Executa o comando via pipes no processo local/remoto do workspace sem abrir abas extras de terminal;
@@ -118,3 +133,6 @@ além da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/4
 8. Implementar a navegação direcional espacial entre splits de terminais via `Cmd+Option+Setas` (`#40404`).
 9. Incorporar a verificação de múltiplas janelas de cota antes do auto-continue em Native Chat (`#40412`).
 10. Aplicar a atualização de modelo em sessões ociosas do Claude (`#40405`) e o upload automático de anexos em sessões pareadas (`#40398`).
+11. Permitir atalhos direcionais customizados para mover abas para divisões (Move Tab to Split) em todas as direções cardeais (`#43431`).
+12. Forçar a interrupção de processos de terminal na CLI de fechamento quando a janela gráfica não responder (`#43479`).
+13. Suportar comando de CLI para fechar diretamente abas de terminais parados por ID (`#42651`).

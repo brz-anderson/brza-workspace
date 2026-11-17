@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43385, #43380, #42254, #41955, #41766 e a issue #43366 trazem acompanhamento de agentes entre worktrees, entrega direta de mensagens inter-agentes e subagentes no chat.
+description: Os PRs #43521, #43474, #43456, #43425, #43385 e as issues #43462, #43461 trazem menções @ no chat, banners de workers, chips de citação e retenção de chats em espera.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,14 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43385`](https://github.com/stablyai/orca/pull/43385),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43521`](https://github.com/stablyai/orca/pull/43521),
+[`stablyai/orca#43516`](https://github.com/stablyai/orca/pull/43516),
+[`stablyai/orca#43474`](https://github.com/stablyai/orca/pull/43474),
+[`stablyai/orca#43456`](https://github.com/stablyai/orca/pull/43456),
+[`stablyai/orca#43425`](https://github.com/stablyai/orca/pull/43425) (resolve Issue [`#43424`](https://github.com/stablyai/orca/issues/43424)),
+além das issues [`stablyai/orca#43462`](https://github.com/stablyai/orca/issues/43462) e
+[`stablyai/orca#43461`](https://github.com/stablyai/orca/issues/43461),
+[`stablyai/orca#43385`](https://github.com/stablyai/orca/pull/43385),
 [`stablyai/orca#43380`](https://github.com/stablyai/orca/pull/43380),
 além da issue [`stablyai/orca#43366`](https://github.com/stablyai/orca/issues/43366),
 [`stablyai/orca#42455`](https://github.com/stablyai/orca/pull/42455),
@@ -108,6 +115,20 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     Clicar em um subagente na barra ou transcrição trocava toda a conversa principal pela visualização do subagente, ocultando o contexto da conversa pai, perdendo a posição de rolagem e bloqueando o rascunho ativo no composer.
 19. **Invisibilidade de subagentes nas conversas do Pi Native Chat (`#42448`):**
     Enquanto Claude e Codex exibiam subagentes e ferramentas delegadas de forma visual, o agente Pi não renderizava a presença de subagentes no chat nativo.
+20. **Falta de faixa de worker temporário no topo de chat workers (`#43521`):**
+    Workers temporários disparados no chat não exibiam o banner no topo avisando sobre a natureza efêmera da tarefa, ao contrário do que já ocorria em abas de terminal.
+21. **Ausência de identificador de plugin em mensagens e mails enviados (`#43425`, resolve `#43424`):**
+    Mensagens geradas ou despachadas por plugins no chat nativo não exibiam nome nem ícone do plugin de origem, prejudicando a rastreabilidade das ações automatizadas.
+22. **Incapacidade de referenciar outros chats e terminais via `@` no composer (`#43462`):**
+    O compositor de mensagens não oferecia autocompletar com `@` para menções direcionadas a outras sessões de chat ou abas de terminal abertas no workspace.
+23. **Citações "Add to chat" sem chips navegáveis de retorno (`#43461`):**
+    Textos capturados do terminal ou editor para o chat ficavam colados como texto puro sem transformar-se em chips interativos capazes de saltar para a linha ou arquivo de origem ao clicar.
+24. **Auto-retomada indevida de chats aguardando operador após reinício (`#43474`):**
+    Ao reiniciar o aplicativo, conversas esperando confirmação ou entrada humana eram retomadas cegamente em vez de permanecerem listadas na fila de restart pendente.
+25. **Consumo de memória sem limites em entregas e leituras atrasadas de chat (`#43456`):**
+    Filas de eventos de chat e leituras de histórico acumulavam mensagens na memória sem limite quando o receptor ficava atrasado, elevando o heap do runtime.
+26. **Montagem eager e pesada de abas de chat ocultas no arranque (`#43516`):**
+    O componente de visualização de chat era montado imediatamente para todas as abas no carregamento, degradando a performance inicial de workspaces com muitos chats.
 
 ## O que o upstream implementa
 
@@ -170,6 +191,20 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
   - Fecha facilmente com <kbd>Esc</kbd>, clique no scrim ou no botão fechar, retornando o foco diretamente para a linha de origem.
 - **Suporte a subagentes no Pi Native Chat (`#42448`):**
   - Habilita a detecção e renderização visual de subagentes também em conversas estruturadas conduzidas pelo agente Pi.
+- **Faixa de worker temporário no topo de chat workers (`#43521`):**
+  - Renderiza uma faixa destacada no topo da interface de chat workers indicando que se trata de uma tarefa efêmera/temporária, equiparando à exibição em terminais.
+- **Identificação de plugin em mensagens enviadas (`#43425`, resolve `#43424`):**
+  - Exibe nome e ícone de plugins em badges dedicados nas mensagens e e-mails despachados por eles dentro do Native Chat.
+- **Autocompletar com menções `@` para outros chats e terminais (`#43462`):**
+  - Propõe suporte a menções digitadas com `@` no composer do chat para referenciar diretamente conversas e terminais ativos.
+- **Chips navegáveis para citações "Add to chat" (`#43461`):**
+  - Propõe exibir citações adicionadas ao chat como chips visuais com clique de navegação direta para a posição de origem no terminal ou arquivo.
+- **Retenção de chats aguardando na restart list (`#43474`):**
+  - Mantém chats que dependem de ação humana na lista de reinício pendente após reboot do app, em vez de retomá-los de modo automático.
+- **Limitação de memória em filas de entrega e histórico de chat (`#43456`):**
+  - Aplica teto máximo a filas de eventos de entrega e buffers de leitura histórica, prevenindo consumo descontrolado de RAM quando consumidores ficam lentos.
+- **Montagem tardia (lazy) de abas de chat ocultas (`#43516`):**
+  - Adia a montagem pesada do DOM e da árvore React da view de chat até o momento em que a aba correspondente é efetivamente exibida pelo usuário.
 - **Indicação e acompanhamento de worktree quando o agente migra (`#43385`, Issue `#43366`):**
   - Quando um agente associado a um chat migra ou é transferido para outro worktree, o chat exibe uma faixa de contexto informando para qual worktree o agente se moveu e oferece atalho para seguir ou alternar para o novo espaço de trabalho.
 - **Entrega direta de mensagens entre agentes no Native Chat (`#43380`):**
@@ -177,6 +212,13 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Exibir faixa de worker temporário no topo de chat workers (`#43521`).
+- Identificar plugin de origem com nome e ícone em mensagens e mails do chat (`#43425`, resolve `#43424`).
+- Adotar autocompletar com menções `@` para chats e terminais no composer (`#43462`).
+- Renderizar citações "Add to chat" como chips clicáveis de navegação para a fonte (`#43461`).
+- Reter conversas aguardando confirmação humana na restart list sem retomada cega (`#43474`).
+- Limitar memória de buffers de entrega e leitura histórica no Native Chat (`#43456`).
+- Implementar montagem tardia (lazy) da view de chat apenas quando a aba for exibida (`#43516`).
 - Exibir faixa indicadora e navegação de worktree quando o agente de um chat migrar para outro workspace (`#43385`, Issue `#43366`).
 - Assegurar a entrega direta de mensagens entre agentes e subagentes no Native Chat (`#43380`).
 - Abrir subagentes em sheet deslizante sobre o chat nativo preservando o contexto pai (`#42455`).

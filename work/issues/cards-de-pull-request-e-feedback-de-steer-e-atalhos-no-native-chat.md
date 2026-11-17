@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43198, #43241, #43109, #42784, #43119, #43124, #43060 e a issue #43197 trazem desativação de corretor no composer, progresso de tool calls, notas markdown e cards de PRs.
+description: Os PRs #43392, #43345, #43331, #43198, #43241, #43109 trazem steer exibido como enviado imediatamente, aviso compacto de cota e correções no chat.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,10 @@ tags:
 
 # Cartões de Pull Request, feedback de Steer e atalhos no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43198`](https://github.com/stablyai/orca/pull/43198),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43392`](https://github.com/stablyai/orca/pull/43392),
+[`stablyai/orca#43345`](https://github.com/stablyai/orca/pull/43345),
+[`stablyai/orca#43331`](https://github.com/stablyai/orca/pull/43331),
+[`stablyai/orca#43198`](https://github.com/stablyai/orca/pull/43198),
 [`stablyai/orca#43241`](https://github.com/stablyai/orca/pull/43241),
 [`stablyai/orca#43109`](https://github.com/stablyai/orca/pull/43109),
 [`stablyai/orca#42784`](https://github.com/stablyai/orca/pull/42784),
@@ -192,6 +195,12 @@ além da issue [`stablyai/orca#43197`](https://github.com/stablyai/orca/issues/4
 
 ## O que o upstream implementa
 
+- **Envio imediato de Steer no Native Chat (`#43392`):**
+  - Corrige a interface para que mensagens disparadas com <kbd>Cmd/Ctrl+Enter</kbd> (Steer) sejam renderizadas imediatamente como enviadas na conversa, eliminando o estado intermediário confuso em que apareciam brevemente como cartões enfileirados.
+- **Aviso compacto de limite de uso em linha única (`#43345`):**
+  - Condensa o banner de limite de uso atingido em uma única linha compacta no topo do chat, reduzindo a obstrução do histórico da conversa.
+- **Detecção de conversas salvas em outras pastas (`#43331`):**
+  - Quando uma conversa foi gravada em outro diretório de trabalho, a interface informa claramente a localização correta do arquivo em vez de oferecer um botão "Retry" fadado ao erro.
 - **Configuração para desativar corretor ortográfico no composer (`#43198`):**
   - Adiciona o ajuste `chat.spellcheck` em *Settings › Chat*, permitindo desativar sublinhados vermelhos de verificação ortográfica ao redigir prompts com código, identificadores e termos técnicos.
 - **Envio do texto citado em notas Markdown (`#43241`):**
@@ -333,6 +342,9 @@ além da issue [`stablyai/orca#43197`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Exibir mensagens de Steer (<kbd>Cmd/Ctrl+Enter</kbd>) imediatamente como enviadas no chat nativo (`#43392`).
+- Adotar o aviso de limite de uso de IA compacto em linha única no topo da conversa (`#43345`).
+- Apontar a pasta correta quando a conversa pertencer a outro worktree (`#43331`).
 - Incluir a opção `chat.spellcheck` para desativar corretor ortográfico no composer (`#43198`).
 - Enviar o texto citado em notas Markdown disparadas a partir de conversas (`#43241`).
 - Oferecer o atalho de 1 clique para transferir chat de pastas WSL para o host WSL configurado (`#43109`).

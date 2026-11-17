@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43217, #43049, #43101, #42933, #42940, #42847 e as issues #43183, #43154, #43155 trazem preservação de modelo/esforço no resume, contenção de stalls, flags remotas e SSH headless no Antigravity.
+description: Os PRs #43363, #43217, #43049, #43101, #42933 trazem modelos no picker da conta real do chat, preservação de modelo no resume e flags remotas no Antigravity.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,8 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43217`](https://github.com/stablyai/orca/pull/43217),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43363`](https://github.com/stablyai/orca/pull/43363),
+[`stablyai/orca#43217`](https://github.com/stablyai/orca/pull/43217),
 [`stablyai/orca#43049`](https://github.com/stablyai/orca/pull/43049),
 [`stablyai/orca#43101`](https://github.com/stablyai/orca/pull/43101),
 [`stablyai/orca#42933`](https://github.com/stablyai/orca/pull/42933),
@@ -119,6 +120,8 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 
 ## O que o upstream implementa e corrige
 
+- **Listagem de modelos no agent picker a partir da conta ativa do chat (`#43363`):**
+  - No menu de seleção de modelos do Antigravity, consulta os modelos disponíveis com base na conta configurada para a nova sessão de chat em vez de consultar cegamente a conta global do host, evitando exibir modelos não autorizados ou omitir modelos corporativos.
 - **Preservação de modelo e esforço na receita de retomada do Antigravity (`#43217`):**
   - Mantém o modelo resolvido e as flags de reasoning effort na receita de lançamento de retomada de sessão (`resume launch recipe`), assegurando coerência no raciocínio ao dar prosseguimento a chats existentes.
 - **Detecção de stalls em erros de saída e timeouts transparentes no ACP (`#43183`):**
@@ -226,3 +229,4 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 22. Assegurar remoção correta de tokens Enterprise e isolamento de `ELECTRON_RUN_AS_NODE` (`#42896`).
 23. Reter modelo e flags de esforço de raciocínio na receita de retomada do Antigravity (`#43217`).
 24. Mitigar congelamentos de 55s no ACP exibindo erros de saída imediatamente (`#43183`).
+25. Consultar modelos disponíveis para o Antigravity baseando-se na conta configurada para a nova sessão (`#43363`).

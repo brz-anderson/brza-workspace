@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42254, #41955, #41766, #40935, #39649 trazem limpeza de subagente ao fechar aba, importação de Kimi Code e subagentes no chat.
+description: Os PRs #43385, #43380, #42254, #41955, #41766 e a issue #43366 trazem acompanhamento de agentes entre worktrees, entrega direta de mensagens inter-agentes e subagentes no chat.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,10 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42455`](https://github.com/stablyai/orca/pull/42455),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43385`](https://github.com/stablyai/orca/pull/43385),
+[`stablyai/orca#43380`](https://github.com/stablyai/orca/pull/43380),
+além da issue [`stablyai/orca#43366`](https://github.com/stablyai/orca/issues/43366),
+[`stablyai/orca#42455`](https://github.com/stablyai/orca/pull/42455),
 [`stablyai/orca#42448`](https://github.com/stablyai/orca/pull/42448),
 [`stablyai/orca#42305`](https://github.com/stablyai/orca/pull/42305) (resolve Issue [`#42099`](https://github.com/stablyai/orca/issues/42099)),
 [`stablyai/orca#42307`](https://github.com/stablyai/orca/pull/42307),
@@ -167,9 +170,15 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
   - Fecha facilmente com <kbd>Esc</kbd>, clique no scrim ou no botão fechar, retornando o foco diretamente para a linha de origem.
 - **Suporte a subagentes no Pi Native Chat (`#42448`):**
   - Habilita a detecção e renderização visual de subagentes também em conversas estruturadas conduzidas pelo agente Pi.
+- **Indicação e acompanhamento de worktree quando o agente migra (`#43385`, Issue `#43366`):**
+  - Quando um agente associado a um chat migra ou é transferido para outro worktree, o chat exibe uma faixa de contexto informando para qual worktree o agente se moveu e oferece atalho para seguir ou alternar para o novo espaço de trabalho.
+- **Entrega direta de mensagens entre agentes no Native Chat (`#43380`):**
+  - Restaura a entrega direta e síncrona de mensagens emitidas por outros agentes e subagentes diretamente para a sessão de chat ativa, eliminando intermediários bloqueantes.
 
 ## O que fazer
 
+- Exibir faixa indicadora e navegação de worktree quando o agente de um chat migrar para outro workspace (`#43385`, Issue `#43366`).
+- Assegurar a entrega direta de mensagens entre agentes e subagentes no Native Chat (`#43380`).
 - Abrir subagentes em sheet deslizante sobre o chat nativo preservando o contexto pai (`#42455`).
 - Renderizar subagentes no Pi Native Chat (`#42448`).
 - Exibir barra de subagentes ativos no mobile para chats de terminal (`#42305`, resolve `#42099`).

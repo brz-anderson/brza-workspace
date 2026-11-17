@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #39416 e os PRs #39413, #39407, #39393 e #39348 trazem fontes web em plugins, persistência de painéis em troca de workspace, travas de substituição e fail-closed em hooks.
+description: Os PRs #43389, #39416, #39413, #39407 e a issue #43379 trazem variáveis de hook aplicadas após a conta do host, fontes web em plugins e isolamento de atalhos.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,8 @@ tags:
 
 # Fontes web em plugins, isolamento de atalhos e resiliência de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#39416`](https://github.com/stablyai/orca/pull/39416),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43389`](https://github.com/stablyai/orca/pull/43389) (resolve Issue [`#43379`](https://github.com/stablyai/orca/issues/43379)),
+[`stablyai/orca#39416`](https://github.com/stablyai/orca/pull/39416),
 [`stablyai/orca#39413`](https://github.com/stablyai/orca/pull/39413),
 [`stablyai/orca#39407`](https://github.com/stablyai/orca/pull/39407),
 [`stablyai/orca#39393`](https://github.com/stablyai/orca/pull/39393),
@@ -69,8 +70,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#39416`](https://github.com
 - **Descarte de inventários órfãos de terminais (`#39383`):**
   - Cancela varreduras caras de PTYs se o painel ou ouvinte do plugin tiver sido fechado antes do processamento da fila.
 
+- **Precedência de variáveis de ambiente em hooks de lançamento de agentes (`#43389`, resolve `#43379`):**
+  - Ajusta o ciclo de vida do gancho `agent.launch.before` para que as variáveis de ambiente personalizadas injetadas pelo plugin sejam mescladas após o ambiente da conta do host (`host account env`), assegurando que overrides de plugins (como proxies corporativos, tokens de roteamento ou chaves de sandbox) tenham precedência efetiva sobre defaults de conta.
+
 ## O que fazer
 
+- Aplicar o ambiente de `agent.launch.before` dos plugins após as variáveis de ambiente da conta do host (`#43389`, resolve `#43379`).
 - Incorporar o suporte a fontes tipográficas em plugins (`#39416`) no `brza-studio`.
 - Adotar o rastreamento por `hydrationId` em formulários declarativos de plugins (`#39413`).
 - Aplicar as proteções de concorrência em substituição de comandos (`#39407`) e negação fail-closed em hooks (`#39393`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43171, #43193, #43244, #43157, #43121, #41930 trazem preservação de branches com barras, pin de novos workspaces, seletores de projeto inteligentes e folder workspaces.
+description: Os PRs #43351, #43319, #43171, #43193 e as issues #43373, #43384 trazem faixas alternadas na sidebar, densidade vertical compacta, renomeação de branch e menus de contexto de projeto.
 scope:
   - brza-studio
   - workspace
@@ -13,10 +13,14 @@ tags:
 
 # Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43171`](https://github.com/stablyai/orca/pull/43171),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43351`](https://github.com/stablyai/orca/pull/43351) (resolve Issue [`#43373`](https://github.com/stablyai/orca/issues/43373)),
+[`stablyai/orca#43319`](https://github.com/stablyai/orca/pull/43319),
+[`stablyai/orca#43171`](https://github.com/stablyai/orca/pull/43171),
 [`stablyai/orca#43193`](https://github.com/stablyai/orca/pull/43193),
 [`stablyai/orca#43244`](https://github.com/stablyai/orca/pull/43244),
 [`stablyai/orca#43044`](https://github.com/stablyai/orca/pull/43044),
+além das issues [`stablyai/orca#43384`](https://github.com/stablyai/orca/issues/43384),
+[`stablyai/orca#43383`](https://github.com/stablyai/orca/issues/43383),
 [`stablyai/orca#43157`](https://github.com/stablyai/orca/pull/43157) (resolve Issue [`#43156`](https://github.com/stablyai/orca/issues/43156)),
 [`stablyai/orca#43121`](https://github.com/stablyai/orca/pull/43121),
 [`stablyai/orca#43113`](https://github.com/stablyai/orca/pull/43113),
@@ -142,21 +146,30 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43171`](https://github.com
   - Adiciona configuração e controle visual para definir novos workspaces como pinados automaticamente na barra lateral, agilizando o acesso a frentes de trabalho prioritárias.
 - **Abertura contextual de seletor de projetos (`#43244`, `#43044`):**
   - O seletor de pastas de projetos passa a reabrir no último diretório navegado e adjacente ao projeto local mais recente, reduzindo cliques repetitivos.
+- **Faixas visuais alternadas de projeto e densidade vertical compacta na sidebar (`#43351`, resolve Issue `#43373`):**
+  - Implementa faixas sutis com sombreamento/cor alternada entre blocos de projetos vizinhos na barra lateral de worktrees, além de reduzir o padding vertical para acomodar mais workspaces visíveis na tela.
+- **Preservação de título de primeira tarefa na barra lateral após renomeação de branch (`#43319`):**
+  - Quando o branch de um worktree é renomeado, a barra lateral preserva o título da primeira tarefa resolvida em vez de regredir para rótulos genéricos.
+- **Menu de contexto de projetos para criação direta de workspaces e suspensão em lote (`#43384`, `#43383`):**
+  - Adiciona ao menu de clique direito do cabeçalho de projetos as ações "New workspace" e "Sleep all workspaces of project".
 
 ## O que fazer no BrzA Studio
 
-1. Sugerir checkouts existentes ao configurar a localização de um projeto no host (`#43157`, resolve `#43156`).
-2. Garantir renderização de folder workspaces fixados no topo da barra lateral e filtragem por projeto (`#43121`, `#33600`).
-3. Preservar nomes de branches com barras no padrão Git em novos workspaces (`#43171`).
-4. Oferecer a opção de pin automático de novos workspaces na criação (`#43193`).
-5. Reabrir o seletor de pastas de projeto no último diretório e junto aos projetos recentes (`#43244`, `#43044`).
-6. Adotar os comandos CLI de vinculação de worktrees a pastas (`#39018`), permitindo reorganizar worktrees sob pastas de projeto.
-7. Incorporar a correção de sufixos numéricos (`#39000`) e a exclusão segura de branches (`#38955`).
-8. Integrar o `BranchStatusSegment` na barra de status do `brza-studio` (`#38869`).
-9. Adotar o botão "Create worktree" nos painéis vazios de pastas multirrepositório (`#39575`).
-10. Aplicar sanitização e `.trim()` em todos os campos de diretório de workspace para evitar criação de pastas acidentais (`#39572`).
-11. Suportar seletores unificados `path:` e `name:` para folder workspaces na CLI e separar instâncias por host no `worktree ps` (`#39637`).
-12. Integrar a busca combinada de projetos e hosts (`project-host-query`, `#39779`) nos modais de criação de workspace.
-13. Expor a visão de Source Control para folder workspaces no cliente móvel (`#39999`).
-14. Incluir a ação "Rename project" no menu de contexto de projeto da sidebar (`#39977`).
-15. Adotar a ativação completa via `activateAndRevealWorktree` na abertura de workspaces a partir do branch picker (`#41930`, resolve `#41929`).
+1. Adotar faixas alternadas e densidade vertical compacta na barra lateral de worktrees (`#43351`, Issue `#43373`).
+2. Preservar o título contextual na sidebar após renomeação de branch (`#43319`).
+3. Adicionar opções de criação de workspace e suspensão de projeto em lote ao menu de contexto da sidebar (`#43384`, `#43383`).
+4. Sugerir checkouts existentes ao configurar a localização de um projeto no host (`#43157`, resolve `#43156`).
+5. Garantir renderização de folder workspaces fixados no topo da barra lateral e filtragem por projeto (`#43121`, `#33600`).
+6. Preservar nomes de branches com barras no padrão Git em novos workspaces (`#43171`).
+7. Oferecer a opção de pin automático de novos workspaces na criação (`#43193`).
+8. Reabrir o seletor de pastas de projeto no último diretório e junto aos projetos recentes (`#43244`, `#43044`).
+9. Adotar os comandos CLI de vinculação de worktrees a pastas (`#39018`), permitindo reorganizar worktrees sob pastas de projeto.
+10. Incorporar a correção de sufixos numéricos (`#39000`) e a exclusão segura de branches (`#38955`).
+11. Integrar o `BranchStatusSegment` na barra de status do `brza-studio` (`#38869`).
+12. Adotar o botão "Create worktree" nos painéis vazios de pastas multirrepositório (`#39575`).
+13. Aplicar sanitização e `.trim()` em todos os campos de diretório de workspace para evitar criação de pastas acidentais (`#39572`).
+14. Suportar seletores unificados `path:` e `name:` para folder workspaces na CLI e separar instâncias por host no `worktree ps` (`#39637`).
+15. Integrar a busca combinada de projetos e hosts (`project-host-query`, `#39779`) nos modais de criação de workspace.
+16. Expor a visão de Source Control para folder workspaces no cliente móvel (`#39999`).
+17. Incluir a ação "Rename project" no menu de contexto de projeto da sidebar (`#39977`).
+18. Adotar a ativação completa via `activateAndRevealWorktree` na abertura de workspaces a partir do branch picker (`#41930`, resolve `#41929`).

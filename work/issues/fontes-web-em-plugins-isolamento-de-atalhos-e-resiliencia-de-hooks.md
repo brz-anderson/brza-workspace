@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43389, #39416, #39413, #39407 e a issue #43379 trazem variáveis de hook aplicadas após a conta do host, fontes web em plugins e isolamento de atalhos.
+description: Os PRs #43569, #43604, #43389, #39416 e as issues #42938, #43552 trazem pilha de fontes fallback, preferências portáteis em settings.json e layout Mermaid ELK.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,10 @@ tags:
 
 # Fontes web em plugins, isolamento de atalhos e resiliência de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43389`](https://github.com/stablyai/orca/pull/43389) (resolve Issue [`#43379`](https://github.com/stablyai/orca/issues/43379)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43569`](https://github.com/stablyai/orca/pull/43569) (resolve Issue [`#42938`](https://github.com/stablyai/orca/issues/42938)),
+[`stablyai/orca#43604`](https://github.com/stablyai/orca/pull/43604),
+além da issue [`stablyai/orca#43552`](https://github.com/stablyai/orca/issues/43552),
+[`stablyai/orca#43389`](https://github.com/stablyai/orca/pull/43389) (resolve Issue [`#43379`](https://github.com/stablyai/orca/issues/43379)),
 [`stablyai/orca#39416`](https://github.com/stablyai/orca/pull/39416),
 [`stablyai/orca#39413`](https://github.com/stablyai/orca/pull/39413),
 [`stablyai/orca#39407`](https://github.com/stablyai/orca/pull/39407),
@@ -46,6 +49,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43389`](https://github.com
 6. **Sobrecarga de varreduras de terminais para eventos de status sem ouvintes (`#39383`):**
    A notificação de alteração de status de agentes executava um inventário completo de PTYs para cada evento enfileirado,
    mesmo após o fechamento do painel do plugin que solicitou o acompanhamento.
+7. **Inviabilidade de declarar pilha ordenada de fontes fallback (fallback stack) (`#43569`, resolve `#42938`):**
+   A configuração de fonte do Editor e do Terminal tratava o valor inserido como um único nome de família tipográfica.
+   Não era possível passar uma lista separada por vírgula (ex.: `JetBrains Mono, Menk Qagan StdEx Tig`), impedindo posicionar fontes PUA ou alfabetos específicos à frente das fontes de símbolos Nerd embutidas.
+8. **Ausência de armazenamento portátil de preferências para dotfiles (`#43604`):**
+   Configurações eram armazenadas em registros de estado do Electron/Chromium, impedindo que desenvolvedores sincronizassem suas preferências de temas, fontes e atalhos entre múltiplas máquinas via repositórios de dotfiles.
+9. **Cruzamento excessivo de conexões em diagramas Mermaid no Markdown preview (`#43552`):**
+   Diagramas de arquitetura, fluxo e entidades relacionais com mais de 15 nós renderizavam de forma emaranhada no preview sob o motor padrão Dagre, sem que o engine alternativo ELK (`layout: elk`) estivesse registrado.
 
 ## O que o upstream implementa
 
@@ -72,9 +82,18 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43389`](https://github.com
 
 - **Precedência de variáveis de ambiente em hooks de lançamento de agentes (`#43389`, resolve `#43379`):**
   - Ajusta o ciclo de vida do gancho `agent.launch.before` para que as variáveis de ambiente personalizadas injetadas pelo plugin sejam mescladas após o ambiente da conta do host (`host account env`), assegurando que overrides de plugins (como proxies corporativos, tokens de roteamento ou chaves de sandbox) tenham precedência efetiva sobre defaults de conta.
+- **Pilha de fontes fallback separadas por vírgula no Editor e Terminal (`#43569`, resolve `#42938`):**
+  - Passa a interpretar a configuração de fonte como uma pilha ordenada com fallbacks sucessivos, viabilizando fontes regionais e PUA sem perder compatibilidade com Nerd Fonts.
+- **Preferências portáteis em `~/.orca/settings.json` (`#43604`):**
+  - Implementa leitura no arranque e persistência bidirecional contínua de configurações em arquivo plano JSON portátil, simplificando a replicação de ambiente via dotfiles (chezmoi, nix, stow).
+- **Suporte ao motor de layout ELK para diagramas Mermaid (`#43552`):**
+  - Registra o engine ELK no renderizador de Markdown preview para diagramas com diretiva `layout: elk`, otimizando a legibilidade de grafos e diagramas ER extensos.
 
 ## O que fazer
 
+- Suportar pilha ordenada de fontes fallback separadas por vírgula no Editor e Terminal (`#43569`, resolve `#42938`).
+- Adotar leitura e escrita de preferências portáteis em `~/.orca/settings.json` para facilitar gestão via dotfiles (`#43604`).
+- Habilitar o motor de layout Mermaid ELK no preview de Markdown para diagramas complexos (`#43552`).
 - Aplicar o ambiente de `agent.launch.before` dos plugins após as variáveis de ambiente da conta do host (`#43389`, resolve `#43379`).
 - Incorporar o suporte a fontes tipográficas em plugins (`#39416`) no `brza-studio`.
 - Adotar o rastreamento por `hydrationId` em formulários declarativos de plugins (`#39413`).

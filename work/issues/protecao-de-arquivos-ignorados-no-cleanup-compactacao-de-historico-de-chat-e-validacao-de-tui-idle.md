@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43532, #43525, #43498, #43245, #38128 e a issue #43523 trazem cards agrupados no cleanup, heap e liberação de memória no AI Vault e remoção de worktrees externos.
+description: Os PRs #43587, #43563, #43557, #43551, #43532, #43525 e as issues #43539, #43523 trazem retenção de descritores no polling de transcripts, leases de chat e limites de heap.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,11 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43532`](https://github.com/stablyai/orca/pull/43532) (resolve Issue [`#43368`](https://github.com/stablyai/orca/issues/43368)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43587`](https://github.com/stablyai/orca/pull/43587) (resolve Issue [`#43539`](https://github.com/stablyai/orca/issues/43539)),
+[`stablyai/orca#43563`](https://github.com/stablyai/orca/pull/43563),
+[`stablyai/orca#43557`](https://github.com/stablyai/orca/pull/43557),
+[`stablyai/orca#43551`](https://github.com/stablyai/orca/pull/43551) (resolve Issue [`#43523`](https://github.com/stablyai/orca/issues/43523)),
+[`stablyai/orca#43532`](https://github.com/stablyai/orca/pull/43532) (resolve Issue [`#43368`](https://github.com/stablyai/orca/issues/43368)),
 [`stablyai/orca#43525`](https://github.com/stablyai/orca/pull/43525) (resolve Issue [`#43523`](https://github.com/stablyai/orca/issues/43523)),
 [`stablyai/orca#43498`](https://github.com/stablyai/orca/pull/43498),
 [`stablyai/orca#43245`](https://github.com/stablyai/orca/pull/43245),
@@ -102,9 +106,25 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Sessões transmitidas no AI Vault retinham metadados indefinidamente na memória durante indexações prolongadas, e a ausência de controle de heap no scanner gerava esgotamento de memória (OOM).
 21. **Falha e pedidos indevidos de reautorização ao remover worktrees externos irmãos (`#43532`, resolve `#43368`):**
     - Ao tentar remover worktrees localizados em pastas irmãs fora da raiz primária, o processo falhava ou insistia em diálogos redundantes de reautorização de sistema de arquivos.
+22. **Congelamento da UI no Windows durante polling de transcripts do Codex por `openSync` síncrono (`#43587`, resolve `#43539`):**
+    - A cada ciclo de polling de transcripts do Codex, o processo invocava `fs.openSync` na thread principal para reabrir arquivos de transcript em disco. No Windows, a latência de chamadas I/O síncronas no NTFS provocava engasgos e congelamentos de 5 a 9 segundos na interface.
+23. **Sobrescrita maciça e desnecessária de chats salvos na inicialização (`#43557`):**
+    - No boot do aplicativo, o gerenciador de sessões reescrevia indiscriminadamente o estado de todos os chats salvos no disco, gerando tempestade de I/O em workspaces com dezenas de sessões gravadas em vez de renovar apenas os leases das conversas ativas.
+24. **Migração redundante de baseline em upgrades com journal de chat inalterado (`#43563`):**
+    - Durante atualizações de versão, o processo de migração recalculava baselines para todo o histórico mesmo quando o arquivo de journal de chat legado permanecia idêntico, atrasando a conclusão do startup.
+25. **Esgotamento de heap no scanner de sessões (`#43551`, resolve `#43523`):**
+    - Ao processar repositórios massivos ou com milhares de turnos de agentes, o scanner de sessões podia exceder o limite de memória do V8 e quebrar a aplicação sem mecanismo de degradação suave ou recuperação controlada.
 
 ## O que o upstream propõe e implementa
 
+- **Retenção de descritor único por cursor no polling de transcripts Codex (`#43587`, resolve `#43539`):**
+  - Mantém um único file descriptor aberto por cursor de leitura em vez de chamar `openSync` repetidamente na thread principal do Electron/Node, eliminando as pausas de 5–9s no Windows e normalizando a leitura em streaming contínuo.
+- **Renovação estrita de leases retidos sem regravação global de chats (`#43557`):**
+  - Cessa a reescrita indiscriminada de todos os chats no startup; apenas renova os leases mantidos por abas ou processos ativos, mantendo as demais conversas intactas no disco.
+- **Preenchimento incremental de baselines faltantes no upgrade (`#43563`):**
+  - Quando o journal legado não foi alterado, o motor de upgrade apenas injeta baselines que estejam estritamente ausentes no novo formato, evitando leituras e escritas completas desnecessárias.
+- **Contenção e recuperação de heap no scanner de sessões (`#43551`, resolve `#43523`):**
+  - Controla o consumo de memória do scanner paginando objetos e implementa interceptação graciosa caso a memória chegue próxima do limite, recuperando o scanner sem derrubar a aplicação.
 - **Cartões agrupados, confirmação em passos e card de progresso em background no Workspace Cleanup (`#43498`):**
   - Agrupa os cartões de worktree por repositório, introduz etapas distintas para confirmação e deleção e exibe cartão de progresso não obstrutivo em segundo plano.
 - **Liberação de metadados de sessões transmitidas e controle de heap no scanner do AI Vault (`#43525`, resolve `#43523`):**
@@ -177,6 +197,10 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Reter descritor de arquivo aberto por cursor no polling de transcripts do Codex, eliminando `openSync` síncrono e congelamentos de UI no Windows (`#43587`, resolve `#43539`).
+- Limitar a renovação no startup aos leases de chats ativos em vez de regravar todas as sessões salvas (`#43557`).
+- Otimizar migrações de upgrade para preencher apenas baselines ausentes quando o journal antigo estiver inalterado (`#43563`).
+- Aplicar controle estrito de memória e recuperação suave no scanner de sessões (`#43551`, resolve `#43523`).
 - Adotar interface de cartões agrupados e card de progresso em background para Workspace Cleanup (`#43498`).
 - Incorporar liberação imediata de metadados e configuração de heap no scanner do AI Vault (`#43525`, resolve `#43523`).
 - Habilitar remoção de worktrees irmãos externos sem disparar erros de reautorização (`#43532`, resolve `#43368`).

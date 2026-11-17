@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43016, #42839, #42747, #42708, #42707 trazem contenção de recusas de escalation/decision_gate fora da mailbox, expurgo de cópias de chat no orchestration.db e parada de workers remotos.
+description: Os PRs #43550, #43467, #43016, #42839 e as issues #43618, #43039 trazem expurgo paginado de Runs concluídas sem travar main thread, rejeição de worker_done e reconciliação de reservas.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,10 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43016`](https://github.com/stablyai/orca/pull/43016),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43550`](https://github.com/stablyai/orca/pull/43550),
+[`stablyai/orca#43467`](https://github.com/stablyai/orca/pull/43467) (resolve Issue [`#43039`](https://github.com/stablyai/orca/issues/43039)),
+além da issue [`stablyai/orca#43618`](https://github.com/stablyai/orca/issues/43618),
+[`stablyai/orca#43016`](https://github.com/stablyai/orca/pull/43016),
 [`stablyai/orca#42839`](https://github.com/stablyai/orca/pull/42839) (resolve STA-15101),
 [`stablyai/orca#42747`](https://github.com/stablyai/orca/pull/42747) (resolve Issue [`#42732`](https://github.com/stablyai/orca/issues/42732)),
 [`stablyai/orca#42708`](https://github.com/stablyai/orca/pull/42708),
@@ -88,6 +91,12 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - O banco de orquestração acumulava cópias integrais de chats de workers resolvidos (~120 KB por cópia em milhares de tarefas), atingindo mais de 1.6 GB com centenas de megabytes de espaço interno desperdiçado, sem capacidade de redução automática de tamanho físico em disco.
 20. **Falha na parada e fechamento de workers federados iniciados remotamente (`#42852`):**
     - Quando um worker era iniciado em um host remoto pareado a partir de outro host, a solicitação de Stop/Close pelo host receptor não era roteada de volta ao host de origem (*home-routed*), deixando o processo do worker rodando indefinidamente na máquina remota.
+21. **Travamento da thread principal durante expurgo massivo de Runs resolvidos (`#43550`):**
+    - A rotina de expurgo de execuções concluídas no `orchestration.db` processava todos os registros elegíveis em uma única transação síncrona, causando congelamentos de centenas de milissegundos na main thread do Electron.
+22. **Rejeição de `worker_done` de workers em servidores conectados como despacho desconhecido (`#43618`):**
+    - Workers supervisionados disparados em servidores Orca conectados (`worker-start --on <server>`) tinham suas mensagens de conclusão `worker_done` recusadas pelo coordenador sob pretexto de despacho não reconhecido, impedindo a liquidação automática do despacho.
+23. **Reserva de inicialização estruturada de Codex retida indefinidamente (`#43467`, resolve `#43039`):**
+    - Quando um worker estruturado era abortado ou liberado precocemente via `worker-release`, a reserva de recursos alocada para o início do Codex ficava órfã e bloqueava despachos subsequentes.
 
 ## O que o upstream implementa
 
@@ -135,9 +144,16 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
   - Executa inferência one-shot rápida sem ferramentas em diretório temporário isolado.
 - **Suporte a stdin e arquivo em `terminal send` (`#41754`, resolve `#40838`):**
   - Permite envio seguro de payloads longos sem expor argumentos em `ps`.
+- **Expurgo paginado de Runs resolvidos sem travar a thread principal (`#43550`):**
+  - Aposenta execuções antigas em lotes paginados no SQLite, evitando que a limpeza de histórico volumoso cause stalls no loop de eventos principal.
+- **Reconciliação de reservas estruturadas órfãs em `worker-release` (`#43467`, resolve `#43039`):**
+  - Libera automaticamente reservas de início estruturado pendentes quando o worker é dispensado prematuramente.
 
 ## O que fazer
 
+- Implementar expurgo paginado de Runs resolvidos no banco de orquestração para eliminar stalls na thread principal (`#43550`).
+- Aceitar e liquidar corretamente mensagens `worker_done` oriundas de workers rodando em servidores conectados (`#43618`).
+- Reconciliar e liberar reservas estruturadas de inicialização órfãs ao executar `worker-release` (`#43467`, resolve `#43039`).
 - Manter escalações e decision gates recusados fora da caixa postal do destinatário (`#43016`).
 - Adotar o expurgo de cópias resolvidas de chat e `auto_vacuum = INCREMENTAL` no `orchestration.db` com ação 'Reclaim space' (`#42839`, resolve STA-15101).
 - Rotear ordens de parada de workers federados remotos ao host de origem (`#42852`).

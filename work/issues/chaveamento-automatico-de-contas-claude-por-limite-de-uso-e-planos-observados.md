@@ -3,12 +3,15 @@ priority: high
 tags:
   - auth
   - tooling
-description: Os PRs #43190, #43135, #43145, #43105, #43087, #43118, #43223, #42856, #42917, #42891 trazem contas por workspace no Codex, import de ~/.codex, filtros de tokens em stats, fixação de contas por worktree e chaveamento por cota.
+description: Os PRs #43578, #43190, #43135, #43145, #43105 e as issues #43579, #43594 trazem auto-switch de contas Claude próximo ao limite de uso, cotas no switcher do Codex e fixação por worktree.
 ---
 
 # Chaveamento automático de contas Claude por limite de uso, planos observados e resgate de cota
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43190`](https://github.com/stablyai/orca/pull/43190),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43578`](https://github.com/stablyai/orca/pull/43578) (resolve Issue [`#43579`](https://github.com/stablyai/orca/issues/43579)),
+além das issues [`stablyai/orca#43594`](https://github.com/stablyai/orca/issues/43594) e
+[`stablyai/orca#43375`](https://github.com/stablyai/orca/issues/43375),
+[`stablyai/orca#43190`](https://github.com/stablyai/orca/pull/43190),
 [`stablyai/orca#43135`](https://github.com/stablyai/orca/pull/43135) (resolve Issue [`#9496`](https://github.com/stablyai/orca/issues/9496)),
 [`stablyai/orca#43145`](https://github.com/stablyai/orca/pull/43145),
 [`stablyai/orca#43105`](https://github.com/stablyai/orca/pull/43105),
@@ -41,6 +44,12 @@ além das issues [`stablyai/orca#43214`](https://github.com/stablyai/orca/issues
    A remoção de uma conta do Claude das preferências do aplicativo apagava ou tornava inacessíveis as conversas históricas vinculadas a ela, sem dar ao usuário a oportunidade de preservar as notas e transcrições geradas.
 7. **Atribuição incorreta de uso pela linha selecionada na interface (`#43087`):**
    O monitoramento de cotas atribuía consumos à linha atualmente destacada na UI em vez de computar o uso estritamente pela chave da conta dona do evento.
+8. **Troca manual tardia quando a cota está na iminência do esgotamento (`#43578`, resolve `#43579`):**
+   Operadores precisavam vigiar ativamente as cotas do Claude para evitar cortes abruptos no meio de raciocínios longos. Sem troca preventiva automática quando a cota atinge limiar crítico (ex.: >95%), turnos em andamento eram interrompidos.
+9. **Omissão de cotas de 5h/semanal e contagens regressivas no switcher de contas do Codex (`#43594`):**
+   O alternador de contas do Codex deixou de detalhar as janelas de utilização de 5 horas e limites semanais com seus respectivos cronômetros de reset, cegando o operador sobre qual conta possuía saldo iminente.
+10. **Inércia na aplicação da conta do provedor de IA após troca (`#43375`):**
+    Ao alternar a conta nas opções do provedor, as chamadas subsequentes persistiam utilizando a credencial anterior por falta de propagação imediata do estado.
 
 ## O que o upstream implementa
 
@@ -74,9 +83,16 @@ além das issues [`stablyai/orca#43214`](https://github.com/stablyai/orca/issues
   - Assegura que alternar para uma conta gerenciada do OpenCode não oculte silenciosamente sessões pré-existentes do usuário.
 - **Perguntar e memorizar conta do Claude por projeto no primeiro arranque (`#23228`):**
   - Solicita a conta preferida na inicialização de novos projetos e persiste a associação automaticamente para as sessões subsequentes.
+- **Auto-switch preventivo de contas Claude próximo ao limite de uso (`#43578`, resolve `#43579`):**
+  - Introduz o toggle "Switch accounts automatically" em *Settings > Accounts > Claude*, chaveando proativamente para uma conta com cota disponível assim que a conta corrente atinge limiar de margem (near usage limit).
+- **Restauração de janelas de 5h/semanal e contagens regressivas no seletor Codex (`#43594`):**
+  - Restabelece as métricas segmentadas por janelas de 5 horas e cotas semanais com contadores em tempo real para cada perfil no alternador de contas do Codex.
 
 ## O que fazer
 
+- Implementar o chaveamento automático preventivo de contas Claude próximo ao limite de uso (`#43578`, resolve `#43579`).
+- Exibir janelas de cota de 5h e semanal com contadores regressivos no switcher de contas do Codex (`#43594`).
+- Assegurar propagação e aplicação imediata da conta selecionada no provedor de IA para os turnos seguintes (`#43375`).
 - Permitir a fixação de worktrees a contas específicas de Claude e Codex (`#43135`, resolve `#9496`), com suporte a importação de credenciais locais de `~/.codex` (`#43190`).
 - Retirar riscos de perda de mensagens em trocas de conta retendo envios até a prontidão da nova conta (`#43145`).
 - Preservar o histórico de conversas pertencentes a contas removidas (`#43118`).

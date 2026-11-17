@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43479, #43431, #42651, #43388, #43393 e as issues #43387, #41009 trazem divisão de abas em todas as direções, encerramento forçado de terminais via CLI e comandos shell ! no chat.
+description: Os PRs #43593, #43574, #43479, #43431, #42651 e a issue #43573 trazem input direto de PTY imune a workers, prevenção de auto-resume duplicado e divisão de abas.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,9 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43479`](https://github.com/stablyai/orca/pull/43479),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43593`](https://github.com/stablyai/orca/pull/43593),
+[`stablyai/orca#43574`](https://github.com/stablyai/orca/pull/43574) (resolve Issue [`#43573`](https://github.com/stablyai/orca/issues/43573)),
+[`stablyai/orca#43479`](https://github.com/stablyai/orca/pull/43479),
 [`stablyai/orca#43431`](https://github.com/stablyai/orca/pull/43431),
 [`stablyai/orca#42651`](https://github.com/stablyai/orca/pull/42651),
 [`stablyai/orca#43388`](https://github.com/stablyai/orca/pull/43388) (resolve Issue [`#43387`](https://github.com/stablyai/orca/issues/43387)),
@@ -76,9 +78,17 @@ além da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/4
     Ao invocar o comando de fechamento de terminal via CLI, caso a janela não confirmasse o fechamento por estar ocupada ou em segundo plano, o processo do terminal continuava vivo consumindo recursos.
 13. **Ausência de suporte CLI para fechar aba de terminal parada por ID (`#42651`):**
     Não havia instrução CLI para localizar e encerrar diretamente abas de terminais já parados indicando seu identificador único.
+14. **Congelamento de entrada de teclado no terminal Unix sob sobrecarga de I/O workers (`#43593`):**
+    No Unix, os dados de digitação do teclado enviados ao PTY eram despachados pela fila comum de workers de I/O. Caso operações pesadas em disco ou tarefas de background saturassem o pool de workers, a digitação travava e caracteres eram engolidos ou entregues com atrasos severos.
+15. **Retomada concorrente espúria de conversas de agente ao restaurar abas salvas (`#43574`, resolve `#43573`):**
+    Ao reabrir ou restaurar abas salvas de terminal, o ambiente tentava retomar automaticamente a sessão do agente salva, mesmo que essa mesma conversa já estivesse ativa em outra aba ou janela, gerando conflitos de concorrência e corrupção de estado.
 
 ## O que o upstream implementa e corrige
 
+- **Escrita direta não bloqueante para entrada de teclado em PTYs Unix (`#43593`):**
+  - Escreve caracteres do teclado diretamente no file descriptor do PTY Unix de forma síncrona e não bloqueante (`O_NONBLOCK`), desacoplando o pipeline de digitação do pool geral de workers de I/O e garantindo resposta instantânea mesmo sob carga pesada do sistema.
+- **Prevenção de auto-resume duplicado ao restaurar abas salvas (`#43574`, resolve `#43573`):**
+  - Ao restaurar uma aba salva que referenciava uma sessão de agente, verifica se a conversa correspondente já está ativa em qualquer outra aba ou superfície; se estiver, abre um shell limpo no diretório de trabalho em vez de forçar um segundo resume concorrente.
 - **Atalhos customizáveis para mover abas para splits em todas as direções (`#43431`):**
   - Torna a ação `Move Tab to Split` configurável com direções explícitas (esquerda, direita, cima e baixo) no mapa de atalhos.
 - **Encerramento forçado de processos de terminal no fechamento CLI sem confirmação (`#43479`):**
@@ -136,3 +146,5 @@ além da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/4
 11. Permitir atalhos direcionais customizados para mover abas para divisões (Move Tab to Split) em todas as direções cardeais (`#43431`).
 12. Forçar a interrupção de processos de terminal na CLI de fechamento quando a janela gráfica não responder (`#43479`).
 13. Suportar comando de CLI para fechar diretamente abas de terminais parados por ID (`#42651`).
+14. Adotar escrita direta não bloqueante para entrada de teclado em PTYs Unix desacoplando do pool de I/O workers (`#43593`).
+15. Evitar auto-resume duplicado ao restaurar abas salvas caso a conversa já esteja ativa em outra aba ou janela (`#43574`, resolve `#43573`).

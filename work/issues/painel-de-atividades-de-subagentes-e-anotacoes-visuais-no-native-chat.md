@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43521, #43474, #43456, #43425, #43385 e as issues #43462, #43461 trazem menções @ no chat, banners de workers, chips de citação e retenção de chats em espera.
+description: Os PRs #43607, #43600, #43567, #43562, #43521, #43474 e as issues #43610, #43597, #43549 trazem presets de modelo, customização de teclas de envio, sincronização de Activity e anotações.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,12 +13,19 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43521`](https://github.com/stablyai/orca/pull/43521),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43607`](https://github.com/stablyai/orca/pull/43607) (resolve Issue [`#43599`](https://github.com/stablyai/orca/issues/43599)),
+[`stablyai/orca#43600`](https://github.com/stablyai/orca/pull/43600) (resolve Issue [`#43595`](https://github.com/stablyai/orca/issues/43595)),
+[`stablyai/orca#43567`](https://github.com/stablyai/orca/pull/43567),
+[`stablyai/orca#43562`](https://github.com/stablyai/orca/pull/43562),
+[`stablyai/orca#43521`](https://github.com/stablyai/orca/pull/43521),
 [`stablyai/orca#43516`](https://github.com/stablyai/orca/pull/43516),
 [`stablyai/orca#43474`](https://github.com/stablyai/orca/pull/43474),
 [`stablyai/orca#43456`](https://github.com/stablyai/orca/pull/43456),
 [`stablyai/orca#43425`](https://github.com/stablyai/orca/pull/43425) (resolve Issue [`#43424`](https://github.com/stablyai/orca/issues/43424)),
-além das issues [`stablyai/orca#43462`](https://github.com/stablyai/orca/issues/43462) e
+além das issues [`stablyai/orca#43610`](https://github.com/stablyai/orca/issues/43610),
+[`stablyai/orca#43597`](https://github.com/stablyai/orca/issues/43597),
+[`stablyai/orca#43549`](https://github.com/stablyai/orca/issues/43549),
+[`stablyai/orca#43462`](https://github.com/stablyai/orca/issues/43462) e
 [`stablyai/orca#43461`](https://github.com/stablyai/orca/issues/43461),
 [`stablyai/orca#43385`](https://github.com/stablyai/orca/pull/43385),
 [`stablyai/orca#43380`](https://github.com/stablyai/orca/pull/43380),
@@ -129,6 +136,20 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     Filas de eventos de chat e leituras de histórico acumulavam mensagens na memória sem limite quando o receptor ficava atrasado, elevando o heap do runtime.
 26. **Montagem eager e pesada de abas de chat ocultas no arranque (`#43516`):**
     O componente de visualização de chat era montado imediatamente para todas as abas no carregamento, degradando a performance inicial de workspaces com muitos chats.
+27. **Falta de seletores rápidos de presets de modelo, esforço de raciocínio e velocidade no Chat (`#43607`, resolve `#43599`):**
+    Ajustar modelo, esforço de raciocínio e velocidade exigia abrir menus suspensos ou configurações em múltiplos níveis. Não havia presets rápidos de um clique posicionados diretamente abaixo do controle de velocidade.
+28. **Inflexibilidade da tecla de envio de mensagens no Native Chat (`#43600`, resolve `#43595`):**
+    O composer do chat disparava o envio fixamente ao pressionar Enter (exigindo Shift+Enter para quebra de linha), sem uma configuração que permitisse inverter o comportamento para operadores acostumados a usar Enter para parágrafos e Shift+Enter para envio.
+29. **Omissão de painéis de agentes recém-iniciados no seletor "Send notes to" (`#43562`):**
+    O menu "Send notes to" só listava painéis de agentes após o primeiro relatório de status formal ter sido emitido. Painéis recém-criados permaneciam invisíveis até que o agente executasse seu primeiro turno, impossibilitando o envio precoce de anotações.
+30. **Dessincronização do destaque na visualização de Activity com a aba ativa (`#43567`):**
+    O item de Activity na barra lateral esquerda não sincronizava seu realce de seleção visual ao alternar entre abas e workspaces de agentes, deixando o operador desorientado sobre qual agente estava selecionado no painel.
+31. **Supressão ou aglutinação de resumos de raciocínio (thinking) entre chamadas de ferramentas (`#43610`):**
+    Trechos intermediários de raciocínio emitidos pelo Claude entre chamadas sucessivas de ferramentas eram mesclados ou ocultados no Chat UI, dificultando acompanhar a linha lógica do modelo durante a execução sequencial de comandos.
+32. **Exibição de tags brutas `<advisory>` de conselhos de modelo como texto de usuário (`#43549`):**
+    Tags de aviso de harness/OMP como `<advisory>` eram despejadas diretamente na área de conversa como se fossem texto digitado pelo usuário, poluindo a visualização.
+33. **Ocupação permanente de espaço de tela pela barra lateral esquerda (`#43597`):**
+    A barra lateral esquerda não possuía modo auto-hide com revelação ao passar o cursor pela borda (edge-hover reveal), sacrificando espaço útil de tela em telas menores ou monitores secundários.
 
 ## O que o upstream implementa
 
@@ -209,9 +230,30 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
   - Quando um agente associado a um chat migra ou é transferido para outro worktree, o chat exibe uma faixa de contexto informando para qual worktree o agente se moveu e oferece atalho para seguir ou alternar para o novo espaço de trabalho.
 - **Entrega direta de mensagens entre agentes no Native Chat (`#43380`):**
   - Restaura a entrega direta e síncrona de mensagens emitidas por outros agentes e subagentes diretamente para a sessão de chat ativa, eliminando intermediários bloqueantes.
+- **Presets rápidos de modelo, esforço e velocidade no Chat (`#43607`, resolve `#43599`):**
+  - Adiciona botões de atalho/chips de presets configuráveis posicionados diretamente abaixo do slider de velocidade do Native Chat, permitindo alternar combinações frequentes de modelo e esforço de raciocínio com um único clique.
+- **Configuração de tecla de envio `nativeChatSendKey` (`#43600`, resolve `#43595`):**
+  - Introduz a configuração `nativeChatSendKey` (`"enter"` ou `"shiftEnter"`), permitindo configurar Shift+Enter para enviar a mensagem e Enter para criar nova linha sem envio acidental.
+- **Listagem de painéis de agentes antes do primeiro status report em anotações (`#43562`):**
+  - No menu "Send notes to", faz fallback para o título do terminal de todos os painéis, permitindo direcionar anotações visuais para agentes logo após a criação da aba, mesmo antes do primeiro turno ou status report.
+- **Sincronização do realce de Activity com o workspace e aba ativa (`#43567`):**
+  - Sincroniza o highlight da view de Activity na barra lateral esquerda com o agente ou workspace atualmente em foco na área de abas.
+- **Formatação de resumos de raciocínio Claude entre execuções de ferramentas (`#43610`):**
+  - Propõe exibir os resumos de pensamento do Claude como linhas independentes e colapsáveis intercaladas entre as chamadas de ferramentas no Chat UI.
+- **Parse e estilização de tags `<advisory>` (`#43549`):**
+  - Trata tags de conselho `<advisory>` do harness OMP com componente visual dedicado em vez de exibi-las como mensagem crua de usuário.
+- **Auto-hide com revelação por hover da barra lateral esquerda (`#43597`):**
+  - Propõe opção para ocultar automaticamente a barra lateral e revelá-la suavemente ao passar o cursor pela margem esquerda da janela.
 
 ## O que fazer
 
+- Adicionar presets rápidos de modelo, esforço de raciocínio e velocidade no Native Chat (`#43607`, resolve `#43599`).
+- Suportar a configuração `nativeChatSendKey` para permitir envio via Shift+Enter (`#43600`, resolve `#43595`).
+- Listar painéis de agentes recém-iniciados no menu "Send notes to" via fallback de título de terminal (`#43562`).
+- Sincronizar o destaque visual do item de Activity na barra lateral esquerda com a aba e workspace ativos (`#43567`).
+- Exibir resumos de pensamento (thinking) do Claude intercalados entre ferramentas no chat nativo (`#43610`).
+- Tratar e estilizar tags `<advisory>` do harness OMP com componente dedicado (`#43549`).
+- Avaliar auto-hide da barra lateral com reveal por hover na borda (`#43597`).
 - Exibir faixa de worker temporário no topo de chat workers (`#43521`).
 - Identificar plugin de origem com nome e ícone em mensagens e mails do chat (`#43425`, resolve `#43424`).
 - Adotar autocompletar com menções `@` para chats e terminais no composer (`#43462`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43363, #43217, #43049, #43101, #42933 trazem modelos no picker da conta real do chat, preservação de modelo no resume e flags remotas no Antigravity.
+description: Os PRs #43571, #43564, #43363, #43217, #43049 trazem fallback de xhigh/max no Antigravity, chat nativo para TRAE CLI e modelos no picker da conta real.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,9 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43363`](https://github.com/stablyai/orca/pull/43363),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43571`](https://github.com/stablyai/orca/pull/43571),
+[`stablyai/orca#43564`](https://github.com/stablyai/orca/pull/43564),
+[`stablyai/orca#43363`](https://github.com/stablyai/orca/pull/43363),
 [`stablyai/orca#43217`](https://github.com/stablyai/orca/pull/43217),
 [`stablyai/orca#43049`](https://github.com/stablyai/orca/pull/43049),
 [`stablyai/orca#43101`](https://github.com/stablyai/orca/pull/43101),
@@ -117,6 +119,10 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Ao executar follow-up ou retomar uma sessão prévia (`agy --conversation <id>`), o comando omitia a flag de modelo original ou configurada em Default Args, resultando no erro fatal `tModel: model is empty` e falhas repetidas 502.
 28. **Perda de flags de modelo e esforço no resume e congelamento de 40–55s em erros de saída (`#43217`, `#43183`):**
     Ao retomar uma sessão do Antigravity por meio da receita de launch, os parâmetros resolvidos de modelo e nível de esforço de raciocínio eram descartados, voltando para os defaults (`#43217`). Além disso, durante erros de saída do modelo em chamadas ACP, a interface permanecia travada em "Sending..." ou "Working" por até 55 segundos durante tentativas silenciosas de retry e reinicialização de ~7.5s, sem feedback ao usuário (`#43183`).
+29. **Lacunas no seletor de esforço xhigh/max e mensagens de commit no Antigravity (`#43571`):**
+    Mesmo com a descoberta prévia de modelos Antigravity, o gerador de mensagens de commit exibia linhas brutas por nível (`claude-opus-4-6-xhigh`, `claude-opus-4-6-max`) sem opções estruturadas de nível de pensamento, os fallbacks de raciocínio não contemplavam `xhigh`/`max` e a invalidação de catálogo de modelos permanecia incompleta.
+30. **Falta de integração ao Chat UI para conversas da TRAE CLI (`#43564`):**
+    A CLI do agente Trae ficava limitada ao terminal TUI, sem suporte para prosseguir conversas no Native Chat com controles nativos de tarefas e aprovações.
 
 ## O que o upstream implementa e corrige
 
@@ -199,6 +205,11 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 - **Correção de remoção de tokens de autenticação e contenção de `ELECTRON_RUN_AS_NODE` (`#42896`):**
   - Passa o tipo de conta exato (pessoal vs business) para a rotina de verificação, garantindo que falhas em contas Gemini Enterprise apaguem apenas `acp_business_token.json`;
   - Restringe `ELECTRON_RUN_AS_NODE=1` estritamente ao ambiente Windows onde o helper precisa, eliminando vazamento para subprocessos no macOS e Linux.
+- **Normalização de fallbacks de raciocínio xhigh/max e mensagens de commit no Antigravity (`#43571`):**
+  - Trata `xhigh` e `max` como níveis estruturados de reasoning effort no seletor de modelos e mensagens de commit em vez de expor sufixos brutos;
+  - Conclui a invalidação limpa do catálogo de modelos quando parâmetros de esforço são alterados.
+- **Suporte ao TRAE CLI no Native Chat UI (`#43564`):**
+  - Permite instanciar conversas com o agente Trae diretamente no Chat UI estruturado, preservando streaming de respostas e histórico de tarefas.
 
 ## O que fazer no BrzA Studio
 
@@ -230,3 +241,5 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 23. Reter modelo e flags de esforço de raciocínio na receita de retomada do Antigravity (`#43217`).
 24. Mitigar congelamentos de 55s no ACP exibindo erros de saída imediatamente (`#43183`).
 25. Consultar modelos disponíveis para o Antigravity baseando-se na conta configurada para a nova sessão (`#43363`).
+26. Incorporar fallbacks de raciocínio `xhigh`/`max` e formatação limpa de opções de pensamento em mensagens de commit do Antigravity (`#43571`).
+27. Suportar TRAE CLI como agente com superfície no Native Chat UI (`#43564`).

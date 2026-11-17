@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38286, #38248, #38574, #38498 e #38495 trazem modos Build/Plan, suporte a artifacts no chat nativo, integração com Cmd+J e links em aprovações.
+description: Os PRs #43606, #38286, #38248, #38574, #38498 e as issues #43603, #43602 trazem modo Plan no OpenCode, visibilidade de prosa prévia a perguntas e modos Build/Plan.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,9 @@ tags:
 
 # Modos Build e Plan e ferramentas de artifacts no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38574`](https://github.com/stablyai/orca/pull/38574),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43606`](https://github.com/stablyai/orca/pull/43606) (resolve Issue [`#43603`](https://github.com/stablyai/orca/issues/43603)),
+além da issue [`stablyai/orca#43602`](https://github.com/stablyai/orca/issues/43602),
+[`stablyai/orca#38574`](https://github.com/stablyai/orca/pull/38574),
 [`stablyai/orca#38498`](https://github.com/stablyai/orca/pull/38498),
 [`stablyai/orca#38495`](https://github.com/stablyai/orca/pull/38495),
 [`stablyai/orca#38510`](https://github.com/stablyai/orca/pull/38510),
@@ -51,6 +53,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38574`](https://github.com
 8. **Esforço de raciocínio travado após a primeira resposta (`#38272`):**
    O seletor de esforço (thinking/reasoning effort) ficava congelado e desabilitado após o primeiro turno de conversa com
    o Claude, impedindo o usuário de elevar o esforço em turnos subsequentes mais complexos ou reduzir para economizar tokens.
+9. **Ausência de suporte ao modo Plan no OpenCode em chat nativo (`#43606`, resolve `#43603`):**
+   Usuários do OpenCode e OpenCode2 não tinham acesso ao comando `/plan` nem ao chip de alternância entre Plan e Build
+   dentro do Native Chat estruturado, restringindo o fluxo de planejamento aos terminais TUI.
+10. **Ocultação de prosa e rascunhos redigidos antes de perguntas interativas (`#43602`):**
+    Quando um agente (como o Claude Code) emite explicações, comparações ou estimativas textuais e logo em seguida invoca
+    `AskUserQuestion` no mesmo turno, a interface do chat oculta o texto precedente enquanto o card da pergunta está aberto,
+    privando o desenvolvedor do contexto necessário para tomar a decisão.
 
 ## O que o upstream implementa
 
@@ -76,9 +85,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38574`](https://github.com
 - **Manutenção do seletor de esforço editável (`#38272`):**
   - Mantém o dropdown de esforço do Claude interativo e mutável mesmo após o envio da primeira mensagem e recebimento da
     resposta inicial.
+- **Suporte ao modo Plan no OpenCode em Native Chat (`#43606`, resolve `#43603`):**
+  - Habilita o comando local `/plan` e o chip visual de Plan para `opencode` e `opencode2` no chat nativo;
+  - Exibe qual agente o OpenCode está executando e permite alternar de volta para Build através do chip de modo.
+- **Exibição contínua de prosa e rascunhos durante perguntas interativas (`#43602`):**
+  - Mantém a prévia da resposta textual gerada visível acima do cartão de pergunta interativa, garantindo que o usuário consulte os dados antes de responder.
 
 ## O que fazer
 
+- Suportar o modo Plan para OpenCode e OpenCode2 no Native Chat estruturado (`#43606`, resolve `#43603`).
+- Garantir a visibilidade contínua de explicações e rascunhos emitidos antes de chamadas `AskUserQuestion` (`#43602`).
 - Integrar as melhorias de UX do composer (`#38286`, `#38251`, `#38253` e `#38272`) no `brza-studio`.
 - Adotar a inclusão de chats nativos no Cmd+J (`#38574`) e exibição prévia de modelo/esforço (`#38498`).
 - Assegurar a propagação de `CLAUDE_CODE_ARTIFACT=1` (`#38248`) no runtime de Native Chat do `brza-studio` e nos adaptadores

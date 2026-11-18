@@ -1,7 +1,7 @@
 {
  "posicoes": {"Prumo": "(fora da R3) A desde a R2: 0 PRs, não se constrói nem a sombra."},
  "medicoes": [
-  {"tipo": "conferido", "quem": "coordenação", "texto": "Trava refez M6/M6b: gh pr list brza-studio → []; --owner=anderson-projeto-externo → 8 PRs, 7 do projeto-externo-claude"},
+  {"tipo": "conferido", "quem": "coordenação", "texto": "Trava refez M6/M6b: gh pr list brza-studio → []; --owner de uma conta de fora → 8 PRs, 7 de uma conta de agente"},
   {"tipo": "conferido", "quem": "coordenação", "texto": "Revisor F1 confere: --author=@me esconde a conta de agente — gh search prs --owner"}
  ],
  "sintese": [

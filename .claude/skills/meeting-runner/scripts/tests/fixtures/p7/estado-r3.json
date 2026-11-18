@@ -131,7 +131,7 @@
     {
       "tipo": "conferido",
       "quem": "coordenação",
-      "texto": "Trava refez M6/M6b: gh pr list brza-studio → []; --owner=anderson-projeto-externo → 8 PRs, 7 do projeto-externo-claude"
+      "texto": "Trava refez M6/M6b: gh pr list brza-studio → []; --owner de uma conta de fora → 8 PRs, 7 de uma conta de agente"
     },
     {
       "tipo": "conferido",

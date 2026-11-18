@@ -46,7 +46,7 @@ chega pelo fetch, e com o `install_offline` trocado por um falso. `python3 -m un
 
 **O que se ligou:** `brza-install --all` ligou o `brza-tree`, e o `brza-install` mostra todo link `ok`.
 
-O commit é `brza-workspace@2ac6638`.
+O commit é `brza-workspace@3dc6cf2`.
 
 ## O que se aprendeu
 

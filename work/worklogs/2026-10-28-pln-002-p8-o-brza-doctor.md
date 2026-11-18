@@ -48,7 +48,7 @@ Anderson". O passo executa o D8 do
   A identidade saiu `ok`, porque o git global já tem o noreply.
 - O C4: a metade do terminal, rodada por Anderson num terminal fora do app, deu "Como o esperado".
 
-O commit é `brza-workspace@cc19e75`.
+O commit é `brza-workspace@a8dd8f2`.
 
 ## O que se aprendeu
 

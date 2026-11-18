@@ -732,7 +732,7 @@ por passo foi atingido, e a prova é o gate com os testes vistos falhando antes.
 ## Documentação
 
 - `brza-workflow/core/CLAUDE.md`, "Os plugins são habilitados só aqui" — a regra do servidor MCP de um workstream só,
-  sem `--scope local`, em `brza-workflow@3826f63`; chegou ao workspace pelo `brza sync` (`75fba13`).
+  sem `--scope local`, em `brza-workflow@3826f63`; chegou ao workspace pelo `brza sync` (`5c7c113`).
 - `brza-workflow/README.md`, a linha do `packages/mcp/` — o `brza-mcp` e os verbos, escrita no P1 (`1dfc9d9`) e
   mesclada em `23d812d`.
 

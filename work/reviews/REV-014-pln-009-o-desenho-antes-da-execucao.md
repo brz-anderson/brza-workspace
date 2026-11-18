@@ -13,13 +13,13 @@ tags:
 
 O parecer do Desenho do
 [PLN-009: O servidor MCP residente coordena o fluxo de trabalho nos dois clients](../../plans/PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md),
-na versão `brza-workspace@ecd380e` com a R1 em disco, antes de qualquer passo. O revisor foi um subagente `reviewer`, da
+na versão `brza-workspace@733b70c` com a R1 em disco, antes de qualquer passo. O revisor foi um subagente `reviewer`, da
 camada alta, que não escreveu o plano. Os destinos saíram da R2 do plano, respondida pela regra de Anderson de
 2026-11-03 ("escolha o encaminhamento dos achados sempre pela opção `recomendada`"; "prefira sempre optar por
 `corrigir aqui`"): 13 achados corrigidos na reescrita do Desenho e dos Passos, e o A14 na issue
 [Os passos do MCP no PLN-003 passam ao PLN-009](../issues/os-passos-do-mcp-no-pln-003-passam-ao-pln-009.md).
 
-Alvo: `plans/PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md`, no estado do disco depois do `ecd380e` (2026-11-03) — já com a
+Alvo: `plans/PLN-009-o-mcp-orquestrador-do-fluxo/PLN-009-plan.md`, no estado do disco depois do `733b70c` (2026-11-03) — já com a
 Entrevista R1 (R1.1 "brza-workflow", R1.2 "PLN-009") e a `## Pendências conhecidas`, que a sessão principal gravou
 durante a revisão. Os números de linha são desse estado (229 linhas). Régua: as rodadas e o Desenho do PLN-003, o
 worklog do P0 (não commitado), o molde `.claude/skills/plan-runner/references/plan-template.md` e o `plans/README.md`.
@@ -29,11 +29,11 @@ de cada um diz a resposta.
 
 ## Achados
 
-### A1 — O PLN-009 não absorveu nenhum achado medido do P0, e agora diverge do Desenho do PLN-003, que os absorveu no `ecd380e`
+### A1 — O PLN-009 não absorveu nenhum achado medido do P0, e agora diverge do Desenho do PLN-003, que os absorveu no `733b70c`
 > lacuna · importante · confiança 95 · → corrigido aqui
 
 **Evidência:**
-- Durante a revisão, o commit `ecd380e` (03:14, "registrar medição das hipóteses do P0 … e ajustes em D3-D7") levou os
+- Durante a revisão, o commit `733b70c` (03:14, "registrar medição das hipóteses do P0 … e ajustes em D3-D7") levou os
   achados ao Desenho do PLN-003: `PLN-003-design.md:474-480` (D4: `ThreadingHTTPServer`, `HTTP/1.1`, `Content-Length`,
   `GET /mcp` SSE concorrente, `~/.local/bin` no `PATH` do plist), `:517-520` (D5: `ORCA_AGENT_SESSION_ID` e
   `ORCA_USER_DATA_PATH` no env do `orca orchestration`), `:557-566` (D6: `claude -p` completo, `CLAUDE_CONFIG_DIR`
@@ -276,9 +276,9 @@ O que sobra é o A2 (o que cai entre os dois) e o A14 (ainda não aplicado).
 
 ### F9 — "O P0 está `[x]` no PLN-003 com evidência falsa: o Desenho não tem os ajustes de D3 a D7"
 > → falso (no estado atual)
-**Por que é falso:** valia às 03:0x, quando o `git diff` do Desenho só mudava o cabeçalho; o commit `ecd380e`, às
+**Por que é falso:** valia às 03:0x, quando o `git diff` do Desenho só mudava o cabeçalho; o commit `733b70c`, às
 03:14, gravou os ajustes.
-**Evidência:** `git show ecd380e -- plans/PLN-003-o-workflow-nos-dois-clients/PLN-003-design.md` → H1 a H6 reescritas
+**Evidência:** `git show 733b70c -- plans/PLN-003-o-workflow-nos-dois-clients/PLN-003-design.md` → H1 a H6 reescritas
 como "CONFIRMADA" e os ajustes em `:474-480`, `:517-520`, `:557-566`.
 
 ## Pontos para rodada
@@ -323,8 +323,8 @@ como "CONFIRMADA" e os ajustes em `:474-480`, `:517-520`, `:557-566`.
 ## O que rodou e o que deu
 
 - `git diff`, `git status` e `git log` no worktree: o PLN-009 mudou durante a revisão (a R1 e as Pendências), e o
-  commit `ecd380e` (03:14) gravou o P0 no PLN-003 — o Desenho, o plano e o worklog.
-- `grep` dos achados do P0: ausentes no PLN-009; presentes no Desenho do PLN-003 depois do `ecd380e` (A1, F9).
+  commit `733b70c` (03:14) gravou o P0 no PLN-003 — o Desenho, o plano e o worklog.
+- `grep` dos achados do P0: ausentes no PLN-009; presentes no Desenho do PLN-003 depois do `733b70c` (A1, F9).
 - `curl localhost:11434/api/tags` → `tev1:4b`; `POST /v1/systemone {}` → 400 "model is required"; `/api/ps` → nenhum
   modelo carregado.
 - `command -v ollama orca brza brza-quota brza-mcp` → `ollama`, `orca` e `brza` do BrzA Studio; sem `brza-quota` nem

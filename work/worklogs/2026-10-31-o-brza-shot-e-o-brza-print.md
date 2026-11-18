@@ -31,7 +31,7 @@ No meio do trabalho, Anderson pediu nesta sessão o `brza print`: "adicionar tbm
 
 ## O que se fez
 
-- **`291cf30` na `master`:** `feat(brza): brza shot, o PNG do artboard, e brza print, o print da conferência`.
+- **`d0f16a1` na `master`:** `feat(brza): brza shot, o PNG do artboard, e brza print, o print da conferência`.
   - **`scripts/brza/brza-shot`** monta o shell do `buildNativeChatVisualDocument` sem o script de ponte: o
     `<html class>`, o CSP com as CDNs, os tokens no `:root` e o `BASE_CSS`. A lista de tokens, as CDNs e o `BASE_CSS`
     saem do código do `brza-studio`, e o comando para e diz o nome quando o código muda de forma. Os tokens saem do
@@ -49,7 +49,7 @@ No meio do trabalho, Anderson pediu nesta sessão o `brza print`: "adicionar tbm
     do canto nos dois temas, e 11 no `test_brza_print.py`, com as ferramentas trocadas por falsas. A suíte
     `python3 -m unittest discover -s scripts/brza/tests` deu `Ran 245 tests … OK` no worktree. Na `master`, a suíte
     caiu com o reinício do BrzA Studio, e os 24 testes novos rodaram de novo e passaram.
-- **`5dd8254` na `master`:** `docs: a imagem do plano sai pelo brza shot e pelo brza print`, pela skill
+- **`8c3c220` na `master`:** `docs: a imagem do plano sai pelo brza shot e pelo brza print`, pela skill
   `agent-instructions-writer`:
   - `plans/README.md`, linha **Arquivos**: a imagem fica na pasta do plano, `PLN-001-<assunto>.png` pelo `brza shot` e
     `PLN-001-C1.png` pelo `brza print`;

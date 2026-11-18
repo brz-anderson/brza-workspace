@@ -39,7 +39,7 @@ pareceres nasceram, e o `move_note.py` renomeou cada um, reescrevendo o H1 e os 
 Os três ganharam a `description`, e a issue [Os pareceres do PLN-009 sem número REV](../issues/os-pareceres-do-pln-009-sem-numero-rev.md)
 foi a `done`. O plano ganhou a seção `## Documentação` e, nas Pendências, a issue
 [O `brza-mcp` não cancela um pedido que espera na fila](../issues/o-mcp-nao-cancela-pedido-na-fila.md), que o checador
-acusava como `backlink-missing`. Commit `8ae71fa`.
+acusava como `backlink-missing`. Commit `ffdac05`.
 
 ## A conferência de fechamento e a decisão
 

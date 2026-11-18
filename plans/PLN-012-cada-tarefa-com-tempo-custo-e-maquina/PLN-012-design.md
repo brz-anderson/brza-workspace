@@ -154,7 +154,7 @@ sessions:
  "chat_id": "claude_2ead5f2f_c37e_41a1_8ef4_a299af008379", "session_name": "tools-kit-produtividade",
  "pid": 44452, "cwd": "/Users/andepb/Projects/brza-workspace/.worktrees/tools-kit", "workstream": "tools-kit",
  "worklogs": ["work/worklogs/2026-11-03-pln-012-abertura-da-produtividade-por-tarefa.md"],
- "commit": "539b744", "until": null}
+ "commit": "7cacd28", "until": null}
 ```
 
 - `chat_id` é o `ORCA_AGENT_SESSION_ID`, quando houver; liga a tarefa ao chat do app mesmo sem `session_id`.

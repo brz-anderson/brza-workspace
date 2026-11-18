@@ -18,7 +18,7 @@ desenhado em [O PLN-002, pedido 8: o /rename opcional e o mapa de sessões, dese
 **A combinação**, com um chat de prova aberto e fechado pelo runtime: o `launch` sem prompt, o `agentSession.rename`
 logo depois e o `providerSession.id` em 2,8 s confirmaram o D7 sem divergência.
 
-**O código**, em `brza-workspace@95d21cc`: o `scripts/brza/brza-sessions` com o `--title`, o `--rename`, o `--wait` que
+**O código**, em `brza-workspace@f31bc5c`: o `scripts/brza/brza-sessions` com o `--title`, o `--rename`, o `--wait` que
 espera a sessão do Claude, o verbo `title`, o mapa `.sessions/sessions.jsonl` (o `record` e a dobra `session_map`) e a
 busca pelo mapa antes do transcript; 12 casos novos no `test_brza_sessions.py`, todos falhando antes; o `.sessions/` no
 `.gitignore`; a ajuda com a regra do correio.

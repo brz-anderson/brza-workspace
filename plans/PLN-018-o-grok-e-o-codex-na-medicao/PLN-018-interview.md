@@ -86,7 +86,7 @@ Respondida em 2026-11-09, na sessão `workspace`, com "opção 1".
 > [PLN-004](../PLN-004-os-runtimes-codex-agy-e-grok-no-fluxo/PLN-004-interview.md), o ponto 10 da R21 já tinha resposta.
 
 Respondida em 2026-11-09, na sessão `workspace`, com "siga a recomendação". Esta sessão não perguntou de novo. O
-registro de lá é o `f4e90e3`.
+registro de lá é o `5df1883`.
 
 1. **Quem grava a linha `turn` do Grok e do Codex?** As três opções estão no ponto 10 da R21 do PLN-004.
 

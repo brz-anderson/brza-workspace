@@ -11,7 +11,7 @@ Pedido da sessão `brand-24`, a pedido de Anderson, em 2026-11-02, pela issue `w
 
 - **`scripts/brza/brza-shot`:** o `PANEL_SHELL` fixo saiu. O `find_token_list` lê o `native-chat-visual-shell.ts`, acha o `import`/`export … from` relativo da lista e segue os reexports (até 6) até a definição. Também aceita a lista definida no próprio shell. Se não resolve, o erro diz o arquivo, o especificador e os caminhos tentados.
 - **`scripts/brza/tests/test_brza_shot.py`:** aproveitado o começo da sessão anterior (o `fake_studio` com a lista fora do caminho antigo), com quatro testes: reexport, lista no próprio shell, import que não resolve e import ausente.
-- **Commit na `master`:** `8d554e7`.
+- **Commit na `master`:** `a5a3ac6`.
 
 ## A conferência
 

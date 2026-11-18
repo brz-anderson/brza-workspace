@@ -18,9 +18,9 @@ moram em `work/reviews/` com H1 `# REV: …` e sem o número `REV-NNN` que a nor
 
 | Parecer | Criado em |
 | :------ | :-------- |
-| [REV-014: o Desenho do PLN-009 antes da execução](../reviews/REV-014-pln-009-o-desenho-antes-da-execucao.md) | `3d94663` |
-| [REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../reviews/REV-015-pln-009-a-revisao-dos-passos.md) | `8b622f8` |
-| [REV-016: a entrega do PLN-009 contra o Pedido e a Cobertura](../reviews/REV-016-pln-009-a-revisao-da-entrega.md) | `5ef53de`, às 18:59 de 2026-11-03, depois de a norma do REV chegar no merge `5dcc2b3` |
+| [REV-014: o Desenho do PLN-009 antes da execução](../reviews/REV-014-pln-009-o-desenho-antes-da-execucao.md) | `ce1ff7f` |
+| [REV-015: os passos P1 a P6 do PLN-009, revisados pelo agy e pelo Opus](../reviews/REV-015-pln-009-a-revisao-dos-passos.md) | `997b454` |
+| [REV-016: a entrega do PLN-009 contra o Pedido e a Cobertura](../reviews/REV-016-pln-009-a-revisao-da-entrega.md) | `029e30c`, às 18:59 de 2026-11-03, depois de a norma do REV chegar no merge `0613191` |
 
 A origem é a MIG-001 do workstream `workspace`,
 `workspace:work/issues/MIG-001-renumeracao-rev-e-refs-pln-008.md`: o script dela não renomeia os três, porque nasceram

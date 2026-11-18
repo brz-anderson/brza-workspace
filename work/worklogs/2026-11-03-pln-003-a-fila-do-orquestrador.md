@@ -11,7 +11,7 @@ refs:
 
 Pedido de Anderson, passado pela sessão `bb0fd632` do `workspace` em 2026-11-03: registrar no PLN-003 a rodada
 respondida lá e ajustar o Desenho na R7.1, no M8, no M17 e no índice. Os registros de lá estão no `workstream/workspace`,
-commit `19a9dda`:
+commit `0b184fb`:
 - [O coordenador se baseia no índice de notas da master](../issues/o-coordenador-le-o-indice-da-master.md), que fechou;
 - [A fila do coordenador vai ao PLN-003](2026-11-03-a-fila-do-coordenador-vai-ao-pln-003.md).
 

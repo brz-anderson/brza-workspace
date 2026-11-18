@@ -47,7 +47,7 @@ Na rodada, Anderson escolheu "Disparar daqui (C4) (Recomendado)" e "Issue no too
 
 O Observado está no C4 do plano. O achado virou
 [O dispatch aceita chamador fora do Studio](../issues/o-dispatch-aceita-chamador-fora-do-studio.md), no commit
-`20d10b2`.
+`e51a17a`.
 
 Na última rodada, Anderson escolheu:
 - "Aprovado (Recomendado)" para o C4, gravado como veredito;

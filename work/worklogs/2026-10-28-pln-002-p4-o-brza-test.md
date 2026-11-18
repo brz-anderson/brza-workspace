@@ -54,7 +54,7 @@ anda depois da branch. O vitest e o install são trocados por falsos, e um `pnpm
 `brza-install`. O `--all` de outra sessão o criou. Esta sessão não rodou o `--all`, para não ligar os scripts em curso
 do P5. O `brza-install` mostra o link `ok`.
 
-O commit é `brza-workspace@51eef6e`.
+O commit é `brza-workspace@9b11a6f`.
 
 ## O que se aprendeu
 

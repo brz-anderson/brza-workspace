@@ -12,7 +12,7 @@ tags:
 
 # O brza tree diz "install: ok" e o worktree sai sem o mobile/node_modules
 
-**Resolvida em 2026-10-31** pelo `f87357d` da `master`, em
+**Resolvida em 2026-10-31** pelo `a85300f` da `master`, em
 [O brza tree instala também o mobile/](../worklogs/2026-10-31-o-brza-tree-instala-o-mobile.md): o `brza tree` instala a
 raiz e o `mobile/`, e imprime `install:  ok (offline: raiz, mobile)`.
 

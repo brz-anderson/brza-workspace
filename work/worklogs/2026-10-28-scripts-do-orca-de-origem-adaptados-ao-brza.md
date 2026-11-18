@@ -24,7 +24,7 @@ Orca, para adaptarmos para o brza". Um subagente Sonnet levantou os dez scripts 
 
 ## O que se fez
 
-Commit `54aefe3`, em `scripts/brza/`:
+Commit `2f6981d`, em `scripts/brza/`:
 - **`brza_runtime.py`:** o módulo comum. Lê o CLI e os dados do app de `ORCA_CLI_COMMAND` e `ORCA_USER_DATA_PATH`, com
   os caminhos do BrzA Studio como padrão, e fornece o `brza(...)` (o CLI com `--json`) e o `rpc(...)` (o socket do
   `orca-runtime.json`).
@@ -42,10 +42,10 @@ Commit `54aefe3`, em `scripts/brza/`:
   `agentSession.send` foi conferida no node contra o `structuredAgentSessionPayloadFingerprint` do `brza-studio`.
 
 O abridor, `scripts/brza/brza-sessions`, é da `brza-workspace-2d`, que o testou contra o runtime e o commitou no
-`711ed55`, com `test_brza_sessions.py`. Os 21 testes de `scripts/brza/tests/` passam.
+`86c6768`, com `test_brza_sessions.py`. Os 21 testes de `scripts/brza/tests/` passam.
 
 Fora do port, no PLN-001: o achado de Anderson no chat ("nesse link, o texto ficou branco e não azul") virou o P53.4,
-commit `b6cece9`.
+commit `43eca00`.
 
 ## A conferência
 

@@ -12,7 +12,7 @@ Pedido da sessão `bb0fd632` do workstream `workspace`, em 2026-11-03: atualizar
 [PLN-003](../../plans/PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md) ("Agente interno que desempata") e o
 `Retomar` com a medição e a rodada de lá. A medição está no worklog
 [O desempatador local do M11: o `tev1:4b` no lugar do Haiku](2026-11-03-o-desempatador-local-do-m11.md), do
-`workspace` (commit `b67fcea`).
+`workspace` (commit `412f467`).
 
 ## O que se fez
 

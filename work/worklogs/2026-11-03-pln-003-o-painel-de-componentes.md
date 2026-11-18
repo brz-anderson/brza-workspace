@@ -36,7 +36,7 @@ Gravadas na [Entrevista](../../plans/PLN-003-o-workflow-nos-dois-clients/PLN-003
   - **Terreno:** o "Não testado" virou ponteiro ao C5.
 - **No workstream `brand`:** a issue
   [O DESIGN.md do BrzA vem do PLN-003](../issues/o-design-md-do-brza-vem-do-pln-003.md), pelo `brza note commit
-  --workstream brand` (`b5ba181`). O worktree estava limpo. O PLN-007 não foi tocado e é citado sem link.
+  --workstream brand` (`f70802d`). O worktree estava limpo. O PLN-007 não foi tocado e é citado sem link.
 - **O `Retomar` do [PLN-003](../../plans/PLN-003-o-workflow-nos-dois-clients/PLN-003-plan.md):** o próximo passo são os
   itens `D`.
 

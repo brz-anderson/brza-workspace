@@ -26,7 +26,7 @@ que executa o D4, no worktree `brza-workflow/.worktrees/pln-012-p2`, branch `fea
   tarefa das outras sessões do workstream paradas há mais de 2 h. Sai 0 sempre.
 - **A linha antiga:** `waits_s` ausente é sem espera, e `machine` ausente é sem CPU (a CPU sai "—").
 - **A fixture da sessão `08e6c812` de 2026-11-03**, tirada do `.measurements/measurements.jsonl` e dos commits de
-  worklog do `workstream/tools-kit` (`74fbe0f` às 22:07:39 e `539b744` às 22:16:03, da abertura do PLN-012; `afaf8c0`
+  worklog do `workstream/tools-kit` (`8274970` às 22:07:39 e `7cacd28` às 22:16:03, da abertura do PLN-012; `fff8b55`
   às 22:32:31, da instalação do grok). Os 3 `task` foram montados à mão na forma do D1. O teste confere o que o P2 pede:
   - a abertura com agente 452 s, Anderson 625 s e pausa 0;
   - o T2 com o grok;
@@ -53,7 +53,7 @@ que executa o D4, no worktree `brza-workflow/.worktrees/pln-012-p2`, branch `fea
 
 - **X2, o segmento passou a `[marco k−1, marco k)`.** O D1 dizia `(marco k−1, marco k]`. A sessão que conduz pediu a
   troca por correio depois do REV-018/A15 do P5: o `--until` leva a hora do começo do primeiro turno da tarefa
-  seguinte, e esse turno tem de ir à seguinte. O D1 já traz o X2 (`tools-kit@fbda802`). O revisor final achou o mesmo
+  seguinte, e esse turno tem de ir à seguinte. O D1 já traz o X2 (`tools-kit@b1ebb0c`). O revisor final achou o mesmo
   (A1). Teste: o turno que começa exatamente no `until`, em ISO e em `HH:MM:00`, vai à tarefa seguinte.
 - **O comando de teste do plano não roda.** `python3 -m unittest tests/hooks/test_summarize_measurements.py` falha no
   `import repo_fixture`, que mora na pasta. A evidência usa

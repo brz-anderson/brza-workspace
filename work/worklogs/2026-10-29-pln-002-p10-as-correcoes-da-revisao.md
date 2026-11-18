@@ -16,7 +16,7 @@ autorização. Posso executar nesta sessão?". O passo corrige o A1 ao A4 e o A6
 
 ## O que se fez
 
-Em `brza-workspace@82ff848`, com um caso que falhou antes para cada achado:
+Em `brza-workspace@46cd486`, com um caso que falhou antes para cada achado:
 - **A1:** o `brza-test` recusa o checkout principal com saída 2, antes do `PRELUDE`, como o `brza-dev`.
 - **A2:** o `brza-tree --rm` pede `--empty` para a branch sem commit próprio; o `--force` fica para o sujo, o não
   mergeado e o órfão, e imprime `descartado:` com cada razão. Um não cobre o outro.
@@ -30,7 +30,7 @@ A suíte foi de 151 a 158 testes, todos `OK`.
 
 ## O que se aprendeu
 
-- **O A3 apareceu antes do conserto.** No commit da revisão (`f77e28c`), o `git pull --rebase` desta sessão recusou
+- **O A3 apareceu antes do conserto.** No commit da revisão (`8abdb9c`), o `git pull --rebase` desta sessão recusou
   pelos arquivos sujos da sessão do PLN-001; o `fetch` mostrou a `origin` parada, e o push foi direto, sem stash.
 
 ## O que ficou

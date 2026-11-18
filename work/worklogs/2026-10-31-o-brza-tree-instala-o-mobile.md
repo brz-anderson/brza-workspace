@@ -37,7 +37,7 @@ e o conserto estão em
 - **A medição, antes da rodada,** num worktree detached de `origin/master` fora do `brza-studio`, removido em seguida:
   - `mobile/`: o install offline passou em 8 s;
   - `cloud/`: o install offline falhou, por falta dos metadados no store.
-- **`f87357d` na `master`:** `fix(brza): o brza tree instala também o mobile/, que tem lockfile próprio`.
+- **`a85300f` na `master`:** `fix(brza): o brza tree instala também o mobile/, que tem lockfile próprio`.
   - O `brza-tree` ganhou o `OWN_LOCKFILE = ('mobile',)` e instala depois da raiz cada pacote dele que tenha
     `pnpm-lock.yaml`.
   - A linha passa a ser `install:  ok (offline: raiz, mobile)`, e a falha num pacote nomeia o diretório onde rodar o

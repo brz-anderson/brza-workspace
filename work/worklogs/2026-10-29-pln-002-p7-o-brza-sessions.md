@@ -34,10 +34,10 @@ em que Anderson desligou a trava de retomada: "Desligar (Recomendado)", com a op
 consultá-la. Levada à rodada aqui, a resposta foi "Tirar a trava do send (Recomendado)". Saíram a saída 3, o `--wake`,
 o `guard` do `--json` e a linha da trava no `list`, e o `resume_guard.py` voltou ao que era. É o X11.
 
-**O código**, em `brza-workspace@9daa020` e `brza-workspace@88d8a3a`:
+**O código**, em `brza-workspace@85e5d4c` e `brza-workspace@f7d5ff3`:
 - `scripts/brza/brza-sessions` ganhou o `list`, o `send` e o `close`; o `open` segue como padrão e aceita o verbo
   explícito. A ajuda traz as saídas e o contrato do `--json`.
-- No `9daa020`, o `resume_guard.py` ganhou o `pending` e o `hold` para o `send`; no `88d8a3a`, voltou ao que era.
+- No `85e5d4c`, o `resume_guard.py` ganhou o `pending` e o `hold` para o `send`; no `f7d5ff3`, voltou ao que era.
 - `python3 -m unittest discover -s scripts/brza/tests` → `Ran 139 tests … OK`; eram 129, e os casos novos falharam
   antes do código. `python3 -m unittest discover -s .claude/hooks/tests` → `OK`.
 

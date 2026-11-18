@@ -401,7 +401,7 @@ também leva em consideração ritmo das contas e o recurso disponível na máqu
 ordem de prioridade; e as notas com `priority`, `blocks` e `deadline` (`work/README.md`, "As propriedades"), que o
 índice da `master` não grava. A rodada foi feita e respondida lá. Aqui ficam as respostas literais e o texto das opções
 escolhidas, como chegaram no pedido da sessão `bb0fd632`; as opções que perderam não foram repassadas. Os registros
-estão no `workstream/workspace`, commit `19a9dda`:
+estão no `workstream/workspace`, commit `0b184fb`:
 [O coordenador se baseia no índice de notas da master](../../work/issues/o-coordenador-le-o-indice-da-master.md) e
 [A fila do coordenador vai ao PLN-003](../../work/worklogs/2026-11-03-a-fila-do-coordenador-vai-ao-pln-003.md).
 
@@ -461,7 +461,7 @@ Respondida em 2026-11-03, no chat do BrzA Studio, na sessão do `tools-kit`.
 ### Rodada 11 — a entrega do `DESIGN.md` ao `brand` (enviada 2026-11-03)
 
 **Apresentado antes:** a R10.2, em texto livre, "vai para o `workstream/brand`"; o worktree do `brand` limpo, no
-`c7c4630`; o PLN-007, da marca, em execução e sem `DESIGN.md`.
+`11947ff`; o PLN-007, da marca, em execução e sem `DESIGN.md`.
 
 Respondida em 2026-11-03, no chat do BrzA Studio, na sessão do `tools-kit`.
 

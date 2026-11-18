@@ -17,7 +17,7 @@ chat": o PNG de 1280 px escondeu um defeito do artboard. Uma grade `1fr 1fr` com
 
 ## O que se fez
 
-- **`0dcc82d` na `master`:** `feat(brza): o brza shot captura em 736 px, a largura do chat`. O `scripts/brza/brza-shot`
+- **`c46bdc1` na `master`:** `feat(brza): o brza shot captura em 736 px, a largura do chat`. O `scripts/brza/brza-shot`
   mudou o padrão do `--width` de 1280 para 736 no `add_argument`, no uso e na ajuda, que agora dizem que é a largura do
   chat.
 - **Os testes:** nenhum dos 13 do `test_brza_shot.py` conferia o padrão; todos passaram de novo.

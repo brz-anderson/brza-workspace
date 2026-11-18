@@ -47,7 +47,7 @@ structured` (chat). Nenhuma caiu e nenhum `fallback` foi usado.
 | :-- | :-- | :-- | :-- |
 | R1, opinião independente | 13:16:58 | 13:21:59 | 3/3. Convergem: visual pelo sync, código do `#38950` fora. Disputas D1 a D4. M1 a M7 conferidos |
 | R2, debate e confiança final | 13:23:10 | 13:25:30 | 3/3. O Prumo mede 0 PRs e vira. A Trava e o Relance votam B sem ler o fato |
-| Proposta v1, revisor e v2 | 13:26 | ~13:35 | Revisor 78. Achados F1 a F5, com F1 (7 PRs do `projeto-externo-claude`) corrigindo o M6 |
+| Proposta v1, revisor e v2 | 13:26 | ~13:35 | Revisor 78. Achados F1 a F5, com F1 (7 PRs de uma conta de agente) corrigindo o M6 |
 | Decisões 2, 3 e 4 e a escolha de C | — | 18:36 | Pausa de ~5 h (X15) |
 | R3 extra, voto informado (Trava e Relance) | 18:37:02 | 18:38:30 | 2/2. Os dois viram para A |
 | Decisão 1 e encerramento | 18:41:00 | 18:42:04 | "1A decidido". Os três `worker_done` aceitos, `autoReleaseAt` ~2 min |
@@ -80,7 +80,7 @@ ao `brza-workflow` (`#38950`) e adotar os cartões de uma linha (`#39658`). A pr
 | M4 | O cartão "Opened PR" é do `#38750`, não do `#39020`. Não está no `HEAD` `8abbde720ce` (Prumo R1, Relance R1, coord.) | [medido] |
 | M5 | `limits.py:22` tem `CEILINGS` com `machine`. Não há leitor de CI no `brza-workflow` (Prumo R1, coord., revisor) | [medido] |
 | M6 | 0 PRs no `brza-studio`, no `brza-workflow` e no `brza-workspace`. Os 100 últimos runs do fork são `schedule=96 workflow_run=4`. O push na `master` não gera run, porque os workflows de `push` filtram `main` (Prumo R2, coord., revisor) | [medido] |
-| M6b | 8 PRs no `orca-projeto-externo` de 24 a 27/10, 7 do `projeto-externo-claude`. O `--author=@me` não os vê (revisor F1, coord.) | [medido] |
+| M6b | 8 PRs num repositório de fora, de 24 a 27/10, 7 de uma conta de agente. O `--author=@me` não os vê (revisor F1, coord.) | [medido] |
 | M7 | `AGENTS.md:73`: "O push vai direto, sem PR" | [lido] |
 | M8 | `worker-stop` fecha o terminal. O `--timeout-ms` é só o prazo de prontidão (Trava, revisor) | [lido] |
 | M9 | 19 a 20 dos 100 últimos runs do fork falharam, todos de `schedule` (revisor, coord.) | [medido] |

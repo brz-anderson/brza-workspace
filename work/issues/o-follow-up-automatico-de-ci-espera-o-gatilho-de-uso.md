@@ -24,8 +24,8 @@ personas: Prumo na R2, Trava e Relance na R3, depois de lerem a taxa de base. O 
 - **0 PRs** em `brz-anderson/brza-studio`, `brza-workflow` e `brza-workspace` (`gh pr list --state all`, 2026-11-09). O
   push vai direto na `master`, sem PR (`AGENTS.md`), e os workflows de `push` do fork filtram `main`. O disparo do
   `#38950` ("PR's checks fail") não teria nenhum evento.
-- **A exceção:** 8 PRs no `anderson-projeto-externo/orca-projeto-externo` de 24/10 a 27/10, **7 do `projeto-externo-claude`** (a conta de agente)
-  (`gh search prs --owner=anderson-projeto-externo --created='>=2026-09-01'`). O evento aparece quando um agente abre PRs. Contar
+- **A exceção:** 8 PRs num repositório de fora, de 24/10 a 27/10, **7 de uma conta de agente**
+  (`gh search prs --owner` nessa conta, `--created='>=2026-09-01'`). O evento aparece quando um agente abre PRs. Contar
   por `--author=@me` não enxerga esses PRs.
 - O `#38950` foi fechado sem merge no upstream. A head real (`ed402736`) tem 163 arquivos e +12.696, e só se lê como
   especificação das regras, não como código a portar.

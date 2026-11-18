@@ -100,7 +100,7 @@ um leitor de `gh` mais uma regra de dedupe. **Risco:** um laço que gasta a cota
 
 O fato novo desta rodada, *medido* às 13h40:
 - `gh pr list --state all` dá **0 PRs** em `brz-anderson/brza-studio`, `brza-workflow` e `brza-workspace`.
-- `gh search prs --author=@me --created=">=2026-09-01"` dá **1 PR** em 70 dias, no `anderson-projeto-externo/orca-projeto-externo`.
+- `gh search prs --author=@me --created=">=2026-09-01"` dá **1 PR** em 70 dias, numa conta e num repositório de fora.
 - `gh run list -R brz-anderson/brza-studio --limit 100` dá 96 runs `schedule` e 4 `workflow_run`. Nenhum run é de `push` ou `pull_request`, embora 34 workflows declarem esses gatilhos.
 - O `AGENTS.md` confirma o fluxo: "O push vai direto, sem PR".
 

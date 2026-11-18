@@ -471,7 +471,7 @@ A primeira reunião pela skill, contra o Studio real, teve três personas (Claud
 `worker-start`. Ela rodou do gate ao encerramento, mas teve 19 desvios e **não conta** para as duas reuniões sem desvio do
 critério de promoção. A lista inteira, com a hora de cada um, está em
 [Reunião CI no chat: a coordenação da reunião de verificação do PLN-017](../../work/worklogs/2026-11-09-reuniao-ci-no-chat-coordenacao.md).
-Correções entregues em `d12ed91` e `db619ac`, com 300 testes e
+Correções entregues em `795fa96` e `24bf3ec`, com 300 testes e
 [REV-023: A revisão final da meeting-runner v2 e os limites antes da promoção](../../work/reviews/REV-023-pln-017-meeting-runner-v2-final.md).
 A matriz X1–X19 com destino e evidência está em
 [PLN-017: a skill `meeting-runner` corrige os 19 desvios da P7 e passa a usar o `brza sessions` v2](../../work/worklogs/2026-11-09-pln-017-meeting-runner-sobre-o-brza-sessions-v2.md).

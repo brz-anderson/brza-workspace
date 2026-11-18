@@ -358,7 +358,7 @@ Respondida em 2026-11-10, 273fc24b-adde-4de7-a0f1-a5849fcac429.
 
 ### Rodada 7 — o aviso, o fallback, o cobre e os pareceres do P11 (enviada 2026-11-10)
 
-> **Apresentado antes:** A revisão do plano no 20dff79 sustentou os quatro pontos. O X3 atribui a classificação aviso × erro à Rodada 5, e a Rodada 5 não tem esse ponto. O roster troca de runtime acima de 55% sem a narração dizer o modelo. Sem cobre:, o --apply marca todos os subpassos pendentes. A evidência das revisões em laço do P11 está em /tmp.
+> **Apresentado antes:** A revisão do plano no 5a0f2e0 sustentou os quatro pontos. O X3 atribui a classificação aviso × erro à Rodada 5, e a Rodada 5 não tem esse ponto. O roster troca de runtime acima de 55% sem a narração dizer o modelo. Sem cobre:, o --apply marca todos os subpassos pendentes. A evidência das revisões em laço do P11 está em /tmp.
 
 Respondida em 2026-11-10, na sessão 01a1c7c8-3571-7120-bb0f-1125dc3e36ea.
 
@@ -523,7 +523,7 @@ Estimado: 6 h · Executado: sem medição desta sessão
 
 Faz-se antes do P9: o aceite manual roda sobre o roster e o `wait` corrigidos.
 
-**Evidência:** `brza-workspace@0797029` · `python3 -I -m unittest discover` nos quatro conjuntos → 56 (kit), 193 (plan-runner), 56 (screen-artboards), 323 (meeting-runner) OK · a `meeting-runner` só mudou em `common.py`, `launch_persona.py`, `panel.py` e `tally.py`, e o `_legacy_measure` traduz as chaves inglesas da medida · subpassos 1 e 3 no `4350325`, com o registro em [O PLN-021: os defeitos do P11.1](../../work/worklogs/2026-11-10-pln-021-p11-1-os-defeitos.md), sem uma 4ª rodada (o limite de três foi o pedido) · seis rodadas de revisão do P11 no [REV-027](../../work/reviews/REV-027-pln-021-p11.md) · `Executado`: sem medição desta sessão · desvios em X9 e proposta em X10
+**Evidência:** `brza-workspace@cc59385` · `python3 -I -m unittest discover` nos quatro conjuntos → 56 (kit), 193 (plan-runner), 56 (screen-artboards), 323 (meeting-runner) OK · a `meeting-runner` só mudou em `common.py`, `launch_persona.py`, `panel.py` e `tally.py`, e o `_legacy_measure` traduz as chaves inglesas da medida · subpassos 1 e 3 no `374df53`, com o registro em [O PLN-021: os defeitos do P11.1](../../work/worklogs/2026-11-10-pln-021-p11-1-os-defeitos.md), sem uma 4ª rodada (o limite de três foi o pedido) · seis rodadas de revisão do P11 no [REV-027](../../work/reviews/REV-027-pln-021-p11.md) · `Executado`: sem medição desta sessão · desvios em X9 e proposta em X10
 
 ### P9 — O aceite manual
 
@@ -614,8 +614,8 @@ Estimado: 0.5 h · Executado: — h
 - 2026-11-10 — Desenho D1–D7 registrado e R4 enviada sem resposta; P1 a P7 executados com as recomendadas, a pedido;
   evals da iteração 1 das duas skills. Travou na R4. [As skills do PLN-021 escritas e os evals da iteração 1](../../work/worklogs/2026-11-10-as-skills-do-pln-021-e-os-evals.md)
 - 2026-11-10 — R4 respondida (Rodada 5, com a R4.6.2 em outra opção), P7 reaberto (X6), P8 feito ([REV-026](../../work/reviews/REV-026-pln-021-p1-a-p7.md)), Rodada 6 e o P11 aberto; o código em inglês subiu à norma. Próximo: o pedido do P11. [O PLN-021: a R4 respondida, o P7 reaberto e a revisão do P8](../../work/worklogs/2026-11-10-pln-021-r4-respondida-e-a-revisao-do-p8.md)
-- 2026-11-10 — P11.1, subpassos 1 e 3, no `4350325` e no `ac36476`, com três rodadas; o worklog saiu na Rodada 8. [O PLN-021: os defeitos do P11.1](../../work/worklogs/2026-11-10-pln-021-p11-1-os-defeitos.md)
-- 2026-11-10 — P11 fechado: subpassos 2 e 4 no `0797029`, três rodadas de revisão. Próximo: o P9, a pedido. [O PLN-021: o código em inglês do P11](../../work/worklogs/2026-11-10-pln-021-codigo-em-ingles.md)
+- 2026-11-10 — P11.1, subpassos 1 e 3, no `374df53` e no `5d5ca35`, com três rodadas; o worklog saiu na Rodada 8. [O PLN-021: os defeitos do P11.1](../../work/worklogs/2026-11-10-pln-021-p11-1-os-defeitos.md)
+- 2026-11-10 — P11 fechado: subpassos 2 e 4 no `cc59385`, três rodadas de revisão. Próximo: o P9, a pedido. [O PLN-021: o código em inglês do P11](../../work/worklogs/2026-11-10-pln-021-codigo-em-ingles.md)
 - 2026-11-11 — Rodada 8, "aplicar agora": os oito achados de texto no plano e no Desenho, antes do P9. [O PLN-021: os oito achados de texto](../../work/worklogs/2026-11-11-pln-021-os-oito-achados-de-texto.md)
 - 2026-11-12 — Parecer da rodada 2 do texto: quatro resíduos aplicados, a CLI do D3, o `verdict`, `level`/`line` e a R6.5 em D4–D6. [O PLN-021: os quatro resíduos do texto](../../work/worklogs/2026-11-12-pln-021-os-quatro-residuos-do-texto.md)
 

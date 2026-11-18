@@ -32,7 +32,7 @@ refs:
 
 1. **Varredura de issues e PRs abertos em `stablyai/orca`:** consultadas 530 issues e PRs abertos nas categorias
    `workflow`, `workspace`, `studio`, `cli`, `skills` e `ferramental` via API do GitHub (`gh api search/issues`).
-2. **Criação de 6 issues priorizadas em `work/issues/`** (commit `d8100ec` em `workstream/playground` e registradas no
+2. **Criação de 6 issues priorizadas em `work/issues/`** (commit `153e443` em `workstream/playground` e registradas no
    `.brza/index.jsonl` da `master`):
    - `priority: high` — [Preservar o dono do painel do Antigravity em subagentes aninhados](../issues/preservar-o-dono-do-painel-do-antigravity-em-subagentes-aninhados.md) (`#37507`, `#37505`)
    - `priority: high` — [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md) (`#35220`, `#36897`, `#19680`)

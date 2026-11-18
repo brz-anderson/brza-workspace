@@ -59,7 +59,7 @@ class RealPlans(unittest.TestCase):
         self.assertTrue(all(p.state == "feito" for p in pl.steps()))
         self.assertEqual(pl.step("P1").estimated_h, 10.5)
         self.assertEqual(pl.step("P1").executed_h, 4.0)
-        self.assertIn("bf06d0a", pl.step("P1").evidence)
+        self.assertIn("85dcda3", pl.step("P1").evidence)
         self.assertIsNone(pl.step("P4a").executed_h)
         self.assertTrue(pl.step("P4a").executed_filled)
         self.assertEqual(len(pl.rounds()), 10)

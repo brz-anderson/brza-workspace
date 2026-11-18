@@ -94,7 +94,7 @@ class Codes(Base):
         self.assertIn("checked-without-evidence", code_list(overview))
 
     def test_evidence_with_commit_command_or_file_line_counts(self):
-        for ev in ("`brza-workspace@bf06d0a`", "`pytest` → 3 OK", "`scripts/x.py:42` muda o que o D pede"):
+        for ev in ("`brza-workspace@85dcda3`", "`pytest` → 3 OK", "`scripts/x.py:42` muda o que o D pede"):
             overview = self.state(plan(step(checks="- [x] **1. A**", exe="1 h", estimate="5", evidence=ev), ROUND1,
                                     rest="0", exe="1"), design=DESIGN)
             self.assertNotIn("checked-without-evidence", code_list(overview), ev)

@@ -65,7 +65,7 @@ pela opção recomendada dele, a linha `janela:`, porque executa a R10.1 (o pain
 ## O que ficou
 
 - [O brza note commit grava o custo da coordenação no worklog de cada persona](../../../tools-kit/work/issues/brza-note-commit-grava-o-custo-da-coordenacao-no-worklog-de-persona.md)
-  — a issue ao `tools-kit` (`edeb58e`), porque o dado gravado continua errado.
+  — a issue ao `tools-kit` (`e89a1ce`), porque o dado gravado continua errado.
 - O painel no `--source marker` do `wait_round.py` não foi feito (modo legado sem Dispatch); quem o usar publica com
   `panel.py publish`.
 

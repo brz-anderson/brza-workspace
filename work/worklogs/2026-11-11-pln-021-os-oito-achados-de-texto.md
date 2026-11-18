@@ -19,7 +19,7 @@ A Rodada 8 do [PLN-021: O plano roda por uma sessão coordenadora, com scripts d
 - **A1.** A Cobertura nomeia o passo e o teste de cada linha. Os C1–C4 estão em `## Casos manuais`, com Observado e Veredito em "—".
 - **A2.** O Desenho cita as rodadas que fecharam cada contrato. Saíram os títulos "Em aberto" e as marcas `[sem lastro, menor]` das escolhas da R5.9.
 - **A5.** O P9 lista os C1–C4, a sonda de permissão do X7 e a prova do `CODEX_MODEL`. O P10 lista o `close_check.py` e a medida pelo `--by-task` (R6.4). Os dois passos não foram executados.
-- **A6.** O worklog do P11.1, que o `ac36476` não tinha: [O PLN-021: os defeitos do P11.1](2026-11-10-pln-021-p11-1-os-defeitos.md).
+- **A6.** O worklog do P11.1, que o `5d5ca35` não tinha: [O PLN-021: os defeitos do P11.1](2026-11-10-pln-021-p11-1-os-defeitos.md).
 - **A7.** A linha `Executa` do P11 diz que a coordenação abriu a sessão, e que o `executor.py` não abriu o P11.
 - **A8.** O Desenho acompanha o código: `wait_brza` devolve `(rc, dict)`, `list_states` recebe `cmd` e `ids`, o `veredito` fica no `executor.py`, o `open` exige `--checkout` ou `--tree`, o molde traz `cobre:`, e o `--apply` sem essa linha não roda e não grava.
 - **A9.** `RE_DATE` em `plan_md.py`, `strip_measurement(text)` e `HERE` no README do kit, e `HERE` no trecho de import do kit no Desenho. O `AQUI` que descreve a `meeting-runner` ficou.

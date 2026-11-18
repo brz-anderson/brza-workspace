@@ -121,7 +121,7 @@ avaliação.
   verde, avaliações, visores e a revisão). **Risco:** espaço em disco; apagar antes da conferência perde a evidência.
   **Estado:** ativo. **Como desfazer:** `rm` dos três links e da pasta do scratch depois de a coordenação fechar a P8.
 
-## Correção posterior: a conferência independente de `d12ed91`
+## Correção posterior: a conferência independente de `795fa96`
 
 A conferência independente da sessão principal (Dispatch `ctx_9c4702bb2c23`) confirmou a dedupe dos eventos, o `failed`
 liberado, o voto por proposta, o subconjunto e a R8/R9, e achou quatro pontos, voltados a esta tarefa no Dispatch
@@ -147,7 +147,7 @@ liberado, o voto por proposta, o subconjunto e a R8/R9, e achou quatro pontos, v
   (`CabecalhoSemClaude`, achado ao conferir o PNG). O `custo_rotulo` do estado e os números não mudaram.
 - **Visto no PNG e fora do escopo:** sem `custos_coordenacao` no `sintese-N.json`, o cartão da coordenação mostra
   "US$ 0 … até —", embora o `synthesis.md` diga que o cartão some. É anterior a esta tarefa; fica como pendência.
-- **Verificação:** as quatro regressões falharam no código de `d12ed91` e passam agora; a suíte foi de 292 a 300 testes
+- **Verificação:** as quatro regressões falharam no código de `795fa96` e passam agora; a suíte foi de 292 a 300 testes
   OK. As sondas da conferência (`b.md` e `b2.md`, os mesmos fatos dentro e fora das crases) e as do revisor rodaram de
   novo: dentro e fora dão o mesmo veredito; o `b.md` do revisor segue 0, e o briefing da P7 segue 1, com o `1.352` na
   linha 22. A reverificação independente deste delta fica com a sessão principal.

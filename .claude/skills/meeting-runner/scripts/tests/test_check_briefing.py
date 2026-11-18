@@ -111,7 +111,7 @@ class NumeroEntreCrases(unittest.TestCase):
 
 
 class NumeroComUnidadeEntreCrases(unittest.TestCase):
-    """A1 da conferência de d12ed91: dentro das crases passava todo número com unidade longa, acento, moeda, razão ou
+    """A1 da conferência de 795fa96: dentro das crases passava todo número com unidade longa, acento, moeda, razão ou
     diff, que fora delas é acusado. O `b2.md` só cobria `` `1.352` `` com a unidade fora da crase."""
 
     FATOS = (("`1.352 commits`", "1.352"), ("`1.352 mudanças`", "1.352"), ("`163 arquivos`", "163"),

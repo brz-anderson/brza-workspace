@@ -14,7 +14,7 @@ refs:
 
 # REV-026: PLN-021 P1 a P7, a entrega do plan-runner coordenado e da screen-artboards
 
-Revisor: `reviewer` (subagente), 2026-11-10, ~00:45 BRT. Alvo: o worktree `playground` em HEAD `21dd29e` mais o diff sem
+Revisor: `reviewer` (subagente), 2026-11-10, ~00:45 BRT. Alvo: o worktree `playground` em HEAD `503eca5` mais o diff sem
 commit do ajuste R4.6.2 (artboard.py às 00:36, plano às 00:32). Isolado, sem corrigir nada.
 
 Contagem: **12 importantes, 6 sugestões, 5 falsos.**
@@ -246,7 +246,7 @@ do `plan-runner` → 151 OK; `plan_state.py PLN-017` → rc 1, com os 2 erros ci
 
 **Por que é falso:** com o `artboard.py` de HEAD, cinco dos testes novos falham.
 
-**Evidência:** numa cópia em scratch com o `artboard.py` de `21dd29e`, a mesma suíte deu `FAILED (failures=2,
+**Evidência:** numa cópia em scratch com o `artboard.py` de `503eca5`, a mesma suíte deu `FAILED (failures=2,
 errors=3)`, em `test_desktop_do_brza_studio_usa_os_tokens_vivos_sem_escopo_de_pacote`,
 `test_scheme_explicito_no_desktop_do_brza_studio_sai_2`, `test_shot_desktop_do_brza_studio_*` e
 `test_promote_desktop_do_brza_studio_com_tema`.
@@ -275,7 +275,7 @@ workstream/playground --stat -- .claude/skills/plan-runner` → 38 arquivos, só
 
 **Por que é falso:** os dois commits existem.
 
-**Evidência:** `git cat-file -e 21dd29e` e `git cat-file -e 1a23a6c` → ok.
+**Evidência:** `git cat-file -e 503eca5` e `git cat-file -e a5c8d36` → ok.
 
 ## Pontos para rodada
 
@@ -300,5 +300,5 @@ com `--pack brza-studio` segue o pacote; o `Executado` de P6 e P7 se mede pelo `
   - `brza shot`, nos três HTML de sonda do scratch.
 - Sondas com o harness `_exec.py`, num scratch fora do repositório: o `parado`/`feito` reaberto, o rc 1 do `wait`, o
   `--tree` antes da recusa, o comando rodado na proposta, o checkout padrão e a batida.
-- `git cat-file -e` de `21dd29e` e `1a23a6c` → ok.
+- `git cat-file -e` de `503eca5` e `a5c8d36` → ok.
 - Nada foi gravado no repositório; o `consult.py --dry-run` não criou `.sessions/pln-021`.

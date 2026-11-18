@@ -44,7 +44,7 @@ pelo `plan-runner` v2. O `plan_state.py` abriu limpo, com a R4 sem resposta e o 
 
 - `~/Projects/brza-workflow/core/AGENTS.md`: o parágrafo "Todo código do ecossistema BrzA é em inglês" (`45e6013`, push em `master`).
 - `~/Projects/brza-studio/AGENTS.md`: a linha em Repo Rules (`049a890a837`, push em `master`).
-- O `brza sync` neste workspace trouxe a norma (`a176ecd`, push) e levou o merge aos workstreams.
+- O `brza sync` neste workspace trouxe a norma (`f1e47f4`, push) e levou o merge aos workstreams.
 
 ## O que ficou aberto
 

@@ -23,7 +23,7 @@ ITEM = re.compile(r"^(\s*)(?:[-*+]|\d+[.)])\s+(.*)$")
 # data)
 NUMERO = re.compile(r"(?<![\w#.:/~-])\d+(?:[.,]\d+)*(?![\w-])|(?<=~)\d+(?:[.,]\d+)*(?![\w-])")
 # entre crases, só sai o que é código: comando, caminho, id, hash ou ref. O resto (`1.352 commits`, `US$ 0,25`,
-# `+19.165/−6.137`, `1352 de 2000`) é fato como fora das crases e passa pelo NUMERO (A1 da conferência de d12ed91).
+# `+19.165/−6.137`, `1352 de 2000`) é fato como fora das crases e passa pelo NUMERO (A1 da conferência de 795fa96).
 COMANDOS = {"brza", "orca", "git", "gh", "grep", "rg", "ls", "wc", "find", "cat", "sed", "awk", "jq", "python3", "python",
             "node", "npm", "pnpm", "curl", "du", "head", "tail", "date", "sqlite3", "claude", "codex", "grok", "agy"}
 SINAL_DE_COMANDO = re.compile(r"\s--?\w|\||\$\(|\s[<>]|\s=|=\S")

@@ -37,7 +37,7 @@ A executora informou a fonte de custo/tokens do Grok. A coordenação leu o `usa
 
 ## Entrega, revisão e P8
 
-Publicados `d12ed91` e `db619ac`: 300 testes, regressões vermelhas antes e revisão final independente em duas passadas. A [REV-023: A revisão final da meeting-runner v2 e os limites antes da promoção](../reviews/REV-023-pln-017-meeting-runner-v2-final.md) guarda os achados A1-A4, correções/documentação e resíduos. O worklog executor registra 26 min de agente (~0,433 h) e US$ 37,41, dos quais US$ 21,61 de subagentes; avaliações têm vazamento da linha de base e não provam ganho causal.
+Publicados `795fa96` e `24bf3ec`: 300 testes, regressões vermelhas antes e revisão final independente em duas passadas. A [REV-023: A revisão final da meeting-runner v2 e os limites antes da promoção](../reviews/REV-023-pln-017-meeting-runner-v2-final.md) guarda os achados A1-A4, correções/documentação e resíduos. O worklog executor registra 26 min de agente (~0,433 h) e US$ 37,41, dos quais US$ 21,61 de subagentes; avaliações têm vazamento da linha de base e não provam ganho causal.
 
 P8 fecha a issue de origem e registra a pendência [A meeting-runner chega ao core depois de duas reuniões sem desvio](../issues/promocao-da-meeting-runner-apos-duas-reunioes-sem-desvio.md). Estado do worker e datas dos eventos no CLI têm destino em [O brza sessions distingue o estado do worker do estado do Dispatch](../issues/estado-do-worker-e-eventos-no-brza-sessions.md). O defeito foi reproduzido pela principal com a função real e a fixture do runtime: `dispatch.status=completed`, `worker.state=succeeded`, retorno `completed`. Nenhuma correção no CLI foi alegada.
 

@@ -40,7 +40,7 @@ e o P6 já commitados.
 **A recusa real:** `scripts/brza/brza-app install`, de dentro do chat, → `recusado: o BrzA Studio.app está aberto (pid
 …)`, saída 2, sem build.
 
-O commit é `brza-workspace@1339793`.
+O commit é `brza-workspace@d92545b`.
 
 **O aviso às sessões.** A pedido de Anderson, o correio foi à `pln-002-p3`, à `pln-002-p4`, à `pln-002-p6` e à
 `brza-workspace-cb`, com o recado dele citado. O P3, o P4 e o P6 já tinham fechado e registrado no plano.
@@ -56,7 +56,7 @@ O commit é `brza-workspace@1339793`.
 `brza-install` e do `brza-run`, nas docstrings do `brza-run` e do `claude-brza` e no `CLAUDE.md:33`. O nome do arquivo,
 do link e o caminho `scripts/brza/brza-install --all` ficam. O `brza install` responde pelo despacho e mostra todo
 link `ok`, e o `brza` está no PATH do zsh de login, onde o ▶ roda o `brza run`. O commit é
-`brza-workspace@e67a3c0`.
+`brza-workspace@cbd40b5`.
 
 ## O que se aprendeu
 

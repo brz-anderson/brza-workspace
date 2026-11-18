@@ -48,7 +48,7 @@ deles escreviam no mesmo checkout; numa corrida do meio, o `test_brza_test.py` d
 o `brza-app`, o `brza-dev` e o `brza-test`, ainda em escrita nas outras sessões. O `brza-install` mostra o `brza-note`
 como `ok`, e os três como `ausente`.
 
-O commit é `brza-workspace@bafce7e`.
+O commit é `brza-workspace@d9469b7`.
 
 ## O que se aprendeu
 

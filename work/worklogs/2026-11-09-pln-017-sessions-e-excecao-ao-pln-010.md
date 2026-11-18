@@ -155,7 +155,7 @@ base `d38e7b4`, não foram corrigidas nesta tarefa; o comando exigido sem `BRZA_
 - **P6:** concluído na emenda do PLN-010; notas, REV-022 e memória são publicados pelo `brza note commit`
   na branch `workstream/tools-kit`, no próprio commit que versiona este registro. O SHA fica no recibo final
   da entrega à coordenação; não se cria uma referência circular ao hash dentro do próprio commit.
-- **Publicação inicial das notas:** `ff8def88423d9c16249cd7b6d3aca710f13e3143`, enviada à
+- **Publicação inicial das notas:** `034d1a512d5a26d5e1c52f286a68d2bc72c479af`, enviada à
   `origin/workstream/tools-kit`; a atualização final deste registro acrescenta o rastro dos artefatos temporários.
   O índice confirmou `REV-022 changed` na `origin/master`, exclusivamente pelo `brza note`.
 - **Revisão:** três rodadas independentes de código, sem bloqueio final; a última lacuna de teste foi corrigida

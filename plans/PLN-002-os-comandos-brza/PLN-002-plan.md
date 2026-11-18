@@ -132,7 +132,7 @@ Estimado: 1,5 h · Executado: 0,2 h
 - [x] **4. Ligar:** `scripts/brza/brza-install --all`, e `brza install` mostra todo link `ok`.
 - [x] **5. Commit** — `feat(brza): o runtime comum e o brza install --all (PLN-002/P1)`.
 
-**Evidência:** `brza-workspace@9e95a2c`, com push na `master`.
+**Evidência:** `brza-workspace@b906310`, com push na `master`.
 - `python3 -m unittest discover -s scripts/brza/tests` → `Ran 33 tests … OK`. Eram 21, que seguem entre eles; o
   `test_brza_runtime.py` traz 10 casos novos, e o `InstallTest` traz 2.
 - `scripts/brza/brza-install --all` ligou o `brza-install`. Pelo link, o `brza-install` mostra `claude-brza`,
@@ -153,7 +153,7 @@ Estimado: 2,5 h · Executado: 0,2 h
   link, e `brza tree --rm pln-002-p2-prova --force`.
 - [x] **4. Ligar e commit** — `brza install --all`; `feat(brza): brza tree (PLN-002/P2)`.
 
-**Evidência:** `brza-workspace@2ac6638`, com push na `master`.
+**Evidência:** `brza-workspace@3dc6cf2`, com push na `master`.
 - `python3 -m unittest discover -s scripts/brza/tests` → `Ran 47 tests … OK`. Eram 33; o `test_brza_tree.py` traz 14,
   num clone de uma `origin` local, com o install trocado por um falso.
 - A corrida real, pelo caminho inteiro: `scripts/brza/brza-tree pln-002-p2-prova` → saída 0 em 10 s, na
@@ -176,7 +176,7 @@ Estimado: 2 h · Executado: 0,2 h
 - [x] **3. Rodar e ver passar**, e o C1 com Anderson.
 - [x] **4. Ligar e commit** — `feat(brza): brza dev (PLN-002/P3)`.
 
-**Evidência:** `brza-workspace@310e12d`, com push na `master`.
+**Evidência:** `brza-workspace@788305d`, com push na `master`.
 - `python3 -m unittest test_brza_runtime test_brza_scripts test_brza_sessions test_brza_tree test_brza_dev`, em
   `scripts/brza/tests` → `Ran 68 tests … OK`. Eram 47; o `test_brza_dev.py` traz 21. O `discover` inteiro falha só nos
   testes do P4 e do P6, que estavam em andamento nas sessões deles.
@@ -200,7 +200,7 @@ Estimado: 2,5 h · Executado: 0,5 h
   anotado no passo.
 - [x] **4. Ligar e commit** — `feat(brza): brza test (PLN-002/P4)`.
 
-**Evidência:** `brza-workspace@51eef6e`, com push na `master`.
+**Evidência:** `brza-workspace@9b11a6f`, com push na `master`.
 - `python3 -m unittest test_brza_runtime test_brza_scripts test_brza_sessions test_brza_tree test_brza_test`, em
   `scripts/brza/tests` → `Ran 61 tests … OK`. Eram 47; o `test_brza_test.py` traz 14, num clone de uma `origin` local,
   com o vitest e o install falsos e um `pnpm` falso no PATH.
@@ -227,7 +227,7 @@ Estimado: 2,5 h · Executado: 0,7 h
 - [x] **6. Commit** — `feat(brza): brza app install (PLN-002/P5)`. O script e o teste subiram nele; a troca dos
   textos, no `docs(brza): brza install e brza run na ajuda e no CLAUDE.md (PLN-002/P5)` (X9).
 
-**Evidência:** `brza-workspace@1339793` (P5.1 ao P5.3) e `brza-workspace@e67a3c0` (P5.5), com push na `master`.
+**Evidência:** `brza-workspace@d92545b` (P5.1 ao P5.3) e `brza-workspace@cbd40b5` (P5.5), com push na `master`.
 - `python3 -m unittest discover -s scripts/brza/tests` → `Ran 111 tests … OK`, com o P3, o P4 e o P6 commitados. O
   `test_brza_app.py` traz 15 casos; sem o `rmtree` antes do `ditto`, ou sem a recusa com o app aberto, um deles falha.
 - `scripts/brza/brza-app install`, de dentro do chat → `recusado: o BrzA Studio.app está aberto (pid …)`, saída 2, sem
@@ -252,7 +252,7 @@ Estimado: 2 h · Executado: 0,4 h
 - [x] **3. Rodar e ver passar**, e o primeiro uso real: o worklog da própria sessão sai do `brza note new`.
 - [x] **4. Ligar e commit** — pelo próprio `brza note commit`. Ver X2.
 
-**Evidência:** `brza-workspace@bafce7e`, com push na `master`, pelo próprio `brza-note commit`.
+**Evidência:** `brza-workspace@d9469b7`, com push na `master`, pelo próprio `brza-note commit`.
 - `python3 -m unittest scripts/brza/tests/test_brza_note.py` → `Ran 14 tests … OK`, num clone de uma
   `origin` local com um checador falso. `python3 -m unittest discover -s scripts/brza/tests` →
   `Ran 111 tests … OK`, contando os testes do P3 ao P5, em escrita no mesmo checkout.
@@ -276,7 +276,7 @@ Estimado: 3 h · Executado: 0,3 h
 - [x] **4. Rodar e ver passar**, e o C3 com Anderson.
 - [x] **5. Commit** — `feat(brza): brza sessions list, send e close (PLN-002/P7)`.
 
-**Evidência:** `brza-workspace@9daa020` e `brza-workspace@88d8a3a`, com push na `master`.
+**Evidência:** `brza-workspace@85e5d4c` e `brza-workspace@f7d5ff3`, com push na `master`.
 - A combinação divergiu da proposta e foi à Rodada 9: o nome vem do `custom-title` do transcript, pelo
   `providerSession.id` do `agentSession.history`. O D7 foi reescrito no lugar; a R10.1 tirou a trava do `send`.
 - `python3 -m unittest discover -s scripts/brza/tests` → `Ran 139 tests … OK`; eram 129. Os casos novos do
@@ -297,7 +297,7 @@ Estimado: 2 h · Executado: 0,4 h
 - [x] **3. Rodar e ver passar**, e o C4 com Anderson.
 - [x] **4. Ligar e commit** — `feat(brza): brza doctor (PLN-002/P8)`.
 
-**Evidência:** `brza-workspace@cc19e75`, com push na `master`.
+**Evidência:** `brza-workspace@a8dd8f2`, com push na `master`.
 - `python3 -m unittest scripts/brza/tests/test_brza_doctor.py` → `Ran 18 tests … OK`; sem o script, falham no
   `run_path`. `env -u TERM_PROGRAM python3 -m unittest discover -s scripts/brza/tests` → `Ran 129 tests … OK`; eram
   111. Sem o `env -u`, os dois testes de saída do `brza-run` falham pelo "Saving session..." do zsh, com o app aberto
@@ -328,7 +328,7 @@ Estimado: 2,5 h · Executado: 0,3 h
   `from=` medido no P9.1.
 - [x] **6. Commit** — `feat(brza): o /rename opcional, o título da aba e o mapa de sessões (PLN-002/P9)`.
 
-**Evidência:** `brza-workspace@95d21cc`, com push na `master`.
+**Evidência:** `brza-workspace@f31bc5c`, com push na `master`.
 - A combinação, contra o app aberto, sem divergência do D7: o `brza agent launch --surface chat` sem `--prompt` abriu
   o chat (`structured`) em 0,8 s; o `agentSession.rename` logo depois deu `applied: true` e trocou o `title` do
   `listAll` na hora; o `providerSession.id` apareceu em 2,8 s, sem prompt. A sessão sem `/rename` entrou no correio
@@ -363,7 +363,7 @@ Estimado: 2,1 h · Executado: 0,3 h
 - [x] **3. Rodar e ver passar** — `env -u TERM_PROGRAM python3 -m unittest discover -s scripts/brza/tests`.
 - [x] **4. Commit** — `fix(brza): as correções da revisão do PLN-002 (PLN-002/P10)`.
 
-**Evidência:** `brza-workspace@82ff848`, com push na `master`.
+**Evidência:** `brza-workspace@46cd486`, com push na `master`.
 - Antes do código, módulo a módulo: `test_brza_test` → `FAILED (failures=1)`; `test_brza_tree` → `FAILED
   (failures=4)`; `test_brza_note` → `FAILED (failures=3)`; `test_brza_app` → a corrida inteira caiu no
   `KeyboardInterrupt` do caso novo do A4 (saída 130). Depois: os quatro → `OK` (15, 15, 18 e 16 casos), e `env -u
@@ -410,10 +410,10 @@ Estimado: 2,1 h · Executado: 0,3 h
   o P5 e o D5.
 - **X9 — O P5 commitou o script antes do C2 e da troca dos textos.** Anderson pediu o reinício do app: "avise as
   sessões pra pararem no primeiro ponto de commit e registrarem no plano, vamos reiniciar". O P5.6 sai em dois
-  commits, o `1339793` e o da troca dos textos. Afeta o P5.
+  commits, o `d92545b` e o da troca dos textos. Afeta o P5.
 - **X11 — O P7 entrou com a trava no `send` e a tirou no mesmo dia.** A R9.3 pôs a recusa e o `--wake`, com o
-  `pending` e o `hold` no `resume_guard.py`, em `9daa020`; a R10.1, depois que a b7 desligou a trava, tirou os dois em
-  `88d8a3a`, e o `resume_guard.py` voltou ao que era. Afeta o P7 e o D7.
+  `pending` e o `hold` no `resume_guard.py`, em `85e5d4c`; a R10.1, depois que a b7 desligou a trava, tirou os dois em
+  `f7d5ff3`, e o `resume_guard.py` voltou ao que era. Afeta o P7 e o D7.
 - **X10 — O `brza doctor` confere também o committer, e o link do `claude-brza` vai na linha do chat.** O D8 cita só o
   `GIT_AUTHOR_IDENT` e os links `brza-*`; o commit leva os dois idents, e o override que aponta para um link ausente
   quebra o chat. O app velho compara com a `origin/master` do último fetch, sem buscar. O contrato não muda. Afeta o
@@ -433,38 +433,38 @@ Estimado: 2,1 h · Executado: 0,3 h
 
 - 2026-10-29 — o Fechamento: a R16, a nota de decisão da R13.4, a `## Documentação` e a issue de origem fechada.
   [O PLN-002 fechado](../../work/worklogs/2026-10-29-pln-002-fechado.md)
-- 2026-10-29 — P10, as correções do A1 ao A4 e do A6, em `brza-workspace@82ff848`. Nada travou; falta o Fechamento.
+- 2026-10-29 — P10, as correções do A1 ao A4 e do A6, em `brza-workspace@46cd486`. Nada travou; falta o Fechamento.
   [O PLN-002/P10: as correções da revisão](../../work/worklogs/2026-10-29-pln-002-p10-as-correcoes-da-revisao.md)
 - 2026-10-29 — a revisão da entrega do P0 ao P9, por um subagente da camada alta: seis achados, a R14 e a R15 com os
   destinos, a R1.4 reaberta pela R14.2, o D2 e o D6 reescritos, o P10 e a issue do A5. O plano volta à execução.
   [A revisão da entrega do PLN-002, do P0 ao P9](../../work/worklogs/2026-10-29-pln-002-revisao-da-entrega.md)
-- 2026-10-29 — P9, o `/rename` opcional, o título da aba e o mapa de sessões, em `brza-workspace@95d21cc`, com o C5
+- 2026-10-29 — P9, o `/rename` opcional, o título da aba e o mapa de sessões, em `brza-workspace@f31bc5c`, com o C5
   passado; o formato do correio medido e levado ao `Retomar` do PLN-001. Nada travou; o plano volta à revisão.
   [O PLN-002/P9: o /rename opcional, o título da aba e o mapa de sessões](../../work/worklogs/2026-10-29-pln-002-p9-o-rename-opcional-e-o-mapa.md)
 - 2026-10-29 — o pedido 8, o `/rename` opcional e o mapa de sessões: a R11 a R13, o D7 reescrito, o P9 e o C5, sem
   código. A R9.1 e a R9.2 reabertas. O P9 espera a autorização de Anderson.
   [O PLN-002, pedido 8: o /rename opcional e o mapa de sessões, desenhados](../../work/worklogs/2026-10-29-pln-002-pedido-8-o-mapa-de-sessoes.md)
-- 2026-10-29 — P7, o `brza sessions list|send|close`, em `brza-workspace@9daa020` e `88d8a3a`, com o C3 passado; a
+- 2026-10-29 — P7, o `brza sessions list|send|close`, em `brza-workspace@85e5d4c` e `f7d5ff3`, com o C3 passado; a
   R5.2 reaberta pela PLN-003/R6.1, a R9 na combinação do D7, a R10 tirando a trava do `send`, X11. Nada travou; o
   plano vai à revisão.
   [O PLN-002/P7: o brza sessions list, send e close](../../work/worklogs/2026-10-29-pln-002-p7-o-brza-sessions.md)
-- 2026-10-28 — P8, o `brza doctor`, em `brza-workspace@cc19e75`, com o C4 passado; X10 no committer e no link do
+- 2026-10-28 — P8, o `brza doctor`, em `brza-workspace@a8dd8f2`, com o C4 passado; X10 no committer e no link do
   `claude-brza`. Nada travou; o plano fica `blocked` no P7.
   [O PLN-002/P8: o brza doctor](../../work/worklogs/2026-10-28-pln-002-p8-o-brza-doctor.md)
-- 2026-10-28 — P5, o `brza app install`, em `brza-workspace@1339793` e `e67a3c0`, com o C2 passado; R8 no `--dmg` e
+- 2026-10-28 — P5, o `brza app install`, em `brza-workspace@d92545b` e `cbd40b5`, com o C2 passado; R8 no `--dmg` e
   na substituição, X7 ao X9. Parou no reinício do app e retomou no C2.
   [O PLN-002/P5: o brza app install](../../work/worklogs/2026-10-28-pln-002-p5-o-brza-app-install.md)
-- 2026-10-28 — P4, o `brza test`, em `brza-workspace@51eef6e`; X5 no preparo do vitest, X6 no baseline por teste.
+- 2026-10-28 — P4, o `brza test`, em `brza-workspace@9b11a6f`; X5 no preparo do vitest, X6 no baseline por teste.
   Nada travou; o `check:changed` segue vermelho pela pendência do import boundaries.
   [O PLN-002/P4: o brza test](../../work/worklogs/2026-10-28-pln-002-p4-o-brza-test.md)
-- 2026-10-28 — P3, o `brza dev`, em `brza-workspace@310e12d`, com o C1 passado; X4 no seed. Nada travou.
+- 2026-10-28 — P3, o `brza dev`, em `brza-workspace@788305d`, com o C1 passado; X4 no seed. Nada travou.
   [O PLN-002/P3: o brza dev](../../work/worklogs/2026-10-28-pln-002-p3-o-brza-dev.md)
-- 2026-10-28 — P6, o `brza note`, em `brza-workspace@bafce7e`; X2 no commit por caminho, X3 no nome da sessão.
+- 2026-10-28 — P6, o `brza note`, em `brza-workspace@d9469b7`; X2 no commit por caminho, X3 no nome da sessão.
   Nada travou.
   [O PLN-002/P6: o brza note](../../work/worklogs/2026-10-28-pln-002-p6-o-brza-note.md)
-- 2026-10-28 — P2, o `brza tree`, em `brza-workspace@2ac6638`. Nada travou.
+- 2026-10-28 — P2, o `brza tree`, em `brza-workspace@3dc6cf2`. Nada travou.
   [O PLN-002/P2: o brza tree](../../work/worklogs/2026-10-28-pln-002-p2-o-brza-tree.md)
-- 2026-10-28 — P1, o runtime comum e o `brza-install --all`, em `brza-workspace@9e95a2c`; X1 no `git`. Nada travou.
+- 2026-10-28 — P1, o runtime comum e o `brza-install --all`, em `brza-workspace@b906310`; X1 no `git`. Nada travou.
   [O PLN-002/P1: o runtime comum e o brza-install --all](../../work/worklogs/2026-10-28-pln-002-p1-o-runtime-comum-e-o-install-all.md)
 - 2026-10-28 — P0, o despacho, feito pela `brza-cli-subcomandos` em `brza-studio@9a81e65c852`. A reinstalação e a troca
   dos textos ficam para o `brza app install`.
@@ -483,7 +483,7 @@ Estimado: 2,1 h · Executado: 0,3 h
 - A ajuda dos scripts de `scripts/brza/` (`brza_runtime.py`, `brza-install`, `brza-tree`, `brza-dev`, `brza-test`,
   `brza-app`, `brza-note`, `brza-sessions`, `brza-doctor`), a docstring que o `--help` mostra — escrita do P1 ao P10;
   é a casa dona do "como usar" (R16.1).
-- `CLAUDE.md`, o `brza install` no lugar do `brza-install` — emendado em P5, em `brza-workspace@e67a3c0`.
+- `CLAUDE.md`, o `brza install` no lugar do `brza-install` — emendado em P5, em `brza-workspace@cbd40b5`.
 
 ## Revisões
 

@@ -12,7 +12,7 @@ tags:
 
 O parecer da entrega do
 [PLN-002: Os passos manuais que se repetem entre sessões viram comandos `brza`](../../plans/PLN-002-os-comandos-brza/PLN-002-plan.md),
-na versão `brza-workspace@0eaf986` e `brza-studio@9a81e65c852`, numa revisão só depois do P9 (R11.2). O revisor foi um
+na versão `brza-workspace@c150810` e `brza-studio@9a81e65c852`, numa revisão só depois do P9 (R11.2). O revisor foi um
 subagente da camada alta, chamado pela sessão `pln-002-sessions-rename`, que não executou os passos; os destinos saíram
 da R14 e da R15, com Anderson.
 
@@ -84,7 +84,7 @@ próprio. Eles caem em "não rodou" (`brza-test:228`), que não entra na saída 
 - `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 25 tests … OK`.
 - `git show --stat` nos 11 commits do workspace e `git -C ~/Projects/brza-studio merge-base --is-ancestor 9a81e65c852
   origin/master` → existem, com o noreply do `brz-anderson`, e estão na `origin/master`.
-- `git diff 9daa020^ 88d8a3a --stat -- .claude/hooks/` → vazio, como o X11 diz.
-- `git diff 9e95a2c^ HEAD -- scripts/brza/brza_runtime.py` → só a docstring removida.
+- `git diff 85e5d4c^ f7d5ff3 --stat -- .claude/hooks/` → vazio, como o X11 diz.
+- `git diff b906310^ HEAD -- scripts/brza/brza_runtime.py` → só a docstring removida.
 - `scripts/brza/brza-sessions list --json`, só leitura → 14 chats em 1,0 s, com `source` `map` e `transcript`.
 - `git check-ignore -v .sessions/sessions.jsonl` → `.gitignore:5`.

@@ -41,7 +41,7 @@ Fiz a conferência com a tarefa do P6.2:
   - o comprimento da cerca.
   O corte por cerca ficou na nova `without_cost_section`. O C2 foi descartado: é a volta deliberada ao corte de antes
   do P7 quando uma cerca não fecha.
-- **Commits:** `brza-workflow@5642ae8`, mesclado em `7afed94`, e o `brza sync` em `brza-workspace@75c88b0`.
+- **Commits:** `brza-workflow@5642ae8`, mesclado em `7afed94`, e o `brza sync` em `brza-workspace@025eb92`.
 - **Suíte com o ambiente da sessão:** 591 testes e 4 falhas, todas de `test_brza_sessions`, que já existiam. Na
   `master` eram 22; as 18 de `note` vinham do mesmo vazamento de ambiente. O log real ficou com 0 linhas `task` e
   `run` de teste. As 3 linhas `run` de teste que restavam saíram, com backup em
@@ -61,7 +61,7 @@ Os quatro foram corrigidos no P8 (`brza-workflow@829527c`), e a segunda rodada a
 
 O checkout principal do `brza-workflow` tinha mudanças sem commit de outra sessão, a do PLN-018, no `task_context`
 do `bin/brza-note`. Por isso o merge foi num worktree destacado, sobre a `origin/master`, com push direto
-(`b2b497d`, X10). O `brza sync` foi em `brza-workspace@ba60bb6`.
+(`b2b497d`, X10). O `brza sync` foi em `brza-workspace@48d5ad9`.
 
 **Aviso à sessão do PLN-018:**
 - a `master` local daquele checkout está 2 commits atrás;

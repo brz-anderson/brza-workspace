@@ -395,7 +395,7 @@ Estimado: 2.0 h · Executado: 1.0 h (0.9 h anteriores e 0.1 h nesta retomada)
   OK, com diferença textual exata registrada. Cobre a sessão cujo único turno está em curso (REV-020, A4).
 
 **Evidência:** `brza-workflow@d38e7b4` · `python3 tests/notes-checker/run.py` → 113 verificações OK · issues em
-`tools-kit@c638345` · código e norma em `brza-workflow@22805fb`, complemento em `4119ec1`; revisões:
+`tools-kit@1d37210` · código e norma em `brza-workflow@22805fb`, complemento em `4119ec1`; revisões:
 [REV-018: A revisão do P5 do PLN-012, o close-task e a norma](../../work/reviews/REV-018-pln-012-p5-o-close-task-e-a-norma.md)
 e [REV-021: O P3 e o ajuste do P5.6 do PLN-012](../../work/reviews/REV-021-pln-012-p3-carimbo-e-medida.md).
 
@@ -406,7 +406,7 @@ Executa a conferência de D1–D6 · executor: sessão que conduz, com Anderson
 Estimado: 1.0 h · Executado: 0.9 h (P6.1 8 min, P6.2 42 min, P6.3 5 min)
 
 - [x] **1. `brza sync`** no workspace, e conferir que o `.brza/core.lock` aponta o merge do P5. — `brza sync` →
-  `brza-workspace@015fe77`, `core.lock` em `brza-workflow@db6bd28`, 5 arquivos escritos e os seis workstreams
+  `brza-workspace@c281650`, `core.lock` em `brza-workflow@db6bd28`, 5 arquivos escritos e os seis workstreams
   mesclados; `git diff --quiet d38e7b4 db6bd28 -- core` → sem diferença, então o core é o do merge do P5.
 - [x] **2. Uma tarefa real** com rodada, subagente e `brza run`, fechada pelo `close-task`: o aviso aparece, e o
   worklog sai com `sessions:` e `## Medida`. — a tarefa da pasta solta na `master` e do conserto do `brza run`
@@ -451,7 +451,7 @@ Estimado: 1.25 h · Executado: 0.8 h
   linhas `run` do teste do `--chat`), A2 (o título dentro de cerca), B1 e B2 (as regras da cerca) e C1 (o comprimento
   da cerca), todos corrigidos aqui; C2 descartado, por ser a volta deliberada ao corte de antes do P7. As 3 linhas
   `run` saíram do log, com backup em `measurements.jsonl.bak-2026-11-09-run`. Commits: `brza-workflow@5642ae8`, com
-  o merge em `7afed94`; `brza sync` → `brza-workspace@75c88b0`, com os seis workstreams mesclados.
+  o merge em `7afed94`; `brza sync` → `brza-workspace@025eb92`, com os seis workstreams mesclados.
 
 **Evidência:** o commit no `brza-workflow` · a lista de falhas antes e depois · o `measurements.jsonl` sem `task` novo
 depois de rodar a suíte numa sessão
@@ -472,7 +472,7 @@ Estimado: 0.5 h · Executado: 0.4 h
 - [x] **3. Rodar e ver passar** — `PYTHONPATH=tests/cli python3 -m unittest test_brza_note test_brza_note_index
   test_brza_scripts` → 210 OK; `tests/hooks` → 348 OK; `tests/notes-checker/run.py` → saída 0.
 - [x] **4. Revisão e commit** — a segunda rodada do REV-024 aprovou. Commits: `brza-workflow@829527c`, com o merge em
-  `b2b497d`, feito num worktree destacado (X10); `brza sync` → `brza-workspace@ba60bb6`, com os seis workstreams
+  `b2b497d`, feito num worktree destacado (X10); `brza sync` → `brza-workspace@48d5ad9`, com os seis workstreams
   mesclados.
 
 **Evidência:** `brza-workflow@b2b497d` · o REV-024
@@ -623,7 +623,7 @@ nas R1 e R2; a diferença é a R3.1 (+1,5 h), a R3.3 (+0,5 h), a R3.4 (+1 h) e a
 - 2026-11-09 — P3, P5.6 e P5.4 concluídos, com merge e push em `brza-workflow@d38e7b4`; 528 testes de CLI OK na
   árvore mesclada. Só o P6 permanece pendente, por pedido de Anderson.
   [PLN-012: o P3 e a integração da medida por tarefa](../../work/worklogs/2026-11-09-pln-012-p3-e-integracao.md)
-- 2026-11-09 — P6.1 feito: `brza sync` → `brza-workspace@015fe77`, lock em `brza-workflow@db6bd28`; a tarefa do P6.2
+- 2026-11-09 — P6.1 feito: `brza sync` → `brza-workspace@c281650`, lock em `brza-workflow@db6bd28`; a tarefa do P6.2
   é a investigação da `master` atrasada.
   [PLN-012: o P6.1, o brza sync que instala a medida por tarefa](../../work/worklogs/2026-11-09-pln-012-p6-1-brza-sync.md)
 - 2026-11-09 — P6.2 feito: a pasta solta apagada, o `brza run` com cada argumento inteiro (`brza-workflow@ffa29fe`,

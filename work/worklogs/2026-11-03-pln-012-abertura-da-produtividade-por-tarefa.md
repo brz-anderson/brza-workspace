@@ -29,7 +29,7 @@ corrido - para irmos afinando o fluxo".
   aparece no `--by-task` e numa linha do worklog (R1.4).
 - **Aberta a issue da lacuna:**
   [Codex e Antigravity ficam sem medida por tarefa](../issues/codex-e-antigravity-sem-medida-por-tarefa.md).
-- **Uma sessão concorrente commitou a abertura**: outra sessão no mesmo worktree, a do `PLN-003`, gravou em `74fbe0f`
+- **Uma sessão concorrente commitou a abertura**: outra sessão no mesmo worktree, a do `PLN-003`, gravou em `8274970`
   a primeira versão do plano e um esqueleto deste worklog, com o e-mail `noreply` do GitHub, e não o do `brz-anderson`.
   Este worklog foi reescrito por cima.
 

@@ -28,7 +28,7 @@ O pedido de Anderson, em 2026-11-06, na sessão `tools-kit-produtividade`: "inic
 - **O aviso do P5 foi para a sessão errada.** Anderson perguntou: "o `P5` terminou e não retornou pra vc, pq?". O P5
   mandou o correio às 19:12:37, e o processo desta sessão só subiu às 19:13:50, no turno seguinte de Anderson
   (`ps -o lstart` do `claude`): o app encerra o processo da sessão parada, e ela some do `ListAgents`. Sem o nome
-  exato na lista, o P5 mandou o aviso a `tools-kit`, outra sessão, que o leu e editou o PLN-012 em `0b65202`, de novo
+  exato na lista, o P5 mandou o aviso a `tools-kit`, outra sessão, que o leu e editou o PLN-012 em `38c0041`, de novo
   com o e-mail `noreply` do GitHub. As edições conferem com o REV-018: o comando de teste do checador, a
   `## Revisões` e a linha do worklog.
 - **O P1, o P2 e o P4 foram avisados** por correio para não mandar o aviso a outra sessão: o worklog de cada um é a
@@ -39,7 +39,7 @@ O pedido de Anderson, em 2026-11-06, na sessão `tools-kit-produtividade`: "inic
   passou a `[marco anterior, marco)` no D1. O P2 foi avisado por correio.
 
 - **Anderson pediu**: "assim que todos os passos retornarem, feche as sessões e limpe as branches que você abriu". Uma
-  espera (`Monitor`) acompanhou o commit dos worklogs: P4 em `4a49d9c`, P1 em `2a28d32` e P2 em `9da2957`. Os três também
+  espera (`Monitor`) acompanhou o commit dos worklogs: P4 em `f452926`, P1 em `e8d6ba2` e P2 em `6dbd542`. Os três também
   avisaram por correio, porque esta sessão estava num turno.
 - **P1, P2 e P4 juntados na integração** (`2602b6d`, `9e82bb1`, `5ecddfe`). O conjunto falhou 43 vezes no
   `test_brza_init`: o P1 e o P2 escreveram "Anderson" no `measure.py` e no resumo, e o `brza init` recusa nome de

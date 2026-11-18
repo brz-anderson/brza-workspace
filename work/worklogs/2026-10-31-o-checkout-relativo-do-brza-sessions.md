@@ -17,7 +17,7 @@ O caso que falhou: rodado em `.worktrees/workspace`,
 
 ## O que se fez
 
-- **`d4c4543` na `master`:**
+- **`718ae49` na `master`:**
   `fix(brza): o --checkout relativo do brza sessions parte da raiz do brza-workspace`.
   - **`scripts/brza/brza-sessions`** ganhou o `workspace_root()` e o `resolve_checkout()`. A raiz é a pasta acima do
     `git --git-common-dir` do cwd quando esse repositório traz o `scripts/brza/brza-sessions`, ou seja, quando é um

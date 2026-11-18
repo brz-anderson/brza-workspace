@@ -262,7 +262,7 @@ descrita no inventário; não é de fluxo), F33 (Tailscale; o mcp escuta só em 
 
 A medição é a do worklog
 [O desempatador local do M11: o `tev1:4b` no lugar do Haiku](../../work/worklogs/2026-11-03-o-desempatador-local-do-m11.md),
-do workstream `workspace` (commit `b67fcea`): a mesma sonda — 10 tarefas em texto livre para a camada e 5 escolhas de
+do workstream `workspace` (commit `412f467`): a mesma sonda — 10 tarefas em texto livre para a camada e 5 escolhas de
 conta por cota, nas duas ordens — no `qwen2.5:7b`, no `qwen2.5:14b`, no `tev1:4b` e no Haiku, num M5 Pro de 24 GB.
 
 | | `qwen2.5:7b` | `qwen2.5:14b` | `tev1:4b` | Haiku |

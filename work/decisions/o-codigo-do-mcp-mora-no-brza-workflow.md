@@ -30,7 +30,7 @@ texto, em 2026-11-06, na sessão do `tools-kit` que fechou o PLN-009: "pode grav
   pararia 22,5 h de MCP. O repositório local `~/Projects/brza` também ficou de fora: ~15 min a mais e uma segunda base
   de testes e de instalação.
 - **O repositório público nasceu depois, só com a CLI:** criado em 2026-11-04 pelo PLN-003/P3
-  (`brza-workspace@8d8042f`), com `brza/`, `Formula/`, `pyproject.toml` e `tests/`, sem o MCP.
+  (`brza-workspace@0e8a534`), com `brza/`, `Formula/`, `pyproject.toml` e `tests/`, sem o MCP.
 
 ## Onde vale
 

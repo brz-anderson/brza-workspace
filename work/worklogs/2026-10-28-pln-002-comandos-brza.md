@@ -64,4 +64,4 @@ desenho listados na issue."
   tinham trabalho ou resposta pendente, e uma era de outro workspace; nenhuma foi fechada.
 - **O risco:** a conversa não se retoma, pela norma. O registro do chat fica no app.
 - **Estado:** fechado; o processo e a aba sumiram.
-- **Como desfazer:** não se desfaz. A tarefa dela estava fechada (`dab8fd9`).
+- **Como desfazer:** não se desfaz. A tarefa dela estava fechada (`39fd959`).

@@ -264,7 +264,7 @@ Respondida em 2026-10-28, na sessão `pln-002-comandos-brza`.
 
 ### Rodada 7 — os pontos sem lastro do desenho e o corte (enviada 2026-10-28)
 
-**Apresentado antes:** o D1 ao D8 e o P1 ao P8, gravados em `a518b8b`, e os pontos que entraram no rascunho sem fonte:
+**Apresentado antes:** o D1 ao D8 e o P1 ao P8, gravados em `3c4eef7`, e os pontos que entraram no rascunho sem fonte:
 `tree --list`, `dev --status`, o `install --all` como flag, o aviso de app velho no `doctor`, o push do `note commit`
 só com `--push` (o `AGENTS.md` manda o push direto na `master`) e a escolha dos testes do `brza test`.
 
@@ -383,7 +383,7 @@ Respondida em 2026-10-29, na sessão `pln-002-p7`.
 **Apresentado antes:** a sessão `brza-workspace-b7` mandou, por correio, a rodada que Anderson respondeu lá em
 2026-10-29: "O que fazer com a trava de retomada (resume_guard no UserPromptSubmit)?" → "Desligar (Recomendado)", cuja
 opção dizia que o `brza sessions send` deixa de consultá-la. A mudança estava na árvore, sem commit nem "decidido", e o
-P7 já tinha a trava no `send` em `brza-workspace@9daa020` (R9.3).
+P7 já tinha a trava no `send` em `brza-workspace@85e5d4c` (R9.3).
 
 Respondida em 2026-10-29, na sessão `pln-002-p7`.
 

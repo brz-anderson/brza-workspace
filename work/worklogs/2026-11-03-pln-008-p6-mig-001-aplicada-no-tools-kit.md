@@ -31,9 +31,9 @@ workstream `workspace` e não foram editados daqui; a consolidação é da `work
    - Links reescritos no `PLN-002-plan.md`, no `PLN-002-interview.md`, na issue do `brza test` e em dois worklogs de
      2026-10-29.
    - `refs:` gravado e `date:` retirado em 29 worklogs.
-   - Commit `bf36704` (`docs(pln-008): migração MIG-001 em tools-kit`, 33 arquivos), com push na
+   - Commit `f918157` (`docs(pln-008): migração MIG-001 em tools-kit`, 33 arquivos), com push na
      `workstream/tools-kit`.
-   - Índice na `master`: `81620e3` (PLN-002, a issue do `brza test` e o REV-001) e `6e10fd0`, a reconstrução, com
+   - Índice na `master`: `04cddd5` (PLN-002, a issue do `brza test` e o REV-001) e `faf2f18`, a reconstrução, com
      50 linhas acrescentadas.
 4. `python3 .claude/skills/notes-checker/scripts/check_notes.py`: 73 arquivos, 0 links não resolvidos, 0 erros,
    0 avisos.
@@ -41,13 +41,13 @@ workstream `workspace` e não foram editados daqui; a consolidação é da `work
 ## Fora do mapa da MIG-001
 
 Três pareceres do PLN-009 nasceram hoje em `work/reviews/` sem o número `REV-NNN`, depois do ensaio, e o script não os
-renomeia: `pln-009-o-desenho-antes-da-execucao.md` (`3d94663`), `pln-009-a-revisao-dos-passos.md` (`8b622f8`) e
-`pln-009-a-revisao-da-entrega.md` (`5ef53de`). O checador não os acusa. Ficaram como estão, e o achado foi à
+renomeia: `pln-009-o-desenho-antes-da-execucao.md` (`ce1ff7f`), `pln-009-a-revisao-dos-passos.md` (`997b454`) e
+`pln-009-a-revisao-da-entrega.md` (`029e30c`). O checador não os acusa. Ficaram como estão, e o achado foi à
 `workspace-a6`, que decide se entram na MIG-001.
 
 ## A segunda passagem, item 3
 
-A `workspace-a6` pediu a passagem depois de o `workspace` aplicar em `361d0d4` (REV-002 a REV-004 renomeados).
+A `workspace-a6` pediu a passagem depois de o `workspace` aplicar em `afc3814` (REV-002 a REV-004 renomeados).
 
 1. `git status --short -- plans work wiki`: vazio, antes da prévia e antes do `--apply`.
 2. Prévia: 0 criados, 0 pareceres, 0 notas com links reescritos, 0 worklogs — igual ao ensaio.

@@ -30,13 +30,13 @@ e não foram editados daqui.
    os worklogs. Caminho de lá virou "o `scripts/…` do workspace de origem"; o e-mail das contas do app virou "a conta
    `admin@` (ou `anderson@`) do workspace de origem"; a decisão de lá citada no PLN-003 e o worktree com o ID de um
    plano de lá viraram descrição pelo assunto; nas citações de Anderson, o nome saiu entre colchetes.
-4. Commit `9a40746`, 16 arquivos, com o `2026-10-31-o-brza-tree-instala-o-mobile.md`, que perdeu o PLN-001 do `refs`
+4. Commit `8e9e2e7`, 16 arquivos, com o `2026-10-31-o-brza-tree-instala-o-mobile.md`, que perdeu o PLN-001 do `refs`
    pelo extrator novo. Índice na `master`: as duas issues `changed`, com o caminho novo e o ID antigo.
-5. Commit `ffc0cf7`: o `refs` de dois worklogs voltou à identidade antiga das issues.
+5. Commit `1d88bda`: o `refs` de dois worklogs voltou à identidade antiga das issues.
 
 ## O que se aprendeu
 
-- **Renomear issue e recalcular o `refs` no mesmo commit troca a identidade.** No `9a40746`, o `brza note commit`
+- **Renomear issue e recalcular o `refs` no mesmo commit troca a identidade.** No `8e9e2e7`, o `brza note commit`
   gravou no `refs` o slug novo das duas issues, porque o índice ainda não tinha o caminho novo e o `git log --follow`
   ainda não via o rename; o checador aceitou o slug novo pelo mesmo motivo. Depois do commit, o índice passou a mapear o
   caminho novo para o ID antigo, e o checador acusou `ref-not-found`. A linha do `refs` se corrige à mão e se recomita.
@@ -46,7 +46,7 @@ e não foram editados daqui.
 
 Dois links para notas de outros workstreams ficaram da primeira passagem, porque o destino novo ainda não existia na
 branch dona (`git ls-tree` na `origin`). A `workspace-a6` pediu a troca depois do push do `studio` e do `workspace`
-(`835f023`), e o caminho e o rótulo vieram do H1 de lá (`git show origin/workstream/<dono>:<caminho> | grep -m1 '^# '`):
+(`7ebaeb5`), e o caminho e o rótulo vieram do H1 de lá (`git show origin/workstream/<dono>:<caminho> | grep -m1 '^# '`):
 - no `PLN-002-interview.md`, o link para o worklog do ▶ e do ⤢, no `studio`, quebrado desde o push de lá;
 - na issue das skills de documento, o link para o worklog do porte das skills, no `workspace`.
 

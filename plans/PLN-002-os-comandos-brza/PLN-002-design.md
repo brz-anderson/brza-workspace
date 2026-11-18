@@ -317,7 +317,7 @@ O `source` e o `opened` são novos (R12.2); o resto é o contrato do P7, sem mud
 
 - **Descartada — achar pelo título da aba.** O título é o nome do app, do `agentSession.rename`, e não o do `/rename`; e
   o título com espaço e dois-pontos não serve de chave (R11.4).
-- **Descartada — a trava no `send` (R9.3).** Entrou em `brza-workspace@9daa020` e saiu em `88d8a3a`, com a trava
+- **Descartada — a trava no `send` (R9.3).** Entrou em `brza-workspace@85e5d4c` e saiu em `f7d5ff3`, com a trava
   desligada (R10.1).
 - **Descartada — o mapa em JSON, um objeto por nome (R12.1).** O JSONL só de acréscimo guarda o histórico.
 - **Descartada — o mapa no `userData` do app, lido pelo P64 (R12.4).** O dev build teria outro mapa, e o app genérico

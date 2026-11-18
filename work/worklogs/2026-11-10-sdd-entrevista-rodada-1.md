@@ -16,7 +16,7 @@ Abertura do [PLN-022: O trabalho do workspace segue Spec Driven Development](../
 ## O que se fez
 
 - Leu a norma e os bloqueios em vigor (`PLN-014` e `PLN-011`, sem relação com SDD). Não havia nota sobre SDD.
-- Levantou o SDD do `projeto-externo`: a regra é `SPEC.md` na raiz da feature ou do pacote, mas só há 3 `spec.md` em `features/`, ainda fora da norma de autoria. Nenhuma lib de `packages/` tem spec.
+- Levantou um SDD já em uso: a regra é `SPEC.md` na raiz da feature ou do pacote, mas as specs existentes ainda estão fora da norma de autoria. Biblioteca de pacote não tem spec.
 - Abriu o PLN-022 e gravou a rodada 1.
 
 ## O que se decidiu

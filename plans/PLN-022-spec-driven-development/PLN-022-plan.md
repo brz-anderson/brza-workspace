@@ -18,7 +18,7 @@ owner: Anderson
 
 - **Origem:** pedido livre, na sessão `sdd-process` de 2026-11-10
 
-> "Implementar o processo Spec Driven Development (SDD) neste workspace." Referência de Anderson: no outro projeto, o `projeto-externo` é o único que chegou a implementar o SDD, e a `SPEC.md` fica na raiz da feature ou do pacote, e não no plano.
+> "Implementar o processo Spec Driven Development (SDD) neste workspace." A `SPEC.md` fica na raiz da feature ou do pacote, e não no plano.
 
 ### Cobertura
 
@@ -27,14 +27,14 @@ A preencher depois da rodada 3.
 ### Fora de escopo
 
 - **A migração das specs que já existem em outros repositórios.** Entra quando um repositório pedir (R2.3).
-- **A sincronização visual, a 4ª etapa do projeto-externo.** Só vale para app com design system de tokens; entra quando o `brza-studio` adotar um (R2.3).
+- **A sincronização visual, a 4ª etapa do processo.** Só vale para app com design system de tokens; entra quando o `brza-studio` adotar um (R2.3).
 - **A autoria e a revisão por seção** (`Autoria`, `Revisor`, `Revisado`). Fica de fora pela R1.2.
 
 ## Entrevista
 
 ### Rodada 1 — onde mora o SDD e quanto dele entra (enviada e respondida 2026-11-10, sessão `sdd-process`)
 
-**Apresentado antes:** não há plano nem nota sobre SDD no acervo. O levantamento do SDD do `projeto-externo` mostrou: a regra é `SPEC.md` na raiz da feature ou do pacote (`CONSTITUTION.md` §0), mas só existem 3 `spec.md` em `features/`, ainda fora da norma de autoria (ADR-015, MIG-015 pendente); nenhuma lib de `packages/` tem spec. O processo tem quatro etapas (especificação, contratos, implementação, sincronização visual), gate de PR e a skill `spec-writer` com a operação Conferir. O card é a fonte do requisito, e a spec o referencia sem transcrever. A recomendação inicial, `PLN-NNN-spec.md` na pasta do plano, caiu: a spec presa ao plano morre com ele.
+**Apresentado antes:** não há plano nem nota sobre SDD no acervo. O levantamento de um processo já em uso mostrou: a regra, numa constituição do projeto, é `SPEC.md` na raiz da feature ou do pacote, mas as specs que existem ainda estão fora da norma de autoria; há ADRs e uma migração pendente, e biblioteca de pacote não tem spec. O processo tem quatro etapas (especificação, contratos, implementação, sincronização visual), um gate de PR e uma skill de escrita de spec com a operação Conferir. O card é a fonte do requisito, e a spec o referencia sem transcrever. A recomendação inicial, `PLN-NNN-spec.md` na pasta do plano, caiu: a spec presa ao plano morre com ele.
 
 1. **R1.1 — Onde a spec mora e o que ela especifica.**
    - A spec mora junto do que especifica, no repositório dono; o plano a cita pelo ID — custo: o processo se espalha por 2 ou 3 repositórios e o `notes-checker` precisa achar a spec fora de `plans/`; se paga: na primeira revisão depois que a coisa muda, porque a spec não morre com o plano.
@@ -43,7 +43,7 @@ A preencher depois da rodada 3.
 
    **Decidido — a spec mora junto do que especifica, no repositório dono**, e o plano a cita pelo ID. Resposta: "1.1.1".
 
-2. **R1.2 — Quanto da maquinaria do projeto-externo entra** (múltipla).
+2. **R1.2 — Quanto da maquinaria do processo entra** (múltipla).
    - Só a ordem das etapas e o gate — custo: um parágrafo de norma e uma checagem no checador; se paga: no primeiro plano de código.
    - Autoria e revisão por seção — custo: alto, e o reset de `Revisado` depende de disciplina; se paga: nunca, com Anderson como único autor e revisor.
    - Uma skill `spec-writer` — custo: escrever e manter a skill; se paga: depois da primeira spec feita à mão.
@@ -72,7 +72,7 @@ A preencher depois da rodada 3.
 
    **Decidido — a skill `spec-writer`, como piloto.** Resposta: "restante recomendado".
 
-3. **R2.3 — Fora de escopo agora** (múltipla): a migração das specs de outros repositórios; a sincronização visual (4ª etapa do projeto-externo).
+3. **R2.3 — Fora de escopo agora** (múltipla): a migração das specs de outros repositórios; a sincronização visual (4ª etapa do processo).
 
    **Decidido — os dois ficam de fora**, com a autoria por seção da R1.2. Resposta: "restante recomendado".
 

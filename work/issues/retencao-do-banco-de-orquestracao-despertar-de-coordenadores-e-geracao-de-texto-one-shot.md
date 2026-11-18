@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43550, #43467, #43016, #42839 e as issues #43618, #43039 trazem expurgo paginado de Runs concluídas sem travar main thread, rejeição de worker_done e reconciliação de reservas.
+description: Os PRs #43953, #43550, #43467 e as issues #43957, #43925, #43875, #43874, #43869 trazem liberação de terminais de workers encerrados, deep links orca:// e receitas de resume.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,9 +14,15 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43550`](https://github.com/stablyai/orca/pull/43550),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43953`](https://github.com/stablyai/orca/pull/43953),
+[`stablyai/orca#43550`](https://github.com/stablyai/orca/pull/43550),
 [`stablyai/orca#43467`](https://github.com/stablyai/orca/pull/43467) (resolve Issue [`#43039`](https://github.com/stablyai/orca/issues/43039)),
-além da issue [`stablyai/orca#43618`](https://github.com/stablyai/orca/issues/43618),
+além das issues [`stablyai/orca#43957`](https://github.com/stablyai/orca/issues/43957),
+[`stablyai/orca#43925`](https://github.com/stablyai/orca/issues/43925),
+[`stablyai/orca#43875`](https://github.com/stablyai/orca/issues/43875),
+[`stablyai/orca#43874`](https://github.com/stablyai/orca/issues/43874),
+[`stablyai/orca#43869`](https://github.com/stablyai/orca/issues/43869),
+[`stablyai/orca#43618`](https://github.com/stablyai/orca/issues/43618),
 [`stablyai/orca#43016`](https://github.com/stablyai/orca/pull/43016),
 [`stablyai/orca#42839`](https://github.com/stablyai/orca/pull/42839) (resolve STA-15101),
 [`stablyai/orca#42747`](https://github.com/stablyai/orca/pull/42747) (resolve Issue [`#42732`](https://github.com/stablyai/orca/issues/42732)),
@@ -97,6 +103,18 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Workers supervisionados disparados em servidores Orca conectados (`worker-start --on <server>`) tinham suas mensagens de conclusão `worker_done` recusadas pelo coordenador sob pretexto de despacho não reconhecido, impedindo a liquidação automática do despacho.
 23. **Reserva de inicialização estruturada de Codex retida indefinidamente (`#43467`, resolve `#43039`):**
     - Quando um worker estruturado era abortado ou liberado precocemente via `worker-release`, a reserva de recursos alocada para o início do Codex ficava órfã e bloqueava despachos subsequentes.
+24. **Terminais de workers retidos após prova de saída (`#43953`):**
+    - Quando um worker recebia ordem de parada (`worker-stop`), o recurso de terminal PTY não era liberado mesmo após o encerramento comprovado do processo, pois a rotina `settleWorkerStop` falhava em desalocar o handle de terminal associado.
+25. **Perda de receita de inicialização ao retomar worker finalizado (`#43875`):**
+    - A receita de inicialização (comando, argumentos e variáveis de ambiente) gravada pelo Orca no início de um worker era apagada assim que o worker finalizava. Ao reativar o worker via `orchestration send`, o ambiente perdia o contexto de execução original.
+26. **Omissão do ID de sessão do provedor (Claude Code) vinculado ao worker (`#43957`):**
+    - O comando `worker-read --source transcript` retornava transcrições vinculadas, mas a API e a CLI de orquestração não expunham o session ID nativo do provedor (`providerSessionId`), impedindo a correlação direta de logs e ferramentas externas.
+27. **Impossibilidade de recriar terminal substituto condicionalmente para um Run ativo (`#43925`):**
+    - Quando o terminal de um coordenador sofria encerramento inesperado em seu worktree, não havia comando ou condição suportada para criar um terminal de substituição mantendo o mesmo identificador de Run.
+28. **Ausência de deep link `orca://` para abas de chat e mensagens de orquestração (`#43874`):**
+    - Ferramentas externas, scripts de automação e notificações não tinham esquema de URI (`orca://chat/...`) para focar diretamente a aba de chat ou abrir o thread de uma mensagem de orquestração entregue.
+29. **Rejeição de `worker_done` de workers rodando em host WSL (`#43869`):**
+    - Workers supervisionados disparados com `--on <WSL host>` tinham suas mensagens de finalização `worker_done` rejeitadas com erro de despacho desconhecido ("unknown dispatch") pelo coordenador rodando no host principal.
 
 ## O que o upstream implementa
 
@@ -148,9 +166,23 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
   - Aposenta execuções antigas em lotes paginados no SQLite, evitando que a limpeza de histórico volumoso cause stalls no loop de eventos principal.
 - **Reconciliação de reservas estruturadas órfãs em `worker-release` (`#43467`, resolve `#43039`):**
   - Libera automaticamente reservas de início estruturado pendentes quando o worker é dispensado prematuramente.
+- **Liberação de terminais de workers após saída comprovada (`#43953`):**
+  - Executa a liberação do terminal associado em `settleWorkerStop` imediatamente após comprovar a saída do processo PTY, eliminando o vazamento de recursos de terminal de workers encerrados.
+- **Preservação de receitas de launch na retomada de workers (`#43875`):**
+  - Mantém duravelmente o registro de comando, argumentos e variáveis de ambiente originais mesmo após o término do worker, permitindo que retomadas via `orchestration send` restaurem a receita com fidelidade.
+- **Exposição de `providerSessionId` de workers de orquestração (`#43957`):**
+  - Expõe o identificador nativo de sessão do provedor (`providerSessionId`, ex.: sessão Claude Code) nos metadados retornados pela CLI e RPC de orquestração.
+- **Deep links `orca://` para abas de chat e mensagens entregues (`#43874`):**
+  - Implementa suporte ao esquema de protocolo `orca://chat/<workspace>/<sessionId>` e `orca://orchestration/message/<messageId>` para navegação direta externa.
 
 ## O que fazer
 
+- Desalocar recursos de terminal de workers imediatamente após comprovação de saída em `settleWorkerStop` (`#43953`).
+- Preservar receitas de lançamento de workers para reativações via `orchestration send` (`#43875`).
+- Expor `providerSessionId` nos metadados de workers de orquestração (`#43957`).
+- Suportar recriação condicional de terminal substituto para Run ativo (`#43925`).
+- Adotar deep links `orca://` para foco em abas de chat e mensagens de orquestração (`#43874`).
+- Aceitar e liquidar `worker_done` emitidos por workers em host WSL (`#43869`).
 - Implementar expurgo paginado de Runs resolvidos no banco de orquestração para eliminar stalls na thread principal (`#43550`).
 - Aceitar e liquidar corretamente mensagens `worker_done` oriundas de workers rodando em servidores conectados (`#43618`).
 - Reconciliar e liberar reservas estruturadas de inicialização órfãs ao executar `worker-release` (`#43467`, resolve `#43039`).

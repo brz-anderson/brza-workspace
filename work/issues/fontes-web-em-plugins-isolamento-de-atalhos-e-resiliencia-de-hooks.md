@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43569, #43604, #43389, #39416 e as issues #42938, #43552 trazem pilha de fontes fallback, preferências portáteis em settings.json e layout Mermaid ELK.
+description: Os PRs #43916, #43877, #43876, #43569, #43604 trazem layouts Mermaid ELK empacotados, confiança de hooks no Windows e aviso na substituição de link CLI.
 scope:
   - brza-studio
   - workspace
@@ -13,9 +13,11 @@ tags:
 
 # Fontes web em plugins, isolamento de atalhos e resiliência de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43569`](https://github.com/stablyai/orca/pull/43569) (resolve Issue [`#42938`](https://github.com/stablyai/orca/issues/42938)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43916`](https://github.com/stablyai/orca/pull/43916) (resolve Issue [`#43552`](https://github.com/stablyai/orca/issues/43552)),
+[`stablyai/orca#43877`](https://github.com/stablyai/orca/pull/43877),
+[`stablyai/orca#43876`](https://github.com/stablyai/orca/pull/43876),
+[`stablyai/orca#43569`](https://github.com/stablyai/orca/pull/43569) (resolve Issue [`#42938`](https://github.com/stablyai/orca/issues/42938)),
 [`stablyai/orca#43604`](https://github.com/stablyai/orca/pull/43604),
-além da issue [`stablyai/orca#43552`](https://github.com/stablyai/orca/issues/43552),
 [`stablyai/orca#43389`](https://github.com/stablyai/orca/pull/43389) (resolve Issue [`#43379`](https://github.com/stablyai/orca/issues/43379)),
 [`stablyai/orca#39416`](https://github.com/stablyai/orca/pull/39416),
 [`stablyai/orca#39413`](https://github.com/stablyai/orca/pull/39413),
@@ -56,6 +58,10 @@ além da issue [`stablyai/orca#43552`](https://github.com/stablyai/orca/issues/4
    Configurações eram armazenadas em registros de estado do Electron/Chromium, impedindo que desenvolvedores sincronizassem suas preferências de temas, fontes e atalhos entre múltiplas máquinas via repositórios de dotfiles.
 9. **Cruzamento excessivo de conexões em diagramas Mermaid no Markdown preview (`#43552`):**
    Diagramas de arquitetura, fluxo e entidades relacionais com mais de 15 nós renderizavam de forma emaranhada no preview sob o motor padrão Dagre, sem que o engine alternativo ELK (`layout: elk`) estivesse registrado.
+10. **Re-pedidos contínuos de aprovação de hooks do Codex no Windows por grafia de separador (`#43877`):**
+    No Windows, o Orca gravava as chaves de confiança de hooks com ambas as grafias de separador (barra invertida `\` e barra normal `/`). O Codex consultava apenas a grafia com barra invertida em `hooks.json`, fazendo com que hooks já aprovados fossem solicitados novamente a cada novo lançamento de agente.
+11. **Substituição silenciosa de links simbólicos CLI entre instâncias do Orca (`#43876`):**
+    Ao executar `orca register` ou clicar em "Install CLI", se outra instalação ou versão em desenvolvimento do app já tivesse registrado o link `/usr/local/bin/orca`, a substituição ocorria sem aviso de qual aplicação anterior detinha o vínculo.
 
 ## O que o upstream implementa
 
@@ -86,14 +92,20 @@ além da issue [`stablyai/orca#43552`](https://github.com/stablyai/orca/issues/4
   - Passa a interpretar a configuração de fonte como uma pilha ordenada com fallbacks sucessivos, viabilizando fontes regionais e PUA sem perder compatibilidade com Nerd Fonts.
 - **Preferências portáteis em `~/.orca/settings.json` (`#43604`):**
   - Implementa leitura no arranque e persistência bidirecional contínua de configurações em arquivo plano JSON portátil, simplificando a replicação de ambiente via dotfiles (chezmoi, nix, stow).
-- **Suporte ao motor de layout ELK para diagramas Mermaid (`#43552`):**
-  - Registra o engine ELK no renderizador de Markdown preview para diagramas com diretiva `layout: elk`, otimizando a legibilidade de grafos e diagramas ER extensos.
+- **Suporte ao motor de layout ELK para diagramas Mermaid (`#43916`, resolve `#43552`):**
+  - Empacota o Mermaid 11.4+ e carrega assincronamente o pacote `@mermaid-js/layout-elk` para renderizar diagramas complexos no preview com a diretiva `layout: elk`, reduzindo cruzamento de arestas e melhorando a hierarquia visual.
+- **Normalização de chaves de hooks do Codex no Windows (`#43877`):**
+  - Ajusta `readHookTrustTables` para permitir que a grafia com barra invertida (`\`) lida pelo Codex defina os estados `trusted_hash` e `enabled` sobre variantes com barra normal, eliminando pedidos redundantes de re-aprovação.
+- **Aviso na substituição de links simbólicos CLI (`#43876`):**
+  - Notifica claramente o desenvolvedor ao executar o registro da CLI (`orca register`) se o link apontava anteriormente para outra instalação ou compilação de desenvolvimento do aplicativo.
 
 ## O que fazer
 
 - Suportar pilha ordenada de fontes fallback separadas por vírgula no Editor e Terminal (`#43569`, resolve `#42938`).
 - Adotar leitura e escrita de preferências portáteis em `~/.orca/settings.json` para facilitar gestão via dotfiles (`#43604`).
-- Habilitar o motor de layout Mermaid ELK no preview de Markdown para diagramas complexos (`#43552`).
+- Habilitar o motor de layout Mermaid ELK no preview de Markdown para diagramas complexos (`#43916`, resolve `#43552`).
+- Normalizar chaves de confiança de hooks do Codex no Windows para evitar re-aprovações redundantes (`#43877`).
+- Notificar substituição de symlinks na instalação da CLI (`#43876`).
 - Aplicar o ambiente de `agent.launch.before` dos plugins após as variáveis de ambiente da conta do host (`#43389`, resolve `#43379`).
 - Incorporar o suporte a fontes tipográficas em plugins (`#39416`) no `brza-studio`.
 - Adotar o rastreamento por `hydrationId` em formulários declarativos de plugins (`#39413`).

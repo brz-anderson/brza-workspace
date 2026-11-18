@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43488, #43493, #43351, #43319 e as issues #43487, #43443, #43373 trazem nome do worktree no explorer, botões de novo arquivo/pasta e drive letters no WSL.
+description: Os PRs #43927, #43488, #43493 e as issues #43928, #43487, #43443 trazem 'New File...' no menu da barra de abas, ocultação de Done na sidebar e melhorias no explorer.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,9 @@ tags:
 
 # Seletor de branches na status bar e suporte a workspaces em pastas multirrepositório
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43488`](https://github.com/stablyai/orca/pull/43488) (resolve Issue [`#43487`](https://github.com/stablyai/orca/issues/43487)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43927`](https://github.com/stablyai/orca/pull/43927),
+além da issue [`stablyai/orca#43928`](https://github.com/stablyai/orca/issues/43928),
+[`stablyai/orca#43488`](https://github.com/stablyai/orca/pull/43488) (resolve Issue [`#43487`](https://github.com/stablyai/orca/issues/43487)),
 [`stablyai/orca#43493`](https://github.com/stablyai/orca/pull/43493),
 além da issue [`stablyai/orca#43443`](https://github.com/stablyai/orca/issues/43443),
 [`stablyai/orca#43351`](https://github.com/stablyai/orca/pull/43351) (resolve Issue [`#43373`](https://github.com/stablyai/orca/issues/43373)),
@@ -102,9 +104,17 @@ além das issues [`stablyai/orca#43384`](https://github.com/stablyai/orca/issues
     A barra de ferramentas do explorador de arquivos não continha botões diretos "New File" e "New Folder", forçando o uso repetitivo do menu de contexto.
 18. **Falha ao mover projetos sob letras de drive mapeadas no WSL (`#43493`):**
     Projetos salvos em caminhos mapeados por letras de drive no subsistema Linux falhavam ao serem movidos ou organizados por causa de discrepâncias na normalização de caminhos.
+19. **Atrito ao criar arquivos a partir da barra de abas (`#43927`):**
+    - O menu de adição rápida (`+`) localizado na barra de abas do editor oferecia apenas criação de chats ou abertura de terminais, forçando o desenvolvedor a alternar para o explorador de arquivos ou usar atalhos globais sempre que desejava criar um novo arquivo em branco.
+20. **Poluição visual da barra lateral por workspaces concluídos mantidos no quadro (`#43928`):**
+    - Ao marcar um workspace como concluído ("Done") no Workspace Board para fins de rastreamento e arquivo, o item continuava listado na barra lateral, poluindo a visualização de workspaces em andamento quando o desenvolvedor desejava manter a sidebar focada apenas em tarefas ativas.
 
 ## O que o upstream implementa e corrige
 
+- **Ação "New File..." diretamente no menu `+` da barra de abas (`#43927`):**
+  - Adiciona o item "New File..." diretamente ao menu suspenso do botão `+` na barra de abas (`feat(desktop): add 'New File...' to '+' menu on tab bar`), permitindo abrir imediatamente um novo buffer de arquivo vinculado ao diretório de trabalho corrente sem passar pelo File Explorer.
+- **Opção para ocultar workspaces concluídos (Done) na barra lateral (`#43928`):**
+  - Propõe configuração para esconder automaticamente workspaces em estado "Done" da lista da barra lateral, preservando-os acessíveis no quadro de tarefas (Workspace Board) e no histórico de projetos.
 - **Nome do worktree no cabeçalho do File Explorer (`#43488`, resolve `#43487`):**
   - Exibe o nome do worktree corrente no topo do painel do explorador de arquivos, facilitando a identificação imediata do contexto de branch ativo.
 - **Botões "New File" e "New Folder" na barra do File Explorer (`#43443`):**
@@ -191,3 +201,5 @@ além das issues [`stablyai/orca#43384`](https://github.com/stablyai/orca/issues
 19. Exibir o nome do worktree ativo no cabeçalho do File Explorer (`#43488`, resolve `#43487`).
 20. Adicionar botões de "New File" e "New Folder" na toolbar do File Explorer (`#43443`).
 21. Suportar movimentação de projetos hospedados sob unidades mapeadas de WSL (`#43493`).
+22. Incluir a opção "New File..." no menu suspenso `+` da barra de abas para criação rápida de arquivos (`#43927`).
+23. Disponibilizar toggle para ocultar workspaces no status Done da barra lateral mantendo visibilidade no Workspace Board (`#43928`).

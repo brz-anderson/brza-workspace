@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43587, #43563, #43557, #43551, #43532, #43525 e as issues #43539, #43523 trazem retenção de descritores no polling de transcripts, leases de chat e limites de heap.
+description: Os PRs #43918, #43587, #43563, #43557 e as issues #43539, #43523 trazem retomada de chats cortados por crash/restart, retenção de descritores no polling e leases de chat.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,8 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43587`](https://github.com/stablyai/orca/pull/43587) (resolve Issue [`#43539`](https://github.com/stablyai/orca/issues/43539)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43918`](https://github.com/stablyai/orca/pull/43918),
+[`stablyai/orca#43587`](https://github.com/stablyai/orca/pull/43587) (resolve Issue [`#43539`](https://github.com/stablyai/orca/issues/43539)),
 [`stablyai/orca#43563`](https://github.com/stablyai/orca/pull/43563),
 [`stablyai/orca#43557`](https://github.com/stablyai/orca/pull/43557),
 [`stablyai/orca#43551`](https://github.com/stablyai/orca/pull/43551) (resolve Issue [`#43523`](https://github.com/stablyai/orca/issues/43523)),
@@ -114,9 +115,14 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Durante atualizações de versão, o processo de migração recalculava baselines para todo o histórico mesmo quando o arquivo de journal de chat legado permanecia idêntico, atrasando a conclusão do startup.
 25. **Esgotamento de heap no scanner de sessões (`#43551`, resolve `#43523`):**
     - Ao processar repositórios massivos ou com milhares de turnos de agentes, o scanner de sessões podia exceder o limite de memória do V8 e quebrar a aplicação sem mecanismo de degradação suave ou recuperação controlada.
+26. **Perda silenciosa de turnos em andamento por crash ou reinício do servidor/app (`#43918`):**
+    - Quando o processo do runtime ou servidor remoto caía ou reiniciava durante a geração de uma resposta de agente (mid-turn), o chat permanecia travado em estado incompleto ou perdia o contexto do turno em execução, forçando o operador a reiniciar manualmente a conversa ou perder o raciocínio em andamento.
 
 ## O que o upstream propõe e implementa
 
+- **Retomada automática de chats interrompidos por crash ou restart (`#43918`):**
+  - Implementa continuação de sessões de chat cortadas (`fix(agent-session): continue chats a crash or restart cut, from the runtime`);
+  - Ao reiniciar o runtime ou servidor, detecta conversas cortadas no meio de uma geração, reconstrói o estado a partir dos registros persistidos no SQLite/journal e retoma a execução sem perda de turnos ou corrupção de estado.
 - **Retenção de descritor único por cursor no polling de transcripts Codex (`#43587`, resolve `#43539`):**
   - Mantém um único file descriptor aberto por cursor de leitura em vez de chamar `openSync` repetidamente na thread principal do Electron/Node, eliminando as pausas de 5–9s no Windows e normalizando a leitura em streaming contínuo.
 - **Renovação estrita de leases retidos sem regravação global de chats (`#43557`):**
@@ -197,6 +203,7 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Retomar automaticamente chats cortados no meio da geração após crash ou reinício do runtime (`#43918`).
 - Reter descritor de arquivo aberto por cursor no polling de transcripts do Codex, eliminando `openSync` síncrono e congelamentos de UI no Windows (`#43587`, resolve `#43539`).
 - Limitar a renovação no startup aos leases de chats ativos em vez de regravar todas as sessões salvas (`#43557`).
 - Otimizar migrações de upgrade para preencher apenas baselines ausentes quando o journal antigo estiver inalterado (`#43563`).

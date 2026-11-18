@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43593, #43574, #43479, #43431, #42651 e a issue #43573 trazem input direto de PTY imune a workers, prevenção de auto-resume duplicado e divisão de abas.
+description: Os PRs #43901, #43896, #43889, #43593, #43574 trazem retenção de entrada de terminal até prontidão do agente, rebuild de tela oculta e polling de 15s em abas calmas.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,10 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43593`](https://github.com/stablyai/orca/pull/43593),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43901`](https://github.com/stablyai/orca/pull/43901),
+[`stablyai/orca#43896`](https://github.com/stablyai/orca/pull/43896),
+[`stablyai/orca#43889`](https://github.com/stablyai/orca/pull/43889),
+[`stablyai/orca#43593`](https://github.com/stablyai/orca/pull/43593),
 [`stablyai/orca#43574`](https://github.com/stablyai/orca/pull/43574) (resolve Issue [`#43573`](https://github.com/stablyai/orca/issues/43573)),
 [`stablyai/orca#43479`](https://github.com/stablyai/orca/pull/43479),
 [`stablyai/orca#43431`](https://github.com/stablyai/orca/pull/43431),
@@ -82,6 +85,12 @@ além da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/4
     No Unix, os dados de digitação do teclado enviados ao PTY eram despachados pela fila comum de workers de I/O. Caso operações pesadas em disco ou tarefas de background saturassem o pool de workers, a digitação travava e caracteres eram engolidos ou entregues com atrasos severos.
 15. **Retomada concorrente espúria de conversas de agente ao restaurar abas salvas (`#43574`, resolve `#43573`):**
     Ao reabrir ou restaurar abas salvas de terminal, o ambiente tentava retomar automaticamente a sessão do agente salva, mesmo que essa mesma conversa já estivesse ativa em outra aba ou janela, gerando conflitos de concorrência e corrupção de estado.
+16. **Perda ou corrupção de entradas enfileiradas de terminal antes do agente estar pronto (`#43896`):**
+    Entradas enviadas para o terminal via CLI (`orca terminal wait --for tui-idle` seguido de `send`) ou mensagens de correio de orquestração eram consumidas antes do agente estar apto a recebê-las. Hooks lentos de shell (como zsh preexec) ou inicializações a frio faziam com que o texto fosse interpretado pelo shell ou descartado.
+17. **Corrupção de tela em terminais ocultos após descarte de buffer (`#43889`):**
+    Quando um terminal em aba oculta gerava grande volume de saída rapidamente, o daemon descartava pacotes para evitar buffer bloat. Ao voltar para a aba, o estado da tela ficava corrompido ou com linhas cortadas.
+18. **Consumo contínuo de CPU por polling acelerado de processos em painéis de agentes ociosos (`#43901`):**
+    O renderer mantinha um loop de polling de foreground process a cada 750 ms em todas as abas onde um agente já havia rodado, gerando drenagem de bateria desnecessária mesmo com agentes em repouso absoluto.
 
 ## O que o upstream implementa e corrige
 
@@ -127,6 +136,12 @@ além da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/4
 - **Reset de modos de escape de mouse e foco em PTYs restaurados (`#41009`):**
   - Propõe emitir sequências de desarme de mouse (`\e[?1000l`, `\e[?1002l`, `\e[?1006l`) e foco (`\e[?1004l`) ao reiniciar
     ou restaurar a frio terminais cujos agentes morreram, evitando poluição de caracteres de coordenadas no prompt.
+- **Retenção de entrada de terminal enfileirada até prontidão real do agente (`#43896`):**
+  - Segura o buffer de digitação e mensagens de orquestração enfileiradas até que o agente em execução confirme prontidão, evitando que comandos sejam engolidos por inicializações a frio, hooks de preexec do shell ou reaproveitamento de painéis.
+- **Reconstrução de tela de terminal oculto a partir do daemon (`#43889`):**
+  - Ao reativar uma aba oculta que sofreu descarte de frames sob alta vazão de saída, reconstrói o frame completo a partir do buffer durável mantido pelo daemon do terminal.
+- **Polling adaptativo de 15s para processos em painéis ociosos (`#43901`):**
+  - Reduz a frequência de verificação de processos de 750 ms para 15 s quando o painel do agente está em repouso, reduzindo significativamente o consumo de CPU em background.
 - **Execução em um clique de linhas `! command` sugeridas por agentes (`#43388`, `#43393`, resolve `#43387`):**
   - No terminal integrado e no aplicativo móvel, detecta linhas no formato `! command` emitidas pelo agente como sugestões executáveis;
   - Renderiza um botão de ação rápida/chip que permite ao usuário disparar o comando no terminal com um único clique ou toque, sem copiar/colar manualmente.
@@ -148,3 +163,6 @@ além da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/4
 13. Suportar comando de CLI para fechar diretamente abas de terminais parados por ID (`#42651`).
 14. Adotar escrita direta não bloqueante para entrada de teclado em PTYs Unix desacoplando do pool de I/O workers (`#43593`).
 15. Evitar auto-resume duplicado ao restaurar abas salvas caso a conversa já esteja ativa em outra aba ou janela (`#43574`, resolve `#43573`).
+16. Reter entradas enfileiradas de terminal até confirmação de prontidão do agente em execução (`#43896`).
+17. Reconstruir tela de terminais ocultos a partir do histórico do daemon após descartes de saída (`#43889`).
+18. Adotar polling adaptativo de 15s para processos de primeiro plano em abas ociosas de agentes (`#43901`).

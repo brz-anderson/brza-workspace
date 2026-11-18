@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43465, #39465, #39445, #38861 e as issues #43464, #39579, #39405, #38120 corrigem vazamento de memória GPU WebGL, travamento modal no macOS e portas Mach.
+description: Os PRs #43898, #43880, #43465, #39465, #39445, #38861 e as issues #43464, #39579, #39405 corrigem animações de compositor, stalls no watchdog e vazamento de memória GPU.
 scope:
   - brza-studio
   - tooling
@@ -13,7 +13,9 @@ tags:
 
 # Vazamento de memória GPU WebGL no terminal e performance no macOS
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43465`](https://github.com/stablyai/orca/pull/43465) (resolve Issue [`#43464`](https://github.com/stablyai/orca/issues/43464)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43898`](https://github.com/stablyai/orca/pull/43898),
+[`stablyai/orca#43880`](https://github.com/stablyai/orca/pull/43880),
+[`stablyai/orca#43465`](https://github.com/stablyai/orca/pull/43465) (resolve Issue [`#43464`](https://github.com/stablyai/orca/issues/43464)),
 [`stablyai/orca#39465`](https://github.com/stablyai/orca/pull/39465) (Issue [`#39405`](https://github.com/stablyai/orca/issues/39405)),
 [`stablyai/orca#39445`](https://github.com/stablyai/orca/pull/39445),
 [`stablyai/orca#38861`](https://github.com/stablyai/orca/pull/38861) (Issue
@@ -67,9 +69,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43465`](https://github.com
     Em sessões interativas prolongadas no macOS com terminais emitindo saídas TUI ricas e fontes com muitos glifos,
     o processo auxiliar de GPU (`Orca Helper (GPU)`) acumulava até 6 GB de memória gráfica retida por não liberar texturas
     WebGL antigas quando as páginas do atlas de glifos se expandiam até 4096 × 4096 pixels.
+11. **Bloqueio de 100% de CPU na thread do compositor por animações contínuas fora da tela (`#43880`):**
+    - Componentes com animações giratórias (como spinners de loading ou ícones de progresso) continuavam animando mesmo quando invisíveis ou fora da janela. No Chromium/Electron, animações CSS/compositor descontroladas em segundo plano causavam loops de 100% de CPU no classificador de quadros (*frame sorter*) da thread do compositor.
+12. **Falta de diagnósticos antecipados em congelamentos antes de travamento severo (`#43898`):**
+    - O watchdog de congelamento só registrava telemetria e diagnósticos de hang severo após um atraso longo (acima de 45 segundos), perdendo a oportunidade de capturar o perfil da CPU e o estado da máquina em estagnações intermediárias (*stalls* de 8 a 45 segundos), dificultando a análise de causa raiz de travamentos transitórios da thread principal.
 
 ## O que o upstream propõe e implementa
 
+- **Execução de animações de rotação apenas enquanto visíveis e na main thread (`#43880`):**
+  - Restringe as animações de spinners para rodarem apenas quando o elemento estiver visível no viewport (`perf(ui): run spin animations on main thread and only while visible`), evitando que o classificador de quadros do Chromium trave a thread do compositor a 100% de CPU.
+- **Camada antecipada de diagnósticos no watchdog de stalls (`#43898`):**
+  - Implementa um nível inicial de alerta para estagnações entre 8s e 45s (`perf(app): report stall watchdog early diagnostics`), capturando perfil de execução JavaScript e estado de memória antes que o congelamento se torne irreversível.
 - **Reconstrução de renderizadores WebGL ao atingir página de 4096² no atlas (`#43465`, resolve `#43464`):**
   - Reconstrói os renderizadores `WebglRenderer` e descarta texturas do contexto anterior assim que uma página do glyph atlas atinge 4096² pixels;
   - Descarrega texturas acumuladas e evita que o processo de aceleração de hardware continue expandindo o consumo de VRAM indefinidamente.
@@ -101,6 +111,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43465`](https://github.com
 
 ## O que fazer
 
+- Executar animações de spin apenas enquanto visíveis no viewport para prevenir consumo excessivo de CPU no compositor thread (`#43880`).
+- Adotar o nível antecipado de diagnóstico no watchdog de stalls para capturar perfis JS entre 8s e 45s de estagnação (`#43898`).
 - Portar as melhorias de `terminal-hidden-view-parking.ts`, contenção de DEC `?2026` e recuperação de atlas WebGL do PR `#38861`
   e `#38857` para o `brza-studio`, protegendo o consumo de CPU e GPU durante sessões simultâneas de chat e terminais de agentes.
 - Adotar o cache do snapshot de layout de teclado com invalidação TIS (`#39465`) para estancar vazamentos de portas Mach no macOS.

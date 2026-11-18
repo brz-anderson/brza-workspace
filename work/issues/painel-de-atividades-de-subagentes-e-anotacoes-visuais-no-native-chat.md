@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43607, #43600, #43567, #43562, #43521, #43474 e as issues #43610, #43597, #43549 trazem presets de modelo, customização de teclas de envio, sincronização de Activity e anotações.
+description: Os PRs #43908, #43954, #43607, #43600 e as issues #43988, #43983, #44003 trazem desacoplamento de streaming, expurgo de status de chats fechados e contagem de chat no Resource Manager.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,9 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43607`](https://github.com/stablyai/orca/pull/43607) (resolve Issue [`#43599`](https://github.com/stablyai/orca/issues/43599)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43908`](https://github.com/stablyai/orca/pull/43908) (resolve Issue [`#43988`](https://github.com/stablyai/orca/issues/43988)),
+[`stablyai/orca#43954`](https://github.com/stablyai/orca/pull/43954),
+[`stablyai/orca#43607`](https://github.com/stablyai/orca/pull/43607) (resolve Issue [`#43599`](https://github.com/stablyai/orca/issues/43599)),
 [`stablyai/orca#43600`](https://github.com/stablyai/orca/pull/43600) (resolve Issue [`#43595`](https://github.com/stablyai/orca/issues/43595)),
 [`stablyai/orca#43567`](https://github.com/stablyai/orca/pull/43567),
 [`stablyai/orca#43562`](https://github.com/stablyai/orca/pull/43562),
@@ -22,7 +24,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43607`](https://github.com
 [`stablyai/orca#43474`](https://github.com/stablyai/orca/pull/43474),
 [`stablyai/orca#43456`](https://github.com/stablyai/orca/pull/43456),
 [`stablyai/orca#43425`](https://github.com/stablyai/orca/pull/43425) (resolve Issue [`#43424`](https://github.com/stablyai/orca/issues/43424)),
-além das issues [`stablyai/orca#43610`](https://github.com/stablyai/orca/issues/43610),
+além das issues [`stablyai/orca#44003`](https://github.com/stablyai/orca/issues/44003),
+[`stablyai/orca#43983`](https://github.com/stablyai/orca/issues/43983),
+[`stablyai/orca#43610`](https://github.com/stablyai/orca/issues/43610),
 [`stablyai/orca#43597`](https://github.com/stablyai/orca/issues/43597),
 [`stablyai/orca#43549`](https://github.com/stablyai/orca/issues/43549),
 [`stablyai/orca#43462`](https://github.com/stablyai/orca/issues/43462) e
@@ -150,6 +154,14 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     Tags de aviso de harness/OMP como `<advisory>` eram despejadas diretamente na área de conversa como se fossem texto digitado pelo usuário, poluindo a visualização.
 33. **Ocupação permanente de espaço de tela pela barra lateral esquerda (`#43597`):**
     A barra lateral esquerda não possuía modo auto-hide com revelação ao passar o cursor pela borda (edge-hover reveal), sacrificando espaço útil de tela em telas menores ou monitores secundários.
+34. **Travamento em "Sending..." de novos chats sob concorrência de streaming múltiplo (`#43908`, resolve `#43988`):**
+    Quando dezenas de chats eram retomados simultaneamente após um restart, o envio de mensagens em um novo chat ficava travado em "Sending..." por dezenas de segundos sem indicador de trabalho. O gravador único de journal no SQLite compartilhava uma única fila FIFO e o limite de backpressure do WAL travava todas as novas escritas.
+35. **Vazamento de memória por retenção vitalícia de status de chats fechados (`#43954`):**
+    O feed de status de chats no processo principal retinha o sumário de cada sessão já aberta ou encerrada durante todo o ciclo de vida do aplicativo, impedindo a desalocação de memória de conversas fechadas.
+36. **Omissão de árvores de processos do Native Chat no Resource Manager (`#43983`):**
+    O monitor de recursos contava apenas processos de terminais PTY locais e processos internos do Orca, ignorando as árvores de processos dos agentes em execução nas abas de chat nativo.
+37. **Reaparecimento de registros falhados limpos da view de Activity após hidratação (`#44003`):**
+    Linhas de atividades com falha previamente limpas pelo desenvolvedor voltavam a aparecer na interface após a hidratação de estado e geravam erros ao tentar abrir worktrees já removidos.
 
 ## O que o upstream implementa
 
@@ -244,9 +256,22 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
   - Trata tags de conselho `<advisory>` do harness OMP com componente visual dedicado em vez de exibi-las como mensagem crua de usuário.
 - **Auto-hide com revelação por hover da barra lateral esquerda (`#43597`):**
   - Propõe opção para ocultar automaticamente a barra lateral e revelá-la suavemente ao passar o cursor pela margem esquerda da janela.
+- **Desacoplamento de streaming e eliminação de contenção em "Sending..." (`#43908`, resolve `#43988`):**
+  - Separa as filas de escrita do journal de chat para que novas mensagens e prompts não compitam diretamente na mesma fila FIFO de chats em streaming simultâneo;
+  - Ajusta os checkpoints do WAL para evitar que picos de escrita congelem novos turnos de conversa.
+- **Expurgo automático de linhas de status de chats encerrados (`#43954`):**
+  - Limpa imediatamente as entradas de status de sessões fechadas do feed do processo principal, eliminando o acúmulo contínuo de memória durante a vida útil do host.
+- **Contabilização de árvores de processos de Chat no Resource Manager (`#43983`):**
+  - Rastreia e agrega o consumo de CPU e RAM das árvores de processos dos agentes em execução no Native Chat, integrando-as à exibição do Resource Manager.
+- **Persistência de limpeza de atividades falhadas na view de Activity (`#44003`):**
+  - Grava duravelmente o descarte de linhas de falha na view de Activity, evitando seu retorno espúrio após reidratação de estado.
 
 ## O que fazer
 
+- Isolar filas de escrita de novos prompts do streaming de chats concorrentes para evitar travamentos em "Sending..." (`#43908`, resolve `#43988`).
+- Desalocar registros de status de chats fechados do processo principal (`#43954`).
+- Contabilizar processos de sessões do Native Chat no Resource Manager (`#43983`).
+- Assegurar que linhas de atividade com falha descartadas permaneçam limpas após reidratação (`#44003`).
 - Adicionar presets rápidos de modelo, esforço de raciocínio e velocidade no Native Chat (`#43607`, resolve `#43599`).
 - Suportar a configuração `nativeChatSendKey` para permitir envio via Shift+Enter (`#43600`, resolve `#43595`).
 - Listar painéis de agentes recém-iniciados no menu "Send notes to" via fallback de título de terminal (`#43562`).

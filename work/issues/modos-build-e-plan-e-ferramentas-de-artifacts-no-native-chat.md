@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43606, #38286, #38248, #38574, #38498 e as issues #43603, #43602 trazem modo Plan no OpenCode, visibilidade de prosa prévia a perguntas e modos Build/Plan.
+description: Os PRs #43891, #43606, #38286, #38248 e as issues #43603, #43602 trazem fsync assíncrono de artifacts, modo Plan no OpenCode e modos Build/Plan.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Modos Build e Plan e ferramentas de artifacts no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43606`](https://github.com/stablyai/orca/pull/43606) (resolve Issue [`#43603`](https://github.com/stablyai/orca/issues/43603)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43891`](https://github.com/stablyai/orca/pull/43891),
+[`stablyai/orca#43606`](https://github.com/stablyai/orca/pull/43606) (resolve Issue [`#43603`](https://github.com/stablyai/orca/issues/43603)),
 além da issue [`stablyai/orca#43602`](https://github.com/stablyai/orca/issues/43602),
 [`stablyai/orca#38574`](https://github.com/stablyai/orca/pull/38574),
 [`stablyai/orca#38498`](https://github.com/stablyai/orca/pull/38498),
@@ -60,6 +61,8 @@ além da issue [`stablyai/orca#43602`](https://github.com/stablyai/orca/issues/4
     Quando um agente (como o Claude Code) emite explicações, comparações ou estimativas textuais e logo em seguida invoca
     `AskUserQuestion` no mesmo turno, a interface do chat oculta o texto precedente enquanto o card da pergunta está aberto,
     privando o desenvolvedor do contexto necessário para tomar a decisão.
+11. **Congelamento da interface gráfica por chamadas `fsync` bloqueantes na gravação de artifacts (`#43891`):**
+    Na persistência de registros de artifacts emitidos pelos agentes, o processo principal executava `fsync` síncrono no disco dentro da thread de UI do Electron (acumulando dezenas de milissegundos bloqueados), causando travamentos perceptíveis do desktop durante a entrega de artefatos grandes.
 
 ## O que o upstream implementa
 
@@ -90,9 +93,12 @@ além da issue [`stablyai/orca#43602`](https://github.com/stablyai/orca/issues/4
   - Exibe qual agente o OpenCode está executando e permite alternar de volta para Build através do chip de modo.
 - **Exibição contínua de prosa e rascunhos durante perguntas interativas (`#43602`):**
   - Mantém a prévia da resposta textual gerada visível acima do cartão de pergunta interativa, garantindo que o usuário consulte os dados antes de responder.
+- **Gravação de registros de artifacts com `fsync` assíncrono fora da thread principal (`#43891`):**
+  - Desloca as confirmações de escrita em disco (`fsync`) dos registros de artifacts para workers fora do loop de eventos principal, eliminando engasgos de interface durante a entrega de artefatos.
 
 ## O que fazer
 
+- Executar sincronização em disco (`fsync`) de registros de artifacts fora da thread principal (`#43891`).
 - Suportar o modo Plan para OpenCode e OpenCode2 no Native Chat estruturado (`#43606`, resolve `#43603`).
 - Garantir a visibilidade contínua de explicações e rascunhos emitidos antes de chamadas `AskUserQuestion` (`#43602`).
 - Integrar as melhorias de UX do composer (`#38286`, `#38251`, `#38253` e `#38272`) no `brza-studio`.

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43571, #43564, #43363, #43217, #43049 trazem fallback de xhigh/max no Antigravity, chat nativo para TRAE CLI e modelos no picker da conta real.
+description: Os PRs #43939, #43571, #43564, #43363, #43217 trazem autenticação do Antigravity via Gemini API key / ADC, fallback de xhigh/max e chat nativo TRAE CLI.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,8 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43571`](https://github.com/stablyai/orca/pull/43571),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43939`](https://github.com/stablyai/orca/pull/43939),
+[`stablyai/orca#43571`](https://github.com/stablyai/orca/pull/43571),
 [`stablyai/orca#43564`](https://github.com/stablyai/orca/pull/43564),
 [`stablyai/orca#43363`](https://github.com/stablyai/orca/pull/43363),
 [`stablyai/orca#43217`](https://github.com/stablyai/orca/pull/43217),
@@ -123,6 +124,8 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Mesmo com a descoberta prévia de modelos Antigravity, o gerador de mensagens de commit exibia linhas brutas por nível (`claude-opus-4-6-xhigh`, `claude-opus-4-6-max`) sem opções estruturadas de nível de pensamento, os fallbacks de raciocínio não contemplavam `xhigh`/`max` e a invalidação de catálogo de modelos permanecia incompleta.
 30. **Falta de integração ao Chat UI para conversas da TRAE CLI (`#43564`):**
     A CLI do agente Trae ficava limitada ao terminal TUI, sem suporte para prosseguir conversas no Native Chat com controles nativos de tarefas e aprovações.
+31. **Dependência exclusiva de login via conta Google no navegador para Antigravity Chat (`#43939`):**
+    O Antigravity no Native Chat só permitia autenticação via OAuth pessoal ou corporativo do Google no navegador. Desenvolvedores que utilizam chave de API própria do Gemini ou credenciais padrão de aplicação do Google Cloud (ADC / Google Agent Platform) em ambientes headless ou de infraestrutura eram incapazes de autenticar o chat nativo.
 
 ## O que o upstream implementa e corrige
 
@@ -210,6 +213,11 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
   - Conclui a invalidação limpa do catálogo de modelos quando parâmetros de esforço são alterados.
 - **Suporte ao TRAE CLI no Native Chat UI (`#43564`):**
   - Permite instanciar conversas com o agente Trae diretamente no Chat UI estruturado, preservando streaming de respostas e histórico de tarefas.
+- **Autenticação de chats Antigravity com API key do Gemini ou Google Agent Platform (ADC) (`#43939`):**
+  - Introduz os métodos de autenticação `gemini-api-key` e `gcp-service-account` / ADC em `Settings → AI Accounts → Antigravity`;
+  - Permite colar a Gemini API key diretamente nas preferências com armazenamento seguro criptografado local em `<userData>/antigravity-chat/`;
+  - Suporta credenciais do Google Cloud Application Default Credentials (ADC) com resolução dinâmica de projeto GCP via `gcloud` ou variável de ambiente;
+  - Executa o chat nativo no servidor Antigravity bundled sem exigir o fluxo de callback no navegador do OAuth.
 
 ## O que fazer no BrzA Studio
 
@@ -243,3 +251,4 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 25. Consultar modelos disponíveis para o Antigravity baseando-se na conta configurada para a nova sessão (`#43363`).
 26. Incorporar fallbacks de raciocínio `xhigh`/`max` e formatação limpa de opções de pensamento em mensagens de commit do Antigravity (`#43571`).
 27. Suportar TRAE CLI como agente com superfície no Native Chat UI (`#43564`).
+28. Habilitar a autenticação de chats Antigravity via chave de API Gemini ou Google Agent Platform (ADC) em Settings (`#43939`).

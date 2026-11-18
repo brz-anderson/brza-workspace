@@ -13,7 +13,7 @@ tags:
 
 # O subcomando `brza jira` despacha operações do Jira Cloud via Atlassian CLI (`acli`)
 
-**Resolvida em 2026-11-12** com a criação do executável `scripts/brza/brza-jira`, inclusão de `jira` em `KNOWN_SUBCOMMANDS` em `scripts/brza/brza` e 11 testes de unidade em `scripts/brza/tests/test_brza_jira.py`. Validado ao vivo com a instância Atlassian Cloud conectada (`projeto-externo.atlassian.net`).
+**Resolvida em 2026-11-12** com a criação do executável `scripts/brza/brza-jira`, inclusão de `jira` em `KNOWN_SUBCOMMANDS` em `scripts/brza/brza` e 11 testes de unidade em `scripts/brza/tests/test_brza_jira.py`. Validado ao vivo com a instância Atlassian Cloud conectada.
 
 ## O contexto
 

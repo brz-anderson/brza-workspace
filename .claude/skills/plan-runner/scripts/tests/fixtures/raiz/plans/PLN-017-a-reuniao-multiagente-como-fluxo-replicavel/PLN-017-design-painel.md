@@ -64,7 +64,7 @@ Abreviações: `WT` = `/Users/andepb/Projects/brza-workspace/.worktrees/playgrou
   - o molde da rodada 3 não tem voto (`WT/.sessions/reuniao-mcp-remoto/rodada-3.md:5-20`) [F22 · lido · 95]; o revisor
     deu 45 à v1 (`coordM:301`) [F23 · lido · 95];
   - custo da coordenação até 21:32:39, US$ 4,74, e do revisor, US$ 1,02 (`agrega-saida.txt`) [F24 · lido · 90].
-- **Os worklogs das personas só chegam ao GitHub no fim:** o primeiro commit deles é o `b816b2d`, às 21:50 de 2026-11-07
+- **Os worklogs das personas só chegam ao GitHub no fim:** o primeiro commit deles é o `56f2c4f`, às 21:50 de 2026-11-07
   (`git log`) [F25 · rodado · 95]. Um link `https://github.com/…#rodada-3…` no painel daria 404 durante a reunião
   [F26 · inferido · 75].
 - **Grok e Antigravity não gravam tokens nem custo** (`/private/tmp/wf-improv/processo/levantamento.md:190-191`)

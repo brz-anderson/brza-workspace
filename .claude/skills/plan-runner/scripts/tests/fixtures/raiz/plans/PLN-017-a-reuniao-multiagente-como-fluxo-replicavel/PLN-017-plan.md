@@ -23,7 +23,7 @@ tags:
 
 # PLN-017: A reunião multiagente com personas roda como fluxo replicável: skill, `brza sessions` e painel no chat
 
-- **Retomar:** plano concluído. Skill protótipo e integração v2 publicadas em `d12ed91`/`db619ac`, 300 testes e REV-023; CLI e painel entregues, P7 executado com 19 desvios. R8 autoriza rodada extra automática pelo gatilho; R9 deixa participantes e motivo com a coordenação. Promoção ao `core/` não realizada: zero das duas reuniões sem desvio, com destino na issue de promoção. O estado do worker no CLI, fallback, limites do verificador/painel, avaliações e leitor do Grok têm destinos em Pendências conhecidas. Nenhuma reunião completa rodou pela integração v2.
+- **Retomar:** plano concluído. Skill protótipo e integração v2 publicadas em `795fa96`/`24bf3ec`, 300 testes e REV-023; CLI e painel entregues, P7 executado com 19 desvios. R8 autoriza rodada extra automática pelo gatilho; R9 deixa participantes e motivo com a coordenação. Promoção ao `core/` não realizada: zero das duas reuniões sem desvio, com destino na issue de promoção. O estado do worker no CLI, fallback, limites do verificador/painel, avaliações e leitor do Grok têm destinos em Pendências conhecidas. Nenhuma reunião completa rodou pela integração v2.
 - **Dividido:** [PLN-017 — Desenho](PLN-017-design.md) · [D1, a skill](PLN-017-design-skill.md) · [D2, o `brza sessions`](PLN-017-design-cli.md) · [D3, o painel](PLN-017-design-painel.md)
 
 ## Pedido
@@ -66,7 +66,7 @@ dito isso, nossa missão agora é:
 
 ## Restrições
 
-- **Toda skill deste plano se cria e se revisa pela skill `skill-creator`.** Pedido de Anderson em 2026-11-08: "utilize a skill skill-creator para criar e revisar as skills desse plano e as que serão criadas futuramente nesse workstream". O plugin `skill-creator@claude-plugins-official` está habilitado no `.claude/settings.json` da branch `workstream/playground` (`brza-workspace@b18f520`), e o registro do escopo está em `.claude/rules/workspace.md`, na `master`. O passo que escreve o `SKILL.md` de D1 roda numa sessão aberta com o plugin carregado e aciona `/skill-creator` antes de gravar; a revisão da skill também passa por ele.
+- **Toda skill deste plano se cria e se revisa pela skill `skill-creator`.** Pedido de Anderson em 2026-11-08: "utilize a skill skill-creator para criar e revisar as skills desse plano e as que serão criadas futuramente nesse workstream". O plugin `skill-creator@claude-plugins-official` está habilitado no `.claude/settings.json` da branch `workstream/playground` (`brza-workspace@88d6aad`), e o registro do escopo está em `.claude/rules/workspace.md`, na `master`. O passo que escreve o `SKILL.md` de D1 roda numa sessão aberta com o plugin carregado e aciona `/skill-creator` antes de gravar; a revisão da skill também passa por ele.
 - **As issues de 2026-11-03 do `playground` não se emendam nem se portam** antes da entrevista do PLN-014, que as trava.
 - **A skill `meeting-runner` mora na branch `workstream/playground`, em `.claude/skills/`, fora da `master`** (R2.1): é um desvio declarado da norma "o `.claude/` mora na `master`", válido até a promoção ao `core/` do `brza-workflow`, depois de duas reuniões sem desvio de fluxo. O `brza sync` não apaga a pasta, porque ela não está no `core.lock`.
 
@@ -312,7 +312,7 @@ Estimado: 10,5 h · Executado: ~4 h (estimativa de relógio ativo; sem medição
 - [x] **3. A revisão** pelo laço da `skill-creator` e pelo `reviewer`; o teste de aceite do `tally.py` contra as tabelas das coordenações (com as duas divergências conhecidas)
 - [x] **4. `brza note commit`** da skill e do worklog da sessão
 
-**Evidência:** `brza-workspace@bf06d0a` (a branch `workstream/playground`); `.claude/skills/meeting-runner/` (`SKILL.md` com 199 linhas, 8 `references/`, 5 scripts, `evals/evals.json` com 3 casos); `cd .claude/skills/meeting-runner && python3 -I -m unittest discover -s scripts/tests -p 'test_*.py'` → 149 testes, OK; aceite do `tally.py` contra `levantamento-processo.md` 3.1 e 3.2 (confiança R1, voto R3, nota dos colegas com as duas variantes, sala 61,8/56,5/57,2, latência e custo de Muralha, Régua e da R7 da Carvão), sem divergência numérica; avaliação com e sem a skill: iteração 1, 100% × 88,9%; iteração 2, 100% × 81,8% (+22 s e +16 mil tokens por tarefa); revisão do `reviewer`: 2 bloqueiam, 15 a corrigir e 8 de melhoria, todos corrigidos salvo M5 e M7, **sem nova revisão das correções**. Fica de fora: a abertura e o encerramento pelo ciclo de vida dos workers e o `wait_round --source mailbox`, nunca rodados contra o Studio ([worklog](../../work/worklogs/2026-11-09-pln-017-p1-p2-a-skill-meeting-runner.md)).
+**Evidência:** `brza-workspace@85dcda3` (a branch `workstream/playground`); `.claude/skills/meeting-runner/` (`SKILL.md` com 199 linhas, 8 `references/`, 5 scripts, `evals/evals.json` com 3 casos); `cd .claude/skills/meeting-runner && python3 -I -m unittest discover -s scripts/tests -p 'test_*.py'` → 149 testes, OK; aceite do `tally.py` contra `levantamento-processo.md` 3.1 e 3.2 (confiança R1, voto R3, nota dos colegas com as duas variantes, sala 61,8/56,5/57,2, latência e custo de Muralha, Régua e da R7 da Carvão), sem divergência numérica; avaliação com e sem a skill: iteração 1, 100% × 88,9%; iteração 2, 100% × 81,8% (+22 s e +16 mil tokens por tarefa); revisão do `reviewer`: 2 bloqueiam, 15 a corrigir e 8 de melhoria, todos corrigidos salvo M5 e M7, **sem nova revisão das correções**. Fica de fora: a abertura e o encerramento pelo ciclo de vida dos workers e o `wait_round --source mailbox`, nunca rodados contra o Studio ([worklog](../../work/worklogs/2026-11-09-pln-017-p1-p2-a-skill-meeting-runner.md)).
 
 ### P2 — O gerador do painel da rodada
 
@@ -325,7 +325,7 @@ Estimado: 6,5 h · Executado: ~2 h (estimativa de relógio ativo; sem medição)
 - [x] **3. Testes `unittest`** com o estado da rodada 3 (fechada e às 21h29) e uma persona sem medição
 - [x] **4. Commit** junto de P1
 
-**Evidência:** `brza-workspace@bf06d0a`; `scripts/panel.py` (`collect`, `render --publish-dir`, `--png`) e os testes de `panel`, com a R3 da reunião MCP fechada e às 21:29:30, persona sem medição, `sem cota`, `erro`, voto e a integração com o `tally.py` sobre os worklogs reais; o PNG a 736 px conferido nas duas situações depois das correções da revisão, com os defeitos cosméticos registrados no worklog (cartão de custo ignora o `--at`; denominador da sala). A média da sala exclui o Antigravity (57,2 em 5 de 6, "Antigravity à parte: 85"), pela E-1 do D1.
+**Evidência:** `brza-workspace@85dcda3`; `scripts/panel.py` (`collect`, `render --publish-dir`, `--png`) e os testes de `panel`, com a R3 da reunião MCP fechada e às 21:29:30, persona sem medição, `sem cota`, `erro`, voto e a integração com o `tally.py` sobre os worklogs reais; o PNG a 736 px conferido nas duas situações depois das correções da revisão, com os defeitos cosméticos registrados no worklog (cartão de custo ignora o `--at`; denominador da sala). A média da sala exclui o Antigravity (57,2 em 5 de 6, "Antigravity à parte: 85"), pela E-1 do D1.
 
 ### P3 — As duas issues
 
@@ -336,7 +336,7 @@ Estimado: 1 h · Executado: 1 h
 - [x] **1. Ao `tools-kit`**: [O `brza sessions` ganha os verbos da reunião multiagente: modelo na abertura, recibo, `wait`, `read --last`, `model`, `usage` e `close --prefix`](../../work/issues/o-brza-sessions-para-a-reuniao-multiagente.md), com P4a, P4b, P5, P6 e a exceção à R1.4 do PLN-010
 - [x] **2. Ao `studio`**: [A fase do painel da reunião no BrzA Studio: argumentação por persona, abrir o chat, gate de decisão e atualização ao vivo](../../work/issues/a-fase-do-painel-da-reuniao-no-brza-studio.md), com o `orchestration-crew` fora
 
-**Evidência:** `brza-workspace@cea9595`, os dois arquivos em `work/issues/`; `python3 .claude/skills/notes-checker/scripts/check_notes.py` → erros: 0, avisos: 0
+**Evidência:** `brza-workspace@2a5b279`, os dois arquivos em `work/issues/`; `python3 .claude/skills/notes-checker/scripts/check_notes.py` → erros: 0, avisos: 0
 
 ### P4a — A abertura com ciclo de vida, o envio e a espera do `brza sessions`
 
@@ -374,7 +374,7 @@ Estimado: 1 h · Executado: 0,174 h (janela da sessão executora, incluindo fech
 - [x] **2. `base_css_call`** ao lado do `string_concat` em `scripts/brza/brza-shot:162-166`
 - [x] **3. `python3 -m unittest discover -s scripts/brza/tests`** e commit na `master`
 
-**Evidência:** `brza-workspace@b24de7c1f1324b2ea85df061b57765ea500ff0bc`, publicado na `master`; vermelho com 2 `ShotError BASE_CSS`, verde com 99 testes. Reviewer independente Claude `opus`, Dispatch `ctx_7153fa486731`: cli 492, hooks 291 e notes-checker 26/26; captura real 1472×108; A1 de cobertura corrigido e verificado por mutação. [PLN-017/P5: o brza shot lê visualBaseCss e mantém o literal antigo](../../../workspace/work/worklogs/2026-11-09-pln-017-p5-brza-shot.md), publicado no `workstream/workspace` em `8f6846f`.
+**Evidência:** `brza-workspace@c5dcd8e6242486d8acd76b1bc7e6423a72f92061`, publicado na `master`; vermelho com 2 `ShotError BASE_CSS`, verde com 99 testes. Reviewer independente Claude `opus`, Dispatch `ctx_7153fa486731`: cli 492, hooks 291 e notes-checker 26/26; captura real 1472×108; A1 de cobertura corrigido e verificado por mutação. [PLN-017/P5: o brza shot lê visualBaseCss e mantém o literal antigo](../../../workspace/work/worklogs/2026-11-09-pln-017-p5-brza-shot.md), publicado no `workstream/workspace` em `5a04b06`.
 
 ### P6 — A emenda ao PLN-010
 
@@ -384,7 +384,7 @@ Estimado: 0,5 h · Executado: incluído nas 1,109 h agregadas de P4a/P4b/P6, sem
 
 - [x] **1. Registrar no PLN-010** a exceção à R1.4, citando PLN-017/R3.1 ("Recibo, --operation e read --last pelo rpc", 2026-11-08, sessão `workflow-improvements`), e o que a troca de transporte custa quando o `brza chat` chegar
 
-**Evidência:** `brza-workspace@ff8def8` e `0cbeb26`, publicados em `workstream/tools-kit`; exceção à R1.4 registrada no PLN-010 com resposta literal, data, sessão e estimativa de 0,5 h para a troca futura do transporte; REV-022 sem bloqueios.
+**Evidência:** `brza-workspace@034d1a5` e `55af44e`, publicados em `workstream/tools-kit`; exceção à R1.4 registrada no PLN-010 com resposta literal, data, sessão e estimativa de 0,5 h para a troca futura do transporte; REV-022 sem bloqueios.
 
 ### P7 — A reunião de verificação
 
@@ -407,11 +407,11 @@ Estimado: 0,5 h · Executado: ~0,1 h (estimativa da coordenação para o registr
 - [x] **2. O critério de promoção ao `core/`** (duas reuniões sem desvio) registrado numa issue ao `workspace` quando a primeira reunião fechar
 - [x] **3. O worklog** e o `Retomar`
 
-**Evidência:** issue de origem encerrada; issue de promoção aberta ao `workspace`, com zero de duas reuniões sem desvio; REV-023, worklog e Retomar atualizados. Correções da skill em `d12ed91`/`db619ac`: 26 min de agente (~0,433 h) conforme worklog executor, contabilizados uma vez no frontmatter; soma registrada aproximada, sem incluir novamente tempos de revisores.
+**Evidência:** issue de origem encerrada; issue de promoção aberta ao `workspace`, com zero de duas reuniões sem desvio; REV-023, worklog e Retomar atualizados. Correções da skill em `795fa96`/`24bf3ec`: 26 min de agente (~0,433 h) conforme worklog executor, contabilizados uma vez no frontmatter; soma registrada aproximada, sem incluir novamente tempos de revisores.
 
 ## Worklogs
 
-- 2026-11-09 — correções após P7 publicadas em `d12ed91`/`db619ac`, 300 testes; R8/R9 aplicadas; revisão independente final e limites registrados.
+- 2026-11-09 — correções após P7 publicadas em `795fa96`/`24bf3ec`, 300 testes; R8/R9 aplicadas; revisão independente final e limites registrados.
   [PLN-017: a skill `meeting-runner` corrige os 19 desvios da P7 e passa a usar o `brza sessions` v2](../../work/worklogs/2026-11-09-pln-017-meeting-runner-sobre-o-brza-sessions-v2.md)
 
 - 2026-11-09 — correções após P7 concluídas; R8/R9 registradas, REV-023 e P8 fechados; pendências com destino explícito.
@@ -425,7 +425,7 @@ Estimado: 0,5 h · Executado: ~0,1 h (estimativa da coordenação para o registr
 
 - 2026-11-09 — coordenação de P4/P5/P6; R7 escolhe o encerramento e a parada guardada; P4/P5/P6 concluídos, revisados e publicados; P7 fica para a próxima execução.
   [PLN-017: coordenação de P4, P5 e P6 e encerramento de workers](../../work/worklogs/2026-11-09-pln-017-coordenacao-p4-p5-p6.md)
-- 2026-11-09 — P5 executado na `master`, 99 testes e revisão independente; commit `b24de7c` publicado.
+- 2026-11-09 — P5 executado na `master`, 99 testes e revisão independente; commit `c5dcd8e` publicado.
   [PLN-017/P5: o brza shot lê visualBaseCss e mantém o literal antigo](../../../workspace/work/worklogs/2026-11-09-pln-017-p5-brza-shot.md)
 
 - 2026-11-09 — P1 e P2: a skill `meeting-runner` v1, o `panel.py`, 149 testes, a avaliação com e sem a skill (100% × 81,8%), a revisão (25 achados, corrigidos salvo 2) e a R5/R6 aplicada nos scripts, só em `--dry-run`. Nada testado contra o Studio.
@@ -434,7 +434,7 @@ Estimado: 0,5 h · Executado: ~0,1 h (estimativa da coordenação para o registr
 - 2026-11-09 — retomada: protótipo de P1/P2 sem commit; 102 testes, 7 falhas e 1 erro; checador de notas sem erros nem avisos. Nenhum passo fechado.
   [PLN-017: retomada e conferência do protótipo da skill](../../work/worklogs/2026-11-09-pln-017-retomada.md)
 
-- 2026-11-08 — R1 a R4: destino, primitiva, UI, narração, a skill, o CLI, o painel e o corte; D1 a D3 gravados; P3 feito (`cea9595`). Parou ao abrir a sessão `pln-017-skill` para P1 e P2.
+- 2026-11-08 — R1 a R4: destino, primitiva, UI, narração, a skill, o CLI, o painel e o corte; D1 a D3 gravados; P3 feito (`2a5b279`). Parou ao abrir a sessão `pln-017-skill` para P1 e P2.
   [O fluxo de reunião multiagente vai a plano: as duas reuniões medidas e a rodada 1](../../work/worklogs/2026-11-08-o-fluxo-de-reuniao-multiagente-vai-a-plano.md)
 
 ## Revisões

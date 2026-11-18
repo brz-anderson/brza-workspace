@@ -24,7 +24,7 @@ repete em cinco lugares:
   mesma variável, não foi. Ao conferir uma correção, procure quem compartilha a causa.
 
 - **Taxa de base medida pelo autor, e não pelo repositório** (reunião CI no chat, 2026-11-09): `gh search prs
-  --author=@me` deu 1 PR, e o `--owner` do mesmo dono mostrou mais 7 de uma conta de agente (`projeto-externo-claude`). O
+  --author=@me` deu 1 PR, e o `--owner` do mesmo dono mostrou mais 7 de uma conta de agente. O
   "zero eventos" e o gatilho de reabertura herdam o ponto cego. Refaça a taxa por `--owner`, por `gh auth status`
   (contas extras) e pelo `on:` dos workflows (push filtrado em `main` num fork cuja default é `master` dá zero runs).
 - **Custo herdado de outra persona ou runtime:** a "rodada extra" com Grok e Antigravity foi orçada pelo custo do

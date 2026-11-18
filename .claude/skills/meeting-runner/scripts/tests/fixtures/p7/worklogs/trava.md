@@ -63,7 +63,7 @@ M3 e M4 me corrigem, e eu medi os dois de novo. A head `ed402736` tem 163 arquiv
 | A | apoio com ressalva | O gatilho conta por `--owner` em todas as contas do `gh`; o desenho guarda sem push, teto de máquina e `worker-stop`. | 86 |
 | B | contra | Sete dias de sombra medem o zero que o `gh` já deu e expiram antes do próximo surto. | 84 |
 
-- **O que o M6/M6b mudou em você:** Larguei a sombra da R2. *Medido agora:* `gh pr list` em `brz-anderson/brza-studio` devolve `[]`; `gh search prs --owner=anderson-projeto-externo` desde 2026-09-01 devolve 8, 7 de `projeto-externo-claude` e 1 de `brz-anderson`. *Lido:* `AGENTS.md:73`, o push vai direto, sem PR. O M6b segura o desenho: `--author=@me` esconde a conta do agente.
+- **O que o M6/M6b mudou em você:** Larguei a sombra da R2. *Medido agora:* `gh pr list` em `brz-anderson/brza-studio` devolve `[]`; `gh search prs --owner` numa conta de fora, desde 2026-09-01, devolve 8, 7 de uma conta de agente e 1 de `brz-anderson`. *Lido:* `AGENTS.md:73`, o push vai direto, sem PR. O M6b segura o desenho: `--author=@me` esconde a conta do agente.
 - **O que te faria mudar de novo:** ≥ 5 PRs com check falhando numa semana, por dono e por conta, ou Anderson tornar o PR o caminho normal do push.
 
 | Parte do plano | Confiança na versão anterior | Confiança na versão atual | Uma linha de porquê |

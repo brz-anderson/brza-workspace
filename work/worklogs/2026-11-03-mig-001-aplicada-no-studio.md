@@ -13,7 +13,7 @@ refs:
 Item 4 da aplicação da [MIG-001: Renumeração dos pareceres REV-001..REV-004 e backfill de refs nos worklogs](../../../workspace/work/issues/MIG-001-renumeracao-rev-e-refs-pln-008.md),
 na P6 do PLN-008, pedido pela sessão `workspace-a6` com a autorização de Anderson de 2026-11-03 ("sim", à pergunta
 "Abro as três sessões com o mesmo roteiro do `tools-kit`?"). Rodou na sessão `studio-mig001`, depois de `tools-kit`
-(`bf36704`) e `workspace` (`361d0d4`).
+(`f918157`) e `workspace` (`afc3814`).
 
 ## O que rodou
 
@@ -23,12 +23,12 @@ na P6 do PLN-008, pedido pela sessão `workspace-a6` com a autorização de Ande
    ensaio. Dos 44 worklogs da pasta, um já estava na forma final. Três avisos `unknown-ref-mention` em
    `2026-10-28-pln-001-no-molde-do-workspace-de-origem.md`: menções históricas a planos do workspace de origem, que o D3
    só avisa.
-3. `--apply --workstream studio`: saída 0, mesmas contagens. Commit `d5abc5e`
+3. `--apply --workstream studio`: saída 0, mesmas contagens. Commit `5941b29`
    (`docs(pln-008): migração MIG-001 em studio`), 43 arquivos, com push na `workstream/studio`. Índice da `master`: em
    dia, nada a acrescentar.
 4. `python3 .claude/skills/notes-checker/scripts/check_notes.py`: 63 arquivos, 0 links não resolvidos, **0 erros** e 8
    avisos — 3 `backlink-missing`, 2 `tag-out-of-vocabulary` e os 3 `unknown-ref-mention` acima. Os mesmos avisos já
-   existiam em `24e303e`, o pai do commit da migração, além de 39 `date-on-worklog`, que a migração eliminou.
+   existiam em `4ebe4ef`, o pai do commit da migração, além de 39 `date-on-worklog`, que a migração eliminou.
 
 ## Pendente
 

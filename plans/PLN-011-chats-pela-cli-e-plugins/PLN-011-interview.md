@@ -213,7 +213,7 @@ nota de `work/decisions/` nasce dessas respostas.
 > o `after` conta linhas do journal, até 200 por página (`structured-agent-session-params.ts:319-326`); na sessão que
 > teve um hand-off da fila em dúvida, todo `after` da CLI local volta `cursor_compacted` até o epoch mudar
 > (`agent-session-history-page.ts:87-95`, inferido). O pedido do PLN-010, recebido por correio da sessão "Plano: brza
-> sessions sobre o brza chat (tools-kit)" e gravado em `workstream/tools-kit@5ef728d`: `--since <cursor>`,
+> sessions sobre o brza chat (tools-kit)" e gravado em `workstream/tools-kit@6169056`: `--since <cursor>`,
 > `--operation <id>`, o recibo com `operation`, o cursor inválido distinguível pelo código.
 
 Respondida em 2026-11-03, pelo `agy`.

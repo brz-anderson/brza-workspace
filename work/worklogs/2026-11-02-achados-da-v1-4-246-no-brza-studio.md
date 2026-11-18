@@ -173,6 +173,6 @@ a sessão que o executa, num worktree do `brza-studio`:
 - **A regra das aspas nos blocos ▶, na norma comum** (a `brand`, em Antigravity, passou `head $(which brza)` sem aspas, e o
   caminho `/Applications/BrzA Studio.app/…` tem espaço): `brza-workflow@c7a9e68`, no `core/AGENTS.md` e na lista fechada
   do teste de ouro (`tests/hooks/golden_differences.py`, o `why` `aspas`), com push no `origin/master` do `brza-workflow`;
-  `brza sync` escreveu o `AGENTS.md` (`44ec360` na `master` do workspace) e mesclou e enviou `brand`, `studio`,
+  `brza sync` escreveu o `AGENTS.md` (`8567d94` na `master` do workspace) e mesclou e enviou `brand`, `studio`,
   `tools-kit` e `workspace`. **Risco:** nenhum para o código; os quatro worktrees ganharam um merge da `master`.
   **Como desfazer:** reverter o `c7a9e68` no `brza-workflow` e rodar o `brza sync`.

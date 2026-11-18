@@ -18,7 +18,7 @@ a norma de lá se a daqui estivesse atrás, mostrar as divergências antes de es
 
 ## A norma daqui não está atrás
 
-- **O brza-workspace nasceu depois do último commit de norma do workspace de origem**: o `0bc2c77`, de 2026-10-27 às
+- **O brza-workspace nasceu depois do último commit de norma do workspace de origem**: o `48bd5b5`, de 2026-10-27 às
   23:49, contra o `3b6ecdb` do checador, às 18:53, e o `084fa47` da `plan-runner`, às 18:52, que o molde e o
   `conduct.md` daqui já trazem (o worklog gravado antes da linha do `## Worklogs`). O checkout local do plugin de lá
   está 17 commits atrás da origin; a comparação foi contra a `origin/master`.

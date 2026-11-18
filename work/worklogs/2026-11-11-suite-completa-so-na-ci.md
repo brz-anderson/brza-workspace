@@ -30,7 +30,7 @@ o binário do pacote npm `bun`, o runtime em que o vitest do `brza-studio` roda.
     vermelho que veio do upstream;
   - o fork não traz as tags do upstream; só a `v1.4.251-alpha.1` está lá.
 - **A norma ganhou a seção "A suíte completa do `brza-studio` só roda na CI do GitHub"** em `.claude/rules/workspace.md`,
-  no commit `ad366f2` da `master`, e chegou aos workstreams pelo `brza note sync`.
+  no commit `cf8a568` da `master`, e chegou aos workstreams pelo `brza note sync`.
 - **As memórias foram ajustadas:**
   - a `suite-completa-uma-vez-no-merge` saiu, porque a regra subiu à norma. A `studio-dd` já a tinha reescrito para
     "só na CI", com a nota de que ela sairia quando a norma chegasse;

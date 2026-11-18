@@ -12,7 +12,7 @@ refs:
 
 Anderson pediu, na sessão `pln-001-molde`, para trabalhar a issue
 [Os Passos e os Desvios do PLN-001 no molde, depois da Run do P44 ao P50](../issues/pln-001-passos-e-desvios-no-molde-depois-da-run.md),
-porque a Run `run_de875fc52a75` tinha fechado no `b102c91` com os Desvios do X1 ao X20. O plano é o
+porque a Run `run_de875fc52a75` tinha fechado no `7959747` com os Desvios do X1 ao X20. O plano é o
 [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](../../plans/PLN-001-o-brza-studio-generico/PLN-001-plan.md).
 
 ## A rodada

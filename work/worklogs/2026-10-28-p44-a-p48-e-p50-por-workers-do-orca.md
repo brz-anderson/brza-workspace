@@ -12,7 +12,7 @@ refs:
 A Run do P44 ao P48 e do P50 do [PLN-001: O BrzA Studio — o build local, o tema, o visualizador, o Windows e o chat](../../plans/PLN-001-o-brza-studio-generico/PLN-001-plan.md),
 executada em 2026-10-28 por três workers do Orca. A Run `run_de875fc52a75` foi coordenada por esta sessão do
 `brza-workspace` (`pln-001-p44-p50`, em modo chat), a pedido de Anderson: "Retome o PLN-001 pelo Retomar do plano
-(commit 3cf6ad6) e dispare com /orchestration a Run do P44 ao P48 e do P50". As rodadas já tinham fechado na sessão de
+(commit 7f5d4d6) e dispare com /orchestration a Run do P44 ao P48 e do P50". As rodadas já tinham fechado na sessão de
 mesmo nome em terminal. Commits `d7f4e5b5618`, `a1213f86859`, `68abc3821cd`, `05aa8af16cc`, `85469cf3b4d` e
 `fc7f07a8a1e` na `master` do `brza-studio`. A evidência detalhada está nos passos do plano.
 

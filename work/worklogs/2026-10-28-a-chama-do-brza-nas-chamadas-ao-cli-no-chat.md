@@ -77,7 +77,7 @@ do `brza-studio`, sobre `fbff699fa58`.
 ## O que ficou aberto
 
 - **O ícone do `git`** é o P44 do PLN-001, que segue sem executar. Ali a pendência "o comando que casa com mais de uma
-  categoria" agora cita a `brzaCli` (`e9c1217`), como em `brza … && git commit`. Hoje vale a primeira da lista que
+  categoria" agora cita a `brzaCli` (`b86e9e2`), como em `brza … && git commit`. Hoje vale a primeira da lista que
   casar.
 
 ## As sessões seguintes
@@ -98,8 +98,8 @@ adaptava os scripts do workspace de origem para o brza. A coordenação foi por 
 entre as duas sessões, sem Run.
 
 - **A divisão**, decidida por Anderson numa rodada da `brza-workspace-80`: o abridor de sessões fica com esta sessão.
-  O `claude-brza`, o `brza-run`, o `brza-install` e o módulo comum `brza_runtime.py` ficam com a outra (`54aefe3`).
-- **O `brza-sessions`** (`scripts/brza/brza-sessions`, `711ed55`, com 6 testes em
+  O `claude-brza`, o `brza-run`, o `brza-install` e o módulo comum `brza_runtime.py` ficam com a outra (`2f6981d`).
+- **O `brza-sessions`** (`scripts/brza/brza-sessions`, `86c6768`, com 6 testes em
   `scripts/brza/tests/test_brza_sessions.py`):
   - abre o chat com `brza agent launch --surface chat` e `/rename <nome>` como primeiro prompt;
   - manda a tarefa pelo `agentSession.send`, com `queue-if-active`, montando o envelope como o
@@ -111,7 +111,7 @@ entre as duas sessões, sem Run.
   fecha chat.
 - **A troca das sessões**, a pedido de Anderson ("peça as sessões que abriram no terminal para que devolvam o trabalho
   pra vc, ai voce fecha elas e reabre com o modo de chat"):
-  - **`pln-001-p44-p50`:** ela gravou o estado no `Retomar` e respondeu "3cf6ad6 — sem Run". O terminal foi fechado, e
+  - **`pln-001-p44-p50`:** ela gravou o estado no `Retomar` e respondeu "7f5d4d6 — sem Run". O terminal foi fechado, e
     a sessão voltou em chat (`claude_6537844c…`) para disparar a Run.
   - **`pln-001-pedido-30`:** ela já tinha terminado, com o worklog `2026-10-28-pedido-30-previa-de-imagem-desenhada.md`.
     O terminal foi fechado e a sessão não voltou.

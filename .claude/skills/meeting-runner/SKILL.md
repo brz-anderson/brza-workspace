@@ -17,7 +17,7 @@ Duas reuniões de 2026-11-07 (Carvão em Brasa, MCP remoto) provaram que persona
 decisões mais maduras a Anderson, mas deixaram 15 de 32 itens do protocolo implícitos e custaram quatro rodadas no tema
 errado, duas personas na cota do Codex e a conta de médias errada. Esta skill fixa o fluxo e os números, para a próxima
 reunião rodar sem improviso. Estado: **v1, protótipo** — a cópia nesta branch veio de `origin/workstream/playground` no SHA
-`03c9579d56fb2304a48821e2c6978e0514cd7df3` (PLN-026 P8) e vai ao `core/` do
+`c7fd33bb131f9569d0a058f215d7f00c846fb1e7` (PLN-026 P8) e vai ao `core/` do
 `brza-workflow` depois de duas reuniões sem desvio de fluxo (PLN-017/R2.1). A reunião smoke de 2026-11-14
 não conta para essa promoção. A primeira reunião pela skill (P7,
 2026-11-09) teve 19 desvios e não conta; as correções deles estão nos passos abaixo, marcadas `(X…)`.

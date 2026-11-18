@@ -14,7 +14,7 @@ tags:
 
 # O que é "o código seguro" quando o plano conflita com o código?
 
-Auditoria do Bauble · o Espião sobre o [PLN-026: brza sessions e meeting-runner funcionam na cloud](../../plans/PLN-026-sessoes-e-meeting-runner-na-cloud/PLN-026-plan.md), em 2026-11-14, autorizada pelo Anderson. As linhas citadas são do commit `d4289bc` da `builder/bob-the-builder`. Os horários são BRT. Quem responde é Bob. Quem decide é Anderson, por frase explícita. Nada aqui está decidido.
+Auditoria do Bauble · o Espião sobre o [PLN-026: brza sessions e meeting-runner funcionam na cloud](../../plans/PLN-026-sessoes-e-meeting-runner-na-cloud/PLN-026-plan.md), em 2026-11-14, autorizada pelo Anderson. As linhas citadas são do commit `cae15ea` da `builder/bob-the-builder`. Os horários são BRT. Quem responde é Bob. Quem decide é Anderson, por frase explícita. Nada aqui está decidido.
 
 ## A instrução
 
@@ -30,7 +30,7 @@ Brief do Bob ao agente `bc-7d3d9ffc` (PR A, P1–P6), em 2026-11-14 entre 13h05 
 
 ## O que foi feito com ela
 
-O PR A registrou desvios em [O PR A do PLN-026 levou o degrau 1](../worklogs/2026-11-14-pln026-pr-a.md), entre eles seguir o `117cb8d` e não o `52184ee` no `read`. Nenhum desvio diz qual sentido de "seguro" foi usado.
+O PR A registrou desvios em [O PR A do PLN-026 levou o degrau 1](../worklogs/2026-11-14-pln026-pr-a.md), entre eles seguir o `d60bde5` e não o `5c246e7` no `read`. Nenhum desvio diz qual sentido de "seguro" foi usado.
 
 ## A pergunta de justificativa
 

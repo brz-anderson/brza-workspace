@@ -14,7 +14,7 @@ tags:
 
 # Por que o brief do P8 mandou copiar a meeting-runner para a branch, se o D4 pedia worktree só de leitura?
 
-Auditoria do Bauble · o Espião sobre o [PLN-026: brza sessions e meeting-runner funcionam na cloud](../../plans/PLN-026-sessoes-e-meeting-runner-na-cloud/PLN-026-plan.md), em 2026-11-14, autorizada pelo Anderson. As linhas citadas são do commit `d4289bc` da `builder/bob-the-builder`. Os horários são BRT. Quem responde é Bob. Quem decide é Anderson, por frase explícita. Nada aqui está decidido.
+Auditoria do Bauble · o Espião sobre o [PLN-026: brza sessions e meeting-runner funcionam na cloud](../../plans/PLN-026-sessoes-e-meeting-runner-na-cloud/PLN-026-plan.md), em 2026-11-14, autorizada pelo Anderson. As linhas citadas são do commit `cae15ea` da `builder/bob-the-builder`. Os horários são BRT. Quem responde é Bob. Quem decide é Anderson, por frase explícita. Nada aqui está decidido.
 
 ## A instrução
 
@@ -22,7 +22,7 @@ Auditoria do Bauble · o Espião sobre o [PLN-026: brza sessions e meeting-runne
 
 ## Onde aparece
 
-Brief do Bob ao agente `bc-ae6dd743` (P8), em 2026-11-14 entre 14h00 e 14h17. O D4 diz "abre um worktree só de leitura de `origin/workstream/playground` em `03c9579d`" (`PLN-026-plan.md:264`). O desvio está em X6 de [O P8 do PLN-026 roda a reunião smoke na cloud](../worklogs/2026-11-14-pln026-p8.md).
+Brief do Bob ao agente `bc-ae6dd743` (P8), em 2026-11-14 entre 14h00 e 14h17. O D4 diz "abre um worktree só de leitura de `origin/workstream/playground` em `c7fd33bb`" (`PLN-026-plan.md:264`). O desvio está em X6 de [O P8 do PLN-026 roda a reunião smoke na cloud](../worklogs/2026-11-14-pln026-p8.md).
 
 ## Por que não é determinística
 
@@ -30,7 +30,7 @@ Plano e brief dão duas ordens incompatíveis para o mesmo passo, e o brief não
 
 ## O que foi feito com ela
 
-O agente seguiu o brief: a skill e o `skillkit` entraram na branch (`61658f0`, `fd476c8`) e o desvio virou X6 e X7. A revisão xhigh `bc-b5fd74c7` aceitou X6 e X7 na branch do Bob, mas disse que o trecho do Desenho ficou velho.
+O agente seguiu o brief: a skill e o `skillkit` entraram na branch (`915f570`, `7f968eb`) e o desvio virou X6 e X7. A revisão xhigh `bc-b5fd74c7` aceitou X6 e X7 na branch do Bob, mas disse que o trecho do Desenho ficou velho.
 
 ## A pergunta de justificativa
 

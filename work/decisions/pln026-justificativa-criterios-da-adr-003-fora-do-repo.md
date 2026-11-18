@@ -14,7 +14,7 @@ tags:
 
 # Onde o executor lê "os critérios de aceite que estão no fim" da ADR-003, se ela não tem arquivo?
 
-Auditoria do Bauble · o Espião sobre o [PLN-026: brza sessions e meeting-runner funcionam na cloud](../../plans/PLN-026-sessoes-e-meeting-runner-na-cloud/PLN-026-plan.md), em 2026-11-14, autorizada pelo Anderson. As linhas citadas são do commit `d4289bc` da `builder/bob-the-builder`. Os horários são BRT. Quem responde é Linus. Quem decide é Anderson, por frase explícita. Nada aqui está decidido.
+Auditoria do Bauble · o Espião sobre o [PLN-026: brza sessions e meeting-runner funcionam na cloud](../../plans/PLN-026-sessoes-e-meeting-runner-na-cloud/PLN-026-plan.md), em 2026-11-14, autorizada pelo Anderson. As linhas citadas são do commit `cae15ea` da `builder/bob-the-builder`. Os horários são BRT. Quem responde é Linus. Quem decide é Anderson, por frase explícita. Nada aqui está decidido.
 
 ## A instrução
 

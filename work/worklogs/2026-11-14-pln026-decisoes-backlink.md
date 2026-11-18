@@ -11,7 +11,7 @@ O [PLN-026: brza sessions e meeting-runner funcionam na cloud](../../plans/PLN-0
 
 ## Desvio
 
-O commit `c21d29020faa800e9fea55ec650939c823ab07d5` saiu pelo conector do GitHub com o autor Anderson Pereira Brzezinski (`brz.anderson.pereira@gmail.com`), e não `Bob The Builder <bob@brza.dev>`, porque o computador do Bauble não tem credencial de push. É desvio de autoria conhecido. O histórico não foi reescrito.
+O commit `5101bc6fecf22059ae910e902b985b371685decd` saiu pelo conector do GitHub com o autor Anderson Pereira Brzezinski (`brz.anderson.pereira@gmail.com`), e não `Bob The Builder <bob@brza.dev>`, porque o computador do Bauble não tem credencial de push. É desvio de autoria conhecido. O histórico não foi reescrito.
 
 ## Checador
 

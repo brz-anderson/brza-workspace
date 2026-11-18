@@ -14,7 +14,7 @@ tags:
 
 # O que conta como "medido, registrado, revisado e avaliado" no PLN-026?
 
-Auditoria do Bauble · o Espião sobre o [PLN-026: brza sessions e meeting-runner funcionam na cloud](../../plans/PLN-026-sessoes-e-meeting-runner-na-cloud/PLN-026-plan.md), em 2026-11-14, autorizada pelo Anderson. As linhas citadas são do commit `d4289bc` da `builder/bob-the-builder`. Os horários são BRT. Quem responde é Bob. Quem decide é Anderson, por frase explícita. Nada aqui está decidido.
+Auditoria do Bauble · o Espião sobre o [PLN-026: brza sessions e meeting-runner funcionam na cloud](../../plans/PLN-026-sessoes-e-meeting-runner-na-cloud/PLN-026-plan.md), em 2026-11-14, autorizada pelo Anderson. As linhas citadas são do commit `cae15ea` da `builder/bob-the-builder`. Os horários são BRT. Quem responde é Bob. Quem decide é Anderson, por frase explícita. Nada aqui está decidido.
 
 ## A instrução
 
@@ -30,7 +30,7 @@ Os quatro verbos não dizem o quê, com que métrica nem por quem. "Medido" pode
 
 ## O que foi feito com ela
 
-Até a rodada 1 da revisão xhigh, não havia horas apontadas (X5) e as revisões ficavam só nos relatórios dos agentes. Depois, `executed_h` passou a ser o relógio entre `52184ee` e `e07fd47`, e duas revisões viraram nota em `work/reviews/`. Os custos ficaram `ausente`.
+Até a rodada 1 da revisão xhigh, não havia horas apontadas (X5) e as revisões ficavam só nos relatórios dos agentes. Depois, `executed_h` passou a ser o relógio entre `5c246e7` e `e07fd47`, e duas revisões viraram nota em `work/reviews/`. Os custos ficaram `ausente`.
 
 ## A pergunta de justificativa
 

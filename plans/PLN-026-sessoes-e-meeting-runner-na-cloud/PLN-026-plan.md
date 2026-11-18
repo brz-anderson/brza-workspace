@@ -20,7 +20,7 @@ tags:
 
 # PLN-026: brza sessions e meeting-runner funcionam na cloud
 
-- **Retomar:** Nenhum passo está concluído antes do merge. P7 e P8 estão implementados e aguardam o merge. A passagem do `92575d1` está na ata [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). A prova do `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b` está na ata [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md). O runtime único é `packages/client/bin/cloud_runtime.py` em `d45b7d82e1db33b07004e3bf36addec5871c7c15`, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2), rebaseado em `2a0580d6cb07d2a4d50ff086016b96ec775dbf8b` (`builder/pln-026-pr-a`). O primeiro `agent -p` não leva `--resume`; o id é o `session_id` do JSON. O transporte lê `BRZA_WORKFLOW_DIR` e não fixa branch. P9 e P10 ficam de fora. `executed_h` 1,7 pelo relógio entre `52184ee` (16:11:00Z) e `e07fd47` (17:54:25Z). A revisão final está em [REV-pln026-final: a revisão xhigh final dos PRs 3 e 2 do PLN-026](../../work/reviews/2026-11-14-REV-pln026-final.md). A correção do home da CLI e do `--mode` é `02524107e6f8af022da2526ec465a7df43c7bc26`.
+- **Retomar:** Nenhum passo está concluído antes do merge. P7 e P8 estão implementados e aguardam o merge. A passagem do `92575d1` está na ata [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). A prova do `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b` está na ata [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md). O runtime único é `packages/client/bin/cloud_runtime.py` em `d45b7d82e1db33b07004e3bf36addec5871c7c15`, [PR 2](https://github.com/brz-anderson/brza-workflow/pull/2), rebaseado em `2a0580d6cb07d2a4d50ff086016b96ec775dbf8b` (`builder/pln-026-pr-a`). O primeiro `agent -p` não leva `--resume`; o id é o `session_id` do JSON. O transporte lê `BRZA_WORKFLOW_DIR` e não fixa branch. P9 e P10 ficam de fora. `executed_h` 1,7 pelo relógio entre `5c246e7` (16:11:00Z) e `e07fd47` (17:54:25Z). A revisão final está em [REV-pln026-final: a revisão xhigh final dos PRs 3 e 2 do PLN-026](../../work/reviews/2026-11-14-REV-pln026-final.md). A correção do home da CLI e do `--mode` é `02524107e6f8af022da2526ec465a7df43c7bc26`.
 
 ## Pedido
 
@@ -68,14 +68,14 @@ tags:
 - **Capacidade fora do conjunto falha com rc diferente de 0** e a mensagem nomeia o runtime e a capacidade.
 - **Métrica que não existe sai `ausente`.** Zero ficaria parecendo medida.
 - **O default de `user_data()` no macOS permanece** `~/Library/Application Support/brza-studio`.
-- **Commit em `builder/*` usa `Bob The Builder <bob@brza.dev>`.** Decisão do Anderson em 2026-11-14 (R3.3). O `52184ee` permanece com Anderson Pereira. Não se reescreve.
+- **Commit em `builder/*` usa `Bob The Builder <bob@brza.dev>`.** Decisão do Anderson em 2026-11-14 (R3.3). O `5c246e7` permanece com Anderson Pereira. Não se reescreve.
 
 ## Pré-requisitos
 
 - **`CURSOR_CONVERSATION_ID` definida, com prefixo `bc-`.** Conferido neste pod em 2026-11-14 (comprimento 39). Sem ela, o degrau 1 não tem run para listar e o P1 para.
 - **`BRZA_CURSOR_API_KEY` presente no pod da prova do P7** (comprimento 102; o valor não foi gravado). O P1, o P2 e o P5 não precisam dela. Sem a chave ou sem o binário `agent`, o `open` não é declarado. A chave entra como segredo com esse nome (R3.2). O wrapper copia para `CURSOR_API_KEY` só no processo filho. Não vai em `--api-key`, no `env.sh` nem no repo.
 - **O binário `agent` 2026.11.13-eacade1 está neste pod**, em `~/.local/bin/agent` (o `cursor-agent` é o mesmo arquivo). `agent --help` sai 0 e lista `-p`, `--output-format`, `--model`, `--workspace`, `--trust`, `--resume` e `--force`. `agent status` sai 0 com "Not logged in". `agent models` sai 1 pedindo autenticação. Um pod novo não herda o binário: a instalação é `curl https://cursor.com/install -fsS | bash`.
-- **A skill `meeting-runner` está nesta branch desde o P8 (X6).** A origem é `origin/workstream/playground` no SHA `03c9579d56fb2304a48821e2c6978e0514cd7df3`. O D4 pedia um worktree só de leitura; a ordem do P8 trouxe a skill, e o `skillkit` de que ela importa (X7). O transporte studio continua o padrão. Não houve merge na master.
+- **A skill `meeting-runner` está nesta branch desde o P8 (X6).** A origem é `origin/workstream/playground` no SHA `c7fd33bb131f9569d0a058f215d7f00c846fb1e7`. O D4 pedia um worktree só de leitura; a ordem do P8 trouxe a skill, e o `skillkit` de que ela importa (X7). O transporte studio continua o padrão. Não houve merge na master.
 
 ## Entrevista
 
@@ -98,7 +98,7 @@ Respondida em 2026-11-14, na sala BrzA Cloud Builders, com aprovação do Anders
 
    **Decidido — `AgentRuntime`, como a ADR-003.** O nome `SessionSource` fica substituído antes de o plano ser gravado. A ADR permanece Proposta até a frase do Anderson.
 
-3. **Abrir este plano, invertendo a R1.4 do PLN-024.** O texto de lá: "este plano não cria a frente do Bob nem mexe em `brza sessions`" (`plans/PLN-024-prefixo-builder/PLN-024-plan.md:97`, na `origin/workstream/workspace` `28608025`). Opções:
+3. **Abrir este plano, invertendo a R1.4 do PLN-024.** O texto de lá: "este plano não cria a frente do Bob nem mexe em `brza sessions`" (`plans/PLN-024-prefixo-builder/PLN-024-plan.md:97`, na `origin/workstream/workspace` `b7b96db3`). Opções:
    - abrir o PLN-026 e criar a frente (a escolhida) — custo: uma branch `builder/` com notas, e o código no `brza-workflow`; se paga: nesta abertura;
    - esperar o PLN-024 executar o verbo `brza note builder` — custo: a reunião de hoje não tem branch; se paga: se a norma do prefixo tiver de existir antes de qualquer nota.
 
@@ -108,7 +108,7 @@ Respondida em 2026-11-14, na sala BrzA Cloud Builders, com aprovação do Anders
    - `builder/bob-the-builder` a partir de `origin/master`, com worktree em `.worktrees/bob-the-builder` (a escolhida) — custo: o `brza note` de hoje recusa a branch, e o commit sai pelo git; se paga: agora, porque a R4 da sala já nomeou a branch;
    - `workstream/bob-the-builder` — custo: contradiz a R4 e o PLN-024; se paga: nunca para esta frente.
 
-   **Decidido — `builder/bob-the-builder`.** Ponto de partida `5491da433fae67d1dd6217ba99862652c927e3f1`.
+   **Decidido — `builder/bob-the-builder`.** Ponto de partida `693f94e3bfce6e79f2c783dd7948942e85c83aa6`.
 
 5. **O comando do `open`.** Opções, na mensagem seguinte:
    - `agent -p --output-format json --model <id> --workspace <dir> --trust`, com `--resume <chatId>` por persona, sem `--force`, e a capacidade só entra quando a prova passar (a escolhida; a ADR já dizia "só é declarada quando provada") — custo: uma chave e um processo por persona; se paga: na primeira ata;
@@ -143,7 +143,7 @@ Respondida em 2026-11-14, na sala BrzA Cloud Builders, com aprovação do Anders
 
 ### Rodada 3 — a ADR fora do repo, a chave e o autor (enviada 2026-11-14)
 
-**Apresentado antes:** o `52184ee` gravou `arquitetura/adr/ADR-003-porta-agent-runtime.md` e saiu com autor Anderson Pereira. Nomes `CURSOR_*` podem ser recusados em agentes da cloud. O `env.sh` só aceita `GIT_*`.
+**Apresentado antes:** o `5c246e7` gravou `arquitetura/adr/ADR-003-porta-agent-runtime.md` e saiu com autor Anderson Pereira. Nomes `CURSOR_*` podem ser recusados em agentes da cloud. O `env.sh` só aceita `GIT_*`.
 
 Respondida em 2026-11-14, pedido do Anderson nesta sessão.
 
@@ -161,10 +161,10 @@ Respondida em 2026-11-14, pedido do Anderson nesta sessão.
    **Decidido — `BRZA_CURSOR_API_KEY` no wrapper, só no filho.** A chave não vai em `--api-key`, no `env.sh` nem no repo.
 
 3. **Autor dos commits em `builder/*`.** Opções:
-   - `Bob The Builder <bob@brza.dev>` daqui para a frente, sem reescrever o `52184ee` (a escolhida) — custo: o primeiro commit fica com outro autor; se paga: neste commit;
-   - reescrever o `52184ee` — custo: reescreve história já publicada; se paga: nunca, com o pedido desta mensagem.
+   - `Bob The Builder <bob@brza.dev>` daqui para a frente, sem reescrever o `5c246e7` (a escolhida) — custo: o primeiro commit fica com outro autor; se paga: neste commit;
+   - reescrever o `5c246e7` — custo: reescreve história já publicada; se paga: nunca, com o pedido desta mensagem.
 
-   **Decidido — Bob daqui para a frente.** O `52184ee` permanece com Anderson Pereira.
+   **Decidido — Bob daqui para a frente.** O `5c246e7` permanece com Anderson Pereira.
 
 ## Desenho
 
@@ -194,7 +194,7 @@ A ADR-003 (autor Linus, status Proposta) não tem arquivo neste repositório. El
 
 #### A meeting-runner
 
-- **Mora em `origin/workstream/playground`**, SHA `03c9579d`, caminho `.claude/skills/meeting-runner/SKILL.md`. Não está na master nem nesta branch. Não está no `brza-workflow` nem no `brza-studio`.
+- **Mora em `origin/workstream/playground`**, SHA `c7fd33bb`, caminho `.claude/skills/meeting-runner/SKILL.md`. Não está na master nem nesta branch. Não está no `brza-workflow` nem no `brza-studio`.
 - **Quem abre é o `brza sessions`.** `SKILL.md:55-56` e `:95-96`; `scripts/launch_persona.py:13-21`. O argv sai de `.claude/scripts/skillkit/sessions_cli.py:45-46`: `<nome> --agent --checkout --prompt-file --title --wait`.
 - **A mensagem da rodada seguinte é `brza sessions send`.** `SKILL.md:114` e `:262`. A espera padrão é `brza sessions wait` (`wait_round.py:10-12`). O marcador `<!-- fim-rodada-N -->` é o registro que o `tally.py` lê (`SKILL.md:120`).
 - **A ata da coordenação é** `work/worklogs/AAAA-MM-DD-<reuniao>-coordenacao.md` (`references/closing.md:33`). O commit previsto pela skill é `brza note commit` na branch do workstream (`closing.md:76`), que nesta branch recusa.
@@ -261,7 +261,7 @@ O degrau 2, com a mesma chave no filho, acrescenta `list` de outras runs, `read`
 
 #### Como fica
 
-A sessão que Anderson pedir abre um worktree só de leitura de `origin/workstream/playground` em `03c9579d` e roda `launch_persona.py` de lá. O manifesto da reunião nasce nesta branch, com 2 personas (ou 3, se a R2.2 mudar), uma rodada, `--agent cursor` e o checkout deste worktree. A ata sai em `work/worklogs/AAAA-MM-DD-<reuniao>-coordenacao.md`, no molde de `references/closing.md`. O commit da ata é nesta branch, sem PR.
+A sessão que Anderson pedir abre um worktree só de leitura de `origin/workstream/playground` em `c7fd33bb` e roda `launch_persona.py` de lá. O manifesto da reunião nasce nesta branch, com 2 personas (ou 3, se a R2.2 mudar), uma rodada, `--agent cursor` e o checkout deste worktree. A ata sai em `work/worklogs/AAAA-MM-DD-<reuniao>-coordenacao.md`, no molde de `references/closing.md`. O commit da ata é nesta branch, sem PR.
 
 ## Passos
 
@@ -374,11 +374,11 @@ Estimado: 3 h · Executado: — h
 
 Repo da ata: `brza-workspace`, branch `builder/bob-the-builder`, sem PR. Risco ao Studio: nenhum; o runtime forçado é `cloud` e o socket não existe neste pod. Desfazer: apagar o worklog da reunião num commit nesta branch e não declarar a reunião feita. Depende do P7 e da R2.2.
 
-- implementado, aguardando merge. **1.** A skill veio de `origin/workstream/playground` `03c9579d56fb2304a48821e2c6978e0514cd7df3` para esta branch (`61658f02461b7cc2d2c8362ec1b91015e30e5020`), com o `skillkit` (`fd476c8fd52cc53ecb21f5374d0821bb141534bb`). X6 e X7.
+- implementado, aguardando merge. **1.** A skill veio de `origin/workstream/playground` `c7fd33bb131f9569d0a058f215d7f00c846fb1e7` para esta branch (`915f5708a5704b919d00733ecbea4fa6cd247ec2`), com o `skillkit` (`7f968eb95008ba78539aa909448c084e3e3441a3`). X6 e X7.
 - implementado, aguardando merge. **2.** `--transport cloud` abre com `CloudRuntime.open(spec)` e manda a rodada com `send(session_id, prompt)`. O checkout vem de `BRZA_WORKFLOW_DIR` e o módulo é `packages/client/bin/cloud_runtime.py`. Sem a variável, a mensagem pede para defini-la. Sem a flag, o `brza sessions` segue igual.
 - implementado, aguardando merge. **3.** As atas smoke estão em `work/worklogs/`, com `<!-- fim-rodada-1 -->` e a marca SMOKE. Não contam para a promoção. O commit é nesta branch, sem PR.
 
-**Evidência:** em PR, sem caixa marcada. A ata da passagem do `92575d1` está em `9c20c76680d0ba589b4e2b2d422fff8c9595e60d`, [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). O transporte desta nota aponta para `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b`. A prova desse SHA, com as duas personas, está em [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md). X8: a rodada contra `a066d39` foi descartada e não é a ata gravada. O probe `e80ab013` saiu da evidência: o JSONL não está no worklog. Custo `ausente`. `leak_count` 0. Marcador `<!-- fim-rodada-1 -->`. O detalhe está no [O P8 do PLN-026 roda a reunião smoke na cloud](../../work/worklogs/2026-11-14-pln026-p8.md). Executado: — h (X5).
+**Evidência:** em PR, sem caixa marcada. A ata da passagem do `92575d1` está em `93956d5135303451403ad0b6e3520b984ff85486`, [A reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-coordenacao.md). O transporte desta nota aponta para `e07fd479fef2b5cc7e3656ca0e2cb6a05ec9274b`. A prova desse SHA, com as duas personas, está em [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md). X8: a rodada contra `a066d39` foi descartada e não é a ata gravada. O probe `e80ab013` saiu da evidência: o JSONL não está no worklog. Custo `ausente`. `leak_count` 0. Marcador `<!-- fim-rodada-1 -->`. O detalhe está no [O P8 do PLN-026 roda a reunião smoke na cloud](../../work/worklogs/2026-11-14-pln026-p8.md). Executado: — h (X5).
 
 ### P9 — `GROK_HOME` pela regra do Studio
 
@@ -435,7 +435,7 @@ Repo: `brza-workflow`, PR próprio. Risco ao Studio: nenhum. Desfazer: reverter 
   [A segunda reunião smoke do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-2-coordenacao.md)
 - 2026-11-14 — R1 do PR A: help, porta, tokens, chave e o gate da sentinela. As caixas seguem abertas.
   [O PR A do PLN-026 levou o degrau 1](../../work/worklogs/2026-11-14-pln026-pr-a.md)
-- 2026-11-14 — `## Decisões` aponta as 13 notas da auditoria. Desvio de autoria do `c21d290`, sem reescrever histórico.
+- 2026-11-14 — `## Decisões` aponta as 13 notas da auditoria. Desvio de autoria do `5101bc6`, sem reescrever histórico.
   [O PLN-026 aponta as treze decisões da auditoria](../../work/worklogs/2026-11-14-pln026-decisoes-backlink.md)
 - 2026-11-14 — ata smoke final contra `61e47ed`, com o PR #3 em `ed7d91b`. Não conta para a promoção.
   [A reunião smoke final do PLN-026 não conta para a promoção](../../work/worklogs/2026-11-14-pln026-reuniao-smoke-final-coordenacao.md)

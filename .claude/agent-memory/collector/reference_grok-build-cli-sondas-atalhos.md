@@ -13,7 +13,7 @@ Aprendido em 2026-11-03 (grok 1.0.70, `/opt/homebrew/bin/grok`, ST @ 8f41dd5). C
 
 **Armadilhas de execução**
 - Sem trust o `inspect` não carrega nada de projeto (instruções, skills, hooks, `.claude/settings.json`), mas lista os agentes. Use `GROK_FOLDER_TRUST=0` por processo para não gravar `~/.grok/trusted_folders.toml`.
-- Rode com `env -i HOME="$HOME" PATH="$PATH" TERM=dumb GROK_FOLDER_TRUST=0 GROK_MEMORY=0 grok -p …`: o Grok roda também os hooks de `~/.claude/settings.json` (Orca) e do plugin `projeto-externo` (`deny_out_of_scope_write.py`), e a memória do app vem ligada por configuração remota (captura em `~/.grok/memory-v2`).
+- Rode com `env -i HOME="$HOME" PATH="$PATH" TERM=dumb GROK_FOLDER_TRUST=0 GROK_MEMORY=0 grok -p …`: o Grok roda também os hooks de `~/.claude/settings.json` (Orca) e de um plugin externo que barra escrita fora de escopo, e a memória do app vem ligada por configuração remota (captura em `~/.grok/memory-v2`).
 - `--max-turns` mínimo é 1; o `-p` que passa de `--max-turns` sai com 1 e "Error: max turns reached".
 - A primeira corrida sob `--sandbox` cria arquivos vazios em `~/.grok` (`bundles/`, `hooks/`, `hooks-paths`, `sandbox.toml`, `trusted_folders.toml`): conte como "Fora do workspace".
 - No zsh da ferramenta `echo ===` falha ("= not found"); use outro separador.

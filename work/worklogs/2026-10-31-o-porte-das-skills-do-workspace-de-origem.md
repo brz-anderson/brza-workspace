@@ -5,7 +5,6 @@ refs:
   - PLN-002
   - PLN-004
   - issue:close-task-sem-varredura-de-notes-nem-worktrees-sujos
-  - issue:skills-de-documento-da-projeto-externo-num-plugin
 ---
 
 # O porte das skills do workspace de origem para o workspace

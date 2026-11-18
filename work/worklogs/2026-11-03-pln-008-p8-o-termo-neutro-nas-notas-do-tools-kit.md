@@ -7,17 +7,16 @@ refs:
   - PLN-003
   - PLN-008
   - PLN-009
-  - issue:scripts-da-projeto-externo-fora-do-port-para-o-brza
-  - issue:skills-de-documento-da-projeto-externo-num-plugin
 ---
 
 # O PLN-008 P8: o termo neutro nas notas do tools-kit
 
 A pedido da sessão `workspace-a6`, com a autorização de Anderson de 2026-11-03 ("sim", à pergunta "Posso abrir as
 sessões?" do D11), esta sessão tirou das notas do `tools-kit` as citações ao workspace de origem, trocadas por "outro
-workspace" ou "o workspace de origem", sem nome nem ID da nota de lá (R15.1, R15.2, R16.1, R16.3). Ficaram, pela R17.1,
-as duas identidades `issue:<slug>` antigas no `refs`. O PLN-008 e o D11 moram no workstream `workspace` e não foram
-editados daqui.
+workspace" ou "o workspace de origem", sem nome nem ID da nota de lá (R15.1, R15.2, R16.1, R16.3).
+A R17.1 tinha mantido no `refs` a identidade antiga das duas issues; esse slug saiu,
+e as notas apontam as issues pelo link. O PLN-008 e o D11 moram no workstream `workspace`
+e não foram editados daqui.
 
 ## O que se fez
 

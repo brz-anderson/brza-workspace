@@ -18,7 +18,7 @@ tags:
 # PLN-007: A marca BrzA tem símbolo, logotipo e derivadas a partir da chama do app
 
 - **Retomar:** os seis passos executados; P1 a P6 estão na `master` do `brza-studio` (o P6 em `5c286937e0c`) e o README
-  do workspace na `master` daqui (`b30b6bc`). O commit `6d47623` e a tag `v1.4.246-alpha.1` estão no origin; agora há o
+  do workspace na `master` daqui (`b497db3`). O commit `6d47623` e a tag `v1.4.246-alpha.1` estão no origin; agora há o
   commit `release: v1.4.246-alpha.2` (`2511b6298d7`) e a tag anotada `v1.4.246-alpha.2`, **só locais** (com o menu "+" sem
   os agentes não instalados e os pedidos 37 a 42 do PLN-001), e o DMG final em
   `~/Projects/brza-studio/dist/brza-studio-1.4.246-alpha.2-macos-arm64.dmg`. O plano **não fecha** (`status` segue
@@ -98,7 +98,7 @@ Estimado: 6,5 h · Executado: 0,25 h
 [`PLN-007-simbolo-a1.png`](PLN-007-simbolo-a1.png); `magick compare -metric AE` do traço mono original contra a chama do
 mestre, a 1024 px, dá 347 px de 1 milhão, todos no `}` solto e no `{`, que são a correção do D2 e o espelho; o S1 gerado
 tem 12 subpaths e o solto em 9,06–10,08 × 16,68–19,56, igual à sonda do Desenho. O 1024 px saiu pelo `rsvg-convert`, e
-não pelo artboard, que tem 736 px. A aprovação é a [R10](PLN-007-interview.md), e o commit é `f1f7fe6` em `workstream/brand`. A fonte e o gerador estão em
+não pelo artboard, que tem 736 px. A aprovação é a [R10](PLN-007-interview.md), e o commit é `74ef8a4` em `workstream/brand`. A fonte e o gerador estão em
 `PLN-007-fonte-da-marca/`; o `brza-brand-build.mjs` regenera os SVG idênticos, pixel a pixel. O mestre sai sem a língua
 clara e sem as faíscas do D1, por decisão da R10.
 
@@ -293,7 +293,7 @@ Estimado: 1,5 h · Executado: 0,75 h
 
 - **5:** `curl -sI` das duas URLs do raw (`…/brza-studio/master/resources/brand/brza-workspace-lockup-horizontal-{dark,light}.svg`)
   deu `HTTP/2 200` e `content-type: image/svg+xml`, depois do merge do P4; o `<picture>` do D8 está no título do `README.md`
-  da `master` do workspace, em `b30b6bc`, com push. 
+  da `master` do workspace, em `b497db3`, com push. 
 - **1:** com um stub que devolvia o texto sem trocar, `cli-display-name.test.ts` deu 3 falhas e 1 passe; o root help trazia o
   cabeçalho `orca`, `Usage: orca <command> [options]` e `$ orca open`, 90 linhas casando. A regex do plano,
   `(^|\s)orca\s`, não pega o cabeçalho `orca` sozinho na linha, e o teste usa `(^|\s)orca(\s|$)`.

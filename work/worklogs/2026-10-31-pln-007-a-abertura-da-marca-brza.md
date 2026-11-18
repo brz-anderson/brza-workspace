@@ -15,7 +15,7 @@ app para montar a logo", e respondeu ali a R1: o workstream novo `brand`, o guar
 
 ## O que se decidiu
 
-A R1, gravada como chegou da sessão do `workspace`. O número subiu na `master` em `d85c783`.
+A R1, gravada como chegou da sessão do `workspace`. O número subiu na `master` em `07bec22`.
 
 A R2, com artboards no chat: o símbolo é a ilustração do ícone de hoje (A1), com o `}` solto refeito inteiro; a marca é
 monolítica (B1); a sessão desenha o SVG à mão; a referência é o próprio ícone. No meio da rodada, Anderson pediu a borda

@@ -33,7 +33,7 @@ não foi editado.
 4. **Recommit do worklog da MIG-001:** `2026-11-03-mig-001-a-aplicacao-no-brand.md` perdeu os dois pareceres do
    `refs`, que só vinham do texto do link para a migração; ficaram a migração e o PLN-008.
 5. **Checador:** `check_notes.py` com 64 arquivos, 0 links não resolvidos, 0 erros e 0 avisos.
-6. **Commit** `2c18797` na `origin/workstream/brand`, pelo `brza note commit`, só os cinco caminhos.
+6. **Commit** `b634aaa` na `origin/workstream/brand`, pelo `brza note commit`, só os cinco caminhos.
 7. **Conferência final:** o `git grep -il` do nome, fora do `.brza/index.jsonl`, saiu vazio (código 1). Não sobrou
    nada, nem norma, nem `refs`/`depends_on` com as duas exceções da R17.1.
 

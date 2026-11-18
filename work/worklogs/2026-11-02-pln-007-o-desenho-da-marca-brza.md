@@ -91,7 +91,7 @@ e avisa a `brand-24` pelo correio ao terminar. A issue fecha aqui, no `brand`.
   - **Estado:** ativa.
   - **Como desfazer:** fechar a aba quando a sessão terminar.
 
-O conserto voltou: `8d554e7` na `master`, com o arquivo da lista achado pelo import do shell dos visuais; Anderson
+O conserto voltou: `a5a3ac6` na `master`, com o arquivo da lista achado pelo import do shell dos visuais; Anderson
 relatou os 98 `unittest` passando e o teste novo falhando antes. A sessão conferiu o commit na `origin/master` e rodou o
 `brza shot` oficial: o PNG saiu igual ao da cópia do scratch, e a issue fechou.
 
@@ -158,7 +158,7 @@ O P4 correu num `implementer`, com o pedido em `/private/tmp/pln-007/prompt-p4.m
   puxou 5 372 arquivos.
 - Merge do P4 na `master` do `brza-studio`, `1bfb496aebf`, fast-forward e push, como a R11 mandou (em ordem, com os checks).
   Depois, o README do workspace: as duas URLs do raw deram `200` e `image/svg+xml`, e o `<picture>` foi à `master` daqui,
-  `b30b6bc`.
+  `b497db3`.
 - **C5, C7 e C8** foram feitos pelo `brza shot`, a pedido de Anderson ("rode os casos manuais utilizando o `brza shot`"):
   o PNG está em `PLN-007-casos-c5-c7-c8.png`, e o veredito diz "visto no artboard", porque o `brza shot` converte um
   artboard e não abre o app. Na primeira passada o dock pequeno usou a arte de 1024 reduzida, com o selo, e o `.icns` não
@@ -172,7 +172,7 @@ O P4 correu num `implementer`, com o pedido em `/private/tmp/pln-007/prompt-p4.m
 - **O worktree `.worktrees/pln-007-brand-assets` e a branch `feat/pln-007-brand-assets` do `brza-studio`**, removidos
   depois do merge; **risco:** nenhum, a branch estava contida na `master`; **estado:** removidos; **como desfazer:**
   `git worktree add` a partir do `1bfb496aebf`.
-- **Dois pushes à `master`:** `a3a89e3aaf5..1bfb496aebf` no `brza-studio` e `3c40096..b30b6bc` no `brza-workspace`.
+- **Dois pushes à `master`:** `a3a89e3aaf5..1bfb496aebf` no `brza-studio` e `231176c..b497db3` no `brza-workspace`.
 
 ## A execução do P5
 

@@ -13,7 +13,7 @@ O pedido da sessão `workspace-a6`, em 2026-11-03: o item 4 da aplicação da
 no workstream `brand`, parte do
 [PLN-008: O worklog cita no refs os planos, issues, revisões e migrações que toca](../../plans/PLN-008-o-worklog-cita-os-refs/PLN-008-plan.md)
 (P6). A autorização é de Anderson, de 2026-11-03: "sim", à pergunta "Abro as três sessões com o mesmo roteiro do
-`tools-kit`?". `tools-kit` (`bf36704`) e `workspace` (`361d0d4`) já tinham aplicado. A MIG-001 e o PLN-008 moram no
+`tools-kit`?". `tools-kit` (`f918157`) e `workspace` (`afc3814`) já tinham aplicado. A MIG-001 e o PLN-008 moram no
 `workspace`, e a consolidação é da sessão `workspace-a6`; daqui não foram editados.
 
 ## O que se fez
@@ -35,7 +35,7 @@ no workstream `brand`, parte do
    python3 "$HOME/Projects/brza-workflow/scripts/migrate_pln008.py" --apply --workstream brand
    ```
 
-   Saída 0, com as mesmas contagens. Commit `0e80b71` (`docs(pln-008): migração MIG-001 em brand`), só os quatro
+   Saída 0, com as mesmas contagens. Commit `c0cad57` (`docs(pln-008): migração MIG-001 em brand`), só os quatro
    worklogs, 16 linhas acrescentadas, com push na `origin/workstream/brand`. O índice saiu "bootstrap em dia" e "em
    dia, nada a acrescentar": nenhum commit na `master`.
 4. **Checador:** `python3 .claude/skills/notes-checker/scripts/check_notes.py` com 63 arquivos, 0 links não

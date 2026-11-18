@@ -264,18 +264,18 @@ Estimado: 2 h · Executado: 2,0 h medidas, das quais 1,7 h de espera das sessõe
 
 Evidência parcial de P6 em 2026-11-03: `brza-workflow@a666e78` já publicado; CLI completa (467 testes em
 199,593 s), hooks completos (288 em 21,128 s) e notes-checker (26 casos) passaram, com
-`TMPDIR=/tmp PYTHONDONTWRITEBYTECODE=1`. `brza-sync --ref a666e78` publicou `brza-workspace@5dcc2b3` e levou a norma
-às cinco árvores. `brza-note index --bootstrap-pln008` reservou REV-001 a REV-004 e MIG-001 em `4bb114e`.
+`TMPDIR=/tmp PYTHONDONTWRITEBYTECODE=1`. `brza-sync --ref a666e78` publicou `brza-workspace@0613191` e levou a norma
+às cinco árvores. `brza-note index --bootstrap-pln008` reservou REV-001 a REV-004 e MIG-001 em `415ec9d`.
 Prévia: quatro renomeações e 97 worklogs (29 tools-kit, 21 workspace, 4 brand, 43 studio); playground sem mudanças.
 Revisão prévia em REV-005: A1 e A2 corrigidos na MIG-001, A3 falso, por rodada de 2026-11-03. Ensaio em clone
 isolado (`/private/tmp/pln008-sandbox`): seis passagens de `migrate_pln008.py --apply` na ordem da MIG saíram com 0, e
 os três blocos do critério passaram, o de preservação com 107 notas (98 worklogs); um commit mutante sem `tags` foi
-barrado. Aplicação real em 2026-11-03: `tools-kit` em `bf36704` (prévia igual ao ensaio; segunda passagem zerada) e
-`workspace` em `361d0d4` (REV-002 a REV-004, 22 worklogs); checador sem erros nas duas árvores; bloco de preservação
-restrito a elas: 60 notas, 51 worklogs. Depois, `brand` em `0e80b71`, `studio` em `d5abc5e` e `playground` sem
+barrado. Aplicação real em 2026-11-03: `tools-kit` em `f918157` (prévia igual ao ensaio; segunda passagem zerada) e
+`workspace` em `afc3814` (REV-002 a REV-004, 22 worklogs); checador sem erros nas duas árvores; bloco de preservação
+restrito a elas: 60 notas, 51 worklogs. Depois, `brand` em `c0cad57`, `studio` em `5941b29` e `playground` sem
 mudança, cada um pela sessão dona, com checador sem erros. Conclusão: os três blocos do critério da MIG-001 saíram com
 0 nas cinco árvores (preservação em 107 notas, 98 worklogs); dois `brza note index --rebuild` seguidos responderam "em
-dia, nada a acrescentar", com a master parada em `e8606a4`. MIG-001 `done`. P6 concluído; horas não aferidas.
+dia, nada a acrescentar", com a master parada em `fab29a1`. MIG-001 `done`. P6 concluído; horas não aferidas.
 
 ### P7 — Revisar a entrega e fechar o plano
 
@@ -310,7 +310,7 @@ Evidência parcial de 2026-11-03: `brza-workflow@30b3666`, pela sessão `pln008-
 Ele traz os três avisos (`review-without-number`, `migration-without-type`, `migration-type-without-number`), a norma
 de `depends_on` de volta ao D2, o texto do link fora das duas cópias do extrator e um teste de paridade entre elas.
 `tests/cli` deu 471 OK em 197,8 s, `tests/hooks` 288 OK e o notes-checker 99 verificações, tudo sem a `BRZA_WORKSPACE`.
-O `brza sync --ref 30b3666` publicou `2130026` e levou a norma aos cinco workstreams. Desvio X1: a crase dentro do
+O `brza sync --ref 30b3666` publicou `a58a652` e levou a norma aos cinco workstreams. Desvio X1: a crase dentro do
 texto de um link sai com ele, como o D3 da R14.3 manda. Com o extrator novo, o `refs` muda nos 4 worklogs previstos e
 em dois do `workspace`, que ganhariam o PLN-011 do `studio` (R15).
 
@@ -335,10 +335,10 @@ Evidência do D11, em 2026-11-03:
 - **`brza-workflow@ebb4e7d`**, pela sessão `d11-brza-workflow`, com o e-mail do `brz-anderson`: 18 arquivos; a guarda lê
   `~/.config/brza/foreign.txt`, criado nesta máquina. Suítes sem a `BRZA_WORKSPACE`: CLI 483 OK em 197,9 s, hooks 291
   OK, notes-checker 99 checagens e `tests/mcp` 358 OK. Desvio X2: o arquivo que existe e não se lê é recusado, aceito
-  na R18.3. O sync `8098514` levou a norma aos cinco workstreams.
-- **Master:** `bc4f5ba` deixou o `README.md` e a regra local neutros, e o `brza note sync` a levou às branches.
-- **Notas:** `tools-kit` em `9a40746`, `ffc0cf7` e `e3fd4d2` (a segunda passagem nos links); `studio` em `3297189`;
-  `brand` em `2c18797`; `playground` em `e271921`; `workspace` em `835f023`. Nove arquivos foram renomeados pelo mapa,
+  na R18.3. O sync `321829c` levou a norma aos cinco workstreams.
+- **Master:** `8a036f5` deixou o `README.md` e a regra local neutros, e o `brza note sync` a levou às branches.
+- **Notas:** `tools-kit` em `8e9e2e7`, `1d88bda` e `7fdc1e6` (a segunda passagem nos links); `studio` em `3b1a093`;
+  `brand` em `b634aaa`; `playground` em `1567e80`; `workspace` em `7ebaeb5`. Nove arquivos foram renomeados pelo mapa,
   e os worklogs do `refs` ganharam novo commit nos mesmos commits.
 - **Conferência:** o grep pelo nome do workspace de origem não acha nada nos arquivos atuais das cinco branches, da
   master e do `brza-workflow`, salvo o índice e as identidades da R17.1. O checador dá 0 erros nas cinco árvores, e os

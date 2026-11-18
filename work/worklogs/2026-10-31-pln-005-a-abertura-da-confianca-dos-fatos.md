@@ -55,7 +55,7 @@ que a devolução não é texto: chega pelo `SubagentHandback`, e a especificaç
 
 A R6 decidiu que a citação errada de um fato verdadeiro sai `holds` com `cite: off`. O `implementer` fez o `run`, o
 disparo no fim do `stop`, a marca no `turn` da sessão `-p` e a entrada no `settings.json`, com 22 testes; a R7 fechou
-as três escolhas dele, e a sessão aplicou a da cerca. Desde o `3e123f0`, toda devolução do `designer` e do
+as três escolhas dele, e a sessão aplicou a da cerca. Desde o `2506e82`, toda devolução do `designer` e do
 `collector` com fato `rodado`, `lido` ou `doc` dispara a auditoria.
 
 ## O desfecho da sessão (P5)
@@ -95,21 +95,21 @@ O plano fechou com 4,1 h executadas de 10,5 estimadas. A confiança do `reviewer
 ## Pendente fora do plano
 
 - **O `brza note commit` não commita arquivo apagado:** o `git add` do caminho falha com "pathspec did not match", e a
-  remoção da memória do separador foi por `git commit` direto (`d205495`). É do `tools-kit`, e fica para uma sessão de
+  remoção da memória do separador foi por `git commit` direto (`173bedf`). É do `tools-kit`, e fica para uma sessão de
   lá.
 - **Candidato à norma, da memória do `reviewer`:** medida de largura de linha se refaz com o `len()` do Python, porque
   o `awk length` do macOS conta bytes e acusa falso positivo em linha com acento.
 
 ## Na master
 
-- `2e8ea67` — "Último PLN usado" passa a 005 no `plans/README.md`.
-- `68a925c` — a marca de confiança no `designer.md` e no `collector.md` (P2).
-- `8d22660` — o `fact_audit.py stop` e os testes (P3).
-- `3e123f0` — o `fact_audit.py run`, o `turn` marcado, o resumo e o `settings.json` (P4).
-- `98a60d3` — o `fact_outcome.py` e os testes (P5).
-- `72f684a` — o `--facts` do resumo (P6).
-- `4c92097` — a auditoria no `CLAUDE.md`, no `README.md` e no `close-task` (P7).
-- `b3e3efd` — a premissa fora da marca e o resumo que cita só o id, nos papéis (R10.1).
-- `13a291a` — a marca tolerante e o teto por fato (P10).
-- `2c9a546` — as correções da revisão (P11).
-- `cfa058e` — a coluna `rebaixados` no `--facts` (P11, R12.3).
+- `f50bf7d` — "Último PLN usado" passa a 005 no `plans/README.md`.
+- `e54499f` — a marca de confiança no `designer.md` e no `collector.md` (P2).
+- `6db8589` — o `fact_audit.py stop` e os testes (P3).
+- `2506e82` — o `fact_audit.py run`, o `turn` marcado, o resumo e o `settings.json` (P4).
+- `59c50e1` — o `fact_outcome.py` e os testes (P5).
+- `4d8e63a` — o `--facts` do resumo (P6).
+- `84c2906` — a auditoria no `CLAUDE.md`, no `README.md` e no `close-task` (P7).
+- `6137e6d` — a premissa fora da marca e o resumo que cita só o id, nos papéis (R10.1).
+- `de74787` — a marca tolerante e o teto por fato (P10).
+- `2c37ba8` — as correções da revisão (P11).
+- `9941d37` — a coluna `rebaixados` no `--facts` (P11, R12.3).

@@ -283,8 +283,8 @@ Respondida em 2026-11-03, na sessão `workspace`: "ambos recomendado".
 
 ### Rodada 11 — numeração das revisões e sessão do rebuild (enviada 2026-11-03)
 
-**Apresentado antes:** primeira inclusão no git: PLN-002 em 29/10 (`f77e28c`), PLN-005 em 31/10 (`a875f64`),
-PLN-006 P1–P7 em 02/11 às 12:24 (`e4d457f`), PLN-006 P8 às 13:53 (`f3db26b`). A sessão atual é inserida pelo
+**Apresentado antes:** primeira inclusão no git: PLN-002 em 29/10 (`8abdb9c`), PLN-005 em 31/10 (`069f760`),
+PLN-006 P1–P7 em 02/11 às 12:24 (`f2de063`), PLN-006 P8 às 13:53 (`691a9aa`). A sessão atual é inserida pelo
 `index_line`, inclusive no rebuild (`brza-workflow/bin/brza-note:539-549,654-661`), sem recuperar autoria histórica.
 
 Respondida em 2026-11-03, na sessão `workspace`: "11.1.1 / 11.2.2".

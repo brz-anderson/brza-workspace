@@ -25,8 +25,8 @@ a sessão não o tomou por resposta.
 ## O que corre
 
 - A revisão adversária do `brza-workflow` (parte do P9), retomada depois de parar no limite de uso.
-- O porte, ao núcleo, dos dois commits que a `master` do `brza-workspace` ganhou depois da cópia do P1: `2c9a546` e
-  `cfa058e`, do PLN-005, em oito arquivos.
+- O porte, ao núcleo, dos dois commits que a `master` do `brza-workspace` ganhou depois da cópia do P1: `2c37ba8` e
+  `9941d37`, do PLN-005, em oito arquivos.
 
 ## A revisão e os consertos
 
@@ -42,10 +42,10 @@ Os nove estágios do D12 rodaram nesta sessão, com a evidência no P8 do plano.
 - **X28:** o README e a `.claude/rules/workspace.md` receberam antes o que o sync tira do `AGENTS.md` e do `CLAUDE.md`.
 
 Na `master` do `brza-workspace`, a migração deixou cinco commits:
-- `2e6ea1d`: o manifesto e as regras;
-- `1fd3be0`: o índice, com 29 linhas;
-- `a45018c`: o sync;
-- `bbe723b`: os scripts e os testes;
+- `fa6adf7`: o manifesto e as regras;
+- `1b7e29f`: o índice, com 29 linhas;
+- `2c3e167`: o sync;
+- `694c20d`: os scripts e os testes;
 - o merge nos quatro workstreams.
 
 Sobraram dois `hook_error` na medição, das 12:59. São das sondas da trava do `/compact` que rodei sem o modo `pre`, e
@@ -59,11 +59,11 @@ A revisão da migração está em
 - **O incidente:** o ensaio do revisor, rodado de um clone, escreveu o `fa4152f` na `master` real, porque a
   `BRZA_WORKSPACE` herdada venceu o cwd (A1).
 - **O reset:** a trava do runtime barrou o `reset` do revisor, e a sessão não o repassou. Anderson escolheu "Eu rodo o
-  reset (Recomendado)", e o `git reset --keep bca0a4f` trouxe a `master` de volta à `origin`.
+  reset (Recomendado)", e o `git reset --keep c3f7628` trouxe a `master` de volta à `origin`.
 - **Os consertos, pela regra da recomendada:**
-  - A2 e A6 em `brza-workspace@f12fdd4`;
+  - A2 e A6 em `brza-workspace@804dcaf`;
   - A7 no worklog;
-  - A1, A3, A4, A5 e A8 em `brza-workflow@a313ec5`, levados ao `brza-workspace` pelo `brza sync` (`afc3859`).
+  - A1, A3, A4, A5 e A8 em `brza-workflow@a313ec5`, levados ao `brza-workspace` pelo `brza sync` (`3a7ec1d`).
 
 O plano fechou. As sobras foram para
 [As sobras do PLN-006 no brza-workflow e no plano](../issues/as-sobras-do-pln-006.md).
@@ -159,9 +159,9 @@ O plano fechou. As sobras foram para
   do chat, roda o CLI do `brza-workflow`; um defeito dele chega a todas. **Estado:** ativo; o `brza doctor` dá `ok`.
   **Como desfazer:** antes, os 13 links (`brza-agents`, `-app`, `-dev`, `-doctor`, `-install`, `-note`, `-print`,
   `-run`, `-sessions`, `-shot`, `-test`, `-tree` e `claude-brza`) apontavam todos para
-  `~/Projects/brza-workspace/scripts/brza/<nome>`, e oito desses alvos não existem mais desde o `bbe723b`. A volta pede
-  um checkout no `a45018c`, o último commit com eles:
-  `git -C ~/Projects/brza-workspace worktree add --detach ~/Projects/brza-workspace-volta a45018c`; depois,
+  `~/Projects/brza-workspace/scripts/brza/<nome>`, e oito desses alvos não existem mais desde o `694c20d`. A volta pede
+  um checkout no `2c3e167`, o último commit com eles:
+  `git -C ~/Projects/brza-workspace worktree add --detach ~/Projects/brza-workspace-volta 2c3e167`; depois,
   `ln -sfn ~/Projects/brza-workspace-volta/scripts/brza/<nome> ~/.local/bin/<nome>` para cada um dos 13, e `rm` dos
   quatro novos (`brza-init`, `brza-sync`, `brza-register`, `brza-where`). O revisor conferiu que os oito `--help`
   saem com 0 por esse checkout.
@@ -170,6 +170,6 @@ O plano fechou. As sobras foram para
   uma `brza_claude_fallback` que chama a função `claude` do workspace de origem (estágio 8). As `adm-claude` e `claude-adm` ficam. **Risco:**
   sem o checkout do `brza-workflow`, o `source` falha e a `claude` cai na de verdade, sem o workspace de origem. **Estado:** ativo;
   `zsh -n` ok, e a `claude` roteia nos três casos. **Como desfazer:** trocar as quatro linhas novas pelo bloco
-  antigo, que está na seção "Funções do shell" do `git -C ~/Projects/brza-workspace show d85c783:README.md`, com as
+  antigo, que está na seção "Funções do shell" do `git -C ~/Projects/brza-workspace show 07bec22:README.md`, com as
   `BRZA_WORKSPACE` e `BRZA_STUDIO` de volta; uma cópia do `~/.zshrc` de antes ficou em `/private/tmp/pln006/zshrc-antes`,
   que o macOS pode apagar.

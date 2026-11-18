@@ -44,7 +44,7 @@ Vieram como correções de Anderson ao longo da conversa:
 
 Dois arquivos de exemplo, no scratch do chat, mostraram o formato; Anderson: "está bom assim". O rascunho das três
 regras foi à rodada de aprovação na mensagem, e Anderson respondeu "1" (aprovar como estão). Entraram no `AGENTS.md`,
-na `master`, em `2d3f0f6`, e chegaram aos três workstreams pelo `brza note sync`. As duas memórias que as guardavam
+na `master`, em `b0d306c`, e chegaram aos três workstreams pelo `brza note sync`. As duas memórias que as guardavam
 saíram de `memory/`.
 
 ## A memória neste commit

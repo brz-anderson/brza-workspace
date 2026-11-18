@@ -35,7 +35,7 @@ o workstream (Recomendado)"; e, sobre o texto, "A.1 e F.1".
 ## Onde mais está
 
 - **A norma:** o `AGENTS.md`, "Cada workstream aprende na memória dele", e o `CLAUDE.md`, "A memória vai ao
-  workstream" e a tabela da medição, em `77f018c` na `master`.
+  workstream" e a tabela da medição, em `154f688` na `master`.
 - **Os agentes:** `.claude/agents/`, no mesmo commit.
 - **O `brza-studio`:** a linha `/.claude/agent-memory` no `.gitignore`, em `3e36a6945f2`.
 - **O registro:** [A memória por workstream, os subagentes por papel e as métricas](../worklogs/2026-10-30-a-memoria-por-workstream-os-subagentes-por-papel-e-as-metricas.md).

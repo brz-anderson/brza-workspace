@@ -47,7 +47,7 @@ rodada.
 ## Os três itens do review-writer
 
 Três `designer` defenderam, em paralelo, um item cada. Nenhum achou caso em que a falta custou algo, salvo a ordem de
-revisão: a lente da falha silenciosa teria pegado o `brza tree` que dizia `ok` sem instalar o `mobile/` (`f87357d`). O
+revisão: a lente da falha silenciosa teria pegado o `brza tree` que dizia `ok` sem instalar o `mobile/` (`a85300f`). O
 papel `reviewer` nunca rodou, e houve um parecer só, o do PLN-002, sem achado falso.
 
 - **Confiança:** "Número, só texto" — de 0 a 100, com corte em 80, sem aviso no checador. O melhor argumento contra,
@@ -61,7 +61,7 @@ papel `reviewer` nunca rodou, e houve um parecer só, o do PLN-002, sem achado f
 - **Os detalhes:** a `dúvida` "Sai" dos tipos de achado; a confiança vai "Antes da seta"; a lista "Não é achado" "Fica
   de fora".
 
-O texto foi aprovado na mensagem ("1", pode aplicar) e gravado na `master` em `038c82d`: o `reviewer.md`, o
+O texto foi aprovado na mensagem ("1", pode aplicar) e gravado na `master` em `dd7bda6`: o `reviewer.md`, o
 `conduct.md` e o `close.md` do `plan-runner` e o `work/README.md`. O gate do `brza-studio` virou ponteiro ao `AGENTS.md`
 de lá, porque o rascunho citava um comando que não é o dele.
 
@@ -90,12 +90,12 @@ que o pedido contraria. A iteração 2 deu 100% contra 87%, com ~+12 mil tokens 
 contra 5/8: só a versão com a skill achou o `~/.zshrc` sem o `--agents` e o `gh` na conta corporativa, os dois
 conferidos; a sem a skill afirmou que o `~/.zshrc` batia com o `README.md`. As outras duas tarefas empataram.
 
-Anderson: "tudo aprovado, segue". A skill entrou na `master` em `3f55576`, em `.claude/skills/agent-instructions-writer/`.
+Anderson: "tudo aprovado, segue". A skill entrou na `master` em `f726c42`, em `.claude/skills/agent-instructions-writer/`.
 A otimização da `description` pela `skill-creator` não rodou.
 
 **O link curto para o scratch subiu à norma**, a pedido de Anderson ("suba o candidato a norma"), pela
 `agent-instructions-writer`: no `CLAUDE.md`, um parágrafo depois da tabela de vocabulário, e a linha do scratch passou
-a dizer onde ele fica no chat do BrzA Studio, que o `/private/tmp/claude-501/…` não cobria (`81a3d1b`). A memória que o
+a dizer onde ele fica no chat do BrzA Studio, que o `/private/tmp/claude-501/…` não cobria (`3451548`). A memória que o
 guardava saiu.
 
 ## A sessão paralela no workspace de origem

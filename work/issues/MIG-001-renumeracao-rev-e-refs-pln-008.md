@@ -33,7 +33,7 @@ Prévia de 2026-11-03: 4 pareceres e 97 worklogs em `tools-kit` (29), `workspace
 
 ## Passos
 
-- [x] P1 — Conferir as reservas `REV-001`..`REV-004` e `MIG-001` no índice da master: bootstrap `4bb114e`; a aplicação respondeu "bootstrap em dia".
+- [x] P1 — Conferir as reservas `REV-001`..`REV-004` e `MIG-001` no índice da master: bootstrap `415ec9d`; a aplicação respondeu "bootstrap em dia".
 - [x] P2 — Aplicar em cada workstream pela sessão dona, no comando e na ordem de "Aplicação": ver "Execução".
 - [x] P3 — Provar os quatro nomes novos, a ausência dos antigos e os links resolvidos nos workstreams donos:
   blocos 1 e 2 do critério, saída 0.
@@ -68,24 +68,24 @@ a ordem acima aplicou com saída 0 nas seis passagens (1 + 3 pareceres renomeado
 ## Execução
 
 - **`tools-kit`, item 1**, pela sessão `tools-kit-mig001`, em 2026-11-03: prévia igual ao ensaio (REV-001, 5 notas
-  com links, 29 worklogs); `--apply` com saída 0; commit `bf36704`, com push; índice `81620e3` e reconstrução
-  `6e10fd0` na master; checador com 73 arquivos, 0 erros e 0 avisos; worklog do `tools-kit` em `8600fa1`.
+  com links, 29 worklogs); `--apply` com saída 0; commit `f918157`, com push; índice `04cddd5` e reconstrução
+  `faf2f18` na master; checador com 73 arquivos, 0 erros e 0 avisos; worklog do `tools-kit` em `777b610`.
 - **`workspace`, item 2**, pela sessão `workspace-a6`, em 2026-11-03: prévia igual ao ensaio (REV-002 a REV-004, 5
-  notas com links, 22 worklogs); `--apply` com saída 0; commit `361d0d4`, com push; checador com 59 arquivos, 0
+  notas com links, 22 worklogs); `--apply` com saída 0; commit `afc3814`, com push; checador com 59 arquivos, 0
   erros e 4 avisos `unknown-ref-mention` (menções históricas a planos de outro workspace, que o D3 só avisa). O bloco de
   preservação, restrito às duas árvores, conferiu 60 notas, 51 delas worklogs.
 - **`tools-kit`, item 3**, pela sessão `tools-kit-mig001`: prévia e `--apply` zerados, sem commit da migração, como
-  no ensaio; checador com 74 arquivos, 0 erros e 0 avisos; worklog do `tools-kit` em `57c29b5`.
-- **Fora do mapa D4:** três pareceres do PLN-009 criados em 2026-11-03 no `tools-kit` (`3d94663`, `8b622f8`, `5ef53de`)
+  no ensaio; checador com 74 arquivos, 0 erros e 0 avisos; worklog do `tools-kit` em `b1fd4bf`.
+- **Fora do mapa D4:** três pareceres do PLN-009 criados em 2026-11-03 no `tools-kit` (`ce1ff7f`, `997b454`, `029e30c`)
   sem `REV-NNN`. Anderson escolheu, nesta data, "Issue no tools-kit (Recomendado)": a sessão dona do PLN-009 os numera.
-  Issue gravada pela sessão `tools-kit-rev-pln009` em `6292986`: [Os pareceres do PLN-009 sem número REV](os-pareceres-do-pln-009-sem-numero-rev.md).
+  Issue gravada pela sessão `tools-kit-rev-pln009` em `6cb178c`: [Os pareceres do PLN-009 sem número REV](os-pareceres-do-pln-009-sem-numero-rev.md).
   Não entram nesta MIG.
-- **`brand`, item 4**, pela sessão `brand-mig001`: prévia igual ao ensaio (4 worklogs); commit `0e80b71`, com push;
-  checador com 63 arquivos, 0 erros e 0 avisos; worklog de lá em `2a40e3a`.
-- **`studio`, item 4**, pela sessão `studio-mig001`: prévia igual ao ensaio (43 worklogs); commit `d5abc5e`, com
-  push; checador com 0 erros e os avisos que já havia, menos os 39 `date-on-worklog`; worklog de lá em `3aeb36d`.
+- **`brand`, item 4**, pela sessão `brand-mig001`: prévia igual ao ensaio (4 worklogs); commit `c0cad57`, com push;
+  checador com 63 arquivos, 0 erros e 0 avisos; worklog de lá em `26a5715`.
+- **`studio`, item 4**, pela sessão `studio-mig001`: prévia igual ao ensaio (43 worklogs); commit `5941b29`, com
+  push; checador com 0 erros e os avisos que já havia, menos os 39 `date-on-worklog`; worklog de lá em `d9c1a56`.
 - **`playground`, item 4**, pela sessão `playground-mig001`: prévia e `--apply` zerados, sem commit da migração;
-  checador com 0 erros e 0 avisos; worklog de lá em `70c4a68`.
+  checador com 0 erros e 0 avisos; worklog de lá em `a20f127`.
 - **Texto de link:** o `refs:` dos worklogs de `brand` e `playground` pegou REV-001 e REV-004 do título desta MIG no
   texto do link ("REV-001..REV-004"), como o D3 conta. Anderson escolheu "Ponto para P7" em 2026-11-03.
 
@@ -95,7 +95,7 @@ Concluída em 2026-11-03 pela sessão `workspace-a6`, no worktree `workspace`, c
 remoto: os três blocos do critério saíram com 0 — "Mapa D4 conferido", "H1, mapa D4, links, refs e ausência de date
 conferidos nas cinco árvores" e "Frontmatter preservado em 107 nota(s) migrada(s), 98 worklog(s)" —, com o checador sem
 erros nas cinco. Dois `brza note index --rebuild` seguidos responderam "em dia, nada a acrescentar", e a master
-continuou em `e8606a4`.
+continuou em `fab29a1`.
 
 ## Revisão antes da aplicação
 

@@ -22,8 +22,8 @@ cita, o índice ainda não tem o caminho novo, e o `git log --follow` ainda não
 slug novo no `refs`, e o checador o aceita pelo mesmo motivo. Depois do commit, o checador acusa `ref-not-found`, e a
 linha precisa ser corrigida à mão.
 
-Reprodução no `tools-kit`: o `9a40746` renomeou as duas issues e gravou os slugs novos no `refs` de dois worklogs; o
-`ffc0cf7` os voltou à identidade antiga.
+Reprodução no `tools-kit`: o `8e9e2e7` renomeou as duas issues e gravou os slugs novos no `refs` de dois worklogs; o
+`1d88bda` os voltou à identidade antiga.
 
 ## O que falta decidir
 

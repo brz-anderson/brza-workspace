@@ -37,5 +37,5 @@ o texto, "A.1" ("Pode aplicar como está (Recomendado)"), com "B.1", "D.1" e "E.
 - **A norma:** o `AGENTS.md`, "Cada workstream mora numa branch…" e "Um workstream, uma sessão…"; o
   `plans/README.md`; o `work/README.md`, "Commit"; a `plan-runner`.
 - **O código:** o `brza-note` (`workstream`, `sync`, a raiz pelo workstream) e o `check_notes.py` (o link entre
-  branches), em `786f5b1` na `master`.
+  branches), em `bd06624` na `master`.
 - **O registro:** [As notas em workstreams, e a `master` só com a norma](../worklogs/2026-10-30-as-notas-em-workstreams-e-a-master-so-com-a-norma.md).

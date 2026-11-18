@@ -33,7 +33,7 @@ interface, como numa sessão do Cowork. A sessão não conseguiu abrir o link do
 
 ## O que foi feito
 
-- **A norma**, na `master` (`89f8fe1`), em `.claude/skills/plan-runner/references/open-and-plan.md`, Desenhar, passo 3:
+- **A norma**, na `master` (`182e17a`), em `.claude/skills/plan-runner/references/open-and-plan.md`, Desenhar, passo 3:
   a rodada do Desenho vai na mensagem, em texto, e cada alternativa de interface é um artboard `::orca-visual` com a
   letra da opção no `title`; fora do chat, o artboard vai ao scratch e a rodada leva o caminho. O `brza note sync`
   levou a norma ao `studio`, ao `tools-kit` e ao `workspace`.
@@ -68,13 +68,13 @@ estruturado (`NativeChatPromptStrip`, do `a0eefa646e4` no `brza-studio`).
   - 2.1, a sessão confere cada artboard pelo PNG a 736 px antes da rodada;
   - 3.1, o `brza shot` passa a 736 px por padrão, pedido à sessão `tools-kit-shot-736`, aberta pelo `brza sessions`;
   - 4.1, o PNG da alternativa escolhida fica ao lado da issue, `a-faixa-recolhida-com-icone-e-acao.png`, gravado no
-    `studio` (`1c079c2`).
+    `studio` (`6d4ce79`).
 - **O `--checkout` relativo falha fora da raiz:** `brza sessions … --checkout .worktrees/tools-kit`, rodado no worktree
   do `workspace`, resolveu o caminho a partir do cwd e devolveu `selector_not_found`. Com o caminho absoluto, abriu.
-- **A norma**, aprovada por Anderson ("1. sim"), na `master` (`a29f79b`), levada aos workstreams pelo `brza note sync`:
+- **A norma**, aprovada por Anderson ("1. sim"), na `master` (`7cc63d7`), levada aos workstreams pelo `brza note sync`:
   no Desenhar, passo 3, a sessão confere cada artboard pelo `brza shot --width 736` antes da rodada; no passo 4, a
   escolhida que vai a uma issue deixa o PNG ao lado dela; no `work/README.md`, a imagem de uma nota fica ao lado dela.
-- **O `brza shot` a 736 px** saiu do `tools-kit` no `0dcc82d`.
+- **O `brza shot` a 736 px** saiu do `tools-kit` no `c46bdc1`.
 - **O `--checkout` relativo** (resposta "2. 1"): o `brza sessions` passa a resolvê-lo a partir da raiz do
   `brza-workspace`, pedido por correio à sessão `tools-kit-shot-736`. A norma não muda.
 - **A implementação da faixa C** foi pedida, com o "siga" de Anderson, à sessão `studio-faixa-c`, aberta pelo

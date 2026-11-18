@@ -16,13 +16,13 @@ correto, atualize em todas as referências".
 
 ## O que foi feito
 
-- **Workspace, `master`, `0b24169`:** o `author.email` do `.brza/workspace.toml` e o `GIT_AUTHOR_EMAIL` e o
+- **Workspace, `master`, `13c79d3`:** o `author.email` do `.brza/workspace.toml` e o `GIT_AUTHOR_EMAIL` e o
   `GIT_COMMITTER_EMAIL` do `env` do `.claude/settings.json`. Os dois são parte local, que o `brza sync` não toca.
 - **Núcleo do `brza-workflow`, `c527e42`:** o `core/AGENTS.md` dizia "saem com o noreply do `{{author.login}}`" e o
   `core/CLAUDE.md`, "deve sair o noreply do `{{author.login}}`". Com um e-mail que não é noreply, a frase ficaria
   falsa, e as duas passaram a "o e-mail do". As fixtures de ouro (`tests/hooks/fixtures/golden/master/`) seguiram a
   frase e mantêm o noreply, que é o autor do teste.
-- **`brza sync`, `1f56808`:** renderizou de novo o `AGENTS.md` e o `CLAUDE.md` com o e-mail novo e mesclou a `master`
+- **`brza sync`, `e1d33c5`:** renderizou de novo o `AGENTS.md` e o `CLAUDE.md` com o e-mail novo e mesclou a `master`
   em `brand`, `playground`, `studio`, `tools-kit` e `workspace`. Os quatro arquivos de cada worktree ficaram sem
   noreply, conferidos por `grep`.
 

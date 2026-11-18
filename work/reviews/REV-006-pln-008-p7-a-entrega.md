@@ -26,7 +26,7 @@ A sessão principal refez a evidência de A1, A2, A3 e A6 antes da rodada. Os de
 **Evidência:** a norma pede `REV-NNN-<assunto>.md` (`brza-workflow/core/work/README.md:159,326`); o checador só
 reconhece `REV_NOTE_RE` (`check_notes.py:72`) e não acusa o nome fora da forma. Sonda em
 `/private/tmp/pln008-p7-sonda/s1`: parecer `work/reviews/pln-001-sem-numero.md`, MIG sem `type` e issue `type: migration`
-sem número dão 0 avisos. Três pareceres do PLN-009 no `tools-kit` nasceram assim, um depois da norma (`5ef53de`); o
+sem número dão 0 avisos. Três pareceres do PLN-009 no `tools-kit` nasceram assim, um depois da norma (`029e30c`); o
 índice da master não tem linha para eles, e o worklog que os linka fica sem a referência. Cobertura `Pedido 2`; D7.
 
 ### A2 — A norma aceita `REV-NNN` e `decision:` em `depends_on`, e o checador barra os dois

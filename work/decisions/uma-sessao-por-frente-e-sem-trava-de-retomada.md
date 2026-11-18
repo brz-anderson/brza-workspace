@@ -44,5 +44,5 @@ atrapalhando que economizando tokens". A medição de 2026-10-27 23h55 a 2026-10
 - **A norma:** `AGENTS.md`, "Uma frente, uma sessão; uma tarefa, um worklog", e o `CLAUDE.md`, "O cache da sessão
   principal dura 1 h".
 - **A configuração:** o hook `UserPromptSubmit` saiu do `.claude/settings.json`.
-- **O `brza sessions send` sem a trava:** `88d8a3a`, pela sessão `pln-002-p7`.
+- **O `brza sessions send` sem a trava:** `f7d5ff3`, pela sessão `pln-002-p7`.
 - **O registro:** [A sessão por frente e a trava de retomada desligada](../worklogs/2026-10-29-a-sessao-por-frente-e-a-trava-desligada.md).

@@ -83,7 +83,7 @@ Estimado: 1,5 h · Executado: 0,3 h
 - [x] **3. Rodar** as três suítes lá — `scripts/brza/tests`, `.claude/hooks/tests`, `notes-checker` — e ver passar
 - [x] **4. Commit e push** no `brza-workflow`
 
-**Evidência:** `brza-workflow@83fce24`, a partir de `brza-workspace@d85c783` · `python3 -m unittest discover -s
+**Evidência:** `brza-workflow@83fce24`, a partir de `brza-workspace@07bec22` · `python3 -m unittest discover -s
 tests/hooks` → 159 OK, 1 skip (P3) · `-s tests/cli` → 165 OK, 1 skip (P7) · `tests/notes-checker/run.py` → saída 0;
 hooks e checador passam também no `/usr/bin/python3` 3.9.6. Desvios X1–X6.
 
@@ -120,7 +120,7 @@ Estimado: 3,5 h · Executado: 0,4 h
 
 **Evidência:** `brza-workflow@acf8bef`, o merge do P3 sobre o P7 · na `master`: `tests/hooks` → 244 OK, e no
 `/usr/bin/python3` 3.9.6 → 244 OK, 5 skips (sem `tomllib`) · `tests/cli` → 264 OK · `tests/notes-checker/run.py` →
-saída 0. O teste de ouro reproduz os 16 `.md` da `master` do `brza-workspace@d85c783`, salvo a lista fechada de 37
+saída 0. O teste de ouro reproduz os 16 `.md` da `master` do `brza-workspace@07bec22`, salvo a lista fechada de 37
 trocas em `tests/hooks/golden_differences.py`, que o P8 reusa; um `X` plantado em `core/work/README.md` o fez reprovar.
 Um teste confere que, com outro manifesto, não sobra nada do `brza-workspace` no núcleo. Desvios X18–X20; pontos R14.
 
@@ -214,8 +214,8 @@ Estimado: 3 h · Executado: 1,2 h
 - [x] **4. Conferir** a Regressão inteira
 
 **Evidência**, na ordem do D12:
-- **1:** `brza-workspace@2e6ea1d` (manifesto, com o `[checker]` do A2, a `.claude/rules/workspace.md`, o
-  `.gitattributes` e o README com o `brand` e a chave de acesso); o índice `@1fd3be0`, 29 linhas — PLN-001 a PLN-007,
+- **1:** `brza-workspace@fa6adf7` (manifesto, com o `[checker]` do A2, a `.claude/rules/workspace.md`, o
+  `.gitattributes` e o README com o `brand` e a chave de acesso); o índice `@1b7e29f`, 29 linhas — PLN-001 a PLN-007,
   17 issues e 5 decisões de `brand`, `studio`, `tools-kit` e `workspace` (A10).
 - **2:** `brza-register` → `~/.config/brza/workspaces.toml`; o `brza-where` dá `notes` no worktree e `code` no
   `brza-studio`.
@@ -224,7 +224,7 @@ Estimado: 3 h · Executado: 1,2 h
 - **4:** o `index --rebuild` de novo → "em dia".
 - **5:** `brza-install --all --client --relink` e `--chat-command --relink`; o `brza doctor` → `ok` em identidade,
   medição, links (16), registro e chat. O `--local` foi para depois do 6 (X27).
-- **6:** `brza sync --core-only` → `brza-workspace@a45018c` (`brza-workflow@2286f31`); `@bbe723b` tira de
+- **6:** `brza sync --core-only` → `brza-workspace@2c3e167` (`brza-workflow@2286f31`); `@694c20d` tira de
   `scripts/brza/` o que foi ao núcleo e os testes antigos, e troca o cabeçalho dos cinco scripts locais (A3) →
   `python3 -m unittest discover -s scripts/brza/tests` → 94 OK, e os cinco `--help` sobem; o `--local` → nada a trocar.
 - **7:** `brza note sync` → `brand`, `studio`, `tools-kit` e `workspace` mesclados e enviados.
@@ -244,9 +244,9 @@ Estimado: 1,5 h · Executado: 1,4 h
 
 **Evidência:** duas revisões em vez de uma — a do `brza-workflow` antes da migração e a da migração depois dela (X29),
 nos pareceres de `## Revisões`, com os 19 achados corrigidos e os 9 falsos derrubados · os consertos em
-`brza-workflow@2286f31` e `@a313ec5` e em `brza-workspace@f12fdd4` · na `master` do `brza-workflow` em `a313ec5`:
+`brza-workflow@2286f31` e `@a313ec5` e em `brza-workspace@804dcaf` · na `master` do `brza-workflow` em `a313ec5`:
 `tests/cli` → 413 OK, `tests/hooks` → 287 OK, e no `/usr/bin/python3` 3.9.6 → 287 OK, 5 skips, o checador → saída 0 ·
-o sync da norma nova no `brza-workspace` → `afc3859`, com o merge nos quatro workstreams; de um repositório alheio,
+o sync da norma nova no `brza-workspace` → `3a7ec1d`, com o merge nos quatro workstreams; de um repositório alheio,
 com a `BRZA_WORKSPACE`, o `brza sync` recusa e diz os dois caminhos · o README do `brza-workflow` em `@6d6ad2f`.
 
 ## Regressão
@@ -364,8 +364,8 @@ com a `BRZA_WORKSPACE`, o `brza sync` recusa e diz os dois caminhos · o README 
 - `brz-anderson/brza-workflow`: o repositório novo, com o núcleo, o CLI, os moldes, o pacote do cliente, os testes e o
   README (`@6d6ad2f`), criado em P1.
 - A norma do `brza-workspace`, na `master`: o `AGENTS.md`, o `CLAUDE.md`, o `work/README.md`, o `plans/README.md` e a
-  `plan-runner`, que agora chegam pelo `brza sync` (`a45018c`, `afc3859`); o README local e a
-  `.claude/rules/workspace.md` (`2e6ea1d`, `f12fdd4`), em P8 e P9.
+  `plan-runner`, que agora chegam pelo `brza sync` (`2c3e167`, `3a7ec1d`); o README local e a
+  `.claude/rules/workspace.md` (`fa6adf7`, `804dcaf`), em P8 e P9.
 
 ## Fechamento
 

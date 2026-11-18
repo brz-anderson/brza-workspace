@@ -41,7 +41,7 @@ Padrões vistos nas revisões do PLN-005 (2026-10-31), do PLN-006 (P1–P7 e P8,
 - **Desvio que promete "sai no P_x"** (o legado do X10): conferir no código do último passo se saiu, e se outro desvio
   registra que ficou.
 - **Teste de timeout que não distingue `killpg` de `kill`**: mutação numa cópia em `/private/tmp` mostra.
-- **Cópia que congelou num sha enquanto a origem andou** (PLN-006: o `brza-workflow` nasceu de `d85c783`, e a `master`
+- **Cópia que congelou num sha enquanto a origem andou** (PLN-006: o `brza-workflow` nasceu de `07bec22`, e a `master`
   ganhou o P11 do PLN-005 depois). O sync "sem entrada no lock → sobrescreve" desfaz a mudança alheia com saída 0.
   Conferir com `git log <sha da cópia>..origin/master` e com o `shasum` de cada arquivo nos três lados. Depois, ensaiar
   o `--dry-run` num clone em `/private/tmp`, com o `BRZA_WORKFLOW` apontando para um clone, porque o `fetch` do sync

@@ -23,8 +23,8 @@ do A1, do A2 e do A6. Os destinos foram escolhidos pela regra de Anderson para o
 
 > bug · importante · confiança 97 · → corrigido aqui
 
-**Evidência:** `git -C ~/Projects/brza-workspace log --oneline d85c783..origin/master` → `2c9a546` e `cfa058e`; o
-`fact_audit.py` do núcleo tinha o `shasum` da `d85c783` (`552d631860`), e não o da `origin/master` (`7fd3b2f60c`); o
+**Evidência:** `git -C ~/Projects/brza-workspace log --oneline 07bec22..origin/master` → `2c37ba8` e `9941d37`; o
+`fact_audit.py` do núcleo tinha o `shasum` da `07bec22` (`552d631860`), e não o da `origin/master` (`7fd3b2f60c`); o
 `brza-sync --dry-run --core-only` num clone da `master` saiu com 0 e escreveria o `fact_audit.py`, os dois scripts e o
 `CLAUDE.md` antigos, porque o arquivo fora do lock é sobrescrito (R15.1). Corrigido no `brza-workflow@ebeb779`, o
 porte dos dois commits.

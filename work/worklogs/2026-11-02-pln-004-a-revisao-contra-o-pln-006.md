@@ -71,7 +71,7 @@ o dia anterior está em
   `brza delegate` devolve; o foco entra pelo `--focus` no pedido de cada `brza delegate --type review`; e o mapa de
   qual foco vai a qual runtime fica para depois de uma medição, não a recomendada.
 - **O desenho do experimento da 12.2**, a partir do que as revisões daqui deixaram: o diff é a entrega do PLN-005 na
-  `master` (`2e8ea67..13a291a`, 2.519 linhas em 22 arquivos), e a resposta conhecida é o parecer
+  `master` (`f50bf7d..de74787`, 2.519 linhas em 22 arquivos), e a resposta conhecida é o parecer
   `work/reviews/pln-005-a-confianca-dos-fatos.md`, com 10 achados reais e 5 hipóteses conferidas e falsas. Anderson
   o confirmou ("confirmo o experimento"), e as 9 revisões rodaram em 2026-11-02, de 18:13 em diante: os três
   braços do Claude no Opus como `general-purpose`, sem a memória do `reviewer`; os três do Codex em `gpt-6-astra` com

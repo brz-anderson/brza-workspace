@@ -37,7 +37,7 @@ que o projeto exista no disco, com git, pra mim abrir no BrzA Studio".
   `scripts/summarize_measurements.py`.
 - **A identidade e as funções.** O `env` do `settings.json` põe a identidade do `brz-anderson` e a chave `personal`. A
   função `claude` do `~/.zshrc` passa esse `settings.json` às sessões abertas aqui e no `brza-studio`.
-- **Os commits.** O primeiro foi o `0bc2c77`, que levou também o P52 e o P53 da sessão
+- **Os commits.** O primeiro foi o `48bd5b5`, que levou também o P52 e o P53 da sessão
   `brza-studio-chat-blocos-120-colunas`. Os acertos da rodada G vieram no commit deste worklog.
 
 ## Rodadas

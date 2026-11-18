@@ -611,7 +611,7 @@ Estimado: 0.5 h · Executado: 0.2 h
 - [x] **2.** A marca vai "logo depois do que afirma", e não "no fim da linha" do D1, porque o custo e o "se paga" de uma
   opção dividem a linha `Custo: … Se paga: …`; no `collector`, a regra substitui "Fato sem fonte é inferência".
 
-**Evidência:** `master@68a925c` — `.claude/agents/designer.md:19-29` e `.claude/agents/collector.md:15-24`; a expressão
+**Evidência:** `master@e54499f` — `.claude/agents/designer.md:19-29` e `.claude/agents/collector.md:15-24`; a expressão
 do D2 casa o exemplo `[F3 · lido · 90]` dos dois arquivos, e a maior linha tem 118 colunas; `brza note sync` →
 `studio`, `tools-kit` e `workspace` mesclados e enviados.
 
@@ -627,7 +627,7 @@ Estimado: 2 h · Executado: 0.4 h
 - [x] **2. Implementar.** Com o X1, e as escolhas da R5.
 - [x] **3. Rodar** — `python3 -m unittest discover .claude/hooks/tests`.
 
-**Evidência:** `master@8d22660` — `.claude/hooks/fact_audit.py` (158 linhas; o `measure.py` intocado) e
+**Evidência:** `master@6db8589` — `.claude/hooks/fact_audit.py` (158 linhas; o `measure.py` intocado) e
 `.claude/hooks/tests/test_fact_audit.py` (24 testes). Antes do código, os 18 primeiros falharam com `FileNotFoundError`;
 `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 97 tests … OK`. Sobre o transcript real
 `agent-a4e396c649819d3fd.jsonl`, do `designer`, anterior ao P2: `fact_capture` com `facts: 0`, `unmarked: true`,
@@ -645,7 +645,7 @@ Estimado: 2 h · Executado: 0.6 h
 - [x] **2. Implementar**, com a entrada no `.claude/settings.json`, o `cite` da R6 e as escolhas da R7.
 - [x] **3. Rodar** — `python3 -m unittest discover .claude/hooks/tests`.
 
-**Evidência:** `master@3e123f0` — `.claude/hooks/fact_audit.py` (`stop` solta o `run`; `run` com o `PROMPT` do
+**Evidência:** `master@2506e82` — `.claude/hooks/fact_audit.py` (`stop` solta o `run`; `run` com o `PROMPT` do
 auditor), `.claude/hooks/measure.py` (`fact_audit: true` no `turn`), `scripts/summarize_measurements.py` (o `turn` de
 auditoria fora dos agregados) e a segunda entrada do `SubagentStop` no `.claude/settings.json`. Antes do código, 6
 falhas e 16 erros em 119; `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 119 tests … OK`. O `stop` volta
@@ -661,7 +661,7 @@ Estimado: 1 h · Executado: 0.4 h
 
 - [x] **1.** Testes antes (os 28 falharam com o script ausente), o script, e as escolhas da R8.
 
-**Evidência:** `master@98a60d3` — `scripts/fact_outcome.py` e `.claude/hooks/tests/test_fact_outcome.py` (28 testes);
+**Evidência:** `master@59c50e1` — `scripts/fact_outcome.py` e `.claude/hooks/tests/test_fact_outcome.py` (28 testes);
 `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 147 tests … OK`; contra o log real,
 `fact_outcome.py --pending --workstream all` → "nenhum fato a conferir", saída 0; num log temporário com `F1 lido 95`,
 `F2 inferido 70` e `C1 inferido 60`, o `--pending` lista F2 e C1, `abc:F2 fails … --ref PLN-004/R8.1` grava com o
@@ -677,7 +677,7 @@ Estimado: 1 h · Executado: 0.4 h
 - [x] **1.** Testes antes (22 de 34 com erro, `aggregate_facts` ausente), o `--facts`, a classe da R9 e a dica da
   R10.3, aplicada pela sessão.
 
-**Evidência:** `master@72f684a` — `scripts/summarize_measurements.py` e `test_summarize_measurements.py` (25 testes
+**Evidência:** `master@4d8e63a` — `scripts/summarize_measurements.py` e `test_summarize_measurements.py` (25 testes
 novos); `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 172 tests … OK`; contra o log real,
 `summarize_measurements.py --facts` → saída 0, com a linha `collector fato 90+ lido`: 31 fatos, 17 com desfecho,
 `holds` 100%, confiança média 92,8, distância -7,2, `cite off` 11,8%.
@@ -692,7 +692,7 @@ Estimado: 0.5 h · Executado: 0.3 h
   confiança dos fatos", com os cinco eventos, e o `--facts` no "Resumo"; o `README.md`, os três comandos. O `AGENTS.md`
   ficou de fora: a mecânica é do runtime, e a marca mora nos papéis.
 
-**Evidência:** `master@4c92097` — `CLAUDE.md`, `README.md` e `.claude/skills/close-task/SKILL.md`; nenhuma linha nova
+**Evidência:** `master@84c2906` — `CLAUDE.md`, `README.md` e `.claude/skills/close-task/SKILL.md`; nenhuma linha nova
 de prosa passa de 120 colunas; `brza note sync` → os três workstreams mesclados.
 
 ### P8 — A prova numa devolução real
@@ -715,11 +715,11 @@ Executa D2 (R10.1, R10.2) e D1 (a regra) · executor: `implementer` (o parser e 
 
 Estimado: 0.5 h · Executado: 0.3 h
 
-- [x] **1.** Os papéis: a premissa vai na frase do fato, fora da marca, e o resumo cita só o id — `master@b3e3efd`.
+- [x] **1.** Os papéis: a premissa vai na frase do fato, fora da marca, e o resumo cita só o id — `master@6137e6d`.
 - [x] **2.** O parser aceita `; …` depois do número e um parêntese depois do tipo, e ignora a referência agrupada;
   o teto é `max(0.25, 0.012 × fatos)`; testes com as 10 marcas do `collector` real.
 
-**Evidência:** `master@13a291a` — `.claude/hooks/fact_audit.py` e `test_fact_audit.py` (4 testes novos; antes, 5 falhas e 1
+**Evidência:** `master@de74787` — `.claude/hooks/fact_audit.py` e `test_fact_audit.py` (4 testes novos; antes, 5 falhas e 1
 erro); `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 176 tests … OK`; `marks_of(sources_of(…))` sobre o
 transcript real do `collector` `ab5aa7e0d74df08e7` → F1–F28, 0 malformadas (eram 10); `budget_usd(3)` → `0.25`,
 `budget_usd(50)` → `0.60`. Os dois pontos do `implementer` têm lastro na R10.1: `F7-9` não é "outro id" e segue
@@ -746,10 +746,10 @@ Estimado: 1 h · Executado: 0.8 h
 - [x] **2.** A3 e A4: o `CLAUDE.md` com o teto por fato, a leitura conferida e a linha de 161 colunas quebrada.
 - [x] **3.** A1, A2, A6, A7, A8 e A10, pelo `implementer`, com testes; e o id solto (`[F5]`) como referência, pela
   sessão.
-- [x] **4.** A coluna `rebaixados` do `--facts` (R12.3), pelo `implementer` — `master@cfa058e`,
+- [x] **4.** A coluna `rebaixados` do `--facts` (R12.3), pelo `implementer` — `master@9941d37`,
   `Ran 213 tests … OK`; no log real, 0 rebaixados, porque as 5 auditorias são anteriores ao `read_ok`.
 
-**Evidência:** `master@2c9a546` — `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 208 tests … OK` (eram
+**Evidência:** `master@2c37ba8` — `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 208 tests … OK` (eram
 176). A1: no transcript do `collector` `ab5aa7e0d74df08e7`, as 28 marcas têm o `text` terminando na marca (eram 24
 cortadas), e o maior `context` tem 2.000 caracteres. A2: o `run` lê o `stream-json` e rebaixa a `unknown` o veredito sem
 leitura casada. A8: numa cópia, trocar o `killpg` por `process.kill()` ou tirar o `start_new_session` faz o teste novo
@@ -794,12 +794,12 @@ O `implementer` fez uma chamada real ao `claude` (Haiku, US$ 0,002) para ver a f
 
 ## Documentação
 
-- `.claude/agents/designer.md` e `.claude/agents/collector.md` — a marca de confiança, em P2 e P10 (`68a925c`,
-  `b3e3efd`).
-- `CLAUDE.md`, "A auditoria da confiança dos fatos" e o "Resumo" do hook de medição — em P7 e P11 (`4c92097`,
-  `2c9a546`).
-- `README.md`, os comandos do `--facts` e do `fact_outcome.py` — em P7 (`4c92097`).
-- `.claude/skills/close-task/SKILL.md`, "Os fatos a conferir" — em P7 (`4c92097`).
+- `.claude/agents/designer.md` e `.claude/agents/collector.md` — a marca de confiança, em P2 e P10 (`e54499f`,
+  `6137e6d`).
+- `CLAUDE.md`, "A auditoria da confiança dos fatos" e o "Resumo" do hook de medição — em P7 e P11 (`84c2906`,
+  `2c37ba8`).
+- `README.md`, os comandos do `--facts` e do `fact_outcome.py` — em P7 (`84c2906`).
+- `.claude/skills/close-task/SKILL.md`, "Os fatos a conferir" — em P7 (`84c2906`).
 
 ## Worklogs
 

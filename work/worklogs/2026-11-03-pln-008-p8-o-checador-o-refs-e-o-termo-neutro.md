@@ -21,7 +21,7 @@ Anderson pediu "abra" para a sessão do P8 e "sim" para as sessões do D11. Plan
 
 A sessão `pln008-p8` publicou `brza-workflow@30b3666`, com os três avisos do checador, a norma de `depends_on` de
 volta ao D2, o texto do link fora das duas cópias do extrator e um teste de paridade entre elas. Esta sessão rodou o
-`brza sync --ref 30b3666`, que gerou `2130026`.
+`brza sync --ref 30b3666`, que gerou `a58a652`.
 
 ## A colisão que virou o D11
 
@@ -30,17 +30,17 @@ outro workspace. As Rodadas 15 a 17 transformaram isso no D11: o nome do workspa
 repositórios `brza-*`, com termo neutro, a guarda do `brza init` lendo um arquivo da máquina, o histórico intocado e a
 identidade das duas issues renomeadas mantida.
 
-Esta sessão fez a `master` (`bc4f5ba`) e o `brza note sync`, e definiu o mapa de nomes antes de abrir seis sessões. Um
-`implementer` fez as 33 notas daqui, que esta sessão revisou e gravou em `835f023`. As sessões gravaram:
+Esta sessão fez a `master` (`8a036f5`) e o `brza note sync`, e definiu o mapa de nomes antes de abrir seis sessões. Um
+`implementer` fez as 33 notas daqui, que esta sessão revisou e gravou em `7ebaeb5`. As sessões gravaram:
 
 - `d11-brza-workflow`: `ebb4e7d`;
-- `d11-tools-kit`: `9a40746`, `ffc0cf7` e `e3fd4d2`;
-- `d11-studio`: `3297189`;
-- `d11-brand`: `2c18797`;
-- `d11-playground`: `e271921`;
+- `d11-tools-kit`: `8e9e2e7`, `1d88bda` e `7fdc1e6`;
+- `d11-studio`: `3b1a093`;
+- `d11-brand`: `b634aaa`;
+- `d11-playground`: `1567e80`;
 - `d11-brza-studio`: `a6ef12c`, numa branch.
 
-O `brza sync --ref ebb4e7d` gerou `8098514`.
+O `brza sync --ref ebb4e7d` gerou `321829c`.
 
 Na conferência final, nenhum arquivo atual cita o nome, salvo o índice, as identidades da R17.1 e a `master` do
 `brza-studio`. O checador deu 0 erros nas cinco árvores, e os três blocos da MIG-001 saíram com 0.

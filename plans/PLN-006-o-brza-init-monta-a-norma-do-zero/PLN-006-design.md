@@ -472,7 +472,7 @@ núcleo, liga o driver:
 **Uma linha por evento**, JSON numa linha, chaves em inglês:
 
 ```json
-{"ts":"2026-10-31T14:02:11-03:00","event":"created","kind":"plan","id":"PLN-006","path":"plans/PLN-006-o-brza-init-monta-a-norma-do-zero/PLN-006-plan.md","title":"O `brza init` monta a norma num workspace do zero","description":"…","status":"open","phase":"design","workstream":"workspace","worktree":".worktrees/workspace","session":"brza-workspace-91","commit":"58d28ca"}
+{"ts":"2026-10-31T14:02:11-03:00","event":"created","kind":"plan","id":"PLN-006","path":"plans/PLN-006-o-brza-init-monta-a-norma-do-zero/PLN-006-plan.md","title":"O `brza init` monta a norma num workspace do zero","description":"…","status":"open","phase":"design","workstream":"workspace","worktree":".worktrees/workspace","session":"brza-workspace-91","commit":"986034c"}
 ```
 
 | Chave | De onde vem |

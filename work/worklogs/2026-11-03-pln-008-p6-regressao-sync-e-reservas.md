@@ -28,11 +28,11 @@ P7 permanece fora desta execução; cada workstream aplica suas notas pela sess�
 - CLI completa: 467 testes em 199,593 s; hooks completos: 288 em 21,128 s; notes-checker: 26 casos, todos passaram.
   Os comandos do plano rodaram com `TMPDIR=/tmp PYTHONDONTWRITEBYTECODE=1`. Saídas da sessão no scratch:
   `/tmp/pln008-p6-cli.log`, `/tmp/pln008-p6-hooks.log`, `/tmp/pln008-p6-checker.log`.
-- `brza-sync --dry-run` conferiu a versão publicada. `brza-sync --ref a666e78` publicou `5dcc2b3` no workspace e
+- `brza-sync --dry-run` conferiu a versão publicada. `brza-sync --ref a666e78` publicou `0613191` no workspace e
   sincronizou os cinco workstreams. As quatro alterações locais de norma/golden e o commit local `9f51cda` do
-  brza-workflow ficaram fora dessa operação. Outra sessão posteriormente publicou `c527e42` e sincronizou `1f56808`;
+  brza-workflow ficaram fora dessa operação. Outra sessão posteriormente publicou `c527e42` e sincronizou `e1d33c5`;
   essa segunda operação não é entrega desta tarefa.
-- `brza-note index --bootstrap-pln008`: cinco reservas gravadas, commit `4bb114e`, sem colisão.
+- `brza-note index --bootstrap-pln008`: cinco reservas gravadas, commit `415ec9d`, sem colisão.
 - Prévia sem aplicação: quatro pareceres e 97 worklogs a atualizar em tools-kit (29), workspace (21), brand (4) e
   studio (43); playground sem alterações. Menções históricas desconhecidas apenas avisam, conforme D3.
 - [MIG-001: Renumeração dos pareceres REV-001..REV-004 e backfill de refs nos worklogs](../issues/MIG-001-renumeracao-rev-e-refs-pln-008.md)
@@ -80,11 +80,11 @@ O acervo real segue sem migração. A próxima etapa é a aplicação pelas sess
 ## Aplicação real em `tools-kit` e `workspace`
 
 Anderson pediu "aplique". A sessão `tools-kit-mig001`, aberta por esta com o `brza sessions`, aplicou primeiro o
-`tools-kit`: `bf36704`, 1 parecer, 5 notas com links e 29 worklogs, com checador sem erros. Esta sessão esperou o
-commit chegar ao remoto e aplicou o `workspace`: a prévia saiu igual ao ensaio; o `--apply` gravou `361d0d4`, com push,
+`tools-kit`: `f918157`, 1 parecer, 5 notas com links e 29 worklogs, com checador sem erros. Esta sessão esperou o
+commit chegar ao remoto e aplicou o `workspace`: a prévia saiu igual ao ensaio; o `--apply` gravou `afc3814`, com push,
 e o checador deu 59 arquivos, 0 erros e 4 avisos de menções históricas a planos de fora do acervo. O bloco de preservação,
 restrito às duas árvores, conferiu 60 notas. A segunda passagem do `tools-kit` não mudou nada (worklog de lá em
-`57c29b5`).
+`b1fd4bf`).
 
 O `tools-kit` achou três pareceres do PLN-009 sem `REV-NNN`, fora do D4. Na rodada desta sessão, Anderson escolheu
 "Issue no tools-kit (Recomendado)" para eles, gravada pela sessão de lá, e "Achado para P7 (Recomendado)" para a falta
@@ -92,15 +92,15 @@ de aviso do checador, registrado em P7 do PLN-008.
 
 ## `brand`, `studio`, `playground` e a conclusão da MIG-001
 
-Anderson respondeu "sim" à abertura das três sessões. `brand-mig001` aplicou em `0e80b71` (4 worklogs),
-`studio-mig001` em `d5abc5e` (43 worklogs), e `playground-mig001` não teve mudança; as três saíram sem divergência do
+Anderson respondeu "sim" à abertura das três sessões. `brand-mig001` aplicou em `c0cad57` (4 worklogs),
+`studio-mig001` em `5941b29` (43 worklogs), e `playground-mig001` não teve mudança; as três saíram sem divergência do
 ensaio e com checador sem erros. Com as cinco árvores atualizadas, os três blocos do critério saíram com 0, a
 preservação conferiu 107 notas (98 worklogs), e dois `brza note index --rebuild` seguidos não acrescentaram nada. A
 MIG-001 ficou `done` e o P6 fechou, sem horas aferidas.
 
 O `brand` notou que o `refs:` pegou REV-001 e REV-004 do título da MIG-001 no texto do link. É o que o D3 conta como
 menção; na rodada, Anderson escolheu "Ponto para P7". A issue dos pareceres do PLN-009 foi gravada no `tools-kit`
-em `6292986`, pela sessão `tools-kit-rev-pln009`.
+em `6cb178c`, pela sessão `tools-kit-rev-pln009`.
 
 ## Fora do workspace
 

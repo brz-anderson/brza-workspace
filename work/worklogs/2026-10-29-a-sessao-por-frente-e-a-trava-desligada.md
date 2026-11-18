@@ -23,7 +23,7 @@ decisão: [Uma sessão por frente de trabalho, sem trava de retomada e com o cac
   glossário; o `CLAUDE.md` perdeu a seção da trava e a linha `guard` da medição, e ganhou o `/compact` e os números do
   cache; o `README.md` perdeu as menções à trava.
 - **O `brza sessions send`:** a sessão `pln-002-p7` recebeu as respostas literais por correio e tirou a trava do `send`
-  em `88d8a3a`.
+  em `f7d5ff3`.
 - **O PLN-003:** uma linha no `Retomar`, porque o Desenho ainda conta com a trava no roteador (M2) e na tabela de
   conflitos.
 

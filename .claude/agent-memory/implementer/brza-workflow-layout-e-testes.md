@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-- Repositório `/Users/andepb/Projects/brza-workflow` (PLN-006, nasceu no P1 de `brza-workspace@d85c783`). Gate, da raiz dele, com
+- Repositório `/Users/andepb/Projects/brza-workflow` (PLN-006, nasceu no P1 de `brza-workspace@07bec22`). Gate, da raiz dele, com
   `PYTHONDONTWRITEBYTECODE=1` (o repositório não tem `.gitignore` próprio; sem a variável sobra `__pycache__`):
   `python3 -m unittest discover -s tests/hooks`, `-s tests/cli` e `python3 tests/notes-checker/run.py`.
 - Testes em `tests/{cli,hooks,notes-checker}/`; cada arquivo acha o código por `ROOT`/`BIN`/`CLIENT` ou `HOOKS` calculados do

@@ -12,11 +12,11 @@ tags:
 
 O parecer da entrega do
 [PLN-005: A confiança dos fatos do desenho se mede contra o que se sustentou](../../plans/PLN-005-a-confianca-dos-fatos-do-desenho/PLN-005-plan.md),
-na versão `brza-workspace@13a291a` da `master`. O revisor foi o `reviewer`, chamado pela sessão do workstream
+na versão `brza-workspace@de74787` da `master`. O revisor foi o `reviewer`, chamado pela sessão do workstream
 `workspace`, que não executou os passos; a sessão refez a evidência do A1, do A2, do A3, do A4, do A6, do A7 e do A10
 antes da rodada, e os destinos saíram da R11 do plano, com Anderson.
 
-- **Alvo:** a entrega do PLN-005 na `master` (`2e8ea67..13a291a`), contra o `## Pedido`, a Cobertura, as rodadas R1–R10,
+- **Alvo:** a entrega do PLN-005 na `master` (`f50bf7d..de74787`), contra o `## Pedido`, a Cobertura, as rodadas R1–R10,
   o Desenho D1–D6, os passos P1–P8 e P10 e os desvios X1–X3.
 - **Revisor:** `reviewer`, em 2026-10-31.
 - **O que rodou:** `python3 -m unittest discover -s .claude/hooks/tests` → `Ran 176 tests … OK`;
@@ -76,14 +76,14 @@ resumo conta o `holds` como acerto. A premissa da R1.3 ("amostra sem viés") nã
 > desvio · sugestão · confiança 95 · → corrigido aqui
 
 **Evidência:** `CLAUDE.md:125-126` — "teto de US$ 0,25 e 10 min"; `.claude/hooks/fact_audit.py:244-246` —
-`max(BUDGET_MIN, BUDGET_PER_FACT * facts)`, decidido na R10.2. O P10 (`13a291a`) mudou o código e os papéis, e não o
-`CLAUDE.md` (`git diff 4c92097 13a291a --stat` → só os papéis, o `fact_audit.py` e o teste).
+`max(BUDGET_MIN, BUDGET_PER_FACT * facts)`, decidido na R10.2. O P10 (`de74787`) mudou o código e os papéis, e não o
+`CLAUDE.md` (`git diff 84c2906 de74787 --stat` → só os papéis, o `fact_audit.py` e o teste).
 
 ### A4 — A evidência do P7 diz que nenhuma linha nova de prosa passa de 120 colunas, e uma tem 161
 
 > desvio · sugestão · confiança 95 · → corrigido aqui
 
-**Evidência:** `CLAUDE.md:125` tem 161 caracteres (contados com `len()` do Python, na `master` e em `4c92097`). O plano
+**Evidência:** `CLAUDE.md:125` tem 161 caracteres (contados com `len()` do Python, na `master` e em `84c2906`). O plano
 afirma o contrário no P7 (`PLN-005-plan.md:617-618`), e a regra é a da `agent-instructions-writer`
 (`.claude/skills/agent-instructions-writer/SKILL.md:47`). As linhas 116-122 com 135 são da tabela.
 
@@ -93,10 +93,10 @@ afirma o contrário no P7 (`PLN-005-plan.md:617-618`), e a regra é a da `agent-
 
 **Evidência:** a regra é `conduct.md:44` — "Desvio que muda um `D` vira rodada antes de seguir: no `PLN`, o `D` é
 reescrito no lugar, com a origem nova".
-- **X1** mudou o D2 ("tira as marcas da última mensagem de texto", no plano aceito `d39008c`, linha 249, para o
+- **X1** mudou o D2 ("tira as marcas da última mensagem de texto", no plano aceito `df391b8`, linha 249, para o
   `SubagentHandback`); o plano diz que "não voltou à Entrevista" (`PLN-005-plan.md:667`), e a origem do D2 segue
   "R1.3, R2.1, R3.1, R3.2" (`:407`).
-- **X2** mudou o D3 ("o `workstream` do cwd", `d39008c`, linha 279, para o do fato) sem rodada; a R8 não o cita.
+- **X2** mudou o D3 ("o `workstream` do cwd", `df391b8`, linha 279, para o do fato) sem rodada; a R8 não o cita.
 - **O P2.2** mudou o D1 ("no fim da linha" para "logo depois do que afirma") sem `X`, e o D1 ainda diz "no fim da linha"
   (`PLN-005-plan.md:389`). Essa mudança é a que leva ao A1: a marca no meio do parágrafo deixa a linha longa.
 

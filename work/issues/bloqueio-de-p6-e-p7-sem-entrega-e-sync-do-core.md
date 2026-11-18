@@ -43,4 +43,4 @@ Ao solicitar a execução até o final do plano na sessão atual:
 
 ## Resolução
 
-Resolvida em 2026-11-03: P1 a P5 publicados em `brza-workflow@a666e78`, sincronizados no workspace em `5dcc2b3`; o P6 aplicou e concluiu a MIG-001 e o P7 rodou a revisão, [REV-006: A entrega do PLN-008 contra o Pedido e a Cobertura](../reviews/REV-006-pln-008-p7-a-entrega.md), A6.
+Resolvida em 2026-11-03: P1 a P5 publicados em `brza-workflow@a666e78`, sincronizados no workspace em `0613191`; o P6 aplicou e concluiu a MIG-001 e o P7 rodou a revisão, [REV-006: A entrega do PLN-008 contra o Pedido e a Cobertura](../reviews/REV-006-pln-008-p7-a-entrega.md), A6.

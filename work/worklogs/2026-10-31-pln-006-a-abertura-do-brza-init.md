@@ -26,7 +26,7 @@ plans/ wiki/ work/ skills/ agents/ num repositório do zero". Não havia, e ele 
 
 A R1, toda na recomendada: o plano é o `PLN-006`, no `workspace`; o alvo é um workspace ao lado do código, como o par de
 hoje; o mecanismo é um `brza init` determinístico; e a norma genérica acompanha a daqui por sync. O número subiu na
-`master` em `0310bb4`.
+`master` em `9c725dc`.
 
 O `collector` levantou o Terreno: o que é genérico e o que é local em cada arquivo, o acoplamento em código e o sync de
 hoje. A sessão conferiu cinco fatos por amostra, todos de pé. Um deles contradiz o `CLAUDE.md:3-4`: pela documentação,

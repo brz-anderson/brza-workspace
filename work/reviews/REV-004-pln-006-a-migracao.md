@@ -19,7 +19,7 @@ regra de Anderson para o plano, "escolha sempre o recomendado".
 **Incidente.** O ensaio do segundo sync, rodado de um clone temporário, escreveu na `master` real o commit `fa4152f`,
 com o autor `t <t@t>`, só no `.brza/core.lock` e sem push: a `BRZA_WORKSPACE` herdada da sessão venceu o cwd (A1). A
 trava do runtime barrou o `reset` do revisor, a sessão não o repassou, e Anderson escolheu "Eu rodo o reset
-(Recomendado)": `git reset --keep bca0a4f`, e a `master` voltou à `origin`.
+(Recomendado)": `git reset --keep c3f7628`, e a `master` voltou à `origin`.
 
 ## Achados
 
@@ -37,7 +37,7 @@ passam a recusar, com os dois caminhos na mensagem.
 > desvio · importante · confiança 96 · → corrigido aqui
 
 **Evidência:** `README.md:57-90` mantinha o bloco antigo e "mude aqui e copie para lá", contra o `brza.zsh:3` e o
-`~/.zshrc:51-54`; a `.claude/rules/brza-client.md:11` manda ler a seção. Corrigido em `brza-workspace@f12fdd4`.
+`~/.zshrc:51-54`; a `.claude/rules/brza-client.md:11` manda ler a seção. Corrigido em `brza-workspace@804dcaf`.
 
 ### A3 — A norma não diz que a norma comum se edita no `brza-workflow`
 
@@ -66,14 +66,14 @@ escrito`, e o real gera um commit só do lock (`bin/brza-sync:363-380`). O lock 
 > lacuna · sugestão · confiança 90 · → corrigido aqui
 
 **Evidência:** o gate de testes do `reviewer.md:36` e as linhas do `work/README.md` sobre as notas de outro
-workspace (`:177`) não chegaram à `.claude/rules/workspace.md` nem ao README. Corrigido em `brza-workspace@f12fdd4`.
+workspace (`:177`) não chegaram à `.claude/rules/workspace.md` nem ao README. Corrigido em `brza-workspace@804dcaf`.
 
 ### A7 — A volta dos links depende do `/private/tmp`
 
 > lacuna · sugestão · confiança 85 · → corrigido aqui
 
-**Evidência:** 8 dos 13 alvos de `links-antes.txt` não existem desde o `bbe723b`; a volta funciona por `git worktree
-add --detach <dir> a45018c`, com os oito `--help` saindo com 0, e o worklog não o dizia. Premissa: o macOS limpa o
+**Evidência:** 8 dos 13 alvos de `links-antes.txt` não existem desde o `694c20d`; a volta funciona por `git worktree
+add --detach <dir> 2c3e167`, com os oito `--help` saindo com 0, e o worklog não o dizia. Premissa: o macOS limpa o
 `/private/tmp`. O worklog do dia passou a trazer o comando e a lista.
 
 ### A8 — A docstring do `measure.py:24` ainda cita o `resume_guard.py`
@@ -97,7 +97,7 @@ add --detach <dir> a45018c`, com os oito `--help` saindo com 0, e o worklog não
 
 **Por que é falso:** cada script e teste apagado tem o par no `brza-workflow`, e a chave `hooks` não mudou.
 
-**Evidência:** os 9 scripts apagados têm link em `~/.local/bin` para o `brza-workflow`; `git diff 948fd91 a45018c --
+**Evidência:** os 9 scripts apagados têm link em `~/.local/bin` para o `brza-workflow`; `git diff d7b745c 2c3e167 --
 .claude/settings.json` vazio.
 
 ### A11 — Os achados A2, A3 e A10 do parecer anterior voltaram

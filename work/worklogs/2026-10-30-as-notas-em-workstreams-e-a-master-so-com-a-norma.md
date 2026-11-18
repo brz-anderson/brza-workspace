@@ -23,15 +23,15 @@ decisão está em
   `workstream <nome>` e o `sync`, e recusa a `master`; o `check_notes.py` procura nas branches `workstream/*` o alvo
   que falta na árvore. `python3 -m unittest discover -s scripts/brza/tests` → 187 OK;
   `python3 .claude/skills/notes-checker/tests/run.py` → saída 0.
-- **A norma, em `786f5b1` na `master`:** o `AGENTS.md`, o `CLAUDE.md`, o `README.md`, o `plans/README.md`, o
+- **A norma, em `bd06624` na `master`:** o `AGENTS.md`, o `CLAUDE.md`, o `README.md`, o `plans/README.md`, o
   `work/README.md` e a `plan-runner`, no texto aprovado com "A.1".
-- **O corte:** as três branches nasceram de `786f5b1`, cada uma sem as notas das outras (`d6c8991`, `d527d78`,
-  `f7273e4`); a `master` perdeu as notas em `4f0838f`, que entrou nos workstreams por `git merge -s ours`, para que o
+- **O corte:** as três branches nasceram de `bd06624`, cada uma sem as notas das outras (`d2d4c31`, `6debeb5`,
+  `fa7bb29`); a `master` perdeu as notas em `0da4dc2`, que entrou nos workstreams por `git merge -s ours`, para que o
   `brza note sync` de depois não apague nada. O `studio` ficou com 26 notas, o `tools-kit` com 33 e o `workspace` com 4,
   mais esta e a decisão.
 - **O checador em cada worktree:** 0 erros. No `studio`, dois links do PLN-001 para o workspace de origem
   (`../../../<repositório de origem>/…`) só resolviam do checkout principal; viraram citação em crase, como manda o `work/README.md`
-  (`191ad6e`).
+  (`8b9006c`).
 - **O PLN-003:** uma linha no `Retomar`, porque o Desenho pode contar com as notas na `master` e com o `brza note` de
   antes.
 

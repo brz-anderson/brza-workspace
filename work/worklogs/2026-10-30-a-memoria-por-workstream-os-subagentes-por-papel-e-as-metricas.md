@@ -28,9 +28,9 @@ melhorar o fluxo cada vez mais". A decisão está em
     `python3 -m unittest discover -s scripts/brza/tests` → 229 OK.
 - **A base das rodadas:** nos 235 `AskUserQuestion` dos transcripts deste workspace até aqui, 188 saíram na
   recomendada, 40 em outra opção e 7 em texto livre.
-- **A norma e o código** em `77f018c` na `master`, levados aos três workstreams pelo `brza note sync`.
+- **A norma e o código** em `154f688` na `master`, levados aos três workstreams pelo `brza note sync`.
 - **A memória:** o `brza note memory-setup` ligou os três worktrees; as três memórias do `brza-studio` foram copiadas ao
-  `memory/` do `studio` (`2a3ea80`); as duas da memória compartilhada daqui viraram norma no `CLAUDE.md` e no
+  `memory/` do `studio` (`1932058`); as duas da memória compartilhada daqui viraram norma no `CLAUDE.md` e no
   `AGENTS.md` e saíram.
 - **O `brza-studio`:** `/.claude/agent-memory` no `.gitignore` (`3e36a6945f2`).
 

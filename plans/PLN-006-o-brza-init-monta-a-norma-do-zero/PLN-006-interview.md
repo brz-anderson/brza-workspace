@@ -572,7 +572,7 @@ a regra escolhe opção de rodada, e não é a frase explícita que transforma t
 
 **Apresentado antes:** P1–P7 feitos; o texto inteiro da proposta do índice, por ser a rodada que aprova uma decisão; o
 P8 mexendo no `~/.local/bin`, no `~/.zshrc`, no `~/.config/brza` e na norma da `master`, com a sessão do PLN-005 aberta;
-a `master` do `brza-workspace` dois commits à frente da cópia do P1 (`2c9a546`, `cfa058e`).
+a `master` do `brza-workspace` dois commits à frente da cópia do P1 (`2c37ba8`, `9941d37`).
 
 Respondida em 2026-11-02, depois de um "Continue where you left off." que não respondia a rodada.
 

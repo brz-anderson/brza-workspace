@@ -28,8 +28,8 @@ A reunião de verificação do [PLN-017: A reunião multiagente com personas rod
 - O `#38950` foi **fechado sem merge**. A head real (`ed402736`) tem **163 arquivos**, +12.696. Os "1.352 arquivos" que
   o `gh pr view` mostra vêm da base empilhada na branch do `#39020`.
 - O fluxo de hoje tem **0 PRs** no `brza-studio`, no `brza-workflow` e no `brza-workspace`, e o push na `master` não gera
-  run. As linhas de CI e o disparo automático só têm evento quando um PR existe, como os 7 PRs do `projeto-externo-claude` no
-  `orca-projeto-externo` em 24 a 27/10.
+  run. As linhas de CI e o disparo automático só têm evento quando um PR existe, como os 7 PRs de uma conta de agente num
+  repositório de fora, em 24 a 27/10.
 
 **O destino de cada item de "O que fazer no BrzA Studio":**
 

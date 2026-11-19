@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43901, #43896, #43889, #43593, #43574 trazem retenção de entrada de terminal até prontidão do agente, rebuild de tela oculta e polling de 15s em abas calmas.
+description: A Issue #44012 (commit 1615e5c) trava respostas de perguntas assíncronas no queue handoff; PRs #43901, #43896 trazem retenção de entrada de terminal e polling de 15s.
 scope:
   - brza-studio
   - workspace
@@ -35,7 +35,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43901`](https://github.com
 [`stablyai/orca#40412`](https://github.com/stablyai/orca/pull/40412) (resolve Issue [`#39864`](https://github.com/stablyai/orca/issues/39864)),
 [`stablyai/orca#40405`](https://github.com/stablyai/orca/pull/40405) (resolve Issue [`#40402`](https://github.com/stablyai/orca/issues/40402)) e
 [`stablyai/orca#40398`](https://github.com/stablyai/orca/pull/40398) (resolve Issue [`#12572`](https://github.com/stablyai/orca/issues/12572)),
-além da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
+além da issue [`stablyai/orca#44012`](https://github.com/stablyai/orca/issues/44012) (resolvida no commit `1615e5c`) e
+da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
 
 ## O problema
 
@@ -91,9 +92,14 @@ além da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/4
     Quando um terminal em aba oculta gerava grande volume de saída rapidamente, o daemon descartava pacotes para evitar buffer bloat. Ao voltar para a aba, o estado da tela ficava corrompido ou com linhas cortadas.
 18. **Consumo contínuo de CPU por polling acelerado de processos em painéis de agentes ociosos (`#43901`):**
     O renderer mantinha um loop de polling de foreground process a cada 750 ms em todas as abas onde um agente já havia rodado, gerando drenagem de bateria desnecessária mesmo com agentes em repouso absoluto.
+19. **Dupla submissão de respostas em perguntas assíncronas do Codex durante o handoff da fila (`#44012`, commit `1615e5c`):**
+    Quando o usuário respondia a uma pergunta interativa assíncrona (`ask_question`) do Codex e a mensagem entrava no handoff de enfileiramento (*queue handshake*), o card de pergunta não travava imediatamente o estado dos botões. Clicar novamente ou submeter em rápida sucessão permitia enviar respostas duplicadas ou respostas conflitantes antes da confirmação da fila, corrompendo o fluxo conversacional do agente.
 
 ## O que o upstream implementa e corrige
 
+- **Bloqueio imediato de cartões de pergunta assíncrona durante o queue handoff (`#44012`, commit `1615e5c`):**
+  - Trava os controles e botões de resposta imediatamente após o primeiro envio, mantendo-os desabilitados durante todo o aperto de mão da fila (*queued-handshake*);
+  - Impede submissões concorrentes ou cliques repetidos enquanto o turno do Codex está sendo despachado.
 - **Escrita direta não bloqueante para entrada de teclado em PTYs Unix (`#43593`):**
   - Escreve caracteres do teclado diretamente no file descriptor do PTY Unix de forma síncrona e não bloqueante (`O_NONBLOCK`), desacoplando o pipeline de digitação do pool geral de workers de I/O e garantindo resposta instantânea mesmo sob carga pesada do sistema.
 - **Prevenção de auto-resume duplicado ao restaurar abas salvas (`#43574`, resolve `#43573`):**
@@ -166,3 +172,4 @@ além da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/4
 16. Reter entradas enfileiradas de terminal até confirmação de prontidão do agente em execução (`#43896`).
 17. Reconstruir tela de terminais ocultos a partir do histórico do daemon após descartes de saída (`#43889`).
 18. Adotar polling adaptativo de 15s para processos de primeiro plano em abas ociosas de agentes (`#43901`).
+19. Travar cartões de perguntas assíncronas imediatamente no clique inicial para evitar submissões duplicadas durante o queue handoff do Codex (`#44012`, commit `1615e5c`).

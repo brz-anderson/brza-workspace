@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43939, #43571, #43564, #43363, #43217 trazem autenticação do Antigravity via Gemini API key / ADC, fallback de xhigh/max e chat nativo TRAE CLI.
+description: O PR #44430 (resolve #42512) usa armazenamento de token em arquivo quando o keyring Linux headless está inacessível; PRs #43939, #43571, #43564 trazem autenticação via Gemini API key/ADC e chat TRAE CLI.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,8 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43939`](https://github.com/stablyai/orca/pull/43939),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44430`](https://github.com/stablyai/orca/pull/44430) (resolve Issue [`#42512`](https://github.com/stablyai/orca/issues/42512)),
+[`stablyai/orca#43939`](https://github.com/stablyai/orca/pull/43939),
 [`stablyai/orca#43571`](https://github.com/stablyai/orca/pull/43571),
 [`stablyai/orca#43564`](https://github.com/stablyai/orca/pull/43564),
 [`stablyai/orca#43363`](https://github.com/stablyai/orca/pull/43363),
@@ -96,8 +97,8 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     O mapeamento de modelos do Antigravity restringia a seleção aos modelos pré-definidos antigos (Gemini 3 Pro/Flash), omitindo variantes como Gemini 4 Hydrogen, Carbon e Argon, além de não suportar níveis de raciocínio profundo (`xhigh` e `max`), resultando em erros ou quedas para configurações padrão.
 16. **Inoperância do runtime e chat nativo do Antigravity no Windows (`#42464`):**
     O runtime gerenciado e as rotas de IPC do Antigravity no desktop assumiam caminhos e sinais POSIX, impedindo a inicialização do daemon ACP e a alternância para chat nativo no Windows.
-17. **Falso fallback para prompt de download de 337 MB no Antigravity Chat por cooldown do chaveiro (`#42512`):**
-    Quando `agy` registrava um timeout temporário de 5s no chaveiro do sistema durante o boot, deixava o arquivo `antigravity-keyring-unavailable` no cache. O app interpretava isso como ausência definitiva de credencial em vez de respeitar o cooldown ou validar que `agy acp` estava ativo e autenticado, forçando o prompt de download desnecessário do runtime gerenciado de 337 MB.
+17. **Falso fallback para prompt de download de 337 MB no Antigravity Chat por cooldown do chaveiro e keyring inacessível no Linux headless (`#44430`, resolve `#42512`):**
+    Quando `agy` registrava um timeout temporário de 5s no chaveiro do sistema durante o boot ou quando o daemon de Secret Service/keyring estava indisponível em Linux headless, deixava o arquivo `antigravity-keyring-unavailable` no cache. O app interpretava isso como ausência definitiva de credencial em vez de inspecionar o arquivo de token salvo pelo próprio `agy` (`agy`'s file-based token storage) ou validar que `agy acp` estava ativo e autenticado, forçando o prompt de download desnecessário do runtime gerenciado de 337 MB.
 18. **Crash e perda irrecuperável de sessão ao alternar de terminal para chat (`#42589`):**
     Sessões de agentes longas abertas no terminal sofriam crash ao acionar "Continue in Chat UI", corrompendo o registro de sessão e impossibilitando a retomada em ambos os modos.
 19. **Impossibilidade de escolher dinamicamente a conta em novos lançamentos (`#42506`):**
@@ -198,6 +199,8 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 - **Seletor dinâmico de conta para Claude e Codex no lançamento (`#42506`):**
   - Permite escolher qual perfil ou conta autenticada (`claude-accounts` ou `codex-accounts`) utilizar ao instanciar cada novo chat ou terminal;
   - Introduz o seletor visual em `dynamic-account-launch-setting.tsx` e suporte na CLI via `--account`.
+- **Leitura do armazenamento de token em arquivo do `agy` quando o keyring Linux headless está inacessível (`#44430`, resolve `#42512`):**
+  - Quando o keyring do Linux headless está inacessível ou atinge timeout, o runtime lê diretamente o arquivo de token mantido pelo `agy`, contornando a falha de Secret Service sem exibir o prompt de download de 337 MB do runtime gerenciado.
 - **Validação resiliente de credenciais do Antigravity contra falsos timeouts de keyring (`#42512`):**
   - Verifica ativamente a disponibilidade de sessões autenticadas via `antigravityHostAcpReady()` em vez de abortar cegamente pela simples existência do marcador `antigravity-keyring-unavailable`.
 - **Alinhamento de `clientInfo` para exibição de modelos multi-provedor no Antigravity ACP (`#42759`):**
@@ -228,7 +231,7 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 5. Adotar IDs no formato UUID puro para agentes recém-instanciados (`#42940`).
 6. Habilitar a alternância entre TUI e Native Chat para o Antigravity (`#40201`), permitindo alternar via `⌘⇧J` entre a interface de linha de comando e o chat estruturado sem perder o processo ativo.
 4. Incorporar a seleção dinâmica de conta no lançamento de Claude e Codex (`#42506`).
-5. Eliminar o falso fallback para o runtime gerenciado no Antigravity Chat validando `antigravityHostAcpReady` em vez do marcador temporário de keyring (`#42512`).
+5. Eliminar o falso fallback para o runtime gerenciado no Antigravity Chat lendo o arquivo de tokens do `agy` e validando `antigravityHostAcpReady` quando o keyring Linux headless estiver inacessível (`#44430`, resolve `#42512`).
 6. Blindar o chaveamento TUI ↔ Chat contra crashes irrecuperáveis de sessão (`#42589`).
 7. Incorporar o catálogo expandido de modelos Gemini 4 e esforços `xhigh`/`max` para Antigravity (`#42460`, resolve `#41961`).
 8. Suportar o runtime gerenciado e chat nativo do Antigravity no Windows (`#42464`, `#42847`, resolve `#40321`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43908, #43954, #43607, #43600 e as issues #43988, #43983, #44003 trazem desacoplamento de streaming, expurgo de status de chats fechados e contagem de chat no Resource Manager.
+description: O PR #42965 preserva o menu nativo de cópia em mobile web; PRs #43908, #43954, #43607 trazem desacoplamento de streaming, expurgo de status e presets no Chat.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43908`](https://github.com/stablyai/orca/pull/43908) (resolve Issue [`#43988`](https://github.com/stablyai/orca/issues/43988)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42965`](https://github.com/stablyai/orca/pull/42965),
+[`stablyai/orca#43908`](https://github.com/stablyai/orca/pull/43908) (resolve Issue [`#43988`](https://github.com/stablyai/orca/issues/43988)),
 [`stablyai/orca#43954`](https://github.com/stablyai/orca/pull/43954),
 [`stablyai/orca#43607`](https://github.com/stablyai/orca/pull/43607) (resolve Issue [`#43599`](https://github.com/stablyai/orca/issues/43599)),
 [`stablyai/orca#43600`](https://github.com/stablyai/orca/pull/43600) (resolve Issue [`#43595`](https://github.com/stablyai/orca/issues/43595)),
@@ -162,6 +163,8 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     O monitor de recursos contava apenas processos de terminais PTY locais e processos internos do Orca, ignorando as árvores de processos dos agentes em execução nas abas de chat nativo.
 37. **Reaparecimento de registros falhados limpos da view de Activity após hidratação (`#44003`):**
     Linhas de atividades com falha previamente limpas pelo desenvolvedor voltavam a aparecer na interface após a hidratação de estado e geravam erros ao tentar abrir worktrees já removidos.
+38. **Supressão do menu de contexto nativo de cópia ao selecionar texto do chat na web móvel (`#42965`):**
+    No cliente web para dispositivos móveis (smartphones), ao selecionar trechos de texto em mensagens do chat, o menu de contexto nativo do navegador/sistema operacional (com a ação "Copiar" / "Copy") era suprimido ou desabilitado por manipuladores de eventos de seleção do chat, impedindo que o operador copiasse facilmente partes das respostas do assistente no telefone.
 
 ## O que o upstream implementa
 
@@ -265,9 +268,12 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
   - Rastreia e agrega o consumo de CPU e RAM das árvores de processos dos agentes em execução no Native Chat, integrando-as à exibição do Resource Manager.
 - **Persistência de limpeza de atividades falhadas na view de Activity (`#44003`):**
   - Grava duravelmente o descarte de linhas de falha na view de Activity, evitando seu retorno espúrio após reidratação de estado.
+- **Preservação do menu Copy nativo para texto de chat selecionado em navegadores móveis (`#42965`):**
+  - Ajusta os manipuladores de toque e seleção CSS/DOM no cliente mobile web para reter o menu de contexto nativo do sistema operacional ao selecionar texto de conversa, garantindo acesso direto à ação "Copy".
 
 ## O que fazer
 
+- Preservar o menu de contexto nativo de cópia para texto de chat selecionado no cliente móvel (`#42965`).
 - Isolar filas de escrita de novos prompts do streaming de chats concorrentes para evitar travamentos em "Sending..." (`#43908`, resolve `#43988`).
 - Desalocar registros de status de chats fechados do processo principal (`#43954`).
 - Contabilizar processos de sessões do Native Chat no Resource Manager (`#43983`).

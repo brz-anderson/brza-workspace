@@ -1,14 +1,16 @@
 ---
+status: open
 priority: high
 tags:
   - auth
   - tooling
-description: Os PRs #43578, #43190, #43135, #43145, #43105 e as issues #43579, #43594 trazem auto-switch de contas Claude próximo ao limite de uso, cotas no switcher do Codex e fixação por worktree.
+description: O PR #44431 reabre o painel do Claude em falha de restart e pula teammates; PRs #43578, #43190 trazem auto-switch por limite de uso e fixação por worktree.
 ---
 
 # Chaveamento automático de contas Claude por limite de uso, planos observados e resgate de cota
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43578`](https://github.com/stablyai/orca/pull/43578) (resolve Issue [`#43579`](https://github.com/stablyai/orca/issues/43579)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44431`](https://github.com/stablyai/orca/pull/44431),
+[`stablyai/orca#43578`](https://github.com/stablyai/orca/pull/43578) (resolve Issue [`#43579`](https://github.com/stablyai/orca/issues/43579)),
 além das issues [`stablyai/orca#43594`](https://github.com/stablyai/orca/issues/43594) e
 [`stablyai/orca#43375`](https://github.com/stablyai/orca/issues/43375),
 [`stablyai/orca#43190`](https://github.com/stablyai/orca/pull/43190),
@@ -50,9 +52,14 @@ além das issues [`stablyai/orca#43214`](https://github.com/stablyai/orca/issues
    O alternador de contas do Codex deixou de detalhar as janelas de utilização de 5 horas e limites semanais com seus respectivos cronômetros de reset, cegando o operador sobre qual conta possuía saldo iminente.
 10. **Inércia na aplicação da conta do provedor de IA após troca (`#43375`):**
     Ao alternar a conta nas opções do provedor, as chamadas subsequentes persistiam utilizando a credencial anterior por falta de propagação imediata do estado.
+11. **Fechamento/travamento do painel do Claude e disparo inválido de teammates em falha de restart de conta (`#44431`):**
+    Durante o chaveamento automático ou manual de contas, o processo do Claude é reiniciado. Caso a reinicialização falhe (por exemplo, por erro de autenticação ou indisponibilidade temporária do runtime), o painel do Claude permanecia fechado ou em estado quebrado inacessível para recuperação, enquanto processos dependentes e agentes parceiros (*teammates*) continuavam sendo despachados, gerando erros em cascata.
 
 ## O que o upstream implementa
 
+- **Reabertura de painel do Claude e supressão de teammates em falha de restart de conta (`#44431`):**
+  - Garante que o painel do Claude seja reaberto e restaurado com estado visível de erro/recuperação caso a reinicialização por troca de conta falhe;
+  - Pula explicitamente a inicialização de teammates/subagentes quando o painel principal falhar no reinício, evitando execuções em cascata em um ambiente inválido.
 - **Fixação de worktree a uma conta dedicada de Claude ou Codex (`#43135`, resolve `#9496`):**
   - Permite fixar (*pin*) um worktree a uma conta específica de Claude ou Codex;
   - Ao focar ou abrir aquele worktree, o Studio associa imediatamente a conta fixada sem interferir na conta global ativa nos demais projetos.
@@ -90,6 +97,7 @@ além das issues [`stablyai/orca#43214`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Reabrir o painel do Claude e suspender o despacho de teammates caso a reinicialização por troca de conta falhe (`#44431`).
 - Implementar o chaveamento automático preventivo de contas Claude próximo ao limite de uso (`#43578`, resolve `#43579`).
 - Exibir janelas de cota de 5h e semanal com contadores regressivos no switcher de contas do Codex (`#43594`).
 - Assegurar propagação e aplicação imediata da conta selecionada no provedor de IA para os turnos seguintes (`#43375`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #44430 (resolve #42512) usa armazenamento de token em arquivo quando o keyring Linux headless está inacessível; PRs #43939, #43571, #43564 trazem autenticação via Gemini API key/ADC e chat TRAE CLI.
+description: Os PRs #44559, #44517, #44497, #44484 trazem lançamento com --effort no agy, tratamento de 401 no streaming, remoção de contas órfãs e escopo Workspace no AI Vault.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,11 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44430`](https://github.com/stablyai/orca/pull/44430) (resolve Issue [`#42512`](https://github.com/stablyai/orca/issues/42512)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44559`](https://github.com/stablyai/orca/pull/44559) (resolve Issue [`#39556`](https://github.com/stablyai/orca/issues/39556)),
+[`stablyai/orca#44517`](https://github.com/stablyai/orca/pull/44517) (refs Issue [`#44489`](https://github.com/stablyai/orca/issues/44489)),
+[`stablyai/orca#44497`](https://github.com/stablyai/orca/pull/44497) (resolve Issue [`#44496`](https://github.com/stablyai/orca/issues/44496)),
+[`stablyai/orca#44484`](https://github.com/stablyai/orca/pull/44484) (resolve Issue [`#44483`](https://github.com/stablyai/orca/issues/44483)),
+[`stablyai/orca#44430`](https://github.com/stablyai/orca/pull/44430) (resolve Issue [`#42512`](https://github.com/stablyai/orca/issues/42512)),
 [`stablyai/orca#43939`](https://github.com/stablyai/orca/pull/43939),
 [`stablyai/orca#43571`](https://github.com/stablyai/orca/pull/43571),
 [`stablyai/orca#43564`](https://github.com/stablyai/orca/pull/43564),
@@ -127,9 +131,25 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     A CLI do agente Trae ficava limitada ao terminal TUI, sem suporte para prosseguir conversas no Native Chat com controles nativos de tarefas e aprovações.
 31. **Dependência exclusiva de login via conta Google no navegador para Antigravity Chat (`#43939`):**
     O Antigravity no Native Chat só permitia autenticação via OAuth pessoal ou corporativo do Google no navegador. Desenvolvedores que utilizam chave de API própria do Gemini ou credenciais padrão de aplicação do Google Cloud (ADC / Google Agent Platform) em ambientes headless ou de infraestrutura eram incapazes de autenticar o chat nativo.
+32. **Execução de modelo Antigravity divergente por conflito de esforço de raciocínio no launch (`#44559`, resolve `#39556`):**
+    Ao disparar o Antigravity com nível de esforço de raciocínio específico, o Studio não repassava a flag explícita `--effort` junto à família de modelo no comando da CLI `agy`, fazendo com que o `agy` executasse o modelo padrão ou descartasse a configuração escolhida na interface.
+33. **Registro indevido de aviso 401 não-autenticado como resposta válida com sucesso no Antigravity (`#44517`, refs `#44489`):**
+    Quando requisições longas no `agy` ultrapassavam a validade do token OAuth, o daemon transmitia o aviso `⚠ UNAUTHENTICATED (code 401)` em streaming como `agent_message_chunk` e encerrava com `end_turn`. O Studio gravava a mensagem de aviso como se fosse a resposta do assistente e considerava o turno um sucesso, impedindo que automações detectassem a falha de autenticação.
+34. **Bloqueio de novos chats por conta selecionada travada quando o `agy` está deslogado dela (`#44497`, resolve `#44496`):**
+    Se a conta previamente selecionada no Studio deixasse de ser a conta conectada no `agy`, o Studio bloqueava qualquer novo chat com "native Antigravity account changed" e ocultava a opção de remover a conta em Settings, travando o desenvolvedor sem ter como desvincular o perfil deslogado.
+35. **Descarte de conversas do Antigravity no escopo Workspace de `/resume` no AI Vault (`#44484`, resolve `#44483`):**
+    Como o `agy acp` não grava entradas em `history.jsonl` nem gera mapeamentos em `projects.json`, o scanner do AI Vault não identificava a pasta de trabalho do chat e descartava as sessões do Antigravity da lista de `/resume` filtrada pelo escopo do workspace.
 
 ## O que o upstream implementa e corrige
 
+- **Repasse de `--effort` na família de modelo no lançamento do Antigravity (`#44559`, resolve `#39556`):**
+  - Passa a flag `--effort` junto à família do modelo ao inicializar a CLI `agy`, garantindo que o runtime execute estritamente o modelo e esforço de raciocínio selecionados.
+- **Mapeamento de 401 em streaming para falha formal do turno (`#44517`, refs `#44489`):**
+  - Trata chunks de mensagens compostos pelo aviso `UNAUTHENTICATED (code 401)` como falha explícita do turno, exibindo uma linha de status de erro e registrando `outcome: failure` para que automações e bots não tratem a interrupção como sucesso.
+- **Remoção de contas selecionadas do Antigravity desconectadas no `agy` (`#44497`, resolve `#44496`):**
+  - Permite remover qualquer conta salva nas preferências do Antigravity exceto a que estiver ativamente autenticada no momento, liberando seleções órfãs e restaurando lançamentos sem travar a interface.
+- **Resolução de diretório de trabalho de chats Antigravity via `summary.WorkspaceURIs` (`#44484`, resolve `#44483`):**
+  - Utiliza o identificador `summary.WorkspaceURIs` presente no arquivo de resumo da conversa como fallback para mapear a pasta do workspace no scanner do AI Vault, viabilizando a retomada via `/resume` no escopo do projeto.
 - **Listagem de modelos no agent picker a partir da conta ativa do chat (`#43363`):**
   - No menu de seleção de modelos do Antigravity, consulta os modelos disponíveis com base na conta configurada para a nova sessão de chat em vez de consultar cegamente a conta global do host, evitando exibir modelos não autorizados ou omitir modelos corporativos.
 - **Preservação de modelo e esforço na receita de retomada do Antigravity (`#43217`):**
@@ -255,3 +275,7 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 26. Incorporar fallbacks de raciocínio `xhigh`/`max` e formatação limpa de opções de pensamento em mensagens de commit do Antigravity (`#43571`).
 27. Suportar TRAE CLI como agente com superfície no Native Chat UI (`#43564`).
 28. Habilitar a autenticação de chats Antigravity via chave de API Gemini ou Google Agent Platform (ADC) em Settings (`#43939`).
+29. Repassar `--effort` na família de modelo no comando de inicialização do `agy` para evitar conflito de raciocínio (`#44559`, resolve `#39556`).
+30. Mapear avisos 401 de streaming no Antigravity como erro formal do turno em vez de sucesso com resposta espúria (`#44517`, refs `#44489`).
+31. Permitir remover contas do Antigravity não autenticadas em Settings para evitar bloqueios em "account changed" (`#44497`, resolve `#44496`).
+32. Adotar o fallback para `summary.WorkspaceURIs` no AI Vault para mapear chats Antigravity no escopo de Workspace em `/resume` (`#44484`, resolve `#44483`).

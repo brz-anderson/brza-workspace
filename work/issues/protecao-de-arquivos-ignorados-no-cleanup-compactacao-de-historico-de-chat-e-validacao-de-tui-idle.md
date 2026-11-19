@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43918, #43587, #43563, #43557 e as issues #43539, #43523 trazem retomada de chats cortados por crash/restart, retenção de descritores no polling e leases de chat.
+description: Os PRs #44477, #44445, #44275 trazem tolerância a pastas ilegíveis no resume, retenção de mensagens em criação de worktree e conversão O(N) de chat legado.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,10 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43918`](https://github.com/stablyai/orca/pull/43918),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44477`](https://github.com/stablyai/orca/pull/44477) (resolve Issue [`#37707`](https://github.com/stablyai/orca/issues/37707)),
+[`stablyai/orca#44445`](https://github.com/stablyai/orca/pull/44445),
+[`stablyai/orca#44275`](https://github.com/stablyai/orca/pull/44275),
+[`stablyai/orca#43918`](https://github.com/stablyai/orca/pull/43918),
 [`stablyai/orca#43587`](https://github.com/stablyai/orca/pull/43587) (resolve Issue [`#43539`](https://github.com/stablyai/orca/issues/43539)),
 [`stablyai/orca#43563`](https://github.com/stablyai/orca/pull/43563),
 [`stablyai/orca#43557`](https://github.com/stablyai/orca/pull/43557),
@@ -117,9 +120,22 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Ao processar repositórios massivos ou com milhares de turnos de agentes, o scanner de sessões podia exceder o limite de memória do V8 e quebrar a aplicação sem mecanismo de degradação suave ou recuperação controlada.
 26. **Perda silenciosa de turnos em andamento por crash ou reinício do servidor/app (`#43918`):**
     - Quando o processo do runtime ou servidor remoto caía ou reiniciava durante a geração de uma resposta de agente (mid-turn), o chat permanecia travado em estado incompleto ou perdia o contexto do turno em execução, forçando o operador a reiniciar manualmente a conversa ou perder o raciocínio em andamento.
+27. **Falha irreversível `transcriptUnreadable` ao retomar chat com pastas de projeto ilegíveis (`#44477`, resolve `#37707`):**
+    - Ao retomar uma conversa no Native Chat ou a partir do histórico, o scanner buscava o transcript por ID em todos os baldes de projeto;
+    - Caso encontrasse qualquer pasta ilegível (como diretórios com permissão root deixados por `sudo claude`), o scanner lançava erro `EACCES` e abortava como `transcriptUnreadable` sem tentar outros diretórios válidos.
+28. **Perda da mensagem digitada na criação de worktree caso o agente falhe na inicialização (`#44445`):**
+    - Ao criar um novo worktree com mensagem inicial de prompt, se o agente não conseguisse subir (por falha de binário ou ambiente), a mensagem digitada pelo usuário era descartada e perdida sem oportunidade de recuperação ou envio para um terminal substituto.
+29. **Conversão quadrática lenta de chats legados rescaneando itens por mensagem (`#44275`):**
+    - A rotina de conversão de chats legados rescaneava a lista inteira de itens para cada mensagem individual, resultando em complexidade $O(N^2)$ e travando a interface ao carregar conversas longas.
 
 ## O que o upstream propõe e implementa
 
+- **Tolerância a pastas de projeto ilegíveis no resume de chats Claude (`#44477`, resolve `#37707`):**
+  - Trata pastas ilegíveis (`EACCES`) como simples ausência (*miss*), permitindo que a busca continue pelos demais baldes e conclua a retomada do chat com sucesso.
+- **Preservação de mensagem inicial em falhas de inicialização de worktrees (`#44445`):**
+  - Retém o texto do prompt enviado durante a criação do worktree caso o agente não consiga inicializar, preservando a mensagem no composer ou abrindo-a em um terminal fallback.
+- **Conversão linear O(N) de histórico legado de chat (`#44275`):**
+  - Otimiza o parser de conversas legadas para converter o histórico em tempo linear $O(N)$ em vez de rescanear todos os itens a cada nova mensagem.
 - **Retomada automática de chats interrompidos por crash ou restart (`#43918`):**
   - Implementa continuação de sessões de chat cortadas (`fix(agent-session): continue chats a crash or restart cut, from the runtime`);
   - Ao reiniciar o runtime ou servidor, detecta conversas cortadas no meio de uma geração, reconstrói o estado a partir dos registros persistidos no SQLite/journal e retoma a execução sem perda de turnos ou corrupção de estado.
@@ -203,6 +219,9 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Ignorar pastas de projetos Claude ilegíveis no resume de chat em vez de abortar com `transcriptUnreadable` (`#44477`, resolve `#37707`).
+- Reter mensagens iniciais de criação de worktree quando o agente falhar no arranque (`#44445`).
+- Converter histórico de chat legado em tempo linear $O(N)$ eliminando rescans repetidos (`#44275`).
 - Retomar automaticamente chats cortados no meio da geração após crash ou reinício do runtime (`#43918`).
 - Reter descritor de arquivo aberto por cursor no polling de transcripts do Codex, eliminando `openSync` síncrono e congelamentos de UI no Windows (`#43587`, resolve `#43539`).
 - Limitar a renovação no startup aos leases de chats ativos em vez de regravar todas as sessões salvas (`#43557`).

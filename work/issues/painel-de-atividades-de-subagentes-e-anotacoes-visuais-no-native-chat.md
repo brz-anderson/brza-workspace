@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #42965 preserva o menu nativo de cópia em mobile web; PRs #43908, #43954, #43607 trazem desacoplamento de streaming, expurgo de status e presets no Chat.
+description: Os PRs #44413, #44508, #44203 trazem mensagens entre agentes como status rows, estabilização da faixa de agentes e streaming de saídas de ferramentas no contexto.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,10 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42965`](https://github.com/stablyai/orca/pull/42965),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44413`](https://github.com/stablyai/orca/pull/44413),
+[`stablyai/orca#44508`](https://github.com/stablyai/orca/pull/44508),
+[`stablyai/orca#44203`](https://github.com/stablyai/orca/pull/44203),
+[`stablyai/orca#42965`](https://github.com/stablyai/orca/pull/42965),
 [`stablyai/orca#43908`](https://github.com/stablyai/orca/pull/43908) (resolve Issue [`#43988`](https://github.com/stablyai/orca/issues/43988)),
 [`stablyai/orca#43954`](https://github.com/stablyai/orca/pull/43954),
 [`stablyai/orca#43607`](https://github.com/stablyai/orca/pull/43607) (resolve Issue [`#43599`](https://github.com/stablyai/orca/issues/43599)),
@@ -165,9 +168,22 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     Linhas de atividades com falha previamente limpas pelo desenvolvedor voltavam a aparecer na interface após a hidratação de estado e geravam erros ao tentar abrir worktrees já removidos.
 38. **Supressão do menu de contexto nativo de cópia ao selecionar texto do chat na web móvel (`#42965`):**
     No cliente web para dispositivos móveis (smartphones), ao selecionar trechos de texto em mensagens do chat, o menu de contexto nativo do navegador/sistema operacional (com a ação "Copiar" / "Copy") era suprimido ou desabilitado por manipuladores de eventos de seleção do chat, impedindo que o operador copiasse facilmente partes das respostas do assistente no telefone.
+39. **Mensagens entre agentes e atualizações de workers ocupando turnos inteiros de conversa no chat (`#44413`):**
+    Quando agentes trocavam mensagens de coordenação ou emitiam atualizações de tarefas no chat, cada aviso era exibido como uma mensagem de chat completa e inchada. Reinicializações de workers alteravam linhas antigas e geravam confusão sobre o estado gravado da tarefa.
+40. **Tremulação e reflow visual da faixa de agentes no Native Chat durante atualizações de sessão (`#44508`):**
+    A cada atualização de estado da sessão do agente, a barra horizontal de agentes (*agents strip*) sofria remontagem e saltos de renderização (layout shifts), gerando cintilação visual na área superior do composer.
+41. **Esgotamento de memória ao exportar contexto de chat com saídas extensas de ferramentas (`#44203`):**
+    Ao exportar o contexto da conversa ou transferir dados para o modelo, saídas extensas de ferramentas de terminal eram carregadas inteiramente em strings na memória heap, provocando travamentos e quedas por falta de memória (OOM).
 
 ## O que o upstream implementa
 
+- **Linhas compactas de status para mensagens entre agentes com estado gravado do worker (`#44413`):**
+  - Condensa avisos de início, tarefas e atualizações de workers em linhas compactas de status com o ícone do agente emissor, texto `"Update from <name>"`, botão de cópia e detalhes expansíveis sob demanda;
+  - Vincula o badge ao estado real gravado do despacho (*dispatch state*), exibindo spinner durante execução e badge vermelho em falha, sem que restarts de workers corrompam linhas de histórico prévias.
+- **Estabilização da faixa de agentes durante atualizações de sessão (`#44508`):**
+  - Mantém a barra de agentes estática e imune a saltos visuais durante updates de sessão no Native Chat, eliminando reflows indesejados.
+- **Streaming de grandes saídas de ferramentas na exportação de contexto (`#44203`):**
+  - Transmite saídas volumosas de ferramentas diretamente em streaming durante a exportação do contexto da conversa, sem alocação do conteúdo integral na memória heap.
 - **Renderização e ciclo de vida de subagentes OpenCode no Chat UI (`#39276`):**
   - Implementa o gancho de dialeto ACP `childSession` para capturar frames filhos marcados com `_meta["opencode/child-session"]`,
     vinculando o ID do agente filho à linha do tempo da conversa;
@@ -273,6 +289,9 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Exibir mensagens entre agentes como linhas compactas de status vinculadas ao estado do despacho (`#44413`).
+- Estabilizar a faixa de agentes contra cintilações durante atualizações de sessão no Native Chat (`#44508`).
+- Transmitir saídas volumosas de ferramentas em streaming na exportação de contexto do chat (`#44203`).
 - Preservar o menu de contexto nativo de cópia para texto de chat selecionado no cliente móvel (`#42965`).
 - Isolar filas de escrita de novos prompts do streaming de chats concorrentes para evitar travamentos em "Sending..." (`#43908`, resolve `#43988`).
 - Desalocar registros de status de chats fechados do processo principal (`#43954`).

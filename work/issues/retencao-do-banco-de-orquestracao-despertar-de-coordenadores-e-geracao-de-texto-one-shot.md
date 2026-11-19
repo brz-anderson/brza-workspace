@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43953, #43550, #43467 e as issues #43957, #43925, #43875, #43874, #43869 trazem liberação de terminais de workers encerrados, deep links orca:// e receitas de resume.
+description: Os PRs #44475 e #44327 trazem resposta de permissões de subagentes via coordenador e checkpoint assíncrono de WAL; PR #43953 libera terminais de workers.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,9 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43953`](https://github.com/stablyai/orca/pull/43953),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44475`](https://github.com/stablyai/orca/pull/44475),
+[`stablyai/orca#44327`](https://github.com/stablyai/orca/pull/44327),
+[`stablyai/orca#43953`](https://github.com/stablyai/orca/pull/43953),
 [`stablyai/orca#43550`](https://github.com/stablyai/orca/pull/43550),
 [`stablyai/orca#43467`](https://github.com/stablyai/orca/pull/43467) (resolve Issue [`#43039`](https://github.com/stablyai/orca/issues/43039)),
 além das issues [`stablyai/orca#43957`](https://github.com/stablyai/orca/issues/43957),
@@ -115,9 +117,21 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Ferramentas externas, scripts de automação e notificações não tinham esquema de URI (`orca://chat/...`) para focar diretamente a aba de chat ou abrir o thread de uma mensagem de orquestração entregue.
 29. **Rejeição de `worker_done` de workers rodando em host WSL (`#43869`):**
     - Workers supervisionados disparados com `--on <WSL host>` tinham suas mensagens de finalização `worker_done` rejeitadas com erro de despacho desconhecido ("unknown dispatch") pelo coordenador rodando no host principal.
+30. **Incapacidade de responder a pedidos de permissão de subagentes auxiliares pelo coordenador (`#44475`):**
+    - Quando um worker Claude disparava um subagente auxiliar (*helper agent*) que solicitava permissão para executar uma ferramenta (ex.: Bash), o prompt recebia resposta vazia `{}` automaticamente caso o desenvolvedor não estivesse diretamente no terminal do worker;
+    - O coordenador não tinha visibilidade do diálogo de permissão e o fluxo ficava travado ou abortava silenciosamente.
+31. **Congelamento da thread principal por checkpoints síncronos de WAL no banco de orquestração (`#44327`):**
+    - Transações pequenas de atualização de status (como contagem regressiva de auto-close de workers sendo suspensa ou reiniciada) que cruzavam o limiar de auto-checkpoint do SQLite (1.000 frames) disparavam o checkpoint síncrono do WAL diretamente na thread principal, gerando travamentos de até 500 ms no Electron.
 
 ## O que o upstream implementa
 
+- **Resposta a permissões de subagentes de workers pelo coordenador com hold de 2 minutos (`#44475`):**
+  - Retém o prompt de permissão do subagente auxiliar (*helper agent*) quando o coordenador puder responder ou exibi-lo (aprovações de coordenador ativas ou coordenador de chat), localizando a chamada diretamente no transcript do helper (`<session>/subagents/agent-<id>.jsonl`);
+  - Cria um cartão dedicado de aprovação com identificação de origem ("Allow Bash? · from the worker's general-purpose helper");
+  - Caso não seja respondido no Studio em 2 minutos, encerra a espera de forma limpa e permite que o Claude exiba o diálogo no terminal do próprio worker.
+- **Checkpoints do WAL do banco de orquestração fora da thread principal (`#44327`):**
+  - Move os checkpoints do WAL do `orchestration.db` para uma thread dedicada durante todo o ciclo de vida do banco;
+  - Executa checkpoints em lote apenas quando 1.000 frames estiverem pendentes e drena o residual em pausas de 100 ms, impedindo que escritas de status congelem a main thread.
 - **Isolamento de escalações e decision gates recusados fora da mailbox (`#43016`):**
   - Assegura que solicitações de escalation ou decision_gate recusadas não sejam injetadas na caixa postal do destinatário, registrando o encerramento da decisão apenas nos metadados de governança da tarefa.
 - **Expurgo de cópias resolvidas de chat e auto_vacuum incremental com botão de reclaim (`#42839`, resolve STA-15101):**
@@ -177,6 +191,8 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Responder a pedidos de permissão de subagentes de workers diretamente pela interface do coordenador com retenção de 2 minutos (`#44475`).
+- Executar checkpoints de WAL do banco de orquestração em thread dedicada fora da main thread (`#44327`).
 - Desalocar recursos de terminal de workers imediatamente após comprovação de saída em `settleWorkerStop` (`#43953`).
 - Preservar receitas de lançamento de workers para reativações via `orchestration send` (`#43875`).
 - Expor `providerSessionId` nos metadados de workers de orquestração (`#43957`).

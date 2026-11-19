@@ -4,12 +4,13 @@ priority: high
 tags:
   - auth
   - tooling
-description: O PR #44431 reabre o painel do Claude em falha de restart e pula teammates; PRs #43578, #43190 trazem auto-switch por limite de uso e fixação por worktree.
+description: O PR #43822 limpa locks órfãos do Codex permitindo compartilhamento de histórico; PR #44431 reabre painel do Claude em falha de restart e pula teammates.
 ---
 
 # Chaveamento automático de contas Claude por limite de uso, planos observados e resgate de cota
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44431`](https://github.com/stablyai/orca/pull/44431),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43822`](https://github.com/stablyai/orca/pull/43822),
+[`stablyai/orca#44431`](https://github.com/stablyai/orca/pull/44431),
 [`stablyai/orca#43578`](https://github.com/stablyai/orca/pull/43578) (resolve Issue [`#43579`](https://github.com/stablyai/orca/issues/43579)),
 além das issues [`stablyai/orca#43594`](https://github.com/stablyai/orca/issues/43594) e
 [`stablyai/orca#43375`](https://github.com/stablyai/orca/issues/43375),
@@ -54,9 +55,15 @@ além das issues [`stablyai/orca#43214`](https://github.com/stablyai/orca/issues
     Ao alternar a conta nas opções do provedor, as chamadas subsequentes persistiam utilizando a credencial anterior por falta de propagação imediata do estado.
 11. **Fechamento/travamento do painel do Claude e disparo inválido de teammates em falha de restart de conta (`#44431`):**
     Durante o chaveamento automático ou manual de contas, o processo do Claude é reiniciado. Caso a reinicialização falhe (por exemplo, por erro de autenticação ou indisponibilidade temporária do runtime), o painel do Claude permanecia fechado ou em estado quebrado inacessível para recuperação, enquanto processos dependentes e agentes parceiros (*teammates*) continuavam sendo despachados, gerando erros em cascata.
+12. **Bloqueio de compartilhamento de histórico de contas Codex por arquivos de lock órfãos (`#43822`):**
+    Quando um processo do Codex sofria encerramento abrupto ou concorrência na coordenação, arquivos `*.lock` permaneciam na pasta `thread-writer-locks`. O Studio interpretava qualquer arquivo `.lock` existente como conta ocupada (*busy*), impedindo permanentemente o compartilhamento de histórico de conversas entre diretórios e workspaces.
 
 ## O que o upstream implementa
 
+- **Varredura e liberação de locks obsoletos do Codex para compartilhamento de histórico (`#43822`):**
+  - Executa uma varredura de locks obsoletos através de um helper leve (Perl no macOS/Linux/WSL e PowerShell no Windows) sob `.coordination.lock` exclusivo antes de compartilhar o diretório da conta;
+  - Testa e remove arquivos de lock não detidos ativamente por processos vivos, liberando o histórico para compartilhamento;
+  - Agenda retentativas em background a cada 5 minutos para contas verdadeiramente ocupadas sem bloquear inicializações subsequentes.
 - **Reabertura de painel do Claude e supressão de teammates em falha de restart de conta (`#44431`):**
   - Garante que o painel do Claude seja reaberto e restaurado com estado visível de erro/recuperação caso a reinicialização por troca de conta falhe;
   - Pula explicitamente a inicialização de teammates/subagentes quando o painel principal falhar no reinício, evitando execuções em cascata em um ambiente inválido.
@@ -97,6 +104,7 @@ além das issues [`stablyai/orca#43214`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Executar varredura de locks obsoletos do Codex via helper exclusivo para permitir compartilhamento de histórico de contas (`#43822`).
 - Reabrir o painel do Claude e suspender o despacho de teammates caso a reinicialização por troca de conta falhe (`#44431`).
 - Implementar o chaveamento automático preventivo de contas Claude próximo ao limite de uso (`#43578`, resolve `#43579`).
 - Exibir janelas de cota de 5h e semanal com contadores regressivos no switcher de contas do Codex (`#43594`).

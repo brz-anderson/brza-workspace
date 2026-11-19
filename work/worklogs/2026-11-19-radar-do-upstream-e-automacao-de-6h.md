@@ -95,3 +95,29 @@ refs:
      adicionados o PR `#44590` (resolve Issue `#43875`, retenção durável da receita original de lançamento de workers no banco mesmo quando capturas de contexto subsequentes falharem) e
      o PR `#44332` (orientação e padronização dos tipos formais de mail suportados entre agentes e sobre `--on`, com suporte retroativo ao tipo `status` em servidores legados).
 
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-19)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e commits criados ou
+   atualizados entre `2026-11-19T15:00:00Z` e `2026-11-19T21:15:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Atualização de 4 issues rastreadas em `work/issues/`:**
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionados o PR `#44837` (gestão universal de ferramentas gerenciadas `bot-tools` e identidades para todos os agentes gerenciados e ACP, incluindo Antigravity e Pi),
+     o PR `#44814` (refs Issue `#44776`, descarte inteligente de `--plugin-dir` na inicialização do Claude sob políticas corporativas com `disableSideloadFlags` para permitir abertura do Native Chat) e
+     o PR `#44762` (resolve Issue `#44692`, validação de configurações do catálogo de modelos via hash SHA-256 de conteúdo em vez de carimbos voláteis de mtime/inode, eliminando loops de centenas de processos concorrentes).
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados o PR `#44461` (resolve Issue `#40998`, sincronização imediata de `/rename` e `/name` do Claude com o título da aba do chat e do Session History capturando o evento `session_title_changed`) e
+     o PR `#44808` (reconstituição de saídas do comando local `/recap` a partir de linhas salvas `system/local_command` no transcript durante a reabertura de chats Claude e no Resume in New Chat).
+   - [Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):
+     adicionados o PR `#44691` (proteção estrita por identidade de diretório da pasta externa de importação do Codex contra exclusões acidentais no cleanup de workspaces),
+     o PR `#44763` (revogação automática de autorizações de confiança de Codex e Antigravity na deleção de worktrees via worker assíncrono para prevenir bloqueios na main thread do Electron),
+     o PR `#44025` (recuperação e isolamento do runner assíncrono de importação de históricos Codex de pastas externas com clone de blocos/reflink e tratamento seguro de `ENOSPC`) e
+     o PR `#44571` (delimitação da leitura da fila em SQL a 2.048 linhas/2 MiB sem ordenação pesada em temp B-tree e retomada paginada a cada 16 páginas na prova do journal legado).
+   - [Comandos shell no chat, recibos de perguntas e foco espacial em terminais](../issues/comandos-shell-no-chat-recibos-de-perguntas-e-foco-espacial-em-terminais.md):
+     adicionados o PR `#44791` (resolve Issue `#44783`, restauração de foco no split ativo de terminal após cancelamento do diálogo de fechamento via hook `useModalReturnFocus`, evitando fechamento acidental de todos os splits),
+     o PR `#43529` (preservação durável da identidade e linha de status de conversas de agentes em terminais através de ciclos de suspensão e despertar `workspace.sleep` / `wake`) e
+     o PR `#39831` (delimitação estrita de links clicáveis de arquivos delimitados por parênteses no terminal, eliminando parênteses de fechamento e prosa adjacente).
+   - [Abas de navegador sem moldura e ergonomia de workspace](../issues/abas-de-navegador-sem-moldura-e-ergonomia-de-workspace.md):
+     adicionado o PR `#44744` (suporte a zoom em abas de navegador remoto transmitidas por screencast via Ctrl+scroll, pinch e atalhos de teclado com mapeamento geométrico exato de coordenadas de clique e toque).
+
+

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44471, #44209, #44477 trazem /session para /resume no chat, isolamento de chats corrompidos no auto-continue e tolerância a pastas ilegíveis.
+description: Os PRs #44691, #44763, #44025, #44571 blindam a pasta de importação do Codex no cleanup, revogam confiança de worktree deletado e paginam provas de migração de journal.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,11 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44471`](https://github.com/stablyai/orca/pull/44471),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44691`](https://github.com/stablyai/orca/pull/44691),
+[`stablyai/orca#44763`](https://github.com/stablyai/orca/pull/44763),
+[`stablyai/orca#44025`](https://github.com/stablyai/orca/pull/44025),
+[`stablyai/orca#44571`](https://github.com/stablyai/orca/pull/44571),
+[`stablyai/orca#44471`](https://github.com/stablyai/orca/pull/44471),
 [`stablyai/orca#44209`](https://github.com/stablyai/orca/pull/44209),
 [`stablyai/orca#44477`](https://github.com/stablyai/orca/pull/44477) (resolve Issue [`#37707`](https://github.com/stablyai/orca/issues/37707)),
 [`stablyai/orca#44445`](https://github.com/stablyai/orca/pull/44445),
@@ -133,9 +137,28 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - No ecossistema TUI (como OpenCode), o comando tradicional de seleção de sessões é `/sessions`. No Native Chat, o comando equivalente é `/resume`. Usuários que digitavam `/session` ou `/sessions` não encontravam o comando no autocompletar fora do idioma inglês. Além disso, a lista de histórico de sessões não priorizava a retomada no Native Chat quando este era a superfície padrão configurada do agente.
 31. **Chat corrompido bloqueando auto-continue de limite de uso de todos os outros chats e re-lendo a cada 10s (`#44209`):**
     - Quando um chat salvo apresentava inconsistência ou corrupção em seu journal/transcript, o serviço de retomada automática de limites de uso (*usage-limit auto-continue*) era completamente bloqueado para todos os outros chats íntegros do sistema. Ademais, o leitor de status insistia em tentar reler o arquivo corrompido em loop a cada 10 segundos, consumindo CPU e I/O inutilmente.
+32. **Exclusão inadvertida de conversas da pasta de importação do Codex durante cleanup de workspace (`#44691`):**
+    - A rotina de expurgo de histórico de chat ao deletar um workspace varria recursivamente caminhos de rollouts sem verificar se o arquivo pertencia à pasta externa de importação do Codex (`codex-rollout-protected-roots.ts`). Links simbólicos ou subpastas de checkouts podiam levar à exclusão permanente de históricos de conversas importadas de outras ferramentas ou diretórios do usuário.
+33. **Manutenção indevida de confiança (*agent trust*) de Codex e Antigravity após exclusão de worktrees (`#44763`):**
+    - Ao excluir um worktree pela barra lateral, as entradas de autorização gravadas em `projects."<path>"` do Codex e `trustedWorkspaces` do Antigravity permaneciam registradas nas configurações. Se um novo checkout fosse criado posteriormente no mesmo caminho, ele já iniciava com status de confiável sem aprovação prévia do operador. Além disso, a remoção da confiança síncrona na main thread bloqueava o Electron no Windows durante retries de rename.
+34. **Quebra na importação de conversas Codex de pastas externas e travamentos por pastas lentas (`#44025`):**
+    - A importação de históricos de conversas Codex de pastas externas (`codex-accounts`) estava quebrada desde a versão 1.4.262. Quando a pasta de origem continha links rígidos ausentes ou respondia lentamente, o processo bloqueava a fila inteira de histórico do host, e falhas de disco cheio (`ENOSPC`) lançavam exceções não tratadas em vez de registrar a conversa como pendente de tentativa posterior.
+35. **Sobrecarga de memória e scans repetidos na prova de integridade do journal legado (`#44571`):**
+    - O verificador de conversão do journal legado (`journal-legacy-proof`) lia mensagens enfileiradas ordenadas em SQL, forçando o SQLite a criar B-trees temporárias para centenas de milhares de linhas e travando a inicialização por até 1s por chat. A ausência de paginação e persistência do cursor forçava re-varreduras completas a cada boot.
 
 ## O que o upstream propõe e implementa
 
+- **Proteção estrita da pasta de importação do Codex contra exclusões no cleanup (`#44691`):**
+  - Implementa proteção por identidade de pasta (`codex-rollout-protected-roots.ts`) antes de cada exclusão permanente de rollout, garantindo que nenhum arquivo sob a raiz de importação do Codex seja apagado durante o cleanup de histórico de workspaces.
+- **Revogação automática de confiança de agentes ao excluir worktree via worker dedicado (`#44763`):**
+  - Revoga imediatamente as entradas de permissão do Codex (`projects."<path>"`) e Antigravity (`trustedWorkspaces`) em qualquer deleção de worktree por IPC ou CLI;
+  - Despacha a atualização de `settings.json` para o worker de confiança de projetos em segundo plano, evitando bloqueios na main thread do Electron no Windows.
+- **Resiliência e isolamento da importação de históricos Codex em runner assíncrono (`#44025`):**
+  - Restaura o fluxo de importação externa desacoplando o runner da fila principal do host (`codex-history-import-runner.ts`);
+  - Realiza cópias eficientes via reflink/clone de blocos (Linux FICLONE, Windows Dev Drive ReFS, macOS `cp -c`), trata `ENOSPC`/`EROFS` com encerramento limpo e mantém registro persistente de staging (`import-staging.txt`).
+- **Limitação de leitura em SQL e retomada paginada da prova do journal legado (`#44571`):**
+  - Limita a leitura da fila em SQL a no máximo 2.048 linhas e 2 MiB, eliminando a ordenação desnecessária no SQLite;
+  - Salva o cursor de progresso a cada 16 páginas, permitindo que inicializações subsequentes continuem a prova a partir do último ponto sem rescanear todo o histórico.
 - **Alias `/session` para `/resume` e priorização de retomada no Chat (`#44471`):**
   - Mapeia `/session` e `/sessions` como aliases diretos para o comando `/resume` no autocompletar do composer;
   - Posiciona a ação "Resume in New Chat" como primeira opção no histórico de sessões do AI Vault quando o Native Chat é a superfície padrão do agente, preservando o contexto sem forçar abertura de terminal.
@@ -231,6 +254,10 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Proteger a pasta externa de importação do Codex contra exclusões acidentais durante o cleanup de histórico de workspaces (`#44691`).
+- Revogar a confiança de agentes (Codex e Antigravity) ao deletar worktrees via worker assíncrono para não travar a main thread (`#44763`).
+- Isolar a importação de históricos Codex em runner desacoplado da fila principal do host com suporte a reflink e tratamento de ENOSPC (`#44025`).
+- Limitar a leitura da fila em SQL e paginar a prova de integridade do journal legado para acelerar o boot (`#44571`).
 - Mapear aliases `/session` e `/sessions` para o comando `/resume` e priorizar "Resume in New Chat" no histórico quando o chat for o padrão (`#44471`).
 - Isolar chats corrompidos na fila de retomada automática de limites de uso e suspender re-leituras desnecessárias a cada 10s (`#44209`).
 - Ignorar pastas de projetos Claude ilegíveis no resume de chat em vez de abortar com `transcriptUnreadable` (`#44477`, resolve `#37707`).

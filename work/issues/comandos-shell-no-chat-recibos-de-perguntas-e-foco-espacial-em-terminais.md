@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #44624 preserva abas ao reiniciar terminais marcando PTY como replaced; PRs #43901, #43896 trazem retenção de entrada e polling de 15s.
+description: Os PRs #44791, #43529, #39831 trazem foco no split ao cancelar fechamento, retenção de conversas através de sleep/wake e delimitação de links entre parênteses.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,10 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44624`](https://github.com/stablyai/orca/pull/44624) (refs Issue [`#44586`](https://github.com/stablyai/orca/issues/44586)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44791`](https://github.com/stablyai/orca/pull/44791) (resolve Issue [`#44783`](https://github.com/stablyai/orca/issues/44783)),
+[`stablyai/orca#43529`](https://github.com/stablyai/orca/pull/43529),
+[`stablyai/orca#39831`](https://github.com/stablyai/orca/pull/39831),
+[`stablyai/orca#44624`](https://github.com/stablyai/orca/pull/44624) (refs Issue [`#44586`](https://github.com/stablyai/orca/issues/44586)),
 [`stablyai/orca#43901`](https://github.com/stablyai/orca/pull/43901),
 [`stablyai/orca#43896`](https://github.com/stablyai/orca/pull/43896),
 [`stablyai/orca#43889`](https://github.com/stablyai/orca/pull/43889),
@@ -97,9 +100,21 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
     Quando o usuário respondia a uma pergunta interativa assíncrona (`ask_question`) do Codex e a mensagem entrava no handoff de enfileiramento (*queue handshake*), o card de pergunta não travava imediatamente o estado dos botões. Clicar novamente ou submeter em rápida sucessão permitia enviar respostas duplicadas ou respostas conflitantes antes da confirmação da fila, corrompendo o fluxo conversacional do agente.
 20. **Fechamento e perda indevida da aba de terminal ao reiniciar o painel PTY (`#44624`, refs `#44586`):**
     Quando um painel de terminal era reiniciado e a instância anterior do PTY era descartada antes que o novo processo de substituição estivesse totalmente instanciado, o renderer enviava uma mensagem genérica `pty:kill`. O processo principal tratava esse encerramento como uma solicitação voluntária de fechamento por parte do usuário e aposentava a aba correspondente, fechando a aba sem que o desenvolvedor tivesse pedido.
+21. **Perda de foco e fechamento em cascata de abas após cancelar fechamento de terminal split (`#44791`, resolve `#44783`):**
+    O modal de confirmação de fechamento de terminal (`CloseTerminalDialog`) era aberto pelo estado do React sem gatilho de foco do Radix. Ao clicar em Cancelar, apertar Escape ou fechar clicando fora, o foco do teclado caía no `document.body`. Ao pressionar Cmd+W / Ctrl+W em seguida, o atalho caía no manipulador de nível de aba e fechava todos os splits de uma vez.
+22. **Perda do vínculo de conversas de agentes em painéis de terminal através de ciclos de repouso e despertar (*sleep/wake*) (`#43529`):**
+    Quando um workspace entrava em repouso (*workspace sleep*), o PTY do terminal era terminado. Ao despertar o workspace, os ganchos do agente não conseguiam reconectar a linha de status e o identificador da conversa ao novo PTY, gerando painéis zumbis desconectados do histórico do agente.
+23. **Detecção incorreta de links clicáveis de arquivos englobando texto em prosa adjacente a parênteses (`#39831`):**
+    Quando caminhos de arquivo apareciam delimitados por parênteses no terminal (ex.: `(src/auth/session.ts)` ou `(ver detalhes em src/index.ts:25)`), a regex de detecção de links OSC 8 incluía os parênteses de fechamento ou a prosa subsequente na URL do link, quebrando a navegação por clique.
 
 ## O que o upstream implementa e corrige
 
+- **Restauração de foco no split ativo após cancelamento de modal de terminal (`#44791`, resolve `#44783`):**
+  - Integra o hook `useModalReturnFocus` ao `CloseTerminalDialog`, assegurando que Cancelar, Escape ou dismiss fora do modal retornem o foco exatamente para o painel de terminal dividido ativo em vez de vazar para o body.
+- **Continuidade de conversas de agentes em painéis de terminal através de sleep e wake (`#43529`):**
+  - Implementa registro durável de turnos e identificadores de conversa (`pane-agent-identity.ts` e `worktree-sleep-resume-recording.ts`), permitindo que a reconexão pós-despertar re-vincule a conversa do agente ao novo PTY do painel sem perda de contexto ou linhas de status.
+- **Delimitação estrita de caminhos de arquivos entre parênteses no terminal (`#39831`):**
+  - Ajusta o detector de links (`terminal-file-link-detection-ranges.ts`) para encerrar a captura do caminho no parêntese de fechamento não correspondido sem exigir espaço anterior, ignorando prosa subsequente.
 - **Preservação de abas de terminal ao reiniciar marcando PTY como `replacedByRestart` (`#44624`, refs `#44586`):**
   - O renderer passa o parâmetro `replaced: true` durante o descarte de PTYs vinculados a um reinício de painel;
   - O processo principal roteia o encerramento através de `stopReplacedPanePty`, marcando a saída do processo antigo como `replacedByRestart` e mantendo a aba intacta na interface enquanto o novo PTY é inicializado.
@@ -180,4 +195,8 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
 18. Adotar polling adaptativo de 15s para processos de primeiro plano em abas ociosas de agentes (`#43901`).
 19. Travar cartões de perguntas assíncronas imediatamente no clique inicial para evitar submissões duplicadas durante o queue handoff do Codex (`#44012`, commit `1615e5c`).
 20. Preservar abas de terminais durante reinicializações de painéis marcando o descarte do PTY antigo como `replacedByRestart` (`#44624`, refs `#44586`).
+21. Retornar foco ao split de terminal ativo após cancelar ou fechar o diálogo de confirmação de fechamento (`#44791`, resolve `#44783`).
+22. Preservar a identidade e linha de status de conversas de agentes em terminais através de repouso e despertar (*sleep/wake*) (`#43529`).
+23. Ajustar limites de detecção de links de arquivos no terminal para ignorar parênteses de fechamento e prosa adjacente (`#39831`).
+
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #44428 centraliza listeners de requisição de navegador e retém baselines no Memory Saver; PR #37708 traz abas chromeless e recolhimento de splits.
+description: Os PRs #44744 e #44428 trazem suporte a zoom em páginas de navegador remoto via Ctrl+scroll/pinch/Cmd+-/+ e centralização de listeners webRequest.
 scope:
   - brza-studio
   - workspace
@@ -17,7 +17,8 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44428`](https://github.com/stablyai/orca/pull/44428),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44744`](https://github.com/stablyai/orca/pull/44744),
+[`stablyai/orca#44428`](https://github.com/stablyai/orca/pull/44428),
 [`stablyai/orca#37708`](https://github.com/stablyai/orca/pull/37708),
 [`stablyai/orca#37810`](https://github.com/stablyai/orca/pull/37810),
 [`stablyai/orca#37803`](https://github.com/stablyai/orca/pull/37803),
@@ -48,9 +49,14 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#44428`](https://github.com
    - `#37746`: configuração do local de abertura da aba de Setup ao criar novo workspace.
 6. **Vazamento de `webRequest` listeners e perda de título/favicon baselines em abas hibernadas (`#44428`):**
    Múltiplos componentes registravam listeners de requisições web (`webRequest`) de forma concorrente em sessões de navegador sem proprietário único, gerando vazamento de memória e listeners duplicados. Além disso, quando o Memory Saver descartava ou hibernava abas em segundo plano, os baselines de título e favicon da página eram perdidos entre trocas de contexto.
+7. **Impossibilidade de aplicar zoom em páginas de navegador remoto transmitidas por stream (`#44744`):**
+   Ao visualizar abas de navegador hospedadas em servidores remotos ou headless via screencast, gestos de pinça (*pinch*), rolagem com `Ctrl+scroll` ou atalhos de teclado de zoom (`Cmd/Ctrl+=`, `Cmd/Ctrl+-`, `Cmd/Ctrl+0`) não tinham efeito na página remota ou causavam descalibração na posição de cliques e ponteiros do mouse.
 
 ## O que o upstream implementa
 
+- **Controle de zoom em páginas de navegador remoto com ajuste de geometria de toque/ponteiro (`#44744`):**
+  - Implementa `useRemoteBrowserPageZoom`, interceptando atalhos `Cmd+=`/`Cmd+-`/`Cmd+0`, `Ctrl+wheel` e gestos de pinça no viewport transmitido;
+  - Despacha o nível de zoom via comando RPC (`browser.zoom`) para a instância remota e propaga a escala nos frames de screencast, mapeando coordenadas de clique e toque com precisão tanto no desktop quanto no mobile.
 - **Proprietário único para listeners de requisição e persistência de baselines de título/favicon (`#44428`):**
   - Centraliza a instalação de listeners de requisições web (`webRequest`) nas sessões de navegador em um único proprietário gerenciado, evitando vazamentos e execuções duplicadas;
   - Preserva os baselines de título e favicon das páginas entre atualizações e ciclos de hibernação pelo Memory Saver.
@@ -61,5 +67,6 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#44428`](https://github.com
 
 ## O que fazer
 
+- Suportar zoom em abas de navegador remoto via Ctrl+scroll, pinch e atalhos de teclado com mapeamento de coordenadas (`#44744`).
 - Centralizar a instalação de listeners de requisições de navegador em proprietário único e preservar baselines de título/favicon durante a hibernação de abas pelo Memory Saver (`#44428`).
 - Avaliar a inclusão do modo chromeless, recolhimento de splits e comandos de ergonomia do workspace em versões futuras do `brza-studio`.

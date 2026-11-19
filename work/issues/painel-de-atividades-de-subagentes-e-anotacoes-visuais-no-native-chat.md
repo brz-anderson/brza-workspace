@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #43994 limita a 8 MB o live-text de cada subscriber em main; PRs #44413, #44508 trazem mensagens entre agentes como status rows e estabilização de faixa.
+description: Os PRs #44461 e #44808 sincronizam /rename do Claude com o título da aba e restauram saídas de /recap no reopen; PR #43994 limita live-text a 8 MB.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,9 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43994`](https://github.com/stablyai/orca/pull/43994),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44461`](https://github.com/stablyai/orca/pull/44461) (resolve Issue [`#40998`](https://github.com/stablyai/orca/issues/40998)),
+[`stablyai/orca#44808`](https://github.com/stablyai/orca/pull/44808),
+[`stablyai/orca#43994`](https://github.com/stablyai/orca/pull/43994),
 [`stablyai/orca#44413`](https://github.com/stablyai/orca/pull/44413),
 [`stablyai/orca#44508`](https://github.com/stablyai/orca/pull/44508),
 [`stablyai/orca#44203`](https://github.com/stablyai/orca/pull/44203),
@@ -177,9 +179,17 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     Ao exportar o contexto da conversa ou transferir dados para o modelo, saídas extensas de ferramentas de terminal eram carregadas inteiramente em strings na memória heap, provocando travamentos e quedas por falta de memória (OOM).
 42. **Consumo ilimitado de memória no processo principal com streaming de texto em múltiplos chats (`#43994`):**
     Quando múltiplos chats nativos ou assinantes (*subscribers*) lentos realizavam streaming simultâneo de respostas volumosas, o processo principal do Electron acumulava cópias não entregues de snapshots de texto ao vivo sem teto delimitado por subscriber. Em conexões lentas ou renderers ocupados, a retenção gerava picos de centenas de megabytes no heap do main process antes de desalocar a memória.
+43. **Descompasso de título de chat ao renomear sessão Claude via comando `/rename` ou `/name` (`#44461`, resolve `#40998`):**
+    Ao digitar `/rename <novo-nome>` ou `/name` em um chat Claude, o nome interno da conversa era alterado na CLI, mas a aba do Native Chat e a lista do Session History mantinham o nome autogerado pelo Studio (que tem precedência sobre o título do transcript). A interface não interceptava o evento `session_title_changed` emitido pela CLI, mantendo o título antigo visível.
+44. **Desaparecimento de respostas de comandos locais `/recap` ao reabrir chats Claude (`#44808`):**
+    Respostas geradas pelo comando `/recap` eram gravadas pelo Claude Code em registros do tipo `system/local_command` no transcript, enquanto no streaming ao vivo eram enviadas como frames sintéticos de assistente. Como a rotina de reidratação/catch-up e os decodificadores legados só liam linhas `user` e `assistant`, o conteúdo de resumos do `/recap` desaparecia da conversa ao reabrir a aba ou retomar o chat via "Resume in New Chat".
 
 ## O que o upstream implementa
 
+- **Sincronização imediata de `/rename` e `/name` do Claude com o título da aba do chat (`#44461`, resolve `#40998`):**
+  - Monitora o envio de comandos `/rename` ou `/name` no Native Chat e captura o frame `session_title_changed` emitido pelo Claude durante a resposta para atualizar atômica e diretamente o nome de usuário da conversa (`setUserName`), refletindo o novo título na aba e no Session History.
+- **Restauração de saídas de `/recap` na reabertura de chats Claude (`#44808`):**
+  - Reconstitui o frame sintético de assistente a partir das linhas salvas `system/local_command` do transcript durante a reidratação, decodificando o comando como `command-output` e preservando a saída do `/recap` após reboots ou reaberturas de aba.
 - **Teto de 8 MiB de live-text por subscriber e encerramento limpo de streams lentos (`#43994`):**
   - Implementa um limite rígido de 8 MiB para o texto ao vivo acumulado (em entrega + aguardando) em cada assinante (`subscriber-live-text-cap.ts`);
   - Quando um subscriber ultrapassa esse teto, seu stream é finalizado de forma autônoma sem afetar outros chats ou o orçamento global, permitindo que o cliente frontend restabeleça a conexão e continue a leitura suavemente a partir do seu cursor de histórico;
@@ -296,6 +306,8 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Sincronizar comandos `/rename` e `/name` do Claude diretamente com o título da aba e do Session History (`#44461`, resolve `#40998`).
+- Restaurar saídas do comando local `/recap` na reabertura de chats Claude e no Resume in New Chat (`#44808`).
 - Limitar a 8 MiB o buffer de texto ao vivo de cada subscriber no processo principal com retomada por cursor (`#43994`).
 - Exibir mensagens entre agentes como linhas compactas de status vinculadas ao estado do despacho (`#44413`).
 - Estabilizar a faixa de agentes contra cintilações durante atualizações de sessão no Native Chat (`#44508`).

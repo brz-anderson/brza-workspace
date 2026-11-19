@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44575, #44587, #44578, #44625 trazem retomada de terminais agy no Chat, encerramento limpo com subagentes, exibição de respostas assíncronas e prontidão em silent sign-in.
+description: Os PRs #44837, #44814, #44762 trazem ferramentas/identidade para todos os agentes gerenciados, descarte de --plugin-dir sob políticas restritas e hash SHA-256 no catálogo de modelos.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,10 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44575`](https://github.com/stablyai/orca/pull/44575),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44837`](https://github.com/stablyai/orca/pull/44837),
+[`stablyai/orca#44814`](https://github.com/stablyai/orca/pull/44814) (refs Issue [`#44776`](https://github.com/stablyai/orca/issues/44776)),
+[`stablyai/orca#44762`](https://github.com/stablyai/orca/pull/44762) (resolve Issue [`#44692`](https://github.com/stablyai/orca/issues/44692)),
+[`stablyai/orca#44575`](https://github.com/stablyai/orca/pull/44575),
 [`stablyai/orca#44587`](https://github.com/stablyai/orca/pull/44587) (refs Issue [`#41367`](https://github.com/stablyai/orca/issues/41367)),
 [`stablyai/orca#44578`](https://github.com/stablyai/orca/pull/44578) (resolve Issue [`#40447`](https://github.com/stablyai/orca/issues/40447)),
 [`stablyai/orca#44625`](https://github.com/stablyai/orca/pull/44625),
@@ -151,9 +154,21 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Quando o Antigravity disparava ferramentas assíncronas em segundo plano e, após a conclusão destas, enviava respostas sem solicitação direta (*unprompted replies*), a interface do Native Chat descartava ou não renderizava essas mensagens, deixando o usuário sem visibilidade das ações subsequentes.
 39. **Falha precoce de despacho e prontidão falsa de workers `agy` durante login silencioso (`#44625`):**
     Ao inicializar um worker `agy` que requeria autenticação silenciosa (*silent sign-in* / refresh de credenciais), o runtime sinalizava prontidão antes da conclusão do handshake de autenticação, fazendo com que comandos e dispatches iniciais falhassem com erro de credenciais.
+40. **Restrição de gerenciamento de ferramentas e identidade apenas a Claude e Codex (`#44837`):**
+    A infraestrutura de configuração de ferramentas de bots (*bot-tools*) e identidades injetadas era restrita hardcoded aos agentes Claude e Codex. Outros agentes com suporte a sessões gerenciadas e dialeto ACP (como Antigravity e Pi) ficavam desprovidos do catálogo compartilhado de ferramentas gerenciadas e OAuth de conectores.
+41. **Falha de inicialização do Native Chat Claude quando políticas corporativas rejeitam `--plugin-dir` (`#44814`, refs `#44776`):**
+    Quando configurações gerenciadas da organização (*managed settings*) ativam `disableSideloadFlags`, o binário do Claude CLI encerra na inicialização recusando a flag `--plugin-dir`. Como o Studio só detectava rejeição de flags a partir do erro "unknown option", continuava passando `--plugin-dir` indefinidamente, impossibilitando a abertura de qualquer sessão do Native Chat em contas corporativas restritas.
+42. **Tempestades de centenas de processos por invalidação espúria do catálogo de modelos (`#44762`, resolve `#44692`):**
+    A sonda de catálogo de modelos do Claude monitorava `~/.claude/settings.json` baseando-se em `inode` e `ctime`/`mtime`. Como comandos como `claude -p` reescrevem o arquivo atomicamente (via arquivo temporário e rename) com bytes idênticos, cada disparo alterava a marcação, expirava o escopo e disparava uma nova sonda ~2.5s depois, gerando rajadas descontroladas de centenas de processos concorrentes.
 
 ## O que o upstream implementa e corrige
 
+- **Gerenciamento universal de ferramentas e identidades para todos os agentes (`#44837`):**
+  - Generaliza a infraestrutura de ferramentas (`bot-tools`) para gerenciar ferramentas, identidades e conectores em qualquer agente ACP (incluindo Antigravity) e extensões Pi, persistindo ferramentas gerenciadas inclusive através de reloads de extensões.
+- **Descarte inteligente de `--plugin-dir` em ambientes com sideload bloqueado (`#44814`, refs `#44776`):**
+  - Trata a recusa por políticas corporativas gerenciadas como rejeição formal de flag e memoriza a rejeição por pasta de configuração da conta autenticada, descartando `--plugin-dir` na inicialização do Claude para viabilizar o Native Chat.
+- **Validação de catálogo de modelos por hash SHA-256 de conteúdo (`#44762`, resolve `#44692`):**
+  - Substitui o carimbo de `ctime`/`mtime`/`inode` por um hash SHA-256 do conteúdo real de `settings.json`, garantindo que reescritas atômicas com o mesmo conteúdo não invalidem desnecessariamente o catálogo de modelos nem disparem loops de processos.
 - **Continuidade de conversas de terminal do `agy` no Native Chat (`#44575`):**
   - Implementa a importação e continuidade de sessões de terminal do `agy` no Native Chat UI, localizando o diretório de dados em `~/.gemini/antigravity-cli/brain/<id>/` (ou caminho equivalente do aplicativo), lendo prioritariamente `transcript_full.jsonl` e utilizando `transcript.jsonl` como fallback resiliente para reconstruir o histórico completo da conversa.
 - **Encerramento limpo do run Antigravity quando o último subagente finaliza após o turno pai (`#44587`, refs `#41367`):**
@@ -303,4 +318,8 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 34. Finalizar adequadamente o run do Antigravity quando o último subagente terminar após o turno pai (`#44587`, refs `#41367`).
 35. Exibir respostas e atualizações enviadas pelo Antigravity após a conclusão de ferramentas executadas em segundo plano (`#44578`, resolve `#40447`).
 36. Reter a prontidão de workers `agy` até a conclusão de rotinas de login silencioso (`#44625`).
+37. Estender a gestão de ferramentas gerenciadas e OAuth de conectores para todos os agentes gerenciados e ACP (Antigravity e Pi) (`#44837`).
+38. Descartar `--plugin-dir` na inicialização do Claude sob políticas que bloqueiam sideload para permitir o Native Chat (`#44814`, refs `#44776`).
+39. Validar modificações em arquivos de configuração do catálogo de modelos via hash SHA-256 de conteúdo em vez de `ctime`/`mtime`/`inode` (`#44762`, resolve `#44692`).
+
 

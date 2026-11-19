@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44477, #44445, #44275 trazem tolerância a pastas ilegíveis no resume, retenção de mensagens em criação de worktree e conversão O(N) de chat legado.
+description: Os PRs #44471, #44209, #44477 trazem /session para /resume no chat, isolamento de chats corrompidos no auto-continue e tolerância a pastas ilegíveis.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,9 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44477`](https://github.com/stablyai/orca/pull/44477) (resolve Issue [`#37707`](https://github.com/stablyai/orca/issues/37707)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44471`](https://github.com/stablyai/orca/pull/44471),
+[`stablyai/orca#44209`](https://github.com/stablyai/orca/pull/44209),
+[`stablyai/orca#44477`](https://github.com/stablyai/orca/pull/44477) (resolve Issue [`#37707`](https://github.com/stablyai/orca/issues/37707)),
 [`stablyai/orca#44445`](https://github.com/stablyai/orca/pull/44445),
 [`stablyai/orca#44275`](https://github.com/stablyai/orca/pull/44275),
 [`stablyai/orca#43918`](https://github.com/stablyai/orca/pull/43918),
@@ -127,9 +129,19 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Ao criar um novo worktree com mensagem inicial de prompt, se o agente não conseguisse subir (por falha de binário ou ambiente), a mensagem digitada pelo usuário era descartada e perdida sem oportunidade de recuperação ou envio para um terminal substituto.
 29. **Conversão quadrática lenta de chats legados rescaneando itens por mensagem (`#44275`):**
     - A rotina de conversão de chats legados rescaneava a lista inteira de itens para cada mensagem individual, resultando em complexidade $O(N^2)$ e travando a interface ao carregar conversas longas.
+30. **Incompatibilidade do comando `/session` com o atalho `/resume` no menu slash e na lista de sessões (`#44471`):**
+    - No ecossistema TUI (como OpenCode), o comando tradicional de seleção de sessões é `/sessions`. No Native Chat, o comando equivalente é `/resume`. Usuários que digitavam `/session` ou `/sessions` não encontravam o comando no autocompletar fora do idioma inglês. Além disso, a lista de histórico de sessões não priorizava a retomada no Native Chat quando este era a superfície padrão configurada do agente.
+31. **Chat corrompido bloqueando auto-continue de limite de uso de todos os outros chats e re-lendo a cada 10s (`#44209`):**
+    - Quando um chat salvo apresentava inconsistência ou corrupção em seu journal/transcript, o serviço de retomada automática de limites de uso (*usage-limit auto-continue*) era completamente bloqueado para todos os outros chats íntegros do sistema. Ademais, o leitor de status insistia em tentar reler o arquivo corrompido em loop a cada 10 segundos, consumindo CPU e I/O inutilmente.
 
 ## O que o upstream propõe e implementa
 
+- **Alias `/session` para `/resume` e priorização de retomada no Chat (`#44471`):**
+  - Mapeia `/session` e `/sessions` como aliases diretos para o comando `/resume` no autocompletar do composer;
+  - Posiciona a ação "Resume in New Chat" como primeira opção no histórico de sessões do AI Vault quando o Native Chat é a superfície padrão do agente, preservando o contexto sem forçar abertura de terminal.
+- **Isolamento de chats corrompidos no auto-continue e contenção de re-leituras (`#44209`):**
+  - Isola arquivos de journal ou transcripts corrompidos marcando o registro na leitura de status (`corrupt-journal-reads.ts`), assegurando que a falha de um chat não paralise a fila de auto-continue dos demais chats elegíveis;
+  - Memoriza a condição de corrupção pelo ciclo de leitura de status, eliminando o polling repetitivo a cada 10 segundos e mantendo a integridade das tentativas de continuação.
 - **Tolerância a pastas de projeto ilegíveis no resume de chats Claude (`#44477`, resolve `#37707`):**
   - Trata pastas ilegíveis (`EACCES`) como simples ausência (*miss*), permitindo que a busca continue pelos demais baldes e conclua a retomada do chat com sucesso.
 - **Preservação de mensagem inicial em falhas de inicialização de worktrees (`#44445`):**
@@ -219,6 +231,8 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Mapear aliases `/session` e `/sessions` para o comando `/resume` e priorizar "Resume in New Chat" no histórico quando o chat for o padrão (`#44471`).
+- Isolar chats corrompidos na fila de retomada automática de limites de uso e suspender re-leituras desnecessárias a cada 10s (`#44209`).
 - Ignorar pastas de projetos Claude ilegíveis no resume de chat em vez de abortar com `transcriptUnreadable` (`#44477`, resolve `#37707`).
 - Reter mensagens iniciais de criação de worktree quando o agente falhar no arranque (`#44445`).
 - Converter histórico de chat legado em tempo linear $O(N)$ eliminando rescans repetidos (`#44275`).

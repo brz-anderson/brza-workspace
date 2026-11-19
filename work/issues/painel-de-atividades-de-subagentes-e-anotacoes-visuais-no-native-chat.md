@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44413, #44508, #44203 trazem mensagens entre agentes como status rows, estabilização da faixa de agentes e streaming de saídas de ferramentas no contexto.
+description: O PR #43994 limita a 8 MB o live-text de cada subscriber em main; PRs #44413, #44508 trazem mensagens entre agentes como status rows e estabilização de faixa.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,8 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44413`](https://github.com/stablyai/orca/pull/44413),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#43994`](https://github.com/stablyai/orca/pull/43994),
+[`stablyai/orca#44413`](https://github.com/stablyai/orca/pull/44413),
 [`stablyai/orca#44508`](https://github.com/stablyai/orca/pull/44508),
 [`stablyai/orca#44203`](https://github.com/stablyai/orca/pull/44203),
 [`stablyai/orca#42965`](https://github.com/stablyai/orca/pull/42965),
@@ -174,9 +175,15 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     A cada atualização de estado da sessão do agente, a barra horizontal de agentes (*agents strip*) sofria remontagem e saltos de renderização (layout shifts), gerando cintilação visual na área superior do composer.
 41. **Esgotamento de memória ao exportar contexto de chat com saídas extensas de ferramentas (`#44203`):**
     Ao exportar o contexto da conversa ou transferir dados para o modelo, saídas extensas de ferramentas de terminal eram carregadas inteiramente em strings na memória heap, provocando travamentos e quedas por falta de memória (OOM).
+42. **Consumo ilimitado de memória no processo principal com streaming de texto em múltiplos chats (`#43994`):**
+    Quando múltiplos chats nativos ou assinantes (*subscribers*) lentos realizavam streaming simultâneo de respostas volumosas, o processo principal do Electron acumulava cópias não entregues de snapshots de texto ao vivo sem teto delimitado por subscriber. Em conexões lentas ou renderers ocupados, a retenção gerava picos de centenas de megabytes no heap do main process antes de desalocar a memória.
 
 ## O que o upstream implementa
 
+- **Teto de 8 MiB de live-text por subscriber e encerramento limpo de streams lentos (`#43994`):**
+  - Implementa um limite rígido de 8 MiB para o texto ao vivo acumulado (em entrega + aguardando) em cada assinante (`subscriber-live-text-cap.ts`);
+  - Quando um subscriber ultrapassa esse teto, seu stream é finalizado de forma autônoma sem afetar outros chats ou o orçamento global, permitindo que o cliente frontend restabeleça a conexão e continue a leitura suavemente a partir do seu cursor de histórico;
+  - Desacopla leitores hospedados (*hosted readers*) para processos utilitários externos com retenção limitada e anotações diagnósticas de crash (`orca-retained-bytes`).
 - **Linhas compactas de status para mensagens entre agentes com estado gravado do worker (`#44413`):**
   - Condensa avisos de início, tarefas e atualizações de workers em linhas compactas de status com o ícone do agente emissor, texto `"Update from <name>"`, botão de cópia e detalhes expansíveis sob demanda;
   - Vincula o badge ao estado real gravado do despacho (*dispatch state*), exibindo spinner durante execução e badge vermelho em falha, sem que restarts de workers corrompam linhas de histórico prévias.
@@ -289,6 +296,7 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Limitar a 8 MiB o buffer de texto ao vivo de cada subscriber no processo principal com retomada por cursor (`#43994`).
 - Exibir mensagens entre agentes como linhas compactas de status vinculadas ao estado do despacho (`#44413`).
 - Estabilizar a faixa de agentes contra cintilações durante atualizações de sessão no Native Chat (`#44508`).
 - Transmitir saídas volumosas de ferramentas em streaming na exportação de contexto do chat (`#44203`).

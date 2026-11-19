@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44559, #44517, #44497, #44484 trazem lançamento com --effort no agy, tratamento de 401 no streaming, remoção de contas órfãs e escopo Workspace no AI Vault.
+description: Os PRs #44575, #44587, #44578, #44625 trazem retomada de terminais agy no Chat, encerramento limpo com subagentes, exibição de respostas assíncronas e prontidão em silent sign-in.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,11 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44559`](https://github.com/stablyai/orca/pull/44559) (resolve Issue [`#39556`](https://github.com/stablyai/orca/issues/39556)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44575`](https://github.com/stablyai/orca/pull/44575),
+[`stablyai/orca#44587`](https://github.com/stablyai/orca/pull/44587) (refs Issue [`#41367`](https://github.com/stablyai/orca/issues/41367)),
+[`stablyai/orca#44578`](https://github.com/stablyai/orca/pull/44578) (resolve Issue [`#40447`](https://github.com/stablyai/orca/issues/40447)),
+[`stablyai/orca#44625`](https://github.com/stablyai/orca/pull/44625),
+[`stablyai/orca#44559`](https://github.com/stablyai/orca/pull/44559) (resolve Issue [`#39556`](https://github.com/stablyai/orca/issues/39556)),
 [`stablyai/orca#44517`](https://github.com/stablyai/orca/pull/44517) (refs Issue [`#44489`](https://github.com/stablyai/orca/issues/44489)),
 [`stablyai/orca#44497`](https://github.com/stablyai/orca/pull/44497) (resolve Issue [`#44496`](https://github.com/stablyai/orca/issues/44496)),
 [`stablyai/orca#44484`](https://github.com/stablyai/orca/pull/44484) (resolve Issue [`#44483`](https://github.com/stablyai/orca/issues/44483)),
@@ -139,9 +143,25 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Se a conta previamente selecionada no Studio deixasse de ser a conta conectada no `agy`, o Studio bloqueava qualquer novo chat com "native Antigravity account changed" e ocultava a opção de remover a conta em Settings, travando o desenvolvedor sem ter como desvincular o perfil deslogado.
 35. **Descarte de conversas do Antigravity no escopo Workspace de `/resume` no AI Vault (`#44484`, resolve `#44483`):**
     Como o `agy acp` não grava entradas em `history.jsonl` nem gera mapeamentos em `projects.json`, o scanner do AI Vault não identificava a pasta de trabalho do chat e descartava as sessões do Antigravity da lista de `/resume` filtrada pelo escopo do workspace.
+36. **Impossibilidade de continuar conversas de terminal do `agy` no Native Chat UI (`#44575`):**
+    Sessões de terminal abertas com o Antigravity (`agy`) não podiam ser continuadas diretamente na interface visual do Native Chat (a ação "Continue in Chat" não resolvia os transcripts ou falhava ao carregar o log de passos), obrigando o usuário a reiniciar o contexto do zero na UI gráfica.
+37. **Travamento do status do run quando o último subagente do Antigravity sobrevive ao turno principal (`#44587`, refs `#41367`):**
+    Quando um subagente do Antigravity continuava em execução após o término do turno pai, o status do agente ficava travado em execução indefinidamente ou emitia OSC 7501 de busy de forma inconsistente, sem finalizar o ciclo após o período de carência (*grace period*).
+38. **Omissão de respostas do Antigravity enviadas após a conclusão de chamadas de ferramentas em background (`#44578`, resolve `#40447`):**
+    Quando o Antigravity disparava ferramentas assíncronas em segundo plano e, após a conclusão destas, enviava respostas sem solicitação direta (*unprompted replies*), a interface do Native Chat descartava ou não renderizava essas mensagens, deixando o usuário sem visibilidade das ações subsequentes.
+39. **Falha precoce de despacho e prontidão falsa de workers `agy` durante login silencioso (`#44625`):**
+    Ao inicializar um worker `agy` que requeria autenticação silenciosa (*silent sign-in* / refresh de credenciais), o runtime sinalizava prontidão antes da conclusão do handshake de autenticação, fazendo com que comandos e dispatches iniciais falhassem com erro de credenciais.
 
 ## O que o upstream implementa e corrige
 
+- **Continuidade de conversas de terminal do `agy` no Native Chat (`#44575`):**
+  - Implementa a importação e continuidade de sessões de terminal do `agy` no Native Chat UI, localizando o diretório de dados em `~/.gemini/antigravity-cli/brain/<id>/` (ou caminho equivalente do aplicativo), lendo prioritariamente `transcript_full.jsonl` e utilizando `transcript.jsonl` como fallback resiliente para reconstruir o histórico completo da conversa.
+- **Encerramento limpo do run Antigravity quando o último subagente finaliza após o turno pai (`#44587`, refs `#41367`):**
+  - Ajusta a máquina de estados para encerrar adequadamente a execução do Antigravity quando o último subagente concluir seu trabalho após o término do turno principal, aguardando a estabilização da sequência OSC 7501 após a carência configurada.
+- **Renderização de respostas do Antigravity após chamadas em background (`#44578`, resolve `#40447`):**
+  - Garante que mensagens e respostas subsequentes enviadas pelo Antigravity após a finalização de chamadas assíncronas em segundo plano sejam capturadas pelo receptor de eventos e renderizadas na conversa do Native Chat.
+- **Retenção de prontidão de worker `agy` durante login silencioso (`#44625`):**
+  - Mantém o status do worker em espera e retém a sinalização de prontidão (*worker readiness*) enquanto a autenticação silenciosa estiver em andamento, liberando o worker para aceitar dispatches apenas após a confirmação efetiva do login.
 - **Repasse de `--effort` na família de modelo no lançamento do Antigravity (`#44559`, resolve `#39556`):**
   - Passa a flag `--effort` junto à família do modelo ao inicializar a CLI `agy`, garantindo que o runtime execute estritamente o modelo e esforço de raciocínio selecionados.
 - **Mapeamento de 401 em streaming para falha formal do turno (`#44517`, refs `#44489`):**
@@ -279,3 +299,8 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 30. Mapear avisos 401 de streaming no Antigravity como erro formal do turno em vez de sucesso com resposta espúria (`#44517`, refs `#44489`).
 31. Permitir remover contas do Antigravity não autenticadas em Settings para evitar bloqueios em "account changed" (`#44497`, resolve `#44496`).
 32. Adotar o fallback para `summary.WorkspaceURIs` no AI Vault para mapear chats Antigravity no escopo de Workspace em `/resume` (`#44484`, resolve `#44483`).
+33. Habilitar a importação e continuidade de sessões de terminal do `agy` no Native Chat UI lendo `transcript_full.jsonl` / `transcript.jsonl` (`#44575`).
+34. Finalizar adequadamente o run do Antigravity quando o último subagente terminar após o turno pai (`#44587`, refs `#41367`).
+35. Exibir respostas e atualizações enviadas pelo Antigravity após a conclusão de ferramentas executadas em segundo plano (`#44578`, resolve `#40447`).
+36. Reter a prontidão de workers `agy` até a conclusão de rotinas de login silencioso (`#44625`).
+

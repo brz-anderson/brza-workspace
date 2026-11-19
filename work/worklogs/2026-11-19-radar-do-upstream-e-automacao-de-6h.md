@@ -72,3 +72,26 @@ refs:
      adicionados o PR `#44413` (mensagens entre agentes tornam-se linhas compactas de status com o estado gravado do despacho do worker),
      o PR `#44508` (estabilização da faixa de agentes contra cintilações e reflows durante atualizações de sessão) e
      o PR `#44203` (streaming de saídas extensas de ferramentas na exportação de contexto do chat para evitar estouro de heap).
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-19)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e commits criados ou
+   atualizados entre `2026-11-19T09:00:00Z` e `2026-11-19T15:15:00Z`, comparando com as notas em `work/issues/` e o índice
+   `.brza/index.jsonl`.
+2. **Atualização de 5 issues rastreadas em `work/issues/`:**
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionados o PR `#44575` (continuidade de conversas de terminal do `agy` no Native Chat UI lendo `transcript_full.jsonl` com fallback para `transcript.jsonl`),
+     o PR `#44587` (refs Issue `#41367`, encerramento limpo da execução do Antigravity quando o último subagente finaliza após o turno pai, aguardando acomodação da sequência OSC 7501),
+     o PR `#44578` (resolve Issue `#40447`, renderização e apresentação de respostas assíncronas do Antigravity enviadas após a finalização de chamadas de ferramentas em background) e
+     o PR `#44625` (retenção da sinalização de prontidão de workers `agy` durante login silencioso / refresh de credenciais para prevenir falhas de dispatch iniciais).
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionado o PR `#43994`, que estabelece um teto rígido de 8 MiB para o buffer de texto ao vivo (*live-text*) de cada assinante/subscriber no processo principal (`subscriber-live-text-cap.ts`), encerrando streams lentos ou travados de forma autônoma sem afetar outros chats e permitindo retomada suave a partir do cursor.
+   - [Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):
+     adicionados o PR `#44471` (suporte a `/session` e `/sessions` como aliases de `/resume` no autocompletar do chat e priorização de "Resume in New Chat" no histórico quando o chat for a superfície padrão) e
+     o PR `#44209` (isolamento de chats com journal/transcript corrompido para não bloquear a fila de auto-continue de limite de uso dos demais chats nem insistir em polling repetitivo a cada 10s).
+   - [Comandos shell no chat, recibos de perguntas e foco espacial em terminais](../issues/comandos-shell-no-chat-recibos-de-perguntas-e-foco-espacial-em-terminais.md):
+     adicionado o PR `#44624` (refs Issue `#44586`), que passa `replaced: true` no descarte de PTYs vinculados ao reinício de painéis de terminal, roteando via `stopReplacedPanePty` como `replacedByRestart` para manter a aba aberta no renderer em vez de fechá-la.
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionados o PR `#44590` (resolve Issue `#43875`, retenção durável da receita original de lançamento de workers no banco mesmo quando capturas de contexto subsequentes falharem) e
+     o PR `#44332` (orientação e padronização dos tipos formais de mail suportados entre agentes e sobre `--on`, com suporte retroativo ao tipo `status` em servidores legados).
+

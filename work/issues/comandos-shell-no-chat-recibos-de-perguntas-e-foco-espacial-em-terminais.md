@@ -1,6 +1,6 @@
 ---
 status: open
-description: A Issue #44012 (commit 1615e5c) trava respostas de perguntas assíncronas no queue handoff; PRs #43901, #43896 trazem retenção de entrada de terminal e polling de 15s.
+description: O PR #44624 preserva abas ao reiniciar terminais marcando PTY como replaced; PRs #43901, #43896 trazem retenção de entrada e polling de 15s.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,8 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43901`](https://github.com/stablyai/orca/pull/43901),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44624`](https://github.com/stablyai/orca/pull/44624) (refs Issue [`#44586`](https://github.com/stablyai/orca/issues/44586)),
+[`stablyai/orca#43901`](https://github.com/stablyai/orca/pull/43901),
 [`stablyai/orca#43896`](https://github.com/stablyai/orca/pull/43896),
 [`stablyai/orca#43889`](https://github.com/stablyai/orca/pull/43889),
 [`stablyai/orca#43593`](https://github.com/stablyai/orca/pull/43593),
@@ -94,9 +95,14 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
     O renderer mantinha um loop de polling de foreground process a cada 750 ms em todas as abas onde um agente já havia rodado, gerando drenagem de bateria desnecessária mesmo com agentes em repouso absoluto.
 19. **Dupla submissão de respostas em perguntas assíncronas do Codex durante o handoff da fila (`#44012`, commit `1615e5c`):**
     Quando o usuário respondia a uma pergunta interativa assíncrona (`ask_question`) do Codex e a mensagem entrava no handoff de enfileiramento (*queue handshake*), o card de pergunta não travava imediatamente o estado dos botões. Clicar novamente ou submeter em rápida sucessão permitia enviar respostas duplicadas ou respostas conflitantes antes da confirmação da fila, corrompendo o fluxo conversacional do agente.
+20. **Fechamento e perda indevida da aba de terminal ao reiniciar o painel PTY (`#44624`, refs `#44586`):**
+    Quando um painel de terminal era reiniciado e a instância anterior do PTY era descartada antes que o novo processo de substituição estivesse totalmente instanciado, o renderer enviava uma mensagem genérica `pty:kill`. O processo principal tratava esse encerramento como uma solicitação voluntária de fechamento por parte do usuário e aposentava a aba correspondente, fechando a aba sem que o desenvolvedor tivesse pedido.
 
 ## O que o upstream implementa e corrige
 
+- **Preservação de abas de terminal ao reiniciar marcando PTY como `replacedByRestart` (`#44624`, refs `#44586`):**
+  - O renderer passa o parâmetro `replaced: true` durante o descarte de PTYs vinculados a um reinício de painel;
+  - O processo principal roteia o encerramento através de `stopReplacedPanePty`, marcando a saída do processo antigo como `replacedByRestart` e mantendo a aba intacta na interface enquanto o novo PTY é inicializado.
 - **Bloqueio imediato de cartões de pergunta assíncrona durante o queue handoff (`#44012`, commit `1615e5c`):**
   - Trava os controles e botões de resposta imediatamente após o primeiro envio, mantendo-os desabilitados durante todo o aperto de mão da fila (*queued-handshake*);
   - Impede submissões concorrentes ou cliques repetidos enquanto o turno do Codex está sendo despachado.
@@ -173,3 +179,5 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
 17. Reconstruir tela de terminais ocultos a partir do histórico do daemon após descartes de saída (`#43889`).
 18. Adotar polling adaptativo de 15s para processos de primeiro plano em abas ociosas de agentes (`#43901`).
 19. Travar cartões de perguntas assíncronas imediatamente no clique inicial para evitar submissões duplicadas durante o queue handoff do Codex (`#44012`, commit `1615e5c`).
+20. Preservar abas de terminais durante reinicializações de painéis marcando o descarte do PTY antigo como `replacedByRestart` (`#44624`, refs `#44586`).
+

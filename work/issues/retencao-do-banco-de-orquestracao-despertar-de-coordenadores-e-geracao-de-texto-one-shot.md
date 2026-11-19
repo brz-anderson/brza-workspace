@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44475 e #44327 trazem resposta de permissões de subagentes via coordenador e checkpoint assíncrono de WAL; PR #43953 libera terminais de workers.
+description: Os PRs #44590 e #44332 retêm receita de lançamento de workers em falha de captura e orientam tipos de mail explícitos sobre --on.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,9 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44475`](https://github.com/stablyai/orca/pull/44475),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44590`](https://github.com/stablyai/orca/pull/44590) (resolve Issue [`#43875`](https://github.com/stablyai/orca/issues/43875)),
+[`stablyai/orca#44332`](https://github.com/stablyai/orca/pull/44332),
+[`stablyai/orca#44475`](https://github.com/stablyai/orca/pull/44475),
 [`stablyai/orca#44327`](https://github.com/stablyai/orca/pull/44327),
 [`stablyai/orca#43953`](https://github.com/stablyai/orca/pull/43953),
 [`stablyai/orca#43550`](https://github.com/stablyai/orca/pull/43550),
@@ -107,8 +109,8 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Quando um worker estruturado era abortado ou liberado precocemente via `worker-release`, a reserva de recursos alocada para o início do Codex ficava órfã e bloqueava despachos subsequentes.
 24. **Terminais de workers retidos após prova de saída (`#43953`):**
     - Quando um worker recebia ordem de parada (`worker-stop`), o recurso de terminal PTY não era liberado mesmo após o encerramento comprovado do processo, pois a rotina `settleWorkerStop` falhava em desalocar o handle de terminal associado.
-25. **Perda de receita de inicialização ao retomar worker finalizado (`#43875`):**
-    - A receita de inicialização (comando, argumentos e variáveis de ambiente) gravada pelo Orca no início de um worker era apagada assim que o worker finalizava. Ao reativar o worker via `orchestration send`, o ambiente perdia o contexto de execução original.
+25. **Perda de receita de inicialização ao retomar worker finalizado (`#44590`, resolve `#43875`):**
+    - A receita de inicialização (comando, argumentos e variáveis de ambiente) gravada pelo Orca no início de um worker era perdida se uma captura subsequente de contexto não conseguisse ler o processo finalizado. Ao reativar o worker ou despachar follow-up via `orchestration send`, o ambiente perdia o contexto de execução original.
 26. **Omissão do ID de sessão do provedor (Claude Code) vinculado ao worker (`#43957`):**
     - O comando `worker-read --source transcript` retornava transcrições vinculadas, mas a API e a CLI de orquestração não expunham o session ID nativo do provedor (`providerSessionId`), impedindo a correlação direta de logs e ferramentas externas.
 27. **Impossibilidade de recriar terminal substituto condicionalmente para um Run ativo (`#43925`):**
@@ -122,9 +124,17 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - O coordenador não tinha visibilidade do diálogo de permissão e o fluxo ficava travado ou abortava silenciosamente.
 31. **Congelamento da thread principal por checkpoints síncronos de WAL no banco de orquestração (`#44327`):**
     - Transações pequenas de atualização de status (como contagem regressiva de auto-close de workers sendo suspensa ou reiniciada) que cruzavam o limiar de auto-checkpoint do SQLite (1.000 frames) disparavam o checkpoint síncrono do WAL diretamente na thread principal, gerando travamentos de até 500 ms no Electron.
+32. **Falta de especificação e documentação dos tipos de mail suportados entre agentes e sobre `--on` (`#44332`):**
+    - Agentes orquestradores e workers tinham dificuldades para selecionar os tipos corretos de correio ao enviar mensagens via `orca orchestration send` ou `orca-cli` (especialmente em ambientes com servidores pareados via `--on`), enviando formatos genéricos e falhando em distinguir `task_result`, `ask`, `reply`, `worker_done` e `status`.
 
 ## O que o upstream implementa
 
+- **Retenção durável da receita de lançamento de workers mesmo sob falhas de captura posterior (`#44590`, resolve `#43875`):**
+  - Mantém a linha de receita original armazenada no banco em vez de sobrescrevê-la ou limpá-la caso uma captura de contexto subsequente falhe ou não consiga ler o processo finalizado;
+  - Assegura que workers finalizados possam ser recriados ou receber mensagens subsequentes de follow-up com os parâmetros originais preservados.
+- **Instrução formal de tipos de mail suportados para agentes e suporte sobre `--on` (`#44332`):**
+  - Documenta e orienta no manifesto de skills e nas ferramentas de coordenação quais tipos de mensagem (`task_result`, `ask`, `reply`, `worker_done`, `status`) devem ser utilizados em cada cenário, inclusive em despachos remotos via `--on`;
+  - Garante compatibilidade retroativa para que servidores mais antigos ainda aceitem o tipo `status` e aponta agentes para `orca-cli` na comunicação peer-to-peer.
 - **Resposta a permissões de subagentes de workers pelo coordenador com hold de 2 minutos (`#44475`):**
   - Retém o prompt de permissão do subagente auxiliar (*helper agent*) quando o coordenador puder responder ou exibi-lo (aprovações de coordenador ativas ou coordenador de chat), localizando a chamada diretamente no transcript do helper (`<session>/subagents/agent-<id>.jsonl`);
   - Cria um cartão dedicado de aprovação com identificação de origem ("Allow Bash? · from the worker's general-purpose helper");
@@ -194,7 +204,8 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Responder a pedidos de permissão de subagentes de workers diretamente pela interface do coordenador com retenção de 2 minutos (`#44475`).
 - Executar checkpoints de WAL do banco de orquestração em thread dedicada fora da main thread (`#44327`).
 - Desalocar recursos de terminal de workers imediatamente após comprovação de saída em `settleWorkerStop` (`#43953`).
-- Preservar receitas de lançamento de workers para reativações via `orchestration send` (`#43875`).
+- Reter a receita de lançamento original de workers mesmo quando capturas posteriores falharem (`#44590`, resolve `#43875`).
+- Padronizar e documentar a especificação dos tipos de mail suportados em comunicações inter-agentes e flags `--on` (`#44332`).
 - Expor `providerSessionId` nos metadados de workers de orquestração (`#43957`).
 - Suportar recriação condicional de terminal substituto para Run ativo (`#43925`).
 - Adotar deep links `orca://` para foco em abas de chat e mensagens de orquestração (`#43874`).

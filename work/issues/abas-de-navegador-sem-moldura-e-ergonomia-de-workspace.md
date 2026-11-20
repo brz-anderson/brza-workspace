@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44744 e #44428 trazem suporte a zoom em páginas de navegador remoto via Ctrl+scroll/pinch/Cmd+-/+ e centralização de listeners webRequest.
+description: Os PRs #44742 e #44598 trazem diagnóstico de páginas travadas no navegador e notificação de Memory Saver para abas inativas.
 scope:
   - brza-studio
   - workspace
@@ -17,7 +17,9 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44744`](https://github.com/stablyai/orca/pull/44744),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44742`](https://github.com/stablyai/orca/pull/44742),
+[`stablyai/orca#44598`](https://github.com/stablyai/orca/pull/44598),
+[`stablyai/orca#44744`](https://github.com/stablyai/orca/pull/44744),
 [`stablyai/orca#44428`](https://github.com/stablyai/orca/pull/44428),
 [`stablyai/orca#37708`](https://github.com/stablyai/orca/pull/37708),
 [`stablyai/orca#37810`](https://github.com/stablyai/orca/pull/37810),
@@ -51,9 +53,19 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#44744`](https://github.com
    Múltiplos componentes registravam listeners de requisições web (`webRequest`) de forma concorrente em sessões de navegador sem proprietário único, gerando vazamento de memória e listeners duplicados. Além disso, quando o Memory Saver descartava ou hibernava abas em segundo plano, os baselines de título e favicon da página eram perdidos entre trocas de contexto.
 7. **Impossibilidade de aplicar zoom em páginas de navegador remoto transmitidas por stream (`#44744`):**
    Ao visualizar abas de navegador hospedadas em servidores remotos ou headless via screencast, gestos de pinça (*pinch*), rolagem com `Ctrl+scroll` ou atalhos de teclado de zoom (`Cmd/Ctrl+=`, `Cmd/Ctrl+-`, `Cmd/Ctrl+0`) não tinham efeito na página remota ou causavam descalibração na posição de cliques e ponteiros do mouse.
+8. **Ausência de diagnóstico e feedback visual quando o carregamento de páginas web trava (`#44742`):**
+   Quando uma página web aberta no navegador embutido demorava para responder ou travava durante o carregamento, a interface exibia apenas um spinner genérico sem explicar a causa raiz (ex.: contenção no pool de 6 conexões simultâneas do Chromium, lentidão de DNS/TLS ou bloqueio por política).
+9. **Desperdício de memória RAM por abas inativas de navegador esquecidas em segundo plano (`#44598`):**
+   Usuários acumulavam dezenas de abas de documentação ou preview abertas em segundo plano consumindo gigabytes de memória, sem que o Studio notificasse proativamente sobre a economia obtida ao ligar o Memory Saver.
 
 ## O que o upstream implementa
 
+- **Diagnóstico e watchdog de travamento no carregamento de páginas web (`#44742`):**
+  - Implementa `browser-navigation-stall-watchdog`, monitorando carregamentos estagnados por mais de 10 segundos;
+  - Exibe na barra de status a razão real da retenção ("Waiting for <host>…") e quantas outras abas compartilham o mesmo host em segundo plano, registrando os eventos no trace de performance para auditoria.
+- **Notificações de desempenho com sugestão proativa do Memory Saver (`#44598`):**
+  - Monitora abas inativas do navegador que permanecem carregadas em memória;
+  - Dispara notificação discreta (*toast*) informando quantas abas e há quanto tempo estão sem uso, oferecendo ativar o Memory Saver com um único clique.
 - **Controle de zoom em páginas de navegador remoto com ajuste de geometria de toque/ponteiro (`#44744`):**
   - Implementa `useRemoteBrowserPageZoom`, interceptando atalhos `Cmd+=`/`Cmd+-`/`Cmd+0`, `Ctrl+wheel` e gestos de pinça no viewport transmitido;
   - Despacha o nível de zoom via comando RPC (`browser.zoom`) para a instância remota e propaga a escala nos frames de screencast, mapeando coordenadas de clique e toque com precisão tanto no desktop quanto no mobile.
@@ -67,6 +79,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#44744`](https://github.com
 
 ## O que fazer
 
+- Adotar o watchdog de carregamento travado no navegador com diagnóstico visual e registro em trace (`#44742`).
+- Incorporar notificações de desempenho sugerindo ativar o Memory Saver quando abas inativas acumularem memória RAM em excesso (`#44598`).
 - Suportar zoom em abas de navegador remoto via Ctrl+scroll, pinch e atalhos de teclado com mapeamento de coordenadas (`#44744`).
 - Centralizar a instalação de listeners de requisições de navegador em proprietário único e preservar baselines de título/favicon durante a hibernação de abas pelo Memory Saver (`#44428`).
 - Avaliar a inclusão do modo chromeless, recolhimento de splits e comandos de ergonomia do workspace em versões futuras do `brza-studio`.

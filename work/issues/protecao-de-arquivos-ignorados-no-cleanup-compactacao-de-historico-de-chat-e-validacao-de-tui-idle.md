@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #44745 limpa worktrees de folder workspaces como grupo unificado e o PR #44905 protege pastas WSL sem acordar distros.
+description: Os PRs #44979, #45053 e #44781 retêm branch em falha parcial de exclusão de worktree, eliminam shells ociosos e otimizam reloads de layout.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,10 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44745`](https://github.com/stablyai/orca/pull/44745) (resolve Issue [`#44715`](https://github.com/stablyai/orca/issues/44715)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44979`](https://github.com/stablyai/orca/pull/44979),
+[`stablyai/orca#45053`](https://github.com/stablyai/orca/pull/45053),
+[`stablyai/orca#44781`](https://github.com/stablyai/orca/pull/44781),
+[`stablyai/orca#44745`](https://github.com/stablyai/orca/pull/44745) (resolve Issue [`#44715`](https://github.com/stablyai/orca/issues/44715)),
 [`stablyai/orca#44905`](https://github.com/stablyai/orca/pull/44905),
 [`stablyai/orca#44691`](https://github.com/stablyai/orca/pull/44691),
 [`stablyai/orca#44763`](https://github.com/stablyai/orca/pull/44763),
@@ -153,9 +156,23 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 37. **Inicialização desnecessária de distros WSL paradas para proteger pastas de importação do Codex (`#44905`):**
     - Durante as varreduras de limpeza de histórico de chat, a rotina de proteção de diretórios de importação do Codex tentava ler o conteúdo da pasta inspecionando o sistema de arquivos via WSL, o que forçava o boot de distribuições WSL em repouso;
     - Isso causava picos de CPU, atrasos no ciclo de cleanup e acordava instâncias Linux sem necessidade.
+38. **Exclusão prematura de branch em falhas parciais de remoção de worktree (`#44979`):**
+    - Quando um arquivo com lock de processo (como volumes Docker montados ou arquivos de root) impedia a exclusão física da pasta do checkout, `git worktree remove` desregistrava o worktree e o Studio apagava o branch local e o push-target imediatamente;
+    - A pasta remanescente ficava órfã e sem branch associado, e tentativas posteriores de exclusão eram recusadas pelo Git e pela interface porque o repositório já não rastreava aquele diretório.
+39. **Instanciação redundante de shells ociosos durante a criação de worktrees para agentes (`#45053`):**
+    - Ao criar um novo worktree de agente, o sistema subia temporariamente um shell ocioso intermediário antes de abrir a aba real do agente, impondo atrasos na prontidão da interface e desperdiçando processos de PTY.
+40. **Recargas completas e custosas da projeção de layout em mutações duráveis (`#44781`):**
+    - Mutações de layout e admissão/descarte de painéis disparavam uma notificação ampla que forçava a recarga de todas as partições de workspaces do host, mesmo quando apenas um workspace ou painel isolado havia sido modificado.
 
 ## O que o upstream propõe e implementa
 
+- **Preservação de branch e exclusão de `.git` por último em falhas parciais de worktree (`#44979`):**
+  - Mantém o branch Git e a referência de push-target intactos caso a remoção do diretório do worktree falhe;
+  - Remove o link `.git` do checkout como última operação para que a pasta remanescente ainda comprove sua vinculação ao repositório, permitindo que a ação de Delete na linha com falha finalize a exclusão com segurança assim que o bloqueador for liberado.
+- **Supressão de shells ociosos redundantes no spawn de agentes (`#45053`):**
+  - Ajusta o seeder de terminais iniciais para vincular diretamente o painel do agente sem instanciar shells ociosos intermediários.
+- **Recarga de layout restrita aos workspaces reportados pela escrita (`#44781`):**
+  - Mutações duráveis agora reportam com precisão cirúrgica quais workspaces e partições foram tocados, recarregando apenas os alvos necessários e preservando caches intactos.
 - **Limpeza unificada de worktrees em folder workspaces como um único grupo (`#44745`, resolve `#44715`):**
   - Trata todos os worktrees vinculados a um folder workspace e suas linhagens descendentes como um único grupo indivisível;
   - Um worktree só é removido quando todos os membros do workspace de pasta forem elegíveis para remoção, mantendo o grupo intacto enquanto qualquer repositório irmão ainda estiver em uso;
@@ -269,6 +286,9 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Preservar branch e push-target em exclusões parciais de worktrees mantendo o link `.git` por último para permitir finalização posterior (`#44979`).
+- Suprimir a criação redundante de shells ociosos durante o provisionamento de worktrees de agentes (`#45053`).
+- Restringir a recarga de projeção de layout exclusivamente aos workspaces reportados por escritas duráveis (`#44781`).
 - Tratar worktrees de repositórios vinculados a um folder workspace como grupo unificado no cleanup para evitar remoções parciais (`#44745`, resolve `#44715`).
 - Proteger pastas de importação do Codex em WSL por resolução estática de caminhos sem inicializar distribuições paradas (`#44905`).
 - Proteger a pasta externa de importação do Codex contra exclusões acidentais durante o cleanup de histórico de workspaces (`#44691`).

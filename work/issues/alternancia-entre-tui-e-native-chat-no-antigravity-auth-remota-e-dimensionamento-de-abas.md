@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44660, #44534, #44538 trazem PreToolUse silencioso no agy para não sobrepor revisor, desativação de auto-update em ACP e descoberta de agy no Windows.
+description: Os PRs #44965, #45254 e #45117 detectam API key/ADC do host no chat, identificam versão do agy e executam agentes no agy autenticado.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,11 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44660`](https://github.com/stablyai/orca/pull/44660) (resolve Issue [`#44585`](https://github.com/stablyai/orca/issues/44585)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44965`](https://github.com/stablyai/orca/pull/44965),
+[`stablyai/orca#45254`](https://github.com/stablyai/orca/pull/45254),
+[`stablyai/orca#45117`](https://github.com/stablyai/orca/pull/45117),
+[`stablyai/orca#45244`](https://github.com/stablyai/orca/pull/45244),
+[`stablyai/orca#44660`](https://github.com/stablyai/orca/pull/44660) (resolve Issue [`#44585`](https://github.com/stablyai/orca/issues/44585)),
 [`stablyai/orca#44534`](https://github.com/stablyai/orca/pull/44534),
 [`stablyai/orca#44538`](https://github.com/stablyai/orca/pull/44538),
 [`stablyai/orca#44837`](https://github.com/stablyai/orca/pull/44837),
@@ -169,9 +173,24 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Quando o Studio iniciava instâncias do host ACP ou executava `agy models` para listar modelos, o atualizador em segundo plano do `agy` entrava em execução automática no Windows, roubando o foco da janela ativa (issue #27390) e arriscando substituir o binário no meio da inicialização do servidor ACP.
 45. **Falha na descoberta da CLI `agy` instalada no Windows em diretório padrão de usuário (`#44538`):**
     O instalador oficial do Antigravity no Windows coloca o binário `agy.exe` em `%LOCALAPPDATA%\agy\bin`, que não é adicionado ao `PATH` da sessão gráfica do Electron até que o sistema seja reiniciado. Com isso, o Studio falhava em encontrar a CLI host e abortava a inicialização do Native Chat.
+46. **Ausência de detecção automática de credenciais Gemini API Key e gcloud ADC no host (`#44965`):**
+    Quando um chat Antigravity encontrava problemas de cota ou falta de assinatura em sua conta Google, o desenvolvedor precisava configurar manualmente chaves de API nas preferências globais, sem detecção imediata de chaves já exportadas no shell (`GEMINI_API_KEY`) ou credenciais ativas do Google Cloud Application Default Credentials (`gcloud auth application-default login`).
+47. **Falta de transparência sobre qual binário e versão da CLI `agy` executa o chat (`#45254`):**
+    Ao alternar entre versões locais ou gerenciadas da CLI Antigravity, a interface do Native Chat não informava explicitamente qual executável e versão do `agy` estava provendo a sessão, dificultando o diagnóstico de incompatibilidades e recursos ausentes.
+48. **Falha de execução de agentes Antigravity gerenciados em runtime empacotado sem login (`#45117`):**
+    Automações e bots que utilizavam o agente gerenciado Antigravity tentavam inicializar o runtime empacotado sem login em vez de reaproveitar a CLI `agy` já autenticada e configurada no host do chat.
 
 ## O que o upstream implementa e corrige
 
+- **Detecção automática de Gemini API Key e gcloud ADC com oferta no Chat (`#44965`):**
+  - Detecta automaticamente chaves de API Gemini em variáveis de ambiente e credenciais ADC do `gcloud` no host;
+  - Exibe os métodos detectados como opções de troca em um clique na barra de login ou diante de falhas de autenticação/cota (401/403), além de indicar o método ativo em chip no rodapé.
+- **Identificação do executável e versão do `agy` ativo no chat (`#45254`):**
+  - Exibe no rodapé da conversa qual binário do `agy` está sustentando a sessão e sua respectiva versão instalada.
+- **Execução de agentes gerenciados Antigravity no `agy` do host (`#45117`):**
+  - Redireciona bots e agentes gerenciados Antigravity para rodar sobre a CLI `agy` autenticada no host, garantindo paridade total com o chat interativo.
+- **Ignorar glifos de Gemini enterrados em títulos de shell no status do agente (`#45244`):**
+  - Filtra glifos decorativos de terminal para que o status do agente no cabeçalho não fique corrompido ou oscilando.
 - **PreToolUse silencioso para delegação ao revisor interno do `agy` (`#44660`, resolve `#44585`):**
   - Mantém o stdout do hook `PreToolUse` vazio em scripts POSIX, scripts core do Windows e fallbacks de wrappers/`hooks.json`, permitindo que a política de aprovação embutida do próprio `agy` decida a execução das ferramentas sem interferência ou auto-recusas indevidas em `agy -p`.
 - **Desativação de auto-update do `agy` em sessões ACP e listagens de modelos (`#44534`):**
@@ -339,5 +358,9 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 40. Manter stdout vazio no hook `PreToolUse` do Antigravity para permitir que a política embutida do revisor do `agy` decida a execução sem auto-recusa indevida em `agy -p` (`#44660`, resolve `#44585`).
 41. Injetar `AGY_CLI_DISABLE_AUTO_UPDATE=true` nas especificações de lançamento do host ACP e no probe `agy models`, além de purgar chaves em caixa alternada no Windows (`#44534`).
 42. Incluir `%LOCALAPPDATA%\agy\bin` na lista de descoberta de binários e comandos da CLI Antigravity no Windows (`#44538`).
+43. Detectar automaticamente Gemini API Key e gcloud ADC no host para oferecer autenticação em um clique no Native Chat (`#44965`).
+44. Exibir o executável e a versão da CLI `agy` ativa no rodapé do Native Chat (`#45254`).
+45. Executar bots e agentes gerenciados do Antigravity via CLI `agy` autenticada do host (`#45117`).
+46. Ignorar glifos de Gemini enterrados em títulos de shell na identificação de status do agente (`#45244`).
 
 

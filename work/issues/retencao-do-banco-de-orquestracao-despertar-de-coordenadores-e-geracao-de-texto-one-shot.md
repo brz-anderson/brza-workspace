@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #44919 roteia pedidos de aprovação de workers em chats de coordenador em servidores pareados.
+description: Os PRs #45194, #44472, #45290 e #45330 trazem envio de arquivos via correio, nomeação durável por Dispatch e suspensão de crew.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,11 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44919`](https://github.com/stablyai/orca/pull/44919),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45194`](https://github.com/stablyai/orca/pull/45194),
+[`stablyai/orca#44472`](https://github.com/stablyai/orca/pull/44472),
+[`stablyai/orca#45290`](https://github.com/stablyai/orca/pull/45290),
+[`stablyai/orca#45330`](https://github.com/stablyai/orca/pull/45330),
+[`stablyai/orca#44919`](https://github.com/stablyai/orca/pull/44919),
 [`stablyai/orca#44590`](https://github.com/stablyai/orca/pull/44590) (resolve Issue [`#43875`](https://github.com/stablyai/orca/issues/43875)),
 [`stablyai/orca#44332`](https://github.com/stablyai/orca/pull/44332),
 [`stablyai/orca#44475`](https://github.com/stablyai/orca/pull/44475),
@@ -130,9 +134,26 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 33. **Ausência ou falha no roteamento de pedidos de permissão de workers em chats de coordenador em servidores pareados (`#44919`):**
     - Quando um chat de coordenador é executado em um servidor pareado ou ambiente remoto gerenciado, os prompts de autorização/aprovação (*worker approval prompts*) de subagentes e workers ficavam inacessíveis ou falhavam ao rotear a resposta pelo host proprietário da sessão de chat;
     - Faltava também suporte para que janelas ou dispositivos pareados (como clientes móveis) pudessem encerrar streams de aprovação ou aceitar emparelhamentos como a pessoa operadora.
+34. **Incapacidade de enviar arquivos e anexos em mensagens de correio sobre itens gerenciados (`#45194`):**
+    - Ao despachar mensagens de correio de orquestração sobre itens ou tarefas de agentes gerenciados (localmente ou em servidores conectados), não era possível anexar caminhos de arquivos legíveis pelos destinatários, impedindo a entrega de relatórios ou evidências anexas.
+35. **Perda de identificação de remetentes de mensagens de workers após o fechamento do painel (`#44472`):**
+    - Assim que o terminal ou chat de um worker encerrava e seu painel era descartado, qualquer mensagem anteriormente enviada por ele passava a exibir como remetente o texto genérico "an agent" em vez do nome da tarefa, agente e servidor remoto associados ao despacho original.
+36. **Congelamento da aplicação por até 32 segundos ao abrir chats nativos com bancos volumosos (`#45290`):**
+    - Cada chat nativo visível realizava subscrição síncrona em `orchestration.crewSubscribe`, forçando a reconstrução completa de snapshots de equipe na thread principal mesmo quando o painel de tripulação (*crew panel*) estava em repouso.
+37. **Lentidão em varreduras de coordenadores legados (`#45330`):**
+    - A recuperação de coordenadores legados no banco SQLite consultava a tabela `dispatch_contexts` sem filtro por tarefa, gerando varreduras desnecessárias de linhas em bases com histórico extenso.
 
 ## O que o upstream implementa
 
+- **Envio de arquivos em mensagens de correio de itens gerenciados (`#45194`):**
+  - Permite anexar arquivos locais e remotos em comunicações entre agentes gerenciados (`bot-item-mail-files.ts` e `peer-mail-files.ts`), cuidando do upload para staging de sessões em servidores pareados.
+- **Nomeação durável de remetentes de workers pelo registro de Dispatch (`#44472`):**
+  - Grava no banco a tarefa, agente e host do worker no exato instante em que o correio é emitido;
+  - Exibe "Tarefa · Agente [Servidor]" em cartões de mensagem mesmo quando a aba do worker já foi fechada.
+- **Suspensão de subscrição de crew em chats nativos durante repouso do painel (`#45290`):**
+  - Compartilha o controle de suspensão do painel de tripulação com as abas de chat nativo, eliminando recálculos síncronos redundantes e travamentos de 32s.
+- **Consulta otimizada de contextos de despacho por tarefa (`#45330`):**
+  - Aplica filtro direto por tarefa em `dispatch_contexts`, acelerando a resolução de handles duráveis de coordenação.
 - **Roteamento de aprovações de workers através do host proprietário do chat em servidores pareados (`#44919`):**
   - Encaminha pedidos e streams de aprovação de workers através do host proprietário do chat em conexões remotas;
   - Permite que janelas pareadas ou clientes conectados encerrem com segurança fluxos de aprovação e aceitem emparelhamentos como a pessoa operadora;
@@ -209,6 +230,10 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Suportar envio de arquivos e anexos em mensagens de correio de itens gerenciados localmente ou em hosts remotos (`#45194`).
+- Reter o nome e metadados de remetentes de workers gravando o Dispatch no momento do envio da mensagem (`#44472`).
+- Suspender a subscrição síncrona `orchestration.crewSubscribe` nos chats nativos enquanto o painel de tripulação estiver em repouso (`#45290`).
+- Otimizar consultas de coordenadores legados filtrando `dispatch_contexts` por tarefa (`#45330`).
 - Rotear pedidos de autorização de workers através do host proprietário do chat em servidores pareados e clientes remotos (`#44919`).
 - Responder a pedidos de permissão de subagentes de workers diretamente pela interface do coordenador com retenção de 2 minutos (`#44475`).
 - Executar checkpoints de WAL do banco de orquestração em thread dedicada fora da main thread (`#44327`).

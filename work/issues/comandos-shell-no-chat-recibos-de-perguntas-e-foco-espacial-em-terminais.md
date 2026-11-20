@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44460, #44916 e #44673 retêm nomes de abas de terminal, realizam staging de anexos em servidores e listam MCPs pré-chat.
+description: Os PRs #45100, #45101, #45006 e #45064 corrigem paste em perguntas, atalhos de workspace, aprovação no Codex e wrap no terminal.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,12 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44460`](https://github.com/stablyai/orca/pull/44460) (refs Issue [`#31281`](https://github.com/stablyai/orca/issues/31281)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45100`](https://github.com/stablyai/orca/pull/45100),
+[`stablyai/orca#45101`](https://github.com/stablyai/orca/pull/45101),
+[`stablyai/orca#45006`](https://github.com/stablyai/orca/pull/45006),
+[`stablyai/orca#45064`](https://github.com/stablyai/orca/pull/45064),
+[`stablyai/orca#45110`](https://github.com/stablyai/orca/pull/45110),
+[`stablyai/orca#44460`](https://github.com/stablyai/orca/pull/44460) (refs Issue [`#31281`](https://github.com/stablyai/orca/issues/31281)),
 [`stablyai/orca#44916`](https://github.com/stablyai/orca/pull/44916),
 [`stablyai/orca#44673`](https://github.com/stablyai/orca/pull/44673),
 [`stablyai/orca#44791`](https://github.com/stablyai/orca/pull/44791) (resolve Issue [`#44783`](https://github.com/stablyai/orca/issues/44783)),
@@ -115,9 +120,29 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
     Em chats com backend de terminal executados em servidores pareados ou gerenciados, arrastar ou colar arquivos locais era rejeitado com a mensagem *"Local attachments are not available for remote sessions."*, enquanto o terminal adjacente conseguia fazer upload desses mesmos arquivos para `.orca/drops`.
 26. **Loop de polling prematuro e inicialização desnecessária do app-server do Codex por MCPs não iniciados (`#44673`):**
     Antes de um chat do Codex ser iniciado, servidores MCP configurados eram colocados em estado pendente, disparando o polling de backoff do painel; cada verificação em um chat sem thread inicializava a frio o `codex app-server`, consumindo recursos e mantendo a lista travada.
+27. **Comando de colar (Cmd+V) caindo no composer oculto do chat durante perguntas ativas (`#45100`):**
+    Quando um card de pergunta interativa (`ask_question`) substituía o composer do chat, o editor oculto permanecia registrado como alvo de entrada do painel. Ao pressionar Cmd+V ou colar via menu de contexto, o texto era inserido no composer invisível e o campo de resposta da pergunta permanecia em branco.
+28. **Atalhos de alternância de workspace bloqueados pelo editor de mensagens do chat (`#45101`):**
+    Os acordes de navegação entre workspaces (`Mod+Shift+Up/Down`) ficavam presos no composer do chat como seletores de texto até o início/fim, impedindo ciclar workspaces rapidamente por teclado enquanto o foco estivesse no chat.
+29. **Perda do botão "Approve once" em recusas de ferramentas do Codex acima de 16 KB (`#45006`):**
+    Quando uma resposta de ferramenta ou recusa emitida pelo Codex excedia 16 KB, o payload bruto quebrava o limite de processamento de frames, removendo o botão "Approve once" e forçando o desenvolvedor a lidar com prompts não recuperáveis.
+30. **Sobrescrita da linha superior do terminal por perda de pending-wrap no replay de snapshots (`#45064`):**
+    Ao restaurar um snapshot de terminal gravado enquanto o cursor aguardava wrap na borda direita, o cursor era posicionado na linha home após a restauração dos modos de rolagem/origem, fazendo com que a saída subsequente sobrescrevesse as primeiras linhas da tela.
+31. **Sequências de escape incompletas ou gigantes vazando texto bruto no terminal (`#45110`):**
+    Sequências parciais de escape maiores que 4.096 caracteres (como imagens DCS ou payloads Base64 de OSC 52) eram truncadas para um carry vazio em cortes de fluxo ou snapshots, fazendo com que o restante do payload alcançasse o parser de texto e poluísse o terminal como prosa ilegível.
 
 ## O que o upstream implementa e corrige
 
+- **Roteamento de colagem para o campo de resposta de perguntas interativas (`#45100`):**
+  - Desconsidera o composer de chat quando este estiver sob elemento oculto ou inerte, direcionando atalhos de colar diretamente para o campo de resposta focado.
+- **Liberação de atalhos de alternância de workspace no composer de chat (`#45101`):**
+  - Faz o composer de chat ceder os acordes `Mod+Shift+Up/Down` para o gerenciador global de workspaces, mantendo a seleção tradicional apenas em campos de formulários genéricos.
+- **Manutenção de "Approve once" com limite de 256 KB para recusas do Codex (`#45006`):**
+  - Eleva o teto de captura para 256 KB preservando a opção de aprovação individual sem corromper a persistência do diário.
+- **Preservação de cursor pending-wrap no replay de snapshots de terminal (`#45064`):**
+  - Reimprime a linha do cursor após a restauração dos modos de terminal, rearmando o pending-wrap na célula de borda antes de aplicar o estilo do cursor.
+- **Neutralização de sequências de escape parciais gigantes (>4096 caracteres) (`#45110`):**
+  - Insere um prefixo inerte que mantém o xterm em estado de descarte até o final da sequência (ESC]x; para OSC, ESC P0< para DCS), evitando vazamento de Base64 em snapshots.
 - **Retenção do nome de abas de terminal após fechamento e na retomada (`#44460`, refs `#31281`):**
   - Grava o nome customizado por sessão de agente no cliente local e sincroniza em segundo plano;
   - Exibe o nome customizado nas linhas do Session History / AI Vault mesmo após a aba ser fechada;
@@ -218,5 +243,10 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
 24. Reter o nome customizado de abas de terminal após o fechamento e aplicá-lo ao retomar sessões a partir do histórico (`#44460`, refs `#31281`).
 25. Unificar o staging de arquivos arrastados ou colados em chats de terminal em servidores pareados para `.orca/drops` via `stageClientFilesForAgent` (`#44916`).
 26. Exibir servidores MCP configurados com o estado "not started" antes do início do chat Codex sem polling ou inicialização prematura de app-server (`#44673`).
+27. Direcionar colagens de texto diretamente para o campo de resposta de perguntas interativas ativas no chat (`#45100`).
+28. Liberar atalhos de alternância de workspace (`Mod+Shift+Up/Down`) através do composer de chat (`#45101`).
+29. Reter a opção "Approve once" em recusas de ferramentas do Codex de até 256 KB (`#45006`).
+30. Repintar o estado de pending-wrap do cursor na restauração de snapshots de terminal (`#45064`).
+31. Neutralizar caudas parciais de sequências de escape superiores a 4096 caracteres em cortes de streaming e snapshots (`#45110`).
 
 

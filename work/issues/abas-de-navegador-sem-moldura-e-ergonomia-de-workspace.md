@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44742 e #44598 trazem diagnóstico de páginas travadas no navegador e notificação de Memory Saver para abas inativas.
+description: Os PRs #45242, #45346, #45417, #44647 e #45445 trazem aviso de disco cheio, divisores de split ergonômicos, estabilidade na status bar e otimização de spinners.
 scope:
   - brza-studio
   - workspace
@@ -17,7 +17,12 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44742`](https://github.com/stablyai/orca/pull/44742),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45242`](https://github.com/stablyai/orca/pull/45242),
+[`stablyai/orca#45346`](https://github.com/stablyai/orca/pull/45346),
+[`stablyai/orca#45417`](https://github.com/stablyai/orca/pull/45417),
+[`stablyai/orca#44647`](https://github.com/stablyai/orca/pull/44647),
+[`stablyai/orca#45445`](https://github.com/stablyai/orca/pull/45445),
+[`stablyai/orca#44742`](https://github.com/stablyai/orca/pull/44742),
 [`stablyai/orca#44598`](https://github.com/stablyai/orca/pull/44598),
 [`stablyai/orca#44744`](https://github.com/stablyai/orca/pull/44744),
 [`stablyai/orca#44428`](https://github.com/stablyai/orca/pull/44428),
@@ -57,9 +62,25 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#44742`](https://github.com
    Quando uma página web aberta no navegador embutido demorava para responder ou travava durante o carregamento, a interface exibia apenas um spinner genérico sem explicar a causa raiz (ex.: contenção no pool de 6 conexões simultâneas do Chromium, lentidão de DNS/TLS ou bloqueio por política).
 9. **Desperdício de memória RAM por abas inativas de navegador esquecidas em segundo plano (`#44598`):**
    Usuários acumulavam dezenas de abas de documentação ou preview abertas em segundo plano consumindo gigabytes de memória, sem que o Studio notificasse proativamente sobre a economia obtida ao ligar o Memory Saver.
+10. **Ausência de aviso proativo quando o disco está quase cheio por acúmulo de workspaces (`#45242`):**
+    Quando o armazenamento do sistema atinge níveis críticos de espaço livre, o usuário não recebia sugestões de desempenho para limpeza de workspaces inativos ou arquivos temporários antes que falhas de I/O ocorressem.
+11. **Dificuldade de captura em divisores de split finos e desalinhamento de áreas de arraste com linhas de abas (`#45346`, `#45417`):**
+    Divisores visuais finos entre painéis divididos eram difíceis de arrastar com o ponteiro do mouse; além disso, a medição da geometria de split não considerava adequadamente a altura das linhas de abas adjacentes, gerando áreas cegas de redimensionamento.
+12. **Loop infinito de re-renderização (React #185) por chaveamento contínuo de densidade na barra de status (`#44647`):**
+    O chaveamento dinâmico de densidade em tempo real na barra de status provocava recálculos recursivos de layout e estouro de ciclo de renderização no React (`Maximum update depth exceeded`), além de chips de uso volumosos que poluíam a interface.
+13. **Queda de taxa de quadros e engasgos de animação por spinners em abas fora da tela (`#45445`):**
+    Indicadores de verificação pendente (*pending-check spinners*) continuavam disparando loops de animação CSS e JavaScript mesmo quando renderizados em abas ou contêineres fora do viewport visível ou sob preferências de redução de movimento do sistema (*prefers-reduced-motion*).
 
 ## O que o upstream implementa
 
+- **Notificação de desempenho sugerindo limpeza de workspaces em disco quase cheio (`#45242`):**
+  - Monitora o espaço em disco e exibe aviso com sugestão proativa de limpeza de workspaces antigos quando o limite de segurança for atingido.
+- **Divisores de split finos com área invisível ampla de captura e alinhamento com abas (`#45346`, `#45417`):**
+  - Mantém o traço visual elegante do divisor enquanto expande a área interativa invisível de captura do mouse, medindo a linha de abas para garantir redimensionamento fluido em toda a extensão da divisão.
+- **Remoção de chaveamento contínuo de densidade na barra de status e chips de uso compactos (`#44647`):**
+  - Elimina o cálculo síncrono de densidade em loop contínuo resolvendo o erro React #185, condensa chips de consumo de recursos e agrupa excedentes em botão recolhido `+N`.
+- **Pausa de spinners fora da tela e respeito a reduced motion (`#45445`):**
+  - Pausa animações de spinners de verificação pendente quando fora do viewport visível ou sob reduced-motion, devolvendo fluidez às animações gerais da interface.
 - **Diagnóstico e watchdog de travamento no carregamento de páginas web (`#44742`):**
   - Implementa `browser-navigation-stall-watchdog`, monitorando carregamentos estagnados por mais de 10 segundos;
   - Exibe na barra de status a razão real da retenção ("Waiting for <host>…") e quantas outras abas compartilham o mesmo host em segundo plano, registrando os eventos no trace de performance para auditoria.
@@ -79,6 +100,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#44742`](https://github.com
 
 ## O que fazer
 
+- Exibir aviso de desempenho sugerindo limpeza de workspaces quando o disco estiver quase cheio (`#45242`).
+- Adotar divisores de split com área de captura invisível expandida e medição de linhas de abas (`#45346`, `#45417`).
+- Eliminar o chaveamento contínuo de densidade na barra de status para evitar loops React #185 e compactar chips de uso em `+N` (`#44647`).
+- Pausar animações de spinners pendentes quando fora da tela ou sob reduced motion (`#45445`).
 - Adotar o watchdog de carregamento travado no navegador com diagnóstico visual e registro em trace (`#44742`).
 - Incorporar notificações de desempenho sugerindo ativar o Memory Saver quando abas inativas acumularem memória RAM em excesso (`#44598`).
 - Suportar zoom em abas de navegador remoto via Ctrl+scroll, pinch e atalhos de teclado com mapeamento de coordenadas (`#44744`).

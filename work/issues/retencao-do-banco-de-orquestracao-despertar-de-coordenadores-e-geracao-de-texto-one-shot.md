@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45194, #44472, #45290 e #45330 trazem envio de arquivos via correio, nomeação durável por Dispatch e suspensão de crew.
+description: Os PRs #45426, #45370, #45462, #45194 e #45290 otimizam consultas de correio por índice composto, retêm mensagens durante turnos e tratam tokens no Windows.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,10 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45194`](https://github.com/stablyai/orca/pull/45194),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45426`](https://github.com/stablyai/orca/pull/45426),
+[`stablyai/orca#45370`](https://github.com/stablyai/orca/pull/45370),
+[`stablyai/orca#45462`](https://github.com/stablyai/orca/pull/45462),
+[`stablyai/orca#45194`](https://github.com/stablyai/orca/pull/45194),
 [`stablyai/orca#44472`](https://github.com/stablyai/orca/pull/44472),
 [`stablyai/orca#45290`](https://github.com/stablyai/orca/pull/45290),
 [`stablyai/orca#45330`](https://github.com/stablyai/orca/pull/45330),
@@ -142,9 +145,23 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Cada chat nativo visível realizava subscrição síncrona em `orchestration.crewSubscribe`, forçando a reconstrução completa de snapshots de equipe na thread principal mesmo quando o painel de tripulação (*crew panel*) estava em repouso.
 37. **Lentidão em varreduras de coordenadores legados (`#45330`):**
     - A recuperação de coordenadores legados no banco SQLite consultava a tabela `dispatch_contexts` sem filtro por tarefa, gerando varreduras desnecessárias de linhas em bases com histórico extenso.
+38. **Consulta de correio de coordenador legado varrendo todos os dispatches em vez de filtrar por endereço (`#45426`):**
+    - A recuperação de mensagens de correio destinadas a coordenadores legados realizava uma junção ampla com a tabela de Dispatches inteira em vez de sondar diretamente por endereço via índice composto `(run_id, to_address)` no SQLite;
+    - Isso causava degradação de performance proporcional ao volume acumulado de dispatches no `orchestration.db`.
+39. **Envio prematuro de mensagens de correio cancelando turnos em andamento de agentes ACP que controlam steering por cancelamento (`#45370`):**
+    - Mensagens rotineiras de status ou atualizações de correio entregues a agentes ACP (como Antigravity) no meio de um turno ativo provocavam o cancelamento do turno em execução caso o provedor declarasse `steering: 'queue'`;
+    - Faltava reter e enfileirar o correio de orquestração até o término do turno corrente para agentes com modelo de fila estrita.
+40. **Aspas desnecessárias em tokens seguros de recuperação no cmd do Windows (`#45462`):**
+    - Na montagem de comandos de recuperação para o `cmd.exe` no Windows, tokens alfanuméricos seguros (`[A-Za-z0-9_.-]+`) eram envolvidos por aspas desnecessárias, causando problemas de parsing e quebras em scripts de terminal.
 
 ## O que o upstream implementa
 
+- **Sonda de correio de coordenador legado por endereço via índice composto (`#45426`):**
+  - Utiliza o índice composto `(run_id, to_address)` para sondar mensagens diretamente no SQLite, eliminando o join completo sobre todos os dispatches e acelerando a checagem de correio de coordenadores legados.
+- **Retenção de correio de orquestração até o fim do turno para provedores com steering em fila (`#45370`):**
+  - Adiciona retenção de mensagens de correio até a conclusão do turno ativo para provedores que especificam `steering: 'queue'`, impedindo que mensagens rotineiras de status cancelem turnos em andamento de agentes como o Antigravity.
+- **Tokens de recuperação seguros desaspados no cmd do Windows (`#45462`):**
+  - Remove aspas de tokens alfanuméricos seguros correspondentes a `[A-Za-z0-9_.-]+` em scripts de inicialização e recuperação no terminal Windows.
 - **Envio de arquivos em mensagens de correio de itens gerenciados (`#45194`):**
   - Permite anexar arquivos locais e remotos em comunicações entre agentes gerenciados (`bot-item-mail-files.ts` e `peer-mail-files.ts`), cuidando do upload para staging de sessões em servidores pareados.
 - **Nomeação durável de remetentes de workers pelo registro de Dispatch (`#44472`):**
@@ -230,6 +247,9 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Sondar correio de coordenadores legados diretamente por endereço no SQLite via índice composto `(run_id, to_address)` (`#45426`).
+- Reter mensagens de orquestração até o fim do turno para provedores com `steering: 'queue'`, evitando o cancelamento indevido de turnos ativos (`#45370`).
+- Omitir aspas em tokens seguros de recuperação de linha de comando no Windows (`#45462`).
 - Suportar envio de arquivos e anexos em mensagens de correio de itens gerenciados localmente ou em hosts remotos (`#45194`).
 - Reter o nome e metadados de remetentes de workers gravando o Dispatch no momento do envio da mensagem (`#44472`).
 - Suspender a subscrição síncrona `orchestration.crewSubscribe` nos chats nativos enquanto o painel de tripulação estiver em repouso (`#45290`).

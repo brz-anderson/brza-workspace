@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45100, #45101, #45006 e #45064 corrigem paste em perguntas, atalhos de workspace, aprovação no Codex e wrap no terminal.
+description: Os PRs #45363, #45446, #45449, #45454 e #45480 adicionam chips para workers no chat, corrigem IME e typeahead no terminal e auth do Cursor no Linux.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,12 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45100`](https://github.com/stablyai/orca/pull/45100),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45363`](https://github.com/stablyai/orca/pull/45363),
+[`stablyai/orca#45446`](https://github.com/stablyai/orca/pull/45446),
+[`stablyai/orca#45449`](https://github.com/stablyai/orca/pull/45449),
+[`stablyai/orca#45454`](https://github.com/stablyai/orca/pull/45454),
+[`stablyai/orca#45480`](https://github.com/stablyai/orca/pull/45480) (resolve Issue [`#45455`](https://github.com/stablyai/orca/issues/45455)),
+[`stablyai/orca#45100`](https://github.com/stablyai/orca/pull/45100),
 [`stablyai/orca#45101`](https://github.com/stablyai/orca/pull/45101),
 [`stablyai/orca#45006`](https://github.com/stablyai/orca/pull/45006),
 [`stablyai/orca#45064`](https://github.com/stablyai/orca/pull/45064),
@@ -130,9 +135,29 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
     Ao restaurar um snapshot de terminal gravado enquanto o cursor aguardava wrap na borda direita, o cursor era posicionado na linha home após a restauração dos modos de rolagem/origem, fazendo com que a saída subsequente sobrescrevesse as primeiras linhas da tela.
 31. **Sequências de escape incompletas ou gigantes vazando texto bruto no terminal (`#45110`):**
     Sequências parciais de escape maiores que 4.096 caracteres (como imagens DCS ou payloads Base64 de OSC 52) eram truncadas para um carry vazio em cortes de fluxo ou snapshots, fazendo com que o restante do payload alcançasse o parser de texto e poluísse o terminal como prosa ilegível.
+32. **Nomes de workers em linhas de chat sem botão ou chip direto de abertura (`#45363`):**
+    Quando um chat coordenador ou mensagem referenciava um worker, o nome aparecia como texto puro sem permitir navegação direta ou abertura rápida do painel do worker associado.
+33. **Deslocamento do ponto de ancoragem IME do Cursor Agent no terminal (`#45446`):**
+    Durante a composição de caracteres via IME (Input Method Editor) no terminal do Cursor Agent, a caixa de candidatos do IME perdia a ancoragem espacial no prompt entre re-renderizações consecutivas, saltando para o topo ou fora da área visível.
+34. **Sugestão esmaecida do prompt do Claude aparecendo como texto digitado sob o preedit IME (`#45449`):**
+    Quando o usuário compunha caracteres em idiomas asiáticos/acentuados usando IME sobre o prompt do Claude, a sugestão esmaecida (*dim prompt suggestion*) permanecia visível sob o texto de composição pré-editado (*preedit*), gerando sobreposição visual e confusão de caracteres.
+35. **Typeahead digitado antes do terminal estar pronto corrompendo comando de launch do agente (`#45454`):**
+    Teclas digitadas precocemente pelo usuário (*typeahead*) antes da inicialização completa do PTY e injeção do comando de launch do agente ficavam no buffer de entrada, misturando-se com a linha de comando do agente e provocando erros de sintaxe no shell.
+36. **Falha na leitura do token Cursor armazenado no Secret Service no Linux (`#45480`, resolve `#45455`):**
+    No Linux, quando o arquivo de configuração `auth.json` do Cursor indicava armazenamento no cofre do sistema (`os-secret-store`), o Studio falhava em recuperar o token de autenticação por não consultar o Secret Service via `secret-tool search`.
 
 ## O que o upstream implementa e corrige
 
+- **Chips clicáveis com abertura direta para nomes de workers no chat (`#45363`):**
+  - Converte nomes de workers em linhas de chat em chips interativos que abrem diretamente a visualização do worker.
+- **Ancoragem contínua do candidato IME no terminal do Cursor Agent (`#45446`):**
+  - Mantém o ponto de ancoragem da janela de candidatos do IME alinhado ao prompt em todas as re-renderizações durante a composição ativa.
+- **Mascaramento da sugestão esmaecida do Claude sob o preedit IME (`#45449`):**
+  - Oculta a sugestão esmaecida do prompt enquanto houver composição ativa no buffer de preedit do IME.
+- **Descarga de typeahead antes da injeção do comando de launch de agentes (`#45454`):**
+  - Emite sequência de limpeza (`\x15` / `^U`) para esvaziar o buffer de typeahead antes de injetar o comando de inicialização do agente no PTY.
+- **Leitura do token do Cursor via Secret Service no Linux (`#45480`, resolve `#45455`):**
+  - Executa `secret-tool search` para extrair as credenciais do Cursor quando `auth.json` aponta para `os-secret-store`.
 - **Roteamento de colagem para o campo de resposta de perguntas interativas (`#45100`):**
   - Desconsidera o composer de chat quando este estiver sob elemento oculto ou inerte, direcionando atalhos de colar diretamente para o campo de resposta focado.
 - **Liberação de atalhos de alternância de workspace no composer de chat (`#45101`):**
@@ -248,5 +273,10 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
 29. Reter a opção "Approve once" em recusas de ferramentas do Codex de até 256 KB (`#45006`).
 30. Repintar o estado de pending-wrap do cursor na restauração de snapshots de terminal (`#45064`).
 31. Neutralizar caudas parciais de sequências de escape superiores a 4096 caracteres em cortes de streaming e snapshots (`#45110`).
+32. Converter nomes de workers em linhas de chat em chips interativos para abertura direta (`#45363`).
+33. Manter a ancoragem espacial da janela de candidatos do IME no terminal do Cursor Agent durante a composição (`#45446`).
+34. Ocultar sugestões esmaecidas de prompt sob a caixa de preedit do IME em chats do Claude (`#45449`).
+35. Limpar typeahead prévio antes de injetar comandos de inicialização de agentes no terminal (`#45454`).
+36. Suportar a extração de credenciais do Cursor no Secret Service do Linux via `secret-tool` (`#45480`, resolve `#45455`).
 
 

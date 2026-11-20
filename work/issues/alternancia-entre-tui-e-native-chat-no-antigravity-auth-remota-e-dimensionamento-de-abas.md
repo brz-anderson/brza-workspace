@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44965, #45254 e #45117 detectam API key/ADC do host no chat, identificam versão do agy e executam agentes no agy autenticado.
+description: Os PRs #45333, #45591, #45300 e #45420 trazem instalação de CLI real agy, detecção de cópias em SSH, diagnóstico de comando de agente e nomes limpos do Claude.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,11 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44965`](https://github.com/stablyai/orca/pull/44965),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45333`](https://github.com/stablyai/orca/pull/45333),
+[`stablyai/orca#45591`](https://github.com/stablyai/orca/pull/45591),
+[`stablyai/orca#45300`](https://github.com/stablyai/orca/pull/45300),
+[`stablyai/orca#45420`](https://github.com/stablyai/orca/pull/45420) (resolve Issue [`#45399`](https://github.com/stablyai/orca/issues/45399)),
+[`stablyai/orca#44965`](https://github.com/stablyai/orca/pull/44965),
 [`stablyai/orca#45254`](https://github.com/stablyai/orca/pull/45254),
 [`stablyai/orca#45117`](https://github.com/stablyai/orca/pull/45117),
 [`stablyai/orca#45244`](https://github.com/stablyai/orca/pull/45244),
@@ -179,9 +183,25 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Ao alternar entre versões locais ou gerenciadas da CLI Antigravity, a interface do Native Chat não informava explicitamente qual executável e versão do `agy` estava provendo a sessão, dificultando o diagnóstico de incompatibilidades e recursos ausentes.
 48. **Falha de execução de agentes Antigravity gerenciados em runtime empacotado sem login (`#45117`):**
     Automações e bots que utilizavam o agente gerenciado Antigravity tentavam inicializar o runtime empacotado sem login em vez de reaproveitar a CLI `agy` já autenticada e configurada no host do chat.
+49. **Instalação gerenciada de Antigravity não fornecendo a CLI autônoma real `agy` (`#45333`):**
+    Ao contrário de Claude Code e Codex, a rotina de instalação guiada do Antigravity instalava apenas um bundle interno sem disponibilizar o executável real `agy` no sistema, impedindo que desenvolvedores utilizassem o agente no terminal de linha de comando ou em scripts.
+50. **Omissão de cópias gerenciadas de agentes instalados em hosts SSH remotos no boot (`#45591`):**
+    O daemon remoto `orcad` registrava o provedor de detecção de agentes instalados tardiamente após o início das respostas RPC, fazendo com que as primeiras listagens de agentes no host remoto ignorassem cópias instaladas pelo Studio.
+51. **Erros genéricos e opacos quando comandos customizados de agentes falham no arranque (`#45300`):**
+    Sessões de chat ou bots configurados com comando customizado (ex.: alias `cc` não presente no PATH ou apontando para binário incompatível) falhavam com a mensagem genérica *"Claude stopped before it finished starting"*, sem nomear o comando disparado nem capturar o stderr/código de saída.
+52. **Poluição do seletor de modelos com prefixo de fabricante redundante no Claude (`#45420`, resolve `#45399`):**
+    Modelos listados pelo Claude exibiam nomes redundantes como *"Claude Haiku 5.5"* em vez de acompanhar os rótulos concisos oficiais da CLI ("Haiku 5.5", "Sonnet 5.5"), gerando inconsistências visuais no picker.
 
 ## O que o upstream implementa e corrige
 
+- **Instalação da CLI real `agy` pelo instalador do Antigravity (`#45333`):**
+  - O fluxo gerenciado de instalação passa a baixar e configurar o executável oficial `agy`, concedendo paridade completa com Claude e Codex tanto no Native Chat quanto na linha de comando.
+- **Detecção de cópias de agentes gerenciados em hosts SSH remotos desde a inicialização (`#45591`):**
+  - Move o registro de detecção para a ativação inicial do runtime no `orcad`, garantindo que conexões remotas reconheçam imediatamente executáveis instalados sem falhar o startup caso os settings não estejam prontos.
+- **Diagnóstico detalhado em falhas de inicialização de comandos de agentes (`#45300`):**
+  - Identifica o nome do comando, o executável resolvido e a primeira linha de stderr ou status de saída caso o processo falhe na partida, oferecendo link direto para as preferências.
+- **Remoção de prefixo redundante de fornecedor nos rótulos de modelos do Claude (`#45420`, resolve `#45399`):**
+  - Limpa os nomes exibidos para modelos Claude (exibindo "Haiku 5.5", "Sonnet 5.5"), preservando prefixos históricos apenas para versões legadas ("Claude 3.5 Sonnet") e mantendo compatibilidade com `/model`.
 - **Detecção automática de Gemini API Key e gcloud ADC com oferta no Chat (`#44965`):**
   - Detecta automaticamente chaves de API Gemini em variáveis de ambiente e credenciais ADC do `gcloud` no host;
   - Exibe os métodos detectados como opções de troca em um clique na barra de login ou diante de falhas de autenticação/cota (401/403), além de indicar o método ativo em chip no rodapé.
@@ -362,5 +382,9 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 44. Exibir o executável e a versão da CLI `agy` ativa no rodapé do Native Chat (`#45254`).
 45. Executar bots e agentes gerenciados do Antigravity via CLI `agy` autenticada do host (`#45117`).
 46. Ignorar glifos de Gemini enterrados em títulos de shell na identificação de status do agente (`#45244`).
+47. Fazer o fluxo de instalação gerenciada fornecer o executável oficial `agy` em paridade com outras CLIs (`#45333`).
+48. Registrar a detecção de agentes gerenciados na inicialização do daemon `orcad` para computadores remotos via SSH (`#45591`).
+49. Exibir diagnóstico com nome do comando customizado, executável e stderr/código de saída em falhas de arranque de agentes (`#45300`).
+50. Omitir prefixos redundantes de fabricante nos nomes listados de modelos do Claude no seletor (`#45420`, resolve `#45399`).
 
 

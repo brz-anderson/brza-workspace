@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45426, #45370, #45462, #45194 e #45290 otimizam consultas de correio por índice composto, retêm mensagens durante turnos e tratam tokens no Windows.
+description: Os PRs #45751, #45507, #45744, #45435 e #45819 corrigem endereçamento de workers, ledger de orquestração, níveis do Antigravity e retenção de crew host.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,12 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45426`](https://github.com/stablyai/orca/pull/45426),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45751`](https://github.com/stablyai/orca/pull/45751) (refs Issue [`#14570`](https://github.com/stablyai/orca/issues/14570)),
+[`stablyai/orca#45507`](https://github.com/stablyai/orca/pull/45507) (STA-16556, STA-16557, STA-16590),
+[`stablyai/orca#45744`](https://github.com/stablyai/orca/pull/45744) (refs Issue [`#45701`](https://github.com/stablyai/orca/issues/45701)),
+[`stablyai/orca#45435`](https://github.com/stablyai/orca/pull/45435),
+[`stablyai/orca#45819`](https://github.com/stablyai/orca/pull/45819),
+[`stablyai/orca#45426`](https://github.com/stablyai/orca/pull/45426),
 [`stablyai/orca#45370`](https://github.com/stablyai/orca/pull/45370),
 [`stablyai/orca#45462`](https://github.com/stablyai/orca/pull/45462),
 [`stablyai/orca#45194`](https://github.com/stablyai/orca/pull/45194),
@@ -153,9 +158,32 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Faltava reter e enfileirar o correio de orquestração até o término do turno corrente para agentes com modelo de fila estrita.
 40. **Aspas desnecessárias em tokens seguros de recuperação no cmd do Windows (`#45462`):**
     - Na montagem de comandos de recuperação para o `cmd.exe` no Windows, tokens alfanuméricos seguros (`[A-Za-z0-9_.-]+`) eram envolvidos por aspas desnecessárias, causando problemas de parsing e quebras em scripts de terminal.
+41. **Preâmbulo de workers exibindo o handle do terminal coordenador gerando mistura em `--from` (`#45751`, refs `#14570`):**
+    - O preâmbulo de inicialização de workers imprimia o handle `term_` do coordenador logo acima dos comandos sugeridos ao worker, que usam o próprio handle do worker em `--from`;
+    - Workers acabavam copiando partes do identificador errado para o remetente, fazendo com que mensagens de heartbeat e `worker_done` fossem rejeitadas como vindas do painel errado.
+42. **Vazamento e crescimento ilimitado do ledger de orquestração sob crash-cuts (`#45507`):**
+    - Em interrupções abruptas ou falhas de processo (*crash-cut*), o livro-razão automático de orquestração acumulava registros de continuação indefinidamente sem teto de bytes, arriscando estourar limites de leitura na retomada;
+    - Além disso, faltava expor primitivas de liquidação e descarte de tarefas reiniciáveis (`restartLaunchSettled`, `restartResumableDismiss`) para clientes pareados.
+43. **Nível de esforço de raciocínio de modelos Antigravity estruturados sobrescrito por opções salvas (`#45744`, refs `#45701`):**
+    - Ao disparar um worker Antigravity estruturado com um ID de modelo que carrega sufixo de nível (ex.: `--model gemini-4-hydrogen-medium`) omitindo `--effort`, o runtime mesclava as opções sobre a seleção salva de chat do usuário, substituindo o nível explícito do modelo pelo esforço previamente salvo.
+44. **Reconstrução completa do host de tripulação (crew host) a cada alternância de abas (`#45435`):**
+    - Assim que a última aba ouvinte deixava de monitorar a tripulação, o host era destruído imediatamente na thread principal do Electron;
+    - Ao retornar à aba ou reconectar, a aplicação reconstruía o host inteiro do zero, congelando a interface por vários segundos em execuções com grande volume de tarefas.
+45. **Relatórios finais `worker_done` de workers não acordando membros do grupo em chats de bots (`#45819`):**
+    - A varredura de correio de grupos procurava o worker por seu sender handle, mas relatórios finais vindos de terminais assentavam o Dispatch no ato da entrega, fazendo com que a mensagem ficasse sem requisição de grupo associada e permanecesse não lida.
 
 ## O que o upstream implementa
 
+- **Omissão do handle do terminal coordenador no preâmbulo de workers (`#45751`, refs `#14570`):**
+  - Descreve o coordenador de terminal como receptor padrão de correios enviados sem destinatário explícito (`--to`), impedindo que workers copiem handles misturados em `--from` e garantindo aceitação de heartbeats e `worker_done`.
+- **Controle de tamanho do ledger automático e APIs de reinicialização para pareamento (`#45507`):**
+  - Aplica limite estrito em bytes no livro-razão automático descartando continuações antigas e preservando janelas de rate-limit, além de expor `restartLaunchSettled` e `restartResumableDismiss` para clientes pareados.
+- **Preservação de nível em modelos Antigravity estruturados (`#45744`, refs `#45701`):**
+  - Cria sessões de despacho com `optionsMode: 'replace-model-selection'` quando o modelo solicitado possuir sufixo de nível, impedindo que preferências de esforço do usuário sobreponham a especificação do despacho.
+- **Retenção do crew host por 30s após saída do último ouvinte e tracing de rebuilds (`#45435`):**
+  - Mantém o host de tripulação vivo por 30 segundos após a saída do último listener no Electron main, permitindo trocas de abas e reconexões instantâneas sem reconstrução custosa, registrando métricas de rebuild no trace.
+- **Despertar de membros de grupos por relatórios finais via proveniência gravada (`#45819`):**
+  - Resolve a identidade do worker a partir da proveniência gravada do remetente antes da liquidação do despacho, acordando imediatamente o membro do grupo solicitante.
 - **Sonda de correio de coordenador legado por endereço via índice composto (`#45426`):**
   - Utiliza o índice composto `(run_id, to_address)` para sondar mensagens diretamente no SQLite, eliminando o join completo sobre todos os dispatches e acelerando a checagem de correio de coordenadores legados.
 - **Retenção de correio de orquestração até o fim do turno para provedores com steering em fila (`#45370`):**
@@ -247,6 +275,11 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Omitir o handle do terminal coordenador no preâmbulo de workers para evitar mistura de identificadores em `--from` (`#45751`, refs `#14570`).
+- Limitar o tamanho em bytes do ledger automático de orquestração sob crash-cuts e expor APIs de descarte e reinicialização para pareamento (`#45507`).
+- Preservar o nível de esforço de raciocínio de modelos Antigravity estruturados criando despachos com `optionsMode: 'replace-model-selection'` (`#45744`, refs `#45701`).
+- Reter o crew host na memória do processo principal por 30 segundos após a saída de ouvintes para evitar congelamentos em trocas de abas (`#45435`).
+- Despertar membros de grupos em chats de bots através da proveniência gravada do remetente de relatórios finais de workers (`#45819`).
 - Sondar correio de coordenadores legados diretamente por endereço no SQLite via índice composto `(run_id, to_address)` (`#45426`).
 - Reter mensagens de orquestração até o fim do turno para provedores com `steering: 'queue'`, evitando o cancelamento indevido de turnos ativos (`#45370`).
 - Omitir aspas em tokens seguros de recuperação de linha de comando no Windows (`#45462`).

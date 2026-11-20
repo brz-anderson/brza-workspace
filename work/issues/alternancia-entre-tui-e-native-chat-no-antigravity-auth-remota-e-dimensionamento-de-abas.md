@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45333, #45591, #45300 e #45420 trazem instalação de CLI real agy, detecção de cópias em SSH, diagnóstico de comando de agente e nomes limpos do Claude.
+description: Os PRs #45647, #45663, #45738, #45817, #45351, #45790 e #45850 aprimoram login do Antigravity, visuais inline sem skill loader, batching no journal e resiliência de chat.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,14 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45333`](https://github.com/stablyai/orca/pull/45333),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45647`](https://github.com/stablyai/orca/pull/45647),
+[`stablyai/orca#45663`](https://github.com/stablyai/orca/pull/45663),
+[`stablyai/orca#45738`](https://github.com/stablyai/orca/pull/45738),
+[`stablyai/orca#45817`](https://github.com/stablyai/orca/pull/45817),
+[`stablyai/orca#45351`](https://github.com/stablyai/orca/pull/45351),
+[`stablyai/orca#45790`](https://github.com/stablyai/orca/pull/45790) (resolve Issue [`#45788`](https://github.com/stablyai/orca/issues/45788)),
+[`stablyai/orca#45850`](https://github.com/stablyai/orca/pull/45850) (resolve Issue [`#45760`](https://github.com/stablyai/orca/issues/45760)),
+[`stablyai/orca#45333`](https://github.com/stablyai/orca/pull/45333),
 [`stablyai/orca#45591`](https://github.com/stablyai/orca/pull/45591),
 [`stablyai/orca#45300`](https://github.com/stablyai/orca/pull/45300),
 [`stablyai/orca#45420`](https://github.com/stablyai/orca/pull/45420) (resolve Issue [`#45399`](https://github.com/stablyai/orca/issues/45399)),
@@ -191,9 +198,37 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Sessões de chat ou bots configurados com comando customizado (ex.: alias `cc` não presente no PATH ou apontando para binário incompatível) falhavam com a mensagem genérica *"Claude stopped before it finished starting"*, sem nomear o comando disparado nem capturar o stderr/código de saída.
 52. **Poluição do seletor de modelos com prefixo de fabricante redundante no Claude (`#45420`, resolve `#45399`):**
     Modelos listados pelo Claude exibiam nomes redundantes como *"Claude Haiku 5.5"* em vez de acompanhar os rótulos concisos oficiais da CLI ("Haiku 5.5", "Sonnet 5.5"), gerando inconsistências visuais no picker.
+53. **Ausência de aviso proativo de logout no Antigravity antes do primeiro envio (`#45647`):**
+    Quando o `agy` estava deslogado no host, o Native Chat permitia que o usuário digitasse e enviasse a mensagem inicial, falhando apenas após o envio. Além disso, recusas de envio por ausência de login não ofereciam a mesma ação guiada de "Sign in" em terminal que outras falhas de autenticação disponibilizavam.
+54. **Incapacidade de carregar recursos visuais inline em agentes sem carregador de skills (`#45663`):**
+    Agentes como Pi, Copilot e backends ACP não dispunham de um skill loader integrado ao workspace, ficando impossibilitados de renderizar artefatos e diagramas visuais inline sem que instruções fossem injetadas manualmente no repositório.
+55. **Fechamento acidental de terminal ao tentar continuar conversa pertencente a outro diretório (`#45738`):**
+    Ao selecionar a ação "Continue in Chat UI" em um terminal cuja conversa pertencia a outra pasta ou worktree, o Studio encerrava o terminal ativo antes de validar a pasta da conversa, deixando o desenvolvedor sem a interface de chat e com o terminal fechado.
+56. **Loop de renderização infinita no esmaecimento de turnos quietos (`#45817`):**
+    Um turno quieto que assentava enquanto o chat ainda sinalizava estado de trabalho disparava repetidamente o efeito de layout do fade, tentando marcar a saída indefinidamente e estourando o limite de profundidade de atualização do React (erro #185).
+57. **Sobrecarga de I/O e stalls por escritas síncronas individuais de steps no journal (`#45351`):**
+    Cada passo de item, fato de criação ou saída de ferramenta realizava uma transação síncrona isolada no SQLite. Sob rajadas de múltiplos chats, transações concorrentes geravam contenção de lock e latências elevadas (p90 subindo de 15 para 35 ms sob pressão de disco).
+58. **Falha ao copiar comando manual de atualização de CLIs de agentes no popover (`#45790`, resolve `#45788`):**
+    O botão "Copy" nos popovers de CLIs que exigem atualização manual invocava `navigator.clipboard.writeText`, que era sumariamente rejeitado pelas políticas de permissão do Chromium na janela principal, exibindo o erro *"Could not copy the command"*.
+59. **Comando de launch do OpenCode retido no composer por perda do Enter durante colagem assíncrona (`#45850`, resolve `#45760`):**
+    Ao disparar o OpenCode com prompts longos (3+ linhas ou >150 caracteres), o OpenCode colapsa a colagem assincronamente em `[Pasted ~N lines]`. O Enter disparado pelo Studio antes da conclusão da colagem era engolido pelo shell, deixando o prompt retido no composer sem ser enviado.
 
 ## O que o upstream implementa e corrige
 
+- **Aviso consultivo de logout do Antigravity e oferta de Sign in em recusas (`#45647`):**
+  - Consulta o cache da rota de detecção RPC sem iniciar o `agy` para exibir aviso discreto de login antes do primeiro envio e oferece a ação "Sign in" (abrindo o `agy` no terminal do host) diante de qualquer recusa de envio por falta de login.
+- **Suporte a visuais inline em agentes sem skill loader (`#45663`):**
+  - Permite que o Pi carregue a skill de visuais via `--skill` apontando para o scratch folder do chat, injeta o caminho via `COPILOT_SKILLS_DIRS` para o Copilot e fornece instruções em bloco externo para agentes ACP sem tocar nos arquivos do projeto.
+- **Validação de pasta antes de fechar terminal em \"Continue in Chat UI\" (`#45738`):**
+  - Valida se a conversa pertence ao diretório/worktree ativo antes de fechar o terminal, recusando a continuidade com mensagem explicativa e mantendo a sessão do terminal aberta caso pertença a outra pasta.
+- **Idempotência no esmaecimento de turnos quietos sem loop React #185 (`#45817`):**
+  - Impede que turnos já quietos sejam monitorados novamente a cada reconstrução e torna a escrita de encerramento idempotente, reiniciando o fade adequadamente caso o turno assente novamente no meio da animação.
+- **Loteamento transacional de passos e saídas no journal de chat (`#45351`):**
+  - Agrupa passos de itens, fatos de criação e saídas de ferramentas de múltiplos chats em transações únicas de até 64 passos ou 256 KB, medindo o envelope sem serializar corpos de resposta e re-enfileirando requisições individualmente na fila de drenagem em caso de rollback.
+- **Cópia de comando de atualização via IPC do clipboard (`#45790`, resolve `#45788`):**
+  - Roteia a cópia do comando de atualização manual através de `window.api.ui.writeClipboardText`, garantindo funcionamento em qualquer ambiente.
+- **Reenvio resiliente de Enter após colagem longa no OpenCode (`#45850`, resolve `#45760`):**
+  - Re-lê a caixa de entrada 1 segundo após o envio quando o prompt for colapsado (`[Pasted ~N lines]`) e pressiona Enter novamente caso o placeholder continue retido no composer.
 - **Instalação da CLI real `agy` pelo instalador do Antigravity (`#45333`):**
   - O fluxo gerenciado de instalação passa a baixar e configurar o executável oficial `agy`, concedendo paridade completa com Claude e Codex tanto no Native Chat quanto na linha de comando.
 - **Detecção de cópias de agentes gerenciados em hosts SSH remotos desde a inicialização (`#45591`):**
@@ -386,5 +421,12 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 48. Registrar a detecção de agentes gerenciados na inicialização do daemon `orcad` para computadores remotos via SSH (`#45591`).
 49. Exibir diagnóstico com nome do comando customizado, executável e stderr/código de saída em falhas de arranque de agentes (`#45300`).
 50. Omitir prefixos redundantes de fabricante nos nomes listados de modelos do Claude no seletor (`#45420`, resolve `#45399`).
+51. Exibir aviso consultivo de login do Antigravity antes do primeiro envio e ação "Sign in" em recusas (`#45647`).
+52. Habilitar visualização de gráficos e diagramas inline em agentes sem skill loader nativo (`#45663`).
+53. Validar se a conversa pertence ao diretório ativo antes de fechar o terminal ao continuar no Chat UI (`#45738`).
+54. Tornar o efeito de esmaecimento de turnos quietos idempotente para eliminar loops de renderização React #185 (`#45817`).
+55. Implementar loteamento transacional (batching) de passos e saídas de ferramentas no journal SQLite (`#45351`).
+56. Rotejar a cópia de comandos de atualização de agentes via IPC do clipboard (`#45790`, resolve `#45788`).
+57. Reenviar a tecla Enter automaticamente no OpenCode ao detectar colagens longas assíncronas retidas (`#45850`, resolve `#45760`).
 
 

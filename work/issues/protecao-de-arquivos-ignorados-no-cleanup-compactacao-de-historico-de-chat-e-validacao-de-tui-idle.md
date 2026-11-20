@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44979, #45053 e #44781 retêm branch em falha parcial de exclusão de worktree, eliminam shells ociosos e otimizam reloads de layout.
+description: Os PRs #45221, #45240, #45264, #45313, #45840 e #45522 protegem rollouts e configs no cleanup, tratam auth no Codex, corrigem stage do Git e neutralizam hooks.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,13 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44979`](https://github.com/stablyai/orca/pull/44979),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45221`](https://github.com/stablyai/orca/pull/45221),
+[`stablyai/orca#45240`](https://github.com/stablyai/orca/pull/45240),
+[`stablyai/orca#45264`](https://github.com/stablyai/orca/pull/45264),
+[`stablyai/orca#45313`](https://github.com/stablyai/orca/pull/45313),
+[`stablyai/orca#45840`](https://github.com/stablyai/orca/pull/45840) (resolve Issue [`#45839`](https://github.com/stablyai/orca/issues/45839)),
+[`stablyai/orca#45522`](https://github.com/stablyai/orca/pull/45522),
+[`stablyai/orca#44979`](https://github.com/stablyai/orca/pull/44979),
 [`stablyai/orca#45053`](https://github.com/stablyai/orca/pull/45053),
 [`stablyai/orca#44781`](https://github.com/stablyai/orca/pull/44781),
 [`stablyai/orca#44745`](https://github.com/stablyai/orca/pull/44745) (resolve Issue [`#44715`](https://github.com/stablyai/orca/issues/44715)),
@@ -163,9 +169,33 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Ao criar um novo worktree de agente, o sistema subia temporariamente um shell ocioso intermediário antes de abrir a aba real do agente, impondo atrasos na prontidão da interface e desperdiçando processos de PTY.
 40. **Recargas completas e custosas da projeção de layout em mutações duráveis (`#44781`):**
     - Mutações de layout e admissão/descarte de painéis disparavam uma notificação ampla que forçava a recarga de todas as partições de workspaces do host, mesmo quando apenas um workspace ou painel isolado havia sido modificado.
+41. **Exclusão de rollouts do Codex no cleanup quando conversas forked ainda dependem de seu histórico (`#45221`):**
+    - A limpeza periódica de rollouts do Codex avaliava a elegibilidade de rollouts sem verificar se conversas bifurcadas (*forked chats*) ativas continuavam lendo o histórico original, apagando sessões ainda em uso.
+42. **Deleção acidental de arquivos de configuração e login pela recuperação de escritas atômicas (`#45240`):**
+    - Em interrupções de escrita de arquivos com cópia temporária retida (*held copy*), o mecanismo de recuperação sobrescrevia ou deletava o arquivo retido caso um conflito ocorresse, arriscando apagar arquivos de configuração ou credenciais de autenticação.
+43. **Logout falso e perda de login no Codex diante de erro transitório de leitura em `~/.codex/auth.json` (`#45264`):**
+    - Qualquer erro transitório de leitura (permissão, lock de arquivo) em `~/.codex/auth.json` era interpretado como logout definitivo pela rotina de sincronização, apagando a sessão espelhada do usuário.
+44. **Perda de edições concorrentes em `config.toml` do Codex por sobrescrita cega (`#45313`):**
+    - O escritor de configurações do Codex lia `config.toml`, aplicava edições e substituía o arquivo sem validar se gravações concorrentes haviam ocorrido no intervalo, sobrescrevendo alterações feitas pelo usuário ou pelo agente.
+45. **Falha no comando "Stage All" do Git na presença de links compartilhados ignorados (`#45840`, resolve `#45839`):**
+    - O comando `git add` falha com código 1 quando um pathspec de exclusão aponta para um caminho que as regras de ignore já ocultam. Ao preparar todas as alterações no worktree, o Studio excluía indiscriminadamente todos os links compartilhados (como `node_modules` ou junctions no Windows), falhando o staging sempre que um desses links constava no `.gitignore`.
+46. **Hooks de permissão do Cursor e Command Code autorizando ferramentas fora do Orca (`#45522`):**
+    - Hooks instalados pelo Orca para o Cursor respondiam `{"permission": "allow"}` para qualquer sessão do Cursor na máquina (inclusive fora do Orca), autorizando operações sensíveis sem intervenção do usuário; além disso, hooks do Command Code executavam varreduras caras de processos ancestrais (`ps`) e podiam poluir painéis alheios.
 
 ## O que o upstream propõe e implementa
 
+- **Preservação de rollouts do Codex lidos por chats forked e indexação em worker (`#45221`):**
+  - Executa a indexação de referências de forks em worker dedicado uma vez por varredura com cache de cabeçalhos por rollout ID, preservando rollouts ancestrais enquanto houver chats derivados ativos.
+- **Recuperação segura de escritas atômicas interrompidas via links por hash de conteúdo (`#45240`):**
+  - Vincula arquivos retidos a nomes livres baseados em hash de conteúdo e restaura o arquivo a partir da cópia retida antes de qualquer exclusão temporária, protegendo credenciais e configurações contra perdas.
+- **Tolerância a leituras inacessíveis de `auth.json` no Codex sem logout indevido (`#45264`):**
+  - Trata `~/.codex/auth.json` ilegível como falha de sincronização em vez de logout automático, removendo logins espelhados apenas diante de confirmação explícita de encerramento de sessão.
+- **Proteção contra sobrescrita concorrente em `config.toml` do Codex (`#45313`):**
+  - Passa os bytes exatos lidos na edição e confere o conteúdo do arquivo imediatamente antes do rename atômico, repetindo a edição sobre os bytes atualizados em caso de modificação externa e rotacionando `config.toml.bak` com segurança.
+- **Exclusão cirúrgica de links não-ignorados no Stage All do Git (`#45840`, resolve `#45839`):**
+  - Executa uma verificação rápida (`git check-ignore`) para excluir apenas os links compartilhados que não estejam ignorados pelo repositório, garantindo que o comando "Stage All" funcione com regras de `node_modules` ou junctions no Windows.
+- **Neutralidade de hooks de agentes fora do ambiente Orca (`#45522`):**
+  - Faz com que os hooks de permissão do Cursor respondam `{}` (sem decisão) em sessões externas, evitando aprovação arbitrária de ferramentas, e remove varreduras pesadas de ancestrais no Command Code.
 - **Preservação de branch e exclusão de `.git` por último em falhas parciais de worktree (`#44979`):**
   - Mantém o branch Git e a referência de push-target intactos caso a remoção do diretório do worktree falhe;
   - Remove o link `.git` do checkout como última operação para que a pasta remanescente ainda comprove sua vinculação ao repositório, permitindo que a ação de Delete na linha com falha finalize a exclusão com segurança assim que o bloqueador for liberado.
@@ -286,6 +316,12 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Preservar rollouts ancestrais do Codex no cleanup quando conversas forked ativas dependerem de seu histórico (`#45221`).
+- Assegurar recuperação atômica de arquivos retidos via links baseados em hash de conteúdo (`#45240`).
+- Tratar leituras inacessíveis em `~/.codex/auth.json` como falhas transitórias de sincronização sem deslogar a conta (`#45264`).
+- Proteger gravações em `config.toml` do Codex contra sobrescrita concorrente comparando bytes originais e rotacionando backups com segurança (`#45313`).
+- Validar caminhos ignorados via `git check-ignore` para viabilizar "Stage All" na presença de links compartilhados (`#45840`, resolve `#45839`).
+- Tornar os hooks de permissão de agentes neutros (`{}`) fora do ambiente do aplicativo (`#45522`).
 - Preservar branch e push-target em exclusões parciais de worktrees mantendo o link `.git` por último para permitir finalização posterior (`#44979`).
 - Suprimir a criação redundante de shells ociosos durante o provisionamento de worktrees de agentes (`#45053`).
 - Restringir a recarga de projeção de layout exclusivamente aos workspaces reportados por escritas duráveis (`#44781`).

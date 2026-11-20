@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45363, #45446, #45449, #45454 e #45480 adicionam chips para workers no chat, corrigem IME e typeahead no terminal e auth do Cursor no Linux.
+description: Os PRs #45472, #45871, #45837, #45385, #45702, #45571 e #45783 trazem respostas em lote a perguntas, fallback no Claude, catálogo expandido e fix de reattach no daemon.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,15 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45363`](https://github.com/stablyai/orca/pull/45363),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45472`](https://github.com/stablyai/orca/pull/45472),
+[`stablyai/orca#45871`](https://github.com/stablyai/orca/pull/45871),
+[`stablyai/orca#45837`](https://github.com/stablyai/orca/pull/45837),
+[`stablyai/orca#45385`](https://github.com/stablyai/orca/pull/45385),
+[`stablyai/orca#45702`](https://github.com/stablyai/orca/pull/45702),
+[`stablyai/orca#45571`](https://github.com/stablyai/orca/pull/45571) (refs Issue [`#45563`](https://github.com/stablyai/orca/issues/45563)),
+[`stablyai/orca#45783`](https://github.com/stablyai/orca/pull/45783) (resolve Issue [`#19595`](https://github.com/stablyai/orca/issues/19595)),
+[`stablyai/orca#43785`](https://github.com/stablyai/orca/pull/43785),
+[`stablyai/orca#45363`](https://github.com/stablyai/orca/pull/45363),
 [`stablyai/orca#45446`](https://github.com/stablyai/orca/pull/45446),
 [`stablyai/orca#45449`](https://github.com/stablyai/orca/pull/45449),
 [`stablyai/orca#45454`](https://github.com/stablyai/orca/pull/45454),
@@ -145,9 +153,35 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
     Teclas digitadas precocemente pelo usuário (*typeahead*) antes da inicialização completa do PTY e injeção do comando de launch do agente ficavam no buffer de entrada, misturando-se com a linha de comando do agente e provocando erros de sintaxe no shell.
 36. **Falha na leitura do token Cursor armazenado no Secret Service no Linux (`#45480`, resolve `#45455`):**
     No Linux, quando o arquivo de configuração `auth.json` do Cursor indicava armazenamento no cofre do sistema (`os-secret-store`), o Studio falhava em recuperar o token de autenticação por não consultar o Secret Service via `secret-tool search`.
+37. **Dificuldade de responder sequencialmente a múltiplas perguntas em itens de tarefas (`#45472`, `#45871`):**
+    Itens de agentes gerenciados que emitiam várias perguntas obrigavam o usuário a enviar respostas fragmentadas em comentários isolados; respostas mantidas no buffer eram descartadas ou atribuídas à linha errada caso mensagens intermediárias fossem enviadas antes da confirmação.
+38. **Caixa de comentários de itens gerenciados com largura fixa estreita (`#45837`):**
+    O campo de digitação de comentários em itens de agentes gerenciados não aproveitava o espaço horizontal disponível, dificultando a revisão e edição de textos compridos e respostas detalhadas.
+39. **Pílula de modelo desatualizada após recusa com fallback no Claude Code (`#45385`):**
+    Quando o Claude Code acionava fallback de modelo por recusa de segurança na thread principal, o seletor visual continuava mostrando o modelo original salvo; além disso, selecionar o modelo original novamente no composer não enviava o comando de reativação para tirar o Claude do modo de fallback.
+40. **Modo Plan revertendo indevidamente chats do Claude para modo de permissão restritivo (`#45702`):**
+    Após aprovar um plano em chats iniciados no modo Plan, o Studio lia o modo inicial a partir do frame tardio de inicialização (que já reportava "plan"), forçando `set_permission_mode default` e disparando confirmações manuais em todos os comandos do terminal subsequentes mesmo quando o modo padrão era automático.
+41. **Truncamento de slash commands e skills no menu do Claude após 512 itens (`#45571`, refs `#45563`):**
+    O catálogo de comandos do Claude cortava entradas após a 512ª linha, omitindo skills e comandos customizados do menu slash do Native Chat e causando lentidão ao filtrar emojis complexos.
+42. **Contagem duplicada de bytes de saída no daemon ao reanexar terminais com overlay de histórico (`#45783`, resolve `#19595`):**
+    Ao reconectar a um terminal PTY usando snapshot com overlay de histórico, o daemon retornava a sequência do snapshot em vez da sequência real de conexão, fazendo com que bytes gerados durante o overlay fossem computados duas vezes e descalibrassem a contagem de saída do runtime.
 
 ## O que o upstream implementa e corrige
 
+- **Respostas em lote a múltiplas perguntas de itens em um único comentário (`#45472`, `#45871`):**
+  - Permite responder sequencialmente a várias perguntas de itens de agentes mantendo as respostas no buffer e publicando-as agrupadas no próximo envio com citações exatas de linhas e sem perda de contexto.
+- **Largura total para caixas de comentários de itens gerenciados (`#45837`):**
+  - Expande o contêiner de entrada de comentários para utilizar 100% da largura disponível no card do item gerenciado.
+- **Exibição e reversão de modelos em fallback de recusa no Claude (`#45385`):**
+  - Atualiza dinamicamente a pílula do composer para refletir o modelo de fallback ativo e permite que a seleção manual do modelo original envie `set_model` no turno seguinte para desarmar o fallback.
+- **Restauração de modo de permissão nativo após aprovação de planos (`#45702`):**
+  - Lê o modo inicial a partir de `current_permission_mode` da resposta de inicialização do Claude, garantindo que o chat retorne ao modo de trabalho normal configurado (auto/default) após aprovar planos.
+- **Expansão do catálogo de comandos do Claude para até 1024 entradas (`#45571`, refs `#45563`):**
+  - Eleva o limite para 1024 entradas (ou 512 KiB de JSON) mantendo skills e slash commands acessíveis no Native Chat, além de adotar regex global para sanitização rápida de emojis.
+- **Preservação da sequência de saída no attach de terminais com overlay (`#45783`, resolve `#19595`):**
+  - Mantém a sequência de saída obtida no momento exato do `createOrAttach`, evitando contagem duplicada de bytes live e histórico.
+- **Exibição de checagens de metas na linha expansível de objetivos (`#43785`):**
+  - Renderiza indicadores visuais de progresso e validações de metas diretamente na linha recolhível de objetivos do agente.
 - **Chips clicáveis com abertura direta para nomes de workers no chat (`#45363`):**
   - Converte nomes de workers em linhas de chat em chips interativos que abrem diretamente a visualização do worker.
 - **Ancoragem contínua do candidato IME no terminal do Cursor Agent (`#45446`):**
@@ -278,5 +312,12 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
 34. Ocultar sugestões esmaecidas de prompt sob a caixa de preedit do IME em chats do Claude (`#45449`).
 35. Limpar typeahead prévio antes de injetar comandos de inicialização de agentes no terminal (`#45454`).
 36. Suportar a extração de credenciais do Cursor no Secret Service do Linux via `secret-tool` (`#45480`, resolve `#45455`).
+37. Permitir responder a múltiplas perguntas sequenciais em itens em um único comentário agrupado (`#45472`, `#45871`).
+38. Expandir o campo de comentários de itens gerenciados para ocupar a largura total do contêiner (`#45837`).
+39. Indicar o modelo de fallback ativo no composer do Claude e permitir o retorno ao modelo selecionado via `set_model` (`#45385`).
+40. Restaurar o modo de permissão nativo após a aprovação de planos no Claude via `current_permission_mode` (`#45702`).
+41. Expandir a capacidade do catálogo de comandos do Claude para até 1024 entradas no menu slash (`#45571`, refs `#45563`).
+42. Preservar a sequência de saída obtida no momento da conexão ao reanexar terminais com overlay de histórico (`#45783`, resolve `#19595`).
+43. Exibir checagens de metas na linha expansível de objetivos de agentes (`#43785`).
 
 

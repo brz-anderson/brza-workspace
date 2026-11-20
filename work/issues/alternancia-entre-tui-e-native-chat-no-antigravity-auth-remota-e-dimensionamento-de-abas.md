@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44837, #44814, #44762 trazem ferramentas/identidade para todos os agentes gerenciados, descarte de --plugin-dir sob políticas restritas e hash SHA-256 no catálogo de modelos.
+description: Os PRs #44660, #44534, #44538 trazem PreToolUse silencioso no agy para não sobrepor revisor, desativação de auto-update em ACP e descoberta de agy no Windows.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,10 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44837`](https://github.com/stablyai/orca/pull/44837),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44660`](https://github.com/stablyai/orca/pull/44660) (resolve Issue [`#44585`](https://github.com/stablyai/orca/issues/44585)),
+[`stablyai/orca#44534`](https://github.com/stablyai/orca/pull/44534),
+[`stablyai/orca#44538`](https://github.com/stablyai/orca/pull/44538),
+[`stablyai/orca#44837`](https://github.com/stablyai/orca/pull/44837),
 [`stablyai/orca#44814`](https://github.com/stablyai/orca/pull/44814) (refs Issue [`#44776`](https://github.com/stablyai/orca/issues/44776)),
 [`stablyai/orca#44762`](https://github.com/stablyai/orca/pull/44762) (resolve Issue [`#44692`](https://github.com/stablyai/orca/issues/44692)),
 [`stablyai/orca#44575`](https://github.com/stablyai/orca/pull/44575),
@@ -160,9 +163,21 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Quando configurações gerenciadas da organização (*managed settings*) ativam `disableSideloadFlags`, o binário do Claude CLI encerra na inicialização recusando a flag `--plugin-dir`. Como o Studio só detectava rejeição de flags a partir do erro "unknown option", continuava passando `--plugin-dir` indefinidamente, impossibilitando a abertura de qualquer sessão do Native Chat em contas corporativas restritas.
 42. **Tempestades de centenas de processos por invalidação espúria do catálogo de modelos (`#44762`, resolve `#44692`):**
     A sonda de catálogo de modelos do Claude monitorava `~/.claude/settings.json` baseando-se em `inode` e `ctime`/`mtime`. Como comandos como `claude -p` reescrevem o arquivo atomicamente (via arquivo temporário e rename) com bytes idênticos, cada disparo alterava a marcação, expirava o escopo e disparava uma nova sonda ~2.5s depois, gerando rajadas descontroladas de centenas de processos concorrentes.
+43. **Hook PreToolUse forçando diálogo de confirmação e sobrepondo o revisor embutido do Antigravity (`#44660`, resolve `#44585`):**
+    O hook gerenciado `PreToolUse` do Antigravity emitia `{"decision":"ask"}` em stdout para cada chamada de ferramenta. No `agy 1.5.12`, isso sobrescrevia a política interna de aprovação automática do próprio revisor (*built-in reviewer*), forçando prompts manuais no modo interativo e causando negações automáticas indevidas no modo headless/não-interativo (`agy -p`).
+44. **Atualizações automáticas em segundo plano roubando foco e corrompendo probes do `agy` no Windows (`#44534`):**
+    Quando o Studio iniciava instâncias do host ACP ou executava `agy models` para listar modelos, o atualizador em segundo plano do `agy` entrava em execução automática no Windows, roubando o foco da janela ativa (issue #27390) e arriscando substituir o binário no meio da inicialização do servidor ACP.
+45. **Falha na descoberta da CLI `agy` instalada no Windows em diretório padrão de usuário (`#44538`):**
+    O instalador oficial do Antigravity no Windows coloca o binário `agy.exe` em `%LOCALAPPDATA%\agy\bin`, que não é adicionado ao `PATH` da sessão gráfica do Electron até que o sistema seja reiniciado. Com isso, o Studio falhava em encontrar a CLI host e abortava a inicialização do Native Chat.
 
 ## O que o upstream implementa e corrige
 
+- **PreToolUse silencioso para delegação ao revisor interno do `agy` (`#44660`, resolve `#44585`):**
+  - Mantém o stdout do hook `PreToolUse` vazio em scripts POSIX, scripts core do Windows e fallbacks de wrappers/`hooks.json`, permitindo que a política de aprovação embutida do próprio `agy` decida a execução das ferramentas sem interferência ou auto-recusas indevidas em `agy -p`.
+- **Desativação de auto-update do `agy` em sessões ACP e listagens de modelos (`#44534`):**
+  - Injeta explicitamente `AGY_CLI_DISABLE_AUTO_UPDATE=true` nas especificações de lançamento do host ACP e no probe `agy models`, além de purgar chaves em caixa alternada no Windows para que não sobreponham a variável configurada.
+- **Inclusão de `%LOCALAPPDATA%\agy\bin` na descoberta de comandos CLI no Windows (`#44538`):**
+  - Adiciona o diretório padrão de instalação do Windows (`AppData\Local\agy\bin` e valor resolvido de `LOCALAPPDATA`) à lista de diretórios pesquisados na resolução de comandos de CLI e especificações de launch do Antigravity.
 - **Gerenciamento universal de ferramentas e identidades para todos os agentes (`#44837`):**
   - Generaliza a infraestrutura de ferramentas (`bot-tools`) para gerenciar ferramentas, identidades e conectores em qualquer agente ACP (incluindo Antigravity) e extensões Pi, persistindo ferramentas gerenciadas inclusive através de reloads de extensões.
 - **Descarte inteligente de `--plugin-dir` em ambientes com sideload bloqueado (`#44814`, refs `#44776`):**
@@ -321,5 +336,8 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 37. Estender a gestão de ferramentas gerenciadas e OAuth de conectores para todos os agentes gerenciados e ACP (Antigravity e Pi) (`#44837`).
 38. Descartar `--plugin-dir` na inicialização do Claude sob políticas que bloqueiam sideload para permitir o Native Chat (`#44814`, refs `#44776`).
 39. Validar modificações em arquivos de configuração do catálogo de modelos via hash SHA-256 de conteúdo em vez de `ctime`/`mtime`/`inode` (`#44762`, resolve `#44692`).
+40. Manter stdout vazio no hook `PreToolUse` do Antigravity para permitir que a política embutida do revisor do `agy` decida a execução sem auto-recusa indevida em `agy -p` (`#44660`, resolve `#44585`).
+41. Injetar `AGY_CLI_DISABLE_AUTO_UPDATE=true` nas especificações de lançamento do host ACP e no probe `agy models`, além de purgar chaves em caixa alternada no Windows (`#44534`).
+42. Incluir `%LOCALAPPDATA%\agy\bin` na lista de descoberta de binários e comandos da CLI Antigravity no Windows (`#44538`).
 
 

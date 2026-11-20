@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44590 e #44332 retêm receita de lançamento de workers em falha de captura e orientam tipos de mail explícitos sobre --on.
+description: O PR #44919 roteia pedidos de aprovação de workers em chats de coordenador em servidores pareados.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,8 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44590`](https://github.com/stablyai/orca/pull/44590) (resolve Issue [`#43875`](https://github.com/stablyai/orca/issues/43875)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44919`](https://github.com/stablyai/orca/pull/44919),
+[`stablyai/orca#44590`](https://github.com/stablyai/orca/pull/44590) (resolve Issue [`#43875`](https://github.com/stablyai/orca/issues/43875)),
 [`stablyai/orca#44332`](https://github.com/stablyai/orca/pull/44332),
 [`stablyai/orca#44475`](https://github.com/stablyai/orca/pull/44475),
 [`stablyai/orca#44327`](https://github.com/stablyai/orca/pull/44327),
@@ -126,9 +127,16 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Transações pequenas de atualização de status (como contagem regressiva de auto-close de workers sendo suspensa ou reiniciada) que cruzavam o limiar de auto-checkpoint do SQLite (1.000 frames) disparavam o checkpoint síncrono do WAL diretamente na thread principal, gerando travamentos de até 500 ms no Electron.
 32. **Falta de especificação e documentação dos tipos de mail suportados entre agentes e sobre `--on` (`#44332`):**
     - Agentes orquestradores e workers tinham dificuldades para selecionar os tipos corretos de correio ao enviar mensagens via `orca orchestration send` ou `orca-cli` (especialmente em ambientes com servidores pareados via `--on`), enviando formatos genéricos e falhando em distinguir `task_result`, `ask`, `reply`, `worker_done` e `status`.
+33. **Ausência ou falha no roteamento de pedidos de permissão de workers em chats de coordenador em servidores pareados (`#44919`):**
+    - Quando um chat de coordenador é executado em um servidor pareado ou ambiente remoto gerenciado, os prompts de autorização/aprovação (*worker approval prompts*) de subagentes e workers ficavam inacessíveis ou falhavam ao rotear a resposta pelo host proprietário da sessão de chat;
+    - Faltava também suporte para que janelas ou dispositivos pareados (como clientes móveis) pudessem encerrar streams de aprovação ou aceitar emparelhamentos como a pessoa operadora.
 
 ## O que o upstream implementa
 
+- **Roteamento de aprovações de workers através do host proprietário do chat em servidores pareados (`#44919`):**
+  - Encaminha pedidos e streams de aprovação de workers através do host proprietário do chat em conexões remotas;
+  - Permite que janelas pareadas ou clientes conectados encerrem com segurança fluxos de aprovação e aceitem emparelhamentos como a pessoa operadora;
+  - Rejeita códigos de pareamento de dispositivos móveis no comando CLI `environment add`.
 - **Retenção durável da receita de lançamento de workers mesmo sob falhas de captura posterior (`#44590`, resolve `#43875`):**
   - Mantém a linha de receita original armazenada no banco em vez de sobrescrevê-la ou limpá-la caso uma captura de contexto subsequente falhe ou não consiga ler o processo finalizado;
   - Assegura que workers finalizados possam ser recriados ou receber mensagens subsequentes de follow-up com os parâmetros originais preservados.
@@ -201,6 +209,7 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Rotear pedidos de autorização de workers através do host proprietário do chat em servidores pareados e clientes remotos (`#44919`).
 - Responder a pedidos de permissão de subagentes de workers diretamente pela interface do coordenador com retenção de 2 minutos (`#44475`).
 - Executar checkpoints de WAL do banco de orquestração em thread dedicada fora da main thread (`#44327`).
 - Desalocar recursos de terminal de workers imediatamente após comprovação de saída em `settleWorkerStop` (`#43953`).

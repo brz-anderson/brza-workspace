@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44691, #44763, #44025, #44571 blindam a pasta de importação do Codex no cleanup, revogam confiança de worktree deletado e paginam provas de migração de journal.
+description: O PR #44745 limpa worktrees de folder workspaces como grupo unificado e o PR #44905 protege pastas WSL sem acordar distros.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,9 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44691`](https://github.com/stablyai/orca/pull/44691),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44745`](https://github.com/stablyai/orca/pull/44745) (resolve Issue [`#44715`](https://github.com/stablyai/orca/issues/44715)),
+[`stablyai/orca#44905`](https://github.com/stablyai/orca/pull/44905),
+[`stablyai/orca#44691`](https://github.com/stablyai/orca/pull/44691),
 [`stablyai/orca#44763`](https://github.com/stablyai/orca/pull/44763),
 [`stablyai/orca#44025`](https://github.com/stablyai/orca/pull/44025),
 [`stablyai/orca#44571`](https://github.com/stablyai/orca/pull/44571),
@@ -145,9 +147,22 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - A importação de históricos de conversas Codex de pastas externas (`codex-accounts`) estava quebrada desde a versão 1.4.262. Quando a pasta de origem continha links rígidos ausentes ou respondia lentamente, o processo bloqueava a fila inteira de histórico do host, e falhas de disco cheio (`ENOSPC`) lançavam exceções não tratadas em vez de registrar a conversa como pendente de tentativa posterior.
 35. **Sobrecarga de memória e scans repetidos na prova de integridade do journal legado (`#44571`):**
     - O verificador de conversão do journal legado (`journal-legacy-proof`) lia mensagens enfileiradas ordenadas em SQL, forçando o SQLite a criar B-trees temporárias para centenas de milhares de linhas e travando a inicialização por até 1s por chat. A ausência de paginação e persistência do cursor forçava re-varreduras completas a cada boot.
+36. **Limpeza prematura ou parcial de worktrees em workspaces de pasta com múltiplos repositórios (`#44745`, resolve `#44715`):**
+    - Quando um workspace é configurado como pasta contendo múltiplos repositórios (`folder workspace`), o mecanismo de cleanup avaliava cada worktree isoladamente com base apenas nas evidências de seu próprio repositório Git;
+    - Se a regra "merged" estivesse ativa, o sistema removia o worktree do repositório A (já integrado) enquanto o worktree do repositório B (no mesmo folder workspace) ainda estava ativamente em uso e com trabalho em andamento.
+37. **Inicialização desnecessária de distros WSL paradas para proteger pastas de importação do Codex (`#44905`):**
+    - Durante as varreduras de limpeza de histórico de chat, a rotina de proteção de diretórios de importação do Codex tentava ler o conteúdo da pasta inspecionando o sistema de arquivos via WSL, o que forçava o boot de distribuições WSL em repouso;
+    - Isso causava picos de CPU, atrasos no ciclo de cleanup e acordava instâncias Linux sem necessidade.
 
 ## O que o upstream propõe e implementa
 
+- **Limpeza unificada de worktrees em folder workspaces como um único grupo (`#44745`, resolve `#44715`):**
+  - Trata todos os worktrees vinculados a um folder workspace e suas linhagens descendentes como um único grupo indivisível;
+  - Um worktree só é removido quando todos os membros do workspace de pasta forem elegíveis para remoção, mantendo o grupo intacto enquanto qualquer repositório irmão ainda estiver em uso;
+  - Reavalia os irmãos locais imediatamente antes da remoção e correlaciona a linhagem persistida para evitar exclusões acidentais caso a varredura de algum repositório falhe.
+- **Proteção de pasta de importação do Codex no WSL por caminho estático sem acordar distros (`#44905`):**
+  - Protege pastas de importação do Codex no WSL resolvendo estaticamente o caminho da distribuição sem acessar ou ler o sistema de arquivos interno;
+  - Limita as consultas ao WSL a um lease de 1 segundo e no máximo uma checagem por varredura quando a distro estiver parada, preservando as sessões sem inicializar distribuições em segundo plano.
 - **Proteção estrita da pasta de importação do Codex contra exclusões no cleanup (`#44691`):**
   - Implementa proteção por identidade de pasta (`codex-rollout-protected-roots.ts`) antes de cada exclusão permanente de rollout, garantindo que nenhum arquivo sob a raiz de importação do Codex seja apagado durante o cleanup de histórico de workspaces.
 - **Revogação automática de confiança de agentes ao excluir worktree via worker dedicado (`#44763`):**
@@ -254,6 +269,8 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Tratar worktrees de repositórios vinculados a um folder workspace como grupo unificado no cleanup para evitar remoções parciais (`#44745`, resolve `#44715`).
+- Proteger pastas de importação do Codex em WSL por resolução estática de caminhos sem inicializar distribuições paradas (`#44905`).
 - Proteger a pasta externa de importação do Codex contra exclusões acidentais durante o cleanup de histórico de workspaces (`#44691`).
 - Revogar a confiança de agentes (Codex e Antigravity) ao deletar worktrees via worker assíncrono para não travar a main thread (`#44763`).
 - Isolar a importação de históricos Codex em runner desacoplado da fila principal do host com suporte a reflink e tratamento de ENOSPC (`#44025`).

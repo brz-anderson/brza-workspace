@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44791, #43529, #39831 trazem foco no split ao cancelar fechamento, retenção de conversas através de sleep/wake e delimitação de links entre parênteses.
+description: Os PRs #44460, #44916 e #44673 retêm nomes de abas de terminal, realizam staging de anexos em servidores e listam MCPs pré-chat.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,10 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44791`](https://github.com/stablyai/orca/pull/44791) (resolve Issue [`#44783`](https://github.com/stablyai/orca/issues/44783)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#44460`](https://github.com/stablyai/orca/pull/44460) (refs Issue [`#31281`](https://github.com/stablyai/orca/issues/31281)),
+[`stablyai/orca#44916`](https://github.com/stablyai/orca/pull/44916),
+[`stablyai/orca#44673`](https://github.com/stablyai/orca/pull/44673),
+[`stablyai/orca#44791`](https://github.com/stablyai/orca/pull/44791) (resolve Issue [`#44783`](https://github.com/stablyai/orca/issues/44783)),
 [`stablyai/orca#43529`](https://github.com/stablyai/orca/pull/43529),
 [`stablyai/orca#39831`](https://github.com/stablyai/orca/pull/39831),
 [`stablyai/orca#44624`](https://github.com/stablyai/orca/pull/44624) (refs Issue [`#44586`](https://github.com/stablyai/orca/issues/44586)),
@@ -106,9 +109,23 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
     Quando um workspace entrava em repouso (*workspace sleep*), o PTY do terminal era terminado. Ao despertar o workspace, os ganchos do agente não conseguiam reconectar a linha de status e o identificador da conversa ao novo PTY, gerando painéis zumbis desconectados do histórico do agente.
 23. **Detecção incorreta de links clicáveis de arquivos englobando texto em prosa adjacente a parênteses (`#39831`):**
     Quando caminhos de arquivo apareciam delimitados por parênteses no terminal (ex.: `(src/auth/session.ts)` ou `(ver detalhes em src/index.ts:25)`), a regex de detecção de links OSC 8 incluía os parênteses de fechamento ou a prosa subsequente na URL do link, quebrando a navegação por clique.
+24. **Perda do nome customizado de abas de terminal ao fechar e na retomada via histórico (`#44460`, refs `#31281`):**
+    Renomear uma aba de terminal atribuía o nome apenas à aba aberta naquele momento. Ao fechar a aba, o histórico de sessões do agente (*Session History* / AI Vault) revertia para o título padrão do agente, e ao retomar a sessão (`/resume`), uma aba anônima e sem nome era criada, perdendo a identificação configurada pelo usuário.
+25. **Rejeição de arquivos arrastados ou colados em chats de terminal em servidores pareados (`#44916`):**
+    Em chats com backend de terminal executados em servidores pareados ou gerenciados, arrastar ou colar arquivos locais era rejeitado com a mensagem *"Local attachments are not available for remote sessions."*, enquanto o terminal adjacente conseguia fazer upload desses mesmos arquivos para `.orca/drops`.
+26. **Loop de polling prematuro e inicialização desnecessária do app-server do Codex por MCPs não iniciados (`#44673`):**
+    Antes de um chat do Codex ser iniciado, servidores MCP configurados eram colocados em estado pendente, disparando o polling de backoff do painel; cada verificação em um chat sem thread inicializava a frio o `codex app-server`, consumindo recursos e mantendo a lista travada.
 
 ## O que o upstream implementa e corrige
 
+- **Retenção do nome de abas de terminal após fechamento e na retomada (`#44460`, refs `#31281`):**
+  - Grava o nome customizado por sessão de agente no cliente local e sincroniza em segundo plano;
+  - Exibe o nome customizado nas linhas do Session History / AI Vault mesmo após a aba ser fechada;
+  - Ao retomar a sessão a partir do histórico (por clique ou arraste, em host local ou pareado), nomeia a nova aba com o nome salvo.
+- **Staging unificado de arquivos para chats de terminal em servidores pareados (`#44916`):**
+  - Unifica o envio de arquivos arrastados, selecionados ou colados via `stageClientFilesForAgent`, enviando os anexos para `.orca/drops` no worktree remoto e fornecendo um caminho legível pelo agente (inclusive em conexões SSH).
+- **Listagem de servidores MCP configurados como "not started" antes do início do chat (`#44673`):**
+  - Lista servidores MCP configurados com o status "not started" antes da inicialização do chat, exibindo-os na interface sem disparar polling prematuro nem acordar o `codex app-server`.
 - **Restauração de foco no split ativo após cancelamento de modal de terminal (`#44791`, resolve `#44783`):**
   - Integra o hook `useModalReturnFocus` ao `CloseTerminalDialog`, assegurando que Cancelar, Escape ou dismiss fora do modal retornem o foco exatamente para o painel de terminal dividido ativo em vez de vazar para o body.
 - **Continuidade de conversas de agentes em painéis de terminal através de sleep e wake (`#43529`):**
@@ -198,5 +215,8 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
 21. Retornar foco ao split de terminal ativo após cancelar ou fechar o diálogo de confirmação de fechamento (`#44791`, resolve `#44783`).
 22. Preservar a identidade e linha de status de conversas de agentes em terminais através de repouso e despertar (*sleep/wake*) (`#43529`).
 23. Ajustar limites de detecção de links de arquivos no terminal para ignorar parênteses de fechamento e prosa adjacente (`#39831`).
+24. Reter o nome customizado de abas de terminal após o fechamento e aplicá-lo ao retomar sessões a partir do histórico (`#44460`, refs `#31281`).
+25. Unificar o staging de arquivos arrastados ou colados em chats de terminal em servidores pareados para `.orca/drops` via `stageClientFilesForAgent` (`#44916`).
+26. Exibir servidores MCP configurados com o estado "not started" antes do início do chat Codex sem polling ou inicialização prematura de app-server (`#44673`).
 
 

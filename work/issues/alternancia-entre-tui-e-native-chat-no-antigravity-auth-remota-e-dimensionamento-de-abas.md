@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45647, #45663, #45738, #45817, #45351, #45790 e #45850 aprimoram login do Antigravity, visuais inline sem skill loader, batching no journal e resiliência de chat.
+description: Os PRs #46101, #39769, #45647 e #45663 trazem pin do ACP server 1.5.2 do Google, integração do Kiro no Native Chat e visuais inline.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,9 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45647`](https://github.com/stablyai/orca/pull/45647),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46101`](https://github.com/stablyai/orca/pull/46101),
+[`stablyai/orca#39769`](https://github.com/stablyai/orca/pull/39769),
+[`stablyai/orca#45647`](https://github.com/stablyai/orca/pull/45647),
 [`stablyai/orca#45663`](https://github.com/stablyai/orca/pull/45663),
 [`stablyai/orca#45738`](https://github.com/stablyai/orca/pull/45738),
 [`stablyai/orca#45817`](https://github.com/stablyai/orca/pull/45817),
@@ -212,9 +214,17 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     O botão "Copy" nos popovers de CLIs que exigem atualização manual invocava `navigator.clipboard.writeText`, que era sumariamente rejeitado pelas políticas de permissão do Chromium na janela principal, exibindo o erro *"Could not copy the command"*.
 59. **Comando de launch do OpenCode retido no composer por perda do Enter durante colagem assíncrona (`#45850`, resolve `#45760`):**
     Ao disparar o OpenCode com prompts longos (3+ linhas ou >150 caracteres), o OpenCode colapsa a colagem assincronamente em `[Pasted ~N lines]`. O Enter disparado pelo Studio antes da conclusão da colagem era engolido pelo shell, deixando o prompt retido no composer sem ser enviado.
+60. **Instabilidade no Antigravity Native Chat por derivação de versão não fixada do servidor ACP do Google (`#46101`):**
+    O runtime gerenciado do Antigravity ou a inicialização do ACP utilizava resolução flutuante ou dependência instável do servidor ACP do Google (`@google/antigravity-acp`), sujeitando as sessões de chat a quebras imprevistas quando novas versões do pacote upstream introduziam incompatibilidades com o protocolo de eventos ou com as ferramentas gerenciadas.
+61. **Falta de suporte nativo ao agente Kiro no chat estruturado do Studio via ACP V3 (`#39769`):**
+    O ecossistema do Studio não reconhecia o agente Kiro como um backend oficial de chat estruturado no Native Chat UI, limitando seu uso a terminais puros e impedindo o aproveitamento do streaming nativo, renderização de ferramentas e persistência de histórico via ACP V3.
 
 ## O que o upstream implementa e corrige
 
+- **Fixação da versão 1.5.2 do servidor ACP do Google para Antigravity (`#46101`):**
+  - Fixa o servidor Google ACP (`@google/antigravity-acp` / pacote de runtime) na versão `1.5.2`, garantindo compatibilidade estável com o protocolo ACP, streaming de turnos e orquestração de subagentes.
+- **Integração do Kiro como agente nativo de chat via ACP V3 (`#39769`):**
+  - Implementa suporte completo ao agente Kiro no Native Chat UI usando o protocolo ACP V3, permitindo seleção de modelos Kiro, streaming estruturado de respostas, cancelamento e ciclo de vida unificado.
 - **Aviso consultivo de logout do Antigravity e oferta de Sign in em recusas (`#45647`):**
   - Consulta o cache da rota de detecção RPC sem iniciar o `agy` para exibir aviso discreto de login antes do primeiro envio e oferece a ação "Sign in" (abrindo o `agy` no terminal do host) diante de qualquer recusa de envio por falta de login.
 - **Suporte a visuais inline em agentes sem skill loader (`#45663`):**
@@ -428,5 +438,7 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 55. Implementar loteamento transacional (batching) de passos e saídas de ferramentas no journal SQLite (`#45351`).
 56. Rotejar a cópia de comandos de atualização de agentes via IPC do clipboard (`#45790`, resolve `#45788`).
 57. Reenviar a tecla Enter automaticamente no OpenCode ao detectar colagens longas assíncronas retidas (`#45850`, resolve `#45760`).
+58. Fixar a versão 1.5.2 do pacote do servidor ACP do Google para Antigravity para garantir estabilidade operacional no Native Chat (`#46101`).
+59. Adicionar suporte ao Kiro como agente nativo de chat estruturado integrando-o via ACP V3 (`#39769`).
 
 

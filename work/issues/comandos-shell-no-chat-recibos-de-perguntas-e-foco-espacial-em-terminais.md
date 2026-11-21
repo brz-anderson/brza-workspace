@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45472, #45871, #45837, #45385, #45702, #45571 e #45783 trazem respostas em lote a perguntas, fallback no Claude, catálogo expandido e fix de reattach no daemon.
+description: Os PRs #45068, #45713, #44954, #45978, #45907, #45472, #45871, #45837, #45385, #45702, #45571 e #45783 trazem fallback de permissão no Claude, kinfo no Mac, isolamento de abas e proteção de rascunhos.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,12 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45472`](https://github.com/stablyai/orca/pull/45472),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45068`](https://github.com/stablyai/orca/pull/45068),
+[`stablyai/orca#45713`](https://github.com/stablyai/orca/pull/45713),
+[`stablyai/orca#44954`](https://github.com/stablyai/orca/pull/44954),
+[`stablyai/orca#45978`](https://github.com/stablyai/orca/pull/45978),
+[`stablyai/orca#45907`](https://github.com/stablyai/orca/pull/45907),
+[`stablyai/orca#45472`](https://github.com/stablyai/orca/pull/45472),
 [`stablyai/orca#45871`](https://github.com/stablyai/orca/pull/45871),
 [`stablyai/orca#45837`](https://github.com/stablyai/orca/pull/45837),
 [`stablyai/orca#45385`](https://github.com/stablyai/orca/pull/45385),
@@ -165,8 +170,29 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
     O catálogo de comandos do Claude cortava entradas após a 512ª linha, omitindo skills e comandos customizados do menu slash do Native Chat e causando lentidão ao filtrar emojis complexos.
 42. **Contagem duplicada de bytes de saída no daemon ao reanexar terminais com overlay de histórico (`#45783`, resolve `#19595`):**
     Ao reconectar a um terminal PTY usando snapshot com overlay de histórico, o daemon retornava a sequência do snapshot em vez da sequência real de conexão, fazendo com que bytes gerados durante o overlay fossem computados duas vezes e descalibrassem a contagem de saída do runtime.
+43. **Falha de inicialização do Claude ao solicitar Full Access quando configurações locais proíbem bypass (`#45068`):**
+    Quando configurações organizacionais ou locais do Claude (`settings.json` ou managed settings) proíbem a concessão de acesso irrestrito (*Full access* / bypass de permissões), a inicialização do Claude falhava ao tentar aplicar o modo sem aprovação em vez de rebaixar suavemente para *Approve for me* ou *Ask*.
+44. **Alto consumo de CPU no macOS por terminais ociosos varrendo periodicamente a tabela global de processos com `ps` (`#45713`):**
+    A rotina de monitoramento de status de terminais no Mac invocava `ps -axo pid,ppid,command` ciclicamente para inspecionar os processos filhos de cada terminal ocioso, gerando varreduras repetidas e desnecessárias de toda a tabela de processos do sistema e impactando a duração da bateria.
+45. **Re-renderizações e leituras desnecessárias de todos os buckets de abas ao alterar o título de um único terminal (`#44954`):**
+    No processo renderer, qualquer evento de alteração de título ou status de uma aba de terminal invalidava e relia o estado de todos os agrupamentos (*buckets*) de abas do workspace, em vez de isolar a mutação estritamente ao bucket onde a aba reside.
+46. **Vazamento de argumentos confidenciais e saídas de erro completas em falhas de comandos customizados de agentes (`#45978`):**
+    Quando comandos customizados de launch de agentes falhavam no arranque, as mensagens de erro exibidas na interface podiam conter argumentos sensíveis de linha de comando (chaves, URLs internas ou tokens) e blocos brutos de `stderr`, expondo dados confidenciais nos logs e toasts de erro.
+47. **Entrega de mensagens de correio de workers sobrescrevendo rascunhos não enviados no terminal Pi (`#45907`):**
+    Quando um worker enviava notificações ou correspondências para um terminal executando o agente Pi, a mensagem era injetada imediatamente no prompt mesmo que o usuário estivesse com um rascunho de texto digitado no editor, sobrescrevendo a entrada não enviada.
 
 ## O que o upstream implementa e corrige
+
+- **Fallback resiliente de permissão do Claude de Full access para Approve for me / Ask (`#45068`):**
+  - Implementa degradação suave quando `bypassPermissions` é bloqueado pelas configurações do Claude, rebaixando automaticamente a sessão para o modo de aprovação permitido mais próximo em vez de abortar o chat.
+- **Leitura eficiente de processos de terminal no macOS via kinfo compartilhada (`#45713`):**
+  - Substitui as invocações periódicas de `ps` por consultas estruturadas de `kinfo_proc` compartilhadas entre os terminais, eliminando picos de CPU causados por varreduras globais em terminais ociosos no Mac.
+- **Isolamento de atualizações de título de terminal por bucket de abas no renderer (`#44954`):**
+  - Restringe o disparo de atualizações de estado exclusivamente ao bucket da aba modificada, impedindo refetches e re-renderizações em outros painéis de abas do workspace.
+- **Redação de argumentos e sanitização de stderr em mensagens de erro de agentes (`#45978`):**
+  - Sanitiza as mensagens de falha de launch de comandos customizados, ocultando argumentos e parâmetros potencialmente sensíveis e exibindo apenas diagnósticos seguros.
+- **Retenção de correio de workers durante edição de rascunho no terminal Pi (`#45907`):**
+  - Enfileira as mensagens de correspondência de workers em segundo plano enquanto o editor do Pi tiver caracteres não submetidos no buffer de entrada, entregando o correio apenas quando o prompt estiver livre.
 
 - **Respostas em lote a múltiplas perguntas de itens em um único comentário (`#45472`, `#45871`):**
   - Permite responder sequencialmente a várias perguntas de itens de agentes mantendo as respostas no buffer e publicando-as agrupadas no próximo envio com citações exatas de linhas e sem perda de contexto.
@@ -319,5 +345,11 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
 41. Expandir a capacidade do catálogo de comandos do Claude para até 1024 entradas no menu slash (`#45571`, refs `#45563`).
 42. Preservar a sequência de saída obtida no momento da conexão ao reanexar terminais com overlay de histórico (`#45783`, resolve `#19595`).
 43. Exibir checagens de metas na linha expansível de objetivos de agentes (`#43785`).
+44. Implementar fallback automático de permissões do Claude para Approve for me ou Ask quando Full access for bloqueado por configurações locais (`#45068`).
+45. Otimizar a checagem de processos filhos de terminais no macOS usando leitura compartilhada de kinfo em substituição a `ps` contínuo (`#45713`).
+46. Isolar as notificações de alteração de título de terminal no renderer para ler apenas o bucket de abas correspondente (`#44954`).
+47. Redigir argumentos de comandos customizados e sanitizar saídas de erro exibidas em falhas de agentes (`#45978`).
+48. Reter notificações e correios de workers enquanto houver rascunho não enviado no terminal Pi (`#45907`).
+
 
 

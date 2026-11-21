@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #38581, #39169 e as issues #39495, #39502 trazem rotação automática de contas Claude por host, janelas por modelo, chaveamento de cota e métricas /stats.
+description: Os PRs #46002 e #46099 exibem e retêm o uso da conta System default do Claude na status bar mesmo ao selecionar contas salvas.
 scope:
   - brza-studio
   - brza-workflow
@@ -17,7 +17,9 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#38581`](https://github.com/stablyai/orca/pull/38581),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46002`](https://github.com/stablyai/orca/pull/46002),
+[`stablyai/orca#46099`](https://github.com/stablyai/orca/pull/46099) (refs Issue [`#45979`](https://github.com/stablyai/orca/issues/45979)),
+[`stablyai/orca#38581`](https://github.com/stablyai/orca/pull/38581),
 [`stablyai/orca#39169`](https://github.com/stablyai/orca/pull/39169),
 [`stablyai/orca#38654`](https://github.com/stablyai/orca/pull/38654),
 [`stablyai/orca#38509`](https://github.com/stablyai/orca/pull/38509),
@@ -105,9 +107,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38581`](https://github.com
 17. **Requisições de rede em background indesejadas pelo medidor de cota OAuth (`#39502`):**
     O painel de monitoramento de uso realizava chamadas periódicas em background para endpoints da Anthropic (`api.anthropic.com`),
     gerando consumo indesejado de rede e alertas em ambientes corporativos com restrições estritas de telemetria.
+18. **Omissão de métricas de uso da conta System default do Claude quando uma conta salva está selecionada (`#46002`):**
+    A barra de status anexava medições de contas inativas apenas a contas que possuíam ID salvo; como a conta "System default" não possui ID salvo, suas leituras eram omitidas da lista inativa, deixando o desenvolvedor sem visibilidade do consumo da conta principal do sistema.
+19. **Perda de telemetria de uso e exibição de "Not checked" ao alternar de conta System default para conta salva (`#46099`, refs `#45979`):**
+    Ao alternar da conta System default para uma conta salva em um menu que permanece aberto, a leitura da conta padrão não era armazenada sob sua respectiva chave de cache, fazendo com que a linha exibisse *"Not checked"* em vez do uso recém-consultado.
 
 ## O que o upstream propõe e implementa
 
+- **Exibição do uso de System default do Claude enquanto outra conta salva está ativa (`#46002`):**
+  - Roteia a chave System default através de `claudeAccountUsagePreparation`, lendo o uso da conta padrão do host diretamente em seu diretório base e exibindo-o na linha correspondente mesmo com contas salvas selecionadas.
+- **Retenção de métricas de System default após alternância de conta (`#46099`, refs `#45979`):**
+  - Alimenta o cache de uso da conta System default de saída sob sua chave específica, mantendo as medições visíveis na linha em vez de reverter para "Not checked".
 - **Motor de rotação automática de contas Claude e monitoramento por modelo (`#39495`):**
   - Proposta de diálogo unificado de contas Claude no status bar e menu de contexto de worktrees;
   - Rotação por host: chaveia automaticamente para a próxima conta cadastrada quando o limite de 5h ou semanal atinge um limiar crítico;
@@ -148,6 +158,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#38581`](https://github.com
 
 ## O que fazer
 
+- Exibir o consumo da conta System default do Claude na status bar mesmo quando uma conta salva estiver selecionada (`#46002`).
+- Reter as medições da conta System default no cache após a alternância para outra conta, evitando o estado "Not checked" (`#46099`, refs `#45979`).
 - Adotar a fixação de conta por projeto (`#38581`) no `brza-studio`, separando contas corporativas de pessoais.
 - Habilitar o fallback de cota em helpers de texto (`#38654`) para fluxos de commit e PR no `brza-workflow`.
 - Incorporar o disparo imediato de continuação de limites ao chavear contas Claude (`#39169`).

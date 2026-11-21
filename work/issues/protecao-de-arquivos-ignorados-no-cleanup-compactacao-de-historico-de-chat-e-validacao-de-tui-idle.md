@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45221, #45240, #45264, #45313, #45840 e #45522 protegem rollouts e configs no cleanup, tratam auth no Codex, corrigem stage do Git e neutralizam hooks.
+description: Os PRs #45986, #45988, #45506, #45912, #45749, #45031, #46043, #45221, #45240, #45264, #45313, #45840 e #45522 aprimoram git staging, isolamento em workers, limpeza residual e sessões de painéis.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,14 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45221`](https://github.com/stablyai/orca/pull/45221),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45986`](https://github.com/stablyai/orca/pull/45986),
+[`stablyai/orca#45988`](https://github.com/stablyai/orca/pull/45988),
+[`stablyai/orca#45506`](https://github.com/stablyai/orca/pull/45506),
+[`stablyai/orca#45912`](https://github.com/stablyai/orca/pull/45912),
+[`stablyai/orca#45749`](https://github.com/stablyai/orca/pull/45749),
+[`stablyai/orca#45031`](https://github.com/stablyai/orca/pull/45031),
+[`stablyai/orca#46043`](https://github.com/stablyai/orca/pull/46043),
+[`stablyai/orca#45221`](https://github.com/stablyai/orca/pull/45221),
 [`stablyai/orca#45240`](https://github.com/stablyai/orca/pull/45240),
 [`stablyai/orca#45264`](https://github.com/stablyai/orca/pull/45264),
 [`stablyai/orca#45313`](https://github.com/stablyai/orca/pull/45313),
@@ -181,8 +188,37 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - O comando `git add` falha com código 1 quando um pathspec de exclusão aponta para um caminho que as regras de ignore já ocultam. Ao preparar todas as alterações no worktree, o Studio excluía indiscriminadamente todos os links compartilhados (como `node_modules` ou junctions no Windows), falhando o staging sempre que um desses links constava no `.gitignore`.
 46. **Hooks de permissão do Cursor e Command Code autorizando ferramentas fora do Orca (`#45522`):**
     - Hooks instalados pelo Orca para o Cursor respondiam `{"permission": "allow"}` para qualquer sessão do Cursor na máquina (inclusive fora do Orca), autorizando operações sensíveis sem intervenção do usuário; além disso, hooks do Command Code executavam varreduras caras de processos ancestrais (`ps`) e podiam poluir painéis alheios.
+47. **Instrução de erro enganosa ao criar worktree sugerindo flag inexistente `--base` (`#45986`):**
+    - Quando a criação de um novo worktree falhava por ausência de um branch base padrão no repositório, o texto de ajuda orientava o desenvolvedor a passar `--base <branch>`, quando o parâmetro suportado pela CLI é estritamente `--base-branch <branch>`, gerando falhas em cadeia na linha de comando.
+48. **Falha no comando "Stage All" do Git quando links compartilhados residem dentro de submódulos (`#45988`):**
+    - A rotina de exclusão de links compartilhados no Git falhava ao processar worktrees com submódulos inicializados, pois o pathspec de exclusão tentava referenciar links compartilhados internos através da fronteira do submódulo, causando erro 128 no `git add`.
+49. **Exclusão de diretório substituto em sobras de remoção de worktree e perda de marcador `.git` no WSL (`#45506`):**
+    - Durante a limpeza de diretórios residuais de remoções incompletas (*leftovers*), se outro checkout ou pasta fosse montada no mesmo caminho após o erro inicial, a rotina podia apagar a pasta errada; além disso, a remoção do marcador `.git` no WSL falhava em conferir a identidade real do checkout, corrompendo referências cruzadas.
+50. **Exclusão de workspace ativo acordando desnecessariamente workspaces irmãos adormecidos (`#45912`):**
+    - Ao deletar o workspace focado na interface, o mecanismo de transferência de foco escolhia o próximo workspace da lista e disparava imediatamente o seu despertar (*wake*), mesmo que o irmão estivesse em repouso configurado (*slept sibling*), provocando uso excessivo de memória e inicialização indesejada de processos.
+51. **Varredura lenta e redundante em lookups de worktree re-indexando todos os checkouts (`#45749`):**
+    - Qualquer consulta simples de existência ou caminho de um worktree acionava uma re-indexação completa de todos os checkouts registrados no repositório, penalizando comandos de terminal e automações com latências proporcionais ao número total de branches.
+52. **Execução de comandos Git capturados na thread principal causando congelamentos de interface (`#45031`):**
+    - Comandos do Git executados internamente para sincronização de status e conferência de branches rodavam síncronos na thread principal do processo renderer no macOS e Linux, provocando pequenos engasgos na digitação e animações durante operações de checkout.
+53. **Expiração precoce de sessões de agentes inativos em painéis abertos pelo TTL de 7 dias (`#46043`):**
+    - Sessões de agentes em painéis ou abas que permaneciam abertas por mais de 7 dias sem atividade recente tinham seu status de sessão expurgado pelo coletor de lixo periódico (TTL fixo de 7 dias), impossibilitando a visualização de histórico ou continuação do chat sem recarregar o workspace.
 
 ## O que o upstream propõe e implementa
+
+- **Correção da dica de comando sugerindo `--base-branch` na criação de worktrees (`#45986`):**
+  - Ajusta a mensagem de erro emitida quando o branch base padrão não é encontrado, instruindo corretamente o uso da flag `--base-branch`.
+- **Suporte a links compartilhados em submódulos no Stage All do Git (`#45988`):**
+  - Trata fronteiras de submódulos ao compor os pathspecs de exclusão de links compartilhados, permitindo que o `git add` prepare alterações em repositórios compostos sem colisão.
+- **Validação de identidade em limpezas residuais de worktrees e proteção `.git` no WSL (`#45506`):**
+  - Confere a identidade do repositório antes de apagar pastas residuais de worktrees incompletos e preserva o link `.git` no WSL até a confirmação formal da remoção.
+- **Preservação do estado adormecido de workspaces irmãos na exclusão do workspace ativo (`#45912`):**
+  - Ajusta a seleção do próximo workspace ativo para transferir o ponteiro de exibição sem disparar o despertar de processos em workspaces marcados como adormecidos (*slept*).
+- **Lookup indexado de worktrees em $O(1)$ sem re-indexação global (`#45749`):**
+  - Utiliza busca indexada por varredura pré-computada para localizar worktrees, eliminando re-indexações completas a cada chamada individual.
+- **Isolamento de comandos Git em worker dedicado de processos no macOS e Linux (`#45031`):**
+  - Move a execução de comandos Git capturados para um worker dedicado de processos, desonerando a thread principal e eliminando engasgos de interface.
+- **Preservação de sessões de agentes inativos em painéis abertos além do TTL de 7 dias (`#46043`):**
+  - Isenta sessões vinculadas a painéis e abas atualmente abertas do expurgo automático de status de 7 dias, retendo os dados enquanto o usuário mantiver o painel no workspace.
 
 - **Preservação de rollouts do Codex lidos por chats forked e indexação em worker (`#45221`):**
   - Executa a indexação de referências de forks em worker dedicado uma vez por varredura com cache de cabeçalhos por rollout ID, preservando rollouts ancestrais enquanto houver chats derivados ativos.
@@ -316,6 +352,13 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Corrigir a mensagem de erro na criação de worktrees para recomendar `--base-branch` (`#45986`).
+- Tratar submódulos no comando "Stage All" do Git para não falhar na presença de links compartilhados (`#45988`).
+- Proteger pastas de checkouts contra exclusão incorreta em limpezas residuais e no WSL (`#45506`).
+- Evitar que a exclusão de um workspace acorde workspaces irmãos que estejam adormecidos (`#45912`).
+- Adotar busca indexada direta de worktrees para eliminar re-indexações globais frequentes (`#45749`).
+- Despachar a execução de comandos Git para worker de processos em background no macOS e Linux (`#45031`).
+- Preservar sessões de agentes ativas em painéis abertos além do TTL de 7 dias (`#46043`).
 - Preservar rollouts ancestrais do Codex no cleanup quando conversas forked ativas dependerem de seu histórico (`#45221`).
 - Assegurar recuperação atômica de arquivos retidos via links baseados em hash de conteúdo (`#45240`).
 - Tratar leituras inacessíveis em `~/.codex/auth.json` como falhas transitórias de sincronização sem deslogar a conta (`#45264`).

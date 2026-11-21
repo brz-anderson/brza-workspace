@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43436, #40812, #40788, #40214, #35220 e as issues #43418, #41017 tratam de escopos de skills no chat, nomes em registros e hashes de pacotes.
+description: Os PRs #45822 e #45966 unificam pastas de skills neutras para agentes gerenciados e corrigem o empacotamento de aliases simbólicos no compartilhamento.
 scope:
   - brza-studio
 priority: high
@@ -15,7 +15,9 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43436`](https://github.com/stablyai/orca/pull/43436),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45822`](https://github.com/stablyai/orca/pull/45822),
+[`stablyai/orca#45966`](https://github.com/stablyai/orca/pull/45966) (resolve Issue [`#45965`](https://github.com/stablyai/orca/issues/45965)),
+[`stablyai/orca#43436`](https://github.com/stablyai/orca/pull/43436),
 [`stablyai/orca#42472`](https://github.com/stablyai/orca/pull/42472) (resolve Issue [`#42408`](https://github.com/stablyai/orca/issues/42408)),
 [`stablyai/orca#40812`](https://github.com/stablyai/orca/pull/40812),
 [`stablyai/orca#40788`](https://github.com/stablyai/orca/pull/40788) (resolve Issue [`#40785`](https://github.com/stablyai/orca/issues/40785)),
@@ -67,9 +69,18 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43436`](https://github.com
 11. **Falha na instalação por discrepância entre nome no registro bundled e repositório comunitário (`#43418`):**
     O comando `skills install` falhava ao tentar instalar `computer-use` porque o catálogo interno usava o nome curto,
     enquanto o repositório comunitário hospeda sob `orca-computer-use`, tornando a instalação impossível via CLI.
+12. **Fragmentação de pastas de skills entre múltiplos agentes gerenciados (`#45822`):**
+    Cada agente mantinha suas próprias skills em diretórios isolados (`.claude/skills`, `.agents/skills`), forçando duplicação de instruções e dificultando a reutilização de ferramentas compartilhadas quando o usuário alternava entre agentes no mesmo projeto ou adicionava skills de templates e links.
+13. **Falha de empacotamento ao compartilhar skills cujo diretório de origem é um alias simbólico (`#45966`, resolve `#45965`):**
+    O pipeline `stageSkill` copiava links simbólicos mantendo-os literais (`verbatimSymlinks`). Quando a pasta raiz da skill era um alias relativo de provedor, a cópia gerava links quebrados (*dangling symlinks*) em sistemas POSIX (`ENOENT`) ou falhava por falta de privilégios de symlink no Windows (`EPERM`).
 
 ## O que os PRs fazem
 
+- **Pasta única e neutra para skills de agentes gerenciados (`#45822`):**
+  - Centraliza skills em `<home>/skills/<name>/`, gerando links automáticos para `.claude/skills` e `.agents/skills` na inicialização de chats ou na troca de agentes;
+  - Exibe na tela *Settings > Skills* as skills próprias do agente primeiro, rotulando claramente quais diretórios de agentes carregam cada skill e ignorando links órfãos ou duplicados.
+- **Resolução de aliases com `realpath` no compartilhamento de skills (`#45966`, resolve `#45965`):**
+  - Resolve caminhos de pastas de origem via `realpath` antes de copiar a skill para o staging, preservando o conteúdo real em vez de criar links simbólicos relativos quebrados, e mantendo o tratamento verbatim apenas para links internos da árvore de arquivos.
 - **PR `#43436`:** retém deterministamente os escopos de cada skill (`scope`) ao selecioná-la no picker de barra (`/`) do Native Chat, mantendo o contexto de resolução intacto.
 - **Issue `#43418`:** propõe alinhar o identificador do catálogo bundled (`computer-use`) com o nome canônico do repositório comunitário (`orca-computer-use`) para permitir instalação direta sem erros de resolução.
 - **PR `#40812`:** ordena deterministamente os caminhos completos dos manifestos antes de computar o hash de identidade do pacote de skills, evitando discrepâncias entre sistemas de arquivos.
@@ -101,3 +112,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43436`](https://github.com
 6. Eliminar falsos alertas de edição em skills embutidas renomeadas através da resolução de nomes canônicos e digests de lançamento (`#42472`, resolve `#42408`).
 7. Preservar os escopos de contexto de cada skill ao selecioná-la no picker de barra (`/`) do Native Chat (`#43436`).
 8. Harmonizar o catálogo bundled de skills (`computer-use`) com o nome no repositório comunitário (`orca-computer-use`) no CLI de instalação (`#43418`).
+9. Centralizar skills de agentes gerenciados em pasta neutra `<home>/skills/<name>/` com linking automático (`#45822`).
+10. Resolver aliases de provedores com `realpath` no staging de compartilhamento de skills (`#45966`, resolve `#45965`).

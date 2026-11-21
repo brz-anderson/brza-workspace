@@ -72,4 +72,18 @@ refs:
    - [Abertura de agentes no Chat UI pela CLI e superfície chat na orquestração](../issues/abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao.md):
      adicionados os PRs `#45594`, priorizando agentes prontos no host no seletor de nova aba da interface e CLI; `#46346`, impedindo a submissão residual de prompts no shell quando o processo CLI encerra prematuramente; `#46129`, disponibilizando "Resume in New CLI" no cabeçalho do chat; e a issue `#46365`, alinhando comandos de criação de workspace e arranque por plugins para seguir a preferência `Chat | CLI` e aceitar `surface`.
 
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-21)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e commits criados ou atualizados entre `2026-11-21T15:00:00Z` e `2026-11-21T21:15:00Z` (range upstream `1e8546eadfc..3b8cbe221f2`), comparando com os registros em `work/issues/` e o índice `.brza/index.jsonl`.
+2. **Atualização de 4 issues rastreadas em `work/issues/`:**
+   - [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):
+     adicionados os PRs `#46217`, restringindo o teste de recarregamento/freshness de skills estritamente ao `SKILL.md` (ignorando arquivos auxiliares de agentes como `openai.yaml` e sidecars para evitar recarregamentos falsos contínuos); e `#46405` (resolve `#46403`), preservando os nomes limpos e canônicos das skills vinculadas a contas Claude.ai no menu `/` após a conclusão de cada turno.
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionados os PRs `#46396` (resolve `#46188`), aposentando graciosamente sessões ACP ao receber `sessionLostNotice` do Antigravity para permitir reconexão limpa e sem processos órfãos; `#46419` (refs `#46401`), publicando comandos slash ao vivo reportados pelo servidor ACP durante o handshake de inicialização de sessão; e `#46476`, assegurando transições de layout e redimensionamento seguras no Native Chat.
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionados os PRs `#46477`, otimizando a leitura da caixa postal de um Run via índice dedicado para evitar varredura sequencial completa em tabelas de mensagens volumosas; `#46402` (resolve `#33634`), ajustando `dispatch-show --preamble` para extrair e nomear o coordenador gravado na atribuição original da tarefa em vez do remetente da inspeção; e `#46412`, `#46397` e `#46450`, registrando automaticamente itens e PRs encerrados no diário mensal `memory/journal/YYYY-MM.md` dos bots em vez de poluir o `MEMORY.md`.
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados os PRs `#45410`, tornando a continuação automática de chats após limites de uso (`nativeChatAutoContinueAfterUsageLimit`) ativada por padrão com cadência máxima de dois envios simultâneos por rodada de reset; `#46165`, aprimorando a busca por início de palavras e ranqueamento no menu de menções `@` de bots com suporte consistente a menus `/` e `$`; e `#46009`, priorizando chats interrompidos no meio de um turno (`mid-reply`) para assumirem as vagas de inicialização primeiro após o reboot.
+
+
 

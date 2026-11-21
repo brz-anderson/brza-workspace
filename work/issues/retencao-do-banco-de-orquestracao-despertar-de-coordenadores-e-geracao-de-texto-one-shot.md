@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46360, #46286, #46120, #46140 e #46372 aprimoram tidy-up seguro de memórias, repaint de agentes com correio retido e consultas indexadas em lote de bots.
+description: Os PRs #46477, #46402, #46412, #46397 e #46450 otimizam leitura de inbox via índice de Run, preâmbulos de coordenador e journal automático de itens em memórias de bots.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,12 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46360`](https://github.com/stablyai/orca/pull/46360),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46477`](https://github.com/stablyai/orca/pull/46477),
+[`stablyai/orca#46402`](https://github.com/stablyai/orca/pull/46402) (resolve Issue [`#33634`](https://github.com/stablyai/orca/issues/33634)),
+[`stablyai/orca#46412`](https://github.com/stablyai/orca/pull/46412),
+[`stablyai/orca#46397`](https://github.com/stablyai/orca/pull/46397),
+[`stablyai/orca#46450`](https://github.com/stablyai/orca/pull/46450),
+[`stablyai/orca#46360`](https://github.com/stablyai/orca/pull/46360),
 [`stablyai/orca#46286`](https://github.com/stablyai/orca/pull/46286),
 [`stablyai/orca#46120`](https://github.com/stablyai/orca/pull/46120),
 [`stablyai/orca#46140`](https://github.com/stablyai/orca/pull/46140),
@@ -209,9 +214,21 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - A ausência de índice em links de conversação de sessão e a busca de respostas do Slack sem filtros prévios geravam contenção de locks no SQLite e lentidão nas notificações de bots.
 57. **Fragmentação de flags de envio estruturado na CLI da orquestração sem agrupamento atômico em JSON payload (`#46372`, `#46355`, `#46356`, `#46339`):**
     - Disparos via CLI que combinavam múltiplas flags de comando estruturado enviavam parâmetros dispersos para o daemon, corrompendo argumentos de payload, deixando chats estruturados temporários órfãos e impedindo a configuração de tiers de contexto em `worker-start`.
+58. **Varredura completa e custosa de todas as mensagens para ler a caixa postal de um Run (`#46477`):**
+    - O comando `inbox` ou a verificação de correio de um Run executava varreduras lineares em toda a tabela de mensagens em vez de utilizar o índice específico de Run, gerando contenção de I/O em bancos com histórico volumoso.
+59. **Identificação incorreta do coordenador no preâmbulo de workers ao inspecionar tarefas (`#46402`, resolve `#33634`):**
+    - `dispatch-show --preamble` derivava a linha do coordenador a partir do remetente (`from`) de quem inspecionava a tarefa. Quando um worker inspecionava sua própria atribuição, a mensagem informava incorretamente que o worker era o seu próprio coordenador.
+60. **Poluição de `MEMORY.md` com status de PRs e tarefas e falta de diário estruturado para itens concluídos (`#46412`, `#46397`, `#46450`):**
+    - Bots acumulavam linhas voláteis de tarefas e links de PRs diretamente em `MEMORY.md`, inflando o contexto de inicialização e dificultando a recuperação de lições duradouras quando itens eram encerrados.
 
 ## O que o upstream implementa
 
+- **Leitura da caixa postal de Run através de índice dedicado (`#46477`):**
+  - Otimiza a leitura da mailbox de um Run específico consultando diretamente pelo índice de Run em vez de varrer toda a tabela de mensagens da orquestração, mitigando contenção de I/O em bancos com histórico volumoso.
+- **Identificação do coordenador gravado no preâmbulo de `dispatch-show` (`#46402`, resolve `#33634`):**
+  - Ajusta a geração do preâmbulo (`dispatch-show --preamble`) para extrair e nomear o coordenador registrado na atribuição da tarefa em vez de usar o remetente da chamada de inspeção, garantindo que workers inspecionando suas próprias tarefas visualizem o coordenador correto.
+- **Diário de itens concluídos e PRs em `memory/journal/YYYY-MM.md` (`#46412`, `#46397`, `#46450`):**
+  - Implementa registro automático de tarefas e PRs finalizados no diário mensal de bots (`memory/journal/YYYY-MM.md`) em vez de manter essas linhas em `MEMORY.md`, mantendo a memória principal enxuta e retendo o histórico com timestamp e resumo estruturado.
 - **Tidy-up atômico e seguro de memórias de bots com movimentação para diário (`#46360`):**
   - Substitui a reescrita destrutiva do `MEMORY.md` por operações atômicas verificadas linha a linha (`move`, `merge`, `retire`) calculadas sobre linhas numeradas e com hash;
   - Preserva integralmente regras ditadas pelo operador, proibições e linhas sem data, limitando a perda a no máximo 25% e arquivando cópias retiradas;
@@ -339,6 +356,9 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Consultar caixa postal de um Run via índice dedicado para evitar varredura sequencial em tabelas de correio volumosas (`#46477`).
+- Exibir o coordenador gravado no despacho em `dispatch-show --preamble` ao inspecionar tarefas por workers (`#46402`, resolve `#33634`).
+- Registrar automaticamente tarefas encerradas e PRs mesclados no diário mensal `memory/journal/YYYY-MM.md` dos bots (`#46412`, `#46397`, `#46450`).
 - Adotar rotina segura de Tidy-up de memórias de bots com operações atômicas (move, merge, retire) e diário histórico (`#46360`).
 - Forçar repaint de agente ocioso reconectado com mensagens retidas na mailbox (`#46286`).
 - Otimizar leituras de identidades de workers de bots com queries em lote indexadas no SQLite (`#46120`).

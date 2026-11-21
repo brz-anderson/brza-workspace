@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46127, #46362, #46281, #46311, #46316, #46368 e #46309 trazem pastas no menu @, quotes em chips, imagens em comentários de itens e preservação de _meta no Antigravity.
+description: Os PRs #45410, #46165 e #46009 trazem retomada automática pós-limite de uso por padrão, busca por início de palavra no menu @ e priorização de chats mid-turn no reboot.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,10 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46127`](https://github.com/stablyai/orca/pull/46127),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45410`](https://github.com/stablyai/orca/pull/45410),
+[`stablyai/orca#46165`](https://github.com/stablyai/orca/pull/46165),
+[`stablyai/orca#46009`](https://github.com/stablyai/orca/pull/46009),
+[`stablyai/orca#46127`](https://github.com/stablyai/orca/pull/46127),
 [`stablyai/orca#46362`](https://github.com/stablyai/orca/pull/46362),
 [`stablyai/orca#46281`](https://github.com/stablyai/orca/pull/46281),
 [`stablyai/orca#46311`](https://github.com/stablyai/orca/pull/46311),
@@ -200,9 +203,24 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     Em turnos com saídas parciais ou desvios de ferramentas que não geravam texto final, o frontend registrava e exibia mensagens de assistente totalmente em branco no desktop e mobile.
 49. **Perda de instruções permanentes (`SOUL.md` / `MEMORY.md`) em chats gerenciados do Antigravity via ACP (`#46368`, resolve `#46367`):**
     A configuração de sessão sobrescrevia o campo `sessionMeta` do arranque com `setup._meta`, fazendo com que chats gerenciados do Antigravity descartassem silenciosamente as instruções permanentes e diretivas de alma e memória.
+50. **Parada prematura de chats após atingir limite de uso por perfil desatualizado (`#45410`):**
+    - Quando um agente atinge o limite de uso temporário (rate limit ou cota de provedor), a retomada automática dependia de `nativeChatAutoContinueAfterUsageLimit`, que vinha desabilitada por padrão, forçando o operador a intervir manualmente quando os limites expiravam. Além disso, redefinições simultâneas de cotas podiam disparar muitos agentes ao mesmo tempo sem escalonamento.
+51. **Dificuldade de busca no menu de menção `@` de bots e perda de hierarquia de comandos (`#46165`):**
+    - A lista de menções `@` de bots no Native Chat não filtrava por início de palavras nem considerava seleções recentes. Além disso, o disparo de `/` ou `$` após nomes espaçados de bots abria menus de forma inconsistente, e o cabeçalho 'Bots' desaparecia se houvesse apenas bots pausados na lista.
+52. **Competição desordenada na reinicialização de chats interrompidos mid-turn versus tarefas concluídas (`#46009`):**
+    - Ao reiniciar o aplicativo após crash ou reboot, chats com agentes interrompidos no meio de uma resposta competiam na mesma fila de inicialização com chats que já haviam concluído a resposta do agente e tinham apenas comandos em background pendentes, atrasando o retorno do agente ao operador.
 
 ## O que o upstream implementa
 
+- **Continuação automática de chats após limite de uso como padrão (`#45410`):**
+  - Habilita `nativeChatAutoContinueAfterUsageLimit` ativada por padrão com migração one-shot de perfis existentes no carregamento;
+  - Limita a varredura pós-redefinição de cota a dois envios por rodada (mais antigos primeiro), prevenindo picos de concorrência ao reabrir múltiplos chats simultaneamente.
+- **Busca por início de palavra e ordenação no autocompletar `@` de bots (`#46165`):**
+  - Ranqueia menções de bots no composer do Native Chat priorizando início de palavras e escolhas recentes;
+  - Preserva o prefixo `For:` antes do propósito destacado, mantém o cabeçalho de bots mesmo para bots pausados e abre menus contextuais `/` ou `$` após nomes compostos somente quando suportados pelo agente.
+- **Priorização de chats interrompidos mid-turn na reinicialização (`#46009`):**
+  - Ordena a retomada de chats após reinício priorizando conversas onde o agente estava no meio de um turno (`mid-reply`) para assumirem as vagas de inicialização primeiro;
+  - Conversas finalizadas com apenas comandos de fundo pendentes recebem oferta de retomada sem consumir slots de agentes prioritários.
 - **Suporte a pastas no menu de menções `@` do chat (`#46127`):**
   - Lista diretórios do repositório/workspace no menu suspenso de autocompletar ao digitar `@`, inserindo caminhos normalizados de pastas diretamente no composer.
 - **Citações "Add to chat" renderizadas como chips compactos (`#46362`):**
@@ -337,6 +355,9 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Ativar continuação automática de chats após limites de uso por padrão com limite de dois envios concorrentes pós-reset (`#45410`).
+- Adotar busca por início de palavras e seleções recentes no menu de menções `@` de bots (`#46165`).
+- Priorizar a retomada de chats interrompidos mid-turn no reinício do sistema antes de tarefas finalizadas em background (`#46009`).
 - Listar pastas e diretórios no popover de menções `@` do composer (`#46127`).
 - Renderizar trechos de código de "Add to chat" como chips visuais clicáveis (`#46362`).
 - Exibir imagens de comentários de itens inline no fluxo de conversa do chat (`#46281`).

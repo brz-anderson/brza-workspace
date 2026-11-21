@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46125, #46175, #46109, #46040, #45985, #46018, #45962, #46039, #46130, #46221 e #46228 expandem agentes nativos, auth Google no Antigravity e cards no chat.
+description: Os PRs #46396, #46419 e #46476 aposentam sessões ACP em perda de sessão, publicam live slash commands na inicialização e suportam host-key sealing no Antigravity.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,10 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46125`](https://github.com/stablyai/orca/pull/46125),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46396`](https://github.com/stablyai/orca/pull/46396) (resolve Issue [`#46188`](https://github.com/stablyai/orca/issues/46188)),
+[`stablyai/orca#46419`](https://github.com/stablyai/orca/pull/46419) (refs Issue [`#46401`](https://github.com/stablyai/orca/issues/46401)),
+[`stablyai/orca#46476`](https://github.com/stablyai/orca/pull/46476),
+[`stablyai/orca#46125`](https://github.com/stablyai/orca/pull/46125),
 [`stablyai/orca#46175`](https://github.com/stablyai/orca/pull/46175),
 [`stablyai/orca#46109`](https://github.com/stablyai/orca/pull/46109),
 [`stablyai/orca#46040`](https://github.com/stablyai/orca/pull/46040),
@@ -239,9 +242,21 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Quando um turno de execução encontrava falha transitória no Home, o aplicativo tentava se recuperar abrindo um novo chat em branco em vez de enfileirar e reter a mensagem na conversa ativa.
 66. **Ruído visual por sufixo "Folder" no chip de workspace do composer de chat (`#46228`):**
     O chip de seleção de workspace acima do composer de chat acrescentava o sufixo literal "Folder" junto ao nome do diretório, poluindo o cabeçalho de digitação.
+67. **Travamento permanente de conversas Antigravity após relato de perda de sessão ACP (`#46396`, resolve `#46188`):**
+    Quando a CLI do `agy` sofria expiração ou perda de sessão no runtime ACP, o adapter mantinha a sessão aberta em estado quebrado. Mensagens subsequentes falhavam com erros de sessão inexistente até o reinício completo da aplicação.
+68. **Omissão de comandos de barra enviados durante a inicialização da sessão ACP (`#46419`, refs `#46401`):**
+    Agentes ACP (como Hermes) enviam atualizações de comandos disponíveis (`available_commands_update`) logo após `session/new`. A leitura antecipada retornava indefinida até o término do handshake, resultando em menus `/` vazios ou sem comandos dinâmicos.
+69. **Rejeição do cofre de contas Antigravity em servidores headless sem chave de host (`#46476`):**
+    Em instâncias Linux headless do daemon `orcad`, a ausência de keyring gráfico impedia a selagem segura de credenciais do AI Vault para o Antigravity, mesmo com o keyring do sistema operacional desbloqueado.
 
 ## O que o upstream implementa e corrige
 
+- **Aposentadoria de sessões ACP quebradas em perda de sessão (`#46396`, resolve `#46188`):**
+  - Desativa e encerra imediatamente a sessão ACP defeituosa ao capturar `session_lost_error` ou relato de perda de sessão pelo `agy` via gancho de dialeto `sessionLostNotice`, garantindo que o próximo envio instancie um provedor limpo sem congelar o chat.
+- **Publicação imediata de live slash commands durante o startup de sessões ACP (`#46419`, refs `#46401`):**
+  - Adota e disponibiliza a lista de comandos de barra assim que o processo filho existe, publicando comandos dinâmicos informados em `available_commands_update` mesmo durante o handshake inicial.
+- **Selagem de cofre de contas Antigravity com host-key em servidores headless (`#46476`):**
+  - Permite a selagem e abertura de credenciais do AI Vault utilizando chave de host do daemon `orcad` em ambientes Linux headless sem interface gráfica de keyring.
 - **Autenticação Google no Antigravity integrada e validação prévia de credenciais (`#46125`, `#46175`):**
   - Permite aos usuários de contas Google selecionar o método de autenticação nativo, recusa o início de chats sem credenciais válidas com atalho "agy Sign in" em Settings, e salva preferências de login estritamente quando há alteração efetiva de runtime ou método.
 - **Suporte aos agentes Qwen Code, Factory Droid, Gemini CLI, Kilo Code, MiMo Code, Auggie e Goose no Native Chat (`#46109`, `#46040`, `#45985`, `#46018`, `#45962`, `#46039`):**
@@ -476,6 +491,10 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 62. Renderizar card de arquivos modificados para ferramentas de edição e escrita do agente Pi (`#46130`).
 63. Enfileirar e reter requisições de agentes no Home após falhas de turno em vez de abrir nova conversa (`#46221`).
 64. Omitir o sufixo "Folder" do chip de seleção de workspace no composer de chat (`#46228`).
+65. Aposentar e recriar sessões ACP de forma limpa ao detectar perda de sessão (`session_lost_error`) no Antigravity (`#46396`, resolve `#46188`).
+66. Publicar comandos de barra em tempo real enviados durante a inicialização da sessão ACP (`#46419`, refs `#46401`).
+67. Permitir selagem de cofre de credenciais com host-key no Antigravity em ambientes Linux headless (`#46476`).
+
 
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45822 e #45966 unificam pastas de skills neutras para agentes gerenciados e corrigem o empacotamento de aliases simbólicos no compartilhamento.
+description: Os PRs #46217 e #46405 preservam skills de conta Claude com nomes limpos no menu / e impedem que arquivos sidecar marquem skills como desatualizadas.
 scope:
   - brza-studio
 priority: high
@@ -15,7 +15,9 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45822`](https://github.com/stablyai/orca/pull/45822),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46217`](https://github.com/stablyai/orca/pull/46217),
+[`stablyai/orca#46405`](https://github.com/stablyai/orca/pull/46405) (resolve Issue [`#46403`](https://github.com/stablyai/orca/issues/46403)),
+[`stablyai/orca#45822`](https://github.com/stablyai/orca/pull/45822),
 [`stablyai/orca#45966`](https://github.com/stablyai/orca/pull/45966) (resolve Issue [`#45965`](https://github.com/stablyai/orca/issues/45965)),
 [`stablyai/orca#43436`](https://github.com/stablyai/orca/pull/43436),
 [`stablyai/orca#42472`](https://github.com/stablyai/orca/pull/42472) (resolve Issue [`#42408`](https://github.com/stablyai/orca/issues/42408)),
@@ -73,6 +75,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#45822`](https://github.com
     Cada agente mantinha suas próprias skills em diretórios isolados (`.claude/skills`, `.agents/skills`), forçando duplicação de instruções e dificultando a reutilização de ferramentas compartilhadas quando o usuário alternava entre agentes no mesmo projeto ou adicionava skills de templates e links.
 13. **Falha de empacotamento ao compartilhar skills cujo diretório de origem é um alias simbólico (`#45966`, resolve `#45965`):**
     O pipeline `stageSkill` copiava links simbólicos mantendo-os literais (`verbatimSymlinks`). Quando a pasta raiz da skill era um alias relativo de provedor, a cópia gerava links quebrados (*dangling symlinks*) em sistemas POSIX (`ENOENT`) ou falhava por falta de privilégios de symlink no Windows (`EPERM`).
+14. **Skills consideradas desatualizadas falsamente quando agentes gravam arquivos adicionais na pasta (`#46217`):**
+    Quando agentes (como Codex) geram arquivos locais ao lado de `SKILL.md` (por exemplo `agents/openai.yaml`), a verificação de frescor julgava a pasta inteira em vez do `SKILL.md` oficial, disparando alertas falsos de desatualização e corrompendo a resolução de cópias anteriores.
+15. **Perda de formatação e sumiço de skills de conta Claude no menu `/` após o primeiro turno (`#46405`, resolve `#46403`):**
+    O Claude Code lista skills de conta como `<name>` nos descritores de inicialização, mas passa a reportá-las como `anthropic-skills:<name>` no stream do sistema. Após o primeiro turno, o catálogo adotava o nome com namespace, perdendo descrição e dicas de argumentos, e jogando a skill para o final do menu `/`.
 
 ## O que os PRs fazem
 
@@ -81,6 +87,11 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#45822`](https://github.com
   - Exibe na tela *Settings > Skills* as skills próprias do agente primeiro, rotulando claramente quais diretórios de agentes carregam cada skill e ignorando links órfãos ou duplicados.
 - **Resolução de aliases com `realpath` no compartilhamento de skills (`#45966`, resolve `#45965`):**
   - Resolve caminhos de pastas de origem via `realpath` antes de copiar a skill para o staging, preservando o conteúdo real em vez de criar links simbólicos relativos quebrados, e mantendo o tratamento verbatim apenas para links internos da árvore de arquivos.
+- **Julgamento de frescor de skills apenas pelo `SKILL.md` oficial (`#46217`):**
+  - Julga a atualidade da skill comparando os bytes de `SKILL.md`, ignorando arquivos sidecar inseridos por agentes (como `agents/openai.yaml`), prevenindo classificações errôneas de cópia editada;
+  - Mantém a exigência de pasta limpa apenas para decisões de exclusão, protegendo arquivos criados por agentes.
+- **Preservação de nomes de skills de conta do Claude no menu `/` (`#46405`, resolve `#46403`):**
+  - Retém a grafia desprovida de namespace (`<name>`) para skills reportadas via `anthropic-skills:<name>` no stream do sistema, mantendo a descrição, dicas de argumentos e ordenação correta no seletor de barra.
 - **PR `#43436`:** retém deterministamente os escopos de cada skill (`scope`) ao selecioná-la no picker de barra (`/`) do Native Chat, mantendo o contexto de resolução intacto.
 - **Issue `#43418`:** propõe alinhar o identificador do catálogo bundled (`computer-use`) com o nome canônico do repositório comunitário (`orca-computer-use`) para permitir instalação direta sem erros de resolução.
 - **PR `#40812`:** ordena deterministamente os caminhos completos dos manifestos antes de computar o hash de identidade do pacote de skills, evitando discrepâncias entre sistemas de arquivos.
@@ -114,3 +125,6 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#45822`](https://github.com
 8. Harmonizar o catálogo bundled de skills (`computer-use`) com o nome no repositório comunitário (`orca-computer-use`) no CLI de instalação (`#43418`).
 9. Centralizar skills de agentes gerenciados em pasta neutra `<home>/skills/<name>/` com linking automático (`#45822`).
 10. Resolver aliases de provedores com `realpath` no staging de compartilhamento de skills (`#45966`, resolve `#45965`).
+11. Avaliar atualidade e frescor de skills isolando o `SKILL.md` oficial de arquivos auxiliares gerados por agentes (`#46217`).
+12. Preservar a grafia limpa sem prefixo de namespace para skills de conta do Claude no seletor `/` (`#46405`, resolve `#46403`).
+

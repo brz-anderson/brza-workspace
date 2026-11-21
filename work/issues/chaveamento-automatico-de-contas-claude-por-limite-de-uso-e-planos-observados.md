@@ -4,12 +4,15 @@ priority: high
 tags:
   - auth
   - tooling
-description: O PR #43822 limpa locks órfãos do Codex permitindo compartilhamento de histórico; PR #44431 reabre painel do Claude em falha de restart e pula teammates.
+description: O PR #46296 notifica o coordenador quando um worker Claude atinge o limite de uso, o PR #46277 aguarda o composer com flags antes do submit e o PR #46144 expõe uso da conta System default.
 ---
 
 # Chaveamento automático de contas Claude por limite de uso, planos observados e resgate de cota
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43822`](https://github.com/stablyai/orca/pull/43822),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46296`](https://github.com/stablyai/orca/pull/46296),
+[`stablyai/orca#46277`](https://github.com/stablyai/orca/pull/46277),
+[`stablyai/orca#46144`](https://github.com/stablyai/orca/pull/46144),
+[`stablyai/orca#43822`](https://github.com/stablyai/orca/pull/43822),
 [`stablyai/orca#44431`](https://github.com/stablyai/orca/pull/44431),
 [`stablyai/orca#43578`](https://github.com/stablyai/orca/pull/43578) (resolve Issue [`#43579`](https://github.com/stablyai/orca/issues/43579)),
 além das issues [`stablyai/orca#43594`](https://github.com/stablyai/orca/issues/43594) e
@@ -57,6 +60,12 @@ além das issues [`stablyai/orca#43214`](https://github.com/stablyai/orca/issues
     Durante o chaveamento automático ou manual de contas, o processo do Claude é reiniciado. Caso a reinicialização falhe (por exemplo, por erro de autenticação ou indisponibilidade temporária do runtime), o painel do Claude permanecia fechado ou em estado quebrado inacessível para recuperação, enquanto processos dependentes e agentes parceiros (*teammates*) continuavam sendo despachados, gerando erros em cascata.
 12. **Bloqueio de compartilhamento de histórico de contas Codex por arquivos de lock órfãos (`#43822`):**
     Quando um processo do Codex sofria encerramento abrupto ou concorrência na coordenação, arquivos `*.lock` permaneciam na pasta `thread-writer-locks`. O Studio interpretava qualquer arquivo `.lock` existente como conta ocupada (*busy*), impedindo permanentemente o compartilhamento de histórico de conversas entre diretórios e workspaces.
+13. **Falta de aviso ao coordenador quando worker terminal do Claude atinge o limite de uso (`#46296`):**
+    Quando um worker terminal despachado com Claude Code estourava a cota da conta/API, o processo travava em loop de erro no terminal sem emitir evento estruturado de volta ao processo coordenador, deixando orquestrações suspensas indefinidamente.
+14. **Submissão prematura de prompts antes da prontidão do composer do Claude (`#46277`):**
+    Ao iniciar o Claude no terminal com flags especiais de composição e autorização, o prompt inicial era submetido antes que o composer do Claude estivesse totalmente inicializado e apto a receber texto, perdendo comandos iniciais de tarefas.
+15. **Omissão do card de uso da conta System default quando uma conta salva do Claude é selecionada (`#46144`):**
+    No app e interfaces remotas, ao selecionar uma conta customizada do Claude, o card com os dados de cota e plano do System default desaparecia, impedindo que o operador comparasse os consumos.
 
 ## O que o upstream implementa
 
@@ -101,9 +110,18 @@ além das issues [`stablyai/orca#43214`](https://github.com/stablyai/orca/issues
   - Introduz o toggle "Switch accounts automatically" em *Settings > Accounts > Claude*, chaveando proativamente para uma conta com cota disponível assim que a conta corrente atinge limiar de margem (near usage limit).
 - **Restauração de janelas de 5h/semanal e contagens regressivas no seletor Codex (`#43594`):**
   - Restabelece as métricas segmentadas por janelas de 5 horas e cotas semanais com contadores em tempo real para cada perfil no alternador de contas do Codex.
+- **Notificação estruturada ao coordenador quando worker Claude atinge limite de uso (`#46296`):**
+  - Detecta o evento de usage limit no terminal do Claude e notifica imediatamente o coordenador da orquestração para acionar rotação de conta ou parada ordenada.
+- **Aguardar composer sinalizado do Claude antes do envio do primeiro prompt (`#46277`):**
+  - Espera a confirmação de prontidão do composer do Claude no terminal antes de submeter o prompt inicial, evitando envio truncado.
+- **Exibição do card de uso do System default junto a contas salvas (`#46144`):**
+  - Mantém o card informativo de consumo do System default acessível mesmo quando um perfil de conta salvo dedicado está selecionado.
 
 ## O que fazer
 
+- Notificar o coordenador imediatamente quando um worker do Claude no terminal atingir limite de cota (`#46296`).
+- Aguardar a prontidão do composer com flags antes de submeter prompts ao Claude (`#46277`).
+- Manter visível o card de consumo do System default ao selecionar contas salvas (`#46144`).
 - Executar varredura de locks obsoletos do Codex via helper exclusivo para permitir compartilhamento de histórico de contas (`#43822`).
 - Reabrir o painel do Claude e suspender o despacho de teammates caso a reinicialização por troca de conta falhe (`#44431`).
 - Implementar o chaveamento automático preventivo de contas Claude próximo ao limite de uso (`#43578`, resolve `#43579`).

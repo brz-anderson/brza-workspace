@@ -8,10 +8,15 @@ completed: 2026-11-21
 tags:
   - tooling
 refs:
+  - issue:abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao
   - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
+  - issue:chaveamento-automatico-de-contas-claude-por-limite-de-uso-e-planos-observados
   - issue:comandos-shell-no-chat-recibos-de-perguntas-e-foco-espacial-em-terminais
+  - issue:cursor-no-chat-via-acp-previa-de-links-de-imagem-bifurcacao-resiliente-e-leitura-por-voz
   - issue:gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache
   - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
+  - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
+  - issue:progresso-de-revisao-no-diff-backend-de-metricas-e-abertura-de-pastas
   - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
 ---
@@ -49,4 +54,22 @@ refs:
      adicionados os PRs `#46105`, implementando suporte a fragmentos `#L<linha>` e intervalos de linhas em links de arquivo OSC 8 no terminal; `#45759`, desacoplando alterações de título de terminais de re-varreduras da barra lateral e Activity; `#46156`, restringindo o sublinhado visual de aba ativa exclusivamente ao split focado; `#44476`, padronizando o alinhamento de opções do menu de contexto de abas com ícones dedicados; `#46206`, limitando o recenseamento de terminais em falhas de status ao host local; e `#46168`, `#46157` e `#46145`, melhorando a ergonomia da caixa de comentários em perguntas de itens e destacando opções recomendadas e retomadas.
    - [Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):
      adicionados os PRs `#45969`, fixando a linha de status no modal Delete para eliminar saltos visuais; `#46211` e `#46202`, adotando junctions no Windows para viabilizar testes de IPC e git safety; `#46028`, isolando regras do Cursor em arquivo exclusivo sem apagar customizações do usuário; `#46185`, desacoplando o arranque do profiler da main thread estagnada no watchdog; `#46024`, lendo status de agentes diretamente da memória sem re-parsing JSON repetido; `#45690`, preservando todos os turnos de chats antigos clonados do Codex; e `#46003`, isolando diretórios de bots para não serem adotados automaticamente como workspaces pais.
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-21)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e commits criados ou atualizados entre `2026-11-21T09:00:00Z` e `2026-11-21T15:15:00Z` (range upstream `16437ccfb17..1e8546eadfc`), comparando com os registros em `work/issues/` e o índice `.brza/index.jsonl`.
+2. **Atualização de 5 issues rastreadas em `work/issues/`:**
+   - [Chaveamento automático de contas Claude por limite de uso, planos observados e resgate de cota](../issues/chaveamento-automatico-de-contas-claude-por-limite-de-uso-e-planos-observados.md):
+     adicionados os PRs `#46296`, emitindo notificação estruturada ao coordenador quando um worker Claude no terminal atinge o limite de uso de cota; `#46277`, aguardando que o composer do Claude com flags especiais esteja pronto antes de submeter o prompt inicial; e `#46144`, mantendo visível o card de dados e consumo da conta System default quando uma conta salva está ativa.
+   - [Cursor no Chat via ACP, prévia de links de imagem, bifurcação resiliente e leitura por voz](../issues/cursor-no-chat-via-acp-previa-de-links-de-imagem-bifurcacao-resiliente-e-leitura-por-voz.md):
+     adicionados os PRs `#46142`, introduzindo suporte a "Approve for me" (`--auto-review`) em terminais do Cursor enquanto mantém isolamento dos modos de chat; e `#46284` (resolve `#46163`), mapeando identificadores de modelos salvos da CLI do Cursor para os modelos, esforço e flags de thinking compatíveis com o servidor nativo de chat.
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionados os PRs `#46360`, implementando Tidy-up atômico e verificável em memórias de bots com movimentação de status para diário `memory/journal/YYYY-MM.md` em vez de reescrita destrutiva de `MEMORY.md`; `#46286`, solicitando repaint de interface para agentes ociosos reconectados com correio retido; `#46120`, consolidando a resolução de identidades de workers de side-chats em duas consultas indexadas no SQLite em lote; `#46140`, indexando links de sessão e mitigando contenção do banco em buscas de notificações do Slack; e `#46372`, unificando flags de envio estruturado na CLI em payload JSON único.
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados os PRs `#46127`, suportando diretórios e pastas no popover de menções `@` do composer; `#46362`, renderizando seleções capturadas via "Add to chat" como chips visuais clicáveis; `#46281`, exibindo capturas de tela e imagens de comentários de itens inline no chat; `#46311`, suprimindo mensagens vazias de assistente no desktop e mobile; `#46316`, compactando linhas de atividades em uma única linha com link para o item; `#46368` (resolve `#46367`), realizando merge em camadas de `_meta` para preservar diretivas permanentes (`SOUL.md` e `MEMORY.md`) em chats gerenciados do Antigravity; e `#46309`, identificando visualmente o modelo autoselecionado no Antigravity.
+   - [Progresso de revisão no diff, backend de métricas e abertura de pastas](../issues/progresso-de-revisao-no-diff-backend-de-metricas-e-abertura-de-pastas.md):
+     adicionados os PRs `#46334` (resolve `#46332`), reconciliando os modelos Monaco do diff com edições realizadas no modo Edit; `#46333` (resolve `#46331`), ajustando o wrapper do banner de arquivo alterado no disco para flex column e impedindo o colapso do editor de diff; `#46381`, mantendo `EditorEditFileSurface` sob o limite de 400 linhas de lint; `#46225` (refs `#46113`), reutilizando grupos de scan na barra lateral com caminhos-mãe idênticos para evitar duplicações; e `#46276`, introduzindo scrim em tela cheia com fechamento por clique externo no visualizador de imagens.
+   - [Abertura de agentes no Chat UI pela CLI e superfície chat na orquestração](../issues/abertura-de-agentes-no-chat-ui-pela-cli-e-superficie-chat-na-orquestracao.md):
+     adicionados os PRs `#45594`, priorizando agentes prontos no host no seletor de nova aba da interface e CLI; `#46346`, impedindo a submissão residual de prompts no shell quando o processo CLI encerra prematuramente; `#46129`, disponibilizando "Resume in New CLI" no cabeçalho do chat; e a issue `#46365`, alinhando comandos de criação de workspace e arranque por plugins para seguir a preferência `Chat | CLI` e aceitar `surface`.
+
 

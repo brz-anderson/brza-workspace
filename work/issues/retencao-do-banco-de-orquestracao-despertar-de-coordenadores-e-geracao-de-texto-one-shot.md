@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46235, #46196, #46086, #46155, #46117, #46080, #46068, #46139 e #46207 aprimoram orquestração multi-host, grupos de bots e continuações por limite de uso.
+description: Os PRs #46360, #46286, #46120, #46140 e #46372 aprimoram tidy-up seguro de memórias, repaint de agentes com correio retido e consultas indexadas em lote de bots.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,12 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46235`](https://github.com/stablyai/orca/pull/46235),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46360`](https://github.com/stablyai/orca/pull/46360),
+[`stablyai/orca#46286`](https://github.com/stablyai/orca/pull/46286),
+[`stablyai/orca#46120`](https://github.com/stablyai/orca/pull/46120),
+[`stablyai/orca#46140`](https://github.com/stablyai/orca/pull/46140),
+[`stablyai/orca#46372`](https://github.com/stablyai/orca/pull/46372),
+[`stablyai/orca#46235`](https://github.com/stablyai/orca/pull/46235),
 [`stablyai/orca#46196`](https://github.com/stablyai/orca/pull/46196),
 [`stablyai/orca#46086`](https://github.com/stablyai/orca/pull/46086),
 [`stablyai/orca#46155`](https://github.com/stablyai/orca/pull/46155),
@@ -194,9 +199,31 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Varreduras de catálogo e ordenação de bots executavam buscas quadráticas repetidas a cada ciclo de renderização e dispatch, gerando engasgos de interface em workspaces com dezenas de bots configurados.
 52. **Perda de rascunhos de editor ao permitir exclusão de bot com arquivos não salvos (`#46207`):**
     - A ação de exclusão de bots não validava a existência de buffers de editor abertos e não salvos em seu workspace/home, apagando diretórios e causando perda irreversível de código em rascunho.
+53. **Reescrita destrutiva integral de `MEMORY.md` em bots corrompendo regras do usuário e segredos (`#46360`):**
+    - A rotina de organização de memória de bots (*Tidy-up*) tentava regerar o arquivo `MEMORY.md` inteiro a partir de texto gerado pelo modelo, causando falhas catastróficas em arquivos extensos, perda de diretivas do operador, remoção indevida de regras e vazamento de segredos.
+54. **Agente ocioso reconectado sem atualização visual de tela quando mensagens estão retidas na mailbox (`#46286`):**
+    - Ao reconectar um agente ocioso cuja caixa postal mantinha mensagens retidas durante execução anterior, a UI não emitia evento de repaint, deixando a tela congelada sem refletir o estado de entrega.
+55. **Milhares de consultas individuais no SQLite por atualização para ler identidades de workers de side-chats (`#46120`):**
+    - Classificar os chats laterais de um bot e construir a base de conversas disparava buscas individuais de terminal e registros de worker chat por chat, gerando milhares de leituras SQLite síncronas na thread principal a cada refresh.
+56. **Contenção no banco por buscas irrestritas em notificações do Slack e links de sessão sem índice (`#46140`):**
+    - A ausência de índice em links de conversação de sessão e a busca de respostas do Slack sem filtros prévios geravam contenção de locks no SQLite e lentidão nas notificações de bots.
+57. **Fragmentação de flags de envio estruturado na CLI da orquestração sem agrupamento atômico em JSON payload (`#46372`, `#46355`, `#46356`, `#46339`):**
+    - Disparos via CLI que combinavam múltiplas flags de comando estruturado enviavam parâmetros dispersos para o daemon, corrompendo argumentos de payload, deixando chats estruturados temporários órfãos e impedindo a configuração de tiers de contexto em `worker-start`.
 
 ## O que o upstream implementa
 
+- **Tidy-up atômico e seguro de memórias de bots com movimentação para diário (`#46360`):**
+  - Substitui a reescrita destrutiva do `MEMORY.md` por operações atômicas verificadas linha a linha (`move`, `merge`, `retire`) calculadas sobre linhas numeradas e com hash;
+  - Preserva integralmente regras ditadas pelo operador, proibições e linhas sem data, limitando a perda a no máximo 25% e arquivando cópias retiradas;
+  - Move linhas de status datado (PRs, hashes, rodadas de revisão) palavra por palavra para `memory/journal/YYYY-MM.md` em transação única e reversível via History/Undo.
+- **Repaint de interface para agentes ociosos reconectados com correio retido (`#46286`):**
+  - Solicita ao agente reconectado uma re-renderização imediata de tela quando sua caixa de correio contiver mensagens retidas, mantendo a fidelidade da UI.
+- **Resolução em lote de identidades de workers de bots via consultas indexadas (`#46120`):**
+  - Consolida milhares de leituras individuais no SQLite em duas consultas indexadas em lote com subqueries de saída antecipada, ignorando chats remotos e reduzindo drasticamente o tempo na main thread.
+- **Indexação de links de sessão e controle de buscas de respostas no Slack (`#46140`):**
+  - Cria índice dedicado para links de conversação de sessão e condiciona buscas de respostas do Slack, prevenindo sobrecarga no banco.
+- **Unificação de flags estruturadas de envio via CLI em payload JSON (`#46372`):**
+  - Consolida flags estruturadas dispersas em um payload JSON íntegro para despachos confiáveis na orquestração.
 - **Roteamento de envios para agentes residentes em computadores pareados (`#46235`):**
   - Direciona despachos e mensagens para o host pareado remoto correspondente quando o agente solicitado não estiver presente no host local.
 - **Grupos de bots híbridos com membros de computadores pareados (`#46196`):**
@@ -312,6 +339,11 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Adotar rotina segura de Tidy-up de memórias de bots com operações atômicas (move, merge, retire) e diário histórico (`#46360`).
+- Forçar repaint de agente ocioso reconectado com mensagens retidas na mailbox (`#46286`).
+- Otimizar leituras de identidades de workers de bots com queries em lote indexadas no SQLite (`#46120`).
+- Indexar links de conversas de sessões para mitigar contenção de banco em notificações (`#46140`).
+- Consolidar flags estruturadas de envio via CLI em payload JSON único (`#46372`).
 - Rotear despachos para computadores pareados quando o agente solicitado não estiver presente no host local (`#46235`).
 - Suportar grupos de bots híbridos contendo membros distribuídos entre hosts locais e servidores pareados (`#46196`).
 - Entregar resultados de workers locais determinística e estritamente à thread de conversa que disparou o turno (`#46086`).

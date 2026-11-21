@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #31595, #37710, #38001 e #37984 e as issues #37701 e #37707 trazem alternância in-place entre Chat UI e Terminal sem forking, abertura via CLI e split adjacente.
+description: Os PRs #45594, #46346 e #46129 priorizam agentes prontos no new-tab picker, previnem submit espúrio de prompt pós-exit da CLI e oferecem Resume in New CLI.
 scope:
   - brza-studio
   - brza-workflow
@@ -17,7 +17,11 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42309`](https://github.com/stablyai/orca/pull/42309) (resolve Issue [`#42308`](https://github.com/stablyai/orca/issues/42308)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45594`](https://github.com/stablyai/orca/pull/45594),
+[`stablyai/orca#46346`](https://github.com/stablyai/orca/pull/46346),
+[`stablyai/orca#46129`](https://github.com/stablyai/orca/pull/46129),
+além da issue [`stablyai/orca#46365`](https://github.com/stablyai/orca/issues/46365),
+[`stablyai/orca#42309`](https://github.com/stablyai/orca/pull/42309) (resolve Issue [`#42308`](https://github.com/stablyai/orca/issues/42308)),
 [`stablyai/orca#41354`](https://github.com/stablyai/orca/pull/41354) (resolve Issue [`#41351`](https://github.com/stablyai/orca/issues/41351)),
 [`stablyai/orca#31595`](https://github.com/stablyai/orca/pull/31595),
 [`stablyai/orca#37710`](https://github.com/stablyai/orca/pull/37710),
@@ -51,6 +55,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42309`](https://github.com
    mas essas sessões eram independentes e não possuíam canal de retorno de coordenação.
 7. **Ausência de suporte ao agente de terminal `loop` no catálogo e ciclo de vida (`#42309`, resolve `#42308`):**
    O agente `loop` executava como terminal comum, sem exibição de status no card de workspace, sem alertas de intervenção humana e sem suporte a retomada de sessão (`loop --session <id>`).
+8. **Ordenação defasada do seletor de nova aba exibindo agentes não instalados antes dos prontos (`#45594`):**
+   Ao abrir o seletor de nova aba ou executar arranque via CLI, agentes que exigem instalação ou configuração remota apareciam intercalados ou à frente dos agentes locais prontos para execução imediata no host.
+9. **Submissão residual de prompts no shell após encerramento do processo da CLI do agente (`#46346`):**
+   Quando a CLI do agente concluía ou encerrava abruptamente a execução, o terminal mantinha o prompt pendente no buffer de entrada e o submetia acidentalmente no shell do usuário.
+10. **Inconsistência de superfície e preferências de lançamento em plugins (`#46365`):**
+    Comandos de criação de workspace e lançamento de agentes chamados por extensões e plugins (`workspace.create` e `agent.launch`) não respeitavam a preferência global `Chat | CLI` do usuário e não aceitavam o parâmetro `surface`.
 
 ## O que o upstream propõe e implementa
 
@@ -70,9 +80,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42309`](https://github.com
   `terminal` handle), garantindo paridade entre workers e agentes isolados.
 - **No PR `#41354` (resolve `#41351`):** explicita nos recibos de lançamento CLI `reporting: { automatic: false, guideCommand: "orca skills get orchestration" }`, esclarecendo que sessões independentes não reportam e direcionando para o fluxo supervisionado de workers.
 - **No PR `#42309` (resolve `#42308`):** integra o agente terminal `loop` com normalização de eventos via rota `/hook/loop`, status em tempo real no workspace card e retomada de sessão com `loop --session <id>`.
+- **No PR `#45594`:** particiona as entradas do seletor de nova aba agrupando por prontidão de runtime no host em vez de ordenação por posição, preservando o tipo de superfície de cada agente.
+- **No PR `#46346`:** evita a injeção espúria de prompts pendentes no shell caso o processo CLI do agente termine ou seja abortado antes da submissão.
+- **No PR `#46129`:** disponibiliza o comando "Resume in New CLI" diretamente no menu de cabeçalho do chat, permitindo transicionar a sessão para um terminal PTY novo.
+- **Na issue `#46365`:** alinha as funções de extensão `workspace.create` e `agent.launch` para aceitar `surface` e respeitar o modo configurado pelo operador.
 
 ## O que fazer
 
+- Priorizar agentes prontos no host no seletor de nova aba da interface e CLI (`#45594`).
+- Impedir submissão de comandos no shell após encerramento do processo do agente CLI (`#46346`).
+- Adicionar opção "Resume in New CLI" no menu de cabeçalho do chat (`#46129`).
+- Suportar a preferência `Chat | CLI` e parâmetro `surface` em `workspace.create` e `agent.launch` para plugins (`#46365`).
 - Portar o PR `#31595` (apoiado no PR `#38063`) para o `brza-studio`, habilitando a transição transparente entre o modo
   terminal e o Native Chat sem duplicação de abas, além de adotar `--command-agent` / `--view-mode chat` no `brza-workflow`.
 - Explicitar metadados e orientações de reporte em lançamentos independentes de agentes pela CLI (`#41354`, resolve `#41351`).

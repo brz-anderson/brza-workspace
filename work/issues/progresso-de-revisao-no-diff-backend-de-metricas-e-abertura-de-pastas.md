@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #40776, #40792, #40818, #40627 e as issues #40789, #40786 trazem progresso de revisão no diff, backend de métricas e abertura de pastas.
+description: Os PRs #46334, #46333, #46381, #46225 e #46276 corrigem sincronização de edições no diff, visibilidade sob banner de arquivo externo e reuso de grupos de scan.
 scope:
   - brza-studio
   - brza-workflow
@@ -15,7 +15,13 @@ tags:
 
 # Progresso de revisão no diff, backend de métricas e abertura de pastas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#40776`](https://github.com/stablyai/orca/pull/40776) (resolve Issue [`#40768`](https://github.com/stablyai/orca/issues/40768)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46334`](https://github.com/stablyai/orca/pull/46334) (resolve Issue [`#46332`](https://github.com/stablyai/orca/issues/46332)),
+[`stablyai/orca#46333`](https://github.com/stablyai/orca/pull/46333) (resolve Issue [`#46331`](https://github.com/stablyai/orca/issues/46331)),
+[`stablyai/orca#46381`](https://github.com/stablyai/orca/pull/46381),
+[`stablyai/orca#46225`](https://github.com/stablyai/orca/pull/46225) (refs Issue [`#46113`](https://github.com/stablyai/orca/issues/46113)),
+[`stablyai/orca#46276`](https://github.com/stablyai/orca/pull/46276),
+além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/46359),
+[`stablyai/orca#40776`](https://github.com/stablyai/orca/pull/40776) (resolve Issue [`#40768`](https://github.com/stablyai/orca/issues/40768)),
 [`stablyai/orca#40792`](https://github.com/stablyai/orca/pull/40792),
 [`stablyai/orca#40818`](https://github.com/stablyai/orca/pull/40818) (resolve Issue [`#40675`](https://github.com/stablyai/orca/issues/40675)),
 [`stablyai/orca#40627`](https://github.com/stablyai/orca/pull/40627),
@@ -51,6 +57,14 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40776`](https://github.com
 7. **Demanda por personas persistentes com governança, custos e segredos integrados (`#40786`):**
    Desenvolvedores e equipes demandam suporte nativo a personas persistentes de agentes com papéis explícitos, tarefas especializadas,
    árvore hierárquica e controle de custos e segredos por agente.
+8. **Edições feitas no modo Edit não sincronizadas com o diff ao retornar para Changes (`#46334`, resolve `#46332`):**
+   Ao fazer edições no modo Edit e retornar para a visualização Changes, os modelos mantidos do Monaco reutilizavam o texto antigo sem sincronizar propriedades, exibindo alterações defasadas e sobrescrevendo o texto correto ao digitar.
+9. **Colapso do visualizador Monaco de diff sob o banner de modificação externa no disco (`#46333`, resolve `#46331`):**
+   O componente `EditorEditFileSurface` envolvia o `ChangesModeView` em uma div com display block comum, anulando o `flex-1` e colapsando a altura do editor Monaco para 0px enquanto o banner "changed on disk" permanecia visível.
+10. **Duplicação de grupos de projetos e subpastas ao escanear novamente pastas-mãe (`#46225`, refs `#46113`):**
+    Escanear uma pasta-mãe pela segunda vez criava novos grupos de projeto duplicados com o mesmo caminho normalizado, gerando desorganização e perda de ordem na barra lateral.
+11. **Dificuldade de fechamento de visualizador de imagem e exclusão destrutiva de pastas com worktrees filhos (`#46276`, `#46359`):**
+    O visualizador de imagens exigia clique preciso no botão de fechar, e a exclusão de workspaces pais não oferecia a opção de manter seus sub-worktrees filhos preservados.
 
 ## O que o upstream implementa e corrige
 
@@ -72,6 +86,16 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40776`](https://github.com
   - Restringe o escopo de Cmd+A estritamente ao editor de notas ativo.
 - **Restauração de abas fechadas a partir da tela de boas-vindas (`#40816`):**
   - Preserva a pilha de abas fechadas acessível mesmo quando a janela estiver vazia, permitindo que `Cmd+Shift+T` reabra a última aba.
+- **Reconciliação e sincronização automática entre Edit mode e Changes mode (`#46334`, resolve `#46332`):**
+  - Reconcilia ambos os modelos Monaco do diff com as propriedades recebidas na montagem antes de anexar listeners, resetando modelos cujo texto mudou e preservando histórico de desfazer (undo) em abas intocadas.
+- **Correção de layout flexbox no banner de alteração externa no editor (`#46333`, resolve `#46331`):**
+  - Ajusta o wrapper do banner em `EditorEditFileSurface` para flex column, impedindo o colapso do editor de diff.
+- **Refatoração modular de `EditorEditFileSurface` sob teto de 400 linhas (`#46381`):**
+  - Modulariza a superfície de edição do editor mantendo cada arquivo sob o limite rigoroso de lint arquitetural de 400 linhas.
+- **Reuso inteligente de grupos de scan com o mesmo caminho-mãe (`#46225`, refs `#46113`):**
+  - Reutiliza grupos existentes na mesma conexão com caminho normalizado idêntico, reorganizando subpastas e preservando a ordem pré-existente de repositórios.
+- **Visualizador de imagens com scrim em tela cheia e fechamento por clique externo (`#46276`):**
+  - Adiciona scrim completo de janela ao visualizador de imagens, permitindo fechamento instantâneo ao clicar em qualquer área externa à imagem.
 
 ## O que fazer no BrzA Studio
 
@@ -80,3 +104,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#40776`](https://github.com
 3. Adotar o reconhecimento e revelação de pastas a partir de links no chat (`#40818`).
 4. Confinar o Select All ao editor Markdown (`#40790`) e habilitar reabertura de abas a partir do welcome screen (`#40816`).
 5. Acompanhar a modelagem de Personas persistentes (`#40786`) para alinhar com o ecossistema `brza-sessions` e `meeting-runner`.
+6. Sincronizar modelos Monaco entre Edit mode e Changes mode reconciliando props na montagem (`#46334`, resolve `#46332`).
+7. Corrigir layout flex column do banner de alteração externa para não colapsar o diff Monaco (`#46333`, resolve `#46331`).
+8. Reutilizar grupos de scan na barra lateral com caminhos-mãe idênticos para evitar duplicações (`#46225`, refs `#46113`).
+9. Adotar fechamento por clique externo (scrim) no visualizador de imagens (`#46276`) e avaliar suporte a "Delete, Keep Children" em workspaces (`#46359`).

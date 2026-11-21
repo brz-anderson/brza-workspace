@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #44461 e #44808 sincronizam /rename do Claude com o título da aba e restauram saídas de /recap no reopen; PR #43994 limita live-text a 8 MB.
+description: Os PRs #46127, #46362, #46281, #46311, #46316, #46368 e #46309 trazem pastas no menu @, quotes em chips, imagens em comentários de itens e preservação de _meta no Antigravity.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,14 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#44461`](https://github.com/stablyai/orca/pull/44461) (resolve Issue [`#40998`](https://github.com/stablyai/orca/issues/40998)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46127`](https://github.com/stablyai/orca/pull/46127),
+[`stablyai/orca#46362`](https://github.com/stablyai/orca/pull/46362),
+[`stablyai/orca#46281`](https://github.com/stablyai/orca/pull/46281),
+[`stablyai/orca#46311`](https://github.com/stablyai/orca/pull/46311),
+[`stablyai/orca#46316`](https://github.com/stablyai/orca/pull/46316),
+[`stablyai/orca#46368`](https://github.com/stablyai/orca/pull/46368) (resolve Issue [`#46367`](https://github.com/stablyai/orca/issues/46367)),
+[`stablyai/orca#46309`](https://github.com/stablyai/orca/pull/46309),
+[`stablyai/orca#44461`](https://github.com/stablyai/orca/pull/44461) (resolve Issue [`#40998`](https://github.com/stablyai/orca/issues/40998)),
 [`stablyai/orca#44808`](https://github.com/stablyai/orca/pull/44808),
 [`stablyai/orca#43994`](https://github.com/stablyai/orca/pull/43994),
 [`stablyai/orca#44413`](https://github.com/stablyai/orca/pull/44413),
@@ -183,9 +190,33 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     Ao digitar `/rename <novo-nome>` ou `/name` em um chat Claude, o nome interno da conversa era alterado na CLI, mas a aba do Native Chat e a lista do Session History mantinham o nome autogerado pelo Studio (que tem precedência sobre o título do transcript). A interface não interceptava o evento `session_title_changed` emitido pela CLI, mantendo o título antigo visível.
 44. **Desaparecimento de respostas de comandos locais `/recap` ao reabrir chats Claude (`#44808`):**
     Respostas geradas pelo comando `/recap` eram gravadas pelo Claude Code em registros do tipo `system/local_command` no transcript, enquanto no streaming ao vivo eram enviadas como frames sintéticos de assistente. Como a rotina de reidratação/catch-up e os decodificadores legados só liam linhas `user` e `assistant`, o conteúdo de resumos do `/recap` desaparecia da conversa ao reabrir a aba ou retomar o chat via "Resume in New Chat".
+45. **Impossibilidade de citar pastas no menu de menções `@` do chat (`#46127`):**
+    O menu popover de autocompletar com `@` suportava apenas arquivos e agentes, forçando o operador a digitar caminhos de pastas inteiros manualmente ao instruir agentes sobre diretórios do projeto.
+46. **Citações "Add to chat" poluindo o composer como blocos Markdown brutos (`#46362`):**
+    Ações de adicionar trechos selecionados de código ou notas ao chat colavam o texto cru no composer, ocupando espaço excessivo e sem indicador de origem navegável.
+47. **Imagens anexadas a comentários de itens e perguntas não exibidas inline no chat (`#46281`):**
+    Quando um usuário ou subagente anexava capturas de tela ou imagens de referência em respostas de perguntas de itens, a imagem não era renderizada inline na conversa, quebrando a inspeção visual.
+48. **Mensagens vazias de assistente poluindo o histórico de conversa (`#46311`):**
+    Em turnos com saídas parciais ou desvios de ferramentas que não geravam texto final, o frontend registrava e exibia mensagens de assistente totalmente em branco no desktop e mobile.
+49. **Perda de instruções permanentes (`SOUL.md` / `MEMORY.md`) em chats gerenciados do Antigravity via ACP (`#46368`, resolve `#46367`):**
+    A configuração de sessão sobrescrevia o campo `sessionMeta` do arranque com `setup._meta`, fazendo com que chats gerenciados do Antigravity descartassem silenciosamente as instruções permanentes e diretivas de alma e memória.
 
 ## O que o upstream implementa
 
+- **Suporte a pastas no menu de menções `@` do chat (`#46127`):**
+  - Lista diretórios do repositório/workspace no menu suspenso de autocompletar ao digitar `@`, inserindo caminhos normalizados de pastas diretamente no composer.
+- **Citações "Add to chat" renderizadas como chips compactos (`#46362`):**
+  - Exibe seleções de código e texto capturadas via "Add to chat" como chips interativos com rótulo de arquivo e linha, despoluindo o composer e permitindo clique para abrir a origem.
+- **Visualização inline de imagens em comentários de itens e perguntas (`#46281`):**
+  - Renderiza capturas de tela e arquivos de imagem anexados a comentários de itens diretamente no feed de chat.
+- **Ocultação de mensagens vazias de assistente no desktop e mobile (`#46311`):**
+  - Suprime a renderização de bolhas e cartões de mensagens de assistente vazias em turnos sem saída de texto.
+- **Linhas compactas de atividade com fusão de worker e link de item (`#46316`):**
+  - Mantém linhas de atividade em layout de linha única e funde a indicação de inicialização de worker com o link direto para o item.
+- **Preservação de instruções permanentes e `_meta` em sessões Antigravity (`#46368`, resolve `#46367`):**
+  - Realiza o merge em camadas de `_meta` no servidor ACP, assegurando que `setup._meta` não destrua `launch.sessionMeta` e garantindo que `SOUL.md` e `MEMORY.md` permaneçam ativos durante a sessão.
+- **Identificação visual de modelo autoselecionado no Antigravity (`#46309`):**
+  - Exibe no cabeçalho e na barra de status o modelo exato escolhido automaticamente pelo Antigravity.
 - **Sincronização imediata de `/rename` e `/name` do Claude com o título da aba do chat (`#44461`, resolve `#40998`):**
   - Monitora o envio de comandos `/rename` ou `/name` no Native Chat e captura o frame `session_title_changed` emitido pelo Claude durante a resposta para atualizar atômica e diretamente o nome de usuário da conversa (`setUserName`), refletindo o novo título na aba e no Session History.
 - **Restauração de saídas de `/recap` na reabertura de chats Claude (`#44808`):**
@@ -306,6 +337,13 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Listar pastas e diretórios no popover de menções `@` do composer (`#46127`).
+- Renderizar trechos de código de "Add to chat" como chips visuais clicáveis (`#46362`).
+- Exibir imagens de comentários de itens inline no fluxo de conversa do chat (`#46281`).
+- Ocultar mensagens vazias de assistente no desktop e mobile (`#46311`).
+- Compactar linhas de atividade de chat em uma única linha com link do item (`#46316`).
+- Preservar instruções permanentes do Antigravity mesclando metadados de sessão no ACP (`#46368`, resolve `#46367`).
+- Exibir o modelo selecionado dinamicamente pelo Antigravity (`#46309`).
 - Sincronizar comandos `/rename` e `/name` do Claude diretamente com o título da aba e do Session History (`#44461`, resolve `#40998`).
 - Restaurar saídas do comando local `/recap` na reabertura de chats Claude e no Resume in New Chat (`#44808`).
 - Limitar a 8 MiB o buffer de texto ao vivo de cada subscriber no processo principal com retomada por cursor (`#43994`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42654, #42646, #42639, #42590, #42227, #42215, #42193, #42168 e as issues #42653, #42645, #42631, #42602, #42214 trazem Cursor via ACP, leitura em voz alta desktop e mobile, fullscreen de código, context sheet e prévia de imagens.
+description: Os PRs #46142 e #46284 trazem auto-review em terminais do Cursor e resolução de model IDs de CLI para o chat server, enquanto #42654 traz Cursor via ACP e leitura por voz.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,9 @@ tags:
 
 # Cursor no Chat via ACP, prévia de links de imagem, bifurcação resiliente e leitura por voz
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42654`](https://github.com/stablyai/orca/pull/42654) (resolve Issue [`#42653`](https://github.com/stablyai/orca/issues/42653)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46142`](https://github.com/stablyai/orca/pull/46142),
+[`stablyai/orca#46284`](https://github.com/stablyai/orca/pull/46284) (resolve Issue [`#46163`](https://github.com/stablyai/orca/issues/46163)),
+[`stablyai/orca#42654`](https://github.com/stablyai/orca/pull/42654) (resolve Issue [`#42653`](https://github.com/stablyai/orca/issues/42653)),
 [`stablyai/orca#42646`](https://github.com/stablyai/orca/pull/42646) (resolve Issue [`#42645`](https://github.com/stablyai/orca/issues/42645)),
 [`stablyai/orca#42639`](https://github.com/stablyai/orca/pull/42639) (resolve Issue [`#42631`](https://github.com/stablyai/orca/issues/42631)),
 [`stablyai/orca#42590`](https://github.com/stablyai/orca/pull/42590),
@@ -55,6 +57,10 @@ além das issues [`stablyai/orca#42602`](https://github.com/stablyai/orca/issues
    Ao mover pastas ou reorganizar subdiretórios de trabalho, conversas do OpenCode tentavam reiniciar no caminho antigo, falhando ou criando sessões vazias.
 10. **Seletor TUI indevido em `/models` do OpenCode no mobile (`#42602`):**
     No cliente mobile, o comando `/models` tentava renderizar menus TUI não adaptados ao toque, travando a navegação.
+11. **Falta de suporte ao modo auto-review do Cursor em terminais PTY (`#46142`):**
+    O modo de auto-revisão e aprovação automática de ações (`--auto-review` / "Approve for me") não podia ser selecionado em terminais do Cursor, forçando intervenção manual em cada etapa de tool call ou conflitando quando argumentos já continham `--force`, `-f` ou `--yolo`.
+12. **Falha `Invalid params` no envio de chat com IDs de modelo salvos da CLI do Cursor (`#46284`, resolve `#46163`):**
+    Modelos configurados pela CLI do Cursor (ex.: `--model cursor-grok-4.6-high`) não eram reconhecidos pelo chat server nativo do Cursor, causando erro de parâmetro inválido no primeiro envio do chat.
 
 ## O que o upstream implementa
 
@@ -77,9 +83,16 @@ além das issues [`stablyai/orca#42602`](https://github.com/stablyai/orca/issues
   - Trata o comando `/fork` emitido durante o streaming de uma resposta enfileirando a bifurcação para ocorrer imediatamente após a conclusão do turno corrente (ou após o acionamento de Stop), bifurcando através da resposta final consolidada.
 - **Envelopamento de listas longas de agentes em cartões roláveis (`#42211`):**
   - Envolve listas extensas de ajustes de agentes em cartões com rolagem vertical interna, mantendo a interface contida.
+- **Suporte a Approve for me (Auto-review) em terminais do Cursor (`#46142`):**
+  - Oferece o modo "Approve for me" em terminais do Cursor com a flag `--auto-review`, mantendo compatibilidade quando argumentos já contêm `--force`, `-f` ou `--yolo`;
+  - Isola o modo exclusivo de terminal fora dos seletores de chat do Cursor para evitar recusas do chat server.
+- **Resolução de IDs de modelo CLI para modelos e esforço do chat server (`#46284`, resolve `#46163`):**
+  - Mapeia nomes salvos da CLI do Cursor (como `cursor-grok-4.6-high`) para o modelo base mais longo correspondente no chat server e decodifica sufixos de thinking, esforço e modo Fast (inclusive mapeando `xhigh` para `extra-high`).
 
 ## O que fazer
 
+- Suportar a flag `--auto-review` ("Approve for me") em terminais do Cursor mantendo isolamento de chat (`#46142`).
+- Resolver IDs de modelos CLI salvos do Cursor para parâmetros compatíveis com o servidor de chat nativo (`#46284`, resolve `#46163`).
 - Integrar o Cursor como agente nativo de chat sobre ACP (`#42193`), suportando seleção de modelo, esforço e planos.
 - Renderizar prévias inline de imagens referenciadas por links em respostas Markdown (`#42227`).
 - Enfileirar bifurcações `/fork` solicitadas durante a resposta do assistente (`#42215`, resolve `#41903`).

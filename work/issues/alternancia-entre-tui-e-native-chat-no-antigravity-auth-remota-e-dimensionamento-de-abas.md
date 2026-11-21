@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46101, #39769, #45647 e #45663 trazem pin do ACP server 1.5.2 do Google, integração do Kiro no Native Chat e visuais inline.
+description: Os PRs #46125, #46175, #46109, #46040, #45985, #46018, #45962, #46039, #46130, #46221 e #46228 expandem agentes nativos, auth Google no Antigravity e cards no chat.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,18 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46101`](https://github.com/stablyai/orca/pull/46101),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46125`](https://github.com/stablyai/orca/pull/46125),
+[`stablyai/orca#46175`](https://github.com/stablyai/orca/pull/46175),
+[`stablyai/orca#46109`](https://github.com/stablyai/orca/pull/46109),
+[`stablyai/orca#46040`](https://github.com/stablyai/orca/pull/46040),
+[`stablyai/orca#45985`](https://github.com/stablyai/orca/pull/45985),
+[`stablyai/orca#46018`](https://github.com/stablyai/orca/pull/46018),
+[`stablyai/orca#45962`](https://github.com/stablyai/orca/pull/45962),
+[`stablyai/orca#46039`](https://github.com/stablyai/orca/pull/46039),
+[`stablyai/orca#46130`](https://github.com/stablyai/orca/pull/46130),
+[`stablyai/orca#46221`](https://github.com/stablyai/orca/pull/46221),
+[`stablyai/orca#46228`](https://github.com/stablyai/orca/pull/46228),
+[`stablyai/orca#46101`](https://github.com/stablyai/orca/pull/46101),
 [`stablyai/orca#39769`](https://github.com/stablyai/orca/pull/39769),
 [`stablyai/orca#45647`](https://github.com/stablyai/orca/pull/45647),
 [`stablyai/orca#45663`](https://github.com/stablyai/orca/pull/45663),
@@ -218,9 +229,29 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     O runtime gerenciado do Antigravity ou a inicialização do ACP utilizava resolução flutuante ou dependência instável do servidor ACP do Google (`@google/antigravity-acp`), sujeitando as sessões de chat a quebras imprevistas quando novas versões do pacote upstream introduziam incompatibilidades com o protocolo de eventos ou com as ferramentas gerenciadas.
 61. **Falta de suporte nativo ao agente Kiro no chat estruturado do Studio via ACP V3 (`#39769`):**
     O ecossistema do Studio não reconhecia o agente Kiro como um backend oficial de chat estruturado no Native Chat UI, limitando seu uso a terminais puros e impedindo o aproveitamento do streaming nativo, renderização de ferramentas e persistência de histórico via ACP V3.
+62. **Autenticação manual no Antigravity e salvamentos redundantes de preferência de login Google (`#46125`, `#46175`):**
+    Usuários de contas Google precisavam realizar autenticação de forma avulsa; sessões eram iniciadas mesmo sem credenciais válidas, gerando falhas silenciosas de conexão ACP, além do seletor salvar mutações redundantes de preferência quando nenhuma alteração real ocorria.
+63. **Ausência de agentes modernos no Native Chat e suporte a bots dedicados (`#46109`, `#46040`, `#45985`, `#46018`, `#45962`, `#46039`):**
+    O Native Chat UI e o runtime de bots estavam restritos aos backends legados, carecendo de suporte integrado para Qwen Code (`#46109`), Factory Droid (`#46040`), Gemini CLI (`#45985`), Kilo Code e MiMo Code (`#46018`), Auggie via ACP (`#45962`) e Goose via ACP (`#46039`).
+64. **Omissão do card de arquivos modificados em ferramentas de escrita e edição do Pi (`#46130`):**
+    Quando o agente Pi utilizava ferramentas internas de mutação de código (`edit` e `write`), o chat não exibia o card estruturado de arquivos alterados (*changed-files card*), forçando a inspeção manual no terminal.
+65. **Abertura indevida de nova sessão de chat no Home após falha transitória de turno (`#46221`):**
+    Quando um turno de execução encontrava falha transitória no Home, o aplicativo tentava se recuperar abrindo um novo chat em branco em vez de enfileirar e reter a mensagem na conversa ativa.
+66. **Ruído visual por sufixo "Folder" no chip de workspace do composer de chat (`#46228`):**
+    O chip de seleção de workspace acima do composer de chat acrescentava o sufixo literal "Folder" junto ao nome do diretório, poluindo o cabeçalho de digitação.
 
 ## O que o upstream implementa e corrige
 
+- **Autenticação Google no Antigravity integrada e validação prévia de credenciais (`#46125`, `#46175`):**
+  - Permite aos usuários de contas Google selecionar o método de autenticação nativo, recusa o início de chats sem credenciais válidas com atalho "agy Sign in" em Settings, e salva preferências de login estritamente quando há alteração efetiva de runtime ou método.
+- **Suporte aos agentes Qwen Code, Factory Droid, Gemini CLI, Kilo Code, MiMo Code, Auggie e Goose no Native Chat (`#46109`, `#46040`, `#45985`, `#46018`, `#45962`, `#46039`):**
+  - Adiciona suporte completo no Native Chat e para automações de bots para Qwen Code, Factory Droid, Gemini CLI, Kilo Code, MiMo Code, Auggie e Goose sobre servidores ACP dedicados.
+- **Card de arquivos modificados para ferramentas do Pi (`#46130`):**
+  - Renderiza o card estruturado de arquivos alterados no chat para invocações de `edit` e `write` pelo agente Pi.
+- **Enfileiramento de requisições no Home após falha de turno (`#46221`):**
+  - Retém e enfileira a requisição do usuário na mesma conversa do Home em vez de abrir um chat em branco quando um turno de agente falhar.
+- **Remoção do sufixo "Folder" no chip de workspace (`#46228`):**
+  - Limpa a exibição do chip de workspace no composer de chat removendo o rótulo redundante "Folder".
 - **Fixação da versão 1.5.2 do servidor ACP do Google para Antigravity (`#46101`):**
   - Fixa o servidor Google ACP (`@google/antigravity-acp` / pacote de runtime) na versão `1.5.2`, garantindo compatibilidade estável com o protocolo ACP, streaming de turnos e orquestração de subagentes.
 - **Integração do Kiro como agente nativo de chat via ACP V3 (`#39769`):**
@@ -440,5 +471,11 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 57. Reenviar a tecla Enter automaticamente no OpenCode ao detectar colagens longas assíncronas retidas (`#45850`, resolve `#45760`).
 58. Fixar a versão 1.5.2 do pacote do servidor ACP do Google para Antigravity para garantir estabilidade operacional no Native Chat (`#46101`).
 59. Adicionar suporte ao Kiro como agente nativo de chat estruturado integrando-o via ACP V3 (`#39769`).
+60. Adotar o fluxo integrado de autenticação Google no Antigravity com validação prévia de credenciais antes do chat (`#46125`, `#46175`).
+61. Habilitar os agentes Qwen Code, Factory Droid, Gemini CLI, Kilo Code, MiMo Code, Auggie e Goose no Native Chat e para execução de bots (`#46109`, `#46040`, `#45985`, `#46018`, `#45962`, `#46039`).
+62. Renderizar card de arquivos modificados para ferramentas de edição e escrita do agente Pi (`#46130`).
+63. Enfileirar e reter requisições de agentes no Home após falhas de turno em vez de abrir nova conversa (`#46221`).
+64. Omitir o sufixo "Folder" do chip de seleção de workspace no composer de chat (`#46228`).
+
 
 

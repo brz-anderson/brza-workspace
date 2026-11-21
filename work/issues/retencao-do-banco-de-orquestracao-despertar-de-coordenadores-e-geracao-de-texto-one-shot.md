@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45751, #45507, #45744, #45435 e #45819 corrigem endereçamento de workers, ledger de orquestração, níveis do Antigravity e retenção de crew host.
+description: Os PRs #46235, #46196, #46086, #46155, #46117, #46080, #46068, #46139 e #46207 aprimoram orquestração multi-host, grupos de bots e continuações por limite de uso.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,16 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45751`](https://github.com/stablyai/orca/pull/45751) (refs Issue [`#14570`](https://github.com/stablyai/orca/issues/14570)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46235`](https://github.com/stablyai/orca/pull/46235),
+[`stablyai/orca#46196`](https://github.com/stablyai/orca/pull/46196),
+[`stablyai/orca#46086`](https://github.com/stablyai/orca/pull/46086),
+[`stablyai/orca#46155`](https://github.com/stablyai/orca/pull/46155),
+[`stablyai/orca#46117`](https://github.com/stablyai/orca/pull/46117),
+[`stablyai/orca#46080`](https://github.com/stablyai/orca/pull/46080),
+[`stablyai/orca#46068`](https://github.com/stablyai/orca/pull/46068),
+[`stablyai/orca#46139`](https://github.com/stablyai/orca/pull/46139),
+[`stablyai/orca#46207`](https://github.com/stablyai/orca/pull/46207),
+[`stablyai/orca#45751`](https://github.com/stablyai/orca/pull/45751) (refs Issue [`#14570`](https://github.com/stablyai/orca/issues/14570)),
 [`stablyai/orca#45507`](https://github.com/stablyai/orca/pull/45507) (STA-16556, STA-16557, STA-16590),
 [`stablyai/orca#45744`](https://github.com/stablyai/orca/pull/45744) (refs Issue [`#45701`](https://github.com/stablyai/orca/issues/45701)),
 [`stablyai/orca#45435`](https://github.com/stablyai/orca/pull/45435),
@@ -171,9 +180,37 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Ao retornar à aba ou reconectar, a aplicação reconstruía o host inteiro do zero, congelando a interface por vários segundos em execuções com grande volume de tarefas.
 45. **Relatórios finais `worker_done` de workers não acordando membros do grupo em chats de bots (`#45819`):**
     - A varredura de correio de grupos procurava o worker por seu sender handle, mas relatórios finais vindos de terminais assentavam o Dispatch no ato da entrega, fazendo com que a mensagem ficasse sem requisição de grupo associada e permanecesse não lida.
+46. **Falha de envio a agentes remotos não instalados localmente em ambientes pareados (`#46235`):**
+    - Quando um coordenador despachava tarefas ou mensagens para um agente específico não instalado na máquina local, o envio falhava com erro de agente ausente em vez de rotear o comando para o computador pareado que possui o agente registrado.
+47. **Confinamento de grupos de bots a um único computador local (`#46196`):**
+    - Grupos de bots (*bot groups*) não suportavam membros heterogêneos distribuídos entre diferentes hosts, impedindo a colaboração entre bots executando no computador local e em servidores pareados.
+48. **Extravio de resultados de workers locais para threads incorretas (`#46086`):**
+    - Em sessões multithread, os resultados de um worker local eram entregues à thread ativa no momento em vez de retornarem especificamente para a thread cujo turno disparou a execução original.
+49. **Silêncio de falha quando o resumo (*brief*) de um worker não era submetido (`#46155`):**
+    - Quando a submissão do brief de tarefa de um worker falhava antes do início do processamento, o coordenador ficava aguardando indefinidamente sem receber aviso de que o brief não foi entregue.
+50. **Omissão da resposta de agentes gerenciados a requisições de pares na sala de grupo (`#46117`):**
+    - Quando um agente gerenciado respondia à solicitação de um par dentro de um grupo de bots, a resposta ficava restrita ao contexto privado do par e não era projetada na sala do grupo (*group room*), quebrando a visibilidade coletiva da tripulação.
+51. **Sobrecarga de $O(N^2)$ na ordenação e consulta em tempo de execução de bots (`#46139`):**
+    - Varreduras de catálogo e ordenação de bots executavam buscas quadráticas repetidas a cada ciclo de renderização e dispatch, gerando engasgos de interface em workspaces com dezenas de bots configurados.
+52. **Perda de rascunhos de editor ao permitir exclusão de bot com arquivos não salvos (`#46207`):**
+    - A ação de exclusão de bots não validava a existência de buffers de editor abertos e não salvos em seu workspace/home, apagando diretórios e causando perda irreversível de código em rascunho.
 
 ## O que o upstream implementa
 
+- **Roteamento de envios para agentes residentes em computadores pareados (`#46235`):**
+  - Direciona despachos e mensagens para o host pareado remoto correspondente quando o agente solicitado não estiver presente no host local.
+- **Grupos de bots híbridos com membros de computadores pareados (`#46196`):**
+  - Permite agrupar bots locais e remotos em um mesmo bot group com orquestração transparente de mensagens e tarefas.
+- **Entrega determinística de resultados de workers locais à thread de origem (`#46086`):**
+  - Assegura que o retorno de workers locais seja roteado estritamente para a thread de conversa que iniciou o turno de trabalho.
+- **Notificação de brief não submetido ao coordenador (`#46155`):**
+  - Emite aviso explícito ao coordenador informando caso a submissão do brief do worker encontre falha na entrega.
+- **Visibilidade de respostas entre pares na sala do grupo de bots (`#46117`):**
+  - Projeta a resposta de agentes gerenciados na sala do grupo quando a requisição partir de outro membro da equipe.
+- **Otimização linear $O(N)$ em lookups e ordenação de bots (`#46139`):**
+  - Elimina buscas quadráticas no catálogo e runtime de bots, tornando ordenações e despachos instantâneos.
+- **Bloqueio de exclusão de bots com rascunhos de editor não salvos (`#46207`):**
+  - Impede a exclusão de qualquer bot enquanto seu home contiver rascunhos pendentes de salvamento no editor.
 - **Omissão do handle do terminal coordenador no preâmbulo de workers (`#45751`, refs `#14570`):**
   - Descreve o coordenador de terminal como receptor padrão de correios enviados sem destinatário explícito (`--to`), impedindo que workers copiem handles misturados em `--from` e garantindo aceitação de heartbeats e `worker_done`.
 - **Controle de tamanho do ledger automático e APIs de reinicialização para pareamento (`#45507`):**
@@ -275,6 +312,13 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Rotear despachos para computadores pareados quando o agente solicitado não estiver presente no host local (`#46235`).
+- Suportar grupos de bots híbridos contendo membros distribuídos entre hosts locais e servidores pareados (`#46196`).
+- Entregar resultados de workers locais determinística e estritamente à thread de conversa que disparou o turno (`#46086`).
+- Notificar o coordenador imediatamente caso a submissão do brief de tarefa do worker falhe (`#46155`).
+- Projetar respostas entre pares na sala do grupo de bots para visibilidade compartilhada da equipe (`#46117`).
+- Otimizar para $O(N)$ buscas e ordenação no catálogo e runtime de bots (`#46139`).
+- Bloquear a exclusão de bots enquanto seu workspace contiver rascunhos de editor não salvos (`#46207`).
 - Omitir o handle do terminal coordenador no preâmbulo de workers para evitar mistura de identificadores em `--from` (`#45751`, refs `#14570`).
 - Limitar o tamanho em bytes do ledger automático de orquestração sob crash-cuts e expor APIs de descarte e reinicialização para pareamento (`#45507`).
 - Preservar o nível de esforço de raciocínio de modelos Antigravity estruturados criando despachos com `optionsMode: 'replace-model-selection'` (`#45744`, refs `#45701`).

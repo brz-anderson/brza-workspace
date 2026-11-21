@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45986, #45988, #45506, #45912, #45749, #45031, #46043, #45221, #45240, #45264, #45313, #45840 e #45522 aprimoram git staging, isolamento em workers, limpeza residual e sessões de painéis.
+description: Os PRs #45969, #46211, #46202, #46028, #46185, #46024, #45690, #46003, #45986 e #45988 trazem junctions no Windows, profiler watchdog, status sem re-parse e proteção de chats.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,15 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45986`](https://github.com/stablyai/orca/pull/45986),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45969`](https://github.com/stablyai/orca/pull/45969),
+[`stablyai/orca#46211`](https://github.com/stablyai/orca/pull/46211),
+[`stablyai/orca#46202`](https://github.com/stablyai/orca/pull/46202),
+[`stablyai/orca#46028`](https://github.com/stablyai/orca/pull/46028),
+[`stablyai/orca#46185`](https://github.com/stablyai/orca/pull/46185),
+[`stablyai/orca#46024`](https://github.com/stablyai/orca/pull/46024),
+[`stablyai/orca#45690`](https://github.com/stablyai/orca/pull/45690),
+[`stablyai/orca#46003`](https://github.com/stablyai/orca/pull/46003),
+[`stablyai/orca#45986`](https://github.com/stablyai/orca/pull/45986),
 [`stablyai/orca#45988`](https://github.com/stablyai/orca/pull/45988),
 [`stablyai/orca#45506`](https://github.com/stablyai/orca/pull/45506),
 [`stablyai/orca#45912`](https://github.com/stablyai/orca/pull/45912),
@@ -202,9 +210,37 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Comandos do Git executados internamente para sincronização de status e conferência de branches rodavam síncronos na thread principal do processo renderer no macOS e Linux, provocando pequenos engasgos na digitação e animações durante operações de checkout.
 53. **Expiração precoce de sessões de agentes inativos em painéis abertos pelo TTL de 7 dias (`#46043`):**
     - Sessões de agentes em painéis ou abas que permaneciam abertas por mais de 7 dias sem atividade recente tinham seu status de sessão expurgado pelo coletor de lixo periódico (TTL fixo de 7 dias), impossibilitando a visualização de histórico ou continuação do chat sem recarregar o workspace.
+54. **Salto visual e lacuna em branco no diálogo de exclusão de workspace (`#45969`):**
+    - O diálogo de exclusão sofria um salto visual exibindo uma lacuna em branco enquanto o status das evidências e arquivos em risco era calculado, em vez de exibir uma linha de status fixa e suave.
+55. **Falhas em testes de links compartilhados, junctions e IPC no Windows (`#46211`, `#46202`):**
+    - No Windows, symlinks compartilhados criavam links padrão que requeriam elevação de privilégios, quebrando testes de IPC, git capture e index-safety que necessitam de junctions NTFS.
+56. **Remoção inadvertida de regras customizadas do Cursor em arquivos compartilhados (`#46028`):**
+    - A injeção de regras operacionais para o agente Cursor sobrescrevia arquivos compartilhados de regras em vez de utilizar um arquivo exclusivo isolado, removendo customizações do usuário ao desinstalar.
+57. **Watchdog de profiler concorrendo com a thread principal travada (`#46185`):**
+    - Quando a thread principal do Electron sofria um congelamento (*hang*), o watchdog de detecção tentava inicializar o profiler de CPU diretamente na própria thread estagnada, impedindo a geração do relatório de diagnóstico.
+58. **Degradação de performance por re-parsing JSON repetido em leituras de status de agentes (`#46024`):**
+    - A cada consulta periódica de status de sessão de agente, o sistema realizava o parse repetido do JSON bruto de status de todas as linhas em vez de reutilizar os registros estruturados já em cache.
+59. **Perda de turnos de chats antigos clonados do Codex ao vinculá-los às sessões originais (`#45690`):**
+    - Ao restabelecer a ligação entre chats clonados e seus originais do Codex, o mecanismo de reconciliação descartava turnos intermediários de transcrições antigas, truncando o histórico da conversa.
+60. **Homes de bots adotados indevidamente como workspaces pais em varreduras automáticas (`#46003`):**
+    - Pastas de trabalho de bots configurados eram identificadas erroneamente como repositórios pais de workspaces em rotinas automáticas de parentesco de diretórios, poluindo a hierarquia de projetos.
 
 ## O que o upstream propõe e implementa
 
+- **Linha de status fixa no diálogo de exclusão (`#45969`):**
+  - Mantém uma linha de status de altura fixa no modal Delete, eliminando lacunas em branco e transições abruptas de layout.
+- **Suporte a junctions para links de diretório em testes no Windows (`#46211`, `#46202`):**
+  - Cria fixtures de diretórios compartilhados como junctions no Windows, garantindo execução confiável dos testes de IPC e git safety sem privilégios de administrador.
+- **Isolamento de regras do Cursor em arquivo exclusivo com remoção apenas de bytes inalterados (`#46028`):**
+  - Grava regras do Cursor em arquivo próprio e remove estritamente os bytes padrão inseridos, preservando customizações do desenvolvedor.
+- **Watchdog de profiler fora da thread principal estagnada (`#46185`):**
+  - Desacopla o arranque do profiler de CPU da main thread durante congelamentos, garantindo a captura precisa de traces de diagnóstico.
+- **Leitura direta de linhas de status de agentes sem re-parsing (`#46024`):**
+  - Elimina parses redundantes de JSON em leituras periódicas de status de agentes, aliviando o consumo de CPU.
+- **Preservação de todos os turnos de chats copiados do Codex (`#45690`):**
+  - Retém a integridade de todos os turnos de conversas herdadas do Codex ao reconectá-las às sessões originais.
+- **Isolamento de homes de bots contra adoção como workspace pai (`#46003`):**
+  - Exclui pastas de bots das heurísticas de parentesco automático de workspaces.
 - **Correção da dica de comando sugerindo `--base-branch` na criação de worktrees (`#45986`):**
   - Ajusta a mensagem de erro emitida quando o branch base padrão não é encontrado, instruindo corretamente o uso da flag `--base-branch`.
 - **Suporte a links compartilhados em submódulos no Stage All do Git (`#45988`):**
@@ -352,6 +388,13 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Manter linha de status fixa no modal Delete eliminando gaps e saltos de layout (`#45969`).
+- Utilizar junctions em links de diretório no Windows para compatibilidade de testes de IPC e git (`#46211`, `#46202`).
+- Isolar regras do Cursor em arquivo exclusivo preservando edições do usuário (`#46028`).
+- Executar watchdog de profiler em thread separada da main thread congelada (`#46185`).
+- Ler linhas de status de agentes diretamente da memória sem re-parsing JSON repetido (`#46024`).
+- Preservar turnos de chats antigos do Codex ao vinculá-los às sessões originais (`#45690`).
+- Isolar diretórios de bots contra adoção automática como workspaces pais (`#46003`).
 - Corrigir a mensagem de erro na criação de worktrees para recomendar `--base-branch` (`#45986`).
 - Tratar submódulos no comando "Stage All" do Git para não falhar na presença de links compartilhados (`#45988`).
 - Proteger pastas de checkouts contra exclusão incorreta em limpezas residuais e no WSL (`#45506`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46002 e #46099 exibem e retêm o uso da conta System default do Claude na status bar mesmo ao selecionar contas salvas.
+description: Os PRs #46119, #46002 e #46099 otimizam a leitura única de logins do Claude e retêm a telemetria da conta System default no desktop e mobile.
 scope:
   - brza-studio
   - brza-workflow
@@ -17,7 +17,8 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46002`](https://github.com/stablyai/orca/pull/46002),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46119`](https://github.com/stablyai/orca/pull/46119),
+[`stablyai/orca#46002`](https://github.com/stablyai/orca/pull/46002),
 [`stablyai/orca#46099`](https://github.com/stablyai/orca/pull/46099) (refs Issue [`#45979`](https://github.com/stablyai/orca/issues/45979)),
 [`stablyai/orca#38581`](https://github.com/stablyai/orca/pull/38581),
 [`stablyai/orca#39169`](https://github.com/stablyai/orca/pull/39169),
@@ -111,9 +112,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46002`](https://github.com
     A barra de status anexava medições de contas inativas apenas a contas que possuíam ID salvo; como a conta "System default" não possui ID salvo, suas leituras eram omitidas da lista inativa, deixando o desenvolvedor sem visibilidade do consumo da conta principal do sistema.
 19. **Perda de telemetria de uso e exibição de "Not checked" ao alternar de conta System default para conta salva (`#46099`, refs `#45979`):**
     Ao alternar da conta System default para uma conta salva em um menu que permanece aberto, a leitura da conta padrão não era armazenada sob sua respectiva chave de cache, fazendo com que a linha exibisse *"Not checked"* em vez do uso recém-consultado.
+20. **Leituras redundantes de logins do Claude e ausência de consumo de System default em clientes móveis (`#46119`):**
+    A rotina de verificação de autenticação lia repetidamente os arquivos de login de cada perfil do Claude a cada ciclo, gerando I/O desnecessário; além disso, a visualização remota em dispositivos móveis não recebia os dados de uso da conta System default do host.
 
 ## O que o upstream propõe e implementa
 
+- **Leitura única de logins do Claude e exibição de uso de System default no app móvel (`#46119`):**
+  - Otimiza a rotina para ler cada login do Claude uma única vez por ciclo de sincronização e expõe as métricas de consumo da conta System default para clientes pareados e app móvel.
 - **Exibição do uso de System default do Claude enquanto outra conta salva está ativa (`#46002`):**
   - Roteia a chave System default através de `claudeAccountUsagePreparation`, lendo o uso da conta padrão do host diretamente em seu diretório base e exibindo-o na linha correspondente mesmo com contas salvas selecionadas.
 - **Retenção de métricas de System default após alternância de conta (`#46099`, refs `#45979`):**
@@ -160,6 +165,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46002`](https://github.com
 
 - Exibir o consumo da conta System default do Claude na status bar mesmo quando uma conta salva estiver selecionada (`#46002`).
 - Reter as medições da conta System default no cache após a alternância para outra conta, evitando o estado "Not checked" (`#46099`, refs `#45979`).
+- Otimizar a leitura de credenciais e logins do Claude para uma única consulta por ciclo e sincronizar o uso de System default com clientes móveis (`#46119`).
 - Adotar a fixação de conta por projeto (`#38581`) no `brza-studio`, separando contas corporativas de pessoais.
 - Habilitar o fallback de cota em helpers de texto (`#38654`) para fluxos de commit e PR no `brza-workflow`.
 - Incorporar o disparo imediato de continuação de limites ao chavear contas Claude (`#39169`).

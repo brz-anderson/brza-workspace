@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45068, #45713, #44954, #45978, #45907, #45472, #45871, #45837, #45385, #45702, #45571 e #45783 trazem fallback de permissão no Claude, kinfo no Mac, isolamento de abas e proteção de rascunhos.
+description: Os PRs #46105, #45759, #46156, #44476, #46206, #46168, #46157, #46145, #45068 e #45713 trazem suporte a #L em OSC 8, isolamento de abas e melhorias ergonômicas no terminal.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,15 @@ tags:
 
 # Comandos shell no chat, recibos de perguntas e foco espacial em terminais
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45068`](https://github.com/stablyai/orca/pull/45068),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46105`](https://github.com/stablyai/orca/pull/46105),
+[`stablyai/orca#45759`](https://github.com/stablyai/orca/pull/45759),
+[`stablyai/orca#46156`](https://github.com/stablyai/orca/pull/46156),
+[`stablyai/orca#44476`](https://github.com/stablyai/orca/pull/44476),
+[`stablyai/orca#46206`](https://github.com/stablyai/orca/pull/46206),
+[`stablyai/orca#46168`](https://github.com/stablyai/orca/pull/46168),
+[`stablyai/orca#46157`](https://github.com/stablyai/orca/pull/46157),
+[`stablyai/orca#46145`](https://github.com/stablyai/orca/pull/46145),
+[`stablyai/orca#45068`](https://github.com/stablyai/orca/pull/45068),
 [`stablyai/orca#45713`](https://github.com/stablyai/orca/pull/45713),
 [`stablyai/orca#44954`](https://github.com/stablyai/orca/pull/44954),
 [`stablyai/orca#45978`](https://github.com/stablyai/orca/pull/45978),
@@ -180,9 +188,33 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
     Quando comandos customizados de launch de agentes falhavam no arranque, as mensagens de erro exibidas na interface podiam conter argumentos sensíveis de linha de comando (chaves, URLs internas ou tokens) e blocos brutos de `stderr`, expondo dados confidenciais nos logs e toasts de erro.
 47. **Entrega de mensagens de correio de workers sobrescrevendo rascunhos não enviados no terminal Pi (`#45907`):**
     Quando um worker enviava notificações ou correspondências para um terminal executando o agente Pi, a mensagem era injetada imediatamente no prompt mesmo que o usuário estivesse com um rascunho de texto digitado no editor, sobrescrevendo a entrada não enviada.
+48. **Links OSC 8 de arquivos no terminal ignorando fragmentos `#L<linha>` e intervalos (`#46105`):**
+    Ao clicar em links de arquivos emitidos no terminal via sequências de escape OSC 8 contendo sufixos de linha (ex.: `#L42` ou `#L10-L20`), o editor abria o documento sempre no topo, ignorando a navegação para a linha ou seleção especificada.
+49. **Alteração de título de terminal disparando varreduras redundantes em toda a barra lateral e Activity (`#45759`):**
+    Cada atualização de título em um terminal PTY disparava a re-varredura completa do estado de todos os workspaces na barra lateral e no painel Activity, provocando overhead desnecessário de CPU e re-renderizações.
+50. **Sublinhado visual de aba ativa aparecendo em grupos de split desfocados (`#46156`):**
+    Em layouts com múltiplos splits de abas, o sublinhado visual indicador de aba ativa continuava exibido em todos os grupos simultaneamente, impedindo identificar qual split detinha o foco do teclado.
+51. **Desalinhamento visual das opções no menu de contexto de abas (`#44476`):**
+    No menu de contexto das abas do terminal e do editor, linhas sem ícones ficavam desalinhadas em relação às opções que possuíam ícones, gerando irregularidade visual.
+52. **Recenseamento de terminais remotos em falhas de status de workers locais (`#46206`):**
+    Ao detectar ausência de status de um worker local, o runtime executava varreduras de recenseamento também em terminais de servidores remotos pareados, gerando tráfego de rede e latências espúrias.
+53. **Caixa de comentários de perguntas de itens muito estreita e sem destaque para opções recomendadas (`#46168`, `#46157`, `#46145`):**
+    Ao responder perguntas em itens de tarefas, a caixa de texto abria com altura inicial de apenas uma linha; além disso, opções recomendadas não tinham distinção visual com estrela, e ações de retomada na fila de mensagens pausadas ficavam pouco evidentes.
 
 ## O que o upstream implementa e corrige
 
+- **Suporte a fragmentos `#L<linha>` e intervalos em links OSC 8 no terminal (`#46105`):**
+  - Faz o tratador de cliques em links de arquivos no terminal interpretar sufixos `#L<linha>` e ranges de linha, posicionando o cursor ou destacando o trecho no editor.
+- **Supressão de varredura global de workspaces na mudança de título de terminal (`#45759`):**
+  - Desacopla atualizações de título de terminal das rotinas de varredura de workspaces da barra lateral e Activity.
+- **Sublinhado de aba ativa restrito ao grupo de split focado (`#46156`):**
+  - Renderiza o sublinhado indicador de aba ativa exclusivamente no painel dividido que possui o foco do teclado no momento.
+- **Alinhamento do menu de contexto de abas com ícones dedicados (`#44476`):**
+  - Atribui ícones estruturados para cada entrada do menu de contexto de abas, padronizando a largura e o alinhamento visual.
+- **Recenseamento restrito a terminais locais em falhas de status de workers (`#46206`):**
+  - Limita a verificação de processos aos terminais do host local quando o status de um worker estiver ausente, eliminando requisições a servidores remotos.
+- **Melhorias de interação e ergonomia em itens e filas pausadas (`#46168`, `#46157`, `#46145`):**
+  - Abre o campo de comentário com 4 linhas de altura ao responder perguntas de itens, destaca a opção recomendada com ícone de estrela e evidencia o botão "Resume" na fila de mensagens pausadas.
 - **Fallback resiliente de permissão do Claude de Full access para Approve for me / Ask (`#45068`):**
   - Implementa degradação suave quando `bypassPermissions` é bloqueado pelas configurações do Claude, rebaixando automaticamente a sessão para o modo de aprovação permitido mais próximo em vez de abortar o chat.
 - **Leitura eficiente de processos de terminal no macOS via kinfo compartilhada (`#45713`):**
@@ -350,6 +382,13 @@ da issue [`stablyai/orca#41009`](https://github.com/stablyai/orca/issues/41009).
 46. Isolar as notificações de alteração de título de terminal no renderer para ler apenas o bucket de abas correspondente (`#44954`).
 47. Redigir argumentos de comandos customizados e sanitizar saídas de erro exibidas em falhas de agentes (`#45978`).
 48. Reter notificações e correios de workers enquanto houver rascunho não enviado no terminal Pi (`#45907`).
+49. Interpretar fragmentos `#L<linha>` e intervalos de linhas em links de arquivo OSC 8 no terminal (`#46105`).
+50. Desacoplar atualizações de título de terminal de re-varreduras da barra lateral e Activity (`#45759`).
+51. Restringir o sublinhado visual de aba ativa exclusivamente ao split focado (`#46156`).
+52. Alinhar opções do menu de contexto de abas com ícones dedicados (`#44476`).
+53. Restringir o recenseamento de terminais em falhas de status de workers estritamente ao host local (`#46206`).
+54. Abrir caixa de comentários de perguntas de itens com 4 linhas, destacar opção recomendada e ressaltar botão Resume (`#46168`, `#46157`, `#46145`).
+
 
 
 

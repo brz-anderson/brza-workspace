@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46477, #46402, #46412, #46397 e #46450 otimizam leitura de inbox via índice de Run, preâmbulos de coordenador e journal automático de itens em memórias de bots.
+description: Os PRs #46287, #46446, #46448, #46273 e #46517 trazem autoria de perguntas, paginação resiliente em worker-read, detecção de encerramento em terminal e hand-offs livres em grupos.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,14 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46477`](https://github.com/stablyai/orca/pull/46477),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46287`](https://github.com/stablyai/orca/pull/46287),
+[`stablyai/orca#46446`](https://github.com/stablyai/orca/pull/46446),
+[`stablyai/orca#46448`](https://github.com/stablyai/orca/pull/46448),
+[`stablyai/orca#46273`](https://github.com/stablyai/orca/pull/46273),
+[`stablyai/orca#46517`](https://github.com/stablyai/orca/pull/46517),
+[`stablyai/orca#46602`](https://github.com/stablyai/orca/pull/46602) (STA-16956),
+[`stablyai/orca#46478`](https://github.com/stablyai/orca/pull/46478),
+[`stablyai/orca#46477`](https://github.com/stablyai/orca/pull/46477),
 [`stablyai/orca#46402`](https://github.com/stablyai/orca/pull/46402) (resolve Issue [`#33634`](https://github.com/stablyai/orca/issues/33634)),
 [`stablyai/orca#46412`](https://github.com/stablyai/orca/pull/46412),
 [`stablyai/orca#46397`](https://github.com/stablyai/orca/pull/46397),
@@ -220,9 +227,36 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - `dispatch-show --preamble` derivava a linha do coordenador a partir do remetente (`from`) de quem inspecionava a tarefa. Quando um worker inspecionava sua própria atribuição, a mensagem informava incorretamente que o worker era o seu próprio coordenador.
 60. **Poluição de `MEMORY.md` com status de PRs e tarefas e falta de diário estruturado para itens concluídos (`#46412`, `#46397`, `#46450`):**
     - Bots acumulavam linhas voláteis de tarefas e links de PRs diretamente em `MEMORY.md`, inflando o contexto de inicialização e dificultando a recuperação de lições duradouras quando itens eram encerrados.
+61. **Perda de autoria e falta de vinculação entre perguntas e workers iniciados (`#46287`):**
+    - Perguntas de agentes (`agent-questions`) não gravavam quem efetivamente as assumiu (`taker`), gerando ambiguidade na entrega de respostas. Além disso, `worker-start` não vinculava explicitamente a tarefa à pergunta que o worker deveria responder.
+62. **Truncamento de mensagens recentes e salto de páginas em `worker-read` (`#46446`):**
+    - Quando um transcript de worker atingia o orçamento de resposta de 512 KiB na primeira página, o backend descartava as mensagens mais novas em vez das mais antigas, e o cursor avançava para o fim do arquivo, impossibilitando a leitura das mensagens truncadas.
+63. **Workers em terminal com processo encerrado reportados indefinidamente como vivos (`#46448`):**
+    - Se o agente em execução num terminal sofresse crash, fosse morto ou encerrasse retornando ao shell, o terminal PTY permanecia aberto. O coordenador nunca era notificado da saída do agente e o despacho permanecia aberto indefinidamente até o reboot do aplicativo.
+64. **Desconexão transacional entre respostas/notices de perguntas e entrega de correio (`#46273`):**
+    - O registro de respostas a perguntas e notificações de queda comitavam separadamente do correio produzido. Falhas ou crashes entre as etapas geravam respostas órfãs sem entrega ou notices perdidas.
+65. **Interrupção arbitrária após 6 repasses de turnos em salas de grupos de bots (`#46517`):**
+    - Conversas encadeadas em salas de grupos de bots eram forçadas a pausar após 6 hand-offs sucessivos e turnos disparados por correio de colegas não despertavam os membros mencionados via `@`.
+66. **Vazamento de instruções confidenciais (`SOUL.md`/`MEMORY.md`) por permissões permissivas em arquivos de contexto (`#46602`, STA-16956):**
+    - Ao mesclar instruções permanentes de bots em arquivos existentes (`QWEN.md`, `.hermes.md`, `GEMINI.md`, etc.), o modo original `0644` era preservado, expondo instruções do operador no workspace.
 
 ## O que o upstream implementa
 
+- **Registro de assunção de perguntas (`taker`) e vinculação `--for` no arranque de workers (`#46287`):**
+  - Grava atomicamente quem assumiu a pergunta do agente no ato do aceite ou leitura (`markAsRead` / `markAsReadAndDelivered`), indexando na tabela de perguntas emparelhadas;
+  - Introduz a flag `worker-start --for <messageId>` para vincular deterministicamente o worker à pergunta que ele foi disparado para responder.
+- **Paginação de `worker-read` ordenada pelas mensagens mais recentes (`#46446`):**
+  - Ordena a primeira página de leitura de trás para frente (`newest-first`) limitando ao orçamento de 512 KiB e ajusta o cursor de retomada para continuar exatamente a partir da última mensagem servida sem perder histórico recente.
+- **Detecção de término de agente em terminal com PTY aberto e notificação ao coordenador (`#46448`):**
+  - Monitora o encerramento do processo do agente no terminal via probes no hook server, identificando processos ausentes ou shells órfãos e liquidando o status do worker para alertar o coordenador sem depender do fechamento do terminal.
+- **Commit atômico de respostas e avisos com correio em savepoint único (`#46273`):**
+  - Unifica a gravação da resposta a perguntas, notificações de descarte e envio do e-mail resultante dentro da mesma transação/savepoint no SQLite, impedindo inconsistências pós-crash.
+- **Eliminação do teto de 6 repasses e continuidade por `@mentions` em salas de grupos (`#46517`):**
+  - Remove o limite arbitrário de 6 hand-offs em salas de grupos de bots, permitindo que turnos disparados por correio continuem acordando membros citados via `@mention` e suprimindo disparos duplicados para membros já notificados.
+- **Permissões seguras `0600` em arquivos de contexto de diretório de bots (`#46602`, STA-16956):**
+  - Força o modo de arquivo estrito `0600` ao criar ou atualizar arquivos de instruções embutidas de bots (`QWEN.md`, `.hermes.md`, `GEMINI.md`, etc.), prevenindo a exposição pública de diretivas no sistema de arquivos.
+- **Otimização de leitura da árvore de chat de bots evitando re-leituras de workers concluídos (`#46478`):**
+  - Interrompe a re-leitura contínua de workers já liquidados a cada atualização da árvore de conversas do bot, aliviando o tráfego do SQLite.
 - **Leitura da caixa postal de Run através de índice dedicado (`#46477`):**
   - Otimiza a leitura da mailbox de um Run específico consultando diretamente pelo índice de Run em vez de varrer toda a tabela de mensagens da orquestração, mitigando contenção de I/O em bancos com histórico volumoso.
 - **Identificação do coordenador gravado no preâmbulo de `dispatch-show` (`#46402`, resolve `#33634`):**
@@ -356,6 +390,13 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Registrar o identificador de quem assumiu cada pergunta de agente (`taker`) e aceitar `worker-start --for <messageId>` (`#46287`).
+- Paginar `worker-read` newest-first dentro do teto de 512 KiB sem descartar mensagens recentes em logs longos (`#46446`).
+- Notificar o coordenador e liquidar o worker quando o agente em terminal encerrar com o shell PTY mantido aberto (`#46448`).
+- Comitar atomicamente respostas e avisos de perguntas junto com seu correio em savepoint único do SQLite (`#46273`).
+- Eliminar o teto de 6 repasses e continuar hand-offs em salas de grupos através de `@mentions` sem mensagens duplicadas (`#46517`).
+- Garantir permissões estritas `0600` em arquivos de instruções embutidas e contexto de diretórios de bots (`#46602`, STA-16956).
+- Evitar re-leitura contínua de workers concluídos na atualização da árvore de chats de bots (`#46478`).
 - Consultar caixa postal de um Run via índice dedicado para evitar varredura sequencial em tabelas de correio volumosas (`#46477`).
 - Exibir o coordenador gravado no despacho em `dispatch-show --preamble` ao inspecionar tarefas por workers (`#46402`, resolve `#33634`).
 - Registrar automaticamente tarefas encerradas e PRs mesclados no diário mensal `memory/journal/YYYY-MM.md` dos bots (`#46412`, `#46397`, `#46450`).

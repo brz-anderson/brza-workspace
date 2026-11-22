@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45969, #46211, #46202, #46028, #46185, #46024, #45690, #46003, #45986 e #45988 trazem junctions no Windows, profiler watchdog, status sem re-parse e proteção de chats.
+description: Os PRs #46138, #46581 e #46201 trazem proteção de checkouts restaurados no cleanup, índice de prosa por turno no journal e modal de exclusão compacto.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,10 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45969`](https://github.com/stablyai/orca/pull/45969),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46138`](https://github.com/stablyai/orca/pull/46138),
+[`stablyai/orca#46581`](https://github.com/stablyai/orca/pull/46581),
+[`stablyai/orca#46201`](https://github.com/stablyai/orca/pull/46201),
+[`stablyai/orca#45969`](https://github.com/stablyai/orca/pull/45969),
 [`stablyai/orca#46211`](https://github.com/stablyai/orca/pull/46211),
 [`stablyai/orca#46202`](https://github.com/stablyai/orca/pull/46202),
 [`stablyai/orca#46028`](https://github.com/stablyai/orca/pull/46028),
@@ -224,9 +227,24 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Ao restabelecer a ligação entre chats clonados e seus originais do Codex, o mecanismo de reconciliação descartava turnos intermediários de transcrições antigas, truncando o histórico da conversa.
 60. **Homes de bots adotados indevidamente como workspaces pais em varreduras automáticas (`#46003`):**
     - Pastas de trabalho de bots configurados eram identificadas erroneamente como repositórios pais de workspaces em rotinas automáticas de parentesco de diretórios, poluindo a hierarquia de projetos.
+61. **Risco de exclusão acidental de checkouts restaurados durante recuperação de remoção e limpeza de órfãos (`#46138`):**
+    - Durante a recuperação de remoções interrompidas de worktrees e limpezas de órfãos no host e no WSL, a ausência de conferência contínua do marcador `.git` e da identidade `dev:ino` do diretório raiz permitia que diretórios recriados ou substituídos por links no mesmo caminho fossem varridos recursivamente. Além disso, o regex de padding de `gitdir` sofria retrocesso quadrático (20k espaços levavam ~190ms).
+62. **Varredura sequencial lenta em buscas de prosa de turnos no journal de chat (`#46581`):**
+    - Leituras de prosa de turnos específicos no Session History e no journal realizavam varreduras lineares em todo o histórico da conversa sem utilizar o índice de turnos, degradando a performance em chats longos.
+63. **Layout excessivamente expandido no modal de confirmação de exclusão de workspace (`#46201`):**
+    - O diálogo de confirmação de exclusão de workspaces utilizava espaçamentos e caixas excessivas que quebravam em telas menores ou diálogos densos.
 
 ## O que o upstream propõe e implementa
 
+- **Proteção rigorosa de checkouts restaurados e validação de marcadores no cleanup (`#46138`):**
+  - Vincula a prova de propriedade do órfão estritamente ao marcador `.git` pré e pós-prova, abortando a varredura caso o marcador desapareça ou seja substituído no meio do processo;
+  - Revalida a identidade do diretório raiz (`dev:ino` via `lstatBigInt`) após a enumeração e antes de disparar exclusões recursivas, impedindo a travessia de symlinks substitutos;
+  - Re-stat do `.git` após ler o payload `gitdir` e parse linear do padding em $O(N)$ em vez de backtracking regex quadrático;
+  - Confinamento da varredura no WSL ao subshell `cwd` e proteção de checkouts Win32 com gitdir `C:/...` sob WSL.
+- **Índice de turnos para buscas rápidas de prosa no journal (`#46581`):**
+  - Utiliza o índice de turnos para realizar lookups pontuais de texto e prosa por turno no journal de conversas, eliminando varreduras sequenciais completas.
+- **Modal de confirmação de exclusão de workspace compacto (`#46201`):**
+  - Compacta o layout e os espaçamentos do diálogo de confirmação de remoção de workspace, garantindo visualização limpa e foco direto nas evidências.
 - **Linha de status fixa no diálogo de exclusão (`#45969`):**
   - Mantém uma linha de status de altura fixa no modal Delete, eliminando lacunas em branco e transições abruptas de layout.
 - **Suporte a junctions para links de diretório em testes no Windows (`#46211`, `#46202`):**
@@ -388,6 +406,9 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 
 ## O que fazer
 
+- Proteger checkouts restaurados no cleanup e validar marcador `.git` pré e pós-prova com parse linear de `gitdir` (`#46138`).
+- Utilizar índice de turnos para consultas de texto e prosa por turno no journal de conversas (`#46581`).
+- Adotar layout compacto e direto no modal de confirmação de exclusão de workspaces (`#46201`).
 - Manter linha de status fixa no modal Delete eliminando gaps e saltos de layout (`#45969`).
 - Utilizar junctions em links de diretório no Windows para compatibilidade de testes de IPC e git (`#46211`, `#46202`).
 - Isolar regras do Cursor em arquivo exclusivo preservando edições do usuário (`#46028`).

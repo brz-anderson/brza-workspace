@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #41598, #41620, #41332, #41268, #41325 trazem configurações nativas de plugins, unificação de automações e corte de Git em CI.
+description: Os PRs #46624, #46584, #46593 e #46522 trazem identificação real de gatilhos em automações, erros claros de agendamento e Import Cookies no topo do browser.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,11 @@ tags:
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#41598`](https://github.com/stablyai/orca/pull/41598) (resolve Issue [`#41369`](https://github.com/stablyai/orca/issues/41369)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46624`](https://github.com/stablyai/orca/pull/46624) (refs Issue [`#46564`](https://github.com/stablyai/orca/issues/46564)),
+[`stablyai/orca#46584`](https://github.com/stablyai/orca/pull/46584) (resolve Issue [`#46564`](https://github.com/stablyai/orca/issues/46564)),
+[`stablyai/orca#46593`](https://github.com/stablyai/orca/pull/46593),
+[`stablyai/orca#46522`](https://github.com/stablyai/orca/pull/46522),
+[`stablyai/orca#41598`](https://github.com/stablyai/orca/pull/41598) (resolve Issue [`#41369`](https://github.com/stablyai/orca/issues/41369)),
 [`stablyai/orca#41620`](https://github.com/stablyai/orca/pull/41620),
 [`stablyai/orca#41332`](https://github.com/stablyai/orca/pull/41332),
 [`stablyai/orca#41268`](https://github.com/stablyai/orca/pull/41268) (resolve Issue [`#41269`](https://github.com/stablyai/orca/issues/41269)),
@@ -52,8 +56,22 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41598`](https://github.com
 6. **Perda do estado de tela cheia nativo após reiniciar o aplicativo (`#40540`, resolve `#40510`):**
    No macOS e Linux, se o usuário estivesse usando o aplicativo em modo tela cheia nativo do sistema operacional, qualquer
    reinício (ou atualização automática) restaurava a janela em modo janela comum, exigindo novo acionamento manual.
+7. **Rotulagem genérica e errônea de gatilhos em execuções de automações (`#46624`, `#46584`, resolve `#46564`):**
+   Na visão de detalhes da execução (desktop e mobile), qualquer execução de automação disparada por eventos (Webhook, GitHub, Slack) era rotulada genericamente como "Trigger: Scheduled". Além disso, quando eventos subsequentes se agrupavam em uma execução em andamento, o campo `run.event` era sobrescrito, corrompendo a identificação do gatilho original.
+8. **Mensagens crípticas de ajuda e erros de sintaxe em agendamentos de automação (`#46593`):**
+   A sintaxe e os erros de agendamento de automações (`automation schedule`) emitiam mensagens genéricas do parser cron sem orientar sobre formatos aceitos ou apontar o campo com erro.
+9. **Dificuldade de acesso a cookies de autenticação no navegador embutido (`#46522`):**
+   A opção "Import Cookies" ficava oculta no submenu profundo do navegador embutido, dificultando a importação de sessões para testes autenticados de automação e web scraping.
 
 ## O que o upstream implementa e corrige
+
+- **Identificação real e durável de gatilhos em execuções de automação (`#46624`, `#46584`, resolve `#46564`):**
+  - Registra e preserva o campo imutável `triggeredBy` no ato de criação da execução, evitando que eventos agrupados posteriormente substituam a fonte original;
+  - Exibe a fonte real do evento (Webhook, GitHub, Slack, etc.) em Run Details e clientes móveis em vez de marcar genericamente como `Scheduled`.
+- **Ajuda e mensagens de erro descritivas para agendamento de automações (`#46593`):**
+  - Clarifica a sintaxe esperada nas mensagens de ajuda e detalha os motivos de recusa em cron expressions inválidas na CLI de automações.
+- **Opção 'Import Cookies' no topo do menu do navegador embutido (`#46522`):**
+  - Promove "Import Cookies" para o primeiro item do menu de opções `⋯` do navegador integrado, acelerando fluxos de autenticação em automações e testes.
 
 - **Ponto de contribuição `contributes.worktreeBadges` para plugins (`#40557`):**
   - Permite que manifestos de plugins (`engines.orca >=1.4.256`) declarem badges condicionais nos cartões de workspace;
@@ -96,15 +114,18 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#41598`](https://github.com
 
 ## O que fazer no BrzA Studio
 
-1. Adotar as configurações nativas de integração e handoff de workspaces para plugins (`#41598`, resolve `#41369`).
-2. Incorporar a navegação unificada de páginas de automações (`#41620`).
-3. Avaliar a API mínima de diagnósticos de plugins para o editor nativo (`#41616`).
-4. Eliminar o trabalho repetido de Git (fetches e merge checks) durante o monitoramento de checks de PR (`#41332`).
-5. Desligar o polling em segundo plano de rate limits para provedores desativados em configurações (`#41268`, resolve `#41269`).
-6. Tornar assíncrona a descoberta de caminhos de setup e atribuição de spans Git (`#41325`).
-7. Adotar o ponto de extensão `contributes.worktreeBadges` (`#40557`) no runtime de plugins do `brza-studio`, permitindo que skills e ferramentas especializadas exibam seus badges e menus contextuais na sidebar.
-8. Incorporar a configuração `prAutoRefresh` em `Settings` (`#40541`) para aliviar carga de CPU e API rate limits em máquinas compartilhadas.
-9. Atualizar o layout do painel de automações (`#40507`) para melhor ergonomia de inspeção e prevenção de cliques destrutivos.
-10. Adotar a atualização sob demanda (`visible-only`) de issues do GitHub ao reativar a janela (`#40534`), desobstruindo a fila da CLI.
-11. Incorporar a checagem `hasTerminalCommandPainted` em `tui-idle` (`#40539`) para garantir entrega segura de comandos via `orchestration dispatch`.
-12. Garantir persistência de fullscreen nativo pós-reinício (`#40540`).
+1. Preservar o gatilho original de automações em `triggeredBy` e rotular execuções de eventos pela sua fonte real (`#46624`, `#46584`, resolve `#46564`).
+2. Adotar mensagens de erro detalhadas e ajuda clara na validação de agendamentos cron (`#46593`).
+3. Posicionar a ação 'Import Cookies' no topo do menu de contexto do navegador embutido (`#46522`).
+4. Adotar as configurações nativas de integração e handoff de workspaces para plugins (`#41598`, resolve `#41369`).
+5. Incorporar a navegação unificada de páginas de automações (`#41620`).
+6. Avaliar a API mínima de diagnósticos de plugins para o editor nativo (`#41616`).
+7. Eliminar o trabalho repetido de Git (fetches e merge checks) durante o monitoramento de checks de PR (`#41332`).
+8. Desligar o polling em segundo plano de rate limits para provedores desativados em configurações (`#41268`, resolve `#41269`).
+9. Tornar assíncrona a descoberta de caminhos de setup e atribuição de spans Git (`#41325`).
+10. Adotar o ponto de extensão `contributes.worktreeBadges` (`#40557`) no runtime de plugins do `brza-studio`, permitindo que skills e ferramentas especializadas exibam seus badges e menus contextuais na sidebar.
+11. Incorporar a configuração `prAutoRefresh` em `Settings` (`#40541`) para aliviar carga de CPU e API rate limits em máquinas compartilhadas.
+12. Atualizar o layout do painel de automações (`#40507`) para melhor ergonomia de inspeção e prevenção de cliques destrutivos.
+13. Adotar a atualização sob demanda (`visible-only`) de issues do GitHub ao reativar a janela (`#40534`), desobstruindo a fila da CLI.
+14. Incorporar a checagem `hasTerminalCommandPainted` em `tui-idle` (`#40539`) para garantir entrega segura de comandos via `orchestration dispatch`.
+15. Garantir persistência de fullscreen nativo pós-reinício (`#40540`).

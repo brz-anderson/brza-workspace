@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45410, #46165 e #46009 trazem retomada automática pós-limite de uso por padrão, busca por início de palavra no menu @ e priorização de chats mid-turn no reboot.
+description: Os PRs #45876, #45881, #46592, #46570, #46583 e #46608 trazem exclusão de chat com tombstone no SQLite, linhas de chat limpas, strip enfileirado sereno e pickers em itens.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,13 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45410`](https://github.com/stablyai/orca/pull/45410),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45876`](https://github.com/stablyai/orca/pull/45876),
+[`stablyai/orca#45881`](https://github.com/stablyai/orca/pull/45881),
+[`stablyai/orca#46592`](https://github.com/stablyai/orca/pull/46592),
+[`stablyai/orca#46570`](https://github.com/stablyai/orca/pull/46570),
+[`stablyai/orca#46583`](https://github.com/stablyai/orca/pull/46583),
+[`stablyai/orca#46608`](https://github.com/stablyai/orca/pull/46608),
+[`stablyai/orca#45410`](https://github.com/stablyai/orca/pull/45410),
 [`stablyai/orca#46165`](https://github.com/stablyai/orca/pull/46165),
 [`stablyai/orca#46009`](https://github.com/stablyai/orca/pull/46009),
 [`stablyai/orca#46127`](https://github.com/stablyai/orca/pull/46127),
@@ -209,9 +215,34 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     - A lista de menções `@` de bots no Native Chat não filtrava por início de palavras nem considerava seleções recentes. Além disso, o disparo de `/` ou `$` após nomes espaçados de bots abria menus de forma inconsistente, e o cabeçalho 'Bots' desaparecia se houvesse apenas bots pausados na lista.
 52. **Competição desordenada na reinicialização de chats interrompidos mid-turn versus tarefas concluídas (`#46009`):**
     - Ao reiniciar o aplicativo após crash ou reboot, chats com agentes interrompidos no meio de uma resposta competiam na mesma fila de inicialização com chats que já haviam concluído a resposta do agente e tinham apenas comandos em background pendentes, atrasando o retorno do agente ao operador.
+53. **Incapacidade de excluir chats permanentemente e poluição do histórico de sessões (`#45876`):**
+    - Usuários não tinham opção para deletar conversas desnecessárias no Native Chat e Session History; chats descartados permaneciam gravados no SQLite, poluíam buscas e podiam ser re-adotados acidentalmente.
+54. **Poluição visual e colisão de controles nas linhas de chat e abas (`#45881`):**
+    - Linhas de chat na lista da sidebar e na aba de chats exibiam múltiplos botões simultâneos; no hover, o botão `⋯` colidia com o timestamp e o status ao vivo ficava oculto em mensagens longas.
+55. **Faixa de mensagens enfileiradas intrusiva e desconectada da linha de atividade (`#46592`):**
+    - A faixa de mensagens enfileiradas (*queued-message strip*) exibia botões permanentes de ação que desviavam o foco da leitura e não se alinhavam com a linha de atividade do chat.
+56. **Falta de menções `@` e comandos `/` na caixa de comentários de itens (`#46570`):**
+    - A caixa de comentários em itens e issues não dispunha dos recursos de autocompletar do composer principal, impedindo citar agentes/arquivos via `@` ou invocar skills e comandos `/` diretamente.
+57. **Falta de feedback visual no carregamento de itens de bots e identificadores opacos em Nova Aba (`#46583`, `#46608`):**
+    - Ao abrir detalhes de itens de bots, a tela permanecia em branco antes da resposta do servidor em vez de exibir um esqueleto (*skeleton loader*); no seletor de Nova Aba, agentes apareciam com IDs internos opacos em vez dos nomes configurados no catálogo.
 
 ## O que o upstream implementa
 
+- **Exclusão atômica de chats com tombstone permanente no SQLite (`#45876`):**
+  - Introduz o método RPC `agentSession.delete.v1` e a opção Delete chat no menu de linha e Session History;
+  - Interrompe a execução ativa com segurança, fecha abas abertas em todos os clientes pareados, exclui a linhagem de sessões `/clear` e grava tombstone permanente no SQLite para impedir re-adoção ou poluição de busca;
+  - Suporta confirmação com opção de memorização "Don't ask again" configurável em Settings.
+- **Linhas de chat serenas com chevron dinâmico e status na prévia (`#45881`):**
+  - Posiciona o ícone da fonte à esquerda com transição suave para chevron de colapso no hover;
+  - Desloca status ao vivo ("N running, N waiting") para a linha de prévia e substitui o timestamp pelo botão de menu `⋯` no hover, evitando conflitos visuais.
+- **Faixa de mensagens enfileiradas limpa com ações no hover (`#46592`):**
+  - Oculta botões permanentes da fila de envio, revelando ações somente no hover do mouse, foco por teclado ou toque em telas touch, alinhando a faixa à linha de atividade.
+- **Menções `@` e comandos slash `/` na caixa de comentários de itens (`#46570`):**
+  - Equipa a caixa de comentários de itens com os mesmos seletores de autocompletar do composer principal do chat, viabilizando menções diretas e envio de skills dedicadas.
+- **Exibição de nomes canônicos do catálogo no seletor de Nova Aba (`#46583`):**
+  - Resolve e exibe os nomes amigáveis dos agentes cadastrados no catálogo no picker de Nova Aba em vez de IDs internos.
+- **Esqueleto (*skeleton loader*) no carregamento de itens de bots (`#46608`):**
+  - Renderiza animação estruturada de esqueleto durante o carregamento assíncrono dos detalhes de itens de bots, eliminando telas vazias.
 - **Continuação automática de chats após limite de uso como padrão (`#45410`):**
   - Habilita `nativeChatAutoContinueAfterUsageLimit` ativada por padrão com migração one-shot de perfis existentes no carregamento;
   - Limita a varredura pós-redefinição de cota a dois envios por rodada (mais antigos primeiro), prevenindo picos de concorrência ao reabrir múltiplos chats simultaneamente.
@@ -355,6 +386,12 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Suportar exclusão de chat via RPC `agentSession.delete.v1` com tombstone permanente no SQLite (`#45876`).
+- Implementar linhas de chat limpas com chevron colapsável no ícone da fonte e status na prévia (`#45881`).
+- Suprimir botões permanentes na faixa de mensagens enfileiradas revelando ações sob hover ou foco (`#46592`).
+- Adicionar autocompletar com menções `@` e comandos `/` na caixa de comentários de itens (`#46570`).
+- Exibir nomes canônicos de catálogo de agentes no seletor de Nova Aba (`#46583`).
+- Renderizar skeleton loader durante o carregamento de detalhes de itens de bots (`#46608`).
 - Ativar continuação automática de chats após limites de uso por padrão com limite de dois envios concorrentes pós-reset (`#45410`).
 - Adotar busca por início de palavras e seleções recentes no menu de menções `@` de bots (`#46165`).
 - Priorizar a retomada de chats interrompidos mid-turn no reinício do sistema antes de tarefas finalizadas em background (`#46009`).

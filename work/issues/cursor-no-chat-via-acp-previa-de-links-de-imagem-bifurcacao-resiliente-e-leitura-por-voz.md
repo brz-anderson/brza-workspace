@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46142 e #46284 trazem auto-review em terminais do Cursor e resolução de model IDs de CLI para o chat server, enquanto #42654 traz Cursor via ACP e leitura por voz.
+description: Os PRs #47093 e #47071 adicionam sessões ACP nativas do Cursor no Session History e otimizam a descoberta de sessões com stat direto de store.db.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,9 @@ tags:
 
 # Cursor no Chat via ACP, prévia de links de imagem, bifurcação resiliente e leitura por voz
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46142`](https://github.com/stablyai/orca/pull/46142),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47093`](https://github.com/stablyai/orca/pull/47093),
+[`stablyai/orca#47071`](https://github.com/stablyai/orca/pull/47071),
+[`stablyai/orca#46142`](https://github.com/stablyai/orca/pull/46142),
 [`stablyai/orca#46284`](https://github.com/stablyai/orca/pull/46284) (resolve Issue [`#46163`](https://github.com/stablyai/orca/issues/46163)),
 [`stablyai/orca#42654`](https://github.com/stablyai/orca/pull/42654) (resolve Issue [`#42653`](https://github.com/stablyai/orca/issues/42653)),
 [`stablyai/orca#42646`](https://github.com/stablyai/orca/pull/42646) (resolve Issue [`#42645`](https://github.com/stablyai/orca/issues/42645)),
@@ -61,9 +63,17 @@ além das issues [`stablyai/orca#42602`](https://github.com/stablyai/orca/issues
     O modo de auto-revisão e aprovação automática de ações (`--auto-review` / "Approve for me") não podia ser selecionado em terminais do Cursor, forçando intervenção manual em cada etapa de tool call ou conflitando quando argumentos já continham `--force`, `-f` ou `--yolo`.
 12. **Falha `Invalid params` no envio de chat com IDs de modelo salvos da CLI do Cursor (`#46284`, resolve `#46163`):**
     Modelos configurados pela CLI do Cursor (ex.: `--model cursor-grok-4.6-high`) não eram reconhecidos pelo chat server nativo do Cursor, causando erro de parâmetro inválido no primeiro envio do chat.
+13. **Ausência de sessões ACP nativas do Cursor no histórico do AI Vault e Session History (`#47071`):**
+    O utilitário `cursor-agent acp` armazena as conversas estruturadas em `<config dir>/acp-sessions/<id>/` contendo `meta.json` e `store.db`. O scanner de histórico do aplicativo ignorava essa árvore, impedindo a listagem e reabertura de sessões do Cursor no Agent Session History.
+14. **Sobrecarga de I/O por varredura recursiva de diretórios em sessões ACP do Cursor (`#47093`):**
+    A descoberta de histórico realizava varredura completa da pasta de cada sessão do Cursor em vez de consultar diretamente os arquivos `store.db` das sessões atreladas ao aplicativo, degradando a performance do AI Vault em perfis com dezenas de conversas salvas.
 
 ## O que o upstream implementa
 
+- **Listagem e reabertura de sessões ACP nativas do Cursor no Session History (`#47071`):**
+  - Mapeia conversas próprias de `cursor-agent acp`, inspeciona o `mtime` de `store.db` para inferir atividade e lê `meta.json` para obter título e diretório de trabalho, viabilizando a reabertura no histórico.
+- **Otimização com `stat` direto de `store.db` em sessões Cursor ACP (`#47093`):**
+  - Executa `stat` direto nos arquivos `store.db` de sessões de posse do aplicativo sem varredura recursiva de pastas, acelerando substancialmente a listagem no AI Vault.
 - **Integração do Cursor no Native Chat sobre servidor ACP (`#42193`, `#41494`):**
   - Adiciona o Cursor como agente suportado no Native Chat, conectando-se ao seu servidor ACP nativo;
   - Reutiliza a autenticação já existente do Cursor no computador do operador;
@@ -100,3 +110,6 @@ além das issues [`stablyai/orca#42602`](https://github.com/stablyai/orca/issues
 - Adotar visualização de código em tela cheia e Context Sheet unificado no cliente móvel (`#42646`, `#42639`).
 - Corrigir a reabertura de chats do OpenCode após movimentação de pastas (`#42590`) e prevenir seletores TUI quebrados no mobile (`#42602`).
 - Conter listas de configurações de agentes em cartões roláveis (`#42211`).
+- Indexar e listar sessões ACP nativas do Cursor no histórico do AI Vault e Session History (`#47071`).
+- Otimizar a checagem de atividade de sessões do Cursor com `stat` direto em `store.db` evitando varreduras recursivas (`#47093`).
+

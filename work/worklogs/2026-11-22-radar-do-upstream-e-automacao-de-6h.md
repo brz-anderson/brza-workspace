@@ -11,6 +11,9 @@ refs:
   - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
   - issue:badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes
   - issue:conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes
+  - issue:cursor-no-chat-via-acp-previa-de-links-de-imagem-bifurcacao-resiliente-e-leitura-por-voz
+  - issue:fontes-web-em-plugins-isolamento-de-atalhos-e-resiliencia-de-hooks
+  - issue:gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache
   - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
   - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
@@ -61,4 +64,21 @@ refs:
    - [Badges de worktree para plugins, cadência de PR e redesenho de automações](../issues/badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes.md):
      adicionados os PRs `#46945` (resolve `#46919`), roteando a abertura de automações de bots para o host real (WSL ou nós SSH); `#46933` (resolve `#46932`), evitando que dark-wake holds congelem a janela de carência de execuções atrasadas; `#46908` (refs `#46027`), reportando `runtime_access_denied` em vez de falso "not running" sob falha de permissão de socket no daemon; e `#46846`, executando validações de hooks de workspace em threads assíncronas para eliminar congelamentos da UI.
 
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-22)
 
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e commits criados ou atualizados entre `2026-11-22T15:00:00Z` e `2026-11-22T21:01:00Z` (range upstream `f2f0cce6e42..2178e7cd95a`), comparando com os registros em `work/issues/` e o índice `.brza/index.jsonl`.
+2. **Atualização de 6 issues rastreadas em `work/issues/`:**
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionados os PRs `#46999` (resolve `#46992`), marcando turnos do Antigravity no terminal interrompidos por cota ou erro formalmente como falhas com mensagem real do assistente; `#46889`, integrando CodeBuddy Code via ACP (`codebuddy --acp`) com instruções `CODEBUDDY.local.md`; `#46878`, integrando Devin nativo com isolamento `in-process`, modos Ask/Code/Smart/Bypass e instruções `AGENTS.local.md`; e `#46896`, suportando Cline via ACP com marcação estrita de falhas em ferramentas em lote.
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados os PRs `#47016` (resolve `#47021`), delimitando diffs via ACP apenas às linhas alteradas em arquivos grandes > 256 KiB; `#47080` (refs `#47055`), retendo correspondências por título no histórico e `/resume` quando a busca FTS não encontrar acertos no corpo; `#47076`, exibindo integralmente comentários de perguntas abertas de agentes em itens sem truncamento em 8 linhas; `#47084`, preservando largura e legibilidade de chips de itens em linhas "Started"; e `#46740`, exibindo estado de repouso ("all-clear") com avatar cinza de bot na aba Items.
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionados os PRs `#46842`, `#46826`, `#46797` e `#46757`, viabilizando mensageria federada bidirecional com cartões de aprovação `NativeChatClientAskRequestCard` e envio via `--on-client`; `#47072`, roteando correio de worker liquidado diretamente para a thread conectora de origem; `#46643`, suportando retomada atômica de workers de terminal pós-reinício sob *Resume work on restart*; e `#47048`, resolvendo o handle em workers ainda em inicialização para evitar falso erro de não encontrado.
+   - [Cursor no Chat via ACP, prévia de links de imagem, bifurcação resiliente e leitura por voz](../issues/cursor-no-chat-via-acp-previa-de-links-de-imagem-bifurcacao-resiliente-e-leitura-por-voz.md):
+     adicionados os PRs `#47071`, descobrindo e indexando sessões ACP nativas de `cursor-agent acp` no Agent Session History; e `#47093`, otimizando a inspeção de atividade de conversas do Cursor via `stat` direto em `store.db`.
+   - [Fontes web em plugins, isolamento de atalhos e resiliência de hooks](../issues/fontes-web-em-plugins-isolamento-de-atalhos-e-resiliencia-de-hooks.md):
+     adicionados os PRs `#47102` (resolve `#47074`), centralizando verticalmente rótulos em formulários declarativos de plugins com a variante `control` de `Label`; e `#47067` (resolve `#47066`), resolvendo com `realpath` a raiz de staging na instalação de plugins locais para prevenir erros EPERM e links mutáveis.
+   - [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):
+     adicionado o PR `#47019` (resolve `#47018`), adicionando `<repo>/.prime/agent/skills` ao escopo de varredura e descoberta de skills locais do Prime Agent.
+   - [Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md):
+     adicionados os PRs `#47079`, habilitando continuação automática de chats após chaveamento de conta mesmo quando o horário de reset é desconhecido; e `#46984` (resolve `#46978`), liquidando prompts cancelados por Stop durante a inicialização do Claude como `unrun` para resguardar Rewind e Fork.

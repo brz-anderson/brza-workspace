@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46756, #46724, #46747, #46751, #46749 e #46718 preservam skills conhecidas em falhas de I/O, unificam diretório Gemini CLI e blindam comandos e plugins da CLI.
+description: O PR #47019 descobre skills do Prime Agent no diretório de projeto (<repo>/.prime/agent/skills), complementando o suporte a skills e comandos de plugins.
 scope:
   - brza-studio
 priority: high
@@ -15,7 +15,8 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46756`](https://github.com/stablyai/orca/pull/46756) (refs Issue [`#46706`](https://github.com/stablyai/orca/issues/46706)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47019`](https://github.com/stablyai/orca/pull/47019) (resolve Issue [`#47018`](https://github.com/stablyai/orca/issues/47018)),
+[`stablyai/orca#46756`](https://github.com/stablyai/orca/pull/46756) (refs Issue [`#46706`](https://github.com/stablyai/orca/issues/46706)),
 [`stablyai/orca#46724`](https://github.com/stablyai/orca/pull/46724),
 [`stablyai/orca#46747`](https://github.com/stablyai/orca/pull/46747) (resolve Issue [`#46708`](https://github.com/stablyai/orca/issues/46708)),
 [`stablyai/orca#46751`](https://github.com/stablyai/orca/pull/46751) (resolve Issue [`#46713`](https://github.com/stablyai/orca/issues/46713)),
@@ -97,9 +98,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46756`](https://github.com
     Quando um ou mais plugins falhavam na atualização em lote via `plugin update --all`, a CLI imprimia as linhas de sucesso e retornava código 0, impossibilitando que scripts de automação e CI detectassem falhas.
 21. **Descarte indevido de comandos atualizados ao descartar registros antigos (`#46718`, resolve `#46701`):**
     Em `commands.register`, o descarte de uma inscrição de comando anterior apagava o identificador do comando incondicionalmente, removendo também a nova implementação registrada para o mesmo ID.
+22. **Omissão de skills do Prime Agent mantidas no diretório do projeto (`#47019`, resolve `#47018`):**
+    O Prime Agent carrega skills específicas do repositório a partir de `<repo>/.prime/agent/skills`. O scanner do aplicativo varria apenas a raiz global `~/.prime/agent/skills` e a pasta padrão `.agents/skills`, deixando invisíveis skills mantidas estritamente na pasta do projeto do Prime Agent.
 
 ## O que os PRs fazem
 
+- **Descoberta de skills do Prime Agent na pasta do projeto (`#47019`, resolve `#47018`):**
+  - Adiciona `.prime/agent` à lista de diretórios de skills por repositório, garantindo que `<repo>/.prime/agent/skills` seja varrido e indexado automaticamente para o Prime Agent, mantendo novas instalações direcionadas a `.agents/skills`.
 - **Retenção de skills conhecidas como indisponíveis em falhas de raiz (`#46756`, refs `#46706`):**
   - Trata falhas não-ENOENT na raiz de skills lançando `SkillRootUnreadableError`, classificando a fonte como `unavailable` e mantendo em cache a última resposta válida conhecida para não perder skills.
 - **Instalação unificada de skills Gemini em `~/.agents/skills` (`#46724`):**
@@ -164,4 +169,5 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46756`](https://github.com
 16. Rejeitar seletores incompatíveis ou sem valor em `plugin install` com `invalid_argument` (`#46751`, resolve `#46713`).
 17. Emitir código 1 e lista de falhas por plugin em `plugin update --all` (`#46749`, resolve `#46698`).
 18. Vincular registros de comandos a seus wrappers para não descartar comandos substituídos (`#46718`, resolve `#46701`).
+19. Varrer e carregar skills mantidas na pasta de projeto do Prime Agent `<repo>/.prime/agent/skills` (`#47019`, resolve `#47018`).
 

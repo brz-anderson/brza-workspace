@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46901, #46930, #46974 e #46739 trazem prévia de imagens ACP sem arquivo, leitura chunked de anexos grandes, colar com botão do meio e primeira linha com chevron em agentes.
+description: Os PRs #47016, #47080, #47076, #47084 e #46740 trazem diffs compactos em arquivos grandes, retenção de títulos em busca vazia, comentários de perguntas íntegros e item pills legíveis.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,12 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46901`](https://github.com/stablyai/orca/pull/46901),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47016`](https://github.com/stablyai/orca/pull/47016) (resolve Issue [`#47021`](https://github.com/stablyai/orca/issues/47021)),
+[`stablyai/orca#47080`](https://github.com/stablyai/orca/pull/47080) (refs Issue [`#47055`](https://github.com/stablyai/orca/issues/47055)),
+[`stablyai/orca#47076`](https://github.com/stablyai/orca/pull/47076),
+[`stablyai/orca#47084`](https://github.com/stablyai/orca/pull/47084),
+[`stablyai/orca#46740`](https://github.com/stablyai/orca/pull/46740),
+[`stablyai/orca#46901`](https://github.com/stablyai/orca/pull/46901),
 [`stablyai/orca#46930`](https://github.com/stablyai/orca/pull/46930),
 [`stablyai/orca#46974`](https://github.com/stablyai/orca/pull/46974) (resolve Issue [`#46953`](https://github.com/stablyai/orca/issues/46953)),
 [`stablyai/orca#46739`](https://github.com/stablyai/orca/pull/46739),
@@ -237,9 +242,29 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     - Em ambientes Linux e navegadores X11/Wayland, o clique com o botão do meio no composer baseado em ProseMirror (tanto no chat principal quanto em caixas de anotação) não disparava a colagem do buffer de seleção primária, quebrando o comportamento esperado da plataforma desktop.
 61. **Omissão de pré-visualização de texto e chevron dinâmico confuso em linhas de mensagens de agentes (`#46739`):**
     - As linhas representativas de agentes no histórico de conversas exibiam apenas indicadores genéricos sem revelar a primeira linha de texto do turno e ocultavam o chevron de expansão, tornando difícil discernir o contexto rápido e saber se a linha era expansível.
+62. **Inflação de diffs e substituição inteira de arquivo em edições de arquivos grandes via ACP (`#47016`, resolve `#47021`):**
+    - Edições em arquivos grandes cuja soma do texto antigo e novo superava 256 KiB eram reportadas como substituição completa do arquivo, transformando uma edição de uma única linha em milhares de linhas removidas e readicionadas.
+63. **Desaparecimento instantâneo de resultados de título ao concluir busca sem correspondência FTS (`#47080`, refs `#47055`):**
+    - No Session History e no seletor `/resume`, enquanto o usuário digitava, sessões com títulos correspondentes apareciam na tela; se a busca full-text subsequente não encontrava correspondências no corpo das conversas, a lista era substituída por tela vazia, fazendo os resultados sumirem abruptamente.
+64. **Truncamento prematuro em 8 linhas de perguntas abertas de agentes em itens (`#47076`):**
+    - Quando um agente postava uma pergunta aberta em um item aguardando resposta humana, o comentário era cortado arbitrariamente em 8 linhas, ocultando o contexto da dúvida até que a pergunta fosse respondida ou substituída.
+65. **Ocultação e ilegibilidade de item pills em linhas "Started" de mensagens com nomes longos (`#47084`):**
+    - Em linhas de mensagens do tipo "Started" contendo remetente e chip de item vinculado, o nome do remetente possuía `flex-basis: auto` enquanto o chip do item tinha `flex-basis: 0`, fazendo com que o nome ocupasse todo o espaço horizontal e esmagasse o pill do item.
+66. **Ausência de estado visual de repouso ("all-clear") na aba Items quando nada requer atenção (`#46740`):**
+    - Quando todas as tarefas, perguntas e itens de um grupo de bots eram concluídos, a aba Items exibia uma lista vazia sem indicação visual de que a operação estava em dia (*all-clear*).
 
 ## O que o upstream implementa
 
+- **Diffs compactos delimitados ao trecho modificado para arquivos grandes em ACP (`#47016`, resolve `#47021`):**
+  - Mantém o caminho `createPatch` para textos até 256 KiB e, para textos maiores, descarta linhas compartilhadas nas extremidades gerando diff apenas sobre o trecho alterado (com tetos de 64 KiB e 256 edições), recalculando as posições originais das linhas.
+- **Retenção de correspondências por título durante buscas full-text sem acertos (`#47080`, refs `#47055`):**
+  - Mantém a exibição de sessões que casam por título enquanto a busca FTS está pendente ou quando não retorna acertos no texto, informando aviso suave sem zerar a lista nem perder foco e rolagem.
+- **Exibição integral de comentários de perguntas abertas enquanto aguardam resposta (`#47076`):**
+  - Mantém o texto completo da pergunta do agente sem truncamento em 8 linhas enquanto a pergunta estiver pendente de resposta humana, preservando espaçamento entre parágrafos.
+- **Dimensionamento proporcional e prioritário de item pills em linhas Started (`#47084`):**
+  - Ajusta a hierarquia flex para que a primeira linha de texto dê espaço primeiro, seguida do nome do remetente, garantindo que o chip do item e o nome preservem caracteres mínimos legíveis.
+- **Linha de all-clear com avatar cinza de bot na aba Items (`#46740`):**
+  - Exibe no topo da aba Items uma linha limpa de "tudo resolvido" com avatar monocromático de bot quando nenhum item demandar atenção humana imediata.
 - **Store de anexos na sessão para pré-visualização de imagens ACP em memória (`#46901`):**
   - Armazena imagens geradas sem caminho em disco no attachment store da sessão ACP, expondo URIs temporárias seguras para renderização inline imediata no Native Chat UI.
 - **Leitura em chunks particionados para imagens acima de 3MB em clientes pareados (`#46930`):**
@@ -469,4 +494,10 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Suportar leitura particionada em faixas (chunked ranges) para anexos de imagens > 3MB em sessões pareadas (`#46930`).
 - Tratar evento de paste com botão do meio do mouse no composer ProseMirror no Linux/desktop (`#46974`, resolve `#46953`).
 - Exibir a primeira linha de conteúdo e chevron sempre visível nas linhas de agentes do chat (`#46739`).
+- Gerar diffs delimitados apenas às linhas alteradas em arquivos grandes > 256 KiB via ACP (`#47016`, resolve `#47021`).
+- Reter resultados por correspondência de título em buscas de sessões quando o FTS retornar vazio (`#47080`, refs `#47055`).
+- Exibir perguntas abertas de agentes em comentários de itens sem truncamento antes da resposta (`#47076`).
+- Garantir legibilidade mínima de item pills em linhas Started de mensagens do chat (`#47084`).
+- Renderizar linha de all-clear com avatar monocromático de bot na aba Items quando não houver pendências (`#46740`).
+
 

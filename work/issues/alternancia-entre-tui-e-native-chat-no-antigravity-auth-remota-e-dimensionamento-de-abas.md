@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46941, #46851, #46963 e #46866 padronizam famílias de esforço Antigravity, seletor de raciocínio no Kiro, formulários AskUser do Droid e retries do OpenCode em ACP.
+description: Os PRs #46999, #46889, #46878 e #46896 trazem marcação de erro em paradas por cota no Antigravity e suporte aos agentes CodeBuddy, Devin e Cline no Native Chat.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,11 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46941`](https://github.com/stablyai/orca/pull/46941),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46999`](https://github.com/stablyai/orca/pull/46999) (resolve Issue [`#46992`](https://github.com/stablyai/orca/issues/46992)),
+[`stablyai/orca#46889`](https://github.com/stablyai/orca/pull/46889),
+[`stablyai/orca#46878`](https://github.com/stablyai/orca/pull/46878),
+[`stablyai/orca#46896`](https://github.com/stablyai/orca/pull/46896),
+[`stablyai/orca#46941`](https://github.com/stablyai/orca/pull/46941),
 [`stablyai/orca#46851`](https://github.com/stablyai/orca/pull/46851),
 [`stablyai/orca#46963`](https://github.com/stablyai/orca/pull/46963) (resolve Issue [`#46957`](https://github.com/stablyai/orca/issues/46957)),
 [`stablyai/orca#46866`](https://github.com/stablyai/orca/pull/46866) (resolve Issues [`#46727`](https://github.com/stablyai/orca/issues/46727), [`#46729`](https://github.com/stablyai/orca/issues/46729)),
@@ -260,9 +264,25 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Ao executar o Factory Droid no Native Chat, pedidos de esclarecimento ou formulários de elicitação disparados pela ferramenta `AskUser` não renderizavam cards de formulário interativo estruturados no Chat UI, deixando o agente em espera indeterminada de entrada do usuário.
 73. **Omissão de resposta final e falhas de retry em sessões filhas do OpenCode via ACP (`#46866`, resolve `#46727`, `#46729`):**
     Ao delegar tarefas para subagentes ou child runs do OpenCode sobre ACP, respostas finais consolidadas não eram entregues de volta à sessão pai, e falhas transitórias de comunicação com provedores de modelo não realizavam retries automáticos com backoff exponencial.
+74. **Falsos sucessos (check verde) em turnos de terminal do Antigravity interrompidos por cota ou erro (`#46999`, resolve `#46992`):**
+    Quando um turno do `agy` no terminal era interrompido com `terminationReason: ERROR` (ex.: estouro de cota de tokens ou requisições), o manipulador de eventos tratava o encerramento do processo como sucesso, exibindo um check verde na linha da mensagem e mantendo o último texto de progresso em vez de reportar falha com a mensagem de erro real do assistente.
+75. **Ausência de suporte ao agente CodeBuddy Code no Native Chat e para execução de bots (`#46889`):**
+    O ecossistema do Studio não integrava o CodeBuddy como backend nativo estruturado via ACP (`codebuddy --acp`), impedindo o carregamento de instruções permanentes de bots a partir de `CODEBUDDY.local.md` e a gestão integrada de permissões e perfis.
+76. **Falta de integração completa do agente Devin no Native Chat com isolamento de processo (`#46878`):**
+    O agente Devin não possuía inicialização nativa com modelo in-process (`devin acp --process-model in-process`), nem mapeamento dos modos de permissão (Ask, Code, Smart, Bypass) para os seletores do Native Chat, além de não alimentar instruções de bots via `AGENTS.local.md`.
+77. **Falta de suporte ao agente Cline no Native Chat com detecção de falhas de ferramentas em lote (`#46896`):**
+    O Cline não era suportado via servidor ACP (`cline --acp`), e ferramentas em lote que sofriam erro parcial reportavam falsamente status de conclusão bem-sucedida, além de prompts descartarem blocos de imagens caso não fossem passados como referências a arquivos físicos.
 
 ## O que o upstream implementa e corrige
 
+- **Marcação correta de turnos falhos por cota no Antigravity (`#46999`, resolve `#46992`):**
+  - Trata `agy Stop` ocioso com `terminationReason ERROR` como desfecho formal de falha (`mainAgent outcome failure`), transformando o texto do erro na mensagem final do assistente e pulando leituras corrompidas de transcript.
+- **Suporte ao CodeBuddy Code no Native Chat e para execução de bots (`#46889`):**
+  - Implementa dialeto ACP para CodeBuddy (`codebuddy --acp`), lê instruções permanentes de bots em `CODEBUDDY.local.md` e integra perfis e comandos de configuração no chat.
+- **Integração nativa do Devin com isolamento in-process e modos de permissão (`#46878`):**
+  - Executa sessões Devin com `devin acp --process-model in-process`, mapeia os modos Ask, Code, Smart e Bypass para os controles de permissão do Native Chat e alimenta instruções de bots via `AGENTS.local.md`.
+- **Suporte ao Cline via ACP com marcação estrita de falhas em ferramentas (`#46896`):**
+  - Conecta o Cline via `cline --acp`, marca chamadas de ferramentas como falhas se qualquer item de lote falhar, preserva imagens como referências a arquivos e lê regras em `.cline/rules/orca.md`.
 - **Mapeamento de famílias de modelos Antigravity para herança de esforço de raciocínio (`#46941`):**
   - Mapeia identificadores de modelos Antigravity com sufixo para suas respectivas famílias oficiais, garantindo que o controle de esforço (`--effort`) permaneça acessível e configurável em workers e subagentes.
 - **Seletor de esforço de raciocínio em novo chat do Kiro antes do primeiro envio (`#46851`):**
@@ -518,3 +538,8 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 69. Exibir o seletor de esforço de raciocínio no composer de chats Kiro antes da primeira mensagem (`#46851`).
 70. Renderizar cards estruturados de formulário para interações `AskUser` do Factory Droid no Native Chat (`#46963`, resolve `#46957`).
 71. Tratar retorno de child runs e retries com backoff em execuções de OpenCode via ACP (`#46866`, resolve `#46727`, `#46729`).
+72. Reportar turnos de terminal do Antigravity parados por erro de cota como falha e exibir mensagem real de erro (`#46999`, resolve `#46992`).
+73. Habilitar suporte nativo ao CodeBuddy Code via ACP no Native Chat e para automação de bots (`#46889`).
+74. Integrar o Devin no Native Chat com isolamento in-process e mapeamento de modos de permissão (`#46878`).
+75. Integrar o Cline no Native Chat com validação estrita de falhas parciais em ferramentas em lote (`#46896`).
+

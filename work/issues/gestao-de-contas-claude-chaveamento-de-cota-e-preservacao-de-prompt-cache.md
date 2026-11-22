@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46119, #46002 e #46099 otimizam a leitura única de logins do Claude e retêm a telemetria da conta System default no desktop e mobile.
+description: Os PRs #47079 e #46984 trazem continuidade automática de chat após troca de conta mesmo com reset desconhecido e liquidação unrun de prompt cancelado por Stop no Claude.
 scope:
   - brza-studio
   - brza-workflow
@@ -17,7 +17,9 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46119`](https://github.com/stablyai/orca/pull/46119),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47079`](https://github.com/stablyai/orca/pull/47079),
+[`stablyai/orca#46984`](https://github.com/stablyai/orca/pull/46984) (resolve Issue [`#46978`](https://github.com/stablyai/orca/issues/46978)),
+[`stablyai/orca#46119`](https://github.com/stablyai/orca/pull/46119),
 [`stablyai/orca#46002`](https://github.com/stablyai/orca/pull/46002),
 [`stablyai/orca#46099`](https://github.com/stablyai/orca/pull/46099) (refs Issue [`#45979`](https://github.com/stablyai/orca/issues/45979)),
 [`stablyai/orca#38581`](https://github.com/stablyai/orca/pull/38581),
@@ -114,9 +116,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46119`](https://github.com
     Ao alternar da conta System default para uma conta salva em um menu que permanece aberto, a leitura da conta padrão não era armazenada sob sua respectiva chave de cache, fazendo com que a linha exibisse *"Not checked"* em vez do uso recém-consultado.
 20. **Leituras redundantes de logins do Claude e ausência de consumo de System default em clientes móveis (`#46119`):**
     A rotina de verificação de autenticação lia repetidamente os arquivos de login de cada perfil do Claude a cada ciclo, gerando I/O desnecessário; além disso, a visualização remota em dispositivos móveis não recebia os dados de uso da conta System default do host.
+21. **Travamento permanente de continuações de chat após troca de conta quando o horário de reset é desconhecido (`#47079`):**
+    Quando um chat pausava por usage limit sem que o provedor informasse o horário exato de reset da cota, a sessão nunca prosseguia automaticamente, mesmo após o operador alternar para uma conta limpa. Além disso, paradas manuais via Stop não revogavam a retomada pendente, provocando retomadas indevidas em chaveamentos posteriores.
+22. **Quebra de Rewind e Fork por registro falso de prompt dropado em Stop no Claude (`#46984`, resolve `#46978`):**
+    Quando o comando Stop era acionado antes do Claude gravar o prompt (por exemplo durante o gancho `UserPromptSubmit`), o resultado `error_during_execution` com `terminal_reason: aborted_streaming` referenciava o UUID sintético do frame de resultado em vez do prompt real, quebrando funções de Rewind e Fork por apontar para um UUID inexistente no transcript.
 
 ## O que o upstream propõe e implementa
 
+- **Continuação de chat limitado após troca de conta mesmo com reset desconhecido (`#47079`):**
+  - Trata o momento da troca de conta como substituto do horário de reset para contas não impactadas pelo limite, permitindo que a nova leitura decida a retomada; lê o horário de reset no texto de erro do Codex em execução local e revoga o agendamento de retomada caso Stop tenha sido acionado.
+- **Liquidação correta como não executado (*unrun*) para prompts cancelados por Stop (`#46984`, resolve `#46978`):**
+  - Seta o garçom do prompt cancelado no arranque como rejeitado e não executado (*unrun*), eliminando referências a UUIDs fantasmas do frame de erro e preservando a integridade das operações de Rewind e Fork.
 - **Leitura única de logins do Claude e exibição de uso de System default no app móvel (`#46119`):**
   - Otimiza a rotina para ler cada login do Claude uma única vez por ciclo de sincronização e expõe as métricas de consumo da conta System default para clientes pareados e app móvel.
 - **Exibição do uso de System default do Claude enquanto outra conta salva está ativa (`#46002`):**
@@ -173,3 +183,6 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46119`](https://github.com
 - Portar o comando `orca account select --agent claude` (`#38227`) para a CLI do `brza`.
 - Avaliar a introdução de motor de rotação automática de contas Claude por host e janelas por modelo (`#39495`).
 - Disponibilizar a opção para desativar chamadas periódicas em background da cota OAuth (`#39502`).
+- Permitir retomada de chats sob limite de uso após chaveamento de conta mesmo sem horário de reset formal informado pelo provedor (`#47079`).
+- Liquidar prompts cancelados por Stop durante a inicialização do Claude como `unrun` para resguardar Rewind e Fork (`#46984`, resolve `#46978`).
+

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43916, #43877, #43876, #43569, #43604 trazem layouts Mermaid ELK empacotados, confiança de hooks no Windows e aviso na substituição de link CLI.
+description: Os PRs #47102 e #47067 alinham labels de controles declarativos de plugins e resolvem links simbólicos no staging de instalação de plugins locais.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,9 @@ tags:
 
 # Fontes web em plugins, isolamento de atalhos e resiliência de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43916`](https://github.com/stablyai/orca/pull/43916) (resolve Issue [`#43552`](https://github.com/stablyai/orca/issues/43552)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47102`](https://github.com/stablyai/orca/pull/47102) (resolve Issue [`#47074`](https://github.com/stablyai/orca/issues/47074)),
+[`stablyai/orca#47067`](https://github.com/stablyai/orca/pull/47067) (resolve Issue [`#47066`](https://github.com/stablyai/orca/issues/47066)),
+[`stablyai/orca#43916`](https://github.com/stablyai/orca/pull/43916) (resolve Issue [`#43552`](https://github.com/stablyai/orca/issues/43552)),
 [`stablyai/orca#43877`](https://github.com/stablyai/orca/pull/43877),
 [`stablyai/orca#43876`](https://github.com/stablyai/orca/pull/43876),
 [`stablyai/orca#43569`](https://github.com/stablyai/orca/pull/43569) (resolve Issue [`#42938`](https://github.com/stablyai/orca/issues/42938)),
@@ -62,9 +64,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43916`](https://github.com
     No Windows, o Orca gravava as chaves de confiança de hooks com ambas as grafias de separador (barra invertida `\` e barra normal `/`). O Codex consultava apenas a grafia com barra invertida em `hooks.json`, fazendo com que hooks já aprovados fossem solicitados novamente a cada novo lançamento de agente.
 11. **Substituição silenciosa de links simbólicos CLI entre instâncias do Orca (`#43876`):**
     Ao executar `orca register` ou clicar em "Install CLI", se outra instalação ou versão em desenvolvimento do app já tivesse registrado o link `/usr/local/bin/orca`, a substituição ocorria sem aviso de qual aplicação anterior detinha o vínculo.
+12. **Desalinhamento vertical de rótulos em RadioGroup e Checkbox declarativos de plugins (`#47102`, resolve `#47074`):**
+    Em formulários declarativos de plugins, os controles de 16px (círculo de rádio ou caixa de seleção) ficavam posicionados 2px abaixo em linhas com `items-start`, enquanto o texto do rótulo utilizava `leading-none` com line-box de 14px, centralizando o texto cerca de 3px acima do centro geométrico do controle visual.
+13. **Falhas EPERM e criação de links mutáveis ao instalar plugins locais a partir de diretórios com junção ou symlink (`#47067`, resolve `#47066`):**
+    Ao instalar um plugin local apontando para uma pasta acessada por symlink ou junction no Windows, o processo de cópia repassava a raiz não resolvida para `cp({ verbatimSymlinks: true })`, recriando o diretório de versão como um link (gerando erro EPERM no Windows ou mantendo um link mutável no macOS/Linux).
 
 ## O que o upstream implementa
 
+- **Alinhamento centrado de rótulos com variante `control` em formulários de plugins (`#47102`, resolve `#47074`):**
+  - Introduz a variante `control` para o componente `Label` com line-box de 20px, garantindo alinhamento perfeito do centro da primeira linha de texto com o círculo de rádio e checkbox, inclusive com quebra de linha.
+- **Resolução de diretório canônico via `realpath` no staging de instalação de plugins (`#47067`, resolve `#47066`):**
+  - Resolve a raiz de staging com `realpath` antes de copiar a árvore de arquivos do plugin, mantendo a cópia literal apenas para itens internos e prevenindo links simbólicos de raiz mutáveis ou erros EPERM.
 - **Distribuição segura de fontes tipográficas via manifesto de plugins (`#39416`):**
   - Adiciona o campo `fonts` na especificação de plugins, permitindo declarar arquivos WOFF2 seguros com limite de 2 MB
     por arquivo e 8 MB por família;
@@ -111,3 +121,6 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43916`](https://github.com
 - Adotar o rastreamento por `hydrationId` em formulários declarativos de plugins (`#39413`).
 - Aplicar as proteções de concorrência em substituição de comandos (`#39407`) e negação fail-closed em hooks (`#39393`).
 - Habilitar o disparo de atalhos de plugins dentro de terminais ativos (`#39348`).
+- Utilizar a variante `control` para centralizar verticalmente labels de RadioGroup e Checkbox em plugins (`#47102`, resolve `#47074`).
+- Resolver o caminho real com `realpath` no staging de instalação de plugins para evitar symlinks mutáveis ou falhas EPERM (`#47067`, resolve `#47066`).
+

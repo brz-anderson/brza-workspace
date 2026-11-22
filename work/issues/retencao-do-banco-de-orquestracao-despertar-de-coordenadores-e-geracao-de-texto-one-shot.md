@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #46955 e anteriores trazem avisos de retenção de entrega em envios send --on para servidores pareados e finalização de workers tardios.
+description: Os PRs #46842, #46826, #46797, #46757, #47072, #46643 e #47048 trazem federação bidirecional de mensagens com servidores pareados e retomada de workers de terminal.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,14 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46955`](https://github.com/stablyai/orca/pull/46955) (resolve Issue [`#46944`](https://github.com/stablyai/orca/issues/46944)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46842`](https://github.com/stablyai/orca/pull/46842),
+[`stablyai/orca#46826`](https://github.com/stablyai/orca/pull/46826),
+[`stablyai/orca#46797`](https://github.com/stablyai/orca/pull/46797),
+[`stablyai/orca#46757`](https://github.com/stablyai/orca/pull/46757),
+[`stablyai/orca#47072`](https://github.com/stablyai/orca/pull/47072),
+[`stablyai/orca#46643`](https://github.com/stablyai/orca/pull/46643),
+[`stablyai/orca#47048`](https://github.com/stablyai/orca/pull/47048),
+[`stablyai/orca#46955`](https://github.com/stablyai/orca/pull/46955) (resolve Issue [`#46944`](https://github.com/stablyai/orca/issues/46944)),
 [`stablyai/orca#46793`](https://github.com/stablyai/orca/pull/46793),
 [`stablyai/orca#46571`](https://github.com/stablyai/orca/pull/46571),
 [`stablyai/orca#46562`](https://github.com/stablyai/orca/pull/46562),
@@ -254,9 +261,25 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Perguntas enviadas para ou originadas de servidores pareados ficavam retidas em caixas postais sem aviso de cancelamento caso o nó remoto perdesse a conexão, sofresse reset ou o Run não tivesse coordenador ativo localmente.
 71. **Ausência de aviso de retenção (delivery hold) ao despachar mensagens com `send --on` para servidores pareados (`#46955`, resolve `#46944`):**
     - Ao utilizar `orca orchestration send --on <event>` com destino a instâncias ou servidores pareados, quando uma entrega era retida aguardando a ocorrência do gatilho ou confirmação de rota, o recibo de comando emitido pela CLI e logs omitiam a indicação de retenção ativa (*delivery hold*), dificultando o diagnóstico de mensagens pendentes em trânsito cross-host.
+72. **Impossibilidade de agentes em servidores pareados enviarem mensagens e perguntas para agentes locais (`#46842`, `#46826`, `#46797`, `#46757`):**
+    - A mensageria federada de orquestração funcionava apenas em sentido unidirecional ou restrito. Agentes rodando em servidores pareados não podiam disparar asks ou enviar correio para agentes neste computador com cartões de aprovação visual e introduções `@mention`, limitando a cooperação em clusters distribuídos.
+73. **Extravio de correio de workers liquidados ao não rotear para a thread conectora de origem (`#47072`):**
+    - Quando um worker encerrava e liquidava sua execução (*settled worker*), o correio residual emitido era roteado de forma genérica no pull loop em vez de ser devolvido diretamente à thread do conector que o havia iniciado, resultando em respostas perdidas para conectores síncronos.
+74. **Perda permanente de workers em terminais após reboot ou crash do daemon de terminal (`#46643`):**
+    - Se a máquina reiniciava ou o terminal daemon sofria crash, workers que executavam tarefas de orquestração em terminais eram considerados irrecuperáveis, mesmo com a opção *Resume work on restart* habilitada, deixando tarefas incompletas e forçando reexecução manual.
+75. **Erro de "worker não encontrado" ao tentar abrir worker ainda em inicialização (`#47048`):**
+    - Ao tentar inspecionar ou focar em um worker que ainda estava no processo inicial de arranque (*still-starting worker*), a rotina de localização de parte falhava com erro de destinatário inexistente em vez de utilizar o handle reservado e abrir a interface correspondente.
 
 ## O que o upstream implementa
 
+- **Federação bidirecional completa de mensageria com servidores pareados (`#46842`, `#46826`, `#46797`, `#46757`):**
+  - Permite que agentes em servidores pareados enviem mensagens e perguntas para agentes deste computador com flag `--on-client`, renderização de cartões `NativeChatClientAskRequestCard`, aprovações de introdução seguras por impressão digital de chave de host e resposta direta via mobile e desktop.
+- **Roteamento direto de correio de worker liquidado para o conector de origem (`#47072`):**
+  - Assegura que mensagens emitidas no encerramento de um worker sejam entregues com precisão à thread do conector responsável pela inicialização.
+- **Retomada resiliente de workers de terminal pós-reinício (*Resume work on restart*) (`#46643`):**
+  - Implementa recuperação e re-vinculação atômica de workers de terminal interrompidos por crash ou reboot sob a política de reinício, oferecendo ofertas de retomada contextualizadas e prevenindo perda de estado.
+- **Resolução de handle em workers em processo de inicialização (`#47048`):**
+  - Utiliza o identificador alocado provisoriamente para localizar e abrir a visão de workers ainda em fase de startup sem disparar falso erro de inexistência.
 - **Indicação explícita de delivery holds em recibos de `send --on` para servidores pareados (`#46955`, resolve `#46944`):**
   - Informa no recibo do despacho e na inspeção de status quando a entrega de uma mensagem inter-servidores está em retenção programada aguardando o evento disparador, evitando falsos positivos de perda de mensagens.
 - **Finalização idêntica para inicializações tardias de workers (`#46793`):**
@@ -488,4 +511,9 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Incorporar o comando CLI `brza text generate` e RPC `text.generate` (`#41729`, resolve `#41726`) para geração rápida de respostas sem ferramentas.
 - Suportar leitura por stdin (`--text -`) e arquivo (`--text-file`) no comando de envio para terminais (`#41754`, resolve `#40838`).
 - Exibir indicação de retenção ativa (delivery hold) em recibos e consultas de `send --on` cross-host (`#46955`, resolve `#46944`).
+- Habilitar mensageria bidirecional federada permitindo que agentes em servidores pareados enviem perguntas e mensagens via `--on-client` com aprovação segura (`#46842`, `#46826`, `#46797`, `#46757`).
+- Rotear o correio emitido por workers liquidados diretamente para a thread conectora de origem (`#47072`).
+- Retomar e re-vincular atomicamente workers de terminais interrompidos por reinício sob a política Resume work on restart (`#46643`).
+- Utilizar o handle reservado de workers em fase de startup para permitir abertura da interface sem falso erro de inexistência (`#47048`).
+
 

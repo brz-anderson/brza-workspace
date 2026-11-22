@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46624, #46584, #46593 e #46522 trazem identificação real de gatilhos em automações, erros claros de agendamento e Import Cookies no topo do browser.
+description: Os PRs #46945, #46933, #46908 e #46846 tratam host de automação de bots, grace period de dark-wake, runtime_access_denied em status e hooks de workspace off-thread.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,11 @@ tags:
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46624`](https://github.com/stablyai/orca/pull/46624) (refs Issue [`#46564`](https://github.com/stablyai/orca/issues/46564)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46945`](https://github.com/stablyai/orca/pull/46945) (resolve Issue [`#46919`](https://github.com/stablyai/orca/issues/46919)),
+[`stablyai/orca#46933`](https://github.com/stablyai/orca/pull/46933) (resolve Issue [`#46932`](https://github.com/stablyai/orca/issues/46932)),
+[`stablyai/orca#46908`](https://github.com/stablyai/orca/pull/46908) (refs Issue [`#46027`](https://github.com/stablyai/orca/issues/46027)),
+[`stablyai/orca#46846`](https://github.com/stablyai/orca/pull/46846),
+[`stablyai/orca#46624`](https://github.com/stablyai/orca/pull/46624) (refs Issue [`#46564`](https://github.com/stablyai/orca/issues/46564)),
 [`stablyai/orca#46584`](https://github.com/stablyai/orca/pull/46584) (resolve Issue [`#46564`](https://github.com/stablyai/orca/issues/46564)),
 [`stablyai/orca#46593`](https://github.com/stablyai/orca/pull/46593),
 [`stablyai/orca#46522`](https://github.com/stablyai/orca/pull/46522),
@@ -62,9 +66,25 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46624`](https://github.com
    A sintaxe e os erros de agendamento de automações (`automation schedule`) emitiam mensagens genéricas do parser cron sem orientar sobre formatos aceitos ou apontar o campo com erro.
 9. **Dificuldade de acesso a cookies de autenticação no navegador embutido (`#46522`):**
    A opção "Import Cookies" ficava oculta no submenu profundo do navegador embutido, dificultando a importação de sessões para testes autenticados de automação e web scraping.
+10. **Abertura de automação de bots apontando para o host local em vez do host de execução (`#46945`, resolve `#46919`):**
+    Ao navegar para os detalhes ou editar uma automação associada a bots executando em nós remotos (WSL ou SSH), o link da interface abria o contexto no host local da UI em vez do host onde o bot reside, provocando falhas de carregamento e comandos apontando para caminhos inexistentes.
+11. **Retenções de dark-wake congelando a janela de carência de execuções perdidas (`#46933`, resolve `#46932`):**
+    Quando um computador acordava em modo dark-wake (suspensão parcial do sistema operacional com tela desligada), automações com hold ativo paralisavam a contagem do período de tolerância (*grace period*) para execuções agendadas atrasadas, resultando em acúmulo e disparo desordenado de tarefas quando o sistema despertava por completo.
+12. **Classificação enganosa de falhas de permissão como daemons inativos no `orca status` (`#46908`, refs `#46027`):**
+    Quando comandos `orca status` ou diagnósticos de runtime encontravam recusa de permissão de leitura nos descritores ou sockets do daemon, o comando reportava falsamente que o daemon não estava em execução ("not running"), em vez de sinalizar explicitamente erro de acesso de permissão.
+13. **Travamentos e congelamentos da interface durante execução de hooks de workspace (`#46846`):**
+    As validações de hooks de workspace executavam checagens síncronas diretamente na thread principal (main thread) do aplicativo, causando travamentos e congelamentos momentâneos no renderer durante a alternância ou abertura de workspaces volumosos.
 
 ## O que o upstream implementa e corrige
 
+- **Navegação de automações de bots roteada para o host correto (`#46945`, resolve `#46919`):**
+  - Roteia a abertura de automações vinculadas a bots para o host proprietário (WSL, SSH ou runtime host remoto), garantindo visualização correta de logs e paths.
+- **Isolamento de dark-wake holds e proteção ao período de carência de agendamentos (`#46933`, resolve `#46932`):**
+  - Impede que retenções temporárias de dark-wake congelem o relógio de grace period de execuções perdidas, garantindo despacho ordenado de tarefas atrasadas ao despertar.
+- **Sinalização explícita de `runtime_access_denied` em verificações de status (`#46908`, refs `#46027`):**
+  - Reporta o estado específico `runtime_access_denied` em vez de falso negativo de processo parado quando houver falha de permissão no socket ou arquivo de lock do daemon.
+- **Execução assíncrona de checagens de hooks de workspace fora da thread principal (`#46846`):**
+  - Move a verificação e resolução de hooks de workspace para worker threads em background, preservando a fluidez de 60fps da UI durante transições de workspace.
 - **Identificação real e durável de gatilhos em execuções de automação (`#46624`, `#46584`, resolve `#46564`):**
   - Registra e preserva o campo imutável `triggeredBy` no ato de criação da execução, evitando que eventos agrupados posteriormente substituam a fonte original;
   - Exibe a fonte real do evento (Webhook, GitHub, Slack, etc.) em Run Details e clientes móveis em vez de marcar genericamente como `Scheduled`.
@@ -129,3 +149,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46624`](https://github.com
 13. Adotar a atualização sob demanda (`visible-only`) de issues do GitHub ao reativar a janela (`#40534`), desobstruindo a fila da CLI.
 14. Incorporar a checagem `hasTerminalCommandPainted` em `tui-idle` (`#40539`) para garantir entrega segura de comandos via `orchestration dispatch`.
 15. Garantir persistência de fullscreen nativo pós-reinício (`#40540`).
+16. Rotear a navegação e edição de automações de bots para o host real de execução em nós remotos e WSL (`#46945`, resolve `#46919`).
+17. Manter a integridade do período de carência de automações agendadas sob despertares em dark-wake (`#46933`, resolve `#46932`).
+18. Distinguir falhas de permissão de acesso ao runtime reportando `runtime_access_denied` no `brza status` (`#46908`, refs `#46027`).
+19. Mover a checagem de hooks de workspace para worker threads para eliminar congelamentos na UI (`#46846`).
+

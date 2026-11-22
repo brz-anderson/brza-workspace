@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46793, #46571, #46562 e #46541 trazem finalização tardia de workers, notificação de perguntas não respondidas por parada de coordenador/taker e suporte cross-host.
+description: O PR #46955 e anteriores trazem avisos de retenção de entrega em envios send --on para servidores pareados e finalização de workers tardios.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,8 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46793`](https://github.com/stablyai/orca/pull/46793),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46955`](https://github.com/stablyai/orca/pull/46955) (resolve Issue [`#46944`](https://github.com/stablyai/orca/issues/46944)),
+[`stablyai/orca#46793`](https://github.com/stablyai/orca/pull/46793),
 [`stablyai/orca#46571`](https://github.com/stablyai/orca/pull/46571),
 [`stablyai/orca#46562`](https://github.com/stablyai/orca/pull/46562),
 [`stablyai/orca#46541`](https://github.com/stablyai/orca/pull/46541),
@@ -251,9 +252,13 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Após assumir uma pergunta (`agent-question`), se o tomador parasse ou sofresse crash sem submeter a resposta, o perguntador ficava aguardando para sempre, pois a decisão de abandono dependia exclusivamente do encerramento geral do turno.
 70. **Silêncio perpétuo em perguntas trocadas com computadores pareados quando o destinatário ou Run não coordena (`#46571`):**
     - Perguntas enviadas para ou originadas de servidores pareados ficavam retidas em caixas postais sem aviso de cancelamento caso o nó remoto perdesse a conexão, sofresse reset ou o Run não tivesse coordenador ativo localmente.
+71. **Ausência de aviso de retenção (delivery hold) ao despachar mensagens com `send --on` para servidores pareados (`#46955`, resolve `#46944`):**
+    - Ao utilizar `orca orchestration send --on <event>` com destino a instâncias ou servidores pareados, quando uma entrega era retida aguardando a ocorrência do gatilho ou confirmação de rota, o recibo de comando emitido pela CLI e logs omitiam a indicação de retenção ativa (*delivery hold*), dificultando o diagnóstico de mensagens pendentes em trânsito cross-host.
 
 ## O que o upstream implementa
 
+- **Indicação explícita de delivery holds em recibos de `send --on` para servidores pareados (`#46955`, resolve `#46944`):**
+  - Informa no recibo do despacho e na inspeção de status quando a entrega de uma mensagem inter-servidores está em retenção programada aguardando o evento disparador, evitando falsos positivos de perda de mensagens.
 - **Finalização idêntica para inicializações tardias de workers (`#46793`):**
   - Trata o término da inicialização de um worker que atinge prontidão tardia exatamente da mesma forma que uma inicialização no prazo, garantindo consistência em bindings e registros de despacho.
 - **Notificação e liberação imediata de workers quando o coordenador para (`#46562`):**
@@ -482,3 +487,5 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Adotar o monitor de inatividade mid-turn de workers com notificação ao coordenador (`#41702`).
 - Incorporar o comando CLI `brza text generate` e RPC `text.generate` (`#41729`, resolve `#41726`) para geração rápida de respostas sem ferramentas.
 - Suportar leitura por stdin (`--text -`) e arquivo (`--text-file`) no comando de envio para terminais (`#41754`, resolve `#40838`).
+- Exibir indicação de retenção ativa (delivery hold) em recibos e consultas de `send --on` cross-host (`#46955`, resolve `#46944`).
+

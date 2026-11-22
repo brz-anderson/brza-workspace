@@ -8,6 +8,7 @@ completed: 2026-11-22
 tags:
   - tooling
 refs:
+  - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
   - issue:badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes
   - issue:conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes
   - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
@@ -46,4 +47,18 @@ refs:
      incorporado o PR `#42312`, que implementa guias de árvore (`tree guides`) para workspaces aninhados e worktrees filhas, otimizando o cálculo de trilhos ancestrais via lista encadeada compartilhada para custo linear proporcional aos trilhos visíveis e ajustando a medição de largura via hook dedicado.
    - [Redesenho de cartões de resposta, progresso por etapas e fila de mensagens](../issues/redesenho-de-cartoes-de-resposta-progresso-por-etapas-e-fila-de-mensagens.md):
      incorporado o PR `#42515`, trazendo o redesign completo do *Answer Card* com ladrilhos preenchidos, barra de etapas segmentada clicável, destaques em pill para opções recomendadas, navegação estruturada e fila de mensagens integrada ao composer com menus de ação rápida.
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-22)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e commits criados ou atualizados entre `2026-11-22T09:00:00Z` e `2026-11-22T15:15:00Z` (range upstream `5bbb4ed9d56..f2f0cce6e42`), comparando com os registros em `work/issues/` e o índice `.brza/index.jsonl`.
+2. **Atualização de 4 issues rastreadas em `work/issues/`:**
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionados os PRs `#46941`, mapeando IDs de modelo Antigravity qualificados com nível para suas famílias canônicas para reter controle de esforço; `#46851`, permitindo escolher o esforço de raciocínio no Kiro antes do envio da primeira mensagem; `#46963` (resolve `#46957`), suportando cards de formulário estruturado para elicitação `AskUser` do Factory Droid; e `#46866` (resolve `#46727`, `#46729`), tratando respostas finais de child runs e retries resilientes de provedor no OpenCode via ACP.
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados os PRs `#46901`, integrando store de anexos da sessão para renderizar imagens de ferramentas ACP sem arquivo em disco; `#46930`, implementando leitura em blocos (`readTextChunk` com ranges) para streaming de imagens > 3MB em clientes pareados; `#46974` (resolve `#46953`), suportando colagem com botão do meio do mouse em editores ProseMirror no Linux/desktop; e `#46739`, exibindo a primeira linha de conteúdo e chevron permanentemente visível em linhas de agentes.
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionado o PR `#46955` (resolve `#46944`), sinalizando avisos de retenção (delivery hold) em recibos de mensagens despachadas com `send --on` para servidores pareados.
+   - [Badges de worktree para plugins, cadência de PR e redesenho de automações](../issues/badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes.md):
+     adicionados os PRs `#46945` (resolve `#46919`), roteando a abertura de automações de bots para o host real (WSL ou nós SSH); `#46933` (resolve `#46932`), evitando que dark-wake holds congelem a janela de carência de execuções atrasadas; `#46908` (refs `#46027`), reportando `runtime_access_denied` em vez de falso "not running" sob falha de permissão de socket no daemon; e `#46846`, executando validações de hooks de workspace em threads assíncronas para eliminar congelamentos da UI.
+
 

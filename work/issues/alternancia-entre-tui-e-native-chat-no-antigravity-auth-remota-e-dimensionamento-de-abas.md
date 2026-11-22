@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46396, #46419 e #46476 aposentam sessões ACP em perda de sessão, publicam live slash commands na inicialização e suportam host-key sealing no Antigravity.
+description: Os PRs #46941, #46851, #46963 e #46866 padronizam famílias de esforço Antigravity, seletor de raciocínio no Kiro, formulários AskUser do Droid e retries do OpenCode em ACP.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,11 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46396`](https://github.com/stablyai/orca/pull/46396) (resolve Issue [`#46188`](https://github.com/stablyai/orca/issues/46188)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46941`](https://github.com/stablyai/orca/pull/46941),
+[`stablyai/orca#46851`](https://github.com/stablyai/orca/pull/46851),
+[`stablyai/orca#46963`](https://github.com/stablyai/orca/pull/46963) (resolve Issue [`#46957`](https://github.com/stablyai/orca/issues/46957)),
+[`stablyai/orca#46866`](https://github.com/stablyai/orca/pull/46866) (resolve Issues [`#46727`](https://github.com/stablyai/orca/issues/46727), [`#46729`](https://github.com/stablyai/orca/issues/46729)),
+[`stablyai/orca#46396`](https://github.com/stablyai/orca/pull/46396) (resolve Issue [`#46188`](https://github.com/stablyai/orca/issues/46188)),
 [`stablyai/orca#46419`](https://github.com/stablyai/orca/pull/46419) (refs Issue [`#46401`](https://github.com/stablyai/orca/issues/46401)),
 [`stablyai/orca#46476`](https://github.com/stablyai/orca/pull/46476),
 [`stablyai/orca#46125`](https://github.com/stablyai/orca/pull/46125),
@@ -248,9 +252,25 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Agentes ACP (como Hermes) enviam atualizações de comandos disponíveis (`available_commands_update`) logo após `session/new`. A leitura antecipada retornava indefinida até o término do handshake, resultando em menus `/` vazios ou sem comandos dinâmicos.
 69. **Rejeição do cofre de contas Antigravity em servidores headless sem chave de host (`#46476`):**
     Em instâncias Linux headless do daemon `orcad`, a ausência de keyring gráfico impedia a selagem segura de credenciais do AI Vault para o Antigravity, mesmo com o keyring do sistema operacional desbloqueado.
+70. **Perda de seletor de esforço ao instanciar workers Antigravity com IDs de modelo qualificados (`#46941`):**
+    Quando subagentes ou workers Antigravity eram inicializados utilizando IDs de modelo com sufixo ou qualificação de nível (como aliases de versão ou sufixos customizados), o runtime não mapeava a família base oficial do modelo, desativando indevidamente o ajuste fino de esforço de raciocínio (reasoning effort).
+71. **Impossibilidade de pré-selecionar o nível de raciocínio em novas conversas com o agente Kiro (`#46851`):**
+    No Native Chat, chats iniciados com o agente Kiro via ACP V3 não permitiam configurar o seletor de esforço de raciocínio antes do envio do primeiro prompt, forçando o início da sessão com valores padrão que não podiam ser alterados retrospectivamente no primeiro turno.
+72. **Bloqueio em formulários de elicitação interativa AskUser do Factory Droid (`#46963`, resolve `#46957`):**
+    Ao executar o Factory Droid no Native Chat, pedidos de esclarecimento ou formulários de elicitação disparados pela ferramenta `AskUser` não renderizavam cards de formulário interativo estruturados no Chat UI, deixando o agente em espera indeterminada de entrada do usuário.
+73. **Omissão de resposta final e falhas de retry em sessões filhas do OpenCode via ACP (`#46866`, resolve `#46727`, `#46729`):**
+    Ao delegar tarefas para subagentes ou child runs do OpenCode sobre ACP, respostas finais consolidadas não eram entregues de volta à sessão pai, e falhas transitórias de comunicação com provedores de modelo não realizavam retries automáticos com backoff exponencial.
 
 ## O que o upstream implementa e corrige
 
+- **Mapeamento de famílias de modelos Antigravity para herança de esforço de raciocínio (`#46941`):**
+  - Mapeia identificadores de modelos Antigravity com sufixo para suas respectivas famílias oficiais, garantindo que o controle de esforço (`--effort`) permaneça acessível e configurável em workers e subagentes.
+- **Seletor de esforço de raciocínio em novo chat do Kiro antes do primeiro envio (`#46851`):**
+  - Habilita o picker de reasoning effort no composer do Kiro logo na abertura de uma nova conversa, antes da submissão da primeira mensagem.
+- **Elicitação interativa com cards de formulário AskUser para Factory Droid (`#46963`, resolve `#46957`):**
+  - Implementa suporte a formulários de elicitação estruturados no Native Chat UI para requisições `AskUser` do Factory Droid, permitindo preenchimento de campos e envio interativo.
+- **Respostas de child runs e retries resilientes de provedor no OpenCode ACP (`#46866`, resolve `#46727`, `#46729`):**
+  - Captura e entrega respostas finais de sessões filhas do OpenCode ao contexto pai e adiciona retries com reconexão resiliente em falhas transitórias de provedor de modelo no ACP.
 - **Aposentadoria de sessões ACP quebradas em perda de sessão (`#46396`, resolve `#46188`):**
   - Desativa e encerra imediatamente a sessão ACP defeituosa ao capturar `session_lost_error` ou relato de perda de sessão pelo `agy` via gancho de dialeto `sessionLostNotice`, garantindo que o próximo envio instancie um provedor limpo sem congelar o chat.
 - **Publicação imediata de live slash commands durante o startup de sessões ACP (`#46419`, refs `#46401`):**
@@ -494,7 +514,7 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 65. Aposentar e recriar sessões ACP de forma limpa ao detectar perda de sessão (`session_lost_error`) no Antigravity (`#46396`, resolve `#46188`).
 66. Publicar comandos de barra em tempo real enviados durante a inicialização da sessão ACP (`#46419`, refs `#46401`).
 67. Permitir selagem de cofre de credenciais com host-key no Antigravity em ambientes Linux headless (`#46476`).
-
-
-
-
+68. Mapear IDs de modelo Antigravity qualificados para famílias canônicas para preservar o seletor de esforço de raciocínio em workers (`#46941`).
+69. Exibir o seletor de esforço de raciocínio no composer de chats Kiro antes da primeira mensagem (`#46851`).
+70. Renderizar cards estruturados de formulário para interações `AskUser` do Factory Droid no Native Chat (`#46963`, resolve `#46957`).
+71. Tratar retorno de child runs e retries com backoff em execuções de OpenCode via ACP (`#46866`, resolve `#46727`, `#46729`).

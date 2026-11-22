@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45876, #45881, #46592, #46570, #46583 e #46608 trazem exclusão de chat com tombstone no SQLite, linhas de chat limpas, strip enfileirado sereno e pickers em itens.
+description: Os PRs #46901, #46930, #46974 e #46739 trazem prévia de imagens ACP sem arquivo, leitura chunked de anexos grandes, colar com botão do meio e primeira linha com chevron em agentes.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,11 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45876`](https://github.com/stablyai/orca/pull/45876),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46901`](https://github.com/stablyai/orca/pull/46901),
+[`stablyai/orca#46930`](https://github.com/stablyai/orca/pull/46930),
+[`stablyai/orca#46974`](https://github.com/stablyai/orca/pull/46974) (resolve Issue [`#46953`](https://github.com/stablyai/orca/issues/46953)),
+[`stablyai/orca#46739`](https://github.com/stablyai/orca/pull/46739),
+[`stablyai/orca#45876`](https://github.com/stablyai/orca/pull/45876),
 [`stablyai/orca#45881`](https://github.com/stablyai/orca/pull/45881),
 [`stablyai/orca#46592`](https://github.com/stablyai/orca/pull/46592),
 [`stablyai/orca#46570`](https://github.com/stablyai/orca/pull/46570),
@@ -225,9 +229,25 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     - A caixa de comentários em itens e issues não dispunha dos recursos de autocompletar do composer principal, impedindo citar agentes/arquivos via `@` ou invocar skills e comandos `/` diretamente.
 57. **Falta de feedback visual no carregamento de itens de bots e identificadores opacos em Nova Aba (`#46583`, `#46608`):**
     - Ao abrir detalhes de itens de bots, a tela permanecia em branco antes da resposta do servidor em vez de exibir um esqueleto (*skeleton loader*); no seletor de Nova Aba, agentes apareciam com IDs internos opacos em vez dos nomes configurados no catálogo.
+58. **Falha na renderização de imagens retornadas por ferramentas ACP sem caminho físico no disco (`#46901`):**
+    - Ferramentas executadas por agentes ACP podem retornar imagens diretamente como payloads base64 sem caminho de arquivo gravado no workspace. O visualizador de anexos do Native Chat buscava carregar apenas arquivos a partir do caminho físico, resultando em imagens quebradas ou ausentes no card de saída da ferramenta.
+59. **Quebra de transferência e lentidão em imagens de chat superiores a 3MB em clientes pareados (`#46930`):**
+    - Quando clientes móveis ou instâncias pareadas tentavam visualizar imagens ou capturas com tamanho superior a 3MB anexadas no chat, o envio de payload monobloco causava estouro de buffer RPC ou timeouts de rede, inviabilizando a inspeção remota de imagens pesadas.
+60. **Bloqueio de colagem via botão do meio do mouse (middle-click paste) em editores ProseMirror (`#46974`, resolve `#46953`):**
+    - Em ambientes Linux e navegadores X11/Wayland, o clique com o botão do meio no composer baseado em ProseMirror (tanto no chat principal quanto em caixas de anotação) não disparava a colagem do buffer de seleção primária, quebrando o comportamento esperado da plataforma desktop.
+61. **Omissão de pré-visualização de texto e chevron dinâmico confuso em linhas de mensagens de agentes (`#46739`):**
+    - As linhas representativas de agentes no histórico de conversas exibiam apenas indicadores genéricos sem revelar a primeira linha de texto do turno e ocultavam o chevron de expansão, tornando difícil discernir o contexto rápido e saber se a linha era expansível.
 
 ## O que o upstream implementa
 
+- **Store de anexos na sessão para pré-visualização de imagens ACP em memória (`#46901`):**
+  - Armazena imagens geradas sem caminho em disco no attachment store da sessão ACP, expondo URIs temporárias seguras para renderização inline imediata no Native Chat UI.
+- **Leitura em chunks particionados para imagens acima de 3MB em clientes pareados (`#46930`):**
+  - Implementa transferência particionada via `readTextChunk` com ranges para streaming resiliente de imagens grandes entre servidor e clientes pareados sem estourar limites de mensagem.
+- **Suporte a middle-click paste em editores ProseMirror no composer (`#46974`, resolve `#46953`):**
+  - Conecta o manipulador nativo de `auxclick` e eventos de seleção primária ao ProseMirror, permitindo colar seleções do sistema operacional com o botão do meio do mouse.
+- **Primeira linha informativa e chevron sempre visível em linhas de agentes (`#46739`):**
+  - Exibe a primeira linha de texto do turno na linha do agente com truncamento elegante e mantém o chevron de expansão permanentemente visível para clareza de navegação.
 - **Exclusão atômica de chats com tombstone permanente no SQLite (`#45876`):**
   - Introduz o método RPC `agentSession.delete.v1` e a opção Delete chat no menu de linha e Session History;
   - Interrompe a execução ativa com segurança, fecha abas abertas em todos os clientes pareados, exclui a linhagem de sessões `/clear` e grava tombstone permanente no SQLite para impedir re-adoção ou poluição de busca;
@@ -445,3 +465,8 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Adotar o suporte nativo a subagentes OpenCode no Chat UI (`#39276`).
 - Adotar o agrupamento visual de subagentes na sidebar (`#38995`) e a ação de backgrounding de ferramentas (`#38963`) no `brza-studio`.
 - Portar o isolamento em threads de workers para o SQLite de histórico (`#38945`) e o rastreamento de processos órfãos (`#39013`).
+- Integrar store de anexos da sessão para renderizar imagens de ferramentas ACP sem caminho físico (`#46901`).
+- Suportar leitura particionada em faixas (chunked ranges) para anexos de imagens > 3MB em sessões pareadas (`#46930`).
+- Tratar evento de paste com botão do meio do mouse no composer ProseMirror no Linux/desktop (`#46974`, resolve `#46953`).
+- Exibir a primeira linha de conteúdo e chevron sempre visível nas linhas de agentes do chat (`#46739`).
+

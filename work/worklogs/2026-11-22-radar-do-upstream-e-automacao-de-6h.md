@@ -9,8 +9,11 @@ tags:
   - tooling
 refs:
   - issue:badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes
+  - issue:conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes
+  - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
   - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
+  - issue:redesenho-de-cartoes-de-resposta-progresso-por-etapas-e-fila-de-mensagens
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
 ---
 
@@ -30,3 +33,17 @@ refs:
      adicionados os PRs `#45876`, implementando exclusão atômica de chat via RPC `agentSession.delete.v1` com fechamento de abas e gravação de tombstone permanente no SQLite; `#45881`, tornando as linhas de chat mais limpas com chevron dinâmico no hover e status na prévia; `#46592`, limpando a faixa de mensagens enfileiradas com ações visíveis apenas sob hover, foco ou toque; `#46570`, equipando a caixa de comentários de itens com os mesmos seletores de menções `@` e comandos slash `/` do composer; `#46583`, exibindo nomes amigáveis de agentes do catálogo no seletor de Nova Aba; e `#46608`, renderizando esqueleto (*skeleton loader*) durante o carregamento de detalhes de itens de bots.
    - [Badges de worktree para plugins, cadência de PR e redesenho de automações](../issues/badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes.md):
      adicionados os PRs `#46624` (refs `#46564`) e `#46584` (resolve `#46564`), identificando duravelmente a fonte de disparo de automações em `triggeredBy` e rotulando a origem real (Webhook, GitHub, Slack) em vez de `Scheduled`; `#46593`, provendo mensagens de erro descritivas e ajuda clara na validação de agendamentos cron de automações; e `#46522`, promovendo a ação 'Import Cookies' para o topo do menu do navegador integrado.
+
+### 2. Ciclo de 6h (06:00 BRT / 09:00 UTC em 2026-11-22)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e commits criados ou atualizados entre `2026-11-22T03:00:00Z` e `2026-11-22T09:15:00Z` (range upstream `f5b017a8f16..5bbb4ed9d56`), comparando com os registros em `work/issues/` e o índice `.brza/index.jsonl`.
+2. **Atualização de 4 issues rastreadas em `work/issues/`:**
+   - [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):
+     adicionados os PRs `#46756` (refs `#46706`), retendo skills conhecidas em cache e marcando a raiz como `unavailable` em caso de erro transitório de I/O (`EACCES`, `EIO`, `EPERM`) sem purgar o catálogo; `#46724`, unificando a instalação de skills do Gemini CLI exclusivamente em `~/.agents/skills` e aposentando cópias redundantes em `~/.gemini/skills`; `#46747` (resolve `#46708`), tratando qualquer formato de `--dry-run` (incluindo `--dry-run=true`) como modo simulação nos comandos de skills; `#46751` (resolve `#46713`), rejeitando seletores inválidos (`--ref` em catálogo/pasta ou `--catalog` em pasta) com `invalid_argument` no `plugin install`; `#46749` (resolve `#46698`), saindo com código 1 e listando comandos individuais de repetição quando algum plugin falha em `plugin update --all`; e `#46718` (resolve `#46701`), associando registros de comandos a seus wrappers únicos para que o descarte de uma inscrição anterior não apague um comando recém-substituído.
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionados os PRs `#46793`, finalizando inicializações de workers que atingem prontidão tardiamente com as mesmas garantias de binding de inicializações no prazo; `#46562`, notificando workers e liberando chamadas `ask --wait` imediatamente quando o coordenador para sem responder ou quando o chat do Run é substituído (`/new`, troca de agente) ou excluído; `#46541`, emitindo aviso de abandono de pergunta de agente no momento em que o tomador (`taker`) para sem responder nem deixar worker `--for` ativo; e `#46571`, notificando agentes imediatamente em falhas de entrega de perguntas para computadores pareados ou runs órfãos.
+   - [Conectores de linhagem na sidebar, cores de grupos de projeto e isolamento de extensões em perfis](../issues/conectores-de-linhagem-na-sidebar-cores-de-grupos-e-isolamento-de-extensoes.md):
+     incorporado o PR `#42312`, que implementa guias de árvore (`tree guides`) para workspaces aninhados e worktrees filhas, otimizando o cálculo de trilhos ancestrais via lista encadeada compartilhada para custo linear proporcional aos trilhos visíveis e ajustando a medição de largura via hook dedicado.
+   - [Redesenho de cartões de resposta, progresso por etapas e fila de mensagens](../issues/redesenho-de-cartoes-de-resposta-progresso-por-etapas-e-fila-de-mensagens.md):
+     incorporado o PR `#42515`, trazendo o redesign completo do *Answer Card* com ladrilhos preenchidos, barra de etapas segmentada clicável, destaques em pill para opções recomendadas, navegação estruturada e fila de mensagens integrada ao composer com menus de ação rápida.
+

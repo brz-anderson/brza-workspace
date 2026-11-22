@@ -35,8 +35,19 @@ Rastreia melhorias de ergonomia visual na árvore de workspaces e grupos de proj
    - O indicador e cronômetro de expiração de cache de prompt na sidebar passa a iniciar estritamente após a conclusão de uma requisição real de IA, evitando acionamentos espúrios e alarmes falsos quando um painel entra em repouso sem chamadas efetuadas.
    - Trata refinamentos na diferenciação entre famílias de child workspaces abertos e pais colapsados ([Issue #42534](https://github.com/stablyai/orca/issues/42534)) e filtro para ocultar projetos que são pastas locais sem Git ([Issue #42530](https://github.com/stablyai/orca/issues/42530)).
 
-## Impacto no BrzA Studio
+## O que o upstream implementa
 
-- **Visual e Hierarquia:** A navegação por workspaces complexos, monorepos e worktrees paralelas fica muito mais limpa e intuitiva com conectores visuais explícitos, identificação colorida por projeto e acesso direto a workspaces adormecidos sem perder a filtragem limpa.
-- **Eficiência de Recursos:** Perfis de navegação isolados (usados pelo studio e automações web) não drenam mais memória da máquina quando colocados em segundo plano.
-- **Polimento de UI:** Elimina pequenos saltos ou fechamentos involuntários de menus de abas durante operações rápidas de limpeza de workspaces.
+- **Conectores de linhagem em árvore na sidebar para child workspaces ([PR #42312](https://github.com/stablyai/orca/pull/42312)):**
+  - Desenha guias visuais de árvore (tronco do pai, conexões tee/elbow para o filho e trilhos verticais de ancestrais) para workspaces aninhados e worktrees filhas;
+  - Otimiza a construção de trilhos ancestrais para custo proporcional aos trilhos desenhados através de lista encadeada compartilhada, eliminando verificações $O(N^2)$ e cópias redundantes de arrays em árvores com centenas de ramos;
+  - Confinamento da largura dos conectores aos limites da barra lateral com medição sob demanda via hook dedicado.
+
+## O que fazer
+
+- Implementar desenho de conectores de linhagem (`tree guides`) para workspaces aninhados e worktrees filhas na barra lateral (`#42312`).
+- Adotar compartilhamento de trilhos em lista encadeada para manter a projeção de linhagem linear na sidebar (`#42312`).
+- Suportar `Group color` configurável com barras coloridas em estilo thread de e-mail na barra lateral (`#42303`).
+- Suspender workers de extensões e alarmes em background para perfis inativos de navegador (`#42324`, resolve `#41906`).
+- Estabilizar a posição de menus de abas e worktrees durante o fechamento de itens concorrentes (`#42261`).
+- Exibir rodapé expansível `Sleeping (N)` com clique para despertar quando o filtro "Hide sleeping" estiver ativo (`#42346`, resolve `#42345`).
+- Iniciar a contagem regressiva de expiração de prompt cache estritamente após requisições reais de IA (`#42574`, resolve `#42556`).

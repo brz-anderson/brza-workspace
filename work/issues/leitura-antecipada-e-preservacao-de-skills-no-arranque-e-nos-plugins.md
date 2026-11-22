@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46217 e #46405 preservam skills de conta Claude com nomes limpos no menu / e impedem que arquivos sidecar marquem skills como desatualizadas.
+description: Os PRs #46756, #46724, #46747, #46751, #46749 e #46718 preservam skills conhecidas em falhas de I/O, unificam diretório Gemini CLI e blindam comandos e plugins da CLI.
 scope:
   - brza-studio
 priority: high
@@ -15,7 +15,13 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46217`](https://github.com/stablyai/orca/pull/46217),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46756`](https://github.com/stablyai/orca/pull/46756) (refs Issue [`#46706`](https://github.com/stablyai/orca/issues/46706)),
+[`stablyai/orca#46724`](https://github.com/stablyai/orca/pull/46724),
+[`stablyai/orca#46747`](https://github.com/stablyai/orca/pull/46747) (resolve Issue [`#46708`](https://github.com/stablyai/orca/issues/46708)),
+[`stablyai/orca#46751`](https://github.com/stablyai/orca/pull/46751) (resolve Issue [`#46713`](https://github.com/stablyai/orca/issues/46713)),
+[`stablyai/orca#46749`](https://github.com/stablyai/orca/pull/46749) (resolve Issue [`#46698`](https://github.com/stablyai/orca/issues/46698)),
+[`stablyai/orca#46718`](https://github.com/stablyai/orca/pull/46718) (resolve Issue [`#46701`](https://github.com/stablyai/orca/issues/46701)),
+[`stablyai/orca#46217`](https://github.com/stablyai/orca/pull/46217),
 [`stablyai/orca#46405`](https://github.com/stablyai/orca/pull/46405) (resolve Issue [`#46403`](https://github.com/stablyai/orca/issues/46403)),
 [`stablyai/orca#45822`](https://github.com/stablyai/orca/pull/45822),
 [`stablyai/orca#45966`](https://github.com/stablyai/orca/pull/45966) (resolve Issue [`#45965`](https://github.com/stablyai/orca/issues/45965)),
@@ -79,8 +85,33 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46217`](https://github.com
     Quando agentes (como Codex) geram arquivos locais ao lado de `SKILL.md` (por exemplo `agents/openai.yaml`), a verificação de frescor julgava a pasta inteira em vez do `SKILL.md` oficial, disparando alertas falsos de desatualização e corrompendo a resolução de cópias anteriores.
 15. **Perda de formatação e sumiço de skills de conta Claude no menu `/` após o primeiro turno (`#46405`, resolve `#46403`):**
     O Claude Code lista skills de conta como `<name>` nos descritores de inicialização, mas passa a reportá-las como `anthropic-skills:<name>` no stream do sistema. Após o primeiro turno, o catálogo adotava o nome com namespace, perdendo descrição e dicas de argumentos, e jogando a skill para o final do menu `/`.
+16. **Queda total de skills conhecidas diante de falha transitória de I/O na raiz de skills (`#46756`, refs `#46706`):**
+    Quando a leitura da raiz de skills encontrava erros temporários de permissão ou I/O (`EACCES`, `EIO`, `EPERM`) em `stat`, `realpath` ou `readdir`, o sistema tratava a raiz como inexistente ou vazia, purgando instantaneamente todas as skills previamente carregadas da memória.
+17. **Avisos contínuos de skills duplicadas no Gemini CLI por instalações redundantes (`#46724`):**
+    O Gemini CLI lê tanto `~/.gemini/skills` quanto `~/.agents/skills` e emite alertas em cada inicialização caso o mesmo nome apareça em ambos. O aplicativo duplicava a instalação nos dois diretórios.
+18. **Ignoramento de flags `--dry-run` com formato `--dry-run=true` em comandos de skills (`#46747`, resolve `#46708`):**
+    A checagem estrita `=== true` no parser de flags ignorava `--dry-run=true` (tratada como string `'true'`), executando a instalação/atualização real em vez de exibir a prévia simulada.
+19. **Instalação incorreta ou silenciosa em seletores incompatíveis de `plugin install` (`#46751`, resolve `#46713`):**
+    O comando `plugin install` descartava silenciosamente `--ref` em IDs de catálogo ou pastas locais, e `--catalog` em pastas de plugins, instalando versões ou origens não solicitadas pelo usuário em vez de rejeitar argumentos inválidos.
+20. **Saída com código 0 em falhas parciais de `plugin update --all` (`#46749`, resolve `#46698`):**
+    Quando um ou mais plugins falhavam na atualização em lote via `plugin update --all`, a CLI imprimia as linhas de sucesso e retornava código 0, impossibilitando que scripts de automação e CI detectassem falhas.
+21. **Descarte indevido de comandos atualizados ao descartar registros antigos (`#46718`, resolve `#46701`):**
+    Em `commands.register`, o descarte de uma inscrição de comando anterior apagava o identificador do comando incondicionalmente, removendo também a nova implementação registrada para o mesmo ID.
 
 ## O que os PRs fazem
+
+- **Retenção de skills conhecidas como indisponíveis em falhas de raiz (`#46756`, refs `#46706`):**
+  - Trata falhas não-ENOENT na raiz de skills lançando `SkillRootUnreadableError`, classificando a fonte como `unavailable` e mantendo em cache a última resposta válida conhecida para não perder skills.
+- **Instalação unificada de skills Gemini em `~/.agents/skills` (`#46724`):**
+  - Instala skills do Gemini exclusivamente no root compartilhado `~/.agents/skills`, mantendo `~/.gemini/skills` apenas para descoberta manual e aposentando cópias duplicadas antigas.
+- **Validação universal de presença de flag para `--dry-run` (`#46747`, resolve `#46708`):**
+  - Trata qualquer ocorrência de `--dry-run` (incluindo `--dry-run=true`) como modo preview em `skills install` e `skills update`.
+- **Rejeição explícita de argumentos inválidos em `plugin install` (`#46751`, resolve `#46713`):**
+  - Emite erro imediato `invalid_argument` ao receber seletores incompatíveis (`--ref` em catálogo/pasta ou `--catalog` em pasta) antes de tentar a instalação.
+- **Código de erro e relatório discriminado em falhas de `plugin update --all` (`#46749`, resolve `#46698`):**
+  - Retorna código 1 (ou 3 em aprovação pendente) caso algum plugin falhe no update em lote, gerando objeto `error.data.failed` com comandos de repetição específicos por plugin.
+- **Descarte escopado por wrapper de comandos substituídos (`#46718`, resolve `#46701`):**
+  - Associa cada registro de comando ao seu próprio wrapper único, garantindo que o descarte de um registro anterior remova o comando apenas se ele ainda for o detentor ativo daquele registro.
 
 - **Pasta única e neutra para skills de agentes gerenciados (`#45822`):**
   - Centraliza skills em `<home>/skills/<name>/`, gerando links automáticos para `.claude/skills` e `.agents/skills` na inicialização de chats ou na troca de agentes;
@@ -127,4 +158,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46217`](https://github.com
 10. Resolver aliases de provedores com `realpath` no staging de compartilhamento de skills (`#45966`, resolve `#45965`).
 11. Avaliar atualidade e frescor de skills isolando o `SKILL.md` oficial de arquivos auxiliares gerados por agentes (`#46217`).
 12. Preservar a grafia limpa sem prefixo de namespace para skills de conta do Claude no seletor `/` (`#46405`, resolve `#46403`).
+13. Reter skills em cache marcando a raiz como `unavailable` em caso de erro temporário de I/O em vez de esvaziar catálogo (`#46756`, refs `#46706`).
+14. Unificar a instalação de skills do Gemini CLI em `~/.agents/skills` sem duplicações em `~/.gemini/skills` (`#46724`).
+15. Tratar qualquer formato de `--dry-run` como simulação nos comandos de skills (`#46747`, resolve `#46708`).
+16. Rejeitar seletores incompatíveis ou sem valor em `plugin install` com `invalid_argument` (`#46751`, resolve `#46713`).
+17. Emitir código 1 e lista de falhas por plugin em `plugin update --all` (`#46749`, resolve `#46698`).
+18. Vincular registros de comandos a seus wrappers para não descartar comandos substituídos (`#46718`, resolve `#46701`).
 

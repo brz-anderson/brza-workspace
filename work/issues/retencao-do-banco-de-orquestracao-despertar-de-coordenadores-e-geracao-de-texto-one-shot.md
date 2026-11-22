@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46287, #46446, #46448, #46273 e #46517 trazem autoria de perguntas, paginação resiliente em worker-read, detecção de encerramento em terminal e hand-offs livres em grupos.
+description: Os PRs #46793, #46571, #46562 e #46541 trazem finalização tardia de workers, notificação de perguntas não respondidas por parada de coordenador/taker e suporte cross-host.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,11 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46287`](https://github.com/stablyai/orca/pull/46287),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#46793`](https://github.com/stablyai/orca/pull/46793),
+[`stablyai/orca#46571`](https://github.com/stablyai/orca/pull/46571),
+[`stablyai/orca#46562`](https://github.com/stablyai/orca/pull/46562),
+[`stablyai/orca#46541`](https://github.com/stablyai/orca/pull/46541),
+[`stablyai/orca#46287`](https://github.com/stablyai/orca/pull/46287),
 [`stablyai/orca#46446`](https://github.com/stablyai/orca/pull/46446),
 [`stablyai/orca#46448`](https://github.com/stablyai/orca/pull/46448),
 [`stablyai/orca#46273`](https://github.com/stablyai/orca/pull/46273),
@@ -239,9 +243,26 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Conversas encadeadas em salas de grupos de bots eram forçadas a pausar após 6 hand-offs sucessivos e turnos disparados por correio de colegas não despertavam os membros mencionados via `@`.
 66. **Vazamento de instruções confidenciais (`SOUL.md`/`MEMORY.md`) por permissões permissivas em arquivos de contexto (`#46602`, STA-16956):**
     - Ao mesclar instruções permanentes de bots em arquivos existentes (`QWEN.md`, `.hermes.md`, `GEMINI.md`, etc.), o modo original `0644` era preservado, expondo instruções do operador no workspace.
+67. **Divergência de finalização em workers que atingem prontidão com atraso (`#46793`):**
+    - Quando um `worker-start` demorava além da janela síncrona e atingia o estado pronto tardiamente, o runtime não finalizava a inicialização com as mesmas garantias de binding e vinculação de mailbox concedidas a inicializações no prazo, gerando tarefas em limbo.
+68. **Trabalhadores e perguntas travados indefinidamente quando o coordenador para sem responder (`#46562`):**
+    - Se um coordenador lia a pergunta de um worker (`worker ask`) e parava ou encerrava sem responder nem despachar worker `--for`, a chamada `ask --wait` permanecia bloqueada indefinidamente. O mesmo ocorria quando o chat coordenador do Run era substituído por `/new` ou excluído.
+69. **Perguntas de agentes sem retorno quando o tomador (`taker`) para sem responder (`#46541`):**
+    - Após assumir uma pergunta (`agent-question`), se o tomador parasse ou sofresse crash sem submeter a resposta, o perguntador ficava aguardando para sempre, pois a decisão de abandono dependia exclusivamente do encerramento geral do turno.
+70. **Silêncio perpétuo em perguntas trocadas com computadores pareados quando o destinatário ou Run não coordena (`#46571`):**
+    - Perguntas enviadas para ou originadas de servidores pareados ficavam retidas em caixas postais sem aviso de cancelamento caso o nó remoto perdesse a conexão, sofresse reset ou o Run não tivesse coordenador ativo localmente.
 
 ## O que o upstream implementa
 
+- **Finalização idêntica para inicializações tardias de workers (`#46793`):**
+  - Trata o término da inicialização de um worker que atinge prontidão tardia exatamente da mesma forma que uma inicialização no prazo, garantindo consistência em bindings e registros de despacho.
+- **Notificação e liberação imediata de workers quando o coordenador para (`#46562`):**
+  - Envia aviso de `unanswered` ao worker no momento em que seu coordenador para sem responder nem deixar worker em execução, destravando chamadas `ask --wait`;
+  - Aposenta Runs e desassocia coordenadores em uma única escrita quando chats são substituídos (`/new`, troca de agente) ou deletados, notificando perguntas abertas imediatamente.
+- **Notificação de abandono de perguntas quando o tomador encerra sem responder (`#46541`):**
+  - Avalia dinamicamente o estado de execução do tomador (`taker`) e dispara notificação de abandono ao autor da pergunta assim que comprovado que o tomador parou e nenhum worker `--for` está ativo.
+- **Resolução determinística de perguntas entre computadores pareados (`#46571`):**
+  - Informa os agentes imediatamente caso uma pergunta direcionada a computador pareado não possa ser entregue ou caso chegue a um Run que perdeu seu coordenador local, eliminando correios órfãos.
 - **Registro de assunção de perguntas (`taker`) e vinculação `--for` no arranque de workers (`#46287`):**
   - Grava atomicamente quem assumiu a pergunta do agente no ato do aceite ou leitura (`markAsRead` / `markAsReadAndDelivered`), indexando na tabela de perguntas emparelhadas;
   - Introduz a flag `worker-start --for <messageId>` para vincular deterministicamente o worker à pergunta que ele foi disparado para responder.
@@ -390,6 +411,10 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 
 ## O que fazer
 
+- Finalizar inicializações de workers que atingem prontidão tardiamente com as mesmas garantias de binding (`#46793`).
+- Notificar workers e liberar `ask --wait` imediatamente quando o coordenador parar ou for substituído/deletado (`#46562`).
+- Disparar aviso de abandono de pergunta de agente no momento em que o tomador parar sem responder (`#46541`).
+- Resolver e avisar imediatamente falhas de entrega em perguntas emparelhadas com servidores remotos (`#46571`).
 - Registrar o identificador de quem assumiu cada pergunta de agente (`taker`) e aceitar `worker-start --for <messageId>` (`#46287`).
 - Paginar `worker-read` newest-first dentro do teto de 512 KiB sem descartar mensagens recentes em logs longos (`#46446`).
 - Notificar o coordenador e liquidar o worker quando o agente em terminal encerrar com o shell PTY mantido aberto (`#46448`).

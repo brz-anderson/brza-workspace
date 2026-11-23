@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47016, #47080, #47076, #47084 e #46740 trazem diffs compactos em arquivos grandes, retenção de títulos em busca vazia, comentários de perguntas íntegros e item pills legíveis.
+description: Os PRs #47200, #47220 e #47191 movem mensagens enfileiradas para chats substitutos, executam correio após falhas e permitem vincular trabalho de agentes a itens de terceiros.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,10 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47016`](https://github.com/stablyai/orca/pull/47016) (resolve Issue [`#47021`](https://github.com/stablyai/orca/issues/47021)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47200`](https://github.com/stablyai/orca/pull/47200),
+[`stablyai/orca#47220`](https://github.com/stablyai/orca/pull/47220),
+[`stablyai/orca#47191`](https://github.com/stablyai/orca/pull/47191),
+[`stablyai/orca#47016`](https://github.com/stablyai/orca/pull/47016) (resolve Issue [`#47021`](https://github.com/stablyai/orca/issues/47021)),
 [`stablyai/orca#47080`](https://github.com/stablyai/orca/pull/47080) (refs Issue [`#47055`](https://github.com/stablyai/orca/issues/47055)),
 [`stablyai/orca#47076`](https://github.com/stablyai/orca/pull/47076),
 [`stablyai/orca#47084`](https://github.com/stablyai/orca/pull/47084),
@@ -252,9 +255,21 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     - Em linhas de mensagens do tipo "Started" contendo remetente e chip de item vinculado, o nome do remetente possuía `flex-basis: auto` enquanto o chip do item tinha `flex-basis: 0`, fazendo com que o nome ocupasse todo o espaço horizontal e esmagasse o pill do item.
 66. **Ausência de estado visual de repouso ("all-clear") na aba Items quando nada requer atenção (`#46740`):**
     - Quando todas as tarefas, perguntas e itens de um grupo de bots eram concluídos, a aba Items exibia uma lista vazia sem indicação visual de que a operação estava em dia (*all-clear*).
+67. **Migração ordenada de mensagens enfileiradas e cancelamento com aviso de mensagens de conectores ao substituir chat (`#47200`):**
+    - Quando um chat era substituído por uma nova conversa, mensagens enfileiradas aguardando a conclusão do turno ativo se perdiam ou ficavam órfãs, enquanto mensagens originadas de conectores ficavam retidas em limbo sem confirmação de cancelamento.
+68. **Bloqueio total de correio de outros agentes por turnos com falhas transitórias (`#47220`):**
+    - Mensagens enfileiradas de outros agentes eram suspensas indefinidamente quando o turno do agente principal falhava por qualquer motivo operacional, mesmo que a falha não fosse por esgotamento de cota de uso (*usage limit*).
+69. **Impossibilidade de agentes anexarem itens, URLs e arquivos a itens abertos de outros agentes (`#47191`):**
+    - Agentes ficavam impossibilitados de associar tarefas filhas, links de PRs, arquivos e comandos `worker-start --item` a itens de trabalho criados por outros agentes no mesmo workspace, limitando a colaboração entre bots na árvore de itens.
 
 ## O que o upstream implementa
 
+- **Migração ordenada de filas de envio e cancelamento limpo de conectores na substituição de chats (`#47200`):**
+  - Ao substituir uma sessão de chat, transfere mensagens enfileiradas atrás do turno em execução diretamente para a nova conversa, mantendo autor, ordem e anexos; drena mensagens de conectores na sessão antiga emitindo aviso de parada.
+- **Liberação de correio entre agentes em turnos falhos que não sejam por limite de uso (`#47220`):**
+  - Executa o correio enfileirado de outros agentes no próximo turno se a falha anterior não tiver sido causada por limite de cota de uso, restringindo a pausa estrita apenas a cenários que aguardam redefinição de cota ou ação humana.
+- **Anexação colaborativa de itens, PRs e arquivos entre agentes em itens abertos (`#47191`):**
+  - Permite que um agente anexe URLs, PRs, arquivos e inicie workers vinculados a itens abertos por outro agente no workspace da máquina local, atribuindo os anexos ao autor chamador com rotulagem amigável ("Another agent").
 - **Diffs compactos delimitados ao trecho modificado para arquivos grandes em ACP (`#47016`, resolve `#47021`):**
   - Mantém o caminho `createPatch` para textos até 256 KiB e, para textos maiores, descarta linhas compartilhadas nas extremidades gerando diff apenas sobre o trecho alterado (com tetos de 64 KiB e 256 edições), recalculando as posições originais das linhas.
 - **Retenção de correspondências por título durante buscas full-text sem acertos (`#47080`, refs `#47055`):**
@@ -499,5 +514,9 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Exibir perguntas abertas de agentes em comentários de itens sem truncamento antes da resposta (`#47076`).
 - Garantir legibilidade mínima de item pills em linhas Started de mensagens do chat (`#47084`).
 - Renderizar linha de all-clear com avatar monocromático de bot na aba Items quando não houver pendências (`#46740`).
+- Migrar mensagens enfileiradas e encerrar com aviso itens de conectores ao trocar de chat ativo (`#47200`).
+- Liberar o processamento de correio de outros agentes após falhas de turno não relacionadas a limite de uso (`#47220`).
+- Suportar anotação e vinculação de itens e workers entre diferentes agentes na árvore de itens (`#47191`).
+
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47079 e #46984 trazem continuidade automática de chat após troca de conta mesmo com reset desconhecido e liquidação unrun de prompt cancelado por Stop no Claude.
+description: O PR #47209 evita re-escaneamentos de transcripts via realpath em perfis compartilhados do Claude, e os PRs #47079 e #46984 tratam limites e cancelamentos.
 scope:
   - brza-studio
   - brza-workflow
@@ -17,7 +17,8 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47079`](https://github.com/stablyai/orca/pull/47079),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47209`](https://github.com/stablyai/orca/pull/47209) (refs Issue [`#47146`](https://github.com/stablyai/orca/issues/47146)),
+[`stablyai/orca#47079`](https://github.com/stablyai/orca/pull/47079),
 [`stablyai/orca#46984`](https://github.com/stablyai/orca/pull/46984) (resolve Issue [`#46978`](https://github.com/stablyai/orca/issues/46978)),
 [`stablyai/orca#46119`](https://github.com/stablyai/orca/pull/46119),
 [`stablyai/orca#46002`](https://github.com/stablyai/orca/pull/46002),
@@ -120,9 +121,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47079`](https://github.com
     Quando um chat pausava por usage limit sem que o provedor informasse o horário exato de reset da cota, a sessão nunca prosseguia automaticamente, mesmo após o operador alternar para uma conta limpa. Além disso, paradas manuais via Stop não revogavam a retomada pendente, provocando retomadas indevidas em chaveamentos posteriores.
 22. **Quebra de Rewind e Fork por registro falso de prompt dropado em Stop no Claude (`#46984`, resolve `#46978`):**
     Quando o comando Stop era acionado antes do Claude gravar o prompt (por exemplo durante o gancho `UserPromptSubmit`), o resultado `error_during_execution` com `terminal_reason: aborted_streaming` referenciava o UUID sintético do frame de resultado em vez do prompt real, quebrando funções de Rewind e Fork por apontar para um UUID inexistente no transcript.
+23. **Re-escaneamento, re-análise e re-indexação redundante de transcripts em múltiplos perfis Claude (`#47209`, refs `#47146`):**
+    Quando múltiplos perfis do Claude compartilham a pasta global de projetos através de links simbólicos (ou quando as raízes de perfis apontam para destinos equivalentes), o indexador de transcripts varria e processava repetidamente os mesmos diretórios de projetos para cada perfil, consumindo CPU e I/O desnecessários.
 
 ## O que o upstream propõe e implementa
 
+- **Varredura única de pastas de projetos entre perfis Claude via `realpath` (`#47209`, refs `#47146`):**
+  - Resolve os caminhos canônicos das raízes de perfis através de `realpath` e desduplica diretórios de projetos antes da indexação, garantindo que transcripts em pastas compartilhadas sejam processados apenas uma vez.
 - **Continuação de chat limitado após troca de conta mesmo com reset desconhecido (`#47079`):**
   - Trata o momento da troca de conta como substituto do horário de reset para contas não impactadas pelo limite, permitindo que a nova leitura decida a retomada; lê o horário de reset no texto de erro do Codex em execução local e revoga o agendamento de retomada caso Stop tenha sido acionado.
 - **Liquidação correta como não executado (*unrun*) para prompts cancelados por Stop (`#46984`, resolve `#46978`):**
@@ -185,4 +190,6 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47079`](https://github.com
 - Disponibilizar a opção para desativar chamadas periódicas em background da cota OAuth (`#39502`).
 - Permitir retomada de chats sob limite de uso após chaveamento de conta mesmo sem horário de reset formal informado pelo provedor (`#47079`).
 - Liquidar prompts cancelados por Stop durante a inicialização do Claude como `unrun` para resguardar Rewind e Fork (`#46984`, resolve `#46978`).
+- Resolver caminhos reais via `realpath` e deduplicar pastas de projetos compartilhadas entre perfis Claude na indexação de transcripts (`#47209`, refs `#47146`).
+
 

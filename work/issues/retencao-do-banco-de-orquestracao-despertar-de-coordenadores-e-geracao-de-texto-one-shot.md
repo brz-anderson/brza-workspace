@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46842, #46826, #46797, #46757, #47072, #46643 e #47048 trazem federação bidirecional de mensagens com servidores pareados e retomada de workers de terminal.
+description: Os PRs #47135 e #47081 trazem desvinculação de Runs no fechamento de terminal do coordenador e notificação de espera prolongada em tarefas de background.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,9 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46842`](https://github.com/stablyai/orca/pull/46842),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47135`](https://github.com/stablyai/orca/pull/47135),
+[`stablyai/orca#47081`](https://github.com/stablyai/orca/pull/47081),
+[`stablyai/orca#46842`](https://github.com/stablyai/orca/pull/46842),
 [`stablyai/orca#46826`](https://github.com/stablyai/orca/pull/46826),
 [`stablyai/orca#46797`](https://github.com/stablyai/orca/pull/46797),
 [`stablyai/orca#46757`](https://github.com/stablyai/orca/pull/46757),
@@ -269,9 +271,17 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Se a máquina reiniciava ou o terminal daemon sofria crash, workers que executavam tarefas de orquestração em terminais eram considerados irrecuperáveis, mesmo com a opção *Resume work on restart* habilitada, deixando tarefas incompletas e forçando reexecução manual.
 75. **Erro de "worker não encontrado" ao tentar abrir worker ainda em inicialização (`#47048`):**
     - Ao tentar inspecionar ou focar em um worker que ainda estava no processo inicial de arranque (*still-starting worker*), a rotina de localização de parte falhava com erro de destinatário inexistente em vez de utilizar o handle reservado e abrir a interface correspondente.
+76. **Perguntas de workers bloqueadas indefinidamente ao fechar terminal ou pane de coordenador (`#47135`):**
+    - Quando o terminal ou pane de um coordenador era fechado ou esvaziado, a desvinculação do Run ativo não era propagada prontamente, fazendo com que perguntas abertas de workers aguardassem indefinidamente por um leitor inexistente.
+77. **Ausência de visibilidade e notificação em esperas longas de tarefas em background de workers (`#47081`):**
+    - Quando um worker executava uma tarefa prolongada em segundo plano, a árvore de execução não exibia o estado de espera ativo e o coordenador não recebia nenhum alerta após períodos estendidos de bloqueio.
 
 ## O que o upstream implementa
 
+- **Desassociação imediata de Runs e aviso de sem leitor ao fechar terminal do coordenador (`#47135`):**
+  - Desvincula (*unbinds*) Runs ativos imediatamente quando o terminal do coordenador encerra ou tem sua pane fechada/esvaziada, notificando perguntas abertas com aviso explícito de *no reader* para liberar workers bloqueados.
+- **Indicador de espera na árvore e notificação após 60 minutos de espera em background (`#47081`):**
+  - Reflete o status de espera na árvore de tarefas quando um worker aguarda sua própria tarefa em segundo plano e dispara notificação única ao coordenador caso a espera contínua atinja 60 minutos.
 - **Federação bidirecional completa de mensageria com servidores pareados (`#46842`, `#46826`, `#46797`, `#46757`):**
   - Permite que agentes em servidores pareados enviem mensagens e perguntas para agentes deste computador com flag `--on-client`, renderização de cartões `NativeChatClientAskRequestCard`, aprovações de introdução seguras por impressão digital de chave de host e resposta direta via mobile e desktop.
 - **Roteamento direto de correio de worker liquidado para o conector de origem (`#47072`):**
@@ -515,5 +525,8 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Rotear o correio emitido por workers liquidados diretamente para a thread conectora de origem (`#47072`).
 - Retomar e re-vincular atomicamente workers de terminais interrompidos por reinício sob a política Resume work on restart (`#46643`).
 - Utilizar o handle reservado de workers em fase de startup para permitir abertura da interface sem falso erro de inexistência (`#47048`).
+- Desvincular Runs e notificar workers com erro no-reader quando a pane do terminal coordenador for fechada (`#47135`).
+- Exibir estado de espera na árvore e alertar o coordenador após 60 minutos de espera em background (`#47081`).
+
 
 

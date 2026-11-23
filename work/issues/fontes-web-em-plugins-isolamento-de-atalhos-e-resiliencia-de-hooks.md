@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47102 e #47067 alinham labels de controles declarativos de plugins e resolvem links simbólicos no staging de instalação de plugins locais.
+description: O PR #47107 reconhece links de ref do Codeberg e Gitea na instalação de plugins via git, e os PRs #47102 e #47067 alinham labels e tratam symlinks locais.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,8 @@ tags:
 
 # Fontes web em plugins, isolamento de atalhos e resiliência de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47102`](https://github.com/stablyai/orca/pull/47102) (resolve Issue [`#47074`](https://github.com/stablyai/orca/issues/47074)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47107`](https://github.com/stablyai/orca/pull/47107) (resolve Issue [`#47104`](https://github.com/stablyai/orca/issues/47104)),
+[`stablyai/orca#47102`](https://github.com/stablyai/orca/pull/47102) (resolve Issue [`#47074`](https://github.com/stablyai/orca/issues/47074)),
 [`stablyai/orca#47067`](https://github.com/stablyai/orca/pull/47067) (resolve Issue [`#47066`](https://github.com/stablyai/orca/issues/47066)),
 [`stablyai/orca#43916`](https://github.com/stablyai/orca/pull/43916) (resolve Issue [`#43552`](https://github.com/stablyai/orca/issues/43552)),
 [`stablyai/orca#43877`](https://github.com/stablyai/orca/pull/43877),
@@ -68,9 +69,13 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47102`](https://github.com
     Em formulários declarativos de plugins, os controles de 16px (círculo de rádio ou caixa de seleção) ficavam posicionados 2px abaixo em linhas com `items-start`, enquanto o texto do rótulo utilizava `leading-none` com line-box de 14px, centralizando o texto cerca de 3px acima do centro geométrico do controle visual.
 13. **Falhas EPERM e criação de links mutáveis ao instalar plugins locais a partir de diretórios com junção ou symlink (`#47067`, resolve `#47066`):**
     Ao instalar um plugin local apontando para uma pasta acessada por symlink ou junction no Windows, o processo de cópia repassava a raiz não resolvida para `cp({ verbatimSymlinks: true })`, recriando o diretório de versão como um link (gerando erro EPERM no Windows ou mantendo um link mutável no macOS/Linux).
+14. **Falha na instalação de plugins a partir de URLs do Codeberg, Gitea e Forgejo com ref (`#47107`, resolve `#47104`):**
+    Ao tentar instalar plugins via Git usando links de repositórios hospedados no Codeberg ou instâncias Gitea/Forgejo apontando para branches, tags ou commits específicos (contendo caminhos `/src/branch/...`, `/src/tag/...` ou `/src/commit/...`), o instalador não reconhecia o padrão de ref, falhando na extração da URL de clone e no checkout do commit desejado.
 
 ## O que o upstream implementa
 
+- **Reconhecimento de links de ref do Codeberg, Gitea e Forgejo no instalador Git (`#47107`, resolve `#47104`):**
+  - Faz o parse de URLs contendo rotas `/src/{branch,tag,commit}/<ref>`, extraindo a URL base de clone e o ref correspondente para instalação correta de plugins a partir dessas plataformas.
 - **Alinhamento centrado de rótulos com variante `control` em formulários de plugins (`#47102`, resolve `#47074`):**
   - Introduz a variante `control` para o componente `Label` com line-box de 20px, garantindo alinhamento perfeito do centro da primeira linha de texto com o círculo de rádio e checkbox, inclusive com quebra de linha.
 - **Resolução de diretório canônico via `realpath` no staging de instalação de plugins (`#47067`, resolve `#47066`):**
@@ -123,4 +128,6 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47102`](https://github.com
 - Habilitar o disparo de atalhos de plugins dentro de terminais ativos (`#39348`).
 - Utilizar a variante `control` para centralizar verticalmente labels de RadioGroup e Checkbox em plugins (`#47102`, resolve `#47074`).
 - Resolver o caminho real com `realpath` no staging de instalação de plugins para evitar symlinks mutáveis ou falhas EPERM (`#47067`, resolve `#47066`).
+- Reconhecer e tratar rotas `/src/...` de repositórios Codeberg, Gitea e Forgejo na instalação de plugins via Git (`#47107`, resolve `#47104`).
+
 

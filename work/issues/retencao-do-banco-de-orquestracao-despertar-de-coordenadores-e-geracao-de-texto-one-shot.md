@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47370, #47371, #47364 e #47363 fecham terminais criados por workers na liquidação e preservam a linhagem de chat em servidores pareados.
+description: Os PRs #47562 (contrato de teardown de workers), #46045 (detecção de término por eventos do SO), #47543 (distinção de host_lost) e #47503 (relatórios pós-stop em grupos) refinam a orquestração.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,11 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47370`](https://github.com/stablyai/orca/pull/47370),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47562`](https://github.com/stablyai/orca/pull/47562),
+[`stablyai/orca#46045`](https://github.com/stablyai/orca/pull/46045),
+[`stablyai/orca#47543`](https://github.com/stablyai/orca/pull/47543),
+[`stablyai/orca#47503`](https://github.com/stablyai/orca/pull/47503),
+[`stablyai/orca#47370`](https://github.com/stablyai/orca/pull/47370),
 [`stablyai/orca#47371`](https://github.com/stablyai/orca/pull/47371),
 [`stablyai/orca#47364`](https://github.com/stablyai/orca/pull/47364),
 [`stablyai/orca#47363`](https://github.com/stablyai/orca/pull/47363),
@@ -289,8 +293,32 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Despachos do tipo *follow-up* constituíam um novo registro de Dispatch sem amarração direta à operação original do worker, fazendo com que seu `worker_done` ficasse retido indefinidamente sem chegar à requisição da sala atendida.
 81. **Janela excessiva de 60 minutos para alertar coordenador sobre workers travados em background (`#47355`):**
     - O prazo de 60 minutos estabelecido no PR `#47081` para emitir alerta único ao coordenador era excessivamente longo para fluxos interativos de orquestração, atrasando intervenções quando processos entravam em deadlock.
+82. **Ausência de contrato explícito de ciclo de vida e teardown de workers distribuídos (`#47562`):**
+    - A orquestração não formalizava a distinção crítica entre workers assentados (*settled* - desfecho de tarefa), encerrados (*ended* - sessão dormente) e destruídos (*destroyed* - término comprovado de processo), nem critérios claros de colocação em hosts (`--environment`, `--repo`, validação de `setupState: ready`) e regras de recuperação entre `lost` e `exited`.
+83. **Polling periódico de saída de agentes em terminais ociosos consumindo CPU e atrasando detecção (`#46045`):**
+    - Terminais monitoravam o encerramento de processos em primeiro plano via timers periódicos de polling (a cada 200–500ms). Isso gerava consumo desnecessário de CPU em máquinas com dezenas de abas abertas e atrasava a percepção de conclusões ou saídas silenciosas de agentes até o próximo tick do timer.
+84. **Omissão da causa real de término de workers e confusão entre interrupção solicitada e perda de host (`#47543`):**
+    - Quando um worker encerrava por queda do host remoto ou perda de conexão SSH, o sistema reportava apenas saída genérica com código `-1` ("stop was requested but never confirmed"), mascarando a indisponibilidade de infraestrutura sob a aparência de cancelamento do usuário.
+85. **Descarte de relatórios de workers ao interromper ou fechar salas de grupos (`#47503`):**
+    - Relatórios e entregas parciais emitidos por workers após um comando Stop ou no momento da remoção de uma sala de grupo eram sumariamente descartados no banco de dados relacional, e os chats dos membros perdiam a vinculação de nomenclatura da sala de origem.
 
 ## O que o upstream implementa
+
+- **Formalização do contrato de teardown e posicionamento host-aware de workers (`#47562`):**
+  - Documenta a descoberta de hosts e setups de projeto (`orca host list --json`, `orca project setups --environment local|<server-id> --json`) e regras estritas de prontidão (`setupState: ready`, `hostId: local`, `--repo id:<repoId>`);
+  - Separa formalmente o ciclo de vida de término em três estados: assentado (*settled* - desfecho de tarefa), encerrado (*ended* - sessão dormente) e destruído (*destroyed* - processo finalizado comprovadamente no SO);
+  - Define regras de recuperação e diferenciação entre `lost` (queda transitória de rede ou host) e `exited` (processo terminou);
+  - Remove restrições desatualizadas em servidores pareados modernos com suporte a `orchestration.remote-owned-workers.v1`.
+- **Detecção orientada a eventos do SO para término de agentes em terminais ociosos (`#46045`):**
+  - Substitui o polling periódico em timer por notificações diretas de saída de processo entregues pelo sistema operacional;
+  - Desativa verificações periódicas em terminais ociosos, poupando CPU e acordando leituras apenas quando eventos reais do SO ocorrerem;
+  - Mantém leitura ativa com backoff exponencial se houver perguntas interativas aguardando liquidação.
+- **Identificação precisa de término de workers e diagnóstico de perda de host (`#47543`):**
+  - Propaga a razão real de encerramento registrada em `worker_dock_facts.reason` para a linha de status do worker;
+  - Introduz a causa `host_lost` para saídas com código `-1` originadas de desconexão da sessão ou queda do host do terminal, distinguindo falhas de infraestrutura de interrupções manuais voluntárias.
+- **Persistência de relatórios de workers e nomenclatura de salas em grupos de bots (`#47503`):**
+  - Garante que relatórios parciais ou finais pós-Stop sobrevivam à interrupção ou remoção de salas de grupos via transações de escrita seguras no banco de dados;
+  - Nomeia chats de membros diretamente com o nome da respectiva sala gravada no momento da escrita.
 
 - **Fechamento automático de terminais de setup, abas e terminais criados com o worker (`#47370`, `#47371`):**
   - Vincula terminais de setup, abas de inicialização e terminais abertos pelo worker diretamente ao handle do worker, encerrando-os atomicamente em `worker-stop` e `worker-release` (preservando o terminal de setup apenas caso a inicialização falhe para auditoria).
@@ -552,6 +580,11 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Encerrar automaticamente terminais de setup, abas de startup e terminais secundários criados pelo worker em sua finalização (`#47370`, `#47371`).
 - Propagar a linhagem estruturada de chat para workers filhos e servidores pareados conectados (`#47364`, `#47363`).
 - Resolver requisições de follow-up garantindo entrega de relatórios `worker_done` à sala de chat de origem (`#47469`, resolve `#47440`).
+- Implementar o contrato formal de posicionamento e teardown de workers separando desfechos settled, ended e destroyed (`#47562`).
+- Substituir o polling de processos em terminais por notificações orientadas a eventos do sistema operacional (`#46045`).
+- Identificar e exibir o motivo exato de encerramento de workers diferenciando cancelamento de perda de host (`host_lost`) (`#47543`).
+- Preservar relatórios parciais e finais de workers e nomenclatura de chats em salas de grupos mesmo após comando Stop (`#47503`).
+
 
 
 

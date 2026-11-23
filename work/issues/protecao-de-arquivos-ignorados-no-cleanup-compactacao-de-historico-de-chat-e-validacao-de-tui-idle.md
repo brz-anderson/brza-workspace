@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #45918 mantém o helper de tidy-up do chat ativo sem travar saves e o PR #42532 estabiliza a ordem das linhas no diálogo de cleanup.
+description: Os PRs #47629 (remoção com retry em ENOTEMPTY no Bun), #45918 (resiliência no tidy-up do chat) e #42532 (ordem no cleanup) aprimoram a faxina e retenção.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,8 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45918`](https://github.com/stablyai/orca/pull/45918),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47629`](https://github.com/stablyai/orca/pull/47629),
+[`stablyai/orca#45918`](https://github.com/stablyai/orca/pull/45918),
 [`stablyai/orca#42532`](https://github.com/stablyai/orca/pull/42532),
 [`stablyai/orca#46138`](https://github.com/stablyai/orca/pull/46138),
 [`stablyai/orca#46581`](https://github.com/stablyai/orca/pull/46581),
@@ -239,9 +240,13 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Quando o processo auxiliar de checkpoint/tidy-up do chat store sofria crash ou ficava em silêncio além do deadline, a rotina de escrita ficava retida aguardando indefinidamente em vez de reiniciar o worker isolado e aplicar backoff, gerando paradas em gravações ativas.
 65. **Deslocamento e reordenação abrupta de linhas na lista de limpeza enquanto o modal de exclusão está aberto (`#42532`):**
     - Se eventos em segundo plano atualizassem o estado dos workspaces durante a exibição do diálogo de confirmação de exclusão do cleanup, as linhas da tabela mudavam de posição repentinamente sob o cursor do usuário, aumentando o risco de exclusão inadvertida de worktrees errados.
+66. **Falha na remoção de diretórios somente leitura gerados em recuperações de espaço no macOS sob Bun (`#47629`):**
+    - No macOS, a chamada recursiva de remoção de árvore (`rm`) sob o runtime Bun rejeita diretórios somente leitura com o código de erro `ENOTEMPTY`, enquanto sob Node.js o erro reportado é `EACCES`. Como o mecanismo de recuperação de espaço (*reclaim space*) executava a rotina de desproteção de diretórios (`makeDirectoriesWritable`) e retry apenas diante de `EACCES`/`EPERM`, a limpeza falhava silenciosamente sob Bun deixando arquivos órfãos sem desalocação.
 
 ## O que o upstream propõe e implementa
 
+- **Retry resiliente na remoção de diretórios somente leitura sob Bun (`#47629`):**
+  - Adiciona o código de erro `ENOTEMPTY` à lista de códigos elegíveis para retentativa de remoção (`makeDirectoriesWritable` + retry único de `rm`) ao desalocar diretórios gerados no macOS, mantendo as proteções de descendência e segurança de diretório intactas.
 - **Reinicialização resiliente do worker de checkpoint/tidy-up do chat store sem travar salvamentos (`#45918`):**
   - Mantém o helper de tidy-up ativo em segundo plano; se o worker ficar ocioso ou silencioso além do deadline ou sofrer crash, é substituído com backoff limitado, reportando a duração e causa da indisponibilidade sem travar operações de save.
 - **Estabilização da ordem de linhas durante a abertura do diálogo de exclusão no cleanup (`#42532`):**
@@ -483,4 +488,6 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Adotar a política de cache de badges do Linear sem revalidação por foco de janela (`#41384`).
 - Reiniciar o checkpoint worker de tidy-up do chat store com backoff exponencial sem reter gravações ativas (`#45918`).
 - Estabilizar a ordem de exibição das linhas da lista de cleanup durante a abertura do diálogo de exclusão (`#42532`).
+- Incluir `ENOTEMPTY` nos códigos de retry para remoção de árvores somente leitura na rotina de reclaim space (`#47629`).
+
 

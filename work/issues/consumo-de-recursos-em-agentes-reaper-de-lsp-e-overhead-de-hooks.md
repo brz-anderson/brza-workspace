@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #43081, #43106, #43090, #43142, #43164, #43129, #43004, #42964 trazem supressão de hooks fora do app, resumo de tokens, reaper de PTYs e isolamento de I/O.
+description: O PR #45844 contabiliza a memória de agentes de chat e seus LSPs no Resource Manager e elimina falsos avisos de terminais.
 scope:
   - brza-studio
   - tools-kit
@@ -14,7 +14,8 @@ tags:
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#43081`](https://github.com/stablyai/orca/pull/43081) (Issue [`#43095`](https://github.com/stablyai/orca/issues/43095)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45844`](https://github.com/stablyai/orca/pull/45844),
+[`stablyai/orca#43081`](https://github.com/stablyai/orca/pull/43081) (Issue [`#43095`](https://github.com/stablyai/orca/issues/43095)),
 [`stablyai/orca#43106`](https://github.com/stablyai/orca/pull/43106) (resolve Issue [`#43104`](https://github.com/stablyai/orca/issues/43104)),
 [`stablyai/orca#43090`](https://github.com/stablyai/orca/pull/43090) (resolve Issue [`#40261`](https://github.com/stablyai/orca/issues/40261)),
 [`stablyai/orca#43142`](https://github.com/stablyai/orca/pull/43142),
@@ -90,8 +91,16 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
     Operações lentas de verificação de integridade Git no repositório consumiam threads da libuv pool, atrasando respostas RPC de status do daemon.
 22. **Sondagens redundantes de PATH no Windows para agentes desabilitados (`#43129`, resolve `#40636`):**
     O runtime verificava executáveis no disco para agentes que haviam sido desabilitados nas configurações, gerando I/O lento no Windows.
+23. **Subnotificação de memória de agentes de chat e servidores de linguagem (LSP) no Resource Manager (`#45844`):**
+    Como agentes de chat (Claude, Codex e CLIs de provedores iniciados via chat) executam fora dos terminais gerenciados, o Resource Manager não computava seus processos: a métrica indicava poucos gigabytes para "Agents" enquanto chats e seus LSPs retinham dezenas de gigabytes de RAM. Além disso, a listagem de sessões de terminal emitia falsos avisos amarelos sempre que um terminal iniciava ou encerrava concorrentemente durante a leitura.
 
 ## O que o upstream propõe e implementa
+
+- **Contabilização e atribuição completa de memória de chat agents no Resource Manager (`#45844`):**
+  - Cada processo de provedor de chat registra seu PID durante a execução e toda a sua árvore de processos (incluindo LSPs e ferramentas) é contabilizada sob a seção Agents;
+  - Atribui a árvore de processos ao workspace e chat correspondente, exibindo o logo do provedor e nome da conversa com navegação por clique; processos compartilhados são agrupados em linha dedicada;
+  - Elimina o falso aviso de erro em terminais relendo a lista dentro do mesmo orçamento de tempo e efetuando retries a cada 2s com o painel aberto;
+  - Preserva a chave da aba de terminais restaurados no boot para exibir o nome correto da aba em vez de um PID cru.
 
 - **Supressão de scripts de hook fora de painéis Orca (`#43081`):**
   - Ignora scripts de hook quando o comando não é originado de painéis gerenciados, cortando chamadas repetidas de `ps` no macOS.
@@ -173,3 +182,5 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Aplicar a suspensão de renderização e liberação de GPU em abas não observadas do `orca serve` (`#42660`, resolve `#19116`).
 - Adotar a saída rápida de hooks sem contexto Orca ativo (`#42655`).
 - Prevenir a execução zumbi de hooks órfãos de python3 (`#42601`).
+- Contabilizar e atribuir processos e consumo de memória de agentes de chat e servidores de linguagem ao respectivo workspace no Resource Manager (`#45844`).
+

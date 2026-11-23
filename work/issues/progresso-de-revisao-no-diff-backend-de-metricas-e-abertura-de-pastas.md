@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46334, #46333, #46381, #46225 e #46276 corrigem sincronização de edições no diff, visibilidade sob banner de arquivo externo e reuso de grupos de scan.
+description: O PR #47639 invalida o cache de diff do Git quando o ctime do arquivo avança, prevenindo diffs obsoletos em regravações in-place.
 scope:
   - brza-studio
   - brza-workflow
@@ -15,7 +15,8 @@ tags:
 
 # Progresso de revisão no diff, backend de métricas e abertura de pastas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46334`](https://github.com/stablyai/orca/pull/46334) (resolve Issue [`#46332`](https://github.com/stablyai/orca/issues/46332)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47639`](https://github.com/stablyai/orca/pull/47639) (resolve Issue [`#47631`](https://github.com/stablyai/orca/issues/47631)),
+[`stablyai/orca#46334`](https://github.com/stablyai/orca/pull/46334) (resolve Issue [`#46332`](https://github.com/stablyai/orca/issues/46332)),
 [`stablyai/orca#46333`](https://github.com/stablyai/orca/pull/46333) (resolve Issue [`#46331`](https://github.com/stablyai/orca/issues/46331)),
 [`stablyai/orca#46381`](https://github.com/stablyai/orca/pull/46381),
 [`stablyai/orca#46225`](https://github.com/stablyai/orca/pull/46225) (refs Issue [`#46113`](https://github.com/stablyai/orca/issues/46113)),
@@ -65,9 +66,14 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
     Escanear uma pasta-mãe pela segunda vez criava novos grupos de projeto duplicados com o mesmo caminho normalizado, gerando desorganização e perda de ordem na barra lateral.
 11. **Dificuldade de fechamento de visualizador de imagem e exclusão destrutiva de pastas com worktrees filhos (`#46276`, `#46359`):**
     O visualizador de imagens exigia clique preciso no botão de fechar, e a exclusão de workspaces pais não oferecia a opção de manter seus sub-worktrees filhos preservados.
+12. **Diff obsoleto servido a partir de cache após regravação in-place de arquivos (`#47639`, resolve `#47631`):**
+    Quando um arquivo era reescrito in-place preservando o timestamp de modificação (`mtime`), tamanho e inode, o carimbo gerado para o arquivo na working-tree era idêntico ao anterior. Como consequência, o cache de diff servia o diff defasado antigo em vez de invalidar a visualização.
 
 ## O que o upstream implementa e corrige
 
+- **Invalidação de cache de diff considerando avanço de `ctime` (`#47639`, resolve `#47631`):**
+  - Incorpora o `ctime` aos carimbos de arquivos da working-tree junto a `mtime`, tamanho e inode, e usa o mais recente entre os dois timestamps na guarda contra racy-writes;
+  - Como a chamada `stat` já retorna `ctime`, a checagem invalida corretamente o cache em regravações in-place sem custo extra de I/O.
 - **Progresso de revisão por arquivo no diff compartilhado com Source Control (`#40776`):**
   - Adiciona controle `[x] Viewed` nos cabeçalhos individuais de diff e no cabeçalho do combined diff ("View all"), com atalho `Ctrl+V` no macOS (ou `Alt+Shift+V`);
   - Arquivos marcados como vistos são automaticamente recolhidos no modo combined diff e atenuados visualmente na árvore do Source Control;
@@ -108,3 +114,5 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 7. Corrigir layout flex column do banner de alteração externa para não colapsar o diff Monaco (`#46333`, resolve `#46331`).
 8. Reutilizar grupos de scan na barra lateral com caminhos-mãe idênticos para evitar duplicações (`#46225`, refs `#46113`).
 9. Adotar fechamento por clique externo (scrim) no visualizador de imagens (`#46276`) e avaliar suporte a "Delete, Keep Children" em workspaces (`#46359`).
+10. Incluir `ctime` no carimbo de arquivos para invalidar o cache de diff do Git em regravações in-place com mtime preservado (`#47639`, resolve `#47631`).
+

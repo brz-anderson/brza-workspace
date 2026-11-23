@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47331 e #47329 trazem atualização em background do servidor ACP do Antigravity e modelos de terceiros, e o PR #47314 expõe esforço do Cursor.
+description: Os PRs #47400 (Gemini API key no agy com regras e skills), #47525 (proxy nas sondagens do agy) e #47546 (fila de ações de conta) refinam a integração do Antigravity.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,10 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47331`](https://github.com/stablyai/orca/pull/47331),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47400`](https://github.com/stablyai/orca/pull/47400),
+[`stablyai/orca#47525`](https://github.com/stablyai/orca/pull/47525),
+[`stablyai/orca#47546`](https://github.com/stablyai/orca/pull/47546),
+[`stablyai/orca#47331`](https://github.com/stablyai/orca/pull/47331),
 [`stablyai/orca#47329`](https://github.com/stablyai/orca/pull/47329),
 [`stablyai/orca#47314`](https://github.com/stablyai/orca/pull/47314) (resolve Issue [`#47202`](https://github.com/stablyai/orca/issues/47202)),
 [`stablyai/orca#47459`](https://github.com/stablyai/orca/pull/47459) (refs Issue [`#47454`](https://github.com/stablyai/orca/issues/47454)),
@@ -284,8 +287,22 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     O seletor de modelos utilizava a lista de transcrições do Cursor em vez do catálogo ACP, omitindo modelos dinâmicos; no lançamento em terminal, modelos compostos perdiam os parâmetros de Effort e Fast, caindo para o ID bruto básico.
 81. **Retenção de saídas obsoletas de ferramentas em eventos `done` sem resposta no Kiro 3 (`#47459`, refs `#47454`):**
     O hook Stop do Kiro 3 enviava apenas identificadores sem corpo de resposta textual, fazendo com que a linha de conclusão retivesse o resultado da última ferramenta executada (`PostToolUse`) em vez de limpar a saída obsoleta.
+82. **Incapacidade de executar chats via chave de API Gemini no Antigravity (`agy`) com regras e skills personalizadas (`#47400`):**
+    Quando o desenvolvedor configurava uma chave de API própria ou autenticação gcloud ADC para o Gemini, o Antigravity fazia fallback para o login do Google da máquina, ignorando as credenciais do projeto e deixando de carregar as regras de `~/.gemini` e as skills locais do workspace.
+83. **Timeouts na sondagem de cota e uso do Antigravity atrás de proxies corporativos (`#47525`):**
+    A CLI do `agy` é desenvolvida em Go e lê exclusivamente variáveis de ambiente de proxy (`HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY`). As configurações de proxy do aplicativo nas preferências do Studio não eram repassadas na inicialização do probe do Antigravity, causando falhas contínuas de timeout em redes corporativas com proxy obrigatório.
+84. **Perda silenciosa de cliques nas contas Antigravity durante leituras em segundo plano (`#47546`):**
+    Ações do usuário no gerenciador de contas (como Save, Refresh, Select ou Remove) disparadas enquanto o recheck periódico de 8s ou um `agy List` estava em voo eram sumariamente ignoradas e descartadas sem retorno visual, fazendo parecer que o botão "Save current account" não funcionava.
 
 ## O que o upstream implementa e corrige
+
+- **Execução de chats via chave de API Gemini no `agy` com regras de `~/.gemini` e skills (`#47400`):**
+  - Roteia chats autenticados por Gemini API key ou gcloud ADC para uma pasta home própria do Orca onde o `agy` estiver instalado;
+  - Carrega as regras e skills customizadas de `~/.gemini` e formata erros da Google API liderando com a sentença amigável da Google e detalhes colapsáveis.
+- **Propagação de configurações de proxy de rede para a CLI `agy` (`#47525`):**
+  - Repassa `networkProxySettings` do aplicativo para o probe de uso do Antigravity através de `withConfiguredProxyEnv`, permitindo funcionamento em redes corporativas com proxy obrigatório sem timeouts.
+- **Fila sequencial para operações na gestão de contas do Antigravity (`#47546`):**
+  - Enfileira cliques em Save, Refresh, Select e Remove disparados enquanto uma leitura em background do `agy` estiver em voo, marcando as linhas como ocupadas e executando as ações assim que a leitura terminar em vez de descartar os cliques silenciosamente.
 
 - **Atualização transparente em segundo plano do servidor ACP do Antigravity (`#47331`):**
   - Atualiza a instalação do servidor ACP para o release fixado automaticamente após a inicialização estabilizar; chats em andamento mantêm a versão prévia e novos chats adotam a nova versão, com suporte a backoff exponencial, checagem de 2 GB de espaço livre e kill switch `antigravityServerAutoUpdateEnabled`.
@@ -566,5 +583,9 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 77. Preservar o acesso a modelos Claude e GPT-OSS em contas corporativas Google no Antigravity sob o servidor ACP 1.5.2 (`#47329`).
 78. Listar modelos dinâmicos do Cursor no seletor a partir do catálogo ACP e reter esforço e modo Fast no terminal (`#47314`, resolve `#47202`).
 79. Limpar linha cacheada de ferramentas em eventos de conclusão sem resposta textual no Kiro 3 (`#47459`, refs `#47454`).
+80. Executar chats autenticados por Gemini API key e gcloud ADC no `agy` carregando regras e skills de `~/.gemini` (`#47400`).
+81. Repassar variáveis de proxy de rede para o runtime e probes de cota da CLI `agy` (`#47525`).
+82. Enfileirar requisições concorrentes de gestão de contas Antigravity em `use-antigravity-account-run` sem descarte de cliques (`#47546`).
+
 
 

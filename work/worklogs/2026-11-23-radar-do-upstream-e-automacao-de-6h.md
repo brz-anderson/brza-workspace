@@ -10,9 +10,13 @@ tags:
 refs:
   - issue:alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas
   - issue:badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes
+  - issue:consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks
   - issue:fontes-web-em-plugins-isolamento-de-atalhos-e-resiliencia-de-hooks
   - issue:gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache
+  - issue:leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins
   - issue:painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat
+  - issue:plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados
+  - issue:progresso-de-revisao-no-diff-backend-de-metricas-e-abertura-de-pastas
   - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
 ---
@@ -50,4 +54,32 @@ refs:
      adicionados os PRs `#47331`, atualizando em background o servidor ACP empacotado do Antigravity com backoff e checagem de espaço livre; `#47329`, preservando o acesso a Claude e GPT-OSS em contas Google no Antigravity sob ACP 1.5.2; `#47314` (resolve `#47202`), listando modelos dinâmicos do Cursor nos seletores com esforço e modo Fast; e `#47459` (refs `#47454`), limpando saídas de ferramentas em eventos `done` sem resposta do Kiro 3.
    - [Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):
      adicionados os PRs `#45918`, mantendo ativo o helper de checkpoint/tidy-up do chat store sem travar salvamentos; e `#42532`, estabilizando a ordem das linhas na listagem de cleanup enquanto o diálogo de exclusão estiver aberto.
+
+### 3. Ciclo de 6h (12:00 BRT / 15:00 UTC em 2026-11-23)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs e commits criados ou atualizados entre `2026-11-23T09:00:00Z` e `2026-11-23T15:00:00Z` (range upstream `ebe35b9edb6..59f3122bc8c`), totalizando 80 commits e comparando com os registros em `work/issues/` e o índice `.brza/index.jsonl`.
+2. **Atualização de 11 issues rastreadas em `work/issues/`:**
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados os PRs `#42129`, introduzindo o pill Side chat no composer ao digitar `/btw` ou `/side`; `#47564`, mapeando perguntas interativas abertas para o estado visual `waiting` em vez do alarmista `blocked`; `#47432`, corrigindo a contagem de workers no composer e permitindo scroll nativo fluido sem snap agressivo na faixa de workers; `#47553` (resolve `#47552`), assegurando iluminação contínua do marcador lateral de turno (rail tick) entre linhas consecutivas; `#47587`, mantendo o modal seletor de modelos aberto ao clicar ou arrastar o scrollbar; `#47485`, restaurando rascunhos de resposta na caixa de comentários quando o agente reformular uma pergunta em itens; `#45168`, preservando mensagens paged-in anteriores ao receber atualizações de snapshot de transcrição; e `#47559`, confinando a abertura de hover cards estritamente à navegação por teclado.
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionados os PRs `#47562`, documentando o contrato formal de ciclo de vida e teardown de workers (settled, ended, destroyed) e posicionamento host-aware (`--environment`, `--repo`); `#46045`, substituindo polling periódico de processos por notificações orientadas a eventos do sistema operacional em terminais ociosos; `#47543`, identificando a causa real de encerramento de workers e distinguindo cancelamentos de perda de host (`host_lost`); e `#47503`, persistindo relatórios parciais e finais de workers pós-Stop em salas de grupos e amarrando nomenclatura de chats à sala de origem.
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionados os PRs `#47400`, executando chats via Gemini API key e gcloud ADC no `agy` sob home própria do Orca com regras de `~/.gemini` e skills locais; `#47525`, repassando configurações de proxy do app para os probes de cota da CLI Go do `agy`; e `#47546`, enfileirando ações concorrentes de gestão de contas Antigravity (Save, Refresh, Select, Remove) durante leituras em background sem descarte silencioso de cliques.
+   - [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):
+     adicionados os PRs `#47582`, introduzindo a flag `skipsSharedSkillFolders` para ocultar `~/.agents/skills` nos seletores do Claude Code; `#47158`, trazendo clareza visual e destino de backup na substituição de cópias locais divergentes de skills empacotadas; e `#47154`, cacheando a listagem de skills no diálogo de compartilhamento de bots para eliminar mais de 32.800 chamadas redundantes a `lstat`.
+   - [Consumo de recursos em agentes: reaper de LSP e overhead de hooks](../issues/consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks.md):
+     adicionado o PR `#45844`, registrando o PID de processos de agentes de chat (Claude, Codex) para contabilizar toda a árvore de subprocessos e LSPs associados sob a seção Agents no Resource Manager, atribuindo-os ao workspace correspondente e eliminando falsos avisos amarelos em listagens concorrentes de terminais.
+   - [Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):
+     adicionado o PR `#47629`, adicionando o código de erro `ENOTEMPTY` à lista de retry seguro na remoção recursiva de diretórios somente leitura gerados no macOS sob o runtime Bun durante rotinas de reclaim space.
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados os PRs `#47683`, preservando a visibilidade do workspace ativo através do virtualizador ao alternar a exibição de workspaces suspensos; `#47542`, adotando a grafia canônica do backlink `.git/worktrees/<name>/gitdir` em volumes APFS/NTFS para evitar worktrees órfãos; `#47249`, medindo a janela de frescor de repositórios a partir da conclusão da varredura e respondendo do cache publicado durante atualizações; e `#47679`, reportando chats de projetos excluídos como `agent_session_workspace_removed`.
+   - [Badges de worktree para plugins, cadência de PR e redesenho de automações](../issues/badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes.md):
+     adicionados os PRs `#47491`, gravando o motivo real tipado de recusa inicial de agentes em execuções de automação; e `#47479` (resolve `#47386`), apresentando webhooks de automação recém-criados em setup cards destacados com ação imediata "Copy URL".
+   - [Fontes web em plugins, isolamento de atalhos e resiliência de hooks](../issues/fontes-web-em-plugins-isolamento-de-atalhos-e-resiliencia-de-hooks.md):
+     adicionados os PRs `#47561`, tratando listas de fontes separadas por vírgula com aspas individuais em CSS para preservar fallbacks tipográficos; e `#47586`, suprimindo atalhos de gerenciamento de abas (Cmd+W e Cmd+T) quando telas cheias de sobreposição (Settings, Activity) ocultam o workspace.
+   - [Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md):
+     adicionados os PRs `#47155`, oferecendo ação direta de re-autenticação para contas Codex expiradas ou revogadas na tela de uso; e `#47540`, restringindo alertas de falta de assinatura no OpenCode Go estritamente a respostas com `EntitlementError`.
+   - [Progresso de revisão no diff, backend de métricas e abertura de pastas](../issues/progresso-de-revisao-no-diff-backend-de-metricas-e-abertura-de-pastas.md):
+     adicionado o PR `#47639` (resolve `#47631`), incorporando `ctime` aos carimbos de arquivos para invalidar o cache de diff do Git em regravações in-place com mtime idêntico.
+
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47189 e #47483 introduzem o comando watch-pr para monitoramento unificado de pull requests e aprimoram auditoria de chamadas em webhooks.
+description: Os PRs #47491 (diagnóstico real de falha de agente em automações) e #47479 (Copy URL em card de webhook) aprimoram a UX de automações.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,9 @@ tags:
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47189`](https://github.com/stablyai/orca/pull/47189),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47491`](https://github.com/stablyai/orca/pull/47491),
+[`stablyai/orca#47479`](https://github.com/stablyai/orca/pull/47479) (resolve Issue [`#47386`](https://github.com/stablyai/orca/issues/47386)),
+[`stablyai/orca#47189`](https://github.com/stablyai/orca/pull/47189),
 [`stablyai/orca#47483`](https://github.com/stablyai/orca/pull/47483),
 [`stablyai/orca#46945`](https://github.com/stablyai/orca/pull/46945) (resolve Issue [`#46919`](https://github.com/stablyai/orca/issues/46919)),
 [`stablyai/orca#46933`](https://github.com/stablyai/orca/pull/46933) (resolve Issue [`#46932`](https://github.com/stablyai/orca/issues/46932)),
@@ -80,8 +82,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47189`](https://github.com
     Acompanhar o ciclo de vida de um Pull Request até aprovação ou término de CI exigia compor automações manuais com múltiplos gatilhos encadeados ou polling periódico, sem prazo de expiração (*deadline*) pré-estabelecido.
 15. **Omissão de justificativa e contabilidade para requisições ignoradas em webhooks (`#47483`):**
     Quando um webhook recebia uma requisição não mapeada ou descartada pelas regras ativas, o log de diagnóstico não informava a razão da ausência de corpo e as chamadas ignoradas não eram contabilizadas nos comandos de inspeção.
+16. **Mensagem genérica de falha em automações quando o agente falha antes do primeiro turno (`#47491`):**
+    Quando um agente recusava o prompt de execução de uma automação antes do primeiro turno (por exemplo, erro de configuração no arquivo de MCP do Codex), o relatório gravava apenas "The bot's turn ended without finishing (failure)". O sistema agora registra o motivo real tipado fornecido pelo provedor (ex.: "Codex couldn't start: failed to load configuration: url is not supported for stdio...").
+17. **Ocultação da URL de recebimento de webhook em linhas colapsadas de automações (`#47479`, resolve `#47386`):**
+    Automações de webhook recém-criadas eram desenhadas como linhas dobradas com a opção "Copy URL" enterrada no menu de detalhes, dificultando a configuração inicial. O webhook agora se apresenta como um card de configuração com a ação "Copy URL" em destaque na frente, no menu da linha e na página de detalhes.
 
 ## O que o upstream implementa e corrige
+
+- **Diagnóstico com motivo real de recusa de agente em execuções de automação (`#47491`):**
+  - Grava a causa tipada emitida pelo provedor (ex.: erro de sintaxe ou configuração MCP) quando o agente recusa o prompt antes de iniciar qualquer turno, em vez de emitir mensagem genérica de falha.
+- **Card de configuração e destaque da ação Copy URL em webhooks de automação (`#47479`, resolve `#47386`):**
+  - Desenha webhooks recém-criados como setup cards com botão Copy URL imediato, além de adicionar a ação no menu de opções da linha e na barra de cabeçalho da página de automações.
 
 - **Comando `orca automations watch-pr` para monitoramento completo de PRs com prazo limite (`#47189`):**
   - Adiciona o comando `orca automations watch-pr owner/repo#n`, configurando espera one-shot (`--once`) sobre os eventos `github.ci_finished`, `pr_conflicted`, `pr_merged`, `pr_closed`, `review`, `review_comment` e `comment`, com prazo padrão de 2 horas (customizável via `--for` ou `--by`);
@@ -166,5 +177,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47189`](https://github.com
 19. Mover a checagem de hooks de workspace para worker threads para eliminar congelamentos na UI (`#46846`).
 20. Incorporar o comando `brza automations watch-pr` com gatilho `github.ci_finished` e prazo de 2 horas (`#47189`).
 21. Exibir justificativa e contagem de chamadas ignoradas em diagnósticos de webhooks (`#47483`).
+22. Gravar e exibir a causa tipada real de recusa inicial de agentes em execuções de automação (`#47491`).
+23. Apresentar automações de webhook em setup card com ação Copy URL destacada (`#47479`, resolve `#47386`).
+
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #42473 traz reordenação e ocultação de abas na Activity Bar e o PR #47296 preserva refs com hífen na instalação de plugins via Git.
+description: Os PRs #47561 (lista de famílias tipográficas separadas por vírgula) e #47586 (supressão de atalhos de abas com Settings aberto) aprimoram a UX e tipografia.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,9 @@ tags:
 
 # Fontes web em plugins, isolamento de atalhos e resiliência de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42473`](https://github.com/stablyai/orca/pull/42473),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47561`](https://github.com/stablyai/orca/pull/47561),
+[`stablyai/orca#47586`](https://github.com/stablyai/orca/pull/47586),
+[`stablyai/orca#42473`](https://github.com/stablyai/orca/pull/42473),
 [`stablyai/orca#47296`](https://github.com/stablyai/orca/pull/47296) (refs Issue [`#47310`](https://github.com/stablyai/orca/issues/47310)),
 [`stablyai/orca#47107`](https://github.com/stablyai/orca/pull/47107) (resolve Issue [`#47104`](https://github.com/stablyai/orca/issues/47104)),
 [`stablyai/orca#47102`](https://github.com/stablyai/orca/pull/47102) (resolve Issue [`#47074`](https://github.com/stablyai/orca/issues/47074)),
@@ -77,9 +79,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42473`](https://github.com
     À medida que plugins e painéis adicionavam novos ícones à Activity Bar, o usuário não dispunha de opções para reordenar por drag-and-drop, ocultar abas secundárias ou navegar por itens agrupados em overflow ("More").
 16. **Truncamento incorreto de branches com hífen na instalação de plugins via Git (`#47296`, refs `#47310`):**
     URLs do GitHub ou Codeberg com branches ou caminhos contendo `-` (como `/tree/feature/-/example`) eram interpretadas de forma errônea como o separador `/-/` do GitLab, cortando o nome do repositório prematuramente e descartando o ref.
+17. **Declaração quebrada de CSS ao configurar listas de famílias de fontes separadas por vírgula (`#47561`):**
+    Ao configurar famílias tipográficas com fallbacks no terminal ou no app (como `D2Coding, Consolas` ou `"Cascadia Mono", D2Coding`), o valor era envolto em um único par de aspas (`"D2Coding, Consolas"`). O motor de renderização CSS interpretava a string inteira como um único nome inexistente de fonte, quebrando a declaração e descartando os fallbacks.
+18. **Atalhos de teclado (Cmd+W e Cmd+T) fechando e abrindo abas ocultas enquanto páginas como Settings estão abertas (`#47586`):**
+    Como o workbench permanece montado por trás de telas de sobreposição completa (Settings, Activity, tela de criação de worktree), seu ouvinte de eventos de teclado continuava ativo. Pressionar Cmd+W fechava inadvertidamente a aba ativa oculta (interrompendo o agente em execução) e Cmd+T criava abas invisíveis ao usuário.
 
 ## O que o upstream implementa
 
+- **Tratamento de configurações de fontes separadas por vírgula como lista tipográfica real (`#47561`):**
+  - Divide a configuração de fontes em vírgulas, remove aspas espúrias de cada item, aplica aspas individuais apenas em famílias que não sejam palavras-chave CSS (como monospace ou sans-serif) e constrói declaração CSS válida com fallbacks funcionais.
+- **Supressão de atalhos de abas quando telas cheias (Settings ou Activity) ocultam o workspace (`#47586`):**
+  - Executa o handler de atalhos de teclado de abas (como Cmd+W e Cmd+T) estritamente quando a visão do workspace estiver visível, impedindo o fechamento ou criação acidental de abas invisíveis.
 - **Reordenação, ocultação e agrupamento 'More' de abas da Activity Bar (`#42473`):**
   - Implementa suporte a arrastar e soltar (drag-and-drop) para reorganizar abas na Activity Bar, opções Hide, Move e Reset no menu de contexto, e agrupamento inteligente em menu "More" com retenção de foco acessível.
 - **Parsing resiliente de refs contendo hífen para GitHub e Codeberg (`#47296`, refs `#47310`):**
@@ -141,6 +151,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42473`](https://github.com
 - Reconhecer e tratar rotas `/src/...` de repositórios Codeberg, Gitea e Forgejo na instalação de plugins via Git (`#47107`, resolve `#47104`).
 - Permitir reordenar, ocultar e agrupar em 'More' as abas da Activity Bar via drag-and-drop e menu (`#42473`).
 - Preservar refs contendo segmentos `-` ao analisar URLs de instalação Git de plugins no GitHub e Codeberg (`#47296`, refs `#47310`).
+- Tratar configurações de fontes com vírgula como lista tipográfica dividida e com aspas individuais (`#47561`).
+- Ignorar atalhos de gerenciamento de abas (Cmd+W, Cmd+T) quando telas como Settings ocultarem o workspace (`#47586`).
+
 
 
 

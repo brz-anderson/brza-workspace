@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47308, #47309 e #47429 adicionam o estado Waiting a itens externos, #47359 evita alargamento do chat e #47337 preserva modo Plan/Build na fila.
+description: Os PRs #42129 (/btw e /side), #47564 (waiting vs blocked), #47432 (contagem de workers) e #47485 (rascunhos de resposta) aprimoram a UX do chat nativo.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,15 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47308`](https://github.com/stablyai/orca/pull/47308),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42129`](https://github.com/stablyai/orca/pull/42129),
+[`stablyai/orca#47564`](https://github.com/stablyai/orca/pull/47564),
+[`stablyai/orca#47432`](https://github.com/stablyai/orca/pull/47432),
+[`stablyai/orca#47553`](https://github.com/stablyai/orca/pull/47553) (resolve Issue [`#47552`](https://github.com/stablyai/orca/issues/47552)),
+[`stablyai/orca#47587`](https://github.com/stablyai/orca/pull/47587),
+[`stablyai/orca#47485`](https://github.com/stablyai/orca/pull/47485),
+[`stablyai/orca#45168`](https://github.com/stablyai/orca/pull/45168),
+[`stablyai/orca#47559`](https://github.com/stablyai/orca/pull/47559),
+[`stablyai/orca#47308`](https://github.com/stablyai/orca/pull/47308),
 [`stablyai/orca#47309`](https://github.com/stablyai/orca/pull/47309),
 [`stablyai/orca#47429`](https://github.com/stablyai/orca/pull/47429),
 [`stablyai/orca#47359`](https://github.com/stablyai/orca/pull/47359) (resolve Issue [`#47358`](https://github.com/stablyai/orca/issues/47358)),
@@ -276,8 +284,42 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     - Ao transferir a fila para uma conversa substituta, apenas o texto bruto era copiado; opções congeladas no enfileiramento (modo Plan/Build, modelo, esforço, personality, fast mode e modo steer) eram descartadas, revertendo envios planejados para o modo padrão.
 73. **Perda de alinhamento e respostas precipitadas em itens com múltiplas perguntas (`#47464`, `#47461`, `#47385`, `#47372`):**
     - Respostas digitadas a uma única pergunta de um conjunto acordavam o agente imediatamente deixando as demais perguntas pendentes; além disso, respostas retidas não recuperavam o indicador `Replying to`, publicando como comentário comum fora de contexto.
+74. **Falta de comando visual rápido para conversas laterais (`/btw` e `/side`) no composer (`#42129`):**
+    - Ao digitar comandos de ramificação lateral como `/btw` ou `/side`, não havia feedback visual antes do envio, gerando incerteza se a mensagem iria para o chat corrente ou criaria uma conversa lateral independente.
+75. **Classificação alarmista de perguntas abertas como estado bloqueado (`blocked`) em chats nativos (`#47564`):**
+    - Enquanto nos terminais uma pergunta aberta lia pacificamente como `waiting`, o Native Chat mapeava a atenção da sessão diretamente para `blocked`, sinalizando bloqueio crítico da thread quando na verdade se tratava apenas de interação dialógica normal.
+76. **Contagem incorreta de workers no composer e travamentos de rolagem na faixa de workers (`#47432`):**
+    - A faixa de workers acima do composer contava workers já inativos ou finalizados; além disso, a faixa sofria de redimensionamento abrupto e tentava forçar encaixes na rolagem, quebrando a precisão de trackpads no macOS.
+77. **Dessincronização do marcador lateral de turno (rail tick) entre linhas do chat (`#47553`, resolve `#47552`):**
+    - Quando o scroll do chat parava exatamente na margem vazia entre duas linhas montadas, a rotina de detecção considerava a linha anterior obsoleta e mantinha aceso o marcador antigo.
+78. **Fechamento indesejado do seletor de modelos ao interagir com a barra de rolagem (`#47587`):**
+    - Clicar ou arrastar a barra de rolagem do popover de modelos fechava sumariamente o modal por tratar o clique como foco fora do componente.
+79. **Descarte integral de rascunhos em itens quando o agente substitui a pergunta aberta (`#47485`):**
+    - Se o usuário estivesse digitando uma resposta a uma pergunta em um item e o agente decidisse atualizar ou substituir a questão, todo o rascunho era apagado sem recuperação.
+80. **Perda de mensagens anteriores paginadas ao receber novos snapshots da transcrição (`#45168`):**
+    - Em chats longos, ao navegar para cima no histórico paginado (*paged-in rows*), qualquer atualização subsequente de frame reenviada pelo host descartava as linhas antigas, fazendo a visualização saltar para o presente.
+81. **Disparo acidental de hover cards após navegação de retorno via teclado (`#47559`):**
+    - Retornar na lista de itens via teclado posicionava o foco no elemento anterior, abrindo hover cards mesmo quando o cursor do mouse apontava para outra região.
 
 ## O que o upstream implementa
+
+- **Pill de Side chat no composer para comandos `/btw` e `/side` (`#42129`):**
+  - Digitar `/btw` ou `/side` seguido de espaço no início do composer exibe uma pílula cinza "Side chat", onde o envio abre o rascunho diretamente como conversa lateral sem poluir o chat principal;
+  - Preserva a serialização do rascunho como texto puro e reconstrói o estado ao montar ou alterar disponibilidade.
+- **Mapeamento de perguntas pendentes para o estado `waiting` em vez de `blocked` (`#47564`):**
+  - Introduz a flag `attentionAsksOnlyQuestions` quando todas as interações pendentes de uma sessão estruturada forem perguntas; mapeia o estado visual de atenção para `waiting` (amarelo claro), reservando o estado alarmista `blocked` (vermelho) apenas para aprovações e permissões pendentes.
+- **Contagem precisa de workers ativos e rolagem nativa da faixa no composer (`#47432`):**
+  - Conta apenas workers genuinamente ativos no composer e permite rolagem nativa sem travar o trackpad ou forçar snap; a ação Clear remove workers finalizados imediatamente.
+- **Iluminação contínua do tick da linha ativa no rail tick do Native Chat (`#47553`, resolve `#47552`):**
+  - Mantém o marcador aceso para a linha correspondente mesmo quando a rolagem para exatamente no espaço vertical entre duas linhas montadas.
+- **Prevenção de fechamento acidental do seletor de modelos ao clicar no scrollbar (`#47587`):**
+  - Mantém o seletor aberto durante a rolagem e cliques na barra de scroll.
+- **Restauração de respostas rascunhadas quando uma pergunta é substituída pelo agente (`#47485`):**
+  - Devolve o texto digitado automaticamente para a caixa de comentários caso a pergunta original tenha sido reformulada antes do envio.
+- **Preservação de histórico paginado ao receber snapshots mais recentes (`#45168`):**
+  - Mantém mensagens antigas já paginadas (*paged-in*) quando o servidor envia novas janelas de transcrição, evitando saltos de scroll.
+- **Abertura de hover cards estritamente sob foco do teclado (`#47559`):**
+  - Corrige acionamento indevido de hover cards em listas após retornos com Back no teclado quando o cursor do mouse está fora da área.
 
 - **Quebra automática de linha para sumários de tarefas em background no chat (`#47359`, resolve `#47358`):**
   - Aplica `overflow-wrap: anywhere` aos textos de sumários de resultados de tarefas em segundo plano, contendo o fluxo dentro da coluna e evitando barras de rolagem horizontais espúrias.
@@ -547,6 +589,15 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Reter opções completas (modo Plan/Build, modelo, esforço e steer) ao migrar mensagens enfileiradas (`#47337`).
 - Sincronizar envio de respostas compostas em itens aguardando resposta humana (`#47464`, `#47461`, `#47385`, `#47372`).
 - Exibir botões Edit e Delete no hover/foco e reter Steer em todas as linhas da fila de envio (`#47346`).
+- Renderizar pill visual de "Side chat" no composer ao digitar `/btw` ou `/side` com preservação de texto e atalhos (`#42129`).
+- Mapear perguntas abertas para o status visual `waiting` em vez de `blocked` no chat nativo (`#47564`).
+- Contabilizar apenas workers ativos e permitir rolagem nativa e fluida na faixa de workers do composer (`#47432`).
+- Assegurar iluminação ininterrupta do marcador de turno (rail tick) entre linhas consecutivas do transcript (`#47553`, resolve `#47552`).
+- Manter aberto o seletor de modelos durante interações com o scrollbar (`#47587`).
+- Restaurar respostas rascunhadas na caixa de comentários quando o agente reformular uma pergunta em itens (`#47485`).
+- Preservar histórico paginado de mensagens anteriores ao receber janelas de transcrição do host (`#45168`).
+- Restringir abertura de hover cards estritamente à navegação focada por teclado (`#47559`).
+
 
 
 

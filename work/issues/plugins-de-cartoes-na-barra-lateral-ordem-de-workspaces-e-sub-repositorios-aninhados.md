@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42658, #42638, #42558, #42085, #42057 e issues #42657, #42632 trazem extensão em Save as de plugins, persistência de painéis em background e SVG customizado.
+description: Os PRs #47683 (workspace ativo visível ao alternar suspensos), #47542 (grafia gitdir em APFS/NTFS), #47249 (janela de frescor de repos) e #47679 aprimoram a sidebar e worktrees.
 scope:
   - brza-studio
   - workspace
@@ -17,7 +17,11 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42658`](https://github.com/stablyai/orca/pull/42658) (resolve Issue [`#42657`](https://github.com/stablyai/orca/issues/42657)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47683`](https://github.com/stablyai/orca/pull/47683),
+[`stablyai/orca#47542`](https://github.com/stablyai/orca/pull/47542),
+[`stablyai/orca#47249`](https://github.com/stablyai/orca/pull/47249),
+[`stablyai/orca#47679`](https://github.com/stablyai/orca/pull/47679),
+[`stablyai/orca#42658`](https://github.com/stablyai/orca/pull/42658) (resolve Issue [`#42657`](https://github.com/stablyai/orca/issues/42657)),
 [`stablyai/orca#42638`](https://github.com/stablyai/orca/pull/42638) (relacionado a [`#42637`](https://github.com/stablyai/orca/issues/42637)),
 [`stablyai/orca#42558`](https://github.com/stablyai/orca/pull/42558) (relacionado a [`#41707`](https://github.com/stablyai/orca/issues/41707) e [`#28300`](https://github.com/stablyai/orca/issues/28300)),
 [`stablyai/orca#42085`](https://github.com/stablyai/orca/pull/42085) (resolve Issue [`#42080`](https://github.com/stablyai/orca/issues/42080)),
@@ -192,9 +196,23 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#42658`](https://github.com
     - Mantém painéis de plugins que reproduzem mídia ou realizam tarefas contínuas vivos em segundo plano mesmo quando outra aba da sidebar for ativada, prevenindo interrupção de reprodução de mídia.
 43. **Coexistência de subpastas `source.path` e hooks de worker em plugins (`#42638`, relacionado a `#42637`):**
     - Estabiliza a resolução de caminhos de arquivos em plugins que combinam subpastas customizadas de código com ganchos de execução assíncrona em workers.
+44. **Preservação da visibilidade do workspace ativo ao alternar workspaces suspensos (`#47683`):**
+    - Ao alternar "Toggle Sleeping Workspaces", a inclusão de linhas acima do workspace ativo o empurrava para fora do campo visual devido à ancoragem de scroll no topo;
+    - A sidebar agora revela o workspace ativo via virtualizador, rolando suavemente apenas o necessário para mantê-lo visível na tela, inclusive em workspaces remotos SSH.
+45. **Resolução de grafia canônica de `gitdir` em volumes case-insensitive (`#47542`):**
+    - Em volumes como macOS APFS e Windows NTFS, `git rev-parse --show-toplevel` retorna a grafia em disco (ex.: `My-Repo/my-task`), enquanto `git worktree list` retorna a grafia registrada no Git (`my-repo/my-task`);
+    - O binding de terminais abertos por `worker-start` lia o toplevel, causando desencontro de ID no registro da sidebar e deixando worktrees órfãos. Agora o sistema lê o backlink em `.git/worktrees/<name>/gitdir` e adota a grafia canônica do Git.
+46. **Estabilização de rescans em repositórios massivos com listagem de worktrees lenta (`#47249`):**
+    - A janela de frescor do catálogo iniciava no começo da varredura, tornando-o obsoleto logo na chegada se a listagem fosse lenta e forçando re-varreduras contínuas; agora a janela de frescor é calculada a partir da conclusão da varredura, e leituras durante a atualização respondem das linhas publicadas anteriormente em background.
+47. **Tratamento definitivo de chats de projetos removidos como `agent_session_workspace_removed` (`#47679`):**
+    - Ao tentar revelar um chat cujo projeto foi excluído do app, a recusa retornava como erro desconhecido exibindo "Retry in a moment" indefinidamente. Agora a sessão reporta `agent_session_workspace_removed`, informando claramente no desktop e mobile que o projeto foi removido.
 
 ## O que fazer
 
+- Reter o workspace ativo na visão da sidebar através do virtualizador ao exibir/ocultar workspaces suspensos (`#47683`).
+- Adotar a grafia canônica de `.git/worktrees/<name>/gitdir` em volumes case-insensitive para prevenir worktrees órfãos (`#47542`).
+- Calcular a janela de frescor de repositórios a partir do término do scan e responder do cache durante atualizações em background (`#47249`).
+- Reportar `agent_session_workspace_removed` e mensagem clara para chats de projetos removidos (`#47679`).
 - Preservar a extensão correta de arquivos de plugins no primeiro salvamento (`#42658`, resolve `#42657`).
 - Manter a execução de painéis de plugins em background na alternância de abas da sidebar (`#42632`).
 - Suportar subpastas `source.path` e hooks de workers em plugins (`#42638`, `#42637`).

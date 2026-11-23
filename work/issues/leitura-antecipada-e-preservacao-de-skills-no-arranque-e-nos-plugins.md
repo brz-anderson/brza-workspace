@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #47019 descobre skills do Prime Agent no diretório de projeto (<repo>/.prime/agent/skills), complementando o suporte a skills e comandos de plugins.
+description: Os PRs #47582 (oculta ~/.agents/skills do Claude), #47158 (clareza em atualizações de skills empacotadas) e #47154 (cache de skills no Share) aprimoram a gestão de skills.
 scope:
   - brza-studio
 priority: high
@@ -15,7 +15,10 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47019`](https://github.com/stablyai/orca/pull/47019) (resolve Issue [`#47018`](https://github.com/stablyai/orca/issues/47018)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47582`](https://github.com/stablyai/orca/pull/47582),
+[`stablyai/orca#47158`](https://github.com/stablyai/orca/pull/47158),
+[`stablyai/orca#47154`](https://github.com/stablyai/orca/pull/47154),
+[`stablyai/orca#47019`](https://github.com/stablyai/orca/pull/47019) (resolve Issue [`#47018`](https://github.com/stablyai/orca/issues/47018)),
 [`stablyai/orca#46756`](https://github.com/stablyai/orca/pull/46756) (refs Issue [`#46706`](https://github.com/stablyai/orca/issues/46706)),
 [`stablyai/orca#46724`](https://github.com/stablyai/orca/pull/46724),
 [`stablyai/orca#46747`](https://github.com/stablyai/orca/pull/46747) (resolve Issue [`#46708`](https://github.com/stablyai/orca/issues/46708)),
@@ -100,8 +103,21 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47019`](https://github.com
     Em `commands.register`, o descarte de uma inscrição de comando anterior apagava o identificador do comando incondicionalmente, removendo também a nova implementação registrada para o mesmo ID.
 22. **Omissão de skills do Prime Agent mantidas no diretório do projeto (`#47019`, resolve `#47018`):**
     O Prime Agent carrega skills específicas do repositório a partir de `<repo>/.prime/agent/skills`. O scanner do aplicativo varria apenas a raiz global `~/.prime/agent/skills` e a pasta padrão `.agents/skills`, deixando invisíveis skills mantidas estritamente na pasta do projeto do Prime Agent.
+23. **Exibição indevida de skills de `~/.agents/skills` no menu `/` do Claude Code (`#47582`):**
+    O Claude Code carrega apenas suas próprias pastas `.claude` e plugins instalados, ignorando as raízes compartilhadas `.agents/skills`. Contudo, o resolver tratava raízes com owner nulo como visíveis a todos os agentes, fazendo com que o menu `/` do Claude oferecesse skills que só existiam em `~/.agents/skills`, cujo envio falhava como comando desconhecido.
+24. **Ambiguidade em atualizações de skills bundled divergentes e destino de backups (`#47158`):**
+    Quando uma skill empacotada diferia da versão distribuída pelo app, o diálogo de atualização e o CLI não deixavam claro o que o botão "Replace" ou `--force` fazia, gerando receio de perda irreversível de customizações locais.
+25. **Degradação de performance com re-varredura exaustiva de dezenas de milhares de arquivos no diálogo de Share (`#47154`):**
+    Cada tick ou seleção de checkbox no diálogo de compartilhamento de bots disparava uma varredura completa do disco em cada projeto vinculado, lendo cada `SKILL.md` e executando mais de 32.800 chamadas `lstat` para 64 skills, congelando a interface.
 
 ## O que os PRs fazem
+
+- **Ocultação de pastas de skills compartilhadas para o Claude (`#47582`):**
+  - Introduz a flag de perfil `skipsSharedSkillFolders` para o Claude (OpenClaude/Claude Code), impedindo que o menu `/` ofereça comandos que residem apenas em `~/.agents/skills`.
+- **Esclarecimento de atualizações de skills bundled e backup seguro com `--force` (`#47158`):**
+  - Esclarece no diálogo e nos tooltips de Settings que a ação "Replace" move a pasta inteira modificada para uma pasta de backup antes de instalar a versão atualizada da skill, e no CLI imprime o caminho exato para onde o backup foi movido.
+- **Cache de listagem de skills no diálogo de compartilhamento de bots (`#47154`):**
+  - Reutiliza a listagem de skills construída na primeira montagem do diálogo Share durante a seleção de checkboxes, eliminando milhares de chamadas de disco a cada clique.
 
 - **Descoberta de skills do Prime Agent na pasta do projeto (`#47019`, resolve `#47018`):**
   - Adiciona `.prime/agent` à lista de diretórios de skills por repositório, garantindo que `<repo>/.prime/agent/skills` seja varrido e indexado automaticamente para o Prime Agent, mantendo novas instalações direcionadas a `.agents/skills`.
@@ -170,4 +186,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47019`](https://github.com
 17. Emitir código 1 e lista de falhas por plugin em `plugin update --all` (`#46749`, resolve `#46698`).
 18. Vincular registros de comandos a seus wrappers para não descartar comandos substituídos (`#46718`, resolve `#46701`).
 19. Varrer e carregar skills mantidas na pasta de projeto do Prime Agent `<repo>/.prime/agent/skills` (`#47019`, resolve `#47018`).
+20. Ocultar raízes de skills de `~/.agents/skills` nos seletores do Claude Code através da flag `skipsSharedSkillFolders` (`#47582`).
+21. Adotar mensagens claras de backup e rotulagem neutra para cópias divergentes de skills empacotadas no diálogo de atualização e CLI (`#47158`).
+22. Reutilizar a listagem em cache de skills no diálogo de compartilhamento de bots para eliminar re-varreduras com `lstat` a cada seleção (`#47154`).
+
 

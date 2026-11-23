@@ -19,6 +19,7 @@ refs:
   - issue:progresso-de-revisao-no-diff-backend-de-metricas-e-abertura-de-pastas
   - issue:protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle
   - issue:retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot
+  - issue:vazamento-de-memoria-gpu-webgl-no-terminal-e-performance-macos
 ---
 
 # Radar de issues e PRs do upstream e automação de 6h (00h, 06h, 12h e 18h BRT)
@@ -81,5 +82,33 @@ refs:
      adicionados os PRs `#47155`, oferecendo ação direta de re-autenticação para contas Codex expiradas ou revogadas na tela de uso; e `#47540`, restringindo alertas de falta de assinatura no OpenCode Go estritamente a respostas com `EntitlementError`.
    - [Progresso de revisão no diff, backend de métricas e abertura de pastas](../issues/progresso-de-revisao-no-diff-backend-de-metricas-e-abertura-de-pastas.md):
      adicionado o PR `#47639` (resolve `#47631`), incorporando `ctime` aos carimbos de arquivos para invalidar o cache de diff do Git em regravações in-place com mtime idêntico.
+
+### 4. Ciclo de 6h (18:00 BRT / 21:00 UTC em 2026-11-23)
+
+1. **Varredura delta das últimas 6h no upstream (`stablyai/orca`):** analisados novos PRs, issues e commits criados ou atualizados entre `2026-11-23T15:00:00Z` e `2026-11-23T21:00:00Z` (range upstream `59f3122bc8c..dbb1cf1bc41`, 48 commits mesclados), comparando contra o catálogo `work/issues/` e o índice `.brza/index.jsonl` para evitar duplicatas.
+2. **Atualização de 10 issues existentes em `work/issues/`:**
+   - [Vazamento de memória GPU WebGL no terminal e performance macOS](../issues/vazamento-de-memoria-gpu-webgl-no-terminal-e-performance-macos.md):
+     adicionado o PR `#43465` (resolve `#43464`, commit `1560ff5b55e`), implementando rebuild periódico do renderizador WebGL do terminal ao atingir página de atlas de 4096², com intervalo de 60s, validação de 2s de PTY ocioso e 2s de pausa na digitação, além de desacoplar painéis encobertos.
+   - [Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):
+     adicionados os PRs `#47784` (resolve `#47780`), `#47774`, `#47724` (resolve `#47715`), `#47667`, `#47719`, `#47457` (refs `#41800`), `#43521` (commit `dbb1cf1bc41`), e as issues `#47807` e `#47781`, tratando badges de status de subagentes no cabeçalho, auto-scroll do chat com ancoragem no rodapé, drag-and-drop de anexos e renderização de diagramas.
+   - [Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):
+     adicionados os PRs `#47828`, `#47819`, `#47783` (resolve `#46100`), `#47536` (commit `21aa900d9c0`), `#47575` e a issue `#47817`, garantindo sobrevivência de coordenadores após reinício do daemon via `providerRelayKeep`, tratamento do erro de capacidade `TerminalHostCapError` e despertar resiliente de workers.
+   - [Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):
+     adicionados o PR `#47716` (resolve `#47703`), commits `15830ffd7e7` (`#47409`), `ee8d885823a` (`#45854`) e PR `#47657`, introduzindo compactação ociosa no Claude (`idleCompaction`), guarda de espaço em disco e mitigação de contenção no cleanup de workspaces.
+   - [Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md):
+     adicionados os commits `231551f9f65` (`#45294`), `6e4ebc83d00` (`#47737`), `85d8985d9e0` (`#47778`), `da839538408` (`#47764`), PR `#47689` e issue `#47829`, preservando `history.jsonl` em migrações do Codex e aprimorando o chaveamento automático de cotas e prompt cache.
+   - [Fontes web em plugins, isolamento de atalhos e resiliência de hooks](../issues/fontes-web-em-plugins-isolamento-de-atalhos-e-resiliencia-de-hooks.md):
+     adicionados os commits `63930784bb2` (`#47767`, resolve `#47766`), `c73dce43060` (`#47710`, resolve `#47709`) e PR `#47702`, tratando URLs com `/blob/` na instalação de plugins Git, parsing de caracteres literais `+` e `,` em atalhos e suporte a `CodeInput`.
+   - [Badges de worktree para plugins, cadência de PR e redesenho de automações](../issues/badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes.md):
+     adicionados o PR `#47726` e as issues `#47796`, `#47795`, `#47794`, `#47793`, tratando motivos tipados de skip (`skipped_needs_interactive_auth`), recuperação pós-restart do daemon e tratamento de ocorrências perdidas em cron schedules com DST.
+   - [Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):
+     adicionados os PRs `#47805` (resolve `#47776`), `#47750`, `#47816`, `#47743` (fecha `#47747`) e `#47739`, implementando quebra de linha de erros Git no Source Control, contenção de foco no branch dialog, aninhamento de grupos de projetos, contadores de bots e projetos e rastreamento automático do arquivo ativo no File Explorer.
+   - [Consumo de recursos em agentes: reaper de LSP e overhead de hooks](../issues/consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks.md):
+     adicionados os commits `6e0805a2e1f` (`#47769`), `64eb525c558` (`#47757`), `64a57263cf4` (`#47529`), `e2c8f4756e8` (`#47705`, refs `#19792`), PR `#47765` e issues `#47826` e `#47825`, consolidando leituras em lote de frotas de bots, indexação de turnos ancorados no journal SQLite, saneamento do Chromium Crashpad herdado e suporte a hooks do Droid.
+   - [Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):
+     adicionadas as issues `#47785` (invocação de skills restritas a usuários via especificação `worker-start --spec-file`) e `#47813` (gravação de tarefas no navegador embutido para síntese de skills).
+   - [Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):
+     adicionados os commits `9948925bbd1` (`#47721`, resolve `#47707`), `8144d7881bb` (`#46518`), e os PRs de browser `#47806`, `#47787`, `#47803`, `#47791`, `#47782`, `#47777`, com suporte a hooks do zcode em `setting.json`, servidores Codex compartilhados no Windows em Job objects kill-on-close e isolamento de segurança e proxy do navegador.
+
 
 

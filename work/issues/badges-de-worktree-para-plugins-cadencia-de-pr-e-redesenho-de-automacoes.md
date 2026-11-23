@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47491 (diagnóstico real de falha de agente em automações) e #47479 (Copy URL em card de webhook) aprimoram a UX de automações.
+description: O PR #47726 e as issues #47796-#47793 aprimoram a confiabilidade do motor de automações e verificações de PR.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,12 @@ tags:
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47491`](https://github.com/stablyai/orca/pull/47491),
+Rastreado do PR aberto no upstream [`stablyai/orca#47726`](https://github.com/stablyai/orca/pull/47726),
+além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues/47796),
+[`stablyai/orca#47795`](https://github.com/stablyai/orca/issues/47795),
+[`stablyai/orca#47794`](https://github.com/stablyai/orca/issues/47794) e
+[`stablyai/orca#47793`](https://github.com/stablyai/orca/issues/47793),
+[`stablyai/orca#47491`](https://github.com/stablyai/orca/pull/47491),
 [`stablyai/orca#47479`](https://github.com/stablyai/orca/pull/47479) (resolve Issue [`#47386`](https://github.com/stablyai/orca/issues/47386)),
 [`stablyai/orca#47189`](https://github.com/stablyai/orca/pull/47189),
 [`stablyai/orca#47483`](https://github.com/stablyai/orca/pull/47483),
@@ -86,9 +91,29 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47491`](https://github.com
     Quando um agente recusava o prompt de execução de uma automação antes do primeiro turno (por exemplo, erro de configuração no arquivo de MCP do Codex), o relatório gravava apenas "The bot's turn ended without finishing (failure)". O sistema agora registra o motivo real tipado fornecido pelo provedor (ex.: "Codex couldn't start: failed to load configuration: url is not supported for stdio...").
 17. **Ocultação da URL de recebimento de webhook em linhas colapsadas de automações (`#47479`, resolve `#47386`):**
     Automações de webhook recém-criadas eram desenhadas como linhas dobradas com a opção "Copy URL" enterrada no menu de detalhes, dificultando a configuração inicial. O webhook agora se apresenta como um card de configuração com a ação "Copy URL" em destaque na frente, no menu da linha e na página de detalhes.
+18. **Ausência de configuração para suprimir respostas automáticas "Fixing..." em revisões de PR (`#47726`):**
+    Em fluxos acionados por revisões de pull request, agentes respondiam automaticamente a cada comentário com confirmações ruidosas ("Fixing..."), sem que o usuário pudesse configurar o agente para atuar silenciosamente.
+19. **Falha genérica em execuções de automação que exigem autenticação interativa (`#47796`):**
+    O estado `skipped_needs_interactive_auth` nunca era atribuído quando uma automação encontrava bloqueio por falta de sign-in, falhando de maneira genérica sem guiar o operador para a autenticação necessária.
+20. **Reclassificação errônea de automações concluídas com sucesso como `dispatch_failed` após reinício (`#47795`):**
+    Ao fechar e reabrir o Orca, execuções de automação que já haviam concluído seu trabalho com êxito eram indevidamente re-rotuladas como `dispatch_failed` pelo reconciliador de inicialização.
+21. **Omissão de registros históricos para ocorrências perdidas enquanto o aplicativo estava fechado (`#47794`):**
+    Quando o computador ou aplicativo permanecia desligado durante múltiplas execuções agendadas, apenas a ocorrência mais recente era gravada, descartando os registros das demais instâncias perdidas.
+22. **Falhas de agendamento cron em transições de horário de verão (DST) e tolerância a timezones inválidos (`#47793`):**
+    Agendamentos de automação baseados em cron pulavam ou duplicavam turnos durante a entrada ou saída do horário de verão e aceitavam strings de fuso horário inválidas sem validação prévia.
 
 ## O que o upstream implementa e corrige
 
+- **Configuração para suprimir respostas "Fixing..." em comentários de revisão (`#47726`):**
+  - Adiciona configuração permitindo desativar respostas automáticas de confirmação em comentários de review de PRs, mantendo o histórico limpo e focando apenas nas correções efetivas de código.
+- **Sinalização explícita de `skipped_needs_interactive_auth` em automações (`#47796`):**
+  - Identifica quando uma automação é impedida por pendência de autenticação interativa, registrando o estado tipado correspondente e apresentando ação direta de sign-in na interface.
+- **Preservação de status de conclusão de automações pós-reinício (`#47795`):**
+  - Evita que execuções previamente finalizadas sejam marcadas como `dispatch_failed` durante o bootstrap de inicialização do aplicativo.
+- **Gravação de histórico de ocorrências perdidas durante fechamento do app (`#47794`):**
+  - Mantém o registro individualizado de todas as execuções de automação cron que foram perdidas enquanto o Orca esteve fechado.
+- **Suporte estrito a fusos horários e transições de horário de verão (DST) em automações (`#47793`):**
+  - Garante execução pontual em mudanças de horário de verão sem duplicações ou omissões e valida formalmente parâmetros `--timezone` na CLI.
 - **Diagnóstico com motivo real de recusa de agente em execuções de automação (`#47491`):**
   - Grava a causa tipada emitida pelo provedor (ex.: erro de sintaxe ou configuração MCP) quando o agente recusa o prompt antes de iniciar qualquer turno, em vez de emitir mensagem genérica de falha.
 - **Card de configuração e destaque da ação Copy URL em webhooks de automação (`#47479`, resolve `#47386`):**
@@ -179,6 +204,11 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47491`](https://github.com
 21. Exibir justificativa e contagem de chamadas ignoradas em diagnósticos de webhooks (`#47483`).
 22. Gravar e exibir a causa tipada real de recusa inicial de agentes em execuções de automação (`#47491`).
 23. Apresentar automações de webhook em setup card com ação Copy URL destacada (`#47479`, resolve `#47386`).
+24. Adicionar configuração para suprimir respostas automáticas "Fixing..." em comentários de revisão de PRs (`#47726`).
+25. Atribuir o estado `skipped_needs_interactive_auth` quando automações demandarem login interativo (`#47796`).
+26. Preservar o status de sucesso de automações finalizadas após reinicializações do app (`#47795`).
+27. Registrar integralmente todas as ocorrências de automação cron perdidas com o app fechado (`#47794`).
+28. Assegurar precisão de horários de verão (DST) e validação de `--timezone` no agendamento cron (`#47793`).
 
 
 

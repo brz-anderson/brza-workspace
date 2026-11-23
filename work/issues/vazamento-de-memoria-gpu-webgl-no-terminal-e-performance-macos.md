@@ -80,9 +80,12 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#43898`](https://github.com
   - Restringe as animações de spinners para rodarem apenas quando o elemento estiver visível no viewport (`perf(ui): run spin animations on main thread and only while visible`), evitando que o classificador de quadros do Chromium trave a thread do compositor a 100% de CPU.
 - **Camada antecipada de diagnósticos no watchdog de stalls (`#43898`):**
   - Implementa um nível inicial de alerta para estagnações entre 8s e 45s (`perf(app): report stall watchdog early diagnostics`), capturando perfil de execução JavaScript e estado de memória antes que o congelamento se torne irreversível.
-- **Reconstrução de renderizadores WebGL ao atingir página de 4096² no atlas (`#43465`, resolve `#43464`):**
+- **Reconstrução de renderizadores WebGL ao atingir página de 4096² no atlas (`#43465`, resolve `#43464`, commit `1560ff5b55e`):**
   - Reconstrói os renderizadores `WebglRenderer` e descarta texturas do contexto anterior assim que uma página do glyph atlas atinge 4096² pixels;
-  - Descarrega texturas acumuladas e evita que o processo de aceleração de hardware continue expandindo o consumo de VRAM indefinidamente.
+  - Descarrega texturas acumuladas e evita que o processo de aceleração de hardware continue expandindo o consumo de VRAM indefinidamente (atingindo dezenas de gigabytes em sessões longas);
+  - Limita a reconstrução a no máximo uma vez a cada 60s no macOS, aguardando pausa de 2s sem saída PTY no atlas e 2s sem digitação do usuário (para não degradar latência de entrada em benchmarks M4);
+  - Mantém panes cobertas por abas de Native Chat desanexadas do WebGL durante a reconstrução e reconecta sob demanda apenas no momento da revelação visual;
+  - Recria contextos de canvas um por frame de animação para eliminar micro-stalls perceptíveis na interface.
 - **Cache de layout de teclado no macOS e invalidação por TIS notification (`#39465`):**
   - Armazena em cache no processo principal o último snapshot de layout obtido com sucesso;
   - Descarta o cache e incrementa a época somente quando o sistema emitir `com.apple.Carbon.TISNotifySelectedKeyboardInputSourceChanged`,

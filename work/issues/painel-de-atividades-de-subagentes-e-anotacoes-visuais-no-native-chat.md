@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #42129 (/btw e /side), #47564 (waiting vs blocked), #47432 (contagem de workers) e #47485 (rascunhos de resposta) aprimoram a UX do chat nativo.
+description: Os PRs #47784 (foco em split ao clicar Stop/Send), #47774 (worker tray status), #47724 (lease em wake de subagentes) e #47667 (@-mentions) refinam o chat nativo.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,15 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#42129`](https://github.com/stablyai/orca/pull/42129),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47784`](https://github.com/stablyai/orca/pull/47784) (resolve Issue [`#47780`](https://github.com/stablyai/orca/issues/47780)),
+[`stablyai/orca#47774`](https://github.com/stablyai/orca/pull/47774),
+[`stablyai/orca#47724`](https://github.com/stablyai/orca/pull/47724) (resolve Issue [`#47715`](https://github.com/stablyai/orca/issues/47715)),
+[`stablyai/orca#47667`](https://github.com/stablyai/orca/pull/47667),
+[`stablyai/orca#47719`](https://github.com/stablyai/orca/pull/47719),
+[`stablyai/orca#47457`](https://github.com/stablyai/orca/pull/47457) (refs Issue [`#41800`](https://github.com/stablyai/orca/issues/41800)),
+[`stablyai/orca#43521`](https://github.com/stablyai/orca/pull/43521),
+além das issues [`stablyai/orca#47807`](https://github.com/stablyai/orca/issues/47807) e [`stablyai/orca#47781`](https://github.com/stablyai/orca/issues/47781),
+[`stablyai/orca#42129`](https://github.com/stablyai/orca/pull/42129),
 [`stablyai/orca#47564`](https://github.com/stablyai/orca/pull/47564),
 [`stablyai/orca#47432`](https://github.com/stablyai/orca/pull/47432),
 [`stablyai/orca#47553`](https://github.com/stablyai/orca/pull/47553) (resolve Issue [`#47552`](https://github.com/stablyai/orca/issues/47552)),
@@ -300,9 +308,39 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     - Em chats longos, ao navegar para cima no histórico paginado (*paged-in rows*), qualquer atualização subsequente de frame reenviada pelo host descartava as linhas antigas, fazendo a visualização saltar para o presente.
 81. **Disparo acidental de hover cards após navegação de retorno via teclado (`#47559`):**
     - Retornar na lista de itens via teclado posicionava o foco no elemento anterior, abrindo hover cards mesmo quando o cursor do mouse apontava para outra região.
+82. **Envio acidental de rascunhos de outro chat ao clicar em Stop/Send em telas divididas (`#47784`, resolve `#47780`):**
+    - Em layout de split chat (dois chats lado a lado), clicar em Stop ou Send no chat da direita mantinha o foco do teclado no editor de prompt do chat da esquerda (devido ao `preventDefault()` para evitar descarte de foco ao `<body>`), fazendo com que o `Cmd+Enter` subsequente enviasse o rascunho do chat esquerdo como steer indesejado.
+83. **Falso estado "Status unavailable" e ícone incorreto para workers cujo chat foi interrompido (`#47774`):**
+    - Na bandeja de workers do composer (worker tray / dock), workers cuja sessão foi encerrada (turnos cortados por saída/crash) caíam no fallback genérico `unavailable`, exibindo "Status unavailable" com contagem de minutos que parecia um worker rodando. Além disso, workers ativos usavam um loader cinza grande em vez do glifo compartilhado `AgentStateDot` (anel amarelo).
+84. **Subagentes presos indefinidamente em "working" após o término de tarefas secundárias (`#47724`, resolve `#47715`):**
+    - Quando um subagente concluía seu turno mas deixava processos em background, o término dessa tarefa invocava `wakeOwner()` incondicionalmente, re-marcando o proprietário como `running` sem expiração. Se o Claude Code não o retomasse, a linha ficava travada em "1 agent working" por dezenas de minutos sem filhos vivos.
+85. **Dificuldade de referenciar chats e terminais ativos no composer (`#47667`):**
+    - O menu de menções `@` suportava apenas arquivos e agentes do catálogo. Operadores que trabalham com múltiplos chats paralelos (ex.: backend, frontend e documentação) não podiam citar conversas nem terminais abertos para leitura ou envio direto sem consultar IDs de sessão manualmente.
+86. **Ausência de estilização Markdown instantânea no composer (`#47719`):**
+    - O editor do composer não formatava Markdown inline durante a digitação, forçando o operador a adivinhar a renderização de tabelas, blocos de código e ênfases antes do envio.
+87. **Galeria de imagens restrita à mensagem atual e travamentos em decodificações pesadas (`#47457`, refs `#41800`):**
+    - O visualizador de imagens do chat limitava a navegação de avançar/voltar exclusivamente aos anexos de uma única mensagem, e a decodificação síncrona monobloco de imagens base64 via `atob` prendia a thread do renderer em long tasks.
+88. **Atrasos na abertura do seletor `/resume` e buscas de texto completo submetidas (`#47807`):**
+    - Invocações do comando `/resume` retardavam a renderização inicial do picker e as buscas FTS devido a bloqueios de indexação no banco de histórico.
 
 ## O que o upstream implementa
 
+- **Transferência automática de foco do teclado ao clicar em Stop/Send em split chat (`#47784`, resolve `#47780`):**
+  - No `NativeChatComposerPrimaryButton`, detecta cliques esquerdos quando o elemento focado atual pertence ao editor de prompt de outro chat (`[data-native-chat-prompt-editor]`) e transfere o foco imediatamente para o composer do chat clicado, retendo o rascunho do outro split intacto e evitando envios cruzados acidentais com `Cmd+Enter`.
+- **Bandeja de workers com status preciso, ações de recuperação e glifo `AgentStateDot` (`#47774`):**
+  - Workers cujo processo ou sessão foi encerrado inesperadamente são exibidos como **Stopped unexpectedly** (ponto vermelho de falha) sob a seção "Needs attention", com ações diretas **Show** (abre o chat) e **Stop** (liquida o despacho pendente);
+  - Unifica o ícone de workers em execução para o `AgentStateDot` (anel amarelo compartilhado) e expande a área de hover para cobrir a largura total da barra colapsada.
+- **Lease de 60 segundos com expiração em `wakeOwner()` de subagentes (`#47724`, resolve `#47715`):**
+  - Implementa lease temporal de 60 segundos no `ClaudeChildWork.end()` para reativar o proprietário; caso nenhum novo frame nomeie o subagente antes do prazo, a linha retorna automaticamente para o status gravado de conclusão (`done / succeeded`), eliminando badges perpétuos de trabalho.
+- **Menções `@` para chats e terminais do host no composer (`#47667`):**
+  - Ao digitar `@` no composer, consulta `agent.list` e `terminal.list` do host (com timeout seguro de 5s) e renderiza opções de chats e terminais como chips interativos que orientam o modelo a usar `orca agent read` e `orca orchestration send`.
+- **Estilização Markdown ao vivo no composer enquanto o usuário digita (`#47719`):**
+  - Aplica decorações de sintaxe Markdown dinamicamente na entrada de texto do composer ProseMirror sem aguardar o envio da mensagem.
+- **Galeria unificada de imagens entre mensagens e decodificação assíncrona fatiada (`#47457`, refs `#41800`):**
+  - Permite navegar por todas as imagens do viewport da conversa com setas de teclado e contador `N / M`;
+  - Fatia a decodificação de payloads base64 com pausas no event loop, evitando long tasks, e descarta decodificações de imagens que já foram invalidadas do cache.
+- **Faixa de worker temporário no topo de chat workers (`#43521`, commit `dbb1cf1bc41`):**
+  - Exibe banner informativo no topo de workers abertos como chat e anuncia conclusão de trabalho por meio de uma região live estável (`aria-live`), evitando alertas duplicados em remontagens.
 - **Pill de Side chat no composer para comandos `/btw` e `/side` (`#42129`):**
   - Digitar `/btw` ou `/side` seguido de espaço no início do composer exibe uma pílula cinza "Side chat", onde o envio abre o rascunho diretamente como conversa lateral sem poluir o chat principal;
   - Preserva a serialização do rascunho como texto puro e reconstrói o estado ao montar ou alterar disponibilidade.
@@ -597,6 +635,13 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Restaurar respostas rascunhadas na caixa de comentários quando o agente reformular uma pergunta em itens (`#47485`).
 - Preservar histórico paginado de mensagens anteriores ao receber janelas de transcrição do host (`#45168`).
 - Restringir abertura de hover cards estritamente à navegação focada por teclado (`#47559`).
+- Transferir o foco do teclado para o split correspondente ao clicar em Stop ou Send no chat nativo (`#47784`, resolve `#47780`), evitando disparos acidentais com `Cmd+Enter`.
+- Identificar workers com sessão interrompida como "Stopped unexpectedly" com ações Show/Stop e ícone `AgentStateDot` na bandeja de workers (`#47774`).
+- Aplicar lease de expiração de 60s em `wakeOwner()` de subagentes para devolver o status a `done / succeeded` quando tarefas secundárias encerrarem (`#47724`, resolve `#47715`).
+- Adicionar menções `@` para chats e terminais ativos no composer do chat (`#47667`).
+- Renderizar estilização Markdown em tempo real durante a digitação no composer (`#47719`).
+- Adotar a galeria unificada de imagens entre mensagens e a decodificação fatiada não-bloqueante no visualizador (`#47457`, refs `#41800`).
+- Exibir a faixa de worker temporário com região `aria-live` estável no topo de chat workers (`#43521`, commit `dbb1cf1bc41`).
 
 
 

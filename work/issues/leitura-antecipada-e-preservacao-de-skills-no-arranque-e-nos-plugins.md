@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47582 (oculta ~/.agents/skills do Claude), #47158 (clareza em atualizações de skills empacotadas) e #47154 (cache de skills no Share) aprimoram a gestão de skills.
+description: Ocultação de skills para Claude (#47582), cache no Share (#47154), spec para worker start (#47785) e skills gravadas (#47813).
 scope:
   - brza-studio
 priority: high
@@ -38,6 +38,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47582`](https://github.com
 [`stablyai/orca#36897`](https://github.com/stablyai/orca/pull/36897),
 [`stablyai/orca#37659 (MERGED no upstream; não está no fork)`](https://github.com/stablyai/orca/pull/37659) e
 [`stablyai/orca#19680`](https://github.com/stablyai/orca/pull/19680), além das issues
+[`stablyai/orca#47785`](https://github.com/stablyai/orca/issues/47785),
+[`stablyai/orca#47813`](https://github.com/stablyai/orca/issues/47813),
 [`stablyai/orca#43418`](https://github.com/stablyai/orca/issues/43418),
 [`stablyai/orca#41017`](https://github.com/stablyai/orca/issues/41017),
 [`stablyai/orca#14690`](https://github.com/stablyai/orca/issues/14690),
@@ -109,6 +111,10 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47582`](https://github.com
     Quando uma skill empacotada diferia da versão distribuída pelo app, o diálogo de atualização e o CLI não deixavam claro o que o botão "Replace" ou `--force` fazia, gerando receio de perda irreversível de customizações locais.
 25. **Degradação de performance com re-varredura exaustiva de dezenas de milhares de arquivos no diálogo de Share (`#47154`):**
     Cada tick ou seleção de checkbox no diálogo de compartilhamento de bots disparava uma varredura completa do disco em cada projeto vinculado, lendo cada `SKILL.md` e executando mais de 32.800 chamadas `lstat` para 64 skills, congelando a interface.
+26. **Invocação de skills restritas a usuários por workers disparados via spec (`#47785`):**
+    Bots agendados que iniciam workers com `orchestration worker-start --spec-file` não conseguiam disparar skills marcadas com `disable-model-invocation: true`, pois a restrição impedia a execução mesmo quando explicitamente instruída pela especificação da automação.
+27. **Gravação de fluxos no navegador embutido para síntese assistida de skills (`#47813`):**
+    Automações repetitivas na web (download de faturas, preenchimento de formulários) demandavam tentativa e erro descritiva pelos bots; a issue propõe gravar a sessão de navegação no browser do Orca e sintetizar automaticamente uma skill reprodutível.
 
 ## O que os PRs fazem
 
@@ -189,5 +195,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47582`](https://github.com
 20. Ocultar raízes de skills de `~/.agents/skills` nos seletores do Claude Code através da flag `skipsSharedSkillFolders` (`#47582`).
 21. Adotar mensagens claras de backup e rotulagem neutra para cópias divergentes de skills empacotadas no diálogo de atualização e CLI (`#47158`).
 22. Reutilizar a listagem em cache de skills no diálogo de compartilhamento de bots para eliminar re-varreduras com `lstat` a cada seleção (`#47154`).
+23. Permitir que workers executem skills com `disable-model-invocation: true` quando invocadas explicitamente via especificação (`worker-start --spec-file`) (`#47785`).
+24. Avaliar suporte a gravação de tarefas no navegador embutido para síntese assistida de skills automatizadas (`#47813`).
 
 

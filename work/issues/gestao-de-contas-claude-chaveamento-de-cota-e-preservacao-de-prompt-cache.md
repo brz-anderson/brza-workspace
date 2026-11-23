@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47155 (re-autenticação para contas Codex expiradas) e #47540 (precisão de erro de cota OpenCode Go) aprimoram o gerenciamento de contas e limites.
+description: Os PRs #45294 (preservação de histórico na migração Codex), #47737 (reutilização de message_id), #47778 e #47764 aprimoram contas e prompts.
 scope:
   - brza-studio
   - brza-workflow
@@ -17,7 +17,13 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47155`](https://github.com/stablyai/orca/pull/47155),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45294`](https://github.com/stablyai/orca/pull/45294),
+[`stablyai/orca#47737`](https://github.com/stablyai/orca/pull/47737) (refs Issue [`#47718`](https://github.com/stablyai/orca/issues/47718)),
+[`stablyai/orca#47778`](https://github.com/stablyai/orca/pull/47778) (refs Issue [`#42644`](https://github.com/stablyai/orca/issues/42644)),
+[`stablyai/orca#47764`](https://github.com/stablyai/orca/pull/47764) (resolve Issue [`#47763`](https://github.com/stablyai/orca/issues/47763)),
+[`stablyai/orca#47689`](https://github.com/stablyai/orca/pull/47689),
+além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/47829),
+[`stablyai/orca#47155`](https://github.com/stablyai/orca/pull/47155),
 [`stablyai/orca#47540`](https://github.com/stablyai/orca/pull/47540),
 [`stablyai/orca#47209`](https://github.com/stablyai/orca/pull/47209) (refs Issue [`#47146`](https://github.com/stablyai/orca/issues/47146)),
 [`stablyai/orca#47079`](https://github.com/stablyai/orca/pull/47079),
@@ -129,9 +135,28 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47155`](https://github.com
     Quando uma conta Codex perdia autorização ou expirava, o painel de uso exibia erro de cota bloqueado sem opção direta de sign-in para renovar as credenciais, forçando o desenvolvedor a navegar pelas configurações para se autenticar novamente.
 25. **Falsos positivos de ausência de assinatura em respostas de rate limit do OpenCode Go (`#47540`):**
     Qualquer erro retornado na consulta de limites de cota do OpenCode Go era classificado como "no subscription" pelo app, mesmo quando se tratava apenas de pico momentâneo de requisições ou indisponibilidade temporária do serviço.
+26. **Sobrescrita de chats e perda de histórico de prompts na migração do Codex (`#45294`):**
+    A migração de versões antigas do Codex sobrescrevia conversas ou descartava o histórico `history.jsonl` de contas removidas, arriscando perda permanente de prompts do usuário.
+27. **Sobrescrita de respostas de assistente por reutilização de `message_id` em turnos futuros (`#47737`, refs `#47718`):**
+    Quando um provedor LLM compatível com a API de mensagens do Codex reutilizava um `message_id` em turnos subsequentes da mesma thread, a resposta mais recente herdava a identidade do turno anterior e sobrescrevia a mensagem antiga no transcript.
+28. **Poluição de métricas de uso na barra de status durante foco ativo no chat (`#47778`, refs `#42644`):**
+    A barra de status mantinha widgets de uso de cota visíveis mesmo enquanto a superfície principal em foco era uma conversa de chat, competindo por atenção visual e espaço.
+29. **Truncamento de argumentos JSON e falha de listagem de modelos Claude no Windows via Bun (`#47764`, resolve `#47763`):**
+    Em shims `.cmd` baseados no runtime Bun no Windows, o escape `""` para argumentos JSON em linha de comando era quebrado pelo `CommandLineToArgvW`. Flags como `--settings {"disableAllHooks":true}` engoliam argumentos subsequentes e causavam falha silenciosa na descoberta de modelos do Claude.
 
 ## O que o upstream propõe e implementa
 
+- **Preservação durável de históricos de prompt `history.jsonl` na migração do Codex (`#45294`, commit `231551f9f65`):**
+  - Garante que a migração de upgrade copie o histórico de cada conta (`history.jsonl`) para a home do runtime em modo de criação exclusiva antes de gravar marcadores ou realizar cópias de sessão, e preserva o arquivo na remoção de contas;
+  - Nunca sobrescreve prompts existentes e realiza mesclagens assíncronas do histórico compartilhado com tolerância a hard links ausentes.
+- **Geração de novas identidades para respostas com `message_id` reutilizado em turnos distintos (`#47737`, commit `6e4ebc83d00`):**
+  - Mapeia identidades de itens do Codex considerando tanto o ID de mensagem quanto o identificador do turno; ao encontrar um `message_id` já existente pertencente a outro turno, emite uma nova identidade distinta sem sobrescrever a resposta histórica.
+- **Ocultação de métricas de uso na barra de status com chat em foco (`#47778`, commit `85d8985d9e0`):**
+  - Oculta o indicador de uso da barra de status enquanto um chat ou terminal em visualização de chat detiver o foco ativo na interface gráfica.
+- **Escape libuv (`\"`) para argumentos JSON em shims Bun `.cmd` no Windows (`#47764`, commit `da839538408`):**
+  - Utiliza escape estilo libuv (`\"`) quando argumentos possuem número par de aspas e apenas caracteres ASCII imprimíveis seguros, garantindo que o Bun decodifique parâmetros JSON de hooks e modelos Claude sem truncamentos.
+- **Exibição de permissões do Claude pré-aprovadas por hooks como `allowed` em vez de `cancelled` (`#47689`):**
+  - Ajusta a sinalização de autorização para refletir permissões previamente concedidas por hooks automáticos sem confundi-las com cancelamentos pelo usuário.
 - **Fluxo guiado de Sign-in para contas Codex expiradas ou revogadas na tela de uso (`#47155`):**
   - Oferece botão imediato de login/sign-in nas linhas de uso com credenciais revogadas, vinculando o estado de erro estritamente à conta e ao runtime específico (incluindo WSL distros) e limpando confirmações de reset obsoletas.
 - **Restrição de reporte de falta de assinatura estritamente para `EntitlementError` no OpenCode Go (`#47540`):**
@@ -203,6 +228,11 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47155`](https://github.com
 - Resolver caminhos reais via `realpath` e deduplicar pastas de projetos compartilhadas entre perfis Claude na indexação de transcripts (`#47209`, refs `#47146`).
 - Oferecer ação de sign-in direto para contas Codex revogadas ou expiradas nas visões de uso (`#47155`).
 - Mapear status de ausência de assinatura no OpenCode Go estritamente diante de `EntitlementError` (`#47540`).
+- Preservar histórico `history.jsonl` de contas em migrações do Codex sem sobrescrever chats ou prompts (`#45294`, commit `231551f9f65`).
+- Emitir novas identidades para respostas quando o provedor LLM reutilizar `message_id` em turnos futuros da mesma thread (`#47737`, refs `#47718`).
+- Ocultar métricas de uso da barra de status enquanto um chat detiver o foco ativo (`#47778`, refs `#42644`).
+- Utilizar citação estilo libuv (`\"`) para parâmetros JSON em shims `.cmd` baseados em Bun no Windows (`#47764`, resolve `#47763`).
+- Tratar permissões do Claude pré-aprovadas por hooks como `allowed` em vez de `cancelled` (`#47689`).
 
 
 

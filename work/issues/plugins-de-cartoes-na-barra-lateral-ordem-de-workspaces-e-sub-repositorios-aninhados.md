@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47683 (workspace ativo visível ao alternar suspensos), #47542 (grafia gitdir em APFS/NTFS), #47249 (janela de frescor de repos) e #47679 aprimoram a sidebar e worktrees.
+description: Os PRs #47805 (quebra de erros Git na sidebar), #47750 (foco no diálogo de branch) e #47816 aprimoram a barra lateral e o explorer.
 scope:
   - brza-studio
   - workspace
@@ -17,7 +17,12 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47683`](https://github.com/stablyai/orca/pull/47683),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47805`](https://github.com/stablyai/orca/pull/47805) (resolve Issue [`#47776`](https://github.com/stablyai/orca/issues/47776)),
+[`stablyai/orca#47750`](https://github.com/stablyai/orca/pull/47750),
+[`stablyai/orca#47816`](https://github.com/stablyai/orca/pull/47816),
+[`stablyai/orca#47743`](https://github.com/stablyai/orca/pull/47743),
+[`stablyai/orca#47739`](https://github.com/stablyai/orca/pull/47739),
+[`stablyai/orca#47683`](https://github.com/stablyai/orca/pull/47683),
 [`stablyai/orca#47542`](https://github.com/stablyai/orca/pull/47542),
 [`stablyai/orca#47249`](https://github.com/stablyai/orca/pull/47249),
 [`stablyai/orca#47679`](https://github.com/stablyai/orca/pull/47679),
@@ -206,9 +211,28 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47683`](https://github.com
     - A janela de frescor do catálogo iniciava no começo da varredura, tornando-o obsoleto logo na chegada se a listagem fosse lenta e forçando re-varreduras contínuas; agora a janela de frescor é calculada a partir da conclusão da varredura, e leituras durante a atualização respondem das linhas publicadas anteriormente em background.
 47. **Tratamento definitivo de chats de projetos removidos como `agent_session_workspace_removed` (`#47679`):**
     - Ao tentar revelar um chat cujo projeto foi excluído do app, a recusa retornava como erro desconhecido exibindo "Retry in a moment" indefinidamente. Agora a sessão reporta `agent_session_workspace_removed`, informando claramente no desktop e mobile que o projeto foi removido.
+48. **Quebra de linha para erros longos de Git no card do Source Control (`#47805`, resolve `#47776`):**
+    - Quando o Git falha ao ler um workspace (ex.: "Branch compare failed"), paths ou hashes longos no erro bruto excediam a largura da sidebar e empurravam todo o painel horizontalmente, cortando a caixa de commit e botões de ação;
+    - O PR `#47805` aplica quebra de linha de emergência (`break-all` / `whitespace-pre-wrap`) no texto do erro dentro do card, mantendo o painel de Source Control contido na largura correta da sidebar.
+49. **Contenção de foco no diálogo de branch após resultado de nome mantido (`#47750`):**
+    - Quando o diálogo de auto-name de branch exibia "Branch name kept", devolvia o foco do teclado para o botão de fechar. Se outro modal estivesse sobreposto com foco ativo, o hand-back transferia o foco indevidamente para o botão de fechar do outro diálogo;
+    - O PR `#47750` restringe a devolução de foco estritamente aos nós descendentes do próprio diálogo de branch.
+50. **Aninhamento hierárquico de grupos de projetos via drag-and-drop e menu de contexto (`#47816`):**
+    - Permite aninhar grupos de projetos dentro de outros grupos na sidebar soltando o cabeçalho de um grupo sobre outro ou selecionando o destino no menu de contexto do grupo ("Move to group"), com cálculo de prevenção de dependência cíclica.
+51. **Contagem visível de Bots e Projetos nos cabeçalhos da sidebar (`#47743`, fecha `#47747`):**
+    - Os cabeçalhos de seção da sidebar passam a exibir contadores numéricos imediatos no formato "Bots (4)" e "Projects (2)", lendo diretamente as coleções reativas de bots e repositórios sem duplicar estado na memória nem computar overhead em segundo plano.
+52. **Revelação e rastreamento automático do arquivo ativo no File Explorer (`#47739`):**
+    - Introduz a configuração `explorerRevealActiveFile` (default `true`) sob Settings → Appearance → Window & sidebar → Advanced → File explorer;
+    - Rastreia automaticamente abas de arquivos ativas em modos `edit`, `markdown-preview` e `diff` de arquivo único, expandindo nós ancestrais colapsados, resetando escopos de pasta se o arquivo estiver fora do display root atual, aplicando seleção visível com `bg-accent text-accent-foreground` e rolando até a linha sem flash âmbar;
+    - Preserva seleções manuais enquanto o mesmo arquivo permanecer ativo e adiciona o comando `fileExplorer.revealActiveFile` ("Reveal Active File in Explorer") na Command Palette.
 
 ## O que fazer
 
+- Quebrar linhas de erros longos de Git dentro dos cards do Source Control para evitar extravasamento lateral da sidebar (`#47805`, resolve `#47776`).
+- Conter a devolução de foco do teclado estritamente dentro do diálogo de branch (`#47750`).
+- Permitir aninhar grupos de projetos via drag-and-drop e menu de contexto com prevenção de ciclos (`#47816`).
+- Exibir contadores de bots e projetos nos cabeçalhos da barra lateral (`#47743`, fecha `#47747`).
+- Implementar revelação automática do arquivo ativo no File Explorer (`explorerRevealActiveFile`) e comando de revelação manual (`#47739`).
 - Reter o workspace ativo na visão da sidebar através do virtualizador ao exibir/ocultar workspaces suspensos (`#47683`).
 - Adotar a grafia canônica de `.git/worktrees/<name>/gitdir` em volumes case-insensitive para prevenir worktrees órfãos (`#47542`).
 - Calcular a janela de frescor de repositórios a partir do término do scan e responder do cache durante atualizações em background (`#47249`).

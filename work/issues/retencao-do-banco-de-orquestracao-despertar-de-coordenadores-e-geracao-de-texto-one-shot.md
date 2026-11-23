@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47562 (contrato de teardown de workers), #46045 (detecção de término por eventos do SO), #47543 (distinção de host_lost) e #47503 (relatórios pós-stop em grupos) refinam a orquestração.
+description: Os PRs #47828, #47819, #47783 (sobrevivência a reinício via terminal host), #47536 (cap de terminais do host) e #47575 refinam a orquestração.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,13 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47562`](https://github.com/stablyai/orca/pull/47562),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47828`](https://github.com/stablyai/orca/pull/47828) (resolve Issue [`#46100`](https://github.com/stablyai/orca/issues/46100)),
+[`stablyai/orca#47819`](https://github.com/stablyai/orca/pull/47819) (resolve Issue [`#46100`](https://github.com/stablyai/orca/issues/46100)),
+[`stablyai/orca#47783`](https://github.com/stablyai/orca/pull/47783) (resolve Issue [`#46100`](https://github.com/stablyai/orca/issues/46100)),
+[`stablyai/orca#47536`](https://github.com/stablyai/orca/pull/47536),
+[`stablyai/orca#47575`](https://github.com/stablyai/orca/pull/47575),
+além da issue [`stablyai/orca#47817`](https://github.com/stablyai/orca/issues/47817),
+[`stablyai/orca#47562`](https://github.com/stablyai/orca/pull/47562),
 [`stablyai/orca#46045`](https://github.com/stablyai/orca/pull/46045),
 [`stablyai/orca#47543`](https://github.com/stablyai/orca/pull/47543),
 [`stablyai/orca#47503`](https://github.com/stablyai/orca/pull/47503),
@@ -301,9 +307,25 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Quando um worker encerrava por queda do host remoto ou perda de conexão SSH, o sistema reportava apenas saída genérica com código `-1` ("stop was requested but never confirmed"), mascarando a indisponibilidade de infraestrutura sob a aparência de cancelamento do usuário.
 85. **Descarte de relatórios de workers ao interromper ou fechar salas de grupos (`#47503`):**
     - Relatórios e entregas parciais emitidos por workers após um comando Stop ou no momento da remoção de uma sala de grupo eram sumariamente descartados no banco de dados relacional, e os chats dos membros perdiam a vinculação de nomenclatura da sala de origem.
+86. **Encerramento forçado de chats e perda de trabalho em voo ao reiniciar ou atualizar o app (`#47828`, `#47819`, `#47783`, resolve `#46100`):**
+    - Fechar ou atualizar o aplicativo finalizava todos os processos de agentes de chat ativos (Codex, Claude e agentes ACP como Gemini, Copilot, Goose, Grok) e marcava os turnos em voo como cortados, forçando o usuário a reiniciar conversas com processos limpos e perdendo comandos em execução, servidores MCP e aprovações em aberto.
+87. **Recusa opaca de inicialização de workers ao atingir a capacidade de terminais do host (`#47536`):**
+    - Quando o daemon atingia o limite configurado de terminais do host, novas tentativas de `worker-start` falhavam com erro genérico sem detalhar a contagem de terminais em uso (`N of M`), a causa `terminal_host_cap` ou instruções para liberar instâncias concluídas.
+88. **Workers de inicialização lenta classificados erroneamente como não observados (`#47575`):**
+    - Se um worker levasse alguns segundos para responder ao handshake de inicialização, a árvore de orquestração o rotulava como `unobserved` em vez de identificá-lo em fase de arranque (`starting`), induzindo o coordenador a abortos prematuros.
+89. **Turno de sessão travado aberto com 0% de CPU após resposta 503 do provedor (`#47817`):**
+    - Quando a API de um modelo retornava erro HTTP 503 temporário, a sessão ficava travada em aberto sem consumo de CPU, ignorando o botão Stop da interface gráfica e chamadas de cancelamento via CLI.
 
 ## O que o upstream implementa
 
+- **Sobrevivência de chats ativos a reinicializações e atualizações via terminal host (`#47828`, `#47819`, `#47828`, resolve `#46100`):**
+  - No macOS e Linux, delega os processos de agentes de chat (Codex, Claude e agentes ACP) para execução sob o host de terminais daemon (`providerRelayKeep`);
+  - Ao fechar o app, os processos continuam em execução em background em vez de serem abortados; na reabertura do aplicativo, o chat reconecta ao mesmo processo com replay ordenado de saídas, preservação de subprocessos e ferramentas, e restauração de pedidos de aprovação mantidos como prompts interativos normais.
+- **Identificação tipada de capacidade de terminais e avisos preventivos em `worker-start` (`#47536`, commit `21aa900d9c0`):**
+  - Implementa o erro tipado `TerminalHostCapError` com o detalhamento `(N of M terminals in use)` e orientações de liberação;
+  - Exibe no recibo de `worker-start` avisos preventivos de capacidade assim que o uso de terminais atinge 80% (ou 90%) do teto do host.
+- **Classificação precisa de workers lentos em inicialização como `starting` (`#47575`):**
+  - Marca workers cujo agente demora para inicializar como `starting` na árvore de tarefas em vez do alarmista `unobserved`.
 - **Formalização do contrato de teardown e posicionamento host-aware de workers (`#47562`):**
   - Documenta a descoberta de hosts e setups de projeto (`orca host list --json`, `orca project setups --environment local|<server-id> --json`) e regras estritas de prontidão (`setupState: ready`, `hostId: local`, `--repo id:<repoId>`);
   - Separa formalmente o ciclo de vida de término em três estados: assentado (*settled* - desfecho de tarefa), encerrado (*ended* - sessão dormente) e destruído (*destroyed* - processo finalizado comprovadamente no SO);
@@ -584,6 +606,9 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Substituir o polling de processos em terminais por notificações orientadas a eventos do sistema operacional (`#46045`).
 - Identificar e exibir o motivo exato de encerramento de workers diferenciando cancelamento de perda de host (`host_lost`) (`#47543`).
 - Preservar relatórios parciais e finais de workers e nomenclatura de chats em salas de grupos mesmo após comando Stop (`#47503`).
+- Implementar sobrevivência de chats ativos a reinicializações e atualizações através do terminal host (`providerRelayKeep`) para Codex, Claude e ACP (`#47828`, `#47819`, `#47783`, resolve `#46100`).
+- Emitir erro tipado `TerminalHostCapError` e avisos preventivos a partir de 80%/90% de ocupação do cap de terminais do host em `worker-start` (`#47536`, commit `21aa900d9c0`).
+- Classificar workers com arranque lento como `starting` em vez de `unobserved` na árvore de tarefas (`#47575`).
 
 
 

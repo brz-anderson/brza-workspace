@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47561 (lista de famílias tipográficas separadas por vírgula) e #47586 (supressão de atalhos de abas com Settings aberto) aprimoram a UX e tipografia.
+description: Os PRs #47767 (links /blob/ no Git install), #47710 (parse de teclas + e , literais) e #47702 (componente CodeInput) expandem plugins e atalhos.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,10 @@ tags:
 
 # Fontes web em plugins, isolamento de atalhos e resiliência de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47561`](https://github.com/stablyai/orca/pull/47561),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47767`](https://github.com/stablyai/orca/pull/47767) (resolve Issue [`#47766`](https://github.com/stablyai/orca/issues/47766)),
+[`stablyai/orca#47710`](https://github.com/stablyai/orca/pull/47710) (resolve Issue [`#47709`](https://github.com/stablyai/orca/issues/47709)),
+[`stablyai/orca#47702`](https://github.com/stablyai/orca/pull/47702),
+[`stablyai/orca#47561`](https://github.com/stablyai/orca/pull/47561),
 [`stablyai/orca#47586`](https://github.com/stablyai/orca/pull/47586),
 [`stablyai/orca#42473`](https://github.com/stablyai/orca/pull/42473),
 [`stablyai/orca#47296`](https://github.com/stablyai/orca/pull/47296) (refs Issue [`#47310`](https://github.com/stablyai/orca/issues/47310)),
@@ -83,9 +86,19 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47561`](https://github.com
     Ao configurar famílias tipográficas com fallbacks no terminal ou no app (como `D2Coding, Consolas` ou `"Cascadia Mono", D2Coding`), o valor era envolto em um único par de aspas (`"D2Coding, Consolas"`). O motor de renderização CSS interpretava a string inteira como um único nome inexistente de fonte, quebrando a declaração e descartando os fallbacks.
 18. **Atalhos de teclado (Cmd+W e Cmd+T) fechando e abrindo abas ocultas enquanto páginas como Settings estão abertas (`#47586`):**
     Como o workbench permanece montado por trás de telas de sobreposição completa (Settings, Activity, tela de criação de worktree), seu ouvinte de eventos de teclado continuava ativo. Pressionar Cmd+W fechava inadvertidamente a aba ativa oculta (interrompendo o agente em execução) e Cmd+T criava abas invisíveis ao usuário.
+19. **Falha de alcance ao colar links de arquivos (`/blob/`) no assistente de instalação Git de plugins (`#47767`, resolve `#47766`):**
+    Ao colar URLs de páginas de arquivos de repositórios no GitHub ou Gitea/Codeberg (como `https://github.com/owner/repo/blob/main/README.md`) no campo de instalação Git de plugins, o instalador mantinha o caminho inteiro da página como a URL do repositório, falhando na verificação de acessibilidade Git.
+20. **Rejeição de teclas `+` e `,` literais em atalhos e listas de keybindings (`#47710`, resolve `#47709`):**
+    Combinações de teclado contendo a tecla mais literal (como `Mod++`) ou listas de atalhos contendo vírgula literal (como `Ctrl+,`) eram sumariamente rejeitadas como inválidas pelo parser, porque `+` e `,` são utilizados internamente como separadores de acorde e de lista.
 
 ## O que o upstream implementa
 
+- **Reconhecimento de URLs de arquivos `/blob/` como o repositório base no instalador Git de plugins (`#47767`, resolve `#47766`, commit `63930784bb2`):**
+  - O utilitário `ownerRepoPageRef` agora lê `/owner/repo/blob/...` como o repositório `owner/repo` em forges públicas (GitHub e Gitea), omitindo ref implícito quando contém barras e mantendo `#ref` explícito para versionamento fixo, com orientações amigáveis no erro de URL inválida.
+- **Parser de atalhos e keybindings com suporte a teclas `+` e `,` literais (`#47710`, resolve `#47709`, commit `c73dce43060`):**
+  - Lê um `+` consecutivo após o separador como a tecla literal Plus (ex.: `Mod++`) e reconecta partes vazias após o separador `+` como a tecla Comma (ex.: `Ctrl+,`), mantendo compatibilidade com plugins legados que declaram `Plus`.
+- **Componente `CodeInput` para painéis declarativos de componentes de plugins (`#47702`):**
+  - Introduz o campo editável `CodeInput` para plugins, suportando syntax highlighting, numeração de linhas e edição estruturada de código em painéis de componentes.
 - **Tratamento de configurações de fontes separadas por vírgula como lista tipográfica real (`#47561`):**
   - Divide a configuração de fontes em vírgulas, remove aspas espúrias de cada item, aplica aspas individuais apenas em famílias que não sejam palavras-chave CSS (como monospace ou sans-serif) e constrói declaração CSS válida com fallbacks funcionais.
 - **Supressão de atalhos de abas quando telas cheias (Settings ou Activity) ocultam o workspace (`#47586`):**
@@ -153,6 +166,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47561`](https://github.com
 - Preservar refs contendo segmentos `-` ao analisar URLs de instalação Git de plugins no GitHub e Codeberg (`#47296`, refs `#47310`).
 - Tratar configurações de fontes com vírgula como lista tipográfica dividida e com aspas individuais (`#47561`).
 - Ignorar atalhos de gerenciamento de abas (Cmd+W, Cmd+T) quando telas como Settings ocultarem o workspace (`#47586`).
+- Reconhecer URLs de arquivos `/blob/` no instalador Git de plugins derivando o repositório correto (`#47767`, resolve `#47766`).
+- Suportar teclas `+` e `,` literais em combinações de atalhos e keybindings (`#47710`, resolve `#47709`).
+- Adotar o componente `CodeInput` em painéis de componentes de plugins (`#47702`).
 
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47629 (remoção com retry em ENOTEMPTY no Bun), #45918 (resiliência no tidy-up do chat) e #42532 (ordem no cleanup) aprimoram a faxina e retenção.
+description: Os PRs #47716 (status done em idle compaction do Claude), #47409 (guarda de espaço em conversão de chat) e #45854 aprimoram a retenção e limpeza.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,11 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47629`](https://github.com/stablyai/orca/pull/47629),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47716`](https://github.com/stablyai/orca/pull/47716) (resolve Issue [`#47703`](https://github.com/stablyai/orca/issues/47703)),
+[`stablyai/orca#47409`](https://github.com/stablyai/orca/pull/47409),
+[`stablyai/orca#45854`](https://github.com/stablyai/orca/pull/45854),
+[`stablyai/orca#47657`](https://github.com/stablyai/orca/pull/47657),
+[`stablyai/orca#47629`](https://github.com/stablyai/orca/pull/47629),
 [`stablyai/orca#45918`](https://github.com/stablyai/orca/pull/45918),
 [`stablyai/orca#42532`](https://github.com/stablyai/orca/pull/42532),
 [`stablyai/orca#46138`](https://github.com/stablyai/orca/pull/46138),
@@ -242,9 +246,21 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Se eventos em segundo plano atualizassem o estado dos workspaces durante a exibição do diálogo de confirmação de exclusão do cleanup, as linhas da tabela mudavam de posição repentinamente sob o cursor do usuário, aumentando o risco de exclusão inadvertida de worktrees errados.
 66. **Falha na remoção de diretórios somente leitura gerados em recuperações de espaço no macOS sob Bun (`#47629`):**
     - No macOS, a chamada recursiva de remoção de árvore (`rm`) sob o runtime Bun rejeita diretórios somente leitura com o código de erro `ENOTEMPTY`, enquanto sob Node.js o erro reportado é `EACCES`. Como o mecanismo de recuperação de espaço (*reclaim space*) executava a rotina de desproteção de diretórios (`makeDirectoriesWritable`) e retry apenas diante de `EACCES`/`EPERM`, a limpeza falhava silenciosamente sob Bun deixando arquivos órfãos sem desalocação.
+67. **Esgotamento de espaço em disco durante a conversão de journals de chat legados (`#47409`):**
+    - A conversão de históricos antigos para o novo SQLite convertia diários inteiros enquanto o arquivo antigo permanecia no disco. Em journals de dezenas de gigabytes, a duplicação temporária consumia o espaço livre restante, gerando falhas catastróficas de I/O por disco cheio.
+68. **Rejeição permanente de journals de chat com estruturas abandonadas da v1.4.219 e out/2026 (`#45854`, `#47657`):**
+    - A prova de integridade (*proof*) descartava e recusava silenciosamente qualquer journal que contivesse colunas ou tabelas criadas por builds intermediárias (`queued_message_pauses` e `queued_messages.source_json`), impedindo sua conversão e bloqueando o expurgo seguro do arquivo antigo.
+69. **Falso status "working" em panes do Claude após conclusão de turno durante compactação ociosa (`#47716`, resolve `#47703`):**
+    - A compactação automática ociosa (`idleCompaction`) do Claude Code relê arquivos de contexto após o evento `Stop` do turno por meio de hooks `PreToolUse`/`PostToolUse`. Esses hooks eram normalizados incondicionalmente como atividade de trabalho, abrindo um turno novo sem fim que mantinha o spinner ativo na barra lateral e limpava `lastAssistantMessage`.
 
 ## O que o upstream propõe e implementa
 
+- **Retenção de status `done` durante compactação ociosa do Claude (`#47716`, resolve `#47703`):**
+  - No normalizador de eventos do Claude, quando `PreCompact` chega com `trigger: "auto"` e o lead já havia reportado `done`, o painel associa o `prompt_id` do turno finalizado e restabelece o turno concluído em cache para os hooks subsequentes, impedindo a reabertura de turnos espúrios e mantendo `lastAssistantMessage`.
+- **Salvaguarda de espaço em disco na conversão do journal de chat antigo (`#47409`, commit `15830ffd7e7`):**
+  - Estima o espaço necessário medindo os bytes de cada chat (`octet_length`) antes da conversão, verificando se o volume livre permanece acima do piso de segurança (10 GB ou 5% do disco); abaixo do piso, a conversão é adiada com backoff e reportada como erro de armazenamento temporário sem esgotar o disco.
+- **Aceitação e verificação de journals com formatos históricos da v1.4.219 e out/2026 (`#45854`, commit `ee8d885823a`, PR `#47657`):**
+  - Admite tabelas históricas (`queued_message_pauses` e `queued_messages.source_json`) com colunas exatas na prova de inventário, garantindo que instalações antigas sejam convertidas e auditadas em todas as inicializações sem exclusões prematuras.
 - **Retry resiliente na remoção de diretórios somente leitura sob Bun (`#47629`):**
   - Adiciona o código de erro `ENOTEMPTY` à lista de códigos elegíveis para retentativa de remoção (`makeDirectoriesWritable` + retry único de `rm`) ao desalocar diretórios gerados no macOS, mantendo as proteções de descendência e segurança de diretório intactas.
 - **Reinicialização resiliente do worker de checkpoint/tidy-up do chat store sem travar salvamentos (`#45918`):**
@@ -482,6 +498,9 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Adotar a tabela durável de cleanup com ocultação imediata de workspaces em remoção (`#41483`).
 - Unificar o gerenciamento de cache de worktrees por repositório para eliminar chamadas redundantes a `git worktree list` (`#41480`).
 - Restringir os atalhos de exclusão de workspace exclusivamente ao foco na barra lateral (`#41457`).
+- Reter o status `done` e preservar `lastAssistantMessage` durante compactações ociosas (`idleCompaction`) do Claude (`#47716`, resolve `#47703`).
+- Aplicar guarda de disco na conversão do journal legado avaliando tamanho por chat e respeitando o piso de 10 GB livres (`#47409`, commit `15830ffd7e7`).
+- Aceitar tabelas e colunas históricas (`queued_message_pauses` e `queued_messages.source_json`) para auditar e converter journals antigos em todas as inicializações sem exclusões indevidas (`#45854`, commit `ee8d885823a`, PR `#47657`).
 - Adotar a detecção e proteção de arquivos ignorados em risco (`readWorktreeAtRiskLocalFiles`) antes da exclusão de workspaces (`#41446`).
 - Incorporar o gatilho de substituição direta de revisões de chat (`journal_outcome_item_supersede`) para estancar o crescimento do SQLite (`#41392`).
 - Aplicar a corroboração do marcador do composer para instâncias adotadas do Claude no `tui-idle` (`#41366`).

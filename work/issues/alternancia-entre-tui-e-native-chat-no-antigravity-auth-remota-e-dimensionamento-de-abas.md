@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47400 (Gemini API key no agy com regras e skills), #47525 (proxy nas sondagens do agy) e #47546 (fila de ações de conta) refinam a integração do Antigravity.
+description: Servidores Codex compartilhados no Windows (#46518), hooks do zcode (#47721) e isolamento e proxy do navegador (#47806, #47791, #47777).
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,15 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47400`](https://github.com/stablyai/orca/pull/47400),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47721`](https://github.com/stablyai/orca/pull/47721) (commit `9948925bbd1`, resolve [`#47707`](https://github.com/stablyai/orca/issues/47707)),
+[`stablyai/orca#46518`](https://github.com/stablyai/orca/pull/46518) (commit `8144d7881bb`),
+[`stablyai/orca#47806`](https://github.com/stablyai/orca/pull/47806),
+[`stablyai/orca#47787`](https://github.com/stablyai/orca/pull/47787),
+[`stablyai/orca#47803`](https://github.com/stablyai/orca/pull/47803),
+[`stablyai/orca#47791`](https://github.com/stablyai/orca/pull/47791),
+[`stablyai/orca#47782`](https://github.com/stablyai/orca/pull/47782),
+[`stablyai/orca#47777`](https://github.com/stablyai/orca/pull/47777),
+[`stablyai/orca#47400`](https://github.com/stablyai/orca/pull/47400),
 [`stablyai/orca#47525`](https://github.com/stablyai/orca/pull/47525),
 [`stablyai/orca#47546`](https://github.com/stablyai/orca/pull/47546),
 [`stablyai/orca#47331`](https://github.com/stablyai/orca/pull/47331),
@@ -293,6 +301,18 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     A CLI do `agy` é desenvolvida em Go e lê exclusivamente variáveis de ambiente de proxy (`HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY`). As configurações de proxy do aplicativo nas preferências do Studio não eram repassadas na inicialização do probe do Antigravity, causando falhas contínuas de timeout em redes corporativas com proxy obrigatório.
 84. **Perda silenciosa de cliques nas contas Antigravity durante leituras em segundo plano (`#47546`):**
     Ações do usuário no gerenciador de contas (como Save, Refresh, Select ou Remove) disparadas enquanto o recheck periódico de 8s ou um `agy List` estava em voo eram sumariamente ignoradas e descartadas sem retorno visual, fazendo parecer que o botão "Save current account" não funcionava.
+85. **Instalação de hooks de status do zcode em `setting.json` da CLI (`#47721`, commit `9948925bbd1`, resolve `#47707`):**
+    A distribuição `zcode-app-cli` do npm lê `~/.zcode/cli/setting.json` (ou `$ZCODE_CLI_SETTINGS_FILE`) e não faz fallback para `config.json`. Com isso, hooks gerenciados nunca disparavam para ele, status do agente ficava cego, runs sofriam timeout após 6h e terminais vazavam; a correção instala e remove hooks também em `setting.json` (local e SSH) quando o arquivo já existir.
+86. **Servidores Codex compartilhados no Windows com contenção em job kill-on-close (`#46518`, commit `8144d7881bb`):**
+    Chats no Windows agora podem compartilhar servidores Codex (`shared Codex servers`); cada árvore de servidor reside em um Job object do Windows com flag `kill-on-close`, garantindo que o encerramento do servidor termine confiavelmente subprocessos residuais sem deixar processos órfãos ou requisições presas em caso de fallback.
+87. **Abertura de painéis laterais de extensões de navegador em páginas SSH e "This device" (`#47806`):**
+    Extensões do navegador rodando em páginas remotas SSH e páginas de servidor exibidas no dispositivo local não conseguiam abrir seus painéis laterais (*side panels*); a correção garante que a ação de clique do painel lateral invoque a API de janela correta.
+88. **Abertura de listas `<select>` via teclado em páginas de navegador streamed/servidor (`#47787`):**
+    Em páginas de navegador executadas em servidor pareado (streamed), menus suspensos `<select>` podiam ser abertos via clique de mouse, mas a ativação via teclado (espaço/enter/setas) não abria a lista popup; a correção propaga eventos de teclado para o overlay.
+89. **Roteamento de `localhost` de página SSH para port-forward do sistema (`#47803`):**
+    Ao clicar em "Open in default browser" em uma página SSH com URL `localhost:<port>`, o navegador padrão da máquina local abria o localhost local em vez da porta encaminhada do host remoto; agora mapeia para a porta devidamente encaminhada.
+90. **Isolamento de segurança do navegador remoto: proibição de leitura de cookies/clipboard e restrição SOCKS (`#47791`, `#47782`, `#47777`):**
+    Agentes remotos não podem ler cookies ou clipboard de páginas abertas no dispositivo local (`#47791`); e o proxy local SOCKS do remote-browser no Windows recusa conexões abertas por outras contas de usuário da máquina (`#47777`), admitindo processos próprios do Orca antes da checagem de propriedade (`#47782`).
 
 ## O que o upstream implementa e corrige
 
@@ -586,6 +606,12 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 80. Executar chats autenticados por Gemini API key e gcloud ADC no `agy` carregando regras e skills de `~/.gemini` (`#47400`).
 81. Repassar variáveis de proxy de rede para o runtime e probes de cota da CLI `agy` (`#47525`).
 82. Enfileirar requisições concorrentes de gestão de contas Antigravity em `use-antigravity-account-run` sem descarte de cliques (`#47546`).
+83. Instalar e sincronizar hooks de status gerenciados em `setting.json` da CLI do zcode local e via SSH (`#47721`, resolve `#47707`).
+84. Suportar servidores Codex compartilhados no Windows dentro de Job objects com flag `kill-on-close` (`#46518`).
+85. Habilitar abertura de painéis laterais de extensões de navegador em páginas SSH e "This device" (`#47806`).
+86. Propagar eventos de teclado para abertura de dropdowns `<select>` em páginas de navegador streamed (`#47787`).
+87. Abrir URLs `localhost` de páginas SSH no navegador do sistema através do port-forward correspondente (`#47803`).
+88. Bloquear acesso de agentes remotos a cookies e clipboard de páginas locais e restringir conexões SOCKS por conta no Windows (`#47791`, `#47782`, `#47777`).
 
 
 

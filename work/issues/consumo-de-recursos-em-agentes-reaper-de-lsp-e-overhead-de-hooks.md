@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #45844 contabiliza a memória de agentes de chat e seus LSPs no Resource Manager e elimina falsos avisos de terminais.
+description: Otimizações de leitura em lote para bots (#47769, #47765), journal indexado (#47529) e saneamento de crashpad (#47705) reduzem overhead.
 scope:
   - brza-studio
   - tools-kit
@@ -14,7 +14,12 @@ tags:
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45844`](https://github.com/stablyai/orca/pull/45844),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47769`](https://github.com/stablyai/orca/pull/47769) (commit `6e0805a2e1f`),
+[`stablyai/orca#47765`](https://github.com/stablyai/orca/pull/47765),
+[`stablyai/orca#47757`](https://github.com/stablyai/orca/pull/47757) (commit `64eb525c558`),
+[`stablyai/orca#47529`](https://github.com/stablyai/orca/pull/47529) (commit `64a57263cf4`),
+[`stablyai/orca#47705`](https://github.com/stablyai/orca/pull/47705) (commit `e2c8f4756e8`, refs [`#19792`](https://github.com/stablyai/orca/issues/19792)),
+[`stablyai/orca#45844`](https://github.com/stablyai/orca/pull/45844),
 [`stablyai/orca#43081`](https://github.com/stablyai/orca/pull/43081) (Issue [`#43095`](https://github.com/stablyai/orca/issues/43095)),
 [`stablyai/orca#43106`](https://github.com/stablyai/orca/pull/43106) (resolve Issue [`#43104`](https://github.com/stablyai/orca/issues/43104)),
 [`stablyai/orca#43090`](https://github.com/stablyai/orca/pull/43090) (resolve Issue [`#40261`](https://github.com/stablyai/orca/issues/40261)),
@@ -158,8 +163,30 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - **Aprovação única de `orca.yaml` por repositório (*Always trust*) (`#42890`):**
   - Reformula o diálogo de confirmação de setup em três opções explícitas (*Always trust*, *Run once*, *Don't run*);
   - *Always trust* grava a confiança a nível de repositório, permitindo que futuras alterações no `orca.yaml` sejam executadas sem novos diálogos de confirmação.
+- **Leitura em lote de frotas de bots sem releituras individuais por item (`#47769`, commit `6e0805a2e1f`):**
+  - O bot work list realizava leituras individuais completas de cada agente e workspace por linha;
+  - O commit consolida a leitura em uma única chamada de frota compartilhada (`fleet read`), compartilhando acessos a repositórios entre workspaces do mesmo batch e mantendo o runtime dentro do orçamento de linhas.
+- **Redução de carga em banco e disco na leitura de workers vinculados a bots (`#47765`):**
+  - Cada vez que a lista de itens de um bot exibia seus workers vinculados, o Orca percorria a cadeia de follow-up no banco e no disco reconstruindo queries do zero; o PR `#47765` evita alocações desnecessárias e preserva a memória do garbage collector.
+- **Construção de dependências do chat host apenas na instalação (`#47757`, commit `64eb525c558`):**
+  - Constrói dependências do chat host apenas no momento da instalação, eliminando a varredura repetitiva de tool-secrets em cada chamada a `ensure`.
+- **Janela de operações do journal indexada por turnos ancorados (`#47529`, commit `64a57263cf4`):**
+  - Ao abrir um turno antigo de uma operação terminada, o leitor percorria todas as linhas até a cabeça do chat e listava todos os envios históricos;
+  - Introduz `throughAnchoredTurns`, delimitando a janela com índices criados na inicialização sem alteração de esquema, tornando o custo de carregar turnos antigos constante.
+- **Expurgo do pipe do Chromium Crashpad herdado em ambientes PTY (`#47705`, commit `e2c8f4756e8`, refs `#19792`):**
+  - O processo principal exportava `CHROME_CRASHPAD_PIPE_NAME` e os painéis herdavam a variável; após reinicialização do daemon, processos filhos encontravam um pipe morto gerando erros em stderr no Windows e poluição de ambiente;
+  - Remove a variável de ambiente (case-insensitive) nos construtores de painel antes do merge explícito, e reutiliza o mesmo predicado no sanitizador do Antigravity ACP.
+- **Conflito de hooks de subagente Droid e reset de sessão principal do terminal (`#47826` e `#47825`):**
+  - Quando o Droid executa subagentes `Task`, envia eventos de hook próprios (SessionStart, Stop, SessionEnd) que resetam indevidamente a linha de sessão principal do terminal; além disso, o Droid ignora os hooks do Orca se `~/.factory/hooks.json` definir o mesmo evento que `~/.factory/settings.json`.
 
 ## O que fazer
+
+- Consolidar leituras de frotas de bots em uma única leitura compartilhada (`fleet read`) sem re-ler agentes por linha (`#47769`).
+- Otimizar consultas de banco e disco ao listar workers vinculados a bots (`#47765`).
+- Construir dependências do chat host apenas na instalação para evitar sweeps repetitivos de tool-secrets (`#47757`).
+- Indexar janelas de operações no journal por turnos ancorados via `throughAnchoredTurns` (`#47529`).
+- Expurgar `CHROME_CRASHPAD_PIPE_NAME` de ambientes herdados em painéis PTY e no sanitizador do Antigravity ACP (`#47705`, refs `#19792`).
+- Prevenir que hooks de subagentes do Droid resetem a sessão principal do terminal e suportar `~/.factory/hooks.json` (`#47826`, `#47825`).
 
 - Suprimir execuções de scripts de hook fora de painéis gerenciados e reduzir invocações a `ps` (`#43081`, `#43095`).
 - Adotar resumo de contexto de tokens para Claude em retomadas de sessão para eliminar estouro de gateways (`#43106`, resolve `#43104`).

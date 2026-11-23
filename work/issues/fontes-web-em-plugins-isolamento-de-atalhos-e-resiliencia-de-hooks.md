@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #47107 reconhece links de ref do Codeberg e Gitea na instalação de plugins via git, e os PRs #47102 e #47067 alinham labels e tratam symlinks locais.
+description: O PR #42473 traz reordenação e ocultação de abas na Activity Bar e o PR #47296 preserva refs com hífen na instalação de plugins via Git.
 scope:
   - brza-studio
   - workspace
@@ -13,7 +13,9 @@ tags:
 
 # Fontes web em plugins, isolamento de atalhos e resiliência de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47107`](https://github.com/stablyai/orca/pull/47107) (resolve Issue [`#47104`](https://github.com/stablyai/orca/issues/47104)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#42473`](https://github.com/stablyai/orca/pull/42473),
+[`stablyai/orca#47296`](https://github.com/stablyai/orca/pull/47296) (refs Issue [`#47310`](https://github.com/stablyai/orca/issues/47310)),
+[`stablyai/orca#47107`](https://github.com/stablyai/orca/pull/47107) (resolve Issue [`#47104`](https://github.com/stablyai/orca/issues/47104)),
 [`stablyai/orca#47102`](https://github.com/stablyai/orca/pull/47102) (resolve Issue [`#47074`](https://github.com/stablyai/orca/issues/47074)),
 [`stablyai/orca#47067`](https://github.com/stablyai/orca/pull/47067) (resolve Issue [`#47066`](https://github.com/stablyai/orca/issues/47066)),
 [`stablyai/orca#43916`](https://github.com/stablyai/orca/pull/43916) (resolve Issue [`#43552`](https://github.com/stablyai/orca/issues/43552)),
@@ -71,9 +73,17 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47107`](https://github.com
     Ao instalar um plugin local apontando para uma pasta acessada por symlink ou junction no Windows, o processo de cópia repassava a raiz não resolvida para `cp({ verbatimSymlinks: true })`, recriando o diretório de versão como um link (gerando erro EPERM no Windows ou mantendo um link mutável no macOS/Linux).
 14. **Falha na instalação de plugins a partir de URLs do Codeberg, Gitea e Forgejo com ref (`#47107`, resolve `#47104`):**
     Ao tentar instalar plugins via Git usando links de repositórios hospedados no Codeberg ou instâncias Gitea/Forgejo apontando para branches, tags ou commits específicos (contendo caminhos `/src/branch/...`, `/src/tag/...` ou `/src/commit/...`), o instalador não reconhecia o padrão de ref, falhando na extração da URL de clone e no checkout do commit desejado.
+15. **Inflexibilidade e impossibilidade de reordenar ou ocultar abas da Activity Bar (`#42473`):**
+    À medida que plugins e painéis adicionavam novos ícones à Activity Bar, o usuário não dispunha de opções para reordenar por drag-and-drop, ocultar abas secundárias ou navegar por itens agrupados em overflow ("More").
+16. **Truncamento incorreto de branches com hífen na instalação de plugins via Git (`#47296`, refs `#47310`):**
+    URLs do GitHub ou Codeberg com branches ou caminhos contendo `-` (como `/tree/feature/-/example`) eram interpretadas de forma errônea como o separador `/-/` do GitLab, cortando o nome do repositório prematuramente e descartando o ref.
 
 ## O que o upstream implementa
 
+- **Reordenação, ocultação e agrupamento 'More' de abas da Activity Bar (`#42473`):**
+  - Implementa suporte a arrastar e soltar (drag-and-drop) para reorganizar abas na Activity Bar, opções Hide, Move e Reset no menu de contexto, e agrupamento inteligente em menu "More" com retenção de foco acessível.
+- **Parsing resiliente de refs contendo hífen para GitHub e Codeberg (`#47296`, refs `#47310`):**
+  - Garante que caminhos contendo segmentos `-` continuem sendo lidos como parte legítima do ref em forges públicas (GitHub, GHE, Codeberg), preservando a regra de corte de `/-/` estritamente para o GitLab.
 - **Reconhecimento de links de ref do Codeberg, Gitea e Forgejo no instalador Git (`#47107`, resolve `#47104`):**
   - Faz o parse de URLs contendo rotas `/src/{branch,tag,commit}/<ref>`, extraindo a URL base de clone e o ref correspondente para instalação correta de plugins a partir dessas plataformas.
 - **Alinhamento centrado de rótulos com variante `control` em formulários de plugins (`#47102`, resolve `#47074`):**
@@ -129,5 +139,8 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47107`](https://github.com
 - Utilizar a variante `control` para centralizar verticalmente labels de RadioGroup e Checkbox em plugins (`#47102`, resolve `#47074`).
 - Resolver o caminho real com `realpath` no staging de instalação de plugins para evitar symlinks mutáveis ou falhas EPERM (`#47067`, resolve `#47066`).
 - Reconhecer e tratar rotas `/src/...` de repositórios Codeberg, Gitea e Forgejo na instalação de plugins via Git (`#47107`, resolve `#47104`).
+- Permitir reordenar, ocultar e agrupar em 'More' as abas da Activity Bar via drag-and-drop e menu (`#42473`).
+- Preservar refs contendo segmentos `-` ao analisar URLs de instalação Git de plugins no GitHub e Codeberg (`#47296`, refs `#47310`).
+
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46945, #46933, #46908 e #46846 tratam host de automação de bots, grace period de dark-wake, runtime_access_denied em status e hooks de workspace off-thread.
+description: Os PRs #47189 e #47483 introduzem o comando watch-pr para monitoramento unificado de pull requests e aprimoram auditoria de chamadas em webhooks.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,9 @@ tags:
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46945`](https://github.com/stablyai/orca/pull/46945) (resolve Issue [`#46919`](https://github.com/stablyai/orca/issues/46919)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47189`](https://github.com/stablyai/orca/pull/47189),
+[`stablyai/orca#47483`](https://github.com/stablyai/orca/pull/47483),
+[`stablyai/orca#46945`](https://github.com/stablyai/orca/pull/46945) (resolve Issue [`#46919`](https://github.com/stablyai/orca/issues/46919)),
 [`stablyai/orca#46933`](https://github.com/stablyai/orca/pull/46933) (resolve Issue [`#46932`](https://github.com/stablyai/orca/issues/46932)),
 [`stablyai/orca#46908`](https://github.com/stablyai/orca/pull/46908) (refs Issue [`#46027`](https://github.com/stablyai/orca/issues/46027)),
 [`stablyai/orca#46846`](https://github.com/stablyai/orca/pull/46846),
@@ -74,9 +76,18 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46945`](https://github.com
     Quando comandos `orca status` ou diagnósticos de runtime encontravam recusa de permissão de leitura nos descritores ou sockets do daemon, o comando reportava falsamente que o daemon não estava em execução ("not running"), em vez de sinalizar explicitamente erro de acesso de permissão.
 13. **Travamentos e congelamentos da interface durante execução de hooks de workspace (`#46846`):**
     As validações de hooks de workspace executavam checagens síncronas diretamente na thread principal (main thread) do aplicativo, causando travamentos e congelamentos momentâneos no renderer durante a alternância ou abertura de workspaces volumosos.
+14. **Inexistência de comando único para monitoramento de PRs com prazo limite (`#47189`):**
+    Acompanhar o ciclo de vida de um Pull Request até aprovação ou término de CI exigia compor automações manuais com múltiplos gatilhos encadeados ou polling periódico, sem prazo de expiração (*deadline*) pré-estabelecido.
+15. **Omissão de justificativa e contabilidade para requisições ignoradas em webhooks (`#47483`):**
+    Quando um webhook recebia uma requisição não mapeada ou descartada pelas regras ativas, o log de diagnóstico não informava a razão da ausência de corpo e as chamadas ignoradas não eram contabilizadas nos comandos de inspeção.
 
 ## O que o upstream implementa e corrige
 
+- **Comando `orca automations watch-pr` para monitoramento completo de PRs com prazo limite (`#47189`):**
+  - Adiciona o comando `orca automations watch-pr owner/repo#n`, configurando espera one-shot (`--once`) sobre os eventos `github.ci_finished`, `pr_conflicted`, `pr_merged`, `pr_closed`, `review`, `review_comment` e `comment`, com prazo padrão de 2 horas (customizável via `--for` ou `--by`);
+  - Registra o gatilho `github.ci_finished` cobrindo tanto aprovações quanto falhas, cancelamentos e aprovações manuais pendentes.
+- **Detalhamento e contabilidade de chamadas ignoradas em webhooks (`#47483`):**
+  - Explica explicitamente no log de diagnóstico a razão de requisições ignoradas não possuírem corpo processado e inclui essas chamadas no cômputo total da verificação de integridade de webhooks.
 - **Navegação de automações de bots roteada para o host correto (`#46945`, resolve `#46919`):**
   - Roteia a abertura de automações vinculadas a bots para o host proprietário (WSL, SSH ou runtime host remoto), garantindo visualização correta de logs e paths.
 - **Isolamento de dark-wake holds e proteção ao período de carência de agendamentos (`#46933`, resolve `#46932`):**
@@ -153,4 +164,7 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#46945`](https://github.com
 17. Manter a integridade do período de carência de automações agendadas sob despertares em dark-wake (`#46933`, resolve `#46932`).
 18. Distinguir falhas de permissão de acesso ao runtime reportando `runtime_access_denied` no `brza status` (`#46908`, refs `#46027`).
 19. Mover a checagem de hooks de workspace para worker threads para eliminar congelamentos na UI (`#46846`).
+20. Incorporar o comando `brza automations watch-pr` com gatilho `github.ci_finished` e prazo de 2 horas (`#47189`).
+21. Exibir justificativa e contagem de chamadas ignoradas em diagnósticos de webhooks (`#47483`).
+
 

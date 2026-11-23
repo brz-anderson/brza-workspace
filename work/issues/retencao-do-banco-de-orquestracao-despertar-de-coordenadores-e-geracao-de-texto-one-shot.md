@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47135 e #47081 trazem desvinculação de Runs no fechamento de terminal do coordenador e notificação de espera prolongada em tarefas de background.
+description: Os PRs #47370, #47371, #47364 e #47363 fecham terminais criados por workers na liquidação e preservam a linhagem de chat em servidores pareados.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,13 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47135`](https://github.com/stablyai/orca/pull/47135),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47370`](https://github.com/stablyai/orca/pull/47370),
+[`stablyai/orca#47371`](https://github.com/stablyai/orca/pull/47371),
+[`stablyai/orca#47364`](https://github.com/stablyai/orca/pull/47364),
+[`stablyai/orca#47363`](https://github.com/stablyai/orca/pull/47363),
+[`stablyai/orca#47355`](https://github.com/stablyai/orca/pull/47355),
+[`stablyai/orca#47469`](https://github.com/stablyai/orca/pull/47469) (resolve Issue [`#47440`](https://github.com/stablyai/orca/issues/47440)),
+[`stablyai/orca#47135`](https://github.com/stablyai/orca/pull/47135),
 [`stablyai/orca#47081`](https://github.com/stablyai/orca/pull/47081),
 [`stablyai/orca#46842`](https://github.com/stablyai/orca/pull/46842),
 [`stablyai/orca#46826`](https://github.com/stablyai/orca/pull/46826),
@@ -275,9 +281,25 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Quando o terminal ou pane de um coordenador era fechado ou esvaziado, a desvinculação do Run ativo não era propagada prontamente, fazendo com que perguntas abertas de workers aguardassem indefinidamente por um leitor inexistente.
 77. **Ausência de visibilidade e notificação em esperas longas de tarefas em background de workers (`#47081`):**
     - Quando um worker executava uma tarefa prolongada em segundo plano, a árvore de execução não exibia o estado de espera ativo e o coordenador não recebia nenhum alerta após períodos estendidos de bloqueio.
+78. **Acúmulo de terminais e abas de setup abertas após encerramento ou liberação de workers (`#47370`, `#47371`):**
+    - Terminais de configuração, abas de startup ou novos terminais criados dinamicamente por um worker durante a execução de ferramentas não eram desalocados no encerramento ou em `worker-release`, acumulando terminais órfãos no painel.
+79. **Reversão para terminais crus de workers disparados a partir de chats persistentes ou servidores pareados (`#47364`, `#47363`):**
+    - Sub-workers iniciados a partir de chats persistentes de agentes ou despachados para servidores pareados (`--on`) perdiam a linhagem de chat, iniciando como abas de terminal genéricas sem o formato conversacional.
+80. **Retenção perene de relatórios de conclusão `worker_done` em despachos de follow-up (`#47469`, resolve `#47440`):**
+    - Despachos do tipo *follow-up* constituíam um novo registro de Dispatch sem amarração direta à operação original do worker, fazendo com que seu `worker_done` ficasse retido indefinidamente sem chegar à requisição da sala atendida.
+81. **Janela excessiva de 60 minutos para alertar coordenador sobre workers travados em background (`#47355`):**
+    - O prazo de 60 minutos estabelecido no PR `#47081` para emitir alerta único ao coordenador era excessivamente longo para fluxos interativos de orquestração, atrasando intervenções quando processos entravam em deadlock.
 
 ## O que o upstream implementa
 
+- **Fechamento automático de terminais de setup, abas e terminais criados com o worker (`#47370`, `#47371`):**
+  - Vincula terminais de setup, abas de inicialização e terminais abertos pelo worker diretamente ao handle do worker, encerrando-os atomicamente em `worker-stop` e `worker-release` (preservando o terminal de setup apenas caso a inicialização falhe para auditoria).
+- **Propagação de linhagem de chat para sub-workers e servidores pareados (`#47364`, `#47363`):**
+  - Carrega a linhagem de conversa estruturada (`orchestration.chat-lineage.v1`) para trabalhadores criados a partir de um persistent agent home e repassa a flag para servidores conectados, garantindo que workers e sub-workers iniciem sempre como chats.
+- **Roteamento de relatório de follow-up para a requisição de grupo atendida (`#47469`, resolve `#47440`):**
+  - Resolve a operação do worker a partir do Dispatch vinculado mais recente na linhagem de acompanhamento, entregando o relatório `worker_done` sem retenção em limbo.
+- **Redução do limiar de alerta de worker travado em background para 20 minutos (`#47355`):**
+  - Reduz de 60 minutos para 20 minutos o tempo de espera contínua em tarefa de segundo plano necessário para acionar a notificação ao coordenador.
 - **Desassociação imediata de Runs e aviso de sem leitor ao fechar terminal do coordenador (`#47135`):**
   - Desvincula (*unbinds*) Runs ativos imediatamente quando o terminal do coordenador encerra ou tem sua pane fechada/esvaziada, notificando perguntas abertas com aviso explícito de *no reader* para liberar workers bloqueados.
 - **Indicador de espera na árvore e notificação após 60 minutos de espera em background (`#47081`):**
@@ -526,7 +548,11 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Retomar e re-vincular atomicamente workers de terminais interrompidos por reinício sob a política Resume work on restart (`#46643`).
 - Utilizar o handle reservado de workers em fase de startup para permitir abertura da interface sem falso erro de inexistência (`#47048`).
 - Desvincular Runs e notificar workers com erro no-reader quando a pane do terminal coordenador for fechada (`#47135`).
-- Exibir estado de espera na árvore e alertar o coordenador após 60 minutos de espera em background (`#47081`).
+- Exibir estado de espera na árvore e alertar o coordenador após 20 minutos de espera em background (`#47355`, reduzindo os 60 min do `#47081`).
+- Encerrar automaticamente terminais de setup, abas de startup e terminais secundários criados pelo worker em sua finalização (`#47370`, `#47371`).
+- Propagar a linhagem estruturada de chat para workers filhos e servidores pareados conectados (`#47364`, `#47363`).
+- Resolver requisições de follow-up garantindo entrega de relatórios `worker_done` à sala de chat de origem (`#47469`, resolve `#47440`).
+
 
 
 

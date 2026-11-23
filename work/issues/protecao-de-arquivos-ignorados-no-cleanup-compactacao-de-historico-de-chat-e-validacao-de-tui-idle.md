@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46138, #46581 e #46201 trazem proteção de checkouts restaurados no cleanup, índice de prosa por turno no journal e modal de exclusão compacto.
+description: O PR #45918 mantém o helper de tidy-up do chat ativo sem travar saves e o PR #42532 estabiliza a ordem das linhas no diálogo de cleanup.
 scope:
   - brza-studio
   - workspace
@@ -14,7 +14,9 @@ tags:
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46138`](https://github.com/stablyai/orca/pull/46138),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#45918`](https://github.com/stablyai/orca/pull/45918),
+[`stablyai/orca#42532`](https://github.com/stablyai/orca/pull/42532),
+[`stablyai/orca#46138`](https://github.com/stablyai/orca/pull/46138),
 [`stablyai/orca#46581`](https://github.com/stablyai/orca/pull/46581),
 [`stablyai/orca#46201`](https://github.com/stablyai/orca/pull/46201),
 [`stablyai/orca#45969`](https://github.com/stablyai/orca/pull/45969),
@@ -233,9 +235,17 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Leituras de prosa de turnos específicos no Session History e no journal realizavam varreduras lineares em todo o histórico da conversa sem utilizar o índice de turnos, degradando a performance em chats longos.
 63. **Layout excessivamente expandido no modal de confirmação de exclusão de workspace (`#46201`):**
     - O diálogo de confirmação de exclusão de workspaces utilizava espaçamentos e caixas excessivas que quebravam em telas menores ou diálogos densos.
+64. **Interrupção de salvamentos e travamento de writes pelo helper de tidy-up em segundo plano do chat (`#45918`):**
+    - Quando o processo auxiliar de checkpoint/tidy-up do chat store sofria crash ou ficava em silêncio além do deadline, a rotina de escrita ficava retida aguardando indefinidamente em vez de reiniciar o worker isolado e aplicar backoff, gerando paradas em gravações ativas.
+65. **Deslocamento e reordenação abrupta de linhas na lista de limpeza enquanto o modal de exclusão está aberto (`#42532`):**
+    - Se eventos em segundo plano atualizassem o estado dos workspaces durante a exibição do diálogo de confirmação de exclusão do cleanup, as linhas da tabela mudavam de posição repentinamente sob o cursor do usuário, aumentando o risco de exclusão inadvertida de worktrees errados.
 
 ## O que o upstream propõe e implementa
 
+- **Reinicialização resiliente do worker de checkpoint/tidy-up do chat store sem travar salvamentos (`#45918`):**
+  - Mantém o helper de tidy-up ativo em segundo plano; se o worker ficar ocioso ou silencioso além do deadline ou sofrer crash, é substituído com backoff limitado, reportando a duração e causa da indisponibilidade sem travar operações de save.
+- **Estabilização da ordem de linhas durante a abertura do diálogo de exclusão no cleanup (`#42532`):**
+  - Congela a ordenação das linhas da lista enquanto o modal de confirmação de deleção estiver aberto, prevenindo saltos de layout e cliques acidentais.
 - **Proteção rigorosa de checkouts restaurados e validação de marcadores no cleanup (`#46138`):**
   - Vincula a prova de propriedade do órfão estritamente ao marcador `.git` pré e pós-prova, abortando a varredura caso o marcador desapareça ou seja substituído no meio do processo;
   - Revalida a identidade do diretório raiz (`dev:ino` via `lstatBigInt`) após a enumeração e antes de disparar exclusões recursivas, impedindo a travessia de symlinks substitutos;
@@ -471,3 +481,6 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Incorporar o gatilho de substituição direta de revisões de chat (`journal_outcome_item_supersede`) para estancar o crescimento do SQLite (`#41392`).
 - Aplicar a corroboração do marcador do composer para instâncias adotadas do Claude no `tui-idle` (`#41366`).
 - Adotar a política de cache de badges do Linear sem revalidação por foco de janela (`#41384`).
+- Reiniciar o checkpoint worker de tidy-up do chat store com backoff exponencial sem reter gravações ativas (`#45918`).
+- Estabilizar a ordem de exibição das linhas da lista de cleanup durante a abertura do diálogo de exclusão (`#42532`).
+

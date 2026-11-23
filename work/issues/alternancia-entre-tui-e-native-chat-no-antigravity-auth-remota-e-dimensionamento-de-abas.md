@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #46999, #46889, #46878 e #46896 trazem marcação de erro em paradas por cota no Antigravity e suporte aos agentes CodeBuddy, Devin e Cline no Native Chat.
+description: Os PRs #47331 e #47329 trazem atualização em background do servidor ACP do Antigravity e modelos de terceiros, e o PR #47314 expõe esforço do Cursor.
 scope:
   - brza-studio
   - workspace
@@ -15,7 +15,11 @@ tags:
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#46999`](https://github.com/stablyai/orca/pull/46999) (resolve Issue [`#46992`](https://github.com/stablyai/orca/issues/46992)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47331`](https://github.com/stablyai/orca/pull/47331),
+[`stablyai/orca#47329`](https://github.com/stablyai/orca/pull/47329),
+[`stablyai/orca#47314`](https://github.com/stablyai/orca/pull/47314) (resolve Issue [`#47202`](https://github.com/stablyai/orca/issues/47202)),
+[`stablyai/orca#47459`](https://github.com/stablyai/orca/pull/47459) (refs Issue [`#47454`](https://github.com/stablyai/orca/issues/47454)),
+[`stablyai/orca#46999`](https://github.com/stablyai/orca/pull/46999) (resolve Issue [`#46992`](https://github.com/stablyai/orca/issues/46992)),
 [`stablyai/orca#46889`](https://github.com/stablyai/orca/pull/46889),
 [`stablyai/orca#46878`](https://github.com/stablyai/orca/pull/46878),
 [`stablyai/orca#46896`](https://github.com/stablyai/orca/pull/46896),
@@ -272,9 +276,25 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     O agente Devin não possuía inicialização nativa com modelo in-process (`devin acp --process-model in-process`), nem mapeamento dos modos de permissão (Ask, Code, Smart, Bypass) para os seletores do Native Chat, além de não alimentar instruções de bots via `AGENTS.local.md`.
 77. **Falta de suporte ao agente Cline no Native Chat com detecção de falhas de ferramentas em lote (`#46896`):**
     O Cline não era suportado via servidor ACP (`cline --acp`), e ferramentas em lote que sofriam erro parcial reportavam falsamente status de conclusão bem-sucedida, além de prompts descartarem blocos de imagens caso não fossem passados como referências a arquivos físicos.
+78. **Ausência de atualização automática em segundo plano do servidor ACP empacotado do Antigravity (`#47331`):**
+    Quando o aplicativo fixava uma versão mais recente do servidor Google ACP, instalações anteriores exigiam intervenção manual em Settings, acumulando downloads repetidos em hosts instáveis e sem controle de tolerância de falhas nem kill switch.
+79. **Ocultação de modelos Claude e GPT-OSS em contas Google no Antigravity sob o servidor ACP 1.5.2 (`#47329`):**
+    Ao atualizar para o servidor ACP 1.5.2 do Google, uma validação estrita do nome de editor permitida para modelos não-Gemini rejeitava identificadores não autorizados, forçando contas corporativas Google a listar exclusivamente o Gemini Flash.
+80. **Omissão de modelos do Cursor nos seletores e perda de esforço e modo Fast no lançamento em terminal (`#47314`, resolve `#47202`):**
+    O seletor de modelos utilizava a lista de transcrições do Cursor em vez do catálogo ACP, omitindo modelos dinâmicos; no lançamento em terminal, modelos compostos perdiam os parâmetros de Effort e Fast, caindo para o ID bruto básico.
+81. **Retenção de saídas obsoletas de ferramentas em eventos `done` sem resposta no Kiro 3 (`#47459`, refs `#47454`):**
+    O hook Stop do Kiro 3 enviava apenas identificadores sem corpo de resposta textual, fazendo com que a linha de conclusão retivesse o resultado da última ferramenta executada (`PostToolUse`) em vez de limpar a saída obsoleta.
 
 ## O que o upstream implementa e corrige
 
+- **Atualização transparente em segundo plano do servidor ACP do Antigravity (`#47331`):**
+  - Atualiza a instalação do servidor ACP para o release fixado automaticamente após a inicialização estabilizar; chats em andamento mantêm a versão prévia e novos chats adotam a nova versão, com suporte a backoff exponencial, checagem de 2 GB de espaço livre e kill switch `antigravityServerAutoUpdateEnabled`.
+- **Acesso preservado a Claude e GPT-OSS no Antigravity sob ACP 1.5.2 (`#47329`):**
+  - Ajusta a identificação de cliente transmitida no handshake para satisfazer a verificação de editores autorizados do servidor 1.5.2, mantendo modelos externos visíveis em contas Google elegíveis.
+- **Catálogo dinâmico de modelos do Cursor com preservação de esforço e modo Fast (`#47314`, resolve `#47202`):**
+  - Lê os modelos a partir do catálogo ACP do Cursor nos seletores e compõe IDs de variantes completas no terminal para reter os ajustes de esforço de raciocínio e modo Fast selecionados.
+- **Limpeza de saída de ferramenta em eventos de conclusão sem resposta do Kiro 3 (`#47459`, refs `#47454`):**
+  - Limpa a linha cacheada de ferramenta em eventos `done` quando esta não contiver resposta do assistente, evitando a exibição de resultados de ferramentas desatualizados no encerramento de turnos.
 - **Marcação correta de turnos falhos por cota no Antigravity (`#46999`, resolve `#46992`):**
   - Trata `agy Stop` ocioso com `terminationReason ERROR` como desfecho formal de falha (`mainAgent outcome failure`), transformando o texto do erro na mensagem final do assistente e pulando leituras corrompidas de transcript.
 - **Suporte ao CodeBuddy Code no Native Chat e para execução de bots (`#46889`):**
@@ -542,4 +562,9 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 73. Habilitar suporte nativo ao CodeBuddy Code via ACP no Native Chat e para automação de bots (`#46889`).
 74. Integrar o Devin no Native Chat com isolamento in-process e mapeamento de modos de permissão (`#46878`).
 75. Integrar o Cline no Native Chat com validação estrita de falhas parciais em ferramentas em lote (`#46896`).
+76. Atualizar automaticamente em background o servidor ACP empacotado do Antigravity com backoff e checagem de espaço livre (`#47331`).
+77. Preservar o acesso a modelos Claude e GPT-OSS em contas corporativas Google no Antigravity sob o servidor ACP 1.5.2 (`#47329`).
+78. Listar modelos dinâmicos do Cursor no seletor a partir do catálogo ACP e reter esforço e modo Fast no terminal (`#47314`, resolve `#47202`).
+79. Limpar linha cacheada de ferramentas em eventos de conclusão sem resposta textual no Kiro 3 (`#47459`, refs `#47454`).
+
 

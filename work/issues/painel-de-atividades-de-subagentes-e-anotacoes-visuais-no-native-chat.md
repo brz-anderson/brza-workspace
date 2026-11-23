@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47200, #47220 e #47191 movem mensagens enfileiradas para chats substitutos, executam correio após falhas e permitem vincular trabalho de agentes a itens de terceiros.
+description: Os PRs #47308, #47309 e #47429 adicionam o estado Waiting a itens externos, #47359 evita alargamento do chat e #47337 preserva modo Plan/Build na fila.
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,14 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47200`](https://github.com/stablyai/orca/pull/47200),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47308`](https://github.com/stablyai/orca/pull/47308),
+[`stablyai/orca#47309`](https://github.com/stablyai/orca/pull/47309),
+[`stablyai/orca#47429`](https://github.com/stablyai/orca/pull/47429),
+[`stablyai/orca#47359`](https://github.com/stablyai/orca/pull/47359) (resolve Issue [`#47358`](https://github.com/stablyai/orca/issues/47358)),
+[`stablyai/orca#47346`](https://github.com/stablyai/orca/pull/47346),
+[`stablyai/orca#47337`](https://github.com/stablyai/orca/pull/47337),
+[`stablyai/orca#47464`](https://github.com/stablyai/orca/pull/47464),
+[`stablyai/orca#47200`](https://github.com/stablyai/orca/pull/47200),
 [`stablyai/orca#47220`](https://github.com/stablyai/orca/pull/47220),
 [`stablyai/orca#47191`](https://github.com/stablyai/orca/pull/47191),
 [`stablyai/orca#47016`](https://github.com/stablyai/orca/pull/47016) (resolve Issue [`#47021`](https://github.com/stablyai/orca/issues/47021)),
@@ -261,9 +268,27 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     - Mensagens enfileiradas de outros agentes eram suspensas indefinidamente quando o turno do agente principal falhava por qualquer motivo operacional, mesmo que a falha não fosse por esgotamento de cota de uso (*usage limit*).
 69. **Impossibilidade de agentes anexarem itens, URLs e arquivos a itens abertos de outros agentes (`#47191`):**
     - Agentes ficavam impossibilitados de associar tarefas filhas, links de PRs, arquivos e comandos `worker-start --item` a itens de trabalho criados por outros agentes no mesmo workspace, limitando a colaboração entre bots na árvore de itens.
+70. **Alargamento horizontal forçado do chat por sumários contínuos de tarefas em background (`#47359`, resolve `#47358`):**
+    - Quando um comando em segundo plano (como `worker-start`) emitia uma linha de resultado ou JSON sem quebras, o token contínuo definia a largura mínima (`min-content`) do transcript, forçando barra de rolagem horizontal em todo o Native Chat.
+71. **Ausência de estado formal `Waiting` para itens retidos por fatores externos (`#47308`, `#47309`, `#47429`):**
+    - Itens aguardando conclusão externa (CI, deploy, revisão, resposta ou reset de cota de uso) permaneciam ambiguamente como `In progress`, sem sinalização clara do motivo da espera no hover card e janelas de desktop/mobile.
+72. **Perda de modo Plan/Build e configurações de entrega ao migrar mensagens enfileiradas (`#47337`):**
+    - Ao transferir a fila para uma conversa substituta, apenas o texto bruto era copiado; opções congeladas no enfileiramento (modo Plan/Build, modelo, esforço, personality, fast mode e modo steer) eram descartadas, revertendo envios planejados para o modo padrão.
+73. **Perda de alinhamento e respostas precipitadas em itens com múltiplas perguntas (`#47464`, `#47461`, `#47385`, `#47372`):**
+    - Respostas digitadas a uma única pergunta de um conjunto acordavam o agente imediatamente deixando as demais perguntas pendentes; além disso, respostas retidas não recuperavam o indicador `Replying to`, publicando como comentário comum fora de contexto.
 
 ## O que o upstream implementa
 
+- **Quebra automática de linha para sumários de tarefas em background no chat (`#47359`, resolve `#47358`):**
+  - Aplica `overflow-wrap: anywhere` aos textos de sumários de resultados de tarefas em segundo plano, contendo o fluxo dentro da coluna e evitando barras de rolagem horizontais espúrias.
+- **Estado `Waiting` e detalhamento de espera em itens de trabalho (`#47308`, `#47309`, `#47429`):**
+  - Introduz o status formal `--status waiting --note "<o que aguarda>"`, exibindo o motivo no hover card no desktop, abaixo do título no mobile e atualizando a contagem da sidebar para "N needs you"; reverte para `In progress` automaticamente quando workers retomam.
+- **Preservação integral de opções e modo Plan/Build na migração da fila de mensagens (`#47337`):**
+  - Preserva modo de interação (Plan/Build), modelo, esforço de raciocínio, personality, fast mode, service tier e modo steer ao mover mensagens enfileiradas para chats substitutos.
+- **Sincronização de respostas a perguntas e controle de contexto em comentários de itens (`#47464`, `#47461`, `#47385`, `#47372`):**
+  - Aguarda o preenchimento de todas as respostas em conjuntos de perguntas antes de acordar o agente, vincula respostas digitadas deterministicamente à pergunta correspondente e mantém o comentário de pergunta aberto até reabertura do item.
+- **Exibição sob demanda de ações de edição e exclusão na fila de mensagens (`#47346`):**
+  - Revela botões Edit e Delete no hover do mouse, foco ou toque, mantendo o botão Steer permanentemente acessível em cada linha da fila de envio.
 - **Migração ordenada de filas de envio e cancelamento limpo de conectores na substituição de chats (`#47200`):**
   - Ao substituir uma sessão de chat, transfere mensagens enfileiradas atrás do turno em execução diretamente para a nova conversa, mantendo autor, ordem e anexos; drena mensagens de conectores na sessão antiga emitindo aviso de parada.
 - **Liberação de correio entre agentes em turnos falhos que não sejam por limite de uso (`#47220`):**
@@ -517,6 +542,12 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Migrar mensagens enfileiradas e encerrar com aviso itens de conectores ao trocar de chat ativo (`#47200`).
 - Liberar o processamento de correio de outros agentes após falhas de turno não relacionadas a limite de uso (`#47220`).
 - Suportar anotação e vinculação de itens e workers entre diferentes agentes na árvore de itens (`#47191`).
+- Aplicar `overflow-wrap: anywhere` em sumários de tarefas em background para evitar alargamento da coluna de chat (`#47359`, resolve `#47358`).
+- Adotar o status `Waiting` e respectivo detalhamento no hover card e telas de itens (`#47308`, `#47309`, `#47429`).
+- Reter opções completas (modo Plan/Build, modelo, esforço e steer) ao migrar mensagens enfileiradas (`#47337`).
+- Sincronizar envio de respostas compostas em itens aguardando resposta humana (`#47464`, `#47461`, `#47385`, `#47372`).
+- Exibir botões Edit e Delete no hover/foco e reter Steer em todas as linhas da fila de envio (`#47346`).
+
 
 
 

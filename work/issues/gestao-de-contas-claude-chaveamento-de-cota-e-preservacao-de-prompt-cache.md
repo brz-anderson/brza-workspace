@@ -10,6 +10,13 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48218
+  - https://github.com/stablyai/orca/pull/48253
+  - https://github.com/stablyai/orca/pull/48238
+  - https://github.com/stablyai/orca/pull/48239
+  - https://github.com/stablyai/orca/issues/48249
+  - https://github.com/stablyai/orca/pull/48323
+  - https://github.com/stablyai/orca/pull/48208
   - https://github.com/stablyai/orca/pull/48071
   - https://github.com/stablyai/orca/issues/48027
   - https://github.com/stablyai/orca/pull/48134
@@ -194,9 +201,33 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
     Ao esgotar a cota de uso de um modelo primário configurado para um bot, não havia definição de modelos de backup para failover automático, interrompendo tarefas não supervisionadas.
 36. **Falta de orquestração unificada de pools de contas e distribuição de cotas entre agentes (`#47954`, refs `#47020`, `#45090`, `#44117`):**
     Falta de suporte para cadastrar pools de contas de provedores (Anthropic, OpenAI, etc.), definir limites configuráveis por conta e balancear a distribuição de agentes, bots e workers entre contas corporativas e individuais.
+37. **Falsos limites de uso por throttling temporário no Codex (`#48218`):**
+    Respostas transitórias de limitação de taxa (throttling/HTTP 429 sem header de retry) emitidas pela API do Codex eram interpretadas pelo frontend como exaustão definitiva de cota (`usage limit`), desativando o agente incorretamente em vez de aplicar backoff exponencial.
+38. **Seleção de contas vinculadas em Orca Account (`#48253`):**
+    Ao conectar contas organizacionais vinculadas (linked accounts) no painel de Orca Account, a interface não permitia chavear explicitamente qual identidade de faturamento secundária associar ao workspace ativo.
+39. **Seletor de contas Google dedicado para agentes e subagentes (`#48238`, `#48239`):**
+    Ambientes com múltiplos perfis Google Workspace / Cloud careciam de um seletor visual na barra de contexto para definir qual conta de serviço ou OAuth Google deve autorizar as ferramentas executadas por agentes e subagentes de pesquisa e automação.
+40. **Prevalência indevida de `ANTHROPIC_AUTH_TOKEN` sobre contas gerenciadas do Claude (`#48249`):**
+    A presença estática da variável de ambiente `ANTHROPIC_AUTH_TOKEN` no terminal ou profile do sistema impedia o chaveamento de contas gerenciadas no app, sobrescrevendo a credencial selecionada no switcher e debitando silenciosamente na conta da chave estática.
+41. **Falhas na autenticação Google causadas por suspensão de dispositivos móveis (`#48323`):**
+    O handshake de login OAuth com o Google em clientes web/móveis falhava com erro de timeout ou interrupção de socket quando o aparelho entrava em sleep durante a autorização externa no navegador.
+42. **Ausência de detalhamento da causa raiz em falhas de login do Google Connector (`#48208`):**
+    Erros de permissão, recusa de consentimento ou bloqueio de domínio corporativo no Google Connector eram apresentados com mensagem genérica de erro de conexão, dificultando o diagnóstico pelo operador.
 
 ## O que o upstream propõe e implementa
 
+- **Diferenciação de throttling transitório e rate limit definitivo no Codex (`#48218`):**
+  - Trata respostas HTTP 429 sem janela formal de reset como throttling momentâneo com backoff exponencial automático, prevenindo a marcação falsa da conta como esgotada.
+- **Suporte a linked accounts na Orca Account (`#48253`):**
+  - Permite visualizar, selecionar e desvincular contas secundárias associadas à conta principal do usuário no painel de contas.
+- **Seletor de perfis Google para agentes (`#48238`, `#48239`):**
+  - Adiciona seletor de contas Google ativas para vincular agentes e subagentes à identidade correta de ferramentas em nuvem.
+- **Precedência de contas gerenciadas frente a `ANTHROPIC_AUTH_TOKEN` (`#48249`):**
+  - Garante que a seleção de perfis Claude no app tenha prioridade determinística sobre variáveis estáticas de ambiente no runtime do processo.
+- **Resiliência do fluxo de sign-in Google contra suspensão do sistema (`#48323`):**
+  - Mantém o estado do callback OAuth em espera tolerante a congelamentos e reconexões de rede após wake-up de dispositivos.
+- **Exibição do motivo específico de falha no Google Connector (`#48208`):**
+  - Extrai e renderiza mensagens explicativas de erro (escopo negado, domínio restrito, cancelamento) no card de setup.
 - **Cessação de releituras de transcripts na mudança de worktree (`#47858`, commit `56b2f9e44a4`):**
   - Mantém o cache de transcripts estável entre trocas de worktrees, atualizando apenas deltas reais.
 - **Botão direto de Sign-in no cartão de conta Claude pendente (`#47834`, commit `ee135b48486`):**
@@ -316,6 +347,12 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 - Adicionar ação de Stop para interromper processos de setup do Google Connector em andamento (`#48187`).
 - Concluir setup do Google cuja etapa de autorização foi realizada externamente fora do card (`#48160`, commit `50d506df9e3`).
 - Preservar a lista completa de modelos do Antigravity quando o comando `agy models` retornar lista truncada (`#47341`, commit `43133540259`).
+- Tratar respostas 429 de throttling no Codex com backoff sem desativar a conta por suposto esgotamento de cota (`#48218`).
+- Adotar o gerenciamento de linked accounts no painel de contas do `brza-studio` (`#48253`).
+- Implementar o seletor de credenciais Google para agentes com acesso a conectores e ferramentas em nuvem (`#48238`, `#48239`).
+- Assegurar precedência estrita das contas Claude configuradas no app sobre variáveis de ambiente como `ANTHROPIC_AUTH_TOKEN` (`#48249`).
+- Proteger fluxos de autenticação OAuth contra interrupções de sleep e troca de redes em clientes remotos (`#48323`).
+- Apresentar detalhes explicativos de falha na autorização do Google Connector (`#48208`).
 
 
 

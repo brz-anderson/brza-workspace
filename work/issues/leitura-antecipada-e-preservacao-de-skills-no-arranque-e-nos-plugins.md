@@ -8,6 +8,11 @@ opened: 2026-11-03
 tags:
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48287
+  - https://github.com/stablyai/orca/issues/48270
+  - https://github.com/stablyai/orca/pull/48245
+  - https://github.com/stablyai/orca/issues/48298
+  - https://github.com/stablyai/orca/issues/48297
   - https://github.com/stablyai/orca/pull/48026
   - https://github.com/stablyai/orca/issues/48023
   - https://github.com/stablyai/orca/pull/48165
@@ -137,9 +142,21 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
     O localizador de pacotes interrompia a subida de diretórios no primeiro `package.json` encontrado, selecionando pastas filhas em vez da raiz verdadeira de monorrepositórios ou plugins com submódulos.
 30. **Falta de integração nativa para manipulação de work items do Azure Boards (`#47797`):**
     Agentes e automações não dispunham de comandos na CLI ou skills padronizadas para leitura e atualização de itens do Azure Boards (semelhante ao suporte já existente para Jira).
+31. **Barra de status desatualizada com versão antiga de CLI atualizada via terminal (`#48287`, Issue `#48270`):**
+    Quando o desenvolvedor atualiza a CLI de um agente (ex.: `claude`, `codex`, `opencode`) manualmente pelo terminal integrado ou externo, o widget da barra de status continuava exibindo a versão antiga ou alerta de update pendente por não re-ler o binário após execuções no terminal.
+32. **Inconsistência de strings de backup na atualização de skills (`#48245`):**
+    Mensagens de log e diálogos de backup gerados durante `skill update` exibiam caminhos parciais ou strings formatadas de maneira inconsistente entre o frontend e a CLI.
+33. **Revisões de segurança e confiança pendentes para skills fundamentais (`#48298`, `#48297`):**
+    Auditorias de segurança para inclusão no Trust Hub das skills centrais de automação `orca-cli` (`#48298`) e `orchestration` (`#48297`) exigiam verificação estrita de permissões e ausência de escapes de sandbox.
 
 ## O que os PRs fazem
 
+- **Releitura automática de versões de CLI na barra de status após comandos no terminal (`#48287`, resolve `#48270`):**
+  - Observa saídas de comandos de atualização no terminal e invalida o cache de versão de binários na barra de status.
+- **Padronização de strings e mensagens de backup em `skill update` (`#48245`):**
+  - Uniformiza mensagens de substituição e caminhos de backup entre CLI e GUI.
+- **Revisão de confiança e conformidade das skills `orca-cli` e `orchestration` (`#48298`, `#48297`):**
+  - Estabelece checklist de segurança e conformidade para skills do Trust Hub.
 - **Vinculação estrita do cache de skills do diálogo Share às pastas e build que os produziram (`#47895`, commit `0b7fe2f6f10`):**
   - Mantém o cache de skills atrelado deterministicamente às pastas e à versão de build correspondente.
 - **Subida até a raiz real do pacote ultrapassando marcadores `package.json` aninhados (`#47979`):**
@@ -235,6 +252,9 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
 30. Escalonar a checagem de atualizações de CLIs de agentes após a inicialização estabilizar (`#47923`, commit `5d34df71806`).
 31. Evitar falso relatório de falha no atualizador de CLI do OpenCode quando o binário já estiver atualizado (`#48183`, resolve Issue `#48028`).
 32. Salvar downloads de CLI ao lado de arquivos com mesmo nome existente em vez de abortar (`#48067`, commit `30a0b6f59e7`).
+33. Atualizar o cache de versão da barra de status quando CLIs forem atualizadas via terminal (`#48287`, resolve `#48270`).
+34. Padronizar mensagens e rotas de backup na substituição de skills (`#48245`).
+35. Adequar as skills `orca-cli` e `orchestration` às diretrizes de segurança e permissões do Trust Hub (`#48298`, `#48297`).
 
 
 

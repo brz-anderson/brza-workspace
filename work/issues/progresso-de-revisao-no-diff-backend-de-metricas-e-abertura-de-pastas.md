@@ -12,6 +12,11 @@ tags:
   - infra
   - design
 references:
+  - https://github.com/stablyai/orca/pull/48293
+  - https://github.com/stablyai/orca/pull/48294
+  - https://github.com/stablyai/orca/issues/48291
+  - https://github.com/stablyai/orca/issues/48279
+  - https://github.com/stablyai/orca/issues/48309
   - https://github.com/stablyai/orca/pull/48047
   - https://github.com/stablyai/orca/issues/48022
   - https://github.com/stablyai/orca/pull/48122
@@ -88,9 +93,25 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
     Em células de código de Jupyter notebooks, o primeiro clique do mouse falhava em iniciar a seleção de texto, demandando múltiplos cliques repetidos.
 15. **Ausência de busca transversal contínua (Cmd/Ctrl+F) em todos os arquivos no diff combinado "View all changes" (`#47870`):**
     Ao visualizar todas as modificações combinadas de uma revisão, a ferramenta de busca localizava ocorrências somente dentro do arquivo ativo em foco, sem navegar entre múltiplos arquivos.
+16. **Execução insegura de binários do sistema no Windows via System32 relativo (`#48293`):**
+    Chamadas a utilitários de sistema no Windows (como `cmd.exe` ou `powershell.exe`) utilizavam caminhos relativos ou variáveis não validadas em vez de resolver o caminho canônico a partir de `SystemRoot` validado, gerando vulnerabilidade a DLL/binary hijacking em diretórios locais manipulados.
+17. **Dificuldade de abrir a interface móvel diretamente no navegador do smartphone (`#48294`, Issue `#48291`):**
+    Ao escanear o QR Code de pareamento ou clicar em "Open in browser", a aplicação tentava abrir um visualizador embutido restrito em vez de despachar a URL pareada diretamente para o navegador padrão do celular.
+18. **Find in Files não permitindo pesquisar arquivos ignorados pelo Git (`#48279`):**
+    A busca textual transversal do editor ("Find in Files") excluía incondicionalmente qualquer arquivo presente no `.gitignore` (como arquivos `.env`, configurações locais ou documentações geradas), sem toggle para incluir arquivos ignorados sob demanda.
+19. **Sessões da CLI do Devin armazenadas em SQLite ausentes no Session History (`#48309`):**
+    O painel de Session History e AI Vault não lia os bancos de dados SQLite locais criados por execuções autônomas da CLI do Devin, deixando essas sessões invisíveis no histórico unificado de conversas.
 
 ## O que o upstream implementa e corrige
 
+- **Resolução segura de caminhos do System32 via SystemRoot validado (`#48293`):**
+  - Valida e ancora todos os executáveis de sistema no caminho canônico `%SystemRoot%\System32` no Windows.
+- **Abertura direta da UI móvel no navegador do celular (`#48294`, resolve `#48291`):**
+  - Redireciona o handshake de pareamento móvel para o navegador padrão do smartphone com suporte a web app e PWA.
+- **Toggle para buscar em arquivos ignorados no Find in Files (`#48279`):**
+  - Adiciona opção "Search in git-ignored files" no painel de busca global.
+- **Descoberta e exibição de sessões SQLite da CLI do Devin no histórico (`#48309`):**
+  - Integra o parser de sessões SQLite do Devin ao catálogo unificado de Session History.
 - **Isolamento de marcas de comando concluído de agentes no terminal (`#47531`, commit `596618a7e52`):**
   - Garante que a marcação OSC de fim de comando emitida pelo agente não seja confundida com o encerramento do subprocesso.
 - **Início imediato de seleção em células de notebook (`#47932`, commit `6efc8b5a57a`):**
@@ -151,5 +172,9 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 16. Exibir skeletons animados estruturados enquanto checks de PR e comentários carregam no diff review (`#47812`, commit `207212b6b46`).
 17. Assegurar carregamento confiável de abas restauradas do navegador após restart quando extensões estiverem instaladas (`#47262`, commit `53846893079`).
 18. Tratar cabeçalhos e identidade de cliente CLI do Codex Native Chat para ambientes com proxy restritivo (`#48012`).
+19. Validar caminhos de ferramentas do Windows ancorando em `SystemRoot` canônico (`#48293`).
+20. Habilitar abertura da interface móvel no navegador nativo do smartphone (`#48294`, resolve `#48291`).
+21. Adicionar opção para pesquisar arquivos ignorados pelo Git no Find in Files (`#48279`).
+22. Incluir sessões SQLite da CLI do Devin no Session History unificado (`#48309`).
 
 

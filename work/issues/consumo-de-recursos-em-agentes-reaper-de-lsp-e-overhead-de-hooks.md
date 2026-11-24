@@ -1,6 +1,6 @@
 ---
 status: open
-description: PRs #48030 (elimina checagem git a cada 30s idle), #48163 (cleanup retries), #48059 (stream binário), #47917 (RPC registry cached) e #47943.
+description: PRs #48222 (compactação de cache de worktrees), #48219 (chaves filtradas do Git config), #48211 (desduplicação de modelos) e #48261 (limite de 32 conexões).
 scope:
   - brza-studio
   - tools-kit
@@ -14,7 +14,12 @@ tags:
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
 
-Rastreado dos PRs no upstream [`stablyai/orca#48030`](https://github.com/stablyai/orca/pull/48030),
+Rastreado dos PRs no upstream [`stablyai/orca#48222`](https://github.com/stablyai/orca/pull/48222),
+[`stablyai/orca#48219`](https://github.com/stablyai/orca/pull/48219),
+[`stablyai/orca#48211`](https://github.com/stablyai/orca/pull/48211),
+[`stablyai/orca#48261`](https://github.com/stablyai/orca/pull/48261),
+[`stablyai/orca#48282`](https://github.com/stablyai/orca/pull/48282) (commit `5b59337bdeb`),
+[`stablyai/orca#48030`](https://github.com/stablyai/orca/pull/48030),
 [`stablyai/orca#48163`](https://github.com/stablyai/orca/pull/48163) (commit `a779ba0f522`),
 [`stablyai/orca#48059`](https://github.com/stablyai/orca/pull/48059) (commit `82c7e4e2d83`),
 [`stablyai/orca#47917`](https://github.com/stablyai/orca/pull/47917) (commit `552862782d4`),
@@ -265,5 +270,10 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Transmitir downloads e salvamentos em disco como frames binários em streaming mantendo memória heap constante (`#48059`, commit `82c7e4e2d83`).
 - Construir o registro de RPCs do runtime desktop uma única vez no boot em vez de instanciar a cada chamada (`#47917`, commit `552862782d4`).
 - Modularizar e limitar funções extensas do registro de sessões de navegador (`#48120`, `#48121`).
+- Compactar entradas de `worktreeOwnerIndexCache` e construir correspondências de forma lazy no renderer (`#48222`).
+- Reter exclusivamente chaves de configuração inspecionadas no `StampedGitConfig` do processo principal (`#48219`).
+- Desduplicar objetos idênticos de modelos e esforço durante a hidratação do catálogo de agentes (`#48211`).
+- Elevar o limite de conexões simultâneas do Relay por computador de 8 para 32 (`#48261`).
+- Buscar o motor de renderização de diagramas do computador sob demanda apenas no primeiro desenho de diagrama no mobile (`#48282`, commit `5b59337bdeb`).
 
 

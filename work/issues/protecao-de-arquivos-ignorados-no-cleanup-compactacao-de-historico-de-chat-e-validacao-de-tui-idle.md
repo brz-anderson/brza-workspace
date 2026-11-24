@@ -11,6 +11,10 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/issues/48303
+  - https://github.com/stablyai/orca/issues/48252
+  - https://github.com/stablyai/orca/pull/48327
+  - https://github.com/stablyai/orca/issues/48292
   - https://github.com/stablyai/orca/pull/43498
   - https://github.com/stablyai/orca/pull/48065
   - https://github.com/stablyai/orca/pull/48163
@@ -278,9 +282,21 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Execuções concluídas de automações mantinham conversas abertas na barra lateral indefinidamente, poluindo a visualização de chats ativos e consumindo recursos residuais.
 73. **Execução inconsistente da auditoria de históricos legados de chat no startup (`#47657`, commit `7c095f7e34d`):**
     - A conferência do estado de conversão de journals antigos de chat não era garantida em todos os arranques, deixando instalações sem feedback claro sobre conversões pendentes.
+74. **Falta de arquivamento e exclusão em lote para conversas de bots (`#48303`):**
+    - Com o aumento de automações contínuas, centenas de chats de bots acumulam-se no painel de conversas sem opção de seleção múltipla para exclusão ou arquivamento em lote, exigindo remoção manual individual de cada sessão.
+75. **Ausência de opção para remover a pasta home do bot na exclusão (`#48252`):**
+    - Ao desinstalar ou excluir um bot configurado, o aplicativo remove apenas o registro do bot mas deixa o diretório home residual intacto em disco, sem questionar se o operador deseja expurgar os arquivos locais de configuração e dados gerados.
+76. **Invalidação e re-escaneamento do File Explorer a cada troca de worktree (`#48327`, Issue `#48292`):**
+    - A alternância de foco entre worktrees no File Explorer descartava o cache da árvore de arquivos e disparava varredura completa do sistema de arquivos para o novo checkout, causando atrasos de renderização e perda de pastas expandidas na navegação rápida.
 
 ## O que o upstream propõe e implementa
 
+- **Exclusão e arquivamento em lote de conversas de bots (`#48303`):**
+  - Introduz seleção múltipla com ações de "Archive All" e "Delete Selected" para chats de automações e bots.
+- **Opção de deleção completa da pasta home de bots (`#48252`):**
+  - Adiciona checkbox opcional no diálogo de remoção de bots para expurgar a pasta home e arquivos de contexto locais.
+- **Cache persistente e restauração de estado do File Explorer entre worktrees (`#48327`, resolve `#48292`):**
+  - Mantém o cache de árvore e os nós expandidos por worktree, evitando re-varreduras completas ao alternar checkouts.
 - **Limpeza de pastas temporárias de git deixadas por plugins (`#47952`, commit `70a1f42a331`):**
   - Implementa rotina de expurgo seguro para remover pastas temporárias residuais de git criadas por operações de plugins.
 - **Auditoria de históricos antigos em todas as inicializações sem exclusões (`#47657`, commit `7c095f7e34d`):**
@@ -554,6 +570,9 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Permitir a criação direta de novo workspace sem exibição de diálogo modal (`#48037`, resolve Issue `#48036`).
 - Exibir ícone de lua e linha esmaecida para workspaces adormecidos/em repouso no mobile (`#48182`).
 - Limpar dinamicamente worktrees de servidores remotos desconectados da barra lateral (`#48048`).
+- Implementar arquivamento e deleção em lote para chats e sessões de bots (`#48303`).
+- Oferecer opção de remoção da pasta home ao deletar bots para evitar resíduos em disco (`#48252`).
+- Reter o cache e a memória de diretórios expandidos do explorador de arquivos entre trocas de worktrees (`#48327`, resolve `#48292`).
 
 
 

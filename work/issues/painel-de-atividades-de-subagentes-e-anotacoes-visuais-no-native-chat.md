@@ -1,6 +1,6 @@
 ---
 status: open
-description: PRs #48124 (searchable chat rail), #48129 (nested scroll), #48126 (visuals vs prose), #48074 (palette de anotação), #48078 (concurrent prompt steering) e #48076 (Muse Code via ACP).
+description: PRs #48289 (workers do coordenador sobre composer), #48223 (nomes limpos no @), #48216 (Fast tier steering), #48271 (worker chats aninhados) e #48247 (conversão de chats).
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,18 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs no upstream [`stablyai/orca#48124`](https://github.com/stablyai/orca/pull/48124) (commit `374693b1414`),
+Rastreado dos PRs no upstream [`stablyai/orca#48289`](https://github.com/stablyai/orca/pull/48289) (commit `c69dc71bca9`),
+[`stablyai/orca#48223`](https://github.com/stablyai/orca/pull/48223),
+[`stablyai/orca#48216`](https://github.com/stablyai/orca/pull/48216),
+[`stablyai/orca#48271`](https://github.com/stablyai/orca/pull/48271),
+[`stablyai/orca#48247`](https://github.com/stablyai/orca/pull/48247),
+[`stablyai/orca#48237`](https://github.com/stablyai/orca/pull/48237),
+[`stablyai/orca#48316`](https://github.com/stablyai/orca/pull/48316) (commit `f36d846d17b`),
+[`stablyai/orca#48302`](https://github.com/stablyai/orca/pull/48302) (commit `06f5660cb08`),
+[`stablyai/orca#48268`](https://github.com/stablyai/orca/issues/48268),
+[`stablyai/orca#48269`](https://github.com/stablyai/orca/issues/48269),
+[`stablyai/orca#48296`](https://github.com/stablyai/orca/issues/48296),
+[`stablyai/orca#48124`](https://github.com/stablyai/orca/pull/48124) (commit `374693b1414`),
 [`stablyai/orca#48129`](https://github.com/stablyai/orca/pull/48129) (commit `f7ddeb3f630`),
 [`stablyai/orca#48126`](https://github.com/stablyai/orca/pull/48126) (resolve Issue [`#48123`](https://github.com/stablyai/orca/issues/48123)),
 [`stablyai/orca#48074`](https://github.com/stablyai/orca/pull/48074),
@@ -719,6 +730,16 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Exibir perguntas abertas unificadas sob botão Send único (`#47999`, commit `4e8e3501e6f`) e balão de pergunta para agentes bloqueados.
 - Compactar comentários de itens até receberem foco explícito (`#48064`, commit `74d17605a62`).
 - Reter o rótulo de perguntas substituídas com respostas retidas pendentes (`#48139`, commit `5d1726ce567`).
+- Exibir workers de chat coordenador flutuando acima da caixa de mensagem no mobile (`#48289`, commit `c69dc71bca9`).
+- Exibir apenas o nome nas linhas do seletor de menções `@` do chat nativo (`#48223`).
+- Reter o tier herdado de velocidade Fast durante o steering de mensagens no Codex (`#48216`).
+- Aninhar chats de workers sob a conversa de orquestração pai em clientes pareados e web (`#48271`, resolve Issue `#48268`).
+- Permitir conversão direta de conversas do Claude Code existentes para Codex ou Pi (`#48247`).
+- Suportar borda customizada de blocos inline de código no chat via temas da aplicação (`#48237`).
+- Citar comentários da Activity de um item diretamente na caixa de comentários (`#48316`, commit `f36d846d17b`).
+- Exibir o propósito do agente no menu de menção `@` em conversas mobile (`#48302`, commit `06f5660cb08`).
+- Filtrar a visualização de Activity por tipo de agente (Claude, Codex, Pi) ao lado do status (`#48269`).
+- Fornecer ação de Clear para falhas de workers assentados retidas no Home Chat dock (`#48296`).
 
 
 

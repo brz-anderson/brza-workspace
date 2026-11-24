@@ -1,6 +1,6 @@
 ---
 status: open
-description: PRs #48146 (held turn em Pi com filhos async), #48153 (fork Claude sem apiBlockIndex), #48178 (slow-start lock), #48080 (human commit credit) e #48087 (recovery de falha de modelo).
+description: PRs #48274 (held messages na volta), #48263 (identidade de colegas em shared agents), #48271 (worker chats aninhados), #48255 (share list) e #48312.
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,18 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs no upstream [`stablyai/orca#48146`](https://github.com/stablyai/orca/pull/48146),
+Rastreado dos PRs no upstream [`stablyai/orca#48274`](https://github.com/stablyai/orca/pull/48274),
+[`stablyai/orca#48263`](https://github.com/stablyai/orca/pull/48263),
+[`stablyai/orca#48271`](https://github.com/stablyai/orca/pull/48271),
+[`stablyai/orca#48255`](https://github.com/stablyai/orca/pull/48255),
+[`stablyai/orca#48256`](https://github.com/stablyai/orca/pull/48256),
+[`stablyai/orca#48277`](https://github.com/stablyai/orca/pull/48277),
+[`stablyai/orca#48283`](https://github.com/stablyai/orca/pull/48283),
+além das issues [`stablyai/orca#48312`](https://github.com/stablyai/orca/issues/48312),
+[`stablyai/orca#48295`](https://github.com/stablyai/orca/issues/48295),
+[`stablyai/orca#48290`](https://github.com/stablyai/orca/issues/48290),
+[`stablyai/orca#48262`](https://github.com/stablyai/orca/issues/48262),
+[`stablyai/orca#48146`](https://github.com/stablyai/orca/pull/48146),
 [`stablyai/orca#48153`](https://github.com/stablyai/orca/pull/48153) (commit `31274053e71`),
 [`stablyai/orca#48178`](https://github.com/stablyai/orca/pull/48178) (commit `d69b00a84a4`),
 [`stablyai/orca#48080`](https://github.com/stablyai/orca/pull/48080),
@@ -673,6 +684,13 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Permitir que rotinas de Look around e manutenção de memória sigam fusos horários configurados (`#48019`).
 - Expor API de plugins para leitura, eventos de itens e respostas como proprietário de itens de bots (`#48010`).
 - Exibir mensagens aguardando de outros agentes no final do chat em vez de acumulá-las na fila própria (`#45882`, commit `28a6043afa3`).
+- Entregar mensagens retidas de colegas a um agente compartilhado quando o computador voltar online (`#48274`).
+- Garantir que mensagens enviadas por colegas em agentes compartilhados postem e ajam com a identidade deles, nunca do proprietário (`#48263`).
+- Manter lista de compartilhamento no host e responder a entregas de agentes compartilhados (`#48255`, `#48256`).
+- Exibir o ator coordenador corrente de runs pertencentes ao chat em `run-show` (`#48312`).
+- Permitir que integrações acordem o chat próprio do bot quando self-mail for recusado (`#48295`).
+- Prevenir roteamento indevido de respostas de orquestração cross-server para terminais flutuantes em vez do Home Chat do bot (`#48290`).
+- Expor API de host de plugin para ler itens entre bots e atuar sobre eles com permissão delegada (`#48262`).
 
 
 

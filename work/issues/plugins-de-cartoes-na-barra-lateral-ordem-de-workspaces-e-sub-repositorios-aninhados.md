@@ -10,6 +10,12 @@ tags:
   - design
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/44653
+  - https://github.com/stablyai/orca/pull/42558
+  - https://github.com/stablyai/orca/pull/48212
+  - https://github.com/stablyai/orca/pull/48258
+  - https://github.com/stablyai/orca/pull/41896
+  - https://github.com/stablyai/orca/issues/48264
   - https://github.com/stablyai/orca/pull/48049
   - https://github.com/stablyai/orca/pull/48084
   - https://github.com/stablyai/orca/pull/48045
@@ -272,6 +278,18 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
     - Quando o status de PR de um workspace era consultado fora de sua linha direta na sidebar (ex.: em diálogos ou popovers), o cache mantinha dados defasados sem refresh adequado.
 59. **Baixo contraste entre aba ativa e abas inativas (`#47871`):**
     - A distinção visual entre a aba em primeiro plano e as demais abas no topo do painel apresentava baixo contraste de cores, dificultando a identificação imediata da aba focada.
+60. **Badges de projeto ausentes ou não configuráveis na barra lateral (`#44653`, commit `28dfb5df111`):**
+    - A lista de projetos na barra lateral não permitia vincular badges contextuais de status ou contadores customizados, dificultando a identificação imediata de repositórios com pendências críticas.
+61. **Ícones SVG inline ausentes para painéis e extensões de plugins (`#42558`, commit `29827448c5f`):**
+    - Plugins não podiam injetar seus próprios ícones vetoriais SVG inline na barra de atividades e nos painéis da barra lateral, ficando limitados aos ícones pré-definidos do sistema.
+62. **Falta de aviso contextual quando um quadro/board da sidebar é movido (`#48212`):**
+    - Ao reorganizar visualmente boards de tarefas ou painéis de automação na barra lateral, os usuários perdiam a localização do painel sem uma dica explicativa de redirecionamento (*sidebar board moved hint*).
+63. **Falta de foco explícito no painel ao alternar abas da barra de abas (`#48258`):**
+    - Clicar em uma aba na tab-strip ativava a visão gráfica mas não transferia o foco de entrada de teclado para o container do painel correspondente, exigindo um clique adicional para começar a digitar.
+64. **Extravasamento e corte de abas em painéis estreitos com múltiplas abas abertas (`#41896`):**
+    - Quando múltiplos painéis verticais eram divididos, painéis estreitos exibiam abas comprimidas sem modo condensado legível, ocultando títulos e status.
+65. **Truncamento de texto sem tooltip/hover com conteúdo completo (`#48264`):**
+    - Componentes de texto truncado por reticências na sidebar e nos cartões de itens não exibiam o texto na íntegra ao passar o cursor do mouse (hover), impossibilitando a leitura de títulos longos.
 
 ## O que fazer
 
@@ -324,4 +342,10 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
 - Refinar seletor de novos membros de grupos de bots (`#48127`, commit `737a50d831b`).
 - Polir cabeçalho e chips de links de itens de trabalho (`#48061`).
 - Exibir card de preview do GitHub ao passar o mouse sobre chip de PR ou issue do item (`#48003`, commit `212a1f746ee`).
+- Adotar badges de status de projetos na barra lateral (`#44653`, commit `28dfb5df111`).
+- Habilitar suporte a ícones vetoriais SVG inline para painéis de plugins (`#42558`, commit `29827448c5f`).
+- Exibir dica contextual de reposicionamento quando um board da barra lateral for movido (`#48212`).
+- Garantir que a alternância de abas na tab-strip transfira imediatamente o foco de entrada para o painel selecionado (`#48258`).
+- Condensar o layout de abas em painéis estreitos preservando legibilidade (`#41896`).
+- Exibir tooltip completo ao passar o cursor sobre textos truncados na interface (`#48264`).
 

@@ -12,6 +12,10 @@ tags:
   - design
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48243
+  - https://github.com/stablyai/orca/commit/9233301cd74
+  - https://github.com/stablyai/orca/pull/48215
+  - https://github.com/stablyai/orca/commit/96692d810c8
   - https://github.com/stablyai/orca/pull/48142
   - https://github.com/stablyai/orca/issues/48138
   - https://github.com/stablyai/orca/pull/48087
@@ -133,9 +137,17 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
     Quando uma automação exigia autenticação interativa ou oauth, a execução permanecia presa indefinidamente em vez de assentar graciosamente como `skip`.
 27. **Perda de ocorrências agendadas ocorridas durante períodos de desligamento (`#47897`, refs `#47888`):**
     Ocorrências agendadas de automações que deveriam disparar durante o desligamento eram descartadas no boot em vez de serem retidas e reconciliadas.
+28. **Incapacidade de remover automações de bots diretamente no painel de Atividade (`#48243`, commit `9233301cd74`):**
+    No painel de Atividade / Activity panel de bots, o operador conseguia pausar automações, mas não havia opção de exclusão direta de automações obsoletas ou descontinuadas sem navegar para as telas profundas de configuração do bot.
+29. **Diálogo "Add apps" desatualizado e pouco ergonômico (`#48215`, commit `96692d810c8`):**
+    A tela modal para adicionar aplicativos, integrações e plugins ("Add apps") apresentava layout denso com filtros pouco intuitivos e falta de agrupamento por categoria ou contexto de uso.
 
 ## O que o upstream implementa e corrige
 
+- **Exclusão direta de automações de bots a partir do painel de Atividade (`#48243`, commit `9233301cd74`):**
+  - Adiciona ação de delete no menu contextual de cada automação no Activity panel.
+- **Redesenho do diálogo Add Apps (`#48215`, commit `96692d810c8`):**
+  - Redesenha a experiência de descoberta e instalação de integrações e apps com categorização clara, busca aprimorada e cartões ilustrados.
 - **Disparo de regras `from=me` para todos os PRs sob a conta do proprietário (`#47879`, commit `4bd55254c3a`):**
   - Corrige a checagem de autor para que regras com filtro `from=me` disparem confiavelmente para qualquer PR aberto sob a conta do dono.
 - **Truncamento de rótulos de resultado de execução longos (`#47865`, commit `7a7b8b981dc`):**
@@ -263,6 +275,8 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
 37. Atualizar automaticamente a listagem de PRs abertos em páginas de itens como linhas visíveis do workspace (`#48007`, commit `56e27bb625c`).
 38. Resolver contenção em hover card de workspace quando referências incluem número isolado de PR vinculado (`#48085`).
 39. Sincronizar bidirecionalmente o status de itens de bots com suas respectivas issues vinculadas no Linear (`#48136`).
+40. Adicionar ação de exclusão de automações de bots diretamente no painel de Atividade (`#48243`, commit `9233301cd74`).
+41. Incorporar o redesign moderno do diálogo Add Apps para instalação de plugins e integrações (`#48215`, commit `96692d810c8`).
 
 
 

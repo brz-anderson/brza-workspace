@@ -12,6 +12,14 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48267
+  - https://github.com/stablyai/orca/commit/e71aed39a4f
+  - https://github.com/stablyai/orca/issues/48284
+  - https://github.com/stablyai/orca/issues/48254
+  - https://github.com/stablyai/orca/pull/48334
+  - https://github.com/stablyai/orca/pull/48278
+  - https://github.com/stablyai/orca/pull/48217
+  - https://github.com/stablyai/orca/issues/48248
   - https://github.com/stablyai/orca/pull/48152
   - https://github.com/stablyai/orca/pull/48035
   - https://github.com/stablyai/orca/issues/48034
@@ -380,9 +388,29 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Redesenha o card Connect Google em duas linhas compactas, permite criar um novo Google app a partir de "Use another account", notifica agentes sobre o login sem poluir mensagens do chat e viabiliza a seleção de conta Google padrão por agentes.
 99. **Encaminhamento de portas de servidores pareados e movimentação de abas de navegador (`#47994`, `#47957`, `#47965`, `#47944`):**
     Encaminha automaticamente portas de servidores pareados para abertura no navegador padrão, viabiliza mover abas entre o computador local e o servidor pareado via menu `⋯`, esclarece motivos de falha na abertura de links e previne carregamento duplicado de páginas abertas por agentes e CLI.
+100. **Falha de integração com chaveiro Linux (keyring) no KDE via `secret-tool` (`#48267`, commit `e71aed39a4f`):**
+    Em distribuições Linux executando KDE Plasma, a persistência de credenciais OAuth e segredos de agentes falhava com erro de backend de keyring por tentar interagir com APIs do GNOME Keyring em vez de utilizar `secret-tool` compatível com KWallet.
+101. **Métricas de uso do Antigravity falhando por `agy CLI not found` sob runtime gerenciado (`#48284`):**
+    Quando o usuário executa o Antigravity exclusivamente via runtime empacotado gerenciado (sem instalação global da CLI no PATH), o widget de medição de uso falhava ao tentar invocar `agy` globalmente, apresentando erro *"agy CLI not found"*.
+102. **Hook órfão `orca-status` em `~/.gemini/config/hooks.json` congelando o Antigravity no Windows (`#48254`):**
+    Após desinstalações ou atualizações no Windows, hooks residuais apontando para caminhos antigos em `~/.gemini/config/hooks.json` causavam o travamento permanente de novos chats do Antigravity ao tentar executar executáveis inexistentes no arranque.
+103. **Port forwards não restaurados e túneis SSH localhost inacessíveis (`#48334`, `#48278`, `#48248`):**
+    Ao reiniciar a conexão SSH ou reconectar a uma máquina remota, portas encaminhadas anteriormente não eram restauradas automaticamente; além disso, conflitos de portas entre `remotePort` 6768 e 6800 tornavam endpoints locais inacessíveis no cliente.
+104. **Links clicados no chat e terminal não respeitando a configuração de navegador do sistema (`#48217`):**
+    Links externos e URLs abertas por agentes no chat ignoravam a opção *"Open links in system browser"*, forçando a abertura dentro do webview embutido do app.
 
 ## O que o upstream implementa e corrige
 
+- **Suporte a `secret-tool` para persistência em Linux/KDE (`#48267`, commit `e71aed39a4f`):**
+  - Detecta ambientes KDE e utiliza `secret-tool` como backend para armazenamento seguro de credenciais.
+- **Resolução de CLI interna para métricas de uso do Antigravity gerenciado (`#48284`):**
+  - Roteia probes de cota para o binário empacotado dentro do runtime quando `agy` global não estiver no PATH.
+- **Limpeza e isolamento de hooks órfãos no Antigravity (`#48254`):**
+  - Valida a existência de arquivos de hooks antes de registrá-los em `hooks.json` e ignora entradas órfãs.
+- **Restauração de port forwards e resolução de conflito de portas SSH (`#48334`, `#48278`, `#48248`):**
+  - Reconecta túneis de portas automaticamente ao restabelecer conexões SSH e padroniza a porta padrão para 6800.
+- **Abertura estrita no navegador do sistema para links externos (`#48217`):**
+  - Honra a preferência do usuário roteando cliques diretamente para o navegador padrão do OS.
 - **Limpeza de cookies por perfil em hosts locais e SSH (`#47955`, commit `fd60d2198ca`):**
   - Expõe ação de limpeza de cookies no card de perfil de Settings para qualquer host.
 - **Perfis pesquisáveis em Import Cookies (`#47970`, commit `4a4cbdfc9d5`):**
@@ -716,6 +744,11 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 103. Preservar o parâmetro de esforço de lançamento quando o agente de terminal iniciar com seu modelo padrão (`#47975`, commit `f124b4b5f48`).
 104. Transmitir sequência Ctrl+Space para aplicações com protocolo Kitty quando a tecla chegar como Unidentified (`#48051`, commit `fe4fbf1c0bf`).
 105. Adicionar configuração de renderização de terminal para desenhar texto em negrito nas cores ANSI normais (`#48188`).
+106. Suportar `secret-tool` para armazenamento de credenciais no Linux sob ambientes KDE (`#48267`, commit `e71aed39a4f`).
+107. Reter métricas de cota do Antigravity utilizando o binário gerenciado quando `agy` não estiver no PATH global (`#48284`).
+108. Proteger a inicialização do Antigravity contra hooks órfãos em `~/.gemini/config/hooks.json` no Windows (`#48254`).
+109. Restaurar automaticamente túneis de portas ao reconectar sessões SSH e corrigir roteamento de portas locais (`#48334`, `#48278`, `#48248`).
+110. Respeitar a opção do usuário de abrir links externos diretamente no navegador padrão do sistema (`#48217`).
 
 
 

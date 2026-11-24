@@ -1,6 +1,6 @@
 ---
 status: open
-description: PRs #47943 (process lookup fora do main), #47927 (alívio de CPU), #47917 (RPC dispatcher único), #47836 e #47853 (hooks Droid).
+description: PRs #48030 (elimina checagem git a cada 30s idle), #48163 (cleanup retries), #48059 (stream binário), #47917 (RPC registry cached) e #47943.
 scope:
   - brza-studio
   - tools-kit
@@ -14,10 +14,15 @@ tags:
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47943`](https://github.com/stablyai/orca/pull/47943),
+Rastreado dos PRs no upstream [`stablyai/orca#48030`](https://github.com/stablyai/orca/pull/48030),
+[`stablyai/orca#48163`](https://github.com/stablyai/orca/pull/48163) (commit `a779ba0f522`),
+[`stablyai/orca#48059`](https://github.com/stablyai/orca/pull/48059) (commit `82c7e4e2d83`),
+[`stablyai/orca#47917`](https://github.com/stablyai/orca/pull/47917) (commit `552862782d4`),
+[`stablyai/orca#48120`](https://github.com/stablyai/orca/pull/48120) (commit `66d362d6215`),
+[`stablyai/orca#48121`](https://github.com/stablyai/orca/pull/48121) (commit `6795b42007c`),
+[`stablyai/orca#47943`](https://github.com/stablyai/orca/pull/47943) (commit `2af98f82527`),
 [`stablyai/orca#47927`](https://github.com/stablyai/orca/pull/47927),
-[`stablyai/orca#47917`](https://github.com/stablyai/orca/pull/47917),
-[`stablyai/orca#47911`](https://github.com/stablyai/orca/pull/47911),
+[`stablyai/orca#47911`](https://github.com/stablyai/orca/pull/47911) (commit `e07572e7da5`),
 [`stablyai/orca#47900`](https://github.com/stablyai/orca/pull/47900),
 [`stablyai/orca#47821`](https://github.com/stablyai/orca/pull/47821),
 [`stablyai/orca#47836`](https://github.com/stablyai/orca/pull/47836) (commit `edbdf6506dc`, resolve [`#47826`](https://github.com/stablyai/orca/issues/47826)),
@@ -249,11 +254,16 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Adotar a saída rápida de hooks sem contexto Orca ativo (`#42655`).
 - Prevenir a execução zumbi de hooks órfãos de python3 (`#42601`).
 - Contabilizar e atribuir processos e consumo de memória de agentes de chat e servidores de linguagem ao respectivo workspace no Resource Manager (`#45844`).
-- Mover a varredura de sockets/portas no Linux para o worker de scan com comando único `ls -ln /proc/*/fd` fora do Electron main (`#47943`).
+- Mover a varredura de sockets/portas no Linux para o worker de scan com comando único `ls -ln /proc/*/fd` fora do Electron main (`#47943`, commit `2af98f82527`).
 - Postergar o boot de workers de journal e do processo de backend de usage até que haja necessidade real (`#47580`, `#47578`).
-- Omitir lookups de workers vinculados para itens limitados por cota de uso e cachear workers assentados (`#47835`, `#47911`).
+- Omitir lookups de workers vinculados para itens limitados por cota de uso e cachear workers assentados (`#47835`, `#47911`, commit `e07572e7da5`).
 - Reatar a observação de raízes locais após o resfriamento do fusível de crash do watcher (`#44265`).
 - Habilitar serialização de `check:changed` entre worktrees concorrentes em hosts ocupados (`#47821`, `#47900`).
 - Instalar hooks gerenciados no caminho lido pelo Droid e isolar eventos de Task workers da linha de agentes (`#47836`, `#47853`).
+- Eliminar checagens repetitivas de arquivos git a cada 30 segundos em todos os worktrees enquanto o aplicativo estiver ocioso (`#48030`).
+- Prevenir sobreposição de tentativas concorrentes de limpeza de workspaces (`#48163`, commit `a779ba0f522`).
+- Transmitir downloads e salvamentos em disco como frames binários em streaming mantendo memória heap constante (`#48059`, commit `82c7e4e2d83`).
+- Construir o registro de RPCs do runtime desktop uma única vez no boot em vez de instanciar a cada chamada (`#47917`, commit `552862782d4`).
+- Modularizar e limitar funções extensas do registro de sessões de navegador (`#48120`, `#48121`).
 
 

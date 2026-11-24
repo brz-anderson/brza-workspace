@@ -1,6 +1,6 @@
 ---
 status: open
-description: Progresso de revisão no diff, backend de métricas, seleção em notebooks e integridade de comandos de terminal.
+description: Largura de Markdown (#48047/#48022), CRLF no Windows (#48122), skeletons em checks (#47812) e restauração de abas (#47262).
 scope:
   - brza-studio
   - brza-workflow
@@ -12,6 +12,12 @@ tags:
   - infra
   - design
 references:
+  - https://github.com/stablyai/orca/pull/48047
+  - https://github.com/stablyai/orca/issues/48022
+  - https://github.com/stablyai/orca/pull/48122
+  - https://github.com/stablyai/orca/pull/47812
+  - https://github.com/stablyai/orca/pull/47262
+  - https://github.com/stablyai/orca/issues/48012
   - https://github.com/stablyai/orca/issues/47870
   - https://github.com/stablyai/orca/commit/596618a7e52
   - https://github.com/stablyai/orca/commit/6efc8b5a57a
@@ -140,5 +146,10 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 11. Prevenir que marcas OSC de comando concluído emitidas pelo próprio agente encerrem o processo de terminal (`#47531`, commit `596618a7e52`).
 12. Habilitar início imediato de seleção no primeiro clique do mouse em células de código de notebooks (`#47932`, commit `6efc8b5a57a`).
 13. Implementar atalho Cmd/Ctrl+F transversal cobrindo todos os arquivos no diff combinado "View all changes" (`#47870`).
+14. Adicionar configuração de largura de leitura de Markdown (largura cheia vs coluna centralizada) (`#48047`, resolve Issue `#48022`).
+15. Copiar blocos de código com quebras de linha CRLF no Windows para execução ordenada em colagens multilinhas do PowerShell (`#48122`, commit `a7fbb36d436`).
+16. Exibir skeletons animados estruturados enquanto checks de PR e comentários carregam no diff review (`#47812`, commit `207212b6b46`).
+17. Assegurar carregamento confiável de abas restauradas do navegador após restart quando extensões estiverem instaladas (`#47262`, commit `53846893079`).
+18. Tratar cabeçalhos e identidade de cliente CLI do Codex Native Chat para ambientes com proxy restritivo (`#48012`).
 
 

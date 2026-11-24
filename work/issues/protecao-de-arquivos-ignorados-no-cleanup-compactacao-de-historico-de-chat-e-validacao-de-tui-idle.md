@@ -1,6 +1,6 @@
 ---
 status: open
-description: Proteção de arquivos no cleanup, compactação de histórico de chat, limpeza de temporários e validação de ociosidade.
+description: Cleanup agrupado (#43498), modal estável (#48065), retry sem sobreposição (#48163) e workspace headless (#48037).
 scope:
   - brza-studio
   - workspace
@@ -11,6 +11,13 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/43498
+  - https://github.com/stablyai/orca/pull/48065
+  - https://github.com/stablyai/orca/pull/48163
+  - https://github.com/stablyai/orca/pull/48037
+  - https://github.com/stablyai/orca/issues/48036
+  - https://github.com/stablyai/orca/pull/48182
+  - https://github.com/stablyai/orca/issues/48048
   - https://github.com/stablyai/orca/pull/47981
   - https://github.com/stablyai/orca/pull/47952
   - https://github.com/stablyai/orca/pull/47906
@@ -541,6 +548,12 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Executar a verificação de integridade do histórico antigo de chat em todas as inicializações (`#47657`, commit `7c095f7e34d`).
 - Permitir que atualizações automáticas aguardem até que o usuário esteja ausente (away) (`#47981`).
 - Fechar automaticamente chats de execuções finalizadas de automação após tempo ocioso configurado (`#47906`).
+- Adotar interface de cartões agrupados, etapas de confirmação e card de progresso em background para Workspace Cleanup (`#43498`, commit `e6f066034bc`).
+- Manter o modal de revisão de deleção de workspaces em tamanho estável durante o fluxo (`#48065`, commit `8d25f6f8417`).
+- Prevenir sobreposição de retentativas na limpeza de workspaces (`#48163`, commit `a779ba0f522`).
+- Permitir a criação direta de novo workspace sem exibição de diálogo modal (`#48037`, resolve Issue `#48036`).
+- Exibir ícone de lua e linha esmaecida para workspaces adormecidos/em repouso no mobile (`#48182`).
+- Limpar dinamicamente worktrees de servidores remotos desconectados da barra lateral (`#48048`).
 
 
 

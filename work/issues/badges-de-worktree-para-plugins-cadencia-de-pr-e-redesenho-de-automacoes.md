@@ -1,6 +1,6 @@
 ---
 status: open
-description: Badges de worktree para plugins, cadência de PR, motor de automações e robustez em reinicializações.
+description: Editor em painel estreito (#48142/#48138), recuperação de modelo (#48087), link de PR em turnos (#48005) e Linear sync (#48136).
 scope:
   - brza-studio
   - workspace
@@ -12,6 +12,13 @@ tags:
   - design
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48142
+  - https://github.com/stablyai/orca/issues/48138
+  - https://github.com/stablyai/orca/pull/48087
+  - https://github.com/stablyai/orca/pull/48005
+  - https://github.com/stablyai/orca/pull/48007
+  - https://github.com/stablyai/orca/issues/48085
+  - https://github.com/stablyai/orca/issues/48136
   - https://github.com/stablyai/orca/pull/47938
   - https://github.com/stablyai/orca/pull/47897
   - https://github.com/stablyai/orca/issues/47888
@@ -250,6 +257,12 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
 31. Reter execuções abertas de automação durante o encerramento do app para reavaliação no boot (`#47855`, commit `1e56e0fc6a3`).
 32. Concluir automações retidas em telas de autenticação como `skip` para não travar a fila (`#47938`).
 33. Reconciliar e executar ocorrências agendadas perdidas entre reinicializações do aplicativo (`#47897`, refs `#47888`).
+34. Ajustar layout responsivo do editor de automações para comportar painéis laterais estreitos (`#48142`, resolve Issue `#48138`).
+35. Recuperar e retentar execuções de automações diante de falhas transitórias de inferência do modelo (`#48087`).
+36. Exibir apenas o link permanente do PR, e não seu estado em cache, em listas de trabalho e notas de turnos (`#48005`, commit `ad96411db85`).
+37. Atualizar automaticamente a listagem de PRs abertos em páginas de itens como linhas visíveis do workspace (`#48007`, commit `56e27bb625c`).
+38. Resolver contenção em hover card de workspace quando referências incluem número isolado de PR vinculado (`#48085`).
+39. Sincronizar bidirecionalmente o status de itens de bots com suas respectivas issues vinculadas no Linear (`#48136`).
 
 
 

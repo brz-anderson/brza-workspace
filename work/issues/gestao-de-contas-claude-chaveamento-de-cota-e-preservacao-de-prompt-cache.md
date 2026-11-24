@@ -1,6 +1,6 @@
 ---
 status: open
-description: Gestão de contas Claude, chaveamento sob limites de cota, modelos de backup e isolamento de históricos.
+description: Gestão de contas Claude, switcher de rate limit (#48071/#48027), recuperação de sign-in (#48134) e restart de conta Codex (#48133).
 scope:
   - brza-studio
   - brza-workflow
@@ -10,6 +10,14 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48071
+  - https://github.com/stablyai/orca/issues/48027
+  - https://github.com/stablyai/orca/pull/48134
+  - https://github.com/stablyai/orca/pull/48133
+  - https://github.com/stablyai/orca/pull/48082
+  - https://github.com/stablyai/orca/pull/48187
+  - https://github.com/stablyai/orca/pull/48160
+  - https://github.com/stablyai/orca/pull/47341
   - https://github.com/stablyai/orca/pull/47983
   - https://github.com/stablyai/orca/pull/47948
   - https://github.com/stablyai/orca/pull/47928
@@ -301,6 +309,13 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 - Implementar configuração de modelos de backup para failover automático sob exaustão de cota de bots (`#47910`).
 - Avaliar a arquitetura de multi-account orchestration com pools de contas e limites distribuídos (`#47954`, `#47020`, `#45090`, `#44117`).
 - Restabelecer a visibilidade dos contadores de uso na barra de status mesmo com chat em foco (`#47933`).
+- Permitir re-tentativa imediata de contas Claude inativas marcadas como Limited via abertura explícita do switcher (`#48071`, resolve Issue `#48027`).
+- Adicionar fluxo de recuperação de login/autenticação diretamente dentro da interface de chat (`#48134`).
+- Reiniciar o Codex sob nova conta credenciada parando e retomando a mesma conversa sem perder contexto (`#48133`).
+- Impedir que prompts posicionais do Claude sejam consumidos como argumentos de flags variádicas (`#48082`, commit `907b43c0465`).
+- Adicionar ação de Stop para interromper processos de setup do Google Connector em andamento (`#48187`).
+- Concluir setup do Google cuja etapa de autorização foi realizada externamente fora do card (`#48160`, commit `50d506df9e3`).
+- Preservar a lista completa de modelos do Antigravity quando o comando `agy models` retornar lista truncada (`#47341`, commit `43133540259`).
 
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: PRs #47980 (worker pill sobre composer), #47878 (leitura do journal), #47929 (chats na sidebar pré-envio) e #47949 (Add to chat chips).
+description: PRs #48124 (searchable chat rail), #48129 (nested scroll), #48126 (visuals vs prose), #48074 (palette de anotação), #48078 (concurrent prompt steering) e #48076 (Muse Code via ACP).
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,21 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47980`](https://github.com/stablyai/orca/pull/47980),
+Rastreado dos PRs no upstream [`stablyai/orca#48124`](https://github.com/stablyai/orca/pull/48124) (commit `374693b1414`),
+[`stablyai/orca#48129`](https://github.com/stablyai/orca/pull/48129) (commit `f7ddeb3f630`),
+[`stablyai/orca#48126`](https://github.com/stablyai/orca/pull/48126) (resolve Issue [`#48123`](https://github.com/stablyai/orca/issues/48123)),
+[`stablyai/orca#48074`](https://github.com/stablyai/orca/pull/48074),
+[`stablyai/orca#48089`](https://github.com/stablyai/orca/pull/48089),
+[`stablyai/orca#48078`](https://github.com/stablyai/orca/pull/48078) (resolve Issue [`#48077`](https://github.com/stablyai/orca/issues/48077)),
+[`stablyai/orca#48076`](https://github.com/stablyai/orca/pull/48076),
+[`stablyai/orca#48128`](https://github.com/stablyai/orca/pull/48128),
+[`stablyai/orca#48038`](https://github.com/stablyai/orca/pull/48038) (commit `c6594b2c249`, resolve Issue [`#48025`](https://github.com/stablyai/orca/issues/48025)),
+[`stablyai/orca#48154`](https://github.com/stablyai/orca/pull/48154),
+[`stablyai/orca#48081`](https://github.com/stablyai/orca/pull/48081) (commit `bb95a42edc5`),
+[`stablyai/orca#47999`](https://github.com/stablyai/orca/pull/47999) (commit `4e8e3501e6f`),
+[`stablyai/orca#48064`](https://github.com/stablyai/orca/pull/48064) (commit `74d17605a62`),
+[`stablyai/orca#48139`](https://github.com/stablyai/orca/pull/48139) (commit `5d1726ce567`),
+[`stablyai/orca#47980`](https://github.com/stablyai/orca/pull/47980) (commit `60b0cbaea7e`),
 [`stablyai/orca#47949`](https://github.com/stablyai/orca/pull/47949) (refs Issue [`#43461`](https://github.com/stablyai/orca/issues/43461)),
 [`stablyai/orca#47975`](https://github.com/stablyai/orca/pull/47975),
 [`stablyai/orca#47875`](https://github.com/stablyai/orca/pull/47875),
@@ -692,6 +706,19 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Pre-carregar histórico de sessões para buscas instantâneas na submissão de `/resume` (`#47815`, commit `d4562c4474e`).
 - Memoizar projeções de linhas de chat durante streaming com ferramentas desacopladas (`#47931`).
 - Habilitar envio de prompt ou comando slash para abas de chat nativo via CLI e API de plugins (`#47854`).
+- Integrar lista de mensagens pesquisável diretamente no rail do Native Chat (`#48124`, commit `374693b1414`).
+- Corrigir scroll aninhado e contenção de rolagem em tool runs expandidos (`#48129`, commit `f7ddeb3f630`).
+- Distinguir visualmente visualizações e artefatos gráficos da prosa de texto comum (`#48126`, resolve Issue `#48123`).
+- Adotar paleta móvel de anotação de screenshots e captura de elementos no navegador (`#48074`).
+- Interromper ferramentas ativas em background no momento do cancelamento do chat (`#48089`).
+- Implementar steering concorrente de prompts no protocolo ACP para Antigravity (`#48078`, resolve Issue `#48077`).
+- Suportar chats nativos e bots do Muse Code sobre ACP (`#48076`).
+- Manter perguntas respondidas fechadas durante o replay de sessões Codex (`#48128`).
+- Resumir arquivos alterados em patches multi-arquivo no Native Chat (`#48038`, commit `c6594b2c249`, resolve Issue `#48025`).
+- Adotar pílula de salto direto para a questão aberta e cabeçalhos de itens condensados (`#48154`, `#48081`, commit `bb95a42edc5`).
+- Exibir perguntas abertas unificadas sob botão Send único (`#47999`, commit `4e8e3501e6f`) e balão de pergunta para agentes bloqueados.
+- Compactar comentários de itens até receberem foco explícito (`#48064`, commit `74d17605a62`).
+- Reter o rótulo de perguntas substituídas com respostas retidas pendentes (`#48139`, commit `5d1726ce567`).
 
 
 

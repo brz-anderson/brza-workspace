@@ -1,6 +1,6 @@
 ---
 status: open
-description: Integração ACP, autenticação Google/Antigravity, proxy de navegador remoto e port-forwarding de servidores pareados.
+description: Resiliência em resume remoto (#48152), deep link SSH (#48035/#48034), servidor Codex Windows (#48073) e texto claro em erros (#48079).
 scope:
   - brza-studio
   - workspace
@@ -12,6 +12,15 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48152
+  - https://github.com/stablyai/orca/pull/48035
+  - https://github.com/stablyai/orca/issues/48034
+  - https://github.com/stablyai/orca/pull/48073
+  - https://github.com/stablyai/orca/pull/48079
+  - https://github.com/stablyai/orca/pull/48017
+  - https://github.com/stablyai/orca/pull/47975
+  - https://github.com/stablyai/orca/pull/48051
+  - https://github.com/stablyai/orca/pull/48188
   - https://github.com/stablyai/orca/pull/47994
   - https://github.com/stablyai/orca/pull/47957
   - https://github.com/stablyai/orca/pull/47965
@@ -699,6 +708,14 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 95. Fragmentar payloads de resposta acima de 4 MB em servidores pareados para suportar screenshots de página inteira (`#47832`, commit `0180c9a3ed6`).
 96. Redesenhar o card Connect Google, permitir setup de novas apps e desacoplar mensagens de auth do chat (`#47861`, `#47905`, `#47823`, `#47820`, `#47814`, `#47790`).
 97. Encaminhar portas de servidores pareados para o navegador padrão e permitir mover abas entre máquinas (`#47994`, `#47957`, `#47965`, `#47944`).
+98. Manter o terminal de origem vivo quando a retomada de um chat remoto falhar (`#48152`).
+99. Suportar links de protocolo `orca://ssh/connect` para conectar automaticamente hosts configurados no SSH config (`#48035`, resolve Issue `#48034`).
+100. Manter chats do Codex no Windows em servidores isolados para garantir precisão e encerramento limpo via comando Stop (`#48073`).
+101. Adotar mensagens em linguagem clara e acessível quando uma sessão de chat não puder ser aberta (`#48079`, commit `8b956a69f37`).
+102. Exibir o modelo salvo com nível de raciocínio como sua família canônica e nível no compositor de chat (`#48017`, commit `08cc08354ad`).
+103. Preservar o parâmetro de esforço de lançamento quando o agente de terminal iniciar com seu modelo padrão (`#47975`, commit `f124b4b5f48`).
+104. Transmitir sequência Ctrl+Space para aplicações com protocolo Kitty quando a tecla chegar como Unidentified (`#48051`, commit `fe4fbf1c0bf`).
+105. Adicionar configuração de renderização de terminal para desenhar texto em negrito nas cores ANSI normais (`#48188`).
 
 
 

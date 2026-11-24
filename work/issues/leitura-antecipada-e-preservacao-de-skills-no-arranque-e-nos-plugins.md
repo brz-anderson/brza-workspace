@@ -1,6 +1,6 @@
 ---
 status: open
-description: Leitura antecipada, empacotamento de plugins, cache de skills no Share e integração com Azure Boards.
+description: Comandos slash no Pi (#48026/#48023), preservação WSL (#48165/#48177/#45247) e updater de CLI escalonado (#47923/#48183).
 scope:
   - brza-studio
 priority: high
@@ -8,6 +8,14 @@ opened: 2026-11-03
 tags:
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48026
+  - https://github.com/stablyai/orca/issues/48023
+  - https://github.com/stablyai/orca/pull/48165
+  - https://github.com/stablyai/orca/pull/48177
+  - https://github.com/stablyai/orca/pull/47923
+  - https://github.com/stablyai/orca/pull/48183
+  - https://github.com/stablyai/orca/issues/48028
+  - https://github.com/stablyai/orca/pull/48067
   - https://github.com/stablyai/orca/pull/47979
   - https://github.com/stablyai/orca/issues/47797
   - https://github.com/stablyai/orca/commit/0b7fe2f6f10
@@ -222,6 +230,11 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
 25. Vincular o cache de skills no diálogo Share às pastas e compilação de origem para evitar prévias defasadas (`#47895`, commit `0b7fe2f6f10`).
 26. Corrigir o resolvedor de pacotes de plugins para alcançar a raiz real ultrapassando `package.json` aninhados (`#47979`).
 27. Implementar comandos de CLI e skills para consulta e edição de work items do Azure Boards (`#47797`).
+28. Descobrir e carregar comandos slash de extensões do Pi antes do envio da primeira mensagem (`#48026`, resolve Issue `#48023`).
+29. Preservar modelos e plugins modificados do Codex durante rebuilds da cópia de configurações do WSL (`#48165`, `#48177`, refs commit `6ed63da9e1a` / `#45247`).
+30. Escalonar a checagem de atualizações de CLIs de agentes após a inicialização estabilizar (`#47923`, commit `5d34df71806`).
+31. Evitar falso relatório de falha no atualizador de CLI do OpenCode quando o binário já estiver atualizado (`#48183`, resolve Issue `#48028`).
+32. Salvar downloads de CLI ao lado de arquivos com mesmo nome existente em vez de abortar (`#48067`, commit `30a0b6f59e7`).
 
 
 

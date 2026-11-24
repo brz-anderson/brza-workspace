@@ -1,6 +1,6 @@
 ---
 status: open
-description: PRs #47973 (handoff e fan-out), #47947 (diagnóstico de silêncio), #47887 (persistência rápida), #47914 (custódia de chat) e #47953 (--cursor).
+description: PRs #48146 (held turn em Pi com filhos async), #48153 (fork Claude sem apiBlockIndex), #48178 (slow-start lock), #48080 (human commit credit) e #48087 (recovery de falha de modelo).
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,16 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47973`](https://github.com/stablyai/orca/pull/47973),
+Rastreado dos PRs no upstream [`stablyai/orca#48146`](https://github.com/stablyai/orca/pull/48146),
+[`stablyai/orca#48153`](https://github.com/stablyai/orca/pull/48153) (commit `31274053e71`),
+[`stablyai/orca#48178`](https://github.com/stablyai/orca/pull/48178) (commit `d69b00a84a4`),
+[`stablyai/orca#48080`](https://github.com/stablyai/orca/pull/48080),
+[`stablyai/orca#48087`](https://github.com/stablyai/orca/pull/48087),
+[`stablyai/orca#45882`](https://github.com/stablyai/orca/pull/45882) (commit `28a6043afa3`),
+além das issues [`stablyai/orca#48086`](https://github.com/stablyai/orca/issues/48086),
+[`stablyai/orca#48019`](https://github.com/stablyai/orca/issues/48019),
+[`stablyai/orca#48010`](https://github.com/stablyai/orca/issues/48010),
+[`stablyai/orca#47973`](https://github.com/stablyai/orca/pull/47973),
 [`stablyai/orca#47914`](https://github.com/stablyai/orca/pull/47914),
 [`stablyai/orca#47951`](https://github.com/stablyai/orca/pull/47951),
 [`stablyai/orca#47953`](https://github.com/stablyai/orca/pull/47953),
@@ -655,6 +664,15 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Transferir atomicamente a custódia de mensagens ao reabrir chats de workers retidos (`#47914`).
 - Suportar paginação histórica reversa com `--cursor` em `orca agent read` (`#47953`).
 - Implementar filtro por `--worktree` e documentação de campos JSON em `orchestration inbox` (`#47868`).
+- Continuar postando turnos mantidos no Pi enquanto workers filhos assíncronos estiverem rodando (`#48146`).
+- Bifurcar (fork) conversas do Claude a partir de transcrições que não possuem `apiBlockIndex` (`#48153`, commit `31274053e71`).
+- Aguardar aquisição de lock em vez do início de setup em cenários de arranque lento de orquestração (`#48178`, commit `d69b00a84a4`).
+- Preservar a atribuição de autoria humana de commits em ações executadas por workers (`#48080`).
+- Registrar o identificador de requisição de origem (`origin`) em itens transversais entre bots (`#48086`).
+- Recuperar execuções de automações de falhas temporárias de inferência de modelo (`#48087`).
+- Permitir que rotinas de Look around e manutenção de memória sigam fusos horários configurados (`#48019`).
+- Expor API de plugins para leitura, eventos de itens e respostas como proprietário de itens de bots (`#48010`).
+- Exibir mensagens aguardando de outros agentes no final do chat em vez de acumulá-las na fila própria (`#45882`, commit `28a6043afa3`).
 
 
 

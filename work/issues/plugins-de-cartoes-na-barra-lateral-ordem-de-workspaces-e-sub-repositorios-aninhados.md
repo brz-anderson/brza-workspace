@@ -1,6 +1,6 @@
 ---
 status: open
-description: Personalização da barra lateral, densidade do App Rail, status de bots colapsados e navegação de worktrees.
+description: Ritmo do App Rail (#48049/#48084), draft guard em plugins (#48176/#48075), popover na status bar (#48088) e bot sidebar (#48132/#48020).
 scope:
   - brza-studio
   - workspace
@@ -10,6 +10,18 @@ tags:
   - design
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48049
+  - https://github.com/stablyai/orca/pull/48084
+  - https://github.com/stablyai/orca/pull/48045
+  - https://github.com/stablyai/orca/pull/48176
+  - https://github.com/stablyai/orca/issues/48075
+  - https://github.com/stablyai/orca/issues/48088
+  - https://github.com/stablyai/orca/issues/48132
+  - https://github.com/stablyai/orca/issues/48020
+  - https://github.com/stablyai/orca/pull/48157
+  - https://github.com/stablyai/orca/pull/48127
+  - https://github.com/stablyai/orca/pull/48061
+  - https://github.com/stablyai/orca/pull/48003
   - https://github.com/stablyai/orca/pull/47935
   - https://github.com/stablyai/orca/pull/47922
   - https://github.com/stablyai/orca/pull/47902
@@ -302,4 +314,14 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
 - Dispor bots fixados em duas colunas paralelas na barra lateral (`#47902`).
 - Manter o status de PR atualizado quando consultado fora da linha da barra lateral (`#47968`).
 - Aumentar o contraste visual da aba ativa em relação às demais abas (`#47871`).
+- Ajustar o ritmo e espaçamento dos botões do App Rail (espaçamento inicial de 40px e gap refinado de 10px) (`#48049`, `#48084`).
+- Permitir que destinos do App Rail ocupem a página inteira de forma fluida (`#48045`, commit `c363299cdac`).
+- Confirmar fechamento de abas cujo editor customizado de plugin retém edições não salvas (`#48176`, resolve Issue `#48075`).
+- Permitir que itens da barra de status de plugins abram painéis como popovers flutuantes (`#48088`).
+- Exibir a descrição do bot abaixo do nome na barra lateral (`#48132`).
+- Aprimorar visibilidade na barra lateral de bots para seleção ativa, tarefas concluídas e workers em background (`#48020`).
+- Simplificar o cabeçalho do Bot Home com ações de topo condensadas (`#48157`).
+- Refinar seletor de novos membros de grupos de bots (`#48127`, commit `737a50d831b`).
+- Polir cabeçalho e chips de links de itens de trabalho (`#48061`).
+- Exibir card de preview do GitHub ao passar o mouse sobre chip de PR ou issue do item (`#48003`, commit `212a1f746ee`).
 

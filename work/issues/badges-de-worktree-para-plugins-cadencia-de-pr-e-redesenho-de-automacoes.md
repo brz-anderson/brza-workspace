@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #47726 e as issues #47796-#47793 aprimoram a confiabilidade do motor de automações e verificações de PR.
+description: Badges de worktree para plugins, cadência de PR, motor de automações e robustez em reinicializações.
 scope:
   - brza-studio
   - workspace
@@ -11,11 +11,26 @@ tags:
   - tooling
   - design
   - infra
+references:
+  - https://github.com/stablyai/orca/pull/47938
+  - https://github.com/stablyai/orca/pull/47897
+  - https://github.com/stablyai/orca/issues/47888
+  - https://github.com/stablyai/orca/commit/4bd55254c3a
+  - https://github.com/stablyai/orca/commit/7a7b8b981dc
+  - https://github.com/stablyai/orca/commit/b73ce0a1619
+  - https://github.com/stablyai/orca/commit/1e56e0fc6a3
 ---
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
 
-Rastreado do PR aberto no upstream [`stablyai/orca#47726`](https://github.com/stablyai/orca/pull/47726),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47938`](https://github.com/stablyai/orca/pull/47938),
+[`stablyai/orca#47897`](https://github.com/stablyai/orca/pull/47897),
+[`stablyai/orca#47879`](https://github.com/stablyai/orca/pull/47879) (commit `4bd55254c3a`),
+[`stablyai/orca#47865`](https://github.com/stablyai/orca/pull/47865) (commit `7a7b8b981dc`),
+[`stablyai/orca#47876`](https://github.com/stablyai/orca/pull/47876) (commit `b73ce0a1619`),
+[`stablyai/orca#47855`](https://github.com/stablyai/orca/pull/47855) (commit `1e56e0fc6a3`),
+além da issue [`stablyai/orca#47888`](https://github.com/stablyai/orca/issues/47888),
+[`stablyai/orca#47726`](https://github.com/stablyai/orca/pull/47726),
 além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues/47796),
 [`stablyai/orca#47795`](https://github.com/stablyai/orca/issues/47795),
 [`stablyai/orca#47794`](https://github.com/stablyai/orca/issues/47794) e
@@ -101,8 +116,29 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
     Quando o computador ou aplicativo permanecia desligado durante múltiplas execuções agendadas, apenas a ocorrência mais recente era gravada, descartando os registros das demais instâncias perdidas.
 22. **Falhas de agendamento cron em transições de horário de verão (DST) e tolerância a timezones inválidos (`#47793`):**
     Agendamentos de automação baseados em cron pulavam ou duplicavam turnos durante a entrada ou saída do horário de verão e aceitavam strings de fuso horário inválidas sem validação prévia.
+23. **Regra de automação `from=me` ignorando PRs criados sob a conta do proprietário (`#47879`, commit `4bd55254c3a`):**
+    A regra de pull request `from=me` falhava em disparar para pull requests abertos diretamente sob a conta do dono do repositório devido a inconsistências na resolução do autor.
+24. **Transbordamento visual de rótulos longos de resultado de execução na barra de workspaces (`#47865`, commit `7a7b8b981dc`):**
+    Quando o resultado de uma execução de automação produzia uma mensagem de status longa, o rótulo transbordava os limites do card de automação e sobrepunha a visualização de workspaces.
+25. **Execuções de automação abortadas e perdidas ao fechar o aplicativo (`#47855`, commit `1e56e0fc6a3`):**
+    Ao fechar o aplicativo, execuções em andamento eram descartadas prematuramente em vez de permanecerem abertas para reavaliação no próximo boot.
+26. **Execuções de automação paralisadas em telas de sign-in (`#47938`):**
+    Quando uma automação exigia autenticação interativa ou oauth, a execução permanecia presa indefinidamente em vez de assentar graciosamente como `skip`.
+27. **Perda de ocorrências agendadas ocorridas durante períodos de desligamento (`#47897`, refs `#47888`):**
+    Ocorrências agendadas de automações que deveriam disparar durante o desligamento eram descartadas no boot em vez de serem retidas e reconciliadas.
 
 ## O que o upstream implementa e corrige
+
+- **Disparo de regras `from=me` para todos os PRs sob a conta do proprietário (`#47879`, commit `4bd55254c3a`):**
+  - Corrige a checagem de autor para que regras com filtro `from=me` disparem confiavelmente para qualquer PR aberto sob a conta do dono.
+- **Truncamento de rótulos de resultado de execução longos (`#47865`, commit `7a7b8b981dc`):**
+  - Aplica truncamento visual nos rótulos de resultado para prevenir que mensagens longas invadam o painel de workspaces.
+- **Preservação de execuções abertas através do encerramento do app (`#47855`, commit `1e56e0fc6a3`):**
+  - Mantém execuções abertas gravadas no banco durante o encerramento para que o arranque do daemon as reavalie apropriadamente.
+- **Assentamento de execuções bloqueadas por sign-in como skip (`#47938`):**
+  - Converte automações retidas em telas de autenticação interativa no estado `skip` sem travar a fila.
+- **Retenção de ocorrências agendadas perdidas entre reinicializações (`#47897`, refs `#47888`):**
+  - Preserva o registro e despacho ordenado de ocorrências agendadas não executadas durante o período em que o app esteve desligado.
 
 - **Configuração para suprimir respostas "Fixing..." em comentários de revisão (`#47726`):**
   - Adiciona configuração permitindo desativar respostas automáticas de confirmação em comentários de review de PRs, mantendo o histórico limpo e focando apenas nas correções efetivas de código.
@@ -209,6 +245,12 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
 26. Preservar o status de sucesso de automações finalizadas após reinicializações do app (`#47795`).
 27. Registrar integralmente todas as ocorrências de automação cron perdidas com o app fechado (`#47794`).
 28. Assegurar precisão de horários de verão (DST) e validação de `--timezone` no agendamento cron (`#47793`).
+29. Ativar regras `from=me` de pull requests para qualquer PR aberto sob a conta do dono (`#47879`, commit `4bd55254c3a`).
+30. Truncar rótulos compridos de resultado de automação para evitar invasão na área de workspaces (`#47865`, commit `7a7b8b981dc`).
+31. Reter execuções abertas de automação durante o encerramento do app para reavaliação no boot (`#47855`, commit `1e56e0fc6a3`).
+32. Concluir automações retidas em telas de autenticação como `skip` para não travar a fila (`#47938`).
+33. Reconciliar e executar ocorrências agendadas perdidas entre reinicializações do aplicativo (`#47897`, refs `#47888`).
+
 
 
 

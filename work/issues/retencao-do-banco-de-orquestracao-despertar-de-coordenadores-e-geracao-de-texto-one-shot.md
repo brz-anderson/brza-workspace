@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47828, #47819, #47783 (sobrevivência a reinício via terminal host), #47536 (cap de terminais do host) e #47575 refinam a orquestração.
+description: PRs #47973 (handoff e fan-out), #47947 (diagnóstico de silêncio), #47887 (persistência rápida), #47914 (custódia de chat) e #47953 (--cursor).
 scope:
   - brza-studio
   - brza-workflow
@@ -14,7 +14,25 @@ tags:
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47828`](https://github.com/stablyai/orca/pull/47828) (resolve Issue [`#46100`](https://github.com/stablyai/orca/issues/46100)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47973`](https://github.com/stablyai/orca/pull/47973),
+[`stablyai/orca#47914`](https://github.com/stablyai/orca/pull/47914),
+[`stablyai/orca#47951`](https://github.com/stablyai/orca/pull/47951),
+[`stablyai/orca#47953`](https://github.com/stablyai/orca/pull/47953),
+[`stablyai/orca#47892`](https://github.com/stablyai/orca/pull/47892) (refs Issue [`#47891`](https://github.com/stablyai/orca/issues/47891)),
+[`stablyai/orca#47947`](https://github.com/stablyai/orca/pull/47947) (commit `06f0ca1a8bd`),
+[`stablyai/orca#47887`](https://github.com/stablyai/orca/pull/47887) (commit `b5b84ae3d27`),
+[`stablyai/orca#47779`](https://github.com/stablyai/orca/pull/47779) (commit `3a53a931aff`),
+[`stablyai/orca#47898`](https://github.com/stablyai/orca/pull/47898) (commit `d8747bb5bb4`),
+[`stablyai/orca#47877`](https://github.com/stablyai/orca/pull/47877) (commit `ab59c53f6ad`),
+[`stablyai/orca#47893`](https://github.com/stablyai/orca/pull/47893) (commit `15b0e99c035`),
+[`stablyai/orca#47554`](https://github.com/stablyai/orca/pull/47554) (commit `2467e89de8c`),
+[`stablyai/orca#47548`](https://github.com/stablyai/orca/pull/47548) (commit `b7c38c4f684`),
+[`stablyai/orca#47818`](https://github.com/stablyai/orca/pull/47818) (commit `9a9290d4697`),
+além das issues [`stablyai/orca#47868`](https://github.com/stablyai/orca/issues/47868),
+[`stablyai/orca#47852`](https://github.com/stablyai/orca/issues/47852),
+[`stablyai/orca#45906`](https://github.com/stablyai/orca/issues/45906) e
+[`stablyai/orca#41179`](https://github.com/stablyai/orca/issues/41179),
+[`stablyai/orca#47828`](https://github.com/stablyai/orca/pull/47828) (resolve Issue [`#46100`](https://github.com/stablyai/orca/issues/46100)),
 [`stablyai/orca#47819`](https://github.com/stablyai/orca/pull/47819) (resolve Issue [`#46100`](https://github.com/stablyai/orca/issues/46100)),
 [`stablyai/orca#47783`](https://github.com/stablyai/orca/pull/47783) (resolve Issue [`#46100`](https://github.com/stablyai/orca/issues/46100)),
 [`stablyai/orca#47536`](https://github.com/stablyai/orca/pull/47536),
@@ -315,6 +333,24 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Se um worker levasse alguns segundos para responder ao handshake de inicialização, a árvore de orquestração o rotulava como `unobserved` em vez de identificá-lo em fase de arranque (`starting`), induzindo o coordenador a abortos prematuros.
 89. **Turno de sessão travado aberto com 0% de CPU após resposta 503 do provedor (`#47817`):**
     - Quando a API de um modelo retornava erro HTTP 503 temporário, a sessão ficava travada em aberto sem consumo de CPU, ignorando o botão Stop da interface gráfica e chamadas de cancelamento via CLI.
+90. **Comunicação opaca quando workers entram em silêncio prolongado (`#47947`, commit `06f0ca1a8bd`):**
+    - Quando um worker em execução para de emitir mensagens ou heartbeats, o orquestrador passa a reportar explicitamente o que é comprovado no sistema (se o processo continua vivo, PID ativo ou socket de controle em espera) em vez de permanecer em silêncio indeterminado.
+91. **Persistência sub-segundo de turnos de painel para continuidade de correio pós-crash (`#47887`, commit `b5b84ae3d27`):**
+    - Grava alterações de estado de turnos de cada painel em até 1 segundo, assegurando que um crash ou relaunch não interrompa nem perca mensagens de correio ociosas destinadas ao agente.
+92. **Injeção de caracteres de correio no shell após encerramento do OpenCode (`#47877`, commit `ab59c53f6ad`):**
+    - Quando o OpenCode saía inesperadamente do ar, o handler de orquestração continuava digitando dados de mensagens na entrada PTY do shell que assumia o terminal; o commit `#47877` interrompe a digitação imediatamente ao detectar a saída do processo do agente.
+93. **Execução de queries SQL da work store em thread de banco dedicada de bots (`#47554`, commit `2467e89de8c`):**
+    - Transfere as operações SQL da loja de trabalho de bots para a thread worker dedicada de bots, eliminando contenções de I/O na main thread.
+94. **Registro de workers iniciados a partir de chats in-app sob a conversa de origem (`#47548`, commit `b7c38c4f684`):**
+    - Garante que trabalhadores iniciados a partir de qualquer chat interno do aplicativo fiquem duravelmente registrados e associados àquele chat de origem no histórico.
+95. **Classificação incorreta de agente com worker próprio ativo como Waiting (`#47818`, commit `9a9290d4697`):**
+    - Quando um agente disparava e executava seu próprio worker, seu status na interface caía indevidamente para `Waiting`; agora permanece claramente como `In progress`.
+96. **Preservação de contexto de handoff e contenção de fan-out de workers (`#47973`):**
+    - Retém o contexto integral durante passagens de tarefa (*handoff*) entre agentes e impõe limites ao número de sub-workers disparados em cascata (*worker fan-out*).
+97. **Transferência de custódia ao reabrir chat de worker retido (`#47914`):**
+    - Ao reabrir uma conversa de worker retido, a custódia do canal de mensagens e eventos é transferida atomicamente para o novo leitor ativo.
+98. **Paginação histórica reversa com `--cursor` em `orca agent read` (`#47953`):**
+    - Introduz o parâmetro `--cursor` no comando CLI para permitir navegação histórica paginada de trás para frente em transcripts volumosos.
 
 ## O que o upstream implementa
 
@@ -609,6 +645,16 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Implementar sobrevivência de chats ativos a reinicializações e atualizações através do terminal host (`providerRelayKeep`) para Codex, Claude e ACP (`#47828`, `#47819`, `#47783`, resolve `#46100`).
 - Emitir erro tipado `TerminalHostCapError` e avisos preventivos a partir de 80%/90% de ocupação do cap de terminais do host em `worker-start` (`#47536`, commit `21aa900d9c0`).
 - Classificar workers com arranque lento como `starting` em vez de `unobserved` na árvore de tarefas (`#47575`).
+- Reportar o estado conhecido de processos e conexões quando workers entrarem em silêncio prolongado (`#47947`, commit `06f0ca1a8bd`).
+- Salvar atualizações de turno de painéis em até 1 segundo para manter o correio ocioso fluindo através de crashes e reinícios (`#47887`, commit `b5b84ae3d27`).
+- Suprimir a injeção contínua de caracteres de mensagens no shell após a finalização do OpenCode (`#47877`, commit `ab59c53f6ad`).
+- Executar operações SQL da loja de trabalho no worker SQLite dedicado de bots (`#47554`, commit `2467e89de8c`).
+- Associar workers iniciados a partir de chats embutidos diretamente à conversa de origem no histórico (`#47548`, commit `b7c38c4f684`).
+- Refletir o status `In progress` para agentes que possuem workers próprios ativos (`#47818`, commit `9a9290d4697`).
+- Preservar o contexto de handoff e limitar o fan-out de workers em cascata (`#47973`).
+- Transferir atomicamente a custódia de mensagens ao reabrir chats de workers retidos (`#47914`).
+- Suportar paginação histórica reversa com `--cursor` em `orca agent read` (`#47953`).
+- Implementar filtro por `--worktree` e documentação de campos JSON em `orchestration inbox` (`#47868`).
 
 
 

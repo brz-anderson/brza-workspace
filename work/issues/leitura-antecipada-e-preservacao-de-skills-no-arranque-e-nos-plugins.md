@@ -1,12 +1,16 @@
 ---
 status: open
-description: Ocultação de skills para Claude (#47582), cache no Share (#47154), spec para worker start (#47785) e skills gravadas (#47813).
+description: Leitura antecipada, empacotamento de plugins, cache de skills no Share e integração com Azure Boards.
 scope:
   - brza-studio
 priority: high
 opened: 2026-11-03
 tags:
   - tooling
+references:
+  - https://github.com/stablyai/orca/pull/47979
+  - https://github.com/stablyai/orca/issues/47797
+  - https://github.com/stablyai/orca/commit/0b7fe2f6f10
 ---
 
 # Leitura antecipada e preservação de skills no arranque e nos plugins
@@ -15,7 +19,10 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47582`](https://github.com/stablyai/orca/pull/47582),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47979`](https://github.com/stablyai/orca/pull/47979),
+[`stablyai/orca#47895`](https://github.com/stablyai/orca/pull/47895) (commit `0b7fe2f6f10`),
+além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/47797),
+[`stablyai/orca#47582`](https://github.com/stablyai/orca/pull/47582),
 [`stablyai/orca#47158`](https://github.com/stablyai/orca/pull/47158),
 [`stablyai/orca#47154`](https://github.com/stablyai/orca/pull/47154),
 [`stablyai/orca#47019`](https://github.com/stablyai/orca/pull/47019) (resolve Issue [`#47018`](https://github.com/stablyai/orca/issues/47018)),
@@ -116,7 +123,22 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47582`](https://github.com
 27. **Gravação de fluxos no navegador embutido para síntese assistida de skills (`#47813`):**
     Automações repetitivas na web (download de faturas, preenchimento de formulários) demandavam tentativa e erro descritiva pelos bots; a issue propõe gravar a sessão de navegação no browser do Orca e sintetizar automaticamente uma skill reprodutível.
 
+28. **Invalidação e inconsistência de prévias de skills em cache no diálogo Share (`#47895`, commit `0b7fe2f6f10`):**
+    O cache de listagem e prévia de skills no diálogo de compartilhamento de bots não verificava se os diretórios de origem ou o build do app haviam sido alterados, exibindo metadados antigos de skills modificadas.
+29. **Falha na identificação da raiz real de plugins em pacotes com `package.json` aninhados (`#47979`):**
+    O localizador de pacotes interrompia a subida de diretórios no primeiro `package.json` encontrado, selecionando pastas filhas em vez da raiz verdadeira de monorrepositórios ou plugins com submódulos.
+30. **Falta de integração nativa para manipulação de work items do Azure Boards (`#47797`):**
+    Agentes e automações não dispunham de comandos na CLI ou skills padronizadas para leitura e atualização de itens do Azure Boards (semelhante ao suporte já existente para Jira).
+
 ## O que os PRs fazem
+
+- **Vinculação estrita do cache de skills do diálogo Share às pastas e build que os produziram (`#47895`, commit `0b7fe2f6f10`):**
+  - Mantém o cache de skills atrelado deterministicamente às pastas e à versão de build correspondente.
+- **Subida até a raiz real do pacote ultrapassando marcadores `package.json` aninhados (`#47979`):**
+  - Continua a busca ascendente além de marcadores aninhados até encontrar a raiz autêntica do pacote de plugin.
+- **Suporte a Azure Boards em CLI e skills (`#47797`):**
+  - Especificação para leitura e alteração de work items do Azure Boards por agentes.
+
 
 - **Ocultação de pastas de skills compartilhadas para o Claude (`#47582`):**
   - Introduz a flag de perfil `skipsSharedSkillFolders` para o Claude (OpenClaude/Claude Code), impedindo que o menu `/` ofereça comandos que residem apenas em `~/.agents/skills`.
@@ -197,5 +219,9 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47582`](https://github.com
 22. Reutilizar a listagem em cache de skills no diálogo de compartilhamento de bots para eliminar re-varreduras com `lstat` a cada seleção (`#47154`).
 23. Permitir que workers executem skills com `disable-model-invocation: true` quando invocadas explicitamente via especificação (`worker-start --spec-file`) (`#47785`).
 24. Avaliar suporte a gravação de tarefas no navegador embutido para síntese assistida de skills automatizadas (`#47813`).
+25. Vincular o cache de skills no diálogo Share às pastas e compilação de origem para evitar prévias defasadas (`#47895`, commit `0b7fe2f6f10`).
+26. Corrigir o resolvedor de pacotes de plugins para alcançar a raiz real ultrapassando `package.json` aninhados (`#47979`).
+27. Implementar comandos de CLI e skills para consulta e edição de work items do Azure Boards (`#47797`).
+
 
 

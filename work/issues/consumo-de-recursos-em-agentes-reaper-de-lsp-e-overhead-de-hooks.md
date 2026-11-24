@@ -1,6 +1,6 @@
 ---
 status: open
-description: Otimizações de leitura em lote para bots (#47769, #47765), journal indexado (#47529) e saneamento de crashpad (#47705) reduzem overhead.
+description: PRs #47943 (process lookup fora do main), #47927 (alívio de CPU), #47917 (RPC dispatcher único), #47836 e #47853 (hooks Droid).
 scope:
   - brza-studio
   - tools-kit
@@ -14,7 +14,19 @@ tags:
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47769`](https://github.com/stablyai/orca/pull/47769) (commit `6e0805a2e1f`),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47943`](https://github.com/stablyai/orca/pull/47943),
+[`stablyai/orca#47927`](https://github.com/stablyai/orca/pull/47927),
+[`stablyai/orca#47917`](https://github.com/stablyai/orca/pull/47917),
+[`stablyai/orca#47911`](https://github.com/stablyai/orca/pull/47911),
+[`stablyai/orca#47900`](https://github.com/stablyai/orca/pull/47900),
+[`stablyai/orca#47821`](https://github.com/stablyai/orca/pull/47821),
+[`stablyai/orca#47836`](https://github.com/stablyai/orca/pull/47836) (commit `edbdf6506dc`, resolve [`#47826`](https://github.com/stablyai/orca/issues/47826)),
+[`stablyai/orca#47853`](https://github.com/stablyai/orca/pull/47853) (commit `4f5e1bb0cd0`, resolve [`#47825`](https://github.com/stablyai/orca/issues/47825)),
+[`stablyai/orca#47580`](https://github.com/stablyai/orca/pull/47580) (commit `ab304f7ce7f`),
+[`stablyai/orca#47578`](https://github.com/stablyai/orca/pull/47578) (commit `e1f3a99dd60`),
+[`stablyai/orca#47835`](https://github.com/stablyai/orca/pull/47835) (commit `e375ec2921b`),
+[`stablyai/orca#44265`](https://github.com/stablyai/orca/pull/44265) (commit `50284224e40`),
+[`stablyai/orca#47769`](https://github.com/stablyai/orca/pull/47769) (commit `6e0805a2e1f`),
 [`stablyai/orca#47765`](https://github.com/stablyai/orca/pull/47765),
 [`stablyai/orca#47757`](https://github.com/stablyai/orca/pull/47757) (commit `64eb525c558`),
 [`stablyai/orca#47529`](https://github.com/stablyai/orca/pull/47529) (commit `64a57263cf4`),
@@ -98,8 +110,35 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
     O runtime verificava executáveis no disco para agentes que haviam sido desabilitados nas configurações, gerando I/O lento no Windows.
 23. **Subnotificação de memória de agentes de chat e servidores de linguagem (LSP) no Resource Manager (`#45844`):**
     Como agentes de chat (Claude, Codex e CLIs de provedores iniciados via chat) executam fora dos terminais gerenciados, o Resource Manager não computava seus processos: a métrica indicava poucos gigabytes para "Agents" enquanto chats e seus LSPs retinham dezenas de gigabytes de RAM. Além disso, a listagem de sessões de terminal emitia falsos avisos amarelos sempre que um terminal iniciava ou encerrava concorrentemente durante a leitura.
+24. **Carga contínua no processo principal do Electron na varredura de portas no Linux (`#47943`):**
+    A cada 30 segundos, a verificação de portas abertas varria `/proc` executando `readlink` assíncrono para cada descritor de arquivo aberto na máquina diretamente no processo principal do Electron, retendo entre 400ms e 1000ms de CPU por varredura em sistemas ocupados.
+25. **Inicialização precoce de workers de journal e processos de backend de usage (`#47580`, `#47578`, commits `ab304f7ce7f`, `e1f3a99dd60`):**
+    O daemon subia workers de banco de journal mesmo quando nenhum chat DB existia e inicializava o processo utilitário de métricas de usage imediatamente no boot em vez de sob demanda, consumindo memória residente desnecessariamente.
+26. **Lookups redundantes de workers em itens bloqueados por limites de cota (`#47835`, commit `e375ec2921b`, e `#47911`):**
+    O motor de automação e itens de bots realizava varreduras completas no banco e disco para itens que limites de cota não podiam mover, além de descartar leituras de workers vinculados já assentados entre exibições.
+27. **Perda silenciosa de watch em raízes locais após disparo do fusível de crash (`#44265`, commit `50284224e40`):**
+    Quando um watcher local de arquivos sofria crash recorrente e o disjuntor de proteção esfriava, o runtime não reativava a observação da raiz local, deixando alterações no sistema de arquivos indetectadas.
+28. **Contenção de CPU por concorrência de `check:changed` entre worktrees (`#47821`, commit `e0b56784f11`, e `#47900`):**
+    Em hosts ocupados com múltiplos worktrees, execuções concorrentes de validação de alterações disputavam CPU intensamente sem serialização ou reaproveitamento do grafo de importação.
+29. **Conflito de registro e hooks em workers Task do Droid (`#47836`, commit `edbdf6506dc`, e `#47853`, commit `4f5e1bb0cd0`):**
+    Hooks gerenciados instalados em caminhos incorretos do Droid e eventos disparados por subagentes Task sobrescreviam indevidamente a linha do agente e o estado do painel.
 
 ## O que o upstream propõe e implementa
+
+- **Delegação da varredura de portas no Linux para worker auxiliar e comando único `ls -ln` (`#47943`):**
+  - Transfere a resolução de sockets para processos para o worker de port-scan fora do processo principal do Electron;
+  - Executa um único comando `ls -ln /proc/[0-9]*/fd` com filtragem em streaming das linhas `fd -> socket:[N]`, reduzindo o custo de CPU de ~1000ms no main process para ~30-50ms no worker com fallback seguro para a varredura legada.
+- **Boot sob demanda de workers de journal e processos utilitários de usage (`#47580`, `#47578`, commits `ab304f7ce7f`, `e1f3a99dd60`):**
+  - Omite o boot de workers de journal SQLite quando nenhum banco de chat existe;
+  - Inicializa o processo utilitário de estatísticas e limites de usage (`usage backend`) de forma lazy, apenas quando a primeira consulta de telemetria é solicitada.
+- **Supressão de lookups de workers em itens bloqueados por cota e cache de workers resolvidos (`#47835`, commit `e375ec2921b`, e `#47911`):**
+  - Pula a resolução de workers para itens que excederam cotas de uso e preserva em cache as leituras de workers vinculados já assentados entre visualizações de itens.
+- **Reativação automática de watchers locais após resfriamento do fusível de crash (`#44265`, commit `50284224e40`):**
+  - Restaura a observação de raízes locais após o período de cooldown do disjuntor de segurança do watcher.
+- **Serialização de verificações de alterações e reuso de grafo de importação (`#47821`, commit `e0b56784f11`, e `#47900`):**
+  - Permite a serialização de verificações `check:changed` entre worktrees concorrentes e reutiliza o grafo de dependências do event loop em inspeções locais de modificações.
+- **Isolamento de hooks gerenciados do Droid e correção de registro de Task workers (`#47836`, commit `edbdf6506dc`, e `#47853`, commit `4f5e1bb0cd0`):**
+  - Instala hooks gerenciados exatamente onde o Droid espera encontrá-los e impede que eventos de Task workers afetem a linha de status do agente no painel.
 
 - **Contabilização e atribuição completa de memória de chat agents no Resource Manager (`#45844`):**
   - Cada processo de provedor de chat registra seu PID durante a execução e toda a sua árvore de processos (incluindo LSPs e ferramentas) é contabilizada sob a seção Agents;
@@ -210,4 +249,11 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Adotar a saída rápida de hooks sem contexto Orca ativo (`#42655`).
 - Prevenir a execução zumbi de hooks órfãos de python3 (`#42601`).
 - Contabilizar e atribuir processos e consumo de memória de agentes de chat e servidores de linguagem ao respectivo workspace no Resource Manager (`#45844`).
+- Mover a varredura de sockets/portas no Linux para o worker de scan com comando único `ls -ln /proc/*/fd` fora do Electron main (`#47943`).
+- Postergar o boot de workers de journal e do processo de backend de usage até que haja necessidade real (`#47580`, `#47578`).
+- Omitir lookups de workers vinculados para itens limitados por cota de uso e cachear workers assentados (`#47835`, `#47911`).
+- Reatar a observação de raízes locais após o resfriamento do fusível de crash do watcher (`#44265`).
+- Habilitar serialização de `check:changed` entre worktrees concorrentes em hosts ocupados (`#47821`, `#47900`).
+- Instalar hooks gerenciados no caminho lido pelo Droid e isolar eventos de Task workers da linha de agentes (`#47836`, `#47853`).
+
 

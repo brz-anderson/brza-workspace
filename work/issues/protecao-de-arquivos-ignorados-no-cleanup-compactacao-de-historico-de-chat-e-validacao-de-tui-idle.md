@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47716 (status done em idle compaction do Claude), #47409 (guarda de espaço em conversão de chat) e #45854 aprimoram a retenção e limpeza.
+description: Proteção de arquivos no cleanup, compactação de histórico de chat, limpeza de temporários e validação de ociosidade.
 scope:
   - brza-studio
   - workspace
@@ -10,11 +10,22 @@ opened: 2026-11-12
 tags:
   - tooling
   - infra
+references:
+  - https://github.com/stablyai/orca/pull/47981
+  - https://github.com/stablyai/orca/pull/47952
+  - https://github.com/stablyai/orca/pull/47906
+  - https://github.com/stablyai/orca/pull/47657
+  - https://github.com/stablyai/orca/commit/70a1f42a331
+  - https://github.com/stablyai/orca/commit/7c095f7e34d
 ---
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47716`](https://github.com/stablyai/orca/pull/47716) (resolve Issue [`#47703`](https://github.com/stablyai/orca/issues/47703)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47981`](https://github.com/stablyai/orca/pull/47981),
+[`stablyai/orca#47952`](https://github.com/stablyai/orca/pull/47952) (commit `70a1f42a331`),
+[`stablyai/orca#47906`](https://github.com/stablyai/orca/pull/47906),
+[`stablyai/orca#47657`](https://github.com/stablyai/orca/pull/47657) (commit `7c095f7e34d`),
+[`stablyai/orca#47716`](https://github.com/stablyai/orca/pull/47716) (resolve Issue [`#47703`](https://github.com/stablyai/orca/issues/47703)),
 [`stablyai/orca#47409`](https://github.com/stablyai/orca/pull/47409),
 [`stablyai/orca#45854`](https://github.com/stablyai/orca/pull/45854),
 [`stablyai/orca#47657`](https://github.com/stablyai/orca/pull/47657),
@@ -252,8 +263,26 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - A prova de integridade (*proof*) descartava e recusava silenciosamente qualquer journal que contivesse colunas ou tabelas criadas por builds intermediárias (`queued_message_pauses` e `queued_messages.source_json`), impedindo sua conversão e bloqueando o expurgo seguro do arquivo antigo.
 69. **Falso status "working" em panes do Claude após conclusão de turno durante compactação ociosa (`#47716`, resolve `#47703`):**
     - A compactação automática ociosa (`idleCompaction`) do Claude Code relê arquivos de contexto após o evento `Stop` do turno por meio de hooks `PreToolUse`/`PostToolUse`. Esses hooks eram normalizados incondicionalmente como atividade de trabalho, abrindo um turno novo sem fim que mantinha o spinner ativo na barra lateral e limpava `lastAssistantMessage`.
+70. **Acúmulo de pastas temporárias residuais de git de plugins (`#47952`, commit `70a1f42a331`):**
+    - Operações de download, empacotamento ou validação de plugins deixavam pastas temporárias de git (`.git` residuais) órfãs no sistema de arquivos, desperdiçando armazenamento ao longo do tempo.
+71. **Interrupção indesejada de fluxos de trabalho por atualizações automáticas intempestivas (`#47981`):**
+    - O instalador automático de atualizações disparava reinicializações do app no meio de sessões ativas com agentes, sem oferecer opção para postergar a atualização até períodos de ociosidade do desenvolvedor.
+72. **Proliferação de chats abertos e ociosos de execuções finalizadas de automação (`#47906`):**
+    - Execuções concluídas de automações mantinham conversas abertas na barra lateral indefinidamente, poluindo a visualização de chats ativos e consumindo recursos residuais.
+73. **Execução inconsistente da auditoria de históricos legados de chat no startup (`#47657`, commit `7c095f7e34d`):**
+    - A conferência do estado de conversão de journals antigos de chat não era garantida em todos os arranques, deixando instalações sem feedback claro sobre conversões pendentes.
 
 ## O que o upstream propõe e implementa
+
+- **Limpeza de pastas temporárias de git deixadas por plugins (`#47952`, commit `70a1f42a331`):**
+  - Implementa rotina de expurgo seguro para remover pastas temporárias residuais de git criadas por operações de plugins.
+- **Auditoria de históricos antigos em todas as inicializações sem exclusões (`#47657`, commit `7c095f7e34d`):**
+  - Garante que a conferência de histórico legado execute no boot e reporte detalhadamente o estado das conversões sem deletar dados.
+- **Espera por ociosidade (away) para aplicação de atualizações automáticas (`#47981`):**
+  - Permite configurar o atualizador automático para aplicar updates apenas quando o usuário estiver ausente.
+- **Fechamento automático de chats de automações concluídas após tempo ocioso (`#47906`):**
+  - Encerra silenciosamente chats de execuções terminadas de automações após timeout de inatividade configurável.
+
 
 - **Retenção de status `done` durante compactação ociosa do Claude (`#47716`, resolve `#47703`):**
   - No normalizador de eventos do Claude, quando `PreCompact` chega com `trigger: "auto"` e o lead já havia reportado `done`, o painel associa o `prompt_id` do turno finalizado e restabelece o turno concluído em cache para os hooks subsequentes, impedindo a reabertura de turnos espúrios e mantendo `lastAssistantMessage`.
@@ -508,5 +537,10 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Reiniciar o checkpoint worker de tidy-up do chat store com backoff exponencial sem reter gravações ativas (`#45918`).
 - Estabilizar a ordem de exibição das linhas da lista de cleanup durante a abertura do diálogo de exclusão (`#42532`).
 - Incluir `ENOTEMPTY` nos códigos de retry para remoção de árvores somente leitura na rotina de reclaim space (`#47629`).
+- Expurga pastas temporárias residuais de git deixadas por operações de plugins (`#47952`, commit `70a1f42a331`).
+- Executar a verificação de integridade do histórico antigo de chat em todas as inicializações (`#47657`, commit `7c095f7e34d`).
+- Permitir que atualizações automáticas aguardem até que o usuário esteja ausente (away) (`#47981`).
+- Fechar automaticamente chats de execuções finalizadas de automação após tempo ocioso configurado (`#47906`).
+
 
 

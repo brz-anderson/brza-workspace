@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #45294 (preservação de histórico na migração Codex), #47737 (reutilização de message_id), #47778 e #47764 aprimoram contas e prompts.
+description: Gestão de contas Claude, chaveamento sob limites de cota, modelos de backup e isolamento de históricos.
 scope:
   - brza-studio
   - brza-workflow
@@ -9,6 +9,21 @@ opened: 2026-11-03
 tags:
   - chat
   - tooling
+references:
+  - https://github.com/stablyai/orca/pull/47983
+  - https://github.com/stablyai/orca/pull/47948
+  - https://github.com/stablyai/orca/pull/47928
+  - https://github.com/stablyai/orca/pull/47910
+  - https://github.com/stablyai/orca/pull/47866
+  - https://github.com/stablyai/orca/pull/47933
+  - https://github.com/stablyai/orca/issues/47954
+  - https://github.com/stablyai/orca/issues/47020
+  - https://github.com/stablyai/orca/issues/45090
+  - https://github.com/stablyai/orca/issues/44117
+  - https://github.com/stablyai/orca/commit/56b2f9e44a4
+  - https://github.com/stablyai/orca/commit/ee135b48486
+  - https://github.com/stablyai/orca/commit/d1916137334
+  - https://github.com/stablyai/orca/commit/b2065bb81ed
 ---
 
 # Gestão de contas Claude, chaveamento de cota e preservação de prompt cache
@@ -17,7 +32,20 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#45294`](https://github.com/stablyai/orca/pull/45294),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47983`](https://github.com/stablyai/orca/pull/47983),
+[`stablyai/orca#47948`](https://github.com/stablyai/orca/pull/47948),
+[`stablyai/orca#47928`](https://github.com/stablyai/orca/pull/47928),
+[`stablyai/orca#47910`](https://github.com/stablyai/orca/pull/47910),
+[`stablyai/orca#47866`](https://github.com/stablyai/orca/pull/47866),
+[`stablyai/orca#47933`](https://github.com/stablyai/orca/pull/47933) (reverte `#47778`),
+[`stablyai/orca#47858`](https://github.com/stablyai/orca/pull/47858) (commit `56b2f9e44a4`),
+[`stablyai/orca#47834`](https://github.com/stablyai/orca/pull/47834) (commit `ee135b48486`),
+[`stablyai/orca#47804`](https://github.com/stablyai/orca/pull/47804) (commit `d1916137334`),
+além das issues [`stablyai/orca#47954`](https://github.com/stablyai/orca/issues/47954),
+[`stablyai/orca#47020`](https://github.com/stablyai/orca/issues/47020),
+[`stablyai/orca#45090`](https://github.com/stablyai/orca/issues/45090),
+[`stablyai/orca#44117`](https://github.com/stablyai/orca/issues/44117),
+[`stablyai/orca#45294`](https://github.com/stablyai/orca/pull/45294),
 [`stablyai/orca#47737`](https://github.com/stablyai/orca/pull/47737) (refs Issue [`#47718`](https://github.com/stablyai/orca/issues/47718)),
 [`stablyai/orca#47778`](https://github.com/stablyai/orca/pull/47778) (refs Issue [`#42644`](https://github.com/stablyai/orca/issues/42644)),
 [`stablyai/orca#47764`](https://github.com/stablyai/orca/pull/47764) (resolve Issue [`#47763`](https://github.com/stablyai/orca/issues/47763)),
@@ -144,7 +172,39 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 29. **Truncamento de argumentos JSON e falha de listagem de modelos Claude no Windows via Bun (`#47764`, resolve `#47763`):**
     Em shims `.cmd` baseados no runtime Bun no Windows, o escape `""` para argumentos JSON em linha de comando era quebrado pelo `CommandLineToArgvW`. Flags como `--settings {"disableAllHooks":true}` engoliam argumentos subsequentes e causavam falha silenciosa na descoberta de modelos do Claude.
 
+30. **Re-leitura redundante de todos os transcripts a cada mudança de worktree (`#47858`, commit `56b2f9e44a4`):**
+    O serviço de cálculo de uso re-processava todos os arquivos de transcrição do histórico do zero sempre que o worktree em foco alternava, consumindo I/O desnecessário de disco.
+31. **Falta de botão direto de reautenticação no cartão de conta Claude que requer novo login (`#47834`, commit `ee135b48486`):**
+    Quando um token de conta Claude expirava ou necessitava de renovação de credenciais, o cartão de status exibia aviso de erro mas carecia de um botão "Sign in" contextual, forçando navegação por menus externos.
+32. **Rótulos obsoletos de planos Claude Max na interface (`#47804`, commit `d1916137334`):**
+    A interface de gerenciamento de cotas exibia os planos renomeados da Anthropic como `Max 5x` e `Max 20x`, em vez das denominações atuais `Max` e `Ultra`.
+33. **Bloqueio da thread principal ao ler histórico inicial de conversas do Claude (`#47983`):**
+    A leitura do primeiro histórico de sessões do Claude na abertura do chat era executada na thread de UI/renderização, gerando engasgos momentâneos na interface gráfica.
+34. **Concorrência entre edições manuais de itens e esperas por limite de cota de bots (`#47948`):**
+    Quando um bot aguardava a liberação de cota de uso, modificações concorrentes no item podiam corromper ou anular o timer de espera, desestabilizando o fluxo de execução.
+35. **Ausência de modelos de contingência para failover sob exaustão de cota de bots (`#47910`):**
+    Ao esgotar a cota de uso de um modelo primário configurado para um bot, não havia definição de modelos de backup para failover automático, interrompendo tarefas não supervisionadas.
+36. **Falta de orquestração unificada de pools de contas e distribuição de cotas entre agentes (`#47954`, refs `#47020`, `#45090`, `#44117`):**
+    Falta de suporte para cadastrar pools de contas de provedores (Anthropic, OpenAI, etc.), definir limites configuráveis por conta e balancear a distribuição de agentes, bots e workers entre contas corporativas e individuais.
+
 ## O que o upstream propõe e implementa
+
+- **Cessação de releituras de transcripts na mudança de worktree (`#47858`, commit `56b2f9e44a4`):**
+  - Mantém o cache de transcripts estável entre trocas de worktrees, atualizando apenas deltas reais.
+- **Botão direto de Sign-in no cartão de conta Claude pendente (`#47834`, commit `ee135b48486`):**
+  - Adiciona o botão de login direto no próprio card da conta com sessão expirada.
+- **Atualização das nomenclaturas de planos Claude para Max e Ultra (`#47804`, commit `d1916137334`):**
+  - Reflete os nomes oficiais Max e Ultra para os planos de alta capacidade.
+- **Leitura do histórico inicial do Claude em background worker (`#47983`):**
+  - Transfere a leitura de histórico na primeira inicialização para um worker thread assíncrono fora da thread de renderização.
+- **Proteção de esperas de cota contra edições concorrentes de itens (`#47948`):**
+  - Sincroniza o ciclo de vida do timer de limite de cota com mutações concorrentes nos itens de bots.
+- **Suporte a modelos de backup para failover de uso em bots (`#47910`):**
+  - Permite configurar modelos secundários para assumir a execução do bot automaticamente quando a cota do modelo principal é atingida.
+- **Orquestração de pools de contas multi-provedor (`#47954`):**
+  - Especificação para agrupamento de contas em pools com roteamento por repositório, tipo de agente e cotas configuráveis.
+- **Reversão da ocultação de uso na barra de status com chat em foco (`#47933`, commit `b2065bb81ed`):**
+  - Reverte a alteração `#47778` para restabelecer a visibilidade das métricas de consumo de tokens enquanto uma conversa detém o foco.
 
 - **Preservação durável de históricos de prompt `history.jsonl` na migração do Codex (`#45294`, commit `231551f9f65`):**
   - Garante que a migração de upgrade copie o histórico de cada conta (`history.jsonl`) para a home do runtime em modo de criação exclusiva antes de gravar marcadores ou realizar cópias de sessão, e preserva o arquivo na remoção de contas;
@@ -233,6 +293,15 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 - Ocultar métricas de uso da barra de status enquanto um chat detiver o foco ativo (`#47778`, refs `#42644`).
 - Utilizar citação estilo libuv (`\"`) para parâmetros JSON em shims `.cmd` baseados em Bun no Windows (`#47764`, resolve `#47763`).
 - Tratar permissões do Claude pré-aprovadas por hooks como `allowed` em vez de `cancelled` (`#47689`).
+- Cessar releituras completas de transcripts durante a alternância de worktree (`#47858`).
+- Incluir botão direto de "Sign in" no cartão de conta Claude quando nova autenticação for necessária (`#47834`).
+- Atualizar a exibição dos planos da Anthropic para Max e Ultra na tela de quotas (`#47804`).
+- Delegar a leitura de histórico inicial do Claude para um worker assíncrono em background (`#47983`).
+- Proteger timers de espera por cota contra mutações concorrentes nos itens de bots (`#47948`).
+- Implementar configuração de modelos de backup para failover automático sob exaustão de cota de bots (`#47910`).
+- Avaliar a arquitetura de multi-account orchestration com pools de contas e limites distribuídos (`#47954`, `#47020`, `#45090`, `#44117`).
+- Restabelecer a visibilidade dos contadores de uso na barra de status mesmo com chat em foco (`#47933`).
+
 
 
 

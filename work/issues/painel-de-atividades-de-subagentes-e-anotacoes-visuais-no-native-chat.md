@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47784 (foco em split ao clicar Stop/Send), #47774 (worker tray status), #47724 (lease em wake de subagentes) e #47667 (@-mentions) refinam o chat nativo.
+description: PRs #47980 (worker pill sobre composer), #47878 (leitura do journal), #47929 (chats na sidebar pré-envio) e #47949 (Add to chat chips).
 scope:
   - brza-studio
   - brza-workflow
@@ -13,7 +13,29 @@ tags:
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47784`](https://github.com/stablyai/orca/pull/47784) (resolve Issue [`#47780`](https://github.com/stablyai/orca/issues/47780)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47980`](https://github.com/stablyai/orca/pull/47980),
+[`stablyai/orca#47949`](https://github.com/stablyai/orca/pull/47949) (refs Issue [`#43461`](https://github.com/stablyai/orca/issues/43461)),
+[`stablyai/orca#47975`](https://github.com/stablyai/orca/pull/47975),
+[`stablyai/orca#47875`](https://github.com/stablyai/orca/pull/47875),
+[`stablyai/orca#47872`](https://github.com/stablyai/orca/pull/47872),
+[`stablyai/orca#47871`](https://github.com/stablyai/orca/pull/47871),
+[`stablyai/orca#47878`](https://github.com/stablyai/orca/pull/47878) (commit `0edcb65de36`),
+[`stablyai/orca#47929`](https://github.com/stablyai/orca/pull/47929) (commit `bd67f13662e`),
+[`stablyai/orca#47959`](https://github.com/stablyai/orca/pull/47959) (commit `925bcc7ecb9`),
+[`stablyai/orca#47859`](https://github.com/stablyai/orca/pull/47859) (commit `4b6677d11b4`),
+[`stablyai/orca#47941`](https://github.com/stablyai/orca/pull/47941) (commit `9ccab10c6dd`),
+[`stablyai/orca#47934`](https://github.com/stablyai/orca/pull/47934) (commit `a60bc9384c6`),
+[`stablyai/orca#47939`](https://github.com/stablyai/orca/pull/47939) (commit `462a4eb8b1d`),
+[`stablyai/orca#47904`](https://github.com/stablyai/orca/pull/47904) (commit `f48a4ef58f2`),
+[`stablyai/orca#47869`](https://github.com/stablyai/orca/pull/47869) (commit `488a697ca7a`),
+[`stablyai/orca#47815`](https://github.com/stablyai/orca/pull/47815) (commit `d4562c4474e`),
+[`stablyai/orca#47978`](https://github.com/stablyai/orca/pull/47978) (commit `4139d3093ef`),
+[`stablyai/orca#47961`](https://github.com/stablyai/orca/pull/47961) (commit `422ec833429`),
+[`stablyai/orca#47963`](https://github.com/stablyai/orca/pull/47963) (commit `d16db92535c`),
+além das issues [`stablyai/orca#47931`](https://github.com/stablyai/orca/issues/47931),
+[`stablyai/orca#47854`](https://github.com/stablyai/orca/issues/47854) e
+[`stablyai/orca#44486`](https://github.com/stablyai/orca/issues/44486),
+[`stablyai/orca#47784`](https://github.com/stablyai/orca/pull/47784) (resolve Issue [`#47780`](https://github.com/stablyai/orca/issues/47780)),
 [`stablyai/orca#47774`](https://github.com/stablyai/orca/pull/47774),
 [`stablyai/orca#47724`](https://github.com/stablyai/orca/pull/47724) (resolve Issue [`#47715`](https://github.com/stablyai/orca/issues/47715)),
 [`stablyai/orca#47667`](https://github.com/stablyai/orca/pull/47667),
@@ -322,6 +344,24 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     - O visualizador de imagens do chat limitava a navegação de avançar/voltar exclusivamente aos anexos de uma única mensagem, e a decodificação síncrona monobloco de imagens base64 via `atob` prendia a thread do renderer em long tasks.
 88. **Atrasos na abertura do seletor `/resume` e buscas de texto completo submetidas (`#47807`):**
     - Invocações do comando `/resume` retardavam a renderização inicial do picker e as buscas FTS devido a bloqueios de indexação no banco de histórico.
+89. **Ocupação rígida da faixa de workers sobre o composer (`#47980`):**
+    - A faixa de workers ativos ocupava altura fixa comprimindo o campo de digitação; o PR `#47980` faz o card de worker flutuar como uma pequena pílula (*floating pill*) acima da caixa de mensagem que se expande em card detalhado sob clique.
+90. **Citações "Add to chat" renderizadas como chips interativos com salto à fonte (`#47949`, refs `#43461`):**
+    - Textos e códigos anexados via "Add to chat" deixam de sujar o composer como blocos Markdown brutos e passam a ser exibidos como chips com arquivo e linha, saltando diretamente para o arquivo ao clicar.
+91. **Invisibilidade de chats recém-abertos de Claude e Codex na sidebar antes do primeiro envio (`#47929`, commit `bd67f13662e`):**
+    - Chats criados no workspace não apareciam na lista da barra lateral até que a primeira mensagem fosse transmitida; agora são registrados e exibidos imediatamente.
+92. **Sobrecarga de leitura no journal para turnos mais novos (`#47878`, commit `0edcb65de36`):**
+    - A leitura da janela de turnos mais recentes no journal SQLite lia todas as mensagens históricas da conversa; agora lê estritamente os envios que a janela comporta.
+93. **Barra de progresso redundante no card de perguntas (`#47959`, commit `925bcc7ecb9`):**
+    - O card de perguntas do chat descartou a barra de passos (step bar), adotando contadores compactos e setas de navegação direta.
+94. **Perda indevida de estado Needs You ao iniciar workers com perguntas abertas (`#47941`, commit `9ccab10c6dd`):**
+    - Iniciar um worker enquanto uma pergunta estava aberta no item limpava o estado de atenção; agora o item permanece rotulado como `Needs you`.
+95. **Fricção no cancelamento de itens por diálogo de justificativa (`#47934`, commit `a60bc9384c6`):**
+    - O cancelamento de itens de agentes passa a ser imediato com um clique, eliminando o diálogo de solicitação de motivo.
+96. **Pre-carregamento de histórico e execução imediata em buscas submetidas de `/resume` (`#47815`, commit `d4562c4474e`):**
+    - Pre-carrega o histórico de sessões e dispara a busca imediatamente ao submeter `/resume`, sem engasgos de interface.
+97. **Re-projeção desnecessária de todas as linhas de chat durante streaming com ferramentas desacopladas (`#47931`):**
+    - Quando o frame de streaming contém ferramentas desacopladas, a lista inteira de mensagens do Native Chat é re-projetada por frame, causando perda de fluidez.
 
 ## O que o upstream implementa
 
@@ -642,6 +682,16 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Renderizar estilização Markdown em tempo real durante a digitação no composer (`#47719`).
 - Adotar a galeria unificada de imagens entre mensagens e a decodificação fatiada não-bloqueante no visualizador (`#47457`, refs `#41800`).
 - Exibir a faixa de worker temporário com região `aria-live` estável no topo de chat workers (`#43521`, commit `dbb1cf1bc41`).
+- Adotar o card flutuante de worker como pílula compacta sobre o composer com expansão sob clique (`#47980`).
+- Renderizar seleções de "Add to chat" como chips interativos de navegação direta à fonte (`#47949`, refs `#43461`).
+- Exibir novos chats Claude e Codex na barra lateral de workspaces imediatamente antes do primeiro envio (`#47929`, commit `bd67f13662e`).
+- Otimizar leituras de turnos recentes do journal para ler apenas os envios que a janela comporta (`#47878`, commit `0edcb65de36`).
+- Simplificar o card de perguntas removendo a barra de progresso em favor de contadores e setas (`#47959`, commit `925bcc7ecb9`).
+- Reter o estado `Needs you` em itens quando workers iniciam com perguntas abertas (`#47941`, commit `9ccab10c6dd`).
+- Cancelar itens de agente instantaneamente com um clique sem modal de justificativa (`#47934`, commit `a60bc9384c6`).
+- Pre-carregar histórico de sessões para buscas instantâneas na submissão de `/resume` (`#47815`, commit `d4562c4474e`).
+- Memoizar projeções de linhas de chat durante streaming com ferramentas desacopladas (`#47931`).
+- Habilitar envio de prompt ou comando slash para abas de chat nativo via CLI e API de plugins (`#47854`).
 
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: O PR #47639 invalida o cache de diff do Git quando o ctime do arquivo avança, prevenindo diffs obsoletos em regravações in-place.
+description: Progresso de revisão no diff, backend de métricas, seleção em notebooks e integridade de comandos de terminal.
 scope:
   - brza-studio
   - brza-workflow
@@ -11,11 +11,19 @@ tags:
   - tooling
   - infra
   - design
+references:
+  - https://github.com/stablyai/orca/issues/47870
+  - https://github.com/stablyai/orca/commit/596618a7e52
+  - https://github.com/stablyai/orca/commit/6efc8b5a57a
+  - https://github.com/stablyai/orca/pull/47639
 ---
 
 # Progresso de revisão no diff, backend de métricas e abertura de pastas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47639`](https://github.com/stablyai/orca/pull/47639) (resolve Issue [`#47631`](https://github.com/stablyai/orca/issues/47631)),
+Rastreado dos commits no upstream [`stablyai/orca#47531`](https://github.com/stablyai/orca/pull/47531) (commit `596618a7e52`),
+[`stablyai/orca#47932`](https://github.com/stablyai/orca/pull/47932) (commit `6efc8b5a57a`),
+além da issue [`stablyai/orca#47870`](https://github.com/stablyai/orca/issues/47870),
+[`stablyai/orca#47639`](https://github.com/stablyai/orca/pull/47639) (resolve Issue [`#47631`](https://github.com/stablyai/orca/issues/47631)),
 [`stablyai/orca#46334`](https://github.com/stablyai/orca/pull/46334) (resolve Issue [`#46332`](https://github.com/stablyai/orca/issues/46332)),
 [`stablyai/orca#46333`](https://github.com/stablyai/orca/pull/46333) (resolve Issue [`#46331`](https://github.com/stablyai/orca/issues/46331)),
 [`stablyai/orca#46381`](https://github.com/stablyai/orca/pull/46381),
@@ -68,8 +76,22 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
     O visualizador de imagens exigia clique preciso no botão de fechar, e a exclusão de workspaces pais não oferecia a opção de manter seus sub-worktrees filhos preservados.
 12. **Diff obsoleto servido a partir de cache após regravação in-place de arquivos (`#47639`, resolve `#47631`):**
     Quando um arquivo era reescrito in-place preservando o timestamp de modificação (`mtime`), tamanho e inode, o carimbo gerado para o arquivo na working-tree era idêntico ao anterior. Como consequência, o cache de diff servia o diff defasado antigo em vez de invalidar a visualização.
+13. **Marcador de comando concluído emitido pelo próprio agente encerrando indevidamente seu comando (`#47531`, commit `596618a7e52`):**
+    O terminal interpretava marcas OSC de comando concluído impressas pelo próprio agente como o término da execução, finalizando processos antes do tempo.
+14. **Falha de disparo de seleção no primeiro clique em células de código de notebooks (`#47932`, commit `6efc8b5a57a`):**
+    Em células de código de Jupyter notebooks, o primeiro clique do mouse falhava em iniciar a seleção de texto, demandando múltiplos cliques repetidos.
+15. **Ausência de busca transversal contínua (Cmd/Ctrl+F) em todos os arquivos no diff combinado "View all changes" (`#47870`):**
+    Ao visualizar todas as modificações combinadas de uma revisão, a ferramenta de busca localizava ocorrências somente dentro do arquivo ativo em foco, sem navegar entre múltiplos arquivos.
 
 ## O que o upstream implementa e corrige
+
+- **Isolamento de marcas de comando concluído de agentes no terminal (`#47531`, commit `596618a7e52`):**
+  - Garante que a marcação OSC de fim de comando emitida pelo agente não seja confundida com o encerramento do subprocesso.
+- **Início imediato de seleção em células de notebook (`#47932`, commit `6efc8b5a57a`):**
+  - Corrige o manipulador de eventos de mouse para iniciar a seleção logo no primeiro clique dentro de células de código.
+- **Busca contínua (Find) transversal em arquivos no modo combined diff (`#47870`):**
+  - Especificação para permitir busca Cmd/Ctrl+F percorrendo todos os blocos de arquivos na visualização combinada.
+
 
 - **Invalidação de cache de diff considerando avanço de `ctime` (`#47639`, resolve `#47631`):**
   - Incorpora o `ctime` aos carimbos de arquivos da working-tree junto a `mtime`, tamanho e inode, e usa o mais recente entre os dois timestamps na guarda contra racy-writes;
@@ -115,4 +137,8 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 8. Reutilizar grupos de scan na barra lateral com caminhos-mãe idênticos para evitar duplicações (`#46225`, refs `#46113`).
 9. Adotar fechamento por clique externo (scrim) no visualizador de imagens (`#46276`) e avaliar suporte a "Delete, Keep Children" em workspaces (`#46359`).
 10. Incluir `ctime` no carimbo de arquivos para invalidar o cache de diff do Git em regravações in-place com mtime preservado (`#47639`, resolve `#47631`).
+11. Prevenir que marcas OSC de comando concluído emitidas pelo próprio agente encerrem o processo de terminal (`#47531`, commit `596618a7e52`).
+12. Habilitar início imediato de seleção no primeiro clique do mouse em células de código de notebooks (`#47932`, commit `6efc8b5a57a`).
+13. Implementar atalho Cmd/Ctrl+F transversal cobrindo todos os arquivos no diff combinado "View all changes" (`#47870`).
+
 

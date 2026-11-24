@@ -1,6 +1,6 @@
 ---
 status: open
-description: Servidores Codex compartilhados no Windows (#46518), hooks do zcode (#47721) e isolamento e proxy do navegador (#47806, #47791, #47777).
+description: Integração ACP, autenticação Google/Antigravity, proxy de navegador remoto e port-forwarding de servidores pareados.
 scope:
   - brza-studio
   - workspace
@@ -11,11 +11,50 @@ tags:
   - auth
   - chat
   - tooling
+references:
+  - https://github.com/stablyai/orca/pull/47994
+  - https://github.com/stablyai/orca/pull/47957
+  - https://github.com/stablyai/orca/pull/47965
+  - https://github.com/stablyai/orca/pull/47944
+  - https://github.com/stablyai/orca/issues/41816
+  - https://github.com/stablyai/orca/issues/43173
+  - https://github.com/stablyai/orca/commit/fd60d2198ca
+  - https://github.com/stablyai/orca/commit/4a4cbdfc9d5
+  - https://github.com/stablyai/orca/commit/12adf31694f
+  - https://github.com/stablyai/orca/commit/2f328403686
+  - https://github.com/stablyai/orca/commit/4667e7b60c3
+  - https://github.com/stablyai/orca/commit/d42e68488aa
+  - https://github.com/stablyai/orca/commit/0180c9a3ed6
+  - https://github.com/stablyai/orca/commit/00910c04951
+  - https://github.com/stablyai/orca/commit/bb60725fb98
+  - https://github.com/stablyai/orca/commit/b1c1282b106
+  - https://github.com/stablyai/orca/commit/8e1290452bc
+  - https://github.com/stablyai/orca/commit/b9da9329026
+  - https://github.com/stablyai/orca/commit/924baaea3a5
 ---
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47721`](https://github.com/stablyai/orca/pull/47721) (commit `9948925bbd1`, resolve [`#47707`](https://github.com/stablyai/orca/issues/47707)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47994`](https://github.com/stablyai/orca/pull/47994),
+[`stablyai/orca#47957`](https://github.com/stablyai/orca/pull/47957),
+[`stablyai/orca#47965`](https://github.com/stablyai/orca/pull/47965),
+[`stablyai/orca#47944`](https://github.com/stablyai/orca/pull/47944),
+[`stablyai/orca#47955`](https://github.com/stablyai/orca/pull/47955) (commit `fd60d2198ca`),
+[`stablyai/orca#47970`](https://github.com/stablyai/orca/pull/47970) (commit `4a4cbdfc9d5`),
+[`stablyai/orca#47827`](https://github.com/stablyai/orca/pull/47827) (commit `12adf31694f`),
+[`stablyai/orca#47577`](https://github.com/stablyai/orca/pull/47577) (commit `2f328403686`),
+[`stablyai/orca#47863`](https://github.com/stablyai/orca/pull/47863) (commit `4667e7b60c3`),
+[`stablyai/orca#47833`](https://github.com/stablyai/orca/pull/47833) (commit `d42e68488aa`),
+[`stablyai/orca#47832`](https://github.com/stablyai/orca/pull/47832) (commit `0180c9a3ed6`),
+[`stablyai/orca#47861`](https://github.com/stablyai/orca/pull/47861) (commit `00910c04951`),
+[`stablyai/orca#47905`](https://github.com/stablyai/orca/pull/47905) (commit `bb60725fb98`),
+[`stablyai/orca#47823`](https://github.com/stablyai/orca/pull/47823) (commit `b1c1282b106`),
+[`stablyai/orca#47820`](https://github.com/stablyai/orca/pull/47820) (commit `8e1290452bc`),
+[`stablyai/orca#47814`](https://github.com/stablyai/orca/pull/47814) (commit `b9da9329026`),
+[`stablyai/orca#47790`](https://github.com/stablyai/orca/pull/47790) (commit `924baaea3a5`),
+além das issues [`stablyai/orca#41816`](https://github.com/stablyai/orca/issues/41816),
+[`stablyai/orca#43173`](https://github.com/stablyai/orca/issues/43173),
+[`stablyai/orca#47721`](https://github.com/stablyai/orca/pull/47721) (commit `9948925bbd1`, resolve [`#47707`](https://github.com/stablyai/orca/issues/47707)),
 [`stablyai/orca#46518`](https://github.com/stablyai/orca/pull/46518) (commit `8144d7881bb`),
 [`stablyai/orca#47806`](https://github.com/stablyai/orca/pull/47806),
 [`stablyai/orca#47787`](https://github.com/stablyai/orca/pull/47787),
@@ -314,7 +353,46 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 90. **Isolamento de segurança do navegador remoto: proibição de leitura de cookies/clipboard e restrição SOCKS (`#47791`, `#47782`, `#47777`):**
     Agentes remotos não podem ler cookies ou clipboard de páginas abertas no dispositivo local (`#47791`); e o proxy local SOCKS do remote-browser no Windows recusa conexões abertas por outras contas de usuário da máquina (`#47777`), admitindo processos próprios do Orca antes da checagem de propriedade (`#47782`).
 
+91. **Limpeza granular de cookies por perfil em qualquer host nas preferências, incluindo SSH (`#47955`, commit `fd60d2198ca`):**
+    Permite limpar cookies de um perfil específico diretamente das telas de Settings em qualquer host pareado ou SSH.
+92. **Busca e filtragem no seletor de perfis de importação de cookies (`#47970`, commit `4a4cbdfc9d5`):**
+    Torna os perfis disponíveis na janela "Import Cookies" pesquisáveis por texto, facilitando a seleção em ambientes com múltiplos perfis de navegador.
+93. **Impressão em página streamed salvando PDF diretamente no Desktop (`#47827`, commit `12adf31694f`):**
+    Ação de imprimir em páginas de navegador streamed de servidor remoto salva o arquivo PDF gerado diretamente no Desktop local do usuário.
+94. **Proteção contra deleção acidental de arquivos de login ilegíveis durante limpeza de cookies (`#47577`, commit `2f328403686`, STA-17441):**
+    A rotina de limpeza de cookies nunca exclui arquivos de sign-in salvos que o runtime não conseguiu decodificar ou ler temporariamente.
+95. **Retomada de controle de página por entrada de usuário em visualizador pareado (`#47863`, commit `4667e7b60c3`):**
+    Quando um usuário interage via mouse ou teclado em uma página compartilhada com um agente, o controle da página é retirado do agente e devolvido ao operador humano.
+96. **Resolução relativa de caminhos de arquivos em `orca exec` no navegador (`#47833`, commit `d42e68488aa`):**
+    Caminhos de arquivos passados para `orca exec` passam a ser resolvidos relativamente à pasta do chamador.
+97. **Fragmentação de respostas maiores que 4 MB em servidores pareados para tráfego de capturas completas (`#47832`, commit `0180c9a3ed6`):**
+    Respostas de servidores pareados que excedem o limite de 4 MB (como capturas de tela em resolução cheia) são transmitidas em partes fracionadas para a CLI desktop.
+98. **Redesenho do card Connect Google e suporte a múltiplas aplicações (`#47861`, `#47905`, `#47823`, `#47820`, `#47814`, `#47790`):**
+    Redesenha o card Connect Google em duas linhas compactas, permite criar um novo Google app a partir de "Use another account", notifica agentes sobre o login sem poluir mensagens do chat e viabiliza a seleção de conta Google padrão por agentes.
+99. **Encaminhamento de portas de servidores pareados e movimentação de abas de navegador (`#47994`, `#47957`, `#47965`, `#47944`):**
+    Encaminha automaticamente portas de servidores pareados para abertura no navegador padrão, viabiliza mover abas entre o computador local e o servidor pareado via menu `⋯`, esclarece motivos de falha na abertura de links e previne carregamento duplicado de páginas abertas por agentes e CLI.
+
 ## O que o upstream implementa e corrige
+
+- **Limpeza de cookies por perfil em hosts locais e SSH (`#47955`, commit `fd60d2198ca`):**
+  - Expõe ação de limpeza de cookies no card de perfil de Settings para qualquer host.
+- **Perfis pesquisáveis em Import Cookies (`#47970`, commit `4a4cbdfc9d5`):**
+  - Adiciona campo de busca em tempo real na listagem de perfis do navegador.
+- **Impressão em PDF no Desktop para páginas streamed (`#47827`, commit `12adf31694f`):**
+  - Salva PDFs de páginas remotas streamed diretamente no Desktop do host local.
+- **Preservação de arquivos de sign-in ilegíveis na purga de cookies (`#47577`, commit `2f328403686`):**
+  - Previne exclusão de arquivos de sessão temporariamente ilegíveis.
+- **Retomada de controle por input em visualizador pareado (`#47863`, commit `4667e7b60c3`):**
+  - Devolve o foco de interação ao usuário imediatamente ao detectar atividade.
+- **Resolução relativa de arquivos em `orca exec` (`#47833`, commit `d42e68488aa`):**
+  - Normaliza caminhos relativos ao diretório de trabalho do chamador.
+- **Respostas segmentadas acima de 4 MB em conexões pareadas (`#47832`, commit `0180c9a3ed6`):**
+  - Fragmenta payloads grandes garantindo que screenshots completas cheguem intactas ao desktop CLI.
+- **Reformulação dos cards Connect Google e suporte a múltiplas instâncias (`#47861`, `#47905`, `#47823`, `#47820`, `#47814`, `#47790`):**
+  - Condensa o visual, permite criar novas aplicações Google e isola notificações no chat.
+- **Port-forwarding de portas de servidores pareados e migração de abas (`#47994`, `#47957`, `#47965`, `#47944`):**
+  - Encaminha portas remotas para o navegador padrão, move abas entre máquinas e elimina recargas duplas.
+
 
 - **Execução de chats via chave de API Gemini no `agy` com regras de `~/.gemini` e skills (`#47400`):**
   - Roteia chats autenticados por Gemini API key ou gcloud ADC para uma pasta home própria do Orca onde o `agy` estiver instalado;
@@ -612,6 +690,16 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 86. Propagar eventos de teclado para abertura de dropdowns `<select>` em páginas de navegador streamed (`#47787`).
 87. Abrir URLs `localhost` de páginas SSH no navegador do sistema através do port-forward correspondente (`#47803`).
 88. Bloquear acesso de agentes remotos a cookies e clipboard de páginas locais e restringir conexões SOCKS por conta no Windows (`#47791`, `#47782`, `#47777`).
+89. Limpar cookies de perfis de navegador em hosts locais e remotos SSH via Settings (`#47955`, commit `fd60d2198ca`).
+90. Adicionar busca textual em perfis na interface de Import Cookies (`#47970`, commit `4a4cbdfc9d5`).
+91. Salvar arquivos PDF diretamente no Desktop do host ao acionar Print em páginas streamed (`#47827`, commit `12adf31694f`).
+92. Proteger arquivos de sessão ilegíveis contra exclusão acidental na limpeza de cookies (`#47577`, commit `2f328403686`).
+93. Restabelecer o controle humano imediato sobre páginas compartilhadas com agentes ao detectar input no viewer pareado (`#47863`, commit `4667e7b60c3`).
+94. Resolver caminhos de arquivos relativos ao diretório do chamador em `orca exec` no navegador (`#47833`, commit `d42e68488aa`).
+95. Fragmentar payloads de resposta acima de 4 MB em servidores pareados para suportar screenshots de página inteira (`#47832`, commit `0180c9a3ed6`).
+96. Redesenhar o card Connect Google, permitir setup de novas apps e desacoplar mensagens de auth do chat (`#47861`, `#47905`, `#47823`, `#47820`, `#47814`, `#47790`).
+97. Encaminhar portas de servidores pareados para o navegador padrão e permitir mover abas entre máquinas (`#47994`, `#47957`, `#47965`, `#47944`).
+
 
 
 

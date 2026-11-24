@@ -1,6 +1,6 @@
 ---
 status: open
-description: Os PRs #47805 (quebra de erros Git na sidebar), #47750 (foco no diálogo de branch) e #47816 aprimoram a barra lateral e o explorer.
+description: Personalização da barra lateral, densidade do App Rail, status de bots colapsados e navegação de worktrees.
 scope:
   - brza-studio
   - workspace
@@ -9,6 +9,17 @@ opened: 2026-11-03
 tags:
   - design
   - tooling
+references:
+  - https://github.com/stablyai/orca/pull/47935
+  - https://github.com/stablyai/orca/pull/47922
+  - https://github.com/stablyai/orca/pull/47902
+  - https://github.com/stablyai/orca/pull/47968
+  - https://github.com/stablyai/orca/pull/47871
+  - https://github.com/stablyai/orca/issues/47693
+  - https://github.com/stablyai/orca/issues/46796
+  - https://github.com/stablyai/orca/issues/47862
+  - https://github.com/stablyai/orca/commit/2f31a354146
+  - https://github.com/stablyai/orca/commit/84cd9c16126
 ---
 
 # Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados
@@ -17,7 +28,17 @@ tags:
 > **Despacho (PLN-014/R1.1):** classe `ausente` · casa `studio`
 > Merge no upstream não muda `status`. PLN-014/R1, 2026-11-12.
 
-Rastreado dos PRs abertos no upstream [`stablyai/orca#47805`](https://github.com/stablyai/orca/pull/47805) (resolve Issue [`#47776`](https://github.com/stablyai/orca/issues/47776)),
+Rastreado dos PRs abertos no upstream [`stablyai/orca#47935`](https://github.com/stablyai/orca/pull/47935),
+[`stablyai/orca#47922`](https://github.com/stablyai/orca/pull/47922),
+[`stablyai/orca#47902`](https://github.com/stablyai/orca/pull/47902),
+[`stablyai/orca#47968`](https://github.com/stablyai/orca/pull/47968),
+[`stablyai/orca#47871`](https://github.com/stablyai/orca/pull/47871),
+[`stablyai/orca#47915`](https://github.com/stablyai/orca/pull/47915) (commit `2f31a354146`),
+[`stablyai/orca#47884`](https://github.com/stablyai/orca/pull/47884) (commit `84cd9c16126`),
+além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues/47693),
+[`stablyai/orca#46796`](https://github.com/stablyai/orca/issues/46796),
+[`stablyai/orca#47862`](https://github.com/stablyai/orca/issues/47862),
+[`stablyai/orca#47805`](https://github.com/stablyai/orca/pull/47805) (resolve Issue [`#47776`](https://github.com/stablyai/orca/issues/47776)),
 [`stablyai/orca#47750`](https://github.com/stablyai/orca/pull/47750),
 [`stablyai/orca#47816`](https://github.com/stablyai/orca/pull/47816),
 [`stablyai/orca#47743`](https://github.com/stablyai/orca/pull/47743),
@@ -225,6 +246,20 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47805`](https://github.com
     - Introduz a configuração `explorerRevealActiveFile` (default `true`) sob Settings → Appearance → Window & sidebar → Advanced → File explorer;
     - Rastreia automaticamente abas de arquivos ativas em modos `edit`, `markdown-preview` e `diff` de arquivo único, expandindo nós ancestrais colapsados, resetando escopos de pasta se o arquivo estiver fora do display root atual, aplicando seleção visível com `bg-accent text-accent-foreground` e rolando até a linha sem flash âmbar;
     - Preserva seleções manuais enquanto o mesmo arquivo permanecer ativo e adiciona o comando `fileExplorer.revealActiveFile` ("Reveal Active File in Explorer") na Command Palette.
+53. **Espaçamento e dimensões desproporcionais dos botões no App Rail (`#47915`, commit `2f31a354146`):**
+    - O trilho de aplicativos (App Rail) exibia botões grandes que consumiam espaço horizontal; o commit reduz os botões para 28px com ícones compactos de 16px, otimizando a área da janela.
+54. **Ausência de status visível em bots quando a seção da sidebar está colapsada (`#47884`, commit `84cd9c16126`, e `#47693`):**
+    - Quando a seção Bots na barra lateral era recolhida, os avatares dos bots não exibiam dicas de status ou badges "Needs you", deixando o operador sem retorno visual sobre atenções pendentes.
+55. **Comportamento inesperado do atalho de exclusão na barra lateral sem item selecionado (`#47935`):**
+    - Ao acionar a tecla Delete/Backspace com o foco na barra lateral mas sem nenhum item selecionado na lista, a ação de exclusão não atuava sobre o workspace aberto, deixando o desenvolvedor sem resposta de UI.
+56. **Abertura de caminhos absolutos no worktree incorreto via CLI (`#47922`):**
+    - Ao invocar a CLI com caminho absoluto de arquivo, o app abria o arquivo no worktree genérico em foco em vez do worktree que realmente continha aquele caminho no disco.
+57. **Seção Bots densa e verticalmente longa sem suporte a colunas paralelas (`#47902`):**
+    - Bots fixados ocupavam uma única coluna vertical densa na barra lateral, forçando rolagem vertical excessiva; o PR introduz disposição em duas colunas para bots fixados.
+58. **Desatualização de status de PR de workspaces fora da linha da barra lateral (`#47968`):**
+    - Quando o status de PR de um workspace era consultado fora de sua linha direta na sidebar (ex.: em diálogos ou popovers), o cache mantinha dados defasados sem refresh adequado.
+59. **Baixo contraste entre aba ativa e abas inativas (`#47871`):**
+    - A distinção visual entre a aba em primeiro plano e as demais abas no topo do painel apresentava baixo contraste de cores, dificultando a identificação imediata da aba focada.
 
 ## O que fazer
 
@@ -260,3 +295,11 @@ Rastreado dos PRs abertos no upstream [`stablyai/orca#47805`](https://github.com
 - Integrar a opção de agrupamento explícito por host ("Group by: Host") na barra lateral (`#40023`).
 - Adotar a fixação de projetos e grupos (`isPinned`) com ordenação intercalada de subgrupos e projetos (`#40334`).
 - Integrar a criação direta de grupos/subgrupos na sidebar e arrasto reparenting transversal (`#40323`).
+- Compactar os botões do App Rail para 28px com ícones de 16px (`#47915`).
+- Exibir avatares recortados com dicas de status e destaque "Needs you" em bots com a seção colapsada (`#47884`, `#47693`).
+- Aplicar a ação de exclusão da sidebar ao workspace aberto quando a lista focada não tiver seleção explícita (`#47935`).
+- Abrir arquivos com caminho absoluto no worktree correto que contém o arquivo (`#47922`).
+- Dispor bots fixados em duas colunas paralelas na barra lateral (`#47902`).
+- Manter o status de PR atualizado quando consultado fora da linha da barra lateral (`#47968`).
+- Aumentar o contraste visual da aba ativa em relação às demais abas (`#47871`).
+

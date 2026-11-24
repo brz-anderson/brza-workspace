@@ -1,6 +1,6 @@
 ---
 status: open
-description: Gestão de contas Claude, switcher de rate limit (#48071/#48027), recuperação de sign-in (#48134) e restart de conta Codex (#48133).
+description: Gestão de contas Claude/Google (#48239/#48450), retomada com boot id (#48404), atalhos de troca (#48466) e controle de usage bar (#48385).
 scope:
   - brza-studio
   - brza-workflow
@@ -10,6 +10,13 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48450
+  - https://github.com/stablyai/orca/pull/48404
+  - https://github.com/stablyai/orca/pull/48466
+  - https://github.com/stablyai/orca/pull/48385
+  - https://github.com/stablyai/orca/issues/48455
+  - https://github.com/stablyai/orca/issues/48456
+  - https://github.com/stablyai/orca/issues/48463
   - https://github.com/stablyai/orca/pull/48218
   - https://github.com/stablyai/orca/pull/48253
   - https://github.com/stablyai/orca/pull/48238
@@ -213,8 +220,33 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
     O handshake de login OAuth com o Google em clientes web/móveis falhava com erro de timeout ou interrupção de socket quando o aparelho entrava em sleep durante a autorização externa no navegador.
 42. **Ausência de detalhamento da causa raiz em falhas de login do Google Connector (`#48208`):**
     Erros de permissão, recusa de consentimento ou bloqueio de domínio corporativo no Google Connector eram apresentados com mensagem genérica de erro de conexão, dificultando o diagnóstico pelo operador.
+43. **Perda de associação de contas Google entre disparos automatizados de bots (`#48450`):**
+    Execuções sucessivas de automações e bots recarregavam o contexto de identidade Google do zero, perdendo a conta vinculada e exigindo re-seleção manual.
+44. **Perda de cache de prompt e invalidação de prefixo ao retomar sessões do Claude (`#48404`):**
+    A retomada de sessões existentes do Claude gerava um novo `boot_id` e cabeçalhos de `SessionStart`, forçando a quebra do prefixo de cache de prompt da Anthropic e reprocessamento caro de tokens.
+45. **Falta de controle explícito de respostas no Claude Agent SDK (`#47928`):**
+    O runtime não interpretava respostas de controle estruturadas (`control_response`) do Claude Agent SDK, ignorando instruções programáticas de pausa, retomada e aprovação.
+46. **Navegação custosa para alternância rápida de contas em sessões ativas (`#48466`):**
+    Operadores com múltiplas contas corporativas e pessoais precisavam navegar manualmente por menus de configurações ou status bar para trocar de conta.
+47. **Ocupação indevida de espaço pela barra de uso em telas compactas (`#48385`):**
+    Em resoluções baixas ou janelas estreitas, a barra de uso na status bar espremia outros indicadores essenciais de branch e dirty status sem opção de ser ocultada.
+48. **Inconsistência de limite de cota entre workspaces paralelos e alerta tardio de exaustão (`#48455`, `#48456`, `#48463`):**
+    A apuração de uso não sincronizava limites em tempo real entre diferentes worktrees do mesmo projeto, e a interface só alertava sobre o teto de tokens após a recusa da API.
 
 ## O que o upstream propõe e implementa
+
+- **Persistência estável de contas Google em disparos de automações de bots (`#48450`):**
+  - Armazena a vinculação de conta Google no escopo do bot e do workspace, reaproveitando as credenciais ativas em novas execuções sem requerer reautenticação.
+- **Preservação de `boot_id` do SessionStart na retomada de chat Claude para retenção de prompt cache (`#48404`):**
+  - Mantém o `boot_id` e contexto inicial da sessão ao retomar chats Claude suspensos, preservando integralmente o cache de prefixo de prompt de 5 minutos/1 hora da Anthropic.
+- **Suporte a respostas de controle estruturadas no Claude Agent SDK (`#47928`):**
+  - Processa pacotes de `control_response` enviados pelo SDK, possibilitando intervenções programáticas no fluxo do agente sem corromper a thread de mensagens.
+- **Atalhos de teclado e menu rápido para chaveamento de contas (`#48466`):**
+  - Introduz atalhos dedicados (ex.: comando no palette e atalho na barra de chat) para alternar instantaneamente entre contas salvas.
+- **Configuração para ocultar a barra de uso da status bar (`#48385`):**
+  - Adiciona toggle de visibilidade para a barra de métricas de cota, liberando espaço horizontal para branch e dirty state.
+- **Sincronização reativa de cotas e alertas preventivos de exaustão de contexto (`#48455`, `#48456`, `#48463`):**
+  - Compartilha o estado de limitação de taxa entre workspaces concorrentes e projeta a aproximação do limite de tokens com alerta visual antecipado.
 
 - **Diferenciação de throttling transitório e rate limit definitivo no Codex (`#48218`):**
   - Trata respostas HTTP 429 sem janela formal de reset como throttling momentâneo com backoff exponencial automático, prevenindo a marcação falsa da conta como esgotada.
@@ -353,6 +385,13 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 - Assegurar precedência estrita das contas Claude configuradas no app sobre variáveis de ambiente como `ANTHROPIC_AUTH_TOKEN` (`#48249`).
 - Proteger fluxos de autenticação OAuth contra interrupções de sleep e troca de redes em clientes remotos (`#48323`).
 - Apresentar detalhes explicativos de falha na autorização do Google Connector (`#48208`).
+- Persistir vinculação de perfis de conta Google entre despachos automáticos de bots sem requerer nova seleção manual (`#48450`).
+- Reter `boot_id` e cabeçalhos de SessionStart na retomada de chats Claude para preservar o cache de prefixo de prompt da Anthropic (`#48404`).
+- Implementar processamento de pacotes `control_response` do Claude Agent SDK para supervisão e pausa programática (`#47928`).
+- Adicionar atalhos de teclado e menu rápido de alternância de contas ativas no chat (`#48466`).
+- Adicionar opção de visualização para ocultar o usage bar na barra de status em telas pequenas (`#48385`).
+- Sincronizar o estado de limitação de cota entre workspaces do mesmo projeto e emitir avisos antecipados de teto de contexto (`#48455`, `#48456`, `#48463`).
+
 
 
 

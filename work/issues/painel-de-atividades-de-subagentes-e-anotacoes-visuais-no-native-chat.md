@@ -1,6 +1,6 @@
 ---
 status: open
-description: PRs #48289 (workers do coordenador sobre composer), #48223 (nomes limpos no @), #48216 (Fast tier steering), #48271 (worker chats aninhados) e #48247 (conversão de chats).
+description: Prosa visível em thinking (#48353), picker @ simplificado (#48425/#48223), snippet helper (#48415), comando shell completo (#48430) e reload de imagens (#48451).
 scope:
   - brza-studio
   - brza-workflow
@@ -9,6 +9,15 @@ opened: 2026-11-05
 tags:
   - chat
   - tooling
+references:
+  - https://github.com/stablyai/orca/pull/48353
+  - https://github.com/stablyai/orca/pull/48425
+  - https://github.com/stablyai/orca/pull/48415
+  - https://github.com/stablyai/orca/pull/48430
+  - https://github.com/stablyai/orca/pull/48451
+  - https://github.com/stablyai/orca/issues/48445
+  - https://github.com/stablyai/orca/issues/48461
+  - https://github.com/stablyai/orca/pull/48289
 ---
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
@@ -387,6 +396,16 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     - Pre-carrega o histórico de sessões e dispara a busca imediatamente ao submeter `/resume`, sem engasgos de interface.
 97. **Re-projeção desnecessária de todas as linhas de chat durante streaming com ferramentas desacopladas (`#47931`):**
     - Quando o frame de streaming contém ferramentas desacopladas, a lista inteira de mensagens do Native Chat é re-projetada por frame, causando perda de fluidez.
+98. **Ocultação de prosa durante blocos de pensamento intercalados (`#48353`, commit `6a87ef6dc1b`):**
+    - Em modelos que emitem tags de pensamento (thinking) no meio da resposta, o stream dividia os blocos e ocultava o texto em prosa precedente até o encerramento do raciocínio.
+99. **Sobrecarga visual no seletor de menções `@` exibindo dados redundantes (`#48425`, `#48223`, commits `004525c2f14`, `69a81ecc972`):**
+    - As linhas do seletor `@` de agentes no mobile e desktop poluíam o espaço exibindo detalhes extensos e paths de execução em vez de focar no nome curto.
+100. **Truncamento de prévia de ferramentas shell no chat (`#48430`):**
+    - Clicar na prévia de comandos shell executados por ferramentas no Native Chat truncava o comando completo, impedindo a inspeção detalhada.
+101. **Imagens locais em cache não recarregadas quando modificadas no disco (`#48451`):**
+    - Quando um agente ou script atualizava uma imagem já exibida na conversa, o visualizador mantinha a versão antiga em cache sem re-ler o arquivo alterado.
+102. **Perda de foco do composer no Linux via Alt-Tab (`#48461`):**
+    - No Linux desktop, alternar janelas desarmava o foco do editor ProseMirror, exigindo clique manual para recuperar o cursor.
 
 ## O que o upstream implementa
 
@@ -740,6 +759,13 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Exibir o propósito do agente no menu de menção `@` em conversas mobile (`#48302`, commit `06f5660cb08`).
 - Filtrar a visualização de Activity por tipo de agente (Claude, Codex, Pi) ao lado do status (`#48269`).
 - Fornecer ação de Clear para falhas de workers assentados retidas no Home Chat dock (`#48296`).
+- Manter a prosa de respostas visível e contínua quando intercalada por blocos de raciocínio/thinking (`#48353`, commit `6a87ef6dc1b`).
+- Exibir apenas o nome canônico do agente nas linhas do seletor `@` no mobile (`#48425`, commit `004525c2f14`).
+- Preservar o helper de snippets de menções utilizado pelo picker móvel (`#48415`, commit `c146a111bfc`).
+- Exibir o comando shell completo ao clicar na prévia de ferramentas no Native Chat (`#48430`).
+- Recarregar artefatos de imagem locais quando o arquivo em disco sofrer mutação (`#48451`).
+- Oferecer opção para colapsar parâmetros de chamadas de ferramentas no balão de chat (`#48445`).
+- Reter o foco do composer de mensagens após alternância de janelas via Alt-Tab no Linux (`#48461`).
 
 
 

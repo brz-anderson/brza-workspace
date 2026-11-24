@@ -1,6 +1,6 @@
 ---
 status: open
-description: Cleanup agrupado (#43498), modal estável (#48065), retry sem sobreposição (#48163) e workspace headless (#48037).
+description: Normalização NFD no macOS (#48397/#48432/#48417), montagem de worktree (#48354) e cleanup agrupado (#43498).
 scope:
   - brza-studio
   - workspace
@@ -11,6 +11,11 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48397
+  - https://github.com/stablyai/orca/pull/48432
+  - https://github.com/stablyai/orca/pull/48417
+  - https://github.com/stablyai/orca/issues/48416
+  - https://github.com/stablyai/orca/pull/48354
   - https://github.com/stablyai/orca/issues/48303
   - https://github.com/stablyai/orca/issues/48252
   - https://github.com/stablyai/orca/pull/48327
@@ -288,9 +293,25 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - Ao desinstalar ou excluir um bot configurado, o aplicativo remove apenas o registro do bot mas deixa o diretório home residual intacto em disco, sem questionar se o operador deseja expurgar os arquivos locais de configuração e dados gerados.
 76. **Invalidação e re-escaneamento do File Explorer a cada troca de worktree (`#48327`, Issue `#48292`):**
     - A alternância de foco entre worktrees no File Explorer descartava o cache da árvore de arquivos e disparava varredura completa do sistema de arquivos para o novo checkout, causando atrasos de renderização e perda de pastas expandidas na navegação rápida.
+77. **Falsas modificações no git status por divergência de decomposição NFD no macOS (`#48397`):**
+    - No macOS/APFS, arquivos com caracteres acentuados são gravados em decomposição UTF-8 (NFD). O analisador de `git status` comparava strings em NFC contra NFD, exibindo falsos arquivos modificados e gerando conflitos ao preparar commits.
+78. **Falha de estilização (dim) em arquivos ignorados com nomes em codificação NFD (`#48432`):**
+    - A engine de matching do `.gitignore` não convertia paths NFD para a forma canônica antes da correspondência, fazendo com que itens ignorados fossem renderizados como arquivos normais.
+79. **Sobrecarga de alocação de caminhos NFD repetidos no macOS (`#48417`, Issue `#48416`):**
+    - O runtime executava normalizações e instanciações repetidas de strings NFD para cada entrada de diretório no macOS, penalizando o garbage collector em repositórios grandes.
+80. **Falha de renderização de worktree ativo quando ocultado pela barra lateral (`#48354`):**
+    - Ao colapsar ou expandir a barra lateral sobrepondo a janela principal, a superfície do worktree ativo era desmontada sem preservação de viewport, exigindo recálculo e provocando flickering ao retornar.
 
 ## O que o upstream propõe e implementa
 
+- **Normalização canônica de caminhos NFD no git status para macOS (`#48397`):**
+  - Aplica normalização uniforme entre UTF-8 NFC e NFD nas saídas do git status, eliminando arquivos fantasmas e falsos positivos de alteração.
+- **Renderização correta (dim) de arquivos ignorados em NFD (`#48432`):**
+  - Normaliza os nomes de arquivos antes de conferir as regras de ignore, assegurando a exibição esmaecida padrão.
+- **Reuso de modelo e deduplicação de strings para caminhos normalizados no macOS (`#48417`, Issue `#48416`):**
+  - Implementa cache e compartilhamento de representações de strings NFD para caminhos de filesystem, reduzindo alocações transitórias.
+- **Preservação de superfície montada de worktree ativo sob colapso da sidebar (`#48354`):**
+  - Mantém o container do worktree ativo montado na árvore DOM mesmo quando ocultado temporariamente pela barra lateral.
 - **Exclusão e arquivamento em lote de conversas de bots (`#48303`):**
   - Introduz seleção múltipla com ações de "Archive All" e "Delete Selected" para chats de automações e bots.
 - **Opção de deleção completa da pasta home de bots (`#48252`):**
@@ -573,6 +594,11 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Implementar arquivamento e deleção em lote para chats e sessões de bots (`#48303`).
 - Oferecer opção de remoção da pasta home ao deletar bots para evitar resíduos em disco (`#48252`).
 - Reter o cache e a memória de diretórios expandidos do explorador de arquivos entre trocas de worktrees (`#48327`, resolve `#48292`).
+- Normalizar caminhos NFD no git status para macOS para eliminar falsas modificações e arquivos fantasmas (`#48397`).
+- Corrigir a estilização esmaecida (dim) de arquivos ignorados com caracteres em decomposição NFD (`#48432`).
+- Reutilizar representações de strings e modelos para caminhos NFD no macOS para conter alocações em GC (`#48417`, `#48416`).
+- Preservar a montagem de superfície de worktrees ativos quando encobertos pela barra lateral (`#48354`).
+
 
 
 

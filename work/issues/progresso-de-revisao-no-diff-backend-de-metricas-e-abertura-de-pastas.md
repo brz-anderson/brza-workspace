@@ -1,6 +1,6 @@
 ---
 status: open
-description: Largura de Markdown (#48047/#48022), CRLF no Windows (#48122), skeletons em checks (#47812) e restauração de abas (#47262).
+description: Menu de escopo de diff (#44229), rebase na base-branch (#42949), non-ASCII file names (#48373) e Reveal in OS (#48392).
 scope:
   - brza-studio
   - brza-workflow
@@ -12,6 +12,13 @@ tags:
   - infra
   - design
 references:
+  - https://github.com/stablyai/orca/pull/44229
+  - https://github.com/stablyai/orca/pull/42949
+  - https://github.com/stablyai/orca/pull/48373
+  - https://github.com/stablyai/orca/pull/48363
+  - https://github.com/stablyai/orca/pull/48351
+  - https://github.com/stablyai/orca/pull/48392
+  - https://github.com/stablyai/orca/pull/48429
   - https://github.com/stablyai/orca/pull/48293
   - https://github.com/stablyai/orca/pull/48294
   - https://github.com/stablyai/orca/issues/48291
@@ -101,9 +108,37 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
     A busca textual transversal do editor ("Find in Files") excluía incondicionalmente qualquer arquivo presente no `.gitignore` (como arquivos `.env`, configurações locais ou documentações geradas), sem toggle para incluir arquivos ignorados sob demanda.
 19. **Sessões da CLI do Devin armazenadas em SQLite ausentes no Session History (`#48309`):**
     O painel de Session History e AI Vault não lia os bancos de dados SQLite locais criados por execuções autônomas da CLI do Devin, deixando essas sessões invisíveis no histórico unificado de conversas.
+20. **Navegação rígida no diff review forçando a seção inferior Commits (`#44229`):**
+    A visualização de diff dividia a tela com uma seção fixa de commits na parte inferior, reduzindo a área vertical de código e dificultando a alternância entre diff de working tree, staged e commits individuais.
+21. **Ausência de ação de rebase direta a partir da linha de base-branch (`#42949`):**
+    Para atualizar o branch de um worktree contra a branch base (main/master), o desenvolvedor precisava abrir o terminal ou menu de branches em vez de ter um botão de rebase direto na linha do branch base.
+22. **Nomes de arquivos com caracteres não-ASCII corrompidos na geração de commits e PRs (`#48373`):**
+    Módulos de IA geradores de mensagens de commit e descrições de PR escapavam ou corrompiam nomes de arquivos contendo acentos, cedilhas ou caracteres CJK (ex.: `\303\241` em vez de `á`).
+23. **Falta de justificativa explicativa quando um agent Command não pode ser executado (`#48363`):**
+    Quando um comando sugerido por um agente na barra de ações estava desabilitado, o botão ficava cinza sem tooltip ou indicação de motivo (ex.: worktree dirty, terminal ocupado).
+24. **Lista desordenada de repositórios no diálogo de setup do GitHub (`#48351`):**
+    O modal de configuração do GitHub listava todos os repositórios em lista plana alfabética, misturando repositórios pessoais e de diferentes organizações.
+25. **Falta de opção para abrir a pasta/arquivo no gerenciador de arquivos do sistema a partir do File Explorer (`#48392`):**
+    Não havia comando no menu de contexto do explorador de arquivos para abrir o Finder (macOS) ou Explorer (Windows) no caminho selecionado.
+26. **Falta de agrupamento por projeto na CLI `orca worktree create` (`#48429`):**
+    Ao criar múltiplos worktrees via CLI, eles eram alocados sem vínculo com o grupo de projetos pai correspondente.
 
 ## O que o upstream implementa e corrige
 
+- **Menu de escopo 'which-changes' substituindo a seção inferior de commits (`#44229`):**
+  - Adiciona menu seletor de escopo no topo do diff (Working Tree, Staged, ou commit específico), liberando 100% da área vertical e permitindo navegação limpa.
+- **Ação de rebase a partir da linha da base-branch (`#42949`):**
+  - Introduz botão direto de rebase contra a base branch configurada na linha de status do Source Control.
+- **Normalização de nomes de arquivos não-ASCII em mensagens de commit e PRs (`#48373`):**
+  - Decodifica caracteres UTF-8 escapados pelo Git para renderizar nomes reais de arquivos na síntese de mensagens por IA.
+- **Tooltips informativos com motivo de bloqueio em agent Commands (`#48363`):**
+  - Exibe mensagem explicativa clara ao passar o mouse sobre comandos desabilitados.
+- **Agrupamento por organização no modal de repositórios do GitHub (`#48351`):**
+  - Organiza a lista de repositórios por conta pessoal e organizações do GitHub.
+- **Comando 'Reveal in OS file manager' no File Explorer (`#48392`):**
+  - Adiciona ação de menu para abrir a pasta ou arquivo no Finder/Explorer nativo do sistema operacional.
+- **Agrupamento por projeto na criação de worktrees via CLI (`#48429`):**
+  - Suporta flag `--project-group` em `orca worktree create` para associar o novo checkout ao grupo pai.
 - **Resolução segura de caminhos do System32 via SystemRoot validado (`#48293`):**
   - Valida e ancora todos os executáveis de sistema no caminho canônico `%SystemRoot%\System32` no Windows.
 - **Abertura direta da UI móvel no navegador do celular (`#48294`, resolve `#48291`):**
@@ -176,5 +211,13 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 20. Habilitar abertura da interface móvel no navegador nativo do smartphone (`#48294`, resolve `#48291`).
 21. Adicionar opção para pesquisar arquivos ignorados pelo Git no Find in Files (`#48279`).
 22. Incluir sessões SQLite da CLI do Devin no Session History unificado (`#48309`).
+23. Substituir a seção inferior fixa de commits pelo menu de escopo 'which-changes' no topo da visualização de diff (`#44229`).
+24. Adicionar ação direta de rebase contra a base branch na barra de status do Source Control (`#42949`).
+25. Decodificar nomes de arquivos não-ASCII para renderização legível em mensagens de commit e descrições de PR geradas por IA (`#48373`).
+26. Exibir tooltips informativos com motivo do bloqueio em agent Commands desabilitados (`#48363`).
+27. Agrupar repositórios por organização no diálogo de configuração do GitHub (`#48351`).
+28. Adicionar ação 'Reveal in OS file manager' (Finder / Explorer) no menu do File Explorer (`#48392`).
+29. Suportar associação a grupos de projeto na criação de worktrees via CLI (`#48429`).
+
 
 

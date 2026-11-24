@@ -1,6 +1,6 @@
 ---
 status: open
-description: Ritmo do App Rail (#48049/#48084), draft guard em plugins (#48176/#48075), popover na status bar (#48088) e bot sidebar (#48132/#48020).
+description: App Rail padrão (#48442), opacidade em grupo (#48365), busca de chats (#48329), colapso de subgrupos (#48412) e quick actions (#48428).
 scope:
   - brza-studio
   - workspace
@@ -10,6 +10,13 @@ tags:
   - design
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48442
+  - https://github.com/stablyai/orca/pull/48365
+  - https://github.com/stablyai/orca/pull/48329
+  - https://github.com/stablyai/orca/pull/48412
+  - https://github.com/stablyai/orca/pull/48428
+  - https://github.com/stablyai/orca/issues/48460
+  - https://github.com/stablyai/orca/issues/48453
   - https://github.com/stablyai/orca/pull/44653
   - https://github.com/stablyai/orca/pull/42558
   - https://github.com/stablyai/orca/pull/48212
@@ -290,6 +297,16 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
     - Quando múltiplos painéis verticais eram divididos, painéis estreitos exibiam abas comprimidas sem modo condensado legível, ocultando títulos e status.
 65. **Truncamento de texto sem tooltip/hover com conteúdo completo (`#48264`):**
     - Componentes de texto truncado por reticências na sidebar e nos cartões de itens não exibiam o texto na íntegra ao passar o cursor do mouse (hover), impossibilitando a leitura de títulos longos.
+66. **App Rail desativado por padrão exigindo configuração manual (`#48442`):**
+    - Novos usuários não tinham acesso imediato à barra vertical de aplicativos (App Rail), gerando navegação fragmentada e desconhecimento dos atalhos integrados de plugins e automações.
+67. **Ruído visual na barra lateral e ícones da activity-bar sem atenuação de foco (`#48365`):**
+    - A lista de ícones da barra lateral e activity-bar permanecia com contraste idêntico mesmo quando o mouse não estava sobre o grupo, poluindo a visão periférica durante a escrita de código.
+68. **Dificuldade de localizar chats históricos e recentes de agentes específicos (`#48329`):**
+    - Não havia campo direto de busca de conversas de agentes no Bot Home nem entrada correspondente no menu principal, exigindo rolagem manual extensiva por threads passadas.
+69. **Falta de controle de colapso para subgrupos de repositórios e projetos aninhados (`#48412`):**
+    - Subgrupos dentro de categorias de projetos não podiam ser recolhidos individualmente, estendendo verticalmente a barra lateral em workspaces com muitos monorepos ou submódulos.
+70. **Ausência de ações rápidas contextuais nas linhas de agentes (`#48428`, Issues `#48460`, `#48453`):**
+    - Para reiniciar, pausar ou bifurcar um agente pela sidebar, o usuário precisava abrir a aba do agente ou acionar menus de contexto ocultos, sem botões de ação rápida ao passar o mouse.
 
 ## O que fazer
 
@@ -348,4 +365,10 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
 - Garantir que a alternância de abas na tab-strip transfira imediatamente o foco de entrada para o painel selecionado (`#48258`).
 - Condensar o layout de abas em painéis estreitos preservando legibilidade (`#41896`).
 - Exibir tooltip completo ao passar o cursor sobre textos truncados na interface (`#48264`).
+- Habilitar o App Rail como recurso padrão para navegação de apps e painéis (`#48442`).
+- Aplicar atenuação visual (`group-hover:opacity`) na barra lateral e ícones de activity bar (`#48365`).
+- Adicionar ferramenta de busca de chats de agentes no Bot Home e no menu principal (`#48329`).
+- Suportar recolhimento individual de subgrupos de projetos na barra lateral (`#48412`).
+- Disponibilizar ações rápidas (restart, pause, fork) nas linhas de agentes da sidebar (`#48428`, `#48460`, `#48453`).
+
 

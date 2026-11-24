@@ -1,6 +1,6 @@
 ---
 status: open
-description: PRs #48274 (held messages na volta), #48263 (identidade de colegas em shared agents), #48271 (worker chats aninhados), #48255 (share list) e #48312.
+description: Quiet workers acionados apenas por transcript (#48011), Look around read-only (#48411), re-read de item recusado (#48387) e leave de bots no Slack (#47428).
 scope:
   - brza-studio
   - brza-workflow
@@ -10,6 +10,17 @@ opened: 2026-11-13
 tags:
   - tooling
   - infra
+references:
+  - https://github.com/stablyai/orca/pull/48011
+  - https://github.com/stablyai/orca/pull/48411
+  - https://github.com/stablyai/orca/pull/48387
+  - https://github.com/stablyai/orca/pull/47428
+  - https://github.com/stablyai/orca/pull/48435
+  - https://github.com/stablyai/orca/pull/48427
+  - https://github.com/stablyai/orca/pull/48390
+  - https://github.com/stablyai/orca/issues/48434
+  - https://github.com/stablyai/orca/issues/48444
+  - https://github.com/stablyai/orca/pull/48274
 ---
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
@@ -371,6 +382,18 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - Ao reabrir uma conversa de worker retido, a custódia do canal de mensagens e eventos é transferida atomicamente para o novo leitor ativo.
 98. **Paginação histórica reversa com `--cursor` em `orca agent read` (`#47953`):**
     - Introduz o parâmetro `--cursor` no comando CLI para permitir navegação histórica paginada de trás para frente em transcripts volumosos.
+99. **Falso diagnóstico de worker travado quando o transcript continua avançando (`#48011`, commit `5467349715b`):**
+    - O orquestrador reportava workers como travados após chamadas de ferramentas mesmo quando a escrita no transcript continuava progredindo.
+100. **Bloqueio de comandos de leitura definidos nas regras do bot pelo Look around (`#48411`, commit `99385200a80`):**
+    - A checagem de inspeção ambiental Look around impedia a execução de comandos somente leitura customizados configurados para o bot.
+101. **Item de trabalho não relido após recusa de resposta a uma pergunta substituída (`#48387`, commit `af1293c8156`):**
+    - Ao recusar resposta a uma pergunta que foi reformulada ou substituída, o orquestrador mantinha o item desatualizado na memória do coordenador.
+102. **Controle de presença de bots em threads do Slack (`#47428`, commit `4aecba8ccf6`):**
+    - Falta de comando nativo para instruir o bot a sair da thread até nova menção `@` explícita.
+103. **Ausência de `--wait-for-reply` e `--timeout` em `orca agent send` (`#48435`, Issue `#48434`):**
+    - O envio via CLI não permitia esperar de forma síncrona pelo encerramento do turno com retorno formatado em JSON.
+104. **Silêncio visual em conversas de grupo com coordenador bloqueado (`#48444`):**
+    - Chats com múltiplos agentes não sinalizavam na interface quando o coordenador estava pausado aguardando entrada humana.
 
 ## O que o upstream implementa
 
@@ -691,6 +714,14 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Permitir que integrações acordem o chat próprio do bot quando self-mail for recusado (`#48295`).
 - Prevenir roteamento indevido de respostas de orquestração cross-server para terminais flutuantes em vez do Home Chat do bot (`#48290`).
 - Expor API de host de plugin para ler itens entre bots e atuar sobre eles com permissão delegada (`#48262`).
+- Reportar workers quietos como travados após chamada de ferramenta apenas se o transcript comprovar ausência de atividade (`#48011`, commit `5467349715b`).
+- Habilitar a execução de comandos somente leitura declarados nas regras do bot durante Look around (`#48411`, commit `99385200a80`).
+- Re-ler o item de trabalho após recusa de resposta a uma pergunta substituída (`#48387`, commit `af1293c8156`).
+- Suportar comando de saída de bots em threads do Slack com retorno sob menção `@` (`#47428`, commit `4aecba8ccf6`).
+- Adicionar flags `--wait-for-reply`, `--timeout` e saída JSON no comando `orca agent send` (`#48435`, Issue `#48434`).
+- Permitir reconexão do dock coordinator a workers pausados sem perda de canal de eventos (`#48427`).
+- Reter o contexto do repositório pai quando bots criam worktrees filhos (`#48390`).
+- Sinalizar visualmente em chats de grupo quando o coordenador estiver aguardando input humano (`#48444`).
 
 
 

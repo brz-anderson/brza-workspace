@@ -1,6 +1,6 @@
 ---
 status: open
-description: Comandos slash no Pi (#48026/#48023), preservação WSL (#48165/#48177/#45247) e updater de CLI escalonado (#47923/#48183).
+description: Slash picker de skills (#48399), proxy em workers (#48426), pre-trust de skills (#48441) e métricas de plugins (#48440).
 scope:
   - brza-studio
 priority: high
@@ -8,6 +8,17 @@ opened: 2026-11-03
 tags:
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48399
+  - https://github.com/stablyai/orca/pull/48440
+  - https://github.com/stablyai/orca/pull/48426
+  - https://github.com/stablyai/orca/pull/48422
+  - https://github.com/stablyai/orca/pull/48421
+  - https://github.com/stablyai/orca/pull/48389
+  - https://github.com/stablyai/orca/pull/48441
+  - https://github.com/stablyai/orca/issues/48410
+  - https://github.com/stablyai/orca/issues/48409
+  - https://github.com/stablyai/orca/issues/48408
+  - https://github.com/stablyai/orca/issues/48464
   - https://github.com/stablyai/orca/pull/48287
   - https://github.com/stablyai/orca/issues/48270
   - https://github.com/stablyai/orca/pull/48245
@@ -148,9 +159,37 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
     Mensagens de log e diálogos de backup gerados durante `skill update` exibiam caminhos parciais ou strings formatadas de maneira inconsistente entre o frontend e a CLI.
 33. **Revisões de segurança e confiança pendentes para skills fundamentais (`#48298`, `#48297`):**
     Auditorias de segurança para inclusão no Trust Hub das skills centrais de automação `orca-cli` (`#48298`) e `orchestration` (`#48297`) exigiam verificação estrita de permissões e ausência de escapes de sandbox.
+34. **Skills de plugins ausentes no picker de comandos slash `/` antes da primeira mensagem (`#48399`):**
+    Ao abrir um novo chat, a lista de sugestões de comandos `/` não incluía as skills instaladas por plugins até que o usuário enviasse o primeiro prompt, frustrando a descoberta rápida de comandos.
+35. **Opacidade operacional e falta de métricas de telemetria de plugins (`#48440`):**
+    Desenvolvedores e administradores não tinham visibilidade de tempos de carregamento, contagem de invocações e consumo de memória de plugins ativos.
+36. **Subprocessos workers de plugins ignorando configurações corporativas de proxy (`#48426`):**
+    Enquanto o app desktop respeitava variáveis de proxy HTTP/HTTPS/NO_PROXY, workers de plugins eram iniciados sem essas configurações, falhando requisições de rede em redes corporativas.
+37. **Travamento silencioso quando workers de plugins falham ao inicializar (`#48422`):**
+    Em caso de falha de sintaxe, dependência ausente ou crash do worker de plugin, a ferramenta ficava em estado de espera infinito sem emitir erro tipado de execução.
+38. **Painéis desacoplados de plugins sem acesso ao contexto do worktree ativo (`#48421`):**
+    Quando um painel de plugin era desanexado para janela própria, perdia o contexto do worktree selecionado, impedindo a execução de operações relativas ao branch.
+39. **Falta de foco rápido em painéis de plugins via paleta de comandos (`#48389`):**
+    Usuários precisavam usar o mouse para localizar e focar painéis de plugins específicos na interface, carecendo de atalhos no Command Palette.
+40. **Diálogos de consentimento desnecessários para skills gerenciadas em instalações limpas (`#48441`, Issues `#48410`, `#48409`, `#48408`, `#48464`):**
+    Skills oficiais distribuídas com o aplicativo exigiam aprovação manual em cada primeiro uso em novas instalações, prejudicando o onboarding de usuários.
 
 ## O que os PRs fazem
 
+- **Carregamento antecipado de skills de plugins no picker slash `/` antes do primeiro prompt (`#48399`):**
+  - Hidrata o índice de skills e comandos de plugins instalados imediatamente na montagem do chat.
+- **Coleta e exposição de métricas de desempenho de plugins (`#48440`):**
+  - Expõe tempos de boot, chamadas RPC e consumo de memória de workers de plugins em telemetria estruturada.
+- **Propagação de variáveis de ambiente de proxy para workers de plugins (`#48426`):**
+  - Herda e repassa `HTTP_PROXY`, `HTTPS_PROXY` e `NO_PROXY` para todos os subprocessos filhos e workers de plugins.
+- **Emissão explícita de erro tipado de ferramenta na falha de arranque de workers (`#48422`):**
+  - Interrompe a espera com erro explicativo caso o worker do plugin sofra crash prematuro ou falhe ao inicializar.
+- **Injeção de contexto de worktree em painéis de plugins destacados (`#48421`):**
+  - Propaga metadados de repositório, branch e worktree ativo para painéis desacoplados de plugins.
+- **Comando dedicado para focar painéis de plugins na Command Palette (`#48389`):**
+  - Registra ações na paleta de comandos para abrir ou focar qualquer painel de plugin instalado diretamente pelo teclado.
+- **Pré-aprovação automática (pre-trust) para skills gerenciadas em instalações limpas (`#48441`):**
+  - Marca skills oficiais do catálogo gerenciado como pré-confiadas em novas instalações, eliminando popups intrusivos de consentimento.
 - **Releitura automática de versões de CLI na barra de status após comandos no terminal (`#48287`, resolve `#48270`):**
   - Observa saídas de comandos de atualização no terminal e invalida o cache de versão de binários na barra de status.
 - **Padronização de strings e mensagens de backup em `skill update` (`#48245`):**
@@ -255,6 +294,14 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
 33. Atualizar o cache de versão da barra de status quando CLIs forem atualizadas via terminal (`#48287`, resolve `#48270`).
 34. Padronizar mensagens e rotas de backup na substituição de skills (`#48245`).
 35. Adequar as skills `orca-cli` e `orchestration` às diretrizes de segurança e permissões do Trust Hub (`#48298`, `#48297`).
+36. Exibir skills instaladas de plugins no autocomplete slash `/` imediatamente antes do envio da primeira mensagem (`#48399`).
+37. Coletar e disponibilizar métricas de tempo de carregamento e uso de memória de workers de plugins (`#48440`).
+38. Repassar variáveis de configuração de proxy (`HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY`) para workers de plugins (`#48426`).
+39. Lançar erro tipado de execução quando um worker de plugin falhar ao subir (`#48422`).
+40. Fornecer contexto de worktree ativo para painéis de plugins desanexados (`#48421`).
+41. Adicionar comando na Command Palette para focar diretamente painéis de plugins (`#48389`).
+42. Conceder pré-confiança (pre-trust) a skills gerenciadas do sistema em novas instalações limpas (`#48441`).
+
 
 
 

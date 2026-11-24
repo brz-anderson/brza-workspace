@@ -1,6 +1,6 @@
 ---
 status: open
-description: Editor em painel estreito (#48142/#48138), recuperação de modelo (#48087), link de PR em turnos (#48005) e Linear sync (#48136).
+description: Espaçamento de automações (#48413), quebra de Run button (#48454), model family switcher (#48393) e webhooks (#48348/#48431).
 scope:
   - brza-studio
   - workspace
@@ -12,6 +12,12 @@ tags:
   - design
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48413
+  - https://github.com/stablyai/orca/pull/48454
+  - https://github.com/stablyai/orca/pull/48393
+  - https://github.com/stablyai/orca/pull/48348
+  - https://github.com/stablyai/orca/pull/48431
+  - https://github.com/stablyai/orca/issues/48446
   - https://github.com/stablyai/orca/pull/48243
   - https://github.com/stablyai/orca/commit/9233301cd74
   - https://github.com/stablyai/orca/pull/48215
@@ -141,9 +147,33 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
     No painel de Atividade / Activity panel de bots, o operador conseguia pausar automações, mas não havia opção de exclusão direta de automações obsoletas ou descontinuadas sem navegar para as telas profundas de configuração do bot.
 29. **Diálogo "Add apps" desatualizado e pouco ergonômico (`#48215`, commit `96692d810c8`):**
     A tela modal para adicionar aplicativos, integrações e plugins ("Add apps") apresentava layout denso com filtros pouco intuitivos e falta de agrupamento por categoria ou contexto de uso.
+30. **Espaçamento condensado e ilegível entre 'Next run' e 'Last run' no card de automações (`#48413`):**
+    Os horários da próxima e da última execução colidiam visualmente em telas médias, dificultando a leitura rápida da cadência agendada.
+31. **Extravasamento do botão 'Run' no cabeçalho do bot em larguras estreitas (`#48454`):**
+    Em painéis de bot redimensionados, o botão 'Run' extrapolava os limites do header ou cortava outros controles sem realizar quebra suave de linha.
+32. **Falta de alternador visual de família de modelos por automação de bot (`#48393`):**
+    Configurar o modelo (Claude 3.5 Sonnet, Haiku, GPT-4o, etc.) exigia edição manual de texto no JSON/YAML em vez de um seletor visual de família de modelos integrado.
+33. **Invisibilidade e corte de campos de webhook na barra lateral estreita (`#48348`):**
+    Parâmetros e URLs de conectores webhook eram truncados sem opção de expansão quando a barra lateral estava comprimida.
+34. **Atribuição incorreta de mensagens em turnos de webhook sem tipagem de proprietário (`#48431`):**
+    Conectores de webhook despachavam payloads sem marcar a titularidade (`owner-typed turns`), misturando mensagens de agentes com respostas de bots externos.
+35. **Despertar de bot no Slack criando novas threads em vez de responder na thread de origem (`#48446`):**
+    Ao ser invocado no Slack, o bot abria um novo canal/thread separado, perdendo o histórico e contexto da conversa onde a solicitação foi feita.
 
 ## O que o upstream implementa e corrige
 
+- **Espaçamento e tipografia clara entre horários Next run e Last run (`#48413`):**
+  - Ajusta o gap e hierarquia visual dos indicadores de execução em cartões de rotinas automáticas.
+- **Quebra flexível (wrap) para o botão Run no cabeçalho de bots (`#48454`):**
+  - Aplica flex-wrap responsivo no cabeçalho do bot, acomodando botões de disparo mesmo em janelas compactas.
+- **Seletor visual de família de modelos nas automações de bots (`#48393`):**
+  - Integra dropdown com ícones e famílias de modelos (Anthropic, OpenAI, Google) diretamente no formulário de automações.
+- **Campos de webhook expansíveis e legíveis na barra lateral estreita (`#48348`):**
+  - Permite expandir URLs e parâmetros de webhook em popovers flutuantes em larguras reduzidas de sidebar.
+- **Tipagem de proprietário em turnos de webhook (`#48431`):**
+  - Identifica explicitamente o remetente em eventos recebidos por conectores de webhook para isolar mensagens.
+- **Despertar contextual em threads do Slack (`#48446`):**
+  - Encaminha respostas de bots diretamente para a thread de origem no Slack, mantendo o fluxo unificado.
 - **Exclusão direta de automações de bots a partir do painel de Atividade (`#48243`, commit `9233301cd74`):**
   - Adiciona ação de delete no menu contextual de cada automação no Activity panel.
 - **Redesenho do diálogo Add Apps (`#48215`, commit `96692d810c8`):**
@@ -277,6 +307,13 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
 39. Sincronizar bidirecionalmente o status de itens de bots com suas respectivas issues vinculadas no Linear (`#48136`).
 40. Adicionar ação de exclusão de automações de bots diretamente no painel de Atividade (`#48243`, commit `9233301cd74`).
 41. Incorporar o redesign moderno do diálogo Add Apps para instalação de plugins e integrações (`#48215`, commit `96692d810c8`).
+42. Refinar espaçamento e hierarquia tipográfica entre Next run e Last run no card de rotinas (`#48413`).
+43. Aplicar flex-wrap para acomodar o botão Run no cabeçalho de bots em larguras comprimidas (`#48454`).
+44. Disponibilizar o seletor visual de famílias de modelos na configuração de automações de bots (`#48393`).
+45. Tornar campos e URLs de conectores webhook expansíveis em popovers na sidebar estreita (`#48348`).
+46. Incluir tipagem de proprietário (`owner-typed turns`) em mensagens recebidas via webhooks (`#48431`).
+47. Reter contexto de threads originais em respostas de bots no Slack (`#48446`).
+
 
 
 

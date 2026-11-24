@@ -1,6 +1,6 @@
 ---
 status: open
-description: Resiliência em resume remoto (#48152), deep link SSH (#48035/#48034), servidor Codex Windows (#48073) e texto claro em erros (#48079).
+description: Antigravity usage sem agy no PATH (#48325), aviso de terminal (#48418), SSH hosts (#48299) e worktrees de bots remotos (#48439).
 scope:
   - brza-studio
   - workspace
@@ -12,6 +12,15 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48325
+  - https://github.com/stablyai/orca/pull/48418
+  - https://github.com/stablyai/orca/pull/48299
+  - https://github.com/stablyai/orca/pull/48300
+  - https://github.com/stablyai/orca/pull/48439
+  - https://github.com/stablyai/orca/issues/48459
+  - https://github.com/stablyai/orca/issues/48458
+  - https://github.com/stablyai/orca/issues/48452
+  - https://github.com/stablyai/orca/issues/48420
   - https://github.com/stablyai/orca/pull/48267
   - https://github.com/stablyai/orca/commit/e71aed39a4f
   - https://github.com/stablyai/orca/issues/48284
@@ -398,9 +407,29 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Ao reiniciar a conexão SSH ou reconectar a uma máquina remota, portas encaminhadas anteriormente não eram restauradas automaticamente; além disso, conflitos de portas entre `remotePort` 6768 e 6800 tornavam endpoints locais inacessíveis no cliente.
 104. **Links clicados no chat e terminal não respeitando a configuração de navegador do sistema (`#48217`):**
     Links externos e URLs abertas por agentes no chat ignoravam a opção *"Open links in system browser"*, forçando a abertura dentro do webview embutido do app.
+105. **Falta de leitura de usage do Antigravity quando o binário está fora do PATH (`#48325`):**
+    Instalações onde o binário do Antigravity residia apenas no diretório de runtimes gerenciados do app ficavam sem medição de cota por falta de fallback explícito na verificação do PATH.
+106. **Falso aviso amarelo de falha ao revelar aba de terminal em execução (`#48418`):**
+    Ao alternar abas para revelar um terminal ativo, um falso aviso amarelo de erro/warning piscava no cabeçalho antes da sincronização do buffer.
+107. **Remoção inadvertida de perfis compartilhados ao salvar hosts SSH em Settings (`#48299`):**
+    Salvar edições na tela de hosts SSH sobrescrevia a lista de perfis do host sem mesclar configurações compartilhadas, removendo acessos corporativos salvos.
+108. **Ausência de relatório de erro quando o salvamento de download copiado falha (`#48300`):**
+    Downloads remotos cancelados ou abortados antes de fechar a stream não reportavam falha, deixando arquivos corrompidos de 0 bytes no destino.
+109. **Congelamento da UI ao abrir worktrees de bots remotos (`#48439`, Issues `#48459`, `#48458`, `#48452`, `#48420`):**
+    A inicialização e conexão com worktrees hospedados em instâncias remotas SSH realizava operações síncronas de inspeção de arquivos na main thread do renderer, travando a interface gráfica até a resposta da rede.
 
 ## O que o upstream implementa e corrige
 
+- **Fallback para executável gerenciado do Antigravity na leitura de uso (`#48325`):**
+  - Consulta o binário `agy` empacotado pelo runtime gerenciado caso o executável não esteja exportado no PATH do sistema operacional.
+- **Supressão de falso aviso de erro ao focar terminais ativos (`#48418`):**
+  - Aguarda a prontidão da stream do PTY antes de computar o estado de erro, eliminando flashes de warning no cabeçalho da aba.
+- **Preservação de perfis compartilhados na edição de hosts SSH (`#48299`):**
+  - Realiza merge seletivo de propriedades de conexão SSH preservando perfis e chaves compartilhadas configuradas.
+- **Tratamento e notificação de downloads corrompidos ou incompletos (`#48300`):**
+  - Valida o fechamento limpo da stream de escrita de downloads antes de registrar sucesso, reportando falhas de I/O adequadamente.
+- **Carregamento assíncrono não bloqueante de worktrees de bots remotos (`#48439`):**
+  - Move a inspeção de arquivos e descoberta de worktrees remotos para background, mantendo a interface fluida sem congelamentos.
 - **Suporte a `secret-tool` para persistência em Linux/KDE (`#48267`, commit `e71aed39a4f`):**
   - Detecta ambientes KDE e utiliza `secret-tool` como backend para armazenamento seguro de credenciais.
 - **Resolução de CLI interna para métricas de uso do Antigravity gerenciado (`#48284`):**
@@ -749,6 +778,12 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 108. Proteger a inicialização do Antigravity contra hooks órfãos em `~/.gemini/config/hooks.json` no Windows (`#48254`).
 109. Restaurar automaticamente túneis de portas ao reconectar sessões SSH e corrigir roteamento de portas locais (`#48334`, `#48278`, `#48248`).
 110. Respeitar a opção do usuário de abrir links externos diretamente no navegador padrão do sistema (`#48217`).
+111. Consultar binário empacotado do Antigravity para medição de uso quando a CLI não estiver no PATH (`#48325`).
+112. Suprimir flashes de aviso falso ao focar e revelar abas de terminal ativas (`#48418`).
+113. Preservar perfis e conexões compartilhadas na atualização de configurações de hosts SSH (`#48299`).
+114. Notificar erros e falhas de I/O em downloads e cópias interrompidas (`#48300`).
+115. Desacoplar abertura de worktrees de bots remotos da thread de renderização da interface (`#48439`, `#48459`, `#48458`, `#48452`, `#48420`).
+
 
 
 

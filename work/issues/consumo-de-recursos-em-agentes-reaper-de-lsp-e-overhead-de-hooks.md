@@ -1,6 +1,6 @@
 ---
 status: open
-description: PRs #48222 (compactação de cache de worktrees), #48219 (chaves filtradas do Git config), #48211 (desduplicação de modelos) e #48261 (limite de 32 conexões).
+description: Perf de modais sem restyle global (#48419), pausa de watchers em first-work (#48400), cleanup de workers de plugins (#48407) e dirty status barato (#48457).
 scope:
   - brza-studio
   - tools-kit
@@ -10,6 +10,12 @@ opened: 2026-11-04
 tags:
   - tooling
   - infra
+references:
+  - https://github.com/stablyai/orca/pull/48419
+  - https://github.com/stablyai/orca/pull/48400
+  - https://github.com/stablyai/orca/pull/48407
+  - https://github.com/stablyai/orca/issues/48457
+  - https://github.com/stablyai/orca/pull/48222
 ---
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
@@ -132,6 +138,14 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
     Em hosts ocupados com múltiplos worktrees, execuções concorrentes de validação de alterações disputavam CPU intensamente sem serialização ou reaproveitamento do grafo de importação.
 29. **Conflito de registro e hooks em workers Task do Droid (`#47836`, commit `edbdf6506dc`, e `#47853`, commit `4f5e1bb0cd0`):**
     Hooks gerenciados instalados em caminhos incorretos do Droid e eventos disparados por subagentes Task sobrescreviam indevidamente a linha do agente e o estado do painel.
+30. **Invalidation de layout e restyle global de árvore DOM ao abrir ou fechar modais (`#48419`):**
+    Abertura e fechamento de modais de formulário, configurações e popups acionavam recálculos de estilo síncronos e restyle em toda a árvore DOM da janela principal, gerando engasgos de frame e congelamento transitório de digitação.
+31. **Saturação de I/O e tempestade de eventos de filesystem durante o primeiro despacho (`#48400`):**
+    Durante o `first-work` e provisionamento inicial de branches/worktrees, watchers de diretório disparavam centenas de eventos em cascata, concorrendo com o checkout de arquivos e gerando travamentos de I/O no daemon.
+32. **Processos workers de plugins e tarefas desacopladas permanecendo órfãos após encerramento (`#48407`):**
+    Ao fechar abas de plugins ou finalizar despachos automatizados, processos auxiliares de plugins mantinham sockets e subprocessos abertos consumindo memória de fundo.
+33. **Custo excessivo de invocações completas de `git status` para verificação de dirty status (`#48457`):**
+    Consultas frequentes de estado de modificação executavam `git status --porcelain` completo mesmo em repositórios massivos sem alterações em disco.
 
 ## O que o upstream propõe e implementa
 
@@ -227,6 +241,14 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
   - Remove a variável de ambiente (case-insensitive) nos construtores de painel antes do merge explícito, e reutiliza o mesmo predicado no sanitizador do Antigravity ACP.
 - **Conflito de hooks de subagente Droid e reset de sessão principal do terminal (`#47826` e `#47825`):**
   - Quando o Droid executa subagentes `Task`, envia eventos de hook próprios (SessionStart, Stop, SessionEnd) que resetam indevidamente a linha de sessão principal do terminal; além disso, o Droid ignora os hooks do Orca se `~/.factory/hooks.json` definir o mesmo evento que `~/.factory/settings.json`.
+- **Contenção de estilo e isolamento de renderização em modais (`#48419`):**
+  - Aplica CSS `contain: layout style` e scoping nos containers de diálogo/modais, evitando que o mount/unmount de popups provoque restyle e reflow síncronos na árvore inteira do documento.
+- **Pausa de watchers durante o first-work de automações e branches (`#48400`):**
+  - Pausa temporariamente os watchers de filesystem (`fs.watch`) durante o bootstrap inicial (`first-work`), retomando a escuta apenas após o checkout completo dos arquivos de projeto.
+- **Reap garantido de workers e subprocessos de plugins órfãos (`#48407`):**
+  - Registra tratadores de terminação e monitoramento de keepalive para processos de plugins desacoplados, encerrando processos filhos e liberando descritores de sockets na finalização de tarefas.
+- **Cheque leve de dirty status antes de invocar `git status` (`#48457`):**
+  - Compara carimbos de data/hora (`mtime`) e stat do diretório `.git` e working tree antes de despachar comandos caros de `git status --porcelain`.
 
 ## O que fazer
 
@@ -275,5 +297,10 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Desduplicar objetos idênticos de modelos e esforço durante a hidratação do catálogo de agentes (`#48211`).
 - Elevar o limite de conexões simultâneas do Relay por computador de 8 para 32 (`#48261`).
 - Buscar o motor de renderização de diagramas do computador sob demanda apenas no primeiro desenho de diagrama no mobile (`#48282`, commit `5b59337bdeb`).
+- Conter restyle e recálculo de layout na abertura e fechamento de modais com isolamento CSS (`#48419`).
+- Pausar temporariamente watchers de filesystem durante first-work e criação de worktrees (`#48400`).
+- Implementar encerramento determinístico e cleanup de workers de plugins desacoplados (`#48407`).
+- Adotar checagem leve de mtime/stat antes de disparar `git status` completo para verificação de dirty (`#48457`).
+
 
 

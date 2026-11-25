@@ -1,6 +1,6 @@
 ---
 status: open
-description: Normalização NFD no macOS (#48397/#48432/#48417), montagem de worktree (#48354) e cleanup agrupado (#43498).
+description: Releitura de imagens locais (#48451), pairing web resiliente (#48524), títulos reais de perguntas (#48530) e recuperação de itens recusados (#48526).
 scope:
   - brza-studio
   - workspace
@@ -11,6 +11,11 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48451
+  - https://github.com/stablyai/orca/pull/48524
+  - https://github.com/stablyai/orca/pull/48530
+  - https://github.com/stablyai/orca/pull/48526
+  - https://github.com/stablyai/orca/issues/48588
   - https://github.com/stablyai/orca/pull/48397
   - https://github.com/stablyai/orca/pull/48432
   - https://github.com/stablyai/orca/pull/48417
@@ -301,9 +306,29 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
     - O runtime executava normalizações e instanciações repetidas de strings NFD para cada entrada de diretório no macOS, penalizando o garbage collector em repositórios grandes.
 80. **Falha de renderização de worktree ativo quando ocultado pela barra lateral (`#48354`):**
     - Ao colapsar ou expandir a barra lateral sobrepondo a janela principal, a superfície do worktree ativo era desmontada sem preservação de viewport, exigindo recálculo e provocando flickering ao retornar.
+81. **Imagens locais em cache não atualizadas após refocus da janela (`#48451`):**
+    - Quando um arquivo de imagem em disco era modificado por um processo externo ou script de build, o visualizador mantinha os bytes em cache mesmo após alternar o foco da janela.
+82. **Travamento no arranque da interface web pareada em caso de erro de migração de banco (`#48524`):**
+    - Se a migração de esquema de banco de dados encontrasse uma inconsistência transitória no host, o servidor web pareado ficava preso no estado `starting` sem reportar erro legível nem tentar recuperação.
+83. **Retenção indevida do estado "Needs you" e títulos opacos de perguntas em itens (`#48530`):**
+    - Após o operador responder às perguntas de um item, o selo "Needs you" continuava aceso na sidebar, e o cabeçalho exibia IDs internos em vez do enunciado textual real da pergunta.
+84. **Perda de respostas digitadas em itens quando a submissão é recusada por validação (`#48526`):**
+    - Se uma resposta submetida a uma pergunta de item fosse rejeitada por validação do modelo ou timeout, o formulário limpava os campos de texto, forçando o operador a redigitar o conteúdo.
+85. **Proliferação de cópias efêmeras de worktrees em falhas de cleanup de automações (`#48588`):**
+    - Automações abortadas mid-flight deixavam pastas temporárias de worktree sem marcação de expiração ou remoção automática no próximo ciclo de coleta.
 
 ## O que o upstream propõe e implementa
 
+- **Invalidação de cache e recarregamento de imagens locais ao focar a janela (`#48451`):**
+  - Monitora o evento de foco da janela (`refocus`) e verifica o `mtime` de imagens locais em exibição, atualizando a textura visual caso o arquivo em disco tenha mudado.
+- **Recuperação e fallback em falhas de migração na web pareada (`#48524`):**
+  - Encerra graciosamente o estado de startup da web pareada emitindo diagnóstico estruturado em caso de falha de migração, permitindo reinicialização sem travamento do daemon.
+- **Limpeza atômica de "Needs you" e renderização de títulos reais de perguntas (`#48530`):**
+  - Desativa o estado "Needs you" no momento exato em que a resposta é gravada e exibe o resumo textual formatado da pergunta na barra de progresso e cartões de itens.
+- **Preservação e recuperação de rascunhos em respostas de itens recusadas (`#48526`):**
+  - Mantém o texto digitado no formulário em caso de rejeição de envio, oferecendo ação imediata de reenvio ou edição.
+- **Coleta programada de worktrees temporários de automações interrompidas (`#48588`):**
+  - Identifica worktrees órfãos criados por automações que terminaram com falha e agenda sua remoção segura na próxima rodada de cleanup.
 - **Normalização canônica de caminhos NFD no git status para macOS (`#48397`):**
   - Aplica normalização uniforme entre UTF-8 NFC e NFD nas saídas do git status, eliminando arquivos fantasmas e falsos positivos de alteração.
 - **Renderização correta (dim) de arquivos ignorados em NFD (`#48432`):**
@@ -598,6 +623,11 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Corrigir a estilização esmaecida (dim) de arquivos ignorados com caracteres em decomposição NFD (`#48432`).
 - Reutilizar representações de strings e modelos para caminhos NFD no macOS para conter alocações em GC (`#48417`, `#48416`).
 - Preservar a montagem de superfície de worktrees ativos quando encobertos pela barra lateral (`#48354`).
+- Recarregar imagens locais no visualizador de arquivos sob evento de refocus da janela (`#48451`).
+- Recuperar o estado da interface web pareada reportando diagnósticos claros em falhas de migração (`#48524`).
+- Limpar atomicamente o selo "Needs you" ao responder perguntas e exibir títulos descritivos em itens (`#48530`).
+- Reter o rascunho de respostas de itens quando a submissão sofrer recusa ou falha de validação (`#48526`).
+- Varrer e expurgar worktrees temporários órfãos de automações interrompidas no cleanup (`#48588`).
 
 
 

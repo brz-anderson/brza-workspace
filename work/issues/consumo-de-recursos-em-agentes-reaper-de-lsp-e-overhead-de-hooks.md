@@ -1,6 +1,6 @@
 ---
 status: open
-description: Perf de modais sem restyle global (#48419), pausa de watchers em first-work (#48400), cleanup de workers de plugins (#48407) e dirty status barato (#48457).
+description: Liberação de recursos em workspaces estacionados (#45956), fila FIFO de check:changed (#48577), home isolada do Codex (#48486) e spawn nativo (#48600).
 scope:
   - brza-studio
   - tools-kit
@@ -11,6 +11,11 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/45956
+  - https://github.com/stablyai/orca/pull/48577
+  - https://github.com/stablyai/orca/pull/48486
+  - https://github.com/stablyai/orca/pull/48600
+  - https://github.com/stablyai/orca/issues/48656
   - https://github.com/stablyai/orca/pull/48419
   - https://github.com/stablyai/orca/pull/48400
   - https://github.com/stablyai/orca/pull/48407
@@ -146,9 +151,29 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
     Ao fechar abas de plugins ou finalizar despachos automatizados, processos auxiliares de plugins mantinham sockets e subprocessos abertos consumindo memória de fundo.
 33. **Custo excessivo de invocações completas de `git status` para verificação de dirty status (`#48457`):**
     Consultas frequentes de estado de modificação executavam `git status --porcelain` completo mesmo em repositórios massivos sem alterações em disco.
+34. **Retenção de memória e descritores de terminais/layouts em workspaces estacionados ou ocultos (`#45956`):**
+    Workspaces que ficavam inativos ou minimizados continuavam retendo instâncias ativas de layout e buffers de terminal no heap do renderer e no daemon de processos, consumindo centenas de megabytes.
+35. **Ordem de execução não determinística e contenção na fila de `check:changed` (`#48577`):**
+    Tarefas de checagem de alteração de arquivos (`check:changed`) competiam de forma desordenada sem fila estrita de chegada, penalizando workspaces ativos com esperas arbitrárias.
+36. **Servidor Codex lendo `~/.codex` como diretório de projeto (`#48486`):**
+    Quando o servidor Codex inicializava, considerava a pasta de configuração de usuário como workspace de projeto, varrendo recursivamente arquivos de cache e travando a CPU.
+37. **Overhead e consumo de memória no spawn de processos via fork/exec (`#48600`):**
+    A instanciação de subprocessos pelo Node.js duplicava a tabela de páginas da memória da aplicação via fork padrão; a migração para `posix_spawn` eliminou picos de memória e latência de arranque.
+38. **Vazamento e overhead de telemetria em probes de status contínuos (`#48656`):**
+    Sondagens de telemetria de uso e recursos executavam sem throttling sob alta carga, elevando o tempo de ciclo do loop de eventos.
 
 ## O que o upstream propõe e implementa
 
+- **Liberação de terminais e layouts de workspaces estacionados ou ocultos (`#45956`):**
+  - Desaloca buffers PTY e layouts de abas em segundo plano quando um workspace é estacionado ou permanece oculto, reidratando-os sob demanda no foco.
+- **Fila estrita FIFO para execuções de `check:changed` (`#48577`):**
+  - Enfileira checagens de integridade e arquivos alterados em ordem rigorosa de chegada, prevenindo inanição (*starvation*) e contenção desordenada de CPU.
+- **Isolamento de diretório home do servidor Codex (`#48486`):**
+  - Assegura que o servidor Codex execute em sua home dedicada sem interpretar `~/.codex` ou diretórios de metadados como repositórios de projeto.
+- **Substituição de spawn tradicional por `posix_spawn` nativo (`#48600`):**
+  - Adota `posix_spawn` para lançamento de executáveis auxiliares e agentes, cortando custos de clonagem de heap e acelerando a criação de processos.
+- **Throttling e contenção de overhead em probes de telemetria contínuos (`#48656`):**
+  - Aplica amortecimento dinâmico em verificações repetidas de status de sistema sob estresse de CPU.
 - **Delegação da varredura de portas no Linux para worker auxiliar e comando único `ls -ln` (`#47943`):**
   - Transfere a resolução de sockets para processos para o worker de port-scan fora do processo principal do Electron;
   - Executa um único comando `ls -ln /proc/[0-9]*/fd` com filtragem em streaming das linhas `fd -> socket:[N]`, reduzindo o custo de CPU de ~1000ms no main process para ~30-50ms no worker com fallback seguro para a varredura legada.
@@ -301,6 +326,11 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Pausar temporariamente watchers de filesystem durante first-work e criação de worktrees (`#48400`).
 - Implementar encerramento determinístico e cleanup de workers de plugins desacoplados (`#48407`).
 - Adotar checagem leve de mtime/stat antes de disparar `git status` completo para verificação de dirty (`#48457`).
+- Desalocar buffers de terminais e layouts de workspaces estacionados ou minimizados (`#45956`).
+- Adotar fila estrita FIFO de execuções para `check:changed` entre worktrees (`#48577`).
+- Isolar diretório de trabalho do servidor Codex impedindo varredura de `~/.codex` (`#48486`).
+- Utilizar `posix_spawn` nativo no lançamento de subprocessos auxiliares (`#48600`).
+- Aplicar amortecimento dinâmico em sondagens contínuas de telemetria sob alta carga (`#48656`).
 
 
 

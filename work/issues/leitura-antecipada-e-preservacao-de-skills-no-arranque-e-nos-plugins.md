@@ -1,6 +1,6 @@
 ---
 status: open
-description: Slash picker de skills (#48399), proxy em workers (#48426), pre-trust de skills (#48441) e métricas de plugins (#48440).
+description: Plugins com servidores MCP (#48659/#48658), status de install local de skills (#48578), update de CLI (#48610) e symlinks seguros (#48616).
 scope:
   - brza-studio
 priority: high
@@ -8,6 +8,13 @@ opened: 2026-11-03
 tags:
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48578
+  - https://github.com/stablyai/orca/pull/48610
+  - https://github.com/stablyai/orca/pull/48659
+  - https://github.com/stablyai/orca/pull/48658
+  - https://github.com/stablyai/orca/pull/48616
+  - https://github.com/stablyai/orca/issues/48635
+  - https://github.com/stablyai/orca/issues/48617
   - https://github.com/stablyai/orca/pull/48399
   - https://github.com/stablyai/orca/pull/48440
   - https://github.com/stablyai/orca/pull/48426
@@ -173,9 +180,29 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
     Usuários precisavam usar o mouse para localizar e focar painéis de plugins específicos na interface, carecendo de atalhos no Command Palette.
 40. **Diálogos de consentimento desnecessários para skills gerenciadas em instalações limpas (`#48441`, Issues `#48410`, `#48409`, `#48408`, `#48464`):**
     Skills oficiais distribuídas com o aplicativo exigiam aprovação manual em cada primeiro uso em novas instalações, prejudicando o onboarding de usuários.
+41. **Status de instalação de skills executando lookups de release remotos antes de ter cópia local (`#48578`):**
+    A interface de gerenciamento de skills tentava consultar repositórios remotos para checar novas releases mesmo quando a skill ainda não tinha sido clonada ou baixada localmente, travando a renderização em ambientes offline ou com firewalls.
+42. **Notificação de atualização de CLI invasiva no centro da tela (`#48610`):**
+    Avisos de nova versão de CLI apareciam como banners centrais bloqueantes em vez de um card sutil posicionado no canto inferior.
+43. **Impossibilidade de plugins fornecerem e gerenciarem servidores MCP (`#48659`, `#48658`):**
+    Plugins de terceiros não tinham ponto de extensão para registrar conexões e servidores MCP (*Model Context Protocol*), nem ferramentas de CLI para listar, migrar ou importar conexões de MCP.
+44. **Vulnerabilidade a links simbólicos inseguros (cross-device symlinks) no carregamento de skills (`#48616`):**
+    O validador de pacotes de skills aceitava symlinks que apontavam para fora do volume de trabalho ou para discos externos arbitrários, criando riscos de escape de sandbox.
+45. **Conflito de namespaces em ferramentas registradas por múltiplos plugins MCP (`#48635`, `#48617`):**
+    Quando dois plugins registravam servidores MCP com ferramentas de mesmo nome, uma sobrepunha a outra silenciosamente sem prefixação ou resolução determinística.
 
 ## O que os PRs fazem
 
+- **Verificação local prévia antes de lookup de release em skills (`#48578`):**
+  - Checa a presença da cópia física local da skill antes de disparar qualquer lookup de rede para releases upstream.
+- **Card sutil de atualização de CLI no canto inferior (`#48610`):**
+  - Reposiciona notificações de nova versão da CLI para um card recolhível no rodapé inferior da janela.
+- **Provedor e gestão de servidores MCP por plugins (`#48659`, `#48658`):**
+  - Adiciona suporte no manifesto de plugins para fornecimento de servidores MCP e comandos CLI (`mcp list`, `mcp move`, `mcp import`).
+- **Recusa estrita de symlinks cross-device inseguros em skills (`#48616`):**
+  - Rejeita symlinks que cruzem limites de ponto de montagem ou dispositivos físicos durante a instalação e validação de skills.
+- **Resolução de namespaces e isolamento de ferramentas MCP (`#48635`, `#48617`):**
+  - Aplica prefixação com o ID do plugin fornecedor nas ferramentas MCP expostas ao runtime dos agentes.
 - **Carregamento antecipado de skills de plugins no picker slash `/` antes do primeiro prompt (`#48399`):**
   - Hidrata o índice de skills e comandos de plugins instalados imediatamente na montagem do chat.
 - **Coleta e exposição de métricas de desempenho de plugins (`#48440`):**
@@ -301,6 +328,11 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
 40. Fornecer contexto de worktree ativo para painéis de plugins desanexados (`#48421`).
 41. Adicionar comando na Command Palette para focar diretamente painéis de plugins (`#48389`).
 42. Conceder pré-confiança (pre-trust) a skills gerenciadas do sistema em novas instalações limpas (`#48441`).
+43. Checar disponibilidade local de skills antes de consultar releases na rede (`#48578`).
+44. Adotar card compacto de atualização de CLI no rodapé (`#48610`).
+45. Suportar registro e gestão de servidores MCP diretamente por plugins (`#48659`, `#48658`).
+46. Rejeitar links simbólicos cross-device inseguros em pacotes de skills (`#48616`).
+47. Isolar ferramentas de servidores MCP com prefixo de namespace do plugin (`#48635`, `#48617`).
 
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Prosa visível em thinking (#48353), picker @ simplificado (#48425/#48223), snippet helper (#48415), comando shell completo (#48430) e reload de imagens (#48451).
+description: Worker tray em chip (#48581), queued row espaçada (#48564/#48598), prompts sugeridos no Codex (#48472) e imagens coladas (#48666).
 scope:
   - brza-studio
   - brza-workflow
@@ -10,6 +10,14 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48581
+  - https://github.com/stablyai/orca/pull/48564
+  - https://github.com/stablyai/orca/pull/48598
+  - https://github.com/stablyai/orca/pull/48472
+  - https://github.com/stablyai/orca/pull/48528
+  - https://github.com/stablyai/orca/pull/48609
+  - https://github.com/stablyai/orca/pull/48666
+  - https://github.com/stablyai/orca/issues/48602
   - https://github.com/stablyai/orca/pull/48353
   - https://github.com/stablyai/orca/pull/48425
   - https://github.com/stablyai/orca/pull/48415
@@ -406,9 +414,29 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
     - Quando um agente ou script atualizava uma imagem já exibida na conversa, o visualizador mantinha a versão antiga em cache sem re-ler o arquivo alterado.
 102. **Perda de foco do composer no Linux via Alt-Tab (`#48461`):**
     - No Linux desktop, alternar janelas desarmava o foco do editor ProseMirror, exigindo clique manual para recuperar o cursor.
+103. **Bandeja de workers ocupando espaço excessivo no composer em chats longos (`#48581`):**
+    - A bandeja de workers ativos (worker tray) ocupava uma barra retangular fixa de largura completa, empurrando o composer para baixo; o upstream introduziu layout em chip/pílula compacta recolhível com contagem e estado inline.
+104. **Aperto visual e quebra de alinhamento na queued row de mensagens pendentes (`#48564`, `#48598`):**
+    - As linhas de mensagens enfileiradas (*queued row*) colidiam visualmente com o composer inferior por falta de margem e separação vertical, além de quebrar o layout quando múltiplas mensagens eram postadas rapidamente.
+105. **Ausência de prompts sugeridos (*suggested prompts*) no Native Chat do Codex (`#48472`):**
+    - Enquanto Claude apresentava chips de sugestão contextuais baseados no estado do repositório, o Codex Native Chat mantinha a tela inicial vazia sem guiar o desenvolvedor sobre ações possíveis.
+106. **Falha na colagem direta de imagens da área de transferência (clipboard) no composer (`#48666`, refs `#48528`):**
+    - Colar capturas de tela diretamente do clipboard (`Cmd+V` / `Ctrl+V`) gerava uploads inconsistentes ou falhava silenciosamente quando o MIME type vinha como `image/png` sem extensão física associada.
+107. **Perda de foco do teclado ao fechar modal ou sheet de inspeção de subagente (`#48609`, resolve Issue `#48602`):**
+    - Fechar a gaveta (*slide-up sheet*) de um subagente descartava o foco ativo para o `<body>`, forçando o operador a clicar novamente no editor de prompt do chat principal.
 
 ## O que o upstream implementa
 
+- **Bandeja de workers compacta em chip recolhível no composer (`#48581`):**
+  - Condensa os indicadores de workers em pílulas compactas alinhadas à direita da barra de ferramentas do composer, com contagem dinâmica e popover detalhado apenas ao clicar.
+- **Espaçamento e alinhamento visual da queued row de mensagens (`#48564`, `#48598`):**
+  - Ajusta margens superiores e inferiores, adiciona padding estruturado e assegura que mensagens enfileiradas não sobreponham os botões de ação e steer do composer.
+- **Chips de prompts sugeridos contextuais para o Codex no Native Chat (`#48472`):**
+  - Renderiza chips clicáveis com ações comuns de projeto (ex.: "Run tests", "Explain structure", "Find bugs") na abertura de novos chats Codex.
+- **Tratamento robusto de colagem de imagens do clipboard (`#48666`, refs `#48528`):**
+  - Intercepta eventos de `paste` com dados de imagem no ProseMirror, converte blobs anônimos em nomes de arquivos temporários válidos e anexa como artefatos prontos para envio.
+- **Restauração determinística de foco ao fechar sheet de subagente (`#48609`, resolve Issue `#48602`):**
+  - Retorna o foco do teclado diretamente ao campo de entrada do chat principal ao encerrar a inspeção de um subagente com <kbd>Esc</kbd> ou botão fechar.
 - **Transferência automática de foco do teclado ao clicar em Stop/Send em split chat (`#47784`, resolve `#47780`):**
   - No `NativeChatComposerPrimaryButton`, detecta cliques esquerdos quando o elemento focado atual pertence ao editor de prompt de outro chat (`[data-native-chat-prompt-editor]`) e transfere o foco imediatamente para o composer do chat clicado, retendo o rascunho do outro split intacto e evitando envios cruzados acidentais com `Cmd+Enter`.
 - **Bandeja de workers com status preciso, ações de recuperação e glifo `AgentStateDot` (`#47774`):**
@@ -766,6 +794,11 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Recarregar artefatos de imagem locais quando o arquivo em disco sofrer mutação (`#48451`).
 - Oferecer opção para colapsar parâmetros de chamadas de ferramentas no balão de chat (`#48445`).
 - Reter o foco do composer de mensagens após alternância de janelas via Alt-Tab no Linux (`#48461`).
+- Adotar bandeja de workers compacta em chip recolhível no composer (`#48581`).
+- Ajustar espaçamento e alinhamento visual da queued row de mensagens pendentes (`#48564`, `#48598`).
+- Exibir chips de prompts sugeridos contextuais no Native Chat do Codex (`#48472`).
+- Tratar colagem de imagens diretamente da área de transferência (clipboard) no composer (`#48666`, refs `#48528`).
+- Restaurar foco no campo de entrada do chat principal ao fechar a sheet de inspeção de subagente (`#48609`, resolve Issue `#48602`).
 
 
 

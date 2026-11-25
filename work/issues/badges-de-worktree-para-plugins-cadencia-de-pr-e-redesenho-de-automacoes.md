@@ -1,6 +1,6 @@
 ---
 status: open
-description: Espaçamento de automações (#48413), quebra de Run button (#48454), model family switcher (#48393) e webhooks (#48348/#48431).
+description: Resiliência de Slack bot (#47907/#47901/#47381), headers MCP no relay (#48477), propósito de bot pós-criação (#48487) e cadência de PR (#48621).
 scope:
   - brza-studio
   - workspace
@@ -12,6 +12,16 @@ tags:
   - design
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/47907
+  - https://github.com/stablyai/orca/pull/47901
+  - https://github.com/stablyai/orca/pull/46794
+  - https://github.com/stablyai/orca/pull/48487
+  - https://github.com/stablyai/orca/pull/47381
+  - https://github.com/stablyai/orca/pull/48496
+  - https://github.com/stablyai/orca/pull/48477
+  - https://github.com/stablyai/orca/pull/47789
+  - https://github.com/stablyai/orca/pull/48621
+  - https://github.com/stablyai/orca/issues/48615
   - https://github.com/stablyai/orca/pull/48413
   - https://github.com/stablyai/orca/pull/48454
   - https://github.com/stablyai/orca/pull/48393
@@ -159,9 +169,37 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
     Conectores de webhook despachavam payloads sem marcar a titularidade (`owner-typed turns`), misturando mensagens de agentes com respostas de bots externos.
 35. **Despertar de bot no Slack criando novas threads em vez de responder na thread de origem (`#48446`):**
     Ao ser invocado no Slack, o bot abria um novo canal/thread separado, perdendo o histórico e contexto da conversa onde a solicitação foi feita.
+36. **Turnos do Slack com respostas vazias ou nulas descartadas sem re-tentativa (`#47907`):**
+    Quando o bot de Slack retornava um turno vazio por lentidão ou atraso do modelo, a integração desistia imediatamente sem retentativa, deixando a menção do usuário sem retorno.
+37. **Silêncio opaco em turnos do Slack quando o bot não produz resposta final (`#47901`):**
+    Se a invocação de um bot via Slack terminasse sem texto de saída (ex.: apenas chamadas de ferramentas internas), o canal permanecia sem mensagem explicativa de conclusão.
+38. **Falta de timer de curta duração com descarte garantido (`#46794`):**
+    Automações não tinham primitivas para agendar timers rápidos de execução única (`--once --by <duration>`) sem criar cron jobs duráveis que precisassem ser limpos manualmente.
+39. **Propósito do bot invisível ou oculto logo após a criação (`#48487`):**
+    Ao concluir o assistente de criação de um bot, seu propósito (*purpose*) e escopo de atuação ficavam escondidos, gerando incerteza no operador sobre a configuração inicial.
+40. **Mascote e cor customizada do bot não refletidos no perfil de usuário do Slack (`#47381`):**
+    Mensagens enviadas pelo bot para o Slack usavam ícones genéricos em vez de adotar a cor e mascote selecionados na interface do Orca Studio.
+41. **Poluição de chats em grupo por tokens de controle `NO_REPLY` (`#48496`):**
+    Bots participantes de grupos que decidiam não responder postavam a string crua `NO_REPLY` no chat da equipe em vez de suprimir silenciosamente a mensagem.
+42. **Perda de cabeçalhos MCP estruturados no relay de bots e follow-ups em threads separadas (`#48477`, `#47789`, `#48621`, `#48615`):**
+    O relay de bots descartava headers `Mcp-Method`, `Name` e `Param-*`, quebrando invocações contextuais de ferramentas de terceiros; ademais, follow-ups de bots abriam conversas soltas em vez de manterem-se na thread pai.
 
 ## O que o upstream implementa e corrige
 
+- **Retentativa inteligente de turnos vazios no Slack antes de falhar (`#47907`):**
+  - Re-envia o turno do Slack até duas vezes caso a resposta retorne em branco, assegurando entrega confiável.
+- **Aviso explícito e claro em turnos do Slack sem resposta textual (`#47901`):**
+  - Posta mensagem informativa discreta quando o agente conclui ações de ferramentas sem gerar prosa explicativa final.
+- **Timer de disparo único de alta precisão (`#46794`):**
+  - Introduz o parâmetro `--once --by` em agendamentos de automação, liquidando o timer atomicamente após o disparo.
+- **Exibição destacada do propósito do bot na tela de conclusão (`#48487`):**
+  - Apresenta card com o propósito estruturado e instruções principais logo após o assistente de criação do bot.
+- **Sincronização de mascote e paleta visual do bot com o avatar do Slack (`#47381`):**
+  - Renderiza o ícone e a cor oficial do bot nos envios da integração com o Slack.
+- **Supressão transparente de tokens `NO_REPLY` em chats de grupo (`#48496`):**
+  - Intercepta e descarta emissões de `NO_REPLY` em conversas de equipe sem gerar bolhas visuais vazias.
+- **Propagação de cabeçalhos MCP no bot relay e continuidade em thread (`#48477`, `#47789`, `#48621`, `#48615`):**
+  - Encaminha headers `Mcp-*` intactos pelo relay e ancora follow-ups de agentes na mesma thread de conversa original.
 - **Espaçamento e tipografia clara entre horários Next run e Last run (`#48413`):**
   - Ajusta o gap e hierarquia visual dos indicadores de execução em cartões de rotinas automáticas.
 - **Quebra flexível (wrap) para o botão Run no cabeçalho de bots (`#48454`):**
@@ -313,6 +351,13 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
 45. Tornar campos e URLs de conectores webhook expansíveis em popovers na sidebar estreita (`#48348`).
 46. Incluir tipagem de proprietário (`owner-typed turns`) em mensagens recebidas via webhooks (`#48431`).
 47. Reter contexto de threads originais em respostas de bots no Slack (`#48446`).
+48. Reenviar turnos do Slack que retornem vazios antes de registrar falha de entrega (`#47907`).
+49. Emitir aviso explicativo no Slack quando turnos do bot concluírem sem prosa final (`#47901`).
+50. Suportar agendamento de timers únicos rápidos com `--once --by` (`#46794`).
+51. Exibir com destaque o propósito e escopo do bot na tela pós-criação (`#48487`).
+52. Sincronizar mascote e cor do bot como avatar oficial em mensagens do Slack (`#47381`).
+53. Suprimir mensagens `NO_REPLY` em conversas de grupo de bots (`#48496`).
+54. Propagar cabeçalhos MCP estruturados no relay e manter follow-ups de bots na mesma thread (`#48477`, `#47789`, `#48621`, `#48615`).
 
 
 

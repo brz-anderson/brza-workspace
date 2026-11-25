@@ -1,6 +1,6 @@
 ---
 status: open
-description: App Rail padrão (#48442), opacidade em grupo (#48365), busca de chats (#48329), colapso de subgrupos (#48412) e quick actions (#48428).
+description: Repo badges de 16px na linha de título (#48607/#48572), chip de modelo em sessões (#48489), aba Home de bot fixa (#48561) e remoção de borda âmbar (#48554).
 scope:
   - brza-studio
   - workspace
@@ -10,6 +10,14 @@ tags:
   - design
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48607
+  - https://github.com/stablyai/orca/pull/48572
+  - https://github.com/stablyai/orca/pull/48565
+  - https://github.com/stablyai/orca/pull/48489
+  - https://github.com/stablyai/orca/pull/48561
+  - https://github.com/stablyai/orca/pull/48554
+  - https://github.com/stablyai/orca/issues/48625
+  - https://github.com/stablyai/orca/issues/48651
   - https://github.com/stablyai/orca/pull/48442
   - https://github.com/stablyai/orca/pull/48365
   - https://github.com/stablyai/orca/pull/48329
@@ -307,6 +315,16 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
     - Subgrupos dentro de categorias de projetos não podiam ser recolhidos individualmente, estendendo verticalmente a barra lateral em workspaces com muitos monorepos ou submódulos.
 70. **Ausência de ações rápidas contextuais nas linhas de agentes (`#48428`, Issues `#48460`, `#48453`):**
     - Para reiniciar, pausar ou bifurcar um agente pela sidebar, o usuário precisava abrir a aba do agente ou acionar menus de contexto ocultos, sem botões de ação rápida ao passar o mouse.
+71. **Badges de repositório desalinhados da linha de título e com baixa legibilidade (`#48607`, `#48572`, `#48565`):**
+    - Os badges indicadores de repositório ficavam posicionados em linhas separadas abaixo do nome do workspace, quebrando o ritmo vertical e usando dimensões incompatíveis (menores que 16px) com contraste deficiente em temas escuros; o upstream integrou os badges diretamente na linha de título com altura padronizada de 16px e alto contraste.
+72. **Ilegibilidade de títulos de sessão longos e omissão do chip de modelo utilizado (`#48489`):**
+    - Títulos de conversas na barra lateral truncavam agressivamente o texto sem exibir um chip indicando o modelo em execução; o upstream passou a exibir chip contextual de modelo com layout legível.
+73. **Aba Home do bot deslocando-se para o final ao abrir novos arquivos (`#48561`):**
+    - A aba principal de contexto de um bot (*Home tab*) era tratada como aba comum, movendo-se para a direita ao inspecionar arquivos; o upstream fixou a aba Home permanentemente à esquerda.
+74. **Borda âmbar persistente na visualização de Activity gerando falso sinal de alerta (`#48554`):**
+    - A view de Activity mantinha uma borda âmbar permanente ao redor do painel, induzindo o operador a acreditar que havia tarefas com aviso ou erro pendente; o upstream removeu o contorno estático.
+75. **Perda de ordenação personalizada de workspaces e boards após recarga (`#48625`, `#48651`):**
+    - A reordenação manual por arrasto (drag-and-drop) de workspaces e cartões de plugins na barra lateral perdia a persistência local após restart do app ou sincronização com servidores pareados; o upstream garantiu gravação atômica no workspace layout store.
 
 ## O que fazer
 
@@ -370,5 +388,10 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
 - Adicionar ferramenta de busca de chats de agentes no Bot Home e no menu principal (`#48329`).
 - Suportar recolhimento individual de subgrupos de projetos na barra lateral (`#48412`).
 - Disponibilizar ações rápidas (restart, pause, fork) nas linhas de agentes da sidebar (`#48428`, `#48460`, `#48453`).
+- Integrar repo badges de 16px na linha de título com cores de alto contraste (`#48607`, `#48572`, `#48565`).
+- Exibir chip contextual do modelo em títulos de sessões na barra lateral (`#48489`).
+- Fixar a aba Home do bot permanentemente à esquerda na barra de abas (`#48561`).
+- Remover borda âmbar fixa na visualização de Activity (`#48554`).
+- Assegurar persistência da ordenação customizada de workspaces e boards de plugins (`#48625`, `#48651`).
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Antigravity usage sem agy no PATH (#48325), aviso de terminal (#48418), SSH hosts (#48299) e worktrees de bots remotos (#48439).
+description: Chat unificado no agy com in-app sign-in (#48305/#48304), cross-site frames em server (#48525), browse via SSH (#48490) e probes sob proxy com auth (#48556).
 scope:
   - brza-studio
   - workspace
@@ -12,6 +12,15 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48305
+  - https://github.com/stablyai/orca/pull/48304
+  - https://github.com/stablyai/orca/pull/48525
+  - https://github.com/stablyai/orca/pull/48490
+  - https://github.com/stablyai/orca/pull/48467
+  - https://github.com/stablyai/orca/pull/48556
+  - https://github.com/stablyai/orca/pull/48517
+  - https://github.com/stablyai/orca/issues/48657
+  - https://github.com/stablyai/orca/issues/48645
   - https://github.com/stablyai/orca/pull/48325
   - https://github.com/stablyai/orca/pull/48418
   - https://github.com/stablyai/orca/pull/48299
@@ -417,9 +426,37 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
     Downloads remotos cancelados ou abortados antes de fechar a stream não reportavam falha, deixando arquivos corrompidos de 0 bytes no destino.
 109. **Congelamento da UI ao abrir worktrees de bots remotos (`#48439`, Issues `#48459`, `#48458`, `#48452`, `#48420`):**
     A inicialização e conexão com worktrees hospedados em instâncias remotas SSH realizava operações síncronas de inspeção de arquivos na main thread do renderer, travando a interface gráfica até a resposta da rede.
+110. **Fragmentação de chat e dependência de binários externos para Antigravity (`#48305`, `#48304`):**
+    Conversas de agentes Antigravity executavam fora do ciclo unificado do Native Chat e a listagem de modelos requeria chamadas de terminal a `agy models` em vez de consultar sessões ativas do protocolo ACP, além de exigir fluxo de login no navegador externo.
+111. **Cliques e eventos de ponteiro bloqueados em cross-site iframes em páginas Server (`#48525`):**
+    No navegador embutido e visualizador pareado, formulários contendo captchas ou autenticação de terceiros renderizados em frames cross-site não recebiam cliques nem entradas do teclado.
+112. **Incapacidade de navegar e inspecionar serviços HTTP remotos via SSH que forwardam para loopback (`#48490`):**
+    Conectar a portas remotas encaminhadas via SSH apontando para `127.0.0.1` ou `localhost` gerava erros de certificado ou recusa de conexão pelo proxy de navegação.
+113. **Downloads da etapa de setup do Google Connector passando despercebidos (`#48467`):**
+    Quando o assistente de conexão com Google baixava arquivos de credencial ou configuração, o operador não recebia destaque visual nem confirmação de destino do arquivo.
+114. **Crash do verificador de novas releases atrás de proxy corporativo com autenticação (`#48556`):**
+    O probe periódico de novas versões da aplicação quebrava com erro não tratado quando o tráfego HTTP/HTTPS passava por proxies autenticados com credenciais `user:pass`.
+115. **Grupos de atualização retidos na memória após remoção do host remoto (`#48517`):**
+    Ao desconectar ou esquecer um host SSH/pareado, suas filas de verificação de atualização continuavam ativas em background consumindo recursos de polling.
+116. **Falha na alternância fluida entre TUI de terminal e Native Chat em conexões pareadas instáveis (`#48657`, `#48645`):**
+    Ao alternar entre a visão de terminal TUI e o Native Chat sob latência variável, frames de tela perdiam o sincronismo de cursor e quebravam a geometria do PTY.
 
 ## O que o upstream implementa e corrige
 
+- **Execução nativa de todo chat no Antigravity e sign-in in-app integrado (`#48305`, `#48304`):**
+  - Unifica as conversas de Antigravity sob o pipeline oficial do Native Chat, lista modelos disponíveis a partir do handshake real da sessão e incorpora modal de sign-in diretamente na interface.
+- **Suporte a eventos de clique e interação em cross-site frames para captchas (`#48525`):**
+  - Habilita propagação correta de cliques e digitação em frames de outros domínios em páginas do modo Server, viabilizando resolução de captchas.
+- **Navegação transparente via SSH para serviços loopback remotos (`#48490`):**
+  - Roteia o tráfego do navegador embutido adequadamente através do túnel SSH para portas mapeadas em `127.0.0.1` da máquina servidora.
+- **Destaque visual e rastreamento de downloads no Google setup (`#48467`):**
+  - Exibe banner destacado informando a conclusão e localização do arquivo baixado durante o setup do conector.
+- **Probes de release resilientes sob proxies autenticados (`#48556`):**
+  - Trata credenciais de autenticação de proxy e falhas transitórias de conexão nos probes de release sem derrubar o runtime.
+- **Expurgo imediato de update groups ao remover hosts (`#48517`):**
+  - Cancela watchers e grupos de atualização de hosts remotos no momento em que são removidos das configurações.
+- **Reconciliação e redimensionamento atômico entre TUI e Native Chat (`#48657`, `#48645`):**
+  - Envia comandos sincronizados de redimensionamento (`SIGWINCH`) e limpa buffers transitórios ao alternar modos de visualização em conexões remotas.
 - **Fallback para executável gerenciado do Antigravity na leitura de uso (`#48325`):**
   - Consulta o binário `agy` empacotado pelo runtime gerenciado caso o executável não esteja exportado no PATH do sistema operacional.
 - **Supressão de falso aviso de erro ao focar terminais ativos (`#48418`):**
@@ -783,6 +820,13 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 113. Preservar perfis e conexões compartilhadas na atualização de configurações de hosts SSH (`#48299`).
 114. Notificar erros e falhas de I/O em downloads e cópias interrompidas (`#48300`).
 115. Desacoplar abertura de worktrees de bots remotos da thread de renderização da interface (`#48439`, `#48459`, `#48458`, `#48452`, `#48420`).
+116. Integrar sign-in in-app e listagem de modelos para o Antigravity no Native Chat (`#48305`, `#48304`).
+117. Permitir interação e cliques em cross-site frames (captchas) em páginas Server do navegador embutido (`#48525`).
+118. Suportar navegação em serviços HTTP encaminhados via SSH para loopback (`#48490`).
+119. Destacar downloads de arquivos de configuração no setup do Google Connector (`#48467`).
+120. Prevenir crashes em probes de release através de proxies com autenticação (`#48556`).
+121. Limpar grupos de atualização associados a hosts remotos removidos (`#48517`).
+122. Estabilizar a geometria de terminais e buffer de tela na transição entre TUI e Native Chat (`#48657`, `#48645`).
 
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Menu de escopo de diff (#44229), rebase na base-branch (#42949), non-ASCII file names (#48373) e Reveal in OS (#48392).
+description: Otimização de scope-menu de diff (#48553), Look around em PowerShell (#48558), run scripts no explorer (#48663) e zoom no board (#48650).
 scope:
   - brza-studio
   - brza-workflow
@@ -12,6 +12,15 @@ tags:
   - infra
   - design
 references:
+  - https://github.com/stablyai/orca/pull/48553
+  - https://github.com/stablyai/orca/pull/48558
+  - https://github.com/stablyai/orca/pull/48520
+  - https://github.com/stablyai/orca/pull/48587
+  - https://github.com/stablyai/orca/pull/48493
+  - https://github.com/stablyai/orca/pull/48663
+  - https://github.com/stablyai/orca/issues/48661
+  - https://github.com/stablyai/orca/pull/48650
+  - https://github.com/stablyai/orca/issues/48647
   - https://github.com/stablyai/orca/pull/44229
   - https://github.com/stablyai/orca/pull/42949
   - https://github.com/stablyai/orca/pull/48373
@@ -122,9 +131,37 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
     Não havia comando no menu de contexto do explorador de arquivos para abrir o Finder (macOS) ou Explorer (Windows) no caminho selecionado.
 26. **Falta de agrupamento por projeto na CLI `orca worktree create` (`#48429`):**
     Ao criar múltiplos worktrees via CLI, eles eram alocados sem vínculo com o grupo de projetos pai correspondente.
+27. **Sobrecarga de reconstrução de histórico no menu de escopo do diff review (`#48553`, STA-17982..17986):**
+    Ao alternar commits ou escopo de arquivos no visualizador de diff (*scope-menu*), o componente recomputava todo o histórico de revisões anteriores de forma síncrona, provocando quedas de taxa de quadros e engasgos de rolagem.
+28. **Comandos Look around falhando no Windows por falta de suporte a PowerShell e encadeamento (`#48558`):**
+    A rotina de inspeção ambiental Look around no Windows tentava executar comandos encadeados com sintaxe Bash (`&&`, `;`) sem suporte nativo a pipelines PowerShell, resultando em falhas silenciosas de verificação.
+29. **Ausência de `--focus text` e omissão da causa de recusa de ferramentas via CLI (`#48520`):**
+    Operações de CLI que solicitavam foco no editor não suportavam focalizar diretamente blocos de texto/prosa, e quando uma ferramenta era recusada pelo agente, o motivo detalhado não era exposto no retorno estruturado.
+30. **Processamento em múltiplas passagens para atribuição de mensagens de turno no journal (`#48587`, STA-18015):**
+    A rotina de vinculação de turnos (*attribute turn messages*) executava sucessivos scans e atualizações no banco SQLite para atribuir mensagens de entrada e saída, duplicando I/O sob fluxos concorrentes.
+31. **Perda de mensagens de início falho de chat para o conector de origem (`#48493`):**
+    Quando um chat falhava antes de estabelecer o canal de comunicação, as mensagens emitidas na fase de handshake não eram transportadas de volta para o conector, deixando o cliente sem diagnósticos de erro.
+32. **Incapacidade de executar scripts diretamente a partir do File Explorer (`#48663`, resolve Issue `#48661`):**
+    Desenvolvedores precisavam abrir um terminal manualmente e navegar até o diretório para rodar scripts de compilação ou teste selecionados na árvore do explorador.
+33. **Falta de controle de zoom no Workspace Board (`#48650`, resolve Issue `#48647`):**
+    O quadro visual de workspaces e cards de tarefas (Workspace Board) não oferecia controles de ampliação ou redução (zoom in/out/reset), dificultando a visão panorâmica em monitores grandes e laptops.
 
 ## O que o upstream implementa e corrige
 
+- **Poda de trabalho redundante de histórico no scope-menu de diff review (`#48553`):**
+  - Otimiza a renderização do menu de escopo calculando apenas o delta necessário entre os commits selecionados sem reconstruir a árvore completa de histórico.
+- **Suporte nativo a PowerShell e encadeamento de comandos em Look around (`#48558`):**
+  - Habilita invocação via PowerShell com separadores seguros de encadeamento no Windows durante checagens Look around somente leitura.
+- **Suporte a `--focus text` e reporte explícito de motivo de recusa (`#48520`):**
+  - Implementa a flag `--focus text` para focar diretamente o bloco de prosa e propaga o campo `refusalReason` no resultado da ferramenta.
+- **Atribuição de mensagens de turnos em passagem única no SQLite (`#48587`):**
+  - Reduz as transações de atribuição de mensagens de turno para uma única passagem otimizada no journal de chat.
+- **Transporte de mensagens de inicialização falha de volta ao conector (`#48493`):**
+  - Encaminha logs e diagnósticos de erro ocorridos no arranque da sessão diretamente para o conector que solicitou a abertura.
+- **Ação de execução de scripts a partir do menu de contexto do File Explorer (`#48663`, resolve `#48661`):**
+  - Adiciona a ação "Run Script" no menu de clique direito de arquivos executáveis no explorador, disparando em terminal dedicado.
+- **Controles de zoom e pan no Workspace Board (`#48650`, resolve `#48647`):**
+  - Adiciona botões de zoom in (+), zoom out (-) e reset (100%), além de suporte a atalhos de teclado e gestos de pinça no trackpad.
 - **Menu de escopo 'which-changes' substituindo a seção inferior de commits (`#44229`):**
   - Adiciona menu seletor de escopo no topo do diff (Working Tree, Staged, ou commit específico), liberando 100% da área vertical e permitindo navegação limpa.
 - **Ação de rebase a partir da linha da base-branch (`#42949`):**
@@ -218,6 +255,13 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 27. Agrupar repositórios por organização no diálogo de configuração do GitHub (`#48351`).
 28. Adicionar ação 'Reveal in OS file manager' (Finder / Explorer) no menu do File Explorer (`#48392`).
 29. Suportar associação a grupos de projeto na criação de worktrees via CLI (`#48429`).
+30. Podar recálculos desnecessários de histórico no scope-menu de diff review (`#48553`).
+31. Suportar PowerShell e encadeamento seguro de comandos Look around no Windows (`#48558`).
+32. Suportar flag `--focus text` e reportar o motivo formal de recusa de ferramentas (`#48520`).
+33. Consolidar a atribuição de mensagens de turnos em passagem única no banco (`#48587`).
+34. Transportar mensagens de chats que falharam no arranque de volta ao conector solicitante (`#48493`).
+35. Permitir execução direta de scripts via clique direito no File Explorer (`#48663`, resolve `#48661`).
+36. Incorporar controles de zoom e ajuste panorâmico no Workspace Board (`#48650`, resolve `#48647`).
 
 
 

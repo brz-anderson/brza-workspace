@@ -1,6 +1,6 @@
 ---
 status: open
-description: Quiet workers acionados apenas por transcript (#48011), Look around read-only (#48411), re-read de item recusado (#48387) e leave de bots no Slack (#47428).
+description: Adormecimento de workspace em chat workers (#48562), workers sob wait-for-setup (#48202), descarte de subagente interrompido (#48518) e liberação de workers de terminal (#42264).
 scope:
   - brza-studio
   - brza-workflow
@@ -11,12 +11,20 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48562
+  - https://github.com/stablyai/orca/pull/48202
+  - https://github.com/stablyai/orca/pull/48518
+  - https://github.com/stablyai/orca/pull/42264
+  - https://github.com/stablyai/orca/pull/48427
+  - https://github.com/stablyai/orca/issues/48594
+  - https://github.com/stablyai/orca/issues/48593
+  - https://github.com/stablyai/orca/issues/48592
+  - https://github.com/stablyai/orca/issues/48614
   - https://github.com/stablyai/orca/pull/48011
   - https://github.com/stablyai/orca/pull/48411
   - https://github.com/stablyai/orca/pull/48387
   - https://github.com/stablyai/orca/pull/47428
   - https://github.com/stablyai/orca/pull/48435
-  - https://github.com/stablyai/orca/pull/48427
   - https://github.com/stablyai/orca/pull/48390
   - https://github.com/stablyai/orca/issues/48434
   - https://github.com/stablyai/orca/issues/48444
@@ -394,9 +402,27 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
     - O envio via CLI não permitia esperar de forma síncrona pelo encerramento do turno com retorno formatado em JSON.
 104. **Silêncio visual em conversas de grupo com coordenador bloqueado (`#48444`):**
     - Chats com múltiplos agentes não sinalizavam na interface quando o coordenador estava pausado aguardando entrada humana.
+105. **Fechamento precoce de chat em workers de chat quando o workspace adormece (`#48562`):**
+    - Quando um workspace era colocado em repouso/adormecido (*asleep*), os chat workers tinham a aba e o processo do chat encerrados sumariamente em vez de pausar e reter o estado dormente do workspace, destruindo o histórico ativo do worker.
+106. **Instabilidade no arranque de workers estruturados aguardando término de setup (`#48202`):**
+    - Disparar workers em workspaces em fase de inicialização concorrente causava corridas de setup, falhando o handshake inicial de orquestração se o lock do workspace demorasse a ser adquirido.
+107. **Subagente interrompido pelo Codex retido em memória sem descarte (`#48518`):**
+    - Quando o Codex cancelava ou interrompia um subagente em execução, a referência ao subagente permanecia ativa na tabela de tarefas em andamento, impedindo que o coordenador identificasse o descarte.
+108. **Falha na liberação limpa de workers de terminal prematuramente encerrados (`#42264`):**
+    - Se o terminal PTY do worker caísse abruptamente, chamadas subsequentes de liberação bloqueavam no lock de terminal; o upstream aperfeiçoou o descarte incondicional.
+109. **Falhas assentadas de workers retidas permanentemente no Home Chat dock (`#48427`, Issues `#48594`, `#48593`, `#48592`, `#48614`):**
+    - Notificações de falha de workers liquidados ficavam presas na barra inferior do Home Chat sem botão de limpeza, acumulando poluição visual após intervenção do desenvolvedor.
 
 ## O que o upstream implementa
 
+- **Chat workers adormecem o workspace em vez de fechar a aba de chat (`#48562`):**
+  - Altera a rotina de suspensão de workspaces para preservar abas e instâncias de chat workers, colocando o workspace em repouso sem abortar o canal de comunicação do agente.
+- **Sincronização de workers estruturados sob wait-for-setup (`#48202`):**
+  - Faz com que `worker-start` aguarde a prontidão de setup do workspace antes de disparar o handshake de orquestração, prevenindo timeouts espúrios de arranque.
+- **Descarte imediato de subagentes cancelados ou interrompidos pelo Codex (`#48518`):**
+  - Notifica o orquestrador no momento em que o Codex emite sinal de interrupção para um subagente, marcando o worker como retirado (*retired*) e liberando os recursos alocados.
+- **Ação de Clear para falhas de workers assentados no dock do Home Chat (`#48427`, Issues `#48594`, `#48593`, `#48592`, `#48614`):**
+  - Disponibiliza botão de descarte direto para limpar erros de workers concluídos retidos na barra inferior do Home Chat.
 - **Sobrevivência de chats ativos a reinicializações e atualizações via terminal host (`#47828`, `#47819`, `#47828`, resolve `#46100`):**
   - No macOS e Linux, delega os processos de agentes de chat (Codex, Claude e agentes ACP) para execução sob o host de terminais daemon (`providerRelayKeep`);
   - Ao fechar o app, os processos continuam em execução em background em vez de serem abortados; na reabertura do aplicativo, o chat reconecta ao mesmo processo com replay ordenado de saídas, preservação de subprocessos e ferramentas, e restauração de pedidos de aprovação mantidos como prompts interativos normais.
@@ -722,6 +748,11 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Permitir reconexão do dock coordinator a workers pausados sem perda de canal de eventos (`#48427`).
 - Reter o contexto do repositório pai quando bots criam worktrees filhos (`#48390`).
 - Sinalizar visualmente em chats de grupo quando o coordenador estiver aguardando input humano (`#48444`).
+- Adotar o adormecimento de workspaces preservando instâncias de chat workers sem encerrar o chat (`#48562`).
+- Sincronizar arranque de workers estruturados aguardando o término de setup do workspace (`#48202`).
+- Descartar imediatamente subagentes interrompidos ou cancelados pelo Codex (`#48518`).
+- Assegurar a liberação incondicional de workers em `worker-release` quando o terminal PTY já encerrou (`#42264`).
+- Permitir limpeza de falhas de workers assentados no dock do Home Chat com ação de Clear (`#48427`, Issues `#48594`, `#48593`, `#48592`, `#48614`).
 
 
 

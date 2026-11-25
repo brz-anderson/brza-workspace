@@ -1,6 +1,6 @@
 ---
 status: open
-description: Gestão de contas Claude/Google (#48239/#48450), retomada com boot id (#48404), atalhos de troca (#48466) e controle de usage bar (#48385).
+description: Sign-in remoto do Claude com link curto (#48611), descarte de recusa antecipada (#48448), token check em wake 401 (#48570) e agentes compartilhados (#48246).
 scope:
   - brza-studio
   - brza-workflow
@@ -10,6 +10,10 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48611
+  - https://github.com/stablyai/orca/pull/48448
+  - https://github.com/stablyai/orca/pull/48570
+  - https://github.com/stablyai/orca/pull/48246
   - https://github.com/stablyai/orca/pull/48450
   - https://github.com/stablyai/orca/pull/48404
   - https://github.com/stablyai/orca/pull/48466
@@ -232,9 +236,25 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
     Em resoluções baixas ou janelas estreitas, a barra de uso na status bar espremia outros indicadores essenciais de branch e dirty status sem opção de ser ocultada.
 48. **Inconsistência de limite de cota entre workspaces paralelos e alerta tardio de exaustão (`#48455`, `#48456`, `#48463`):**
     A apuração de uso não sincronizava limites em tempo real entre diferentes worktrees do mesmo projeto, e a interface só alertava sobre o teto de tokens após a recusa da API.
+49. **Dificuldade de autenticação do Claude em hosts remotos por URLs longas e truncadas (`#48611`):**
+    Ao tentar autenticar o Claude Code em servidores conectados remotamente via SSH ou pairing, a URL de autorização OAuth do terminal era excessivamente longa e sofria truncamento, impedindo o fluxo de login.
+50. **Falha na inicialização quando a recusa chega antes do registro de `onRefusal` (`#48448`):**
+    Quando um modelo recusava uma requisição de forma ultra-rápida, a resposta de recusa chegava antes que o manipulador `onRefusal` tivesse sido anexado, travando a sessão em espera perpétua.
+51. **Falsos bloqueios de cota causados por respostas 401 durante despertar de agentes (`#48570`):**
+    Ao acordar um agente dormente (*wake*), respostas transitórias HTTP 401 de verificação de token eram computadas como esgotamento de cota de uso, suspendendo o agente erroneamente.
+52. **Isolamento de agentes e subagentes entre múltiplas contas do Orca (`#48246`):**
+    Desenvolvedores que utilizavam perfis ou contas distintas não conseguiam compartilhar configurações de agentes nem reutilizar definições de bots colaborativamente.
 
 ## O que o upstream propõe e implementa
 
+- **Links curtos de sign-in do Claude em hosts remotos (`#48611`):**
+  - Implementa encurtamento seguro de URLs de autenticação para hosts remotos, facilitando o clique ou cópia no terminal.
+- **Tratamento ordenado de recusa prematura de requisição (`#48448`):**
+  - Armazena em buffer recusas ocorridas antes da fixação do listener `onRefusal` e dispara o evento imediatamente após o registro.
+- **Token check explícito em erros HTTP 401 durante wake de agentes (`#48570`):**
+  - Diferencia falhas transitórias de credencial ou expiração de token de esgotamentos reais de cota de uso, re-autenticando silenciosamente sem bloquear a conversa.
+- **Compartilhamento de agentes entre contas e perfis Orca (`#48246`):**
+  - Suporta exportação e compartilhamento de configurações de agentes e bots entre contas registradas no host.
 - **Persistência estável de contas Google em disparos de automações de bots (`#48450`):**
   - Armazena a vinculação de conta Google no escopo do bot e do workspace, reaproveitando as credenciais ativas em novas execuções sem requerer reautenticação.
 - **Preservação de `boot_id` do SessionStart na retomada de chat Claude para retenção de prompt cache (`#48404`):**
@@ -391,6 +411,10 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 - Adicionar atalhos de teclado e menu rápido de alternância de contas ativas no chat (`#48466`).
 - Adicionar opção de visualização para ocultar o usage bar na barra de status em telas pequenas (`#48385`).
 - Sincronizar o estado de limitação de cota entre workspaces do mesmo projeto e emitir avisos antecipados de teto de contexto (`#48455`, `#48456`, `#48463`).
+- Implementar URLs curtas para autenticação OAuth do Claude em hosts remotos (`#48611`).
+- Tratar recusas prematuras com retenção em buffer antes do listener `onRefusal` (`#48448`).
+- Adotar token check específico para requisições com 401 no wake de agentes evitando falso bloqueio de cota (`#48570`).
+- Permitir compartilhamento e colaboração de agentes entre contas Orca distintas (`#48246`).
 
 
 

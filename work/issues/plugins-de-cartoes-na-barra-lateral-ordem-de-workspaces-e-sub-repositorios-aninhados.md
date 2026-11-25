@@ -1,6 +1,6 @@
 ---
 status: open
-description: Menu de conta unificado no App Rail (#48724/#48784), RepoMark em seletores (#48835), workspaces aninhados em árvore (#48717) e menu de contexto em agentes (#48428).
+description: Agentes irmãos visíveis após fechar split (#48810), checklist de Customize aberto (#48881), foco em atalhos no menu (#48852) e Cmd+B no browser (#48935).
 scope:
   - brza-studio
   - workspace
@@ -10,6 +10,16 @@ tags:
   - design
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48810
+  - https://github.com/stablyai/orca/pull/48881
+  - https://github.com/stablyai/orca/pull/48852
+  - https://github.com/stablyai/orca/pull/48936
+  - https://github.com/stablyai/orca/pull/48935
+  - https://github.com/stablyai/orca/issues/49002
+  - https://github.com/stablyai/orca/issues/48975
+  - https://github.com/stablyai/orca/issues/48974
+  - https://github.com/stablyai/orca/issues/48970
+  - https://github.com/stablyai/orca/issues/49020
   - https://github.com/stablyai/orca/pull/48724
   - https://github.com/stablyai/orca/pull/48784
   - https://github.com/stablyai/orca/pull/48823
@@ -420,6 +430,16 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
 - Permitir a criação de workspaces de chat duráveis fora do escopo estrito de Projetos (`#48377`).
 - Qualificar chaves e identificadores pai por host na linhagem da sidebar (`#48698`).
 - Expandir altura do dropdown de PRs e issues do GitHub na criação de worktrees para evitar corte do primeiro item (`#48768`).
+- Manter agentes irmãos (siblings) visíveis na barra lateral após fechar um painel em split (`#48810`).
+- Manter checklist de customização do App Rail aberto mesmo quando toggles dobrarem ou desdobrarem a barra (`#48881`).
+- Preservar o foco no botão de conta ao acionar atalhos de teclado a partir do menu do App Rail (`#48852`).
+- Reter a visualização da aba Agents ao enviar notas para um agente sem alternar para a lista de projetos (`#48936`, resolve Issue `#48974`).
+- Permitir alternar a barra lateral esquerda com `Cmd+B` mesmo quando o foco estiver em uma página do navegador Orca (`#48935`, resolve Issue `#48977`).
+- Exibir workspaces com status customizado de board na sidebar quando agrupados por Status (`#49002`).
+- Manter grupos de status colapsados na barra lateral de Agents permanentemente fechados (`#48975`).
+- Disponibilizar opção de configuração para ocultar a seção Projects na sidebar (`#48970`).
+- Exibir na sidebar workspaces abertos via `Cmd+J` mesmo quando houver filtro ativo que os ocultaria (`#49020`).
+
 
 
 

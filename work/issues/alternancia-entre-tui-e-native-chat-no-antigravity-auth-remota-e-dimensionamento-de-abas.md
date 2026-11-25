@@ -1,6 +1,6 @@
 ---
 status: open
-description: Ações de cabeçalho no hover da linha superior (#48832), forwards IPv4/IPv6 em SSH (#48748), zsh startup via wrapper (#48779) e modo auto no terminal (#48479).
+description: Banner de auto-close quieto (#48875), relay token em teammate-mode auto (#48908), Doubao CLI terminal (#48909), omp via Pi RPC (#48880) e SSH multi-host (#49050).
 scope:
   - brza-studio
   - workspace
@@ -12,6 +12,15 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48875
+  - https://github.com/stablyai/orca/pull/48908
+  - https://github.com/stablyai/orca/pull/48909
+  - https://github.com/stablyai/orca/pull/48880
+  - https://github.com/stablyai/orca/pull/48818
+  - https://github.com/stablyai/orca/issues/49050
+  - https://github.com/stablyai/orca/issues/49014
+  - https://github.com/stablyai/orca/issues/48944
+  - https://github.com/stablyai/orca/issues/49024
   - https://github.com/stablyai/orca/pull/48832
   - https://github.com/stablyai/orca/pull/48748
   - https://github.com/stablyai/orca/pull/48560
@@ -849,6 +858,16 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 130. Permitir conexão direta a agentes compartilhados a partir de dispositivos móveis com chave própria (`#48474`).
 131. Suportar direção concorrente de sessão/prompt (steering) no protocolo ACP do Antigravity (`#48078`).
 132. Garantir persistência contínua de chats ACP, Claude e Codex após reinicialização do Orca no macOS e Linux (`#47828`, `#47819`, `#47783`).
+133. Suprimir banner de auto-fechamento do worker no painel de terminal (`#48875`).
+134. Fornecer token de relay para membros de equipe quando o lead Claude nativo estiver em `--teammate-mode auto` (`#48908`).
+135. Suportar CLI do Doubao como worker nativo de terminal (`#48909`).
+136. Registrar OMP como runtime estruturado de sessão no adaptador RPC do Pi (`#48880`).
+137. Configurar distribuições WSL diretamente pelo seletor Computer no fluxo de criação de bots (`#48818`).
+138. Prevenir salvamento duplicado de servidor Orca configurado a partir de dois hosts SSH na mesma máquina (`#49050`).
+139. Sincronizar abas do Native Chat abertas de desktop remoto em conexões diretas mobile (`#49014`).
+140. Suportar continuidade de sessões de terminal do Copilot CLI diretamente em chat nativo (`#48944`).
+141. Disponibilizar modo Zen / Minimal UI com ocultação de ações de cabeçalho e controle de opacidade de janela (`#49024`).
+
 
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Mute de notificações por bot (#48837), escopo de paginação em status (#48813), atribuição por proveniência (#48774) e post de rotinas agendadas em grupos (#48700).
+description: Membros pareados no grupo Home (#49005), agente padrão em New bot (#48931), quebra de notas no item (#48872) e líder de bot groups (#48941).
 scope:
   - brza-studio
   - workspace
@@ -12,6 +12,18 @@ tags:
   - design
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/49005
+  - https://github.com/stablyai/orca/pull/48931
+  - https://github.com/stablyai/orca/pull/48897
+  - https://github.com/stablyai/orca/pull/48872
+  - https://github.com/stablyai/orca/pull/48722
+  - https://github.com/stablyai/orca/pull/48827
+  - https://github.com/stablyai/orca/pull/48876
+  - https://github.com/stablyai/orca/issues/49051
+  - https://github.com/stablyai/orca/issues/49045
+  - https://github.com/stablyai/orca/issues/48978
+  - https://github.com/stablyai/orca/issues/48941
+  - https://github.com/stablyai/orca/issues/48927
   - https://github.com/stablyai/orca/pull/48837
   - https://github.com/stablyai/orca/pull/48390
   - https://github.com/stablyai/orca/pull/48813
@@ -380,6 +392,19 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
 63. Permitir que rotinas de automação agendadas publiquem resultados diretamente em grupos de bots (`#48700`).
 64. Corrigir falha em disparos de eventos de automação de bots (pr_opened, review_requested) (`#48790`).
 65. Ajustar destaque de seleção de cards na lista de bots para não invadir a barra de rolagem (`#48826`).
+66. Incluir membros pareados nos itens do Home de grupos de bots e no contador do badge (`#49005`).
+67. Pré-selecionar o agente padrão ao abrir o formulário New bot (`#48931`).
+68. Excluir demandantes de workspaces compartilhados e assentamentos sem data de 'Show N older' (`#48897`).
+69. Quebrar linhas longas em notas de fechamento e critérios de Done na página do item (`#48872`).
+70. Agrupar chats de bots concluídos e sem atividade por 1 dia sob 'Show N older' (`#48722`).
+71. Afastar highlights de seleção de cartões da barra de rolagem na lista de bots (`#48827`).
+72. Permitir opt-in para atualização automática do Codex antes do disparo de rotinas (`#48876`).
+73. Configuração para desligar mensagem introdutória automática de bots ao serem adicionados a canais do Slack (`#49051`).
+74. Preservar nomes de exibição não-ASCII (ex.: coreano) em bots do Slack sem sobrescrever configurações manuais (`#49045`).
+75. Permitir que bots acordados por DM no Slack façam download de imagens enviadas na conversa (`#48978`).
+76. Suportar indicação explícita de líder de equipe em grupos de bots (`#48941`).
+77. Permitir agrupamento de bots por Projeto com contexto específico do projeto (`#48927`).
+
 
 
 

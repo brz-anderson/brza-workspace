@@ -1,6 +1,6 @@
 ---
 status: open
-description: Combinação de caracteres em branches/folders (#48704), proteção de downloads em cópia (#48764), grupos colapsados retidos (#48773) e reload NFD no Source Control (#48807).
+description: Reload de diffs NFD (#48808), subscrições remotas após reload (#48901), foto fecha no back (#48877), status Done mantido (#49054) e detecção de branches no Windows (#49019).
 scope:
   - brza-studio
   - workspace
@@ -11,6 +11,12 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48808
+  - https://github.com/stablyai/orca/pull/48901
+  - https://github.com/stablyai/orca/pull/48877
+  - https://github.com/stablyai/orca/issues/49054
+  - https://github.com/stablyai/orca/issues/49019
+  - https://github.com/stablyai/orca/issues/48979
   - https://github.com/stablyai/orca/pull/48704
   - https://github.com/stablyai/orca/pull/48764
   - https://github.com/stablyai/orca/pull/48773
@@ -637,6 +643,13 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Nunca remover ou renomear arquivos na pasta Downloads após falha de cópia no servidor (`#48764`).
 - Lembrar grupos de sessões colapsados na barra lateral entre reinicializações do app (`#48773`, resolve Issue `#48706`).
 - Recarregar abas abertas pelo Source Control quando arquivos em decomposição NFD sofrerem alteração em disco no macOS (`#48807`).
+- Recarregar abas e diffs do editor para arquivos em decomposição NFD alterados em disco (`#48808`).
+- Manter subscrições remotas ativas após recarregamento provocado por crash do renderer (`#48901`).
+- Fechar apenas o visualizador de fotos em vez do item inteiro no gesto Back do sistema no mobile (`#48877`).
+- Reabrir workspaces concluídos (Done) automaticamente ao enviar nova mensagem em seu chat (`#49054`).
+- Corrigir falha na detecção de branches Git existentes na criação de worktrees no Windows (`#49019`).
+- Preservar entrada de restauração de chat fechado do Devin após erro de `tab_not_found` mantendo journal (`#48979`).
+
 
 
 

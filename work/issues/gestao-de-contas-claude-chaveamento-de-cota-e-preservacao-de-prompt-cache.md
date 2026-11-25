@@ -1,6 +1,6 @@
 ---
 status: open
-description: Atualizações de CLI em card (#48610), limite de 1.000 identidades (#48727), percentual em chips compactos (#48788), countdown de reset Gemini (#48688) e recovery de login (#48134).
+description: Migração de chats ociosos do Claude para nova conta (#45478), uso de System default no Codex (#48873), WSL target persistido (#48882) e toast compacto de CLI update (#48850).
 scope:
   - brza-studio
   - brza-workflow
@@ -10,6 +10,16 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/45478
+  - https://github.com/stablyai/orca/pull/48873
+  - https://github.com/stablyai/orca/pull/48882
+  - https://github.com/stablyai/orca/pull/48892
+  - https://github.com/stablyai/orca/pull/48850
+  - https://github.com/stablyai/orca/pull/48864
+  - https://github.com/stablyai/orca/pull/48842
+  - https://github.com/stablyai/orca/issues/49042
+  - https://github.com/stablyai/orca/issues/49016
+  - https://github.com/stablyai/orca/issues/49026
   - https://github.com/stablyai/orca/pull/48610
   - https://github.com/stablyai/orca/pull/48727
   - https://github.com/stablyai/orca/pull/48679
@@ -440,6 +450,15 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 - Evitar que sessões PTY antigas do Antigravity sobrescrevam silenciosamente a conta ativa no Windows (`#48739`).
 - Disponibilizar configuração para desativar checagem automática de atualização de CLI no boot de agentes (`#48786`).
 - Fornecer opção para atualizar o agente Codex antes do disparo de execuções de automação agendadas (`#48838`).
+- Migrar conversas ociosas do Claude (incluindo bots) para a nova conta selecionada pelo usuário (`#45478`).
+- Exibir uso de cota do 'System default' mesmo enquanto uma conta salva do Codex estiver selecionada (`#48873`).
+- Preservar o target WSL em seleções remotas de 'System default' (`#48882`).
+- Exibir uso de cota da distribuição WSL focada na barra de status (`#48892`).
+- Adotar toast compacto para notificações de atualização de CLI e oferecer ação de Retry para falhas (`#48850`, `#48864`).
+- Comparar versão do Claude Code instalado via Homebrew cask com o canal estável antes de acusar update inválido (`#48842`, Issue `#49016`).
+- Corrigir detecção de login do Cursor no Windows com o cofre de credenciais padrão da CLI (`#49042`).
+- Permitir que plugins contribuam provedores customizados de uso para o painel de telemetria da status bar (`#49026`).
+
 
 
 

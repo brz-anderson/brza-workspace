@@ -1,6 +1,6 @@
 ---
 status: open
-description: Parada de checagem git a cada 30s no idle (#48030), cache git sem reter saídas brutas (#48204), digest SHA-256 em KeyedJsonRowCache (#48207) e probe env sob demanda (#48736).
+description: Prevenção de livelock no fs.watch (#48937), spawns off-main-thread (#48854/#48853), digitação no editor sem layout scan (#48891) e detecção de memory spikes (#48847).
 scope:
   - brza-studio
   - tools-kit
@@ -11,6 +11,15 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48937
+  - https://github.com/stablyai/orca/pull/48854
+  - https://github.com/stablyai/orca/pull/48853
+  - https://github.com/stablyai/orca/pull/48891
+  - https://github.com/stablyai/orca/pull/48885
+  - https://github.com/stablyai/orca/pull/48847
+  - https://github.com/stablyai/orca/pull/48869
+  - https://github.com/stablyai/orca/issues/49032
+  - https://github.com/stablyai/orca/issues/49007
   - https://github.com/stablyai/orca/pull/48030
   - https://github.com/stablyai/orca/pull/48204
   - https://github.com/stablyai/orca/pull/48207
@@ -346,6 +355,16 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Omitir busca de Home de bots em faixas de abas nas quais nenhum bot resida (`#48802`).
 - Reter carimbo único por remetente em conectores mesmo através de falhas sucessivas de inicialização (`#48734`).
 - Notificar clientes pareados quando worktrees sofrerem alterações externas sem watcher desktop ativo (`#48759`).
+- Interromper livelock no `fs.watch` no Windows quando um diretório observado for excluído (`#48937`).
+- Descarregar spawns de fallback do `orca-provider-exec` para worker threads fora da main thread (`#48854`).
+- Executar processos filhos POSIX com `terminationBarrier: true` em worker threads dedicadas (`#48853`).
+- Impedir que digitação no editor verifique o layout de cada workspace oculto em background (`#48891`).
+- Omitir lookups de histórico de workers quando nenhum worker estiver sendo vinculado (`#48885`).
+- Capturar picos de memória do processo principal a cada 10s consultando a telemetria do sistema operacional (`#48847`).
+- Otimizar busca de handles de terminais fechados com tabela hash em O(1) no mobile (`#48869`).
+- Tratar limpeza de workers de plugins que sofreram reap para não deixar requisições travadas em cancelamento (`#49032`).
+- Proteger ciclo de vida da janela no macOS contra travamentos em exceções do `NSAutoFillHeuristicController` (`#49007`).
+
 
 
 

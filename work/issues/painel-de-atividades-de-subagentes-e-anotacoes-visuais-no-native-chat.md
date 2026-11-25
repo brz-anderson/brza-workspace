@@ -1,6 +1,6 @@
 ---
 status: open
-description: Stop em background tools (#48089), status dot fixo no worker chip (#48787), alinhamento no composer (#48792), tipos na bandeja (#48762), workers no dashboard (#48697) e imagens inline (#48665).
+description: Slide-up sheet para subagentes (#42455), respostas OMP após advisor (#48862), elicitação de formulários (#48904), pausa de chat (#49015) e contabilidade de tokens (#49009).
 scope:
   - brza-studio
   - brza-workflow
@@ -10,6 +10,17 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/42455
+  - https://github.com/stablyai/orca/pull/48862
+  - https://github.com/stablyai/orca/pull/48904
+  - https://github.com/stablyai/orca/pull/48833
+  - https://github.com/stablyai/orca/pull/48929
+  - https://github.com/stablyai/orca/issues/49015
+  - https://github.com/stablyai/orca/issues/49009
+  - https://github.com/stablyai/orca/issues/49033
+  - https://github.com/stablyai/orca/issues/48928
+  - https://github.com/stablyai/orca/issues/48930
+  - https://github.com/stablyai/orca/issues/49048
   - https://github.com/stablyai/orca/pull/48089
   - https://github.com/stablyai/orca/pull/48787
   - https://github.com/stablyai/orca/pull/48792
@@ -824,6 +835,18 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Renderizar imagens coladas inline no balão de envio de chat no local exato da colagem (`#48665`).
 - Oferecer opção de "Fork from this response" em qualquer resposta concluída de chats OMP (`#48780`).
 - Copiar anexos e imagens associadas ao copiar o texto de uma mensagem no Native Chat (`#48830`).
+- Abrir inspeção de subagentes em uma slide-up sheet expansível dentro do próprio painel de chat (`#42455`).
+- Manter respostas OMP visíveis após exibição de cards de recomendação/advisor (`#48862`).
+- Anunciar capacidade de elicitação de formulários interativos (`ask_user_question`) para renderizar question cards no Devin (`#48904`).
+- Reter o card de erro de abertura de chat até que o usuário clique explicitamente em Dismiss ou Retry (`#48833`).
+- Exibir evento de compactação automática do Claude no histórico de chat (`#48929`).
+- Suportar pausa de chat para que novas mensagens fiquem retidas até a retomada manual (`#49015`).
+- Exibir contabilidade detalhada de tokens por sessão e por resposta na interface desktop (`#49009`).
+- Adicionar atalho de teclado para rolar a transcrição de chat enquanto digita no composer (`#49033`).
+- Suportar reações com emojis em mensagens de chat nativo e chats de grupo (`#48928`).
+- Desbloquear envio de imagens para modelos OpenCode configurados com suporte a visão em `opencode.jsonc` (`#48930`).
+- Implementar interface visual polida dedicada para o Muse (Meta) com paridade aos agentes Pi e Grok (`#49048`).
+
 
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Servidor MCP compartilhado no host (#48770), grupo Orca em /mcp (#48707), MCP em Grok/Cursor/Droid (#48778), reinício em troca de servidores (#48785) e SDK embutido (#48819).
+description: MCP em Repository settings (#48940), MCP servers em WSL (#48923/#48898), Claude Agent Teams com host MCP (#48895) e MCP em terminais (#48814).
 scope:
   - brza-studio
 priority: high
@@ -8,6 +8,15 @@ opened: 2026-11-03
 tags:
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48940
+  - https://github.com/stablyai/orca/pull/48923
+  - https://github.com/stablyai/orca/pull/48898
+  - https://github.com/stablyai/orca/pull/48895
+  - https://github.com/stablyai/orca/pull/48844
+  - https://github.com/stablyai/orca/pull/48814
+  - https://github.com/stablyai/orca/pull/48910
+  - https://github.com/stablyai/orca/issues/49047
+  - https://github.com/stablyai/orca/issues/49004
   - https://github.com/stablyai/orca/pull/48770
   - https://github.com/stablyai/orca/pull/48707
   - https://github.com/stablyai/orca/pull/48778
@@ -355,6 +364,16 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
 56. Gerenciar servidores MCP do host remotamente a partir de dispositivos móveis pareados (`#48776`).
 57. Disponibilizar instaladores de um clique para aplicativos MCP (ClickUp, Airtable, Todoist, Zapier) (`#48713`).
 58. Carregar skills criadas com symlinks na pasta `skills/` de bots e plugins corporativos do Claude Code (`#48777`).
+59. Configurar servidores MCP em Repository settings com chave seletora host-servers em Tools (`#48940`).
+60. Disponibilizar servidores MCP do Orca para Codex, Copilot, Amp e Pi executando em WSL (`#48923`).
+61. Fornecer servidores MCP com variáveis de ambiente seguras e repassados por relay para terminais WSL (`#48898`).
+62. Conectar líderes e membros de equipes de agentes do Claude aos servidores MCP do host (`#48895`).
+63. Adicionar página de configurações para servidores MCP de cada host com suporte a adicionar servidores (`#48844`).
+64. Disponibilizar os servidores MCP do host para terminais de agentes com `orca mcp exec` e prompt de reinício (`#48814`).
+65. Retentar carregamento de arquivo de plugin após timeout transitório de transpilação (`#48910`).
+66. Ajustar documentação corrigindo o nome oficial e chamada da skill `orca-computer-use` (`#49047`).
+67. Encaminhar decisões de `agent.tool.before` (deny/rewrite) no Windows para o `PreToolUse` do Claude Code (`#49004`).
+
 
 
 

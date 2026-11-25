@@ -1,6 +1,6 @@
 ---
 status: open
-description: Datação de PR pelo passo mais recente (#48732), limite ampliado de links (#48719), clipboard em previews (#48682) e suporte a fórmulas KaTeX (#48797).
+description: Fallback de MR no GitLab antigo (#48945), histórico escopado no Source Control (#48579), links no system browser (#48933) e git blame em diff tabs (#49052).
 scope:
   - brza-studio
   - brza-workflow
@@ -12,6 +12,13 @@ tags:
   - infra
   - design
 references:
+  - https://github.com/stablyai/orca/pull/48945
+  - https://github.com/stablyai/orca/pull/48579
+  - https://github.com/stablyai/orca/pull/48933
+  - https://github.com/stablyai/orca/pull/48905
+  - https://github.com/stablyai/orca/issues/49052
+  - https://github.com/stablyai/orca/issues/49040
+  - https://github.com/stablyai/orca/issues/49025
   - https://github.com/stablyai/orca/pull/48732
   - https://github.com/stablyai/orca/pull/48719
   - https://github.com/stablyai/orca/pull/48682
@@ -276,6 +283,14 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 41. Corrigir decodificação de texto chinês em codificações GBK e GB18030 na visualização de git diff (`#48793`).
 42. Estabilizar assistente de arrasto do Computer Use no macOS em sistemas com idiomas não-ingleses (`#48845`).
 43. Centralizar configuração de abertura de links em uma opção única respeitando navegador do sistema (`#48217`).
+44. Fazer fallback para endpoint `/changes` na listagem de arquivos de Merge Request em instâncias GitLab anteriores à 15.7 (`#48945`).
+45. Escopar follow-ups de histórico no Source Control para otimizar tempo de carregamento de diffs (`#48579`).
+46. Abrir links clicados com `Shift+Cmd+Click` no navegador padrão do sistema operacional (`#48933`, resolve Issue `#48976`).
+47. Limpar e simplificar menu de Source Control no mobile exibindo apenas opções aplicáveis (`#48905`).
+48. Exibir git blame diretamente na linha sob o cursor em abas de visualização de diff (`#49052`).
+49. Permitir visualização e edição direta do projeto associado na tela de issues do Linear (`#49040`).
+50. Evitar fechamento indesejado do menu 'Send notes to an agent' ao clicar em uma linha de agente no card do workspace (`#49025`).
+
 
 
 

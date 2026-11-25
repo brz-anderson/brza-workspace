@@ -1,6 +1,6 @@
 ---
 status: open
-description: Parada deliberada de workers no dock (#48738/#48684), preservação de setup (#48683), status de handoff (#48686), paginação de agent read (#47953) e histórico retido (#48841).
+description: Reinício e reemissão de worker handle (#41041), aninhamento de workers remotos sob coordenador (#48888), drop cursor em subagentes (#48871) e wake de workers no ask (#49035).
 scope:
   - brza-studio
   - brza-workflow
@@ -11,6 +11,13 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/41041
+  - https://github.com/stablyai/orca/pull/48888
+  - https://github.com/stablyai/orca/pull/48871
+  - https://github.com/stablyai/orca/pull/48916
+  - https://github.com/stablyai/orca/issues/49035
+  - https://github.com/stablyai/orca/issues/49043
+  - https://github.com/stablyai/orca/issues/49038
   - https://github.com/stablyai/orca/pull/48738
   - https://github.com/stablyai/orca/pull/48684
   - https://github.com/stablyai/orca/pull/48683
@@ -772,6 +779,14 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Permitir paginação reversa no comando `orca agent read` com o parâmetro `--cursor` (`#47953`).
 - Preservar histórico retido e transcrições ao reabrir workers finalizados em worktrees filhos reutilizados (`#48841`).
 - Respeitar padrões de workspace para workers criados por bots (Chat vs Terminal, aprovação vs acesso total) (`#48840`).
+- Aceitar relatórios de workers mesmo após reinício do runtime com reemissão do identificador/handle (`#41041`).
+- Aninhar visualmente workers de hosts remotos sob o respectivo coordenador no painel de status (`#48888`).
+- Descartar payloads de cursor excedentes e limitar subagentes interrompidos no Codex (`#48871`).
+- Permitir configuração para ocultar avisos e notices de orquestração da visualização principal (`#48916`).
+- Garantir que workers Antigravity acordem prontamente ao receber resposta de orquestração via ask (`#49035`).
+- Disponibilizar comando CLI para alterar modelo e nível de esforço de chats em execução (`#49043`).
+- Impedir desaparecimento de chats de bots ativos na barra lateral após reinicialização do aplicativo (`#49038`).
+
 
 
 

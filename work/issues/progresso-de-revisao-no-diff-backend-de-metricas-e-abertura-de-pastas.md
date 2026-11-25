@@ -1,6 +1,6 @@
 ---
 status: open
-description: Fallback de MR no GitLab antigo (#48945), histórico escopado no Source Control (#48579), links no system browser (#48933) e git blame em diff tabs (#49052).
+description: Aviso de conflito de binario da CLI (#49249), acao Only em Tarefas (#49265), busca de tabs no diff (#49239) e plano inline (#49158).
 scope:
   - brza-studio
   - brza-workflow
@@ -57,6 +57,20 @@ references:
   - https://github.com/stablyai/orca/commit/596618a7e52
   - https://github.com/stablyai/orca/commit/6efc8b5a57a
   - https://github.com/stablyai/orca/pull/47639
+  - https://github.com/stablyai/orca/pull/49249
+  - https://github.com/stablyai/orca/pull/49265
+  - https://github.com/stablyai/orca/pull/49214
+  - https://github.com/stablyai/orca/pull/49239
+  - https://github.com/stablyai/orca/pull/49073
+  - https://github.com/stablyai/orca/pull/49070
+  - https://github.com/stablyai/orca/pull/49212
+  - https://github.com/stablyai/orca/pull/49157
+  - https://github.com/stablyai/orca/pull/49232
+  - https://github.com/stablyai/orca/issues/49219
+  - https://github.com/stablyai/orca/issues/49158
+  - https://github.com/stablyai/orca/issues/49067
+  - https://github.com/stablyai/orca/issues/49096
+  - https://github.com/stablyai/orca/issues/43635
 ---
 
 # Progresso de revisão no diff, backend de métricas e abertura de pastas
@@ -290,8 +304,12 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 48. Exibir git blame diretamente na linha sob o cursor em abas de visualização de diff (`#49052`).
 49. Permitir visualização e edição direta do projeto associado na tela de issues do Linear (`#49040`).
 50. Evitar fechamento indesejado do menu 'Send notes to an agent' ao clicar em uma linha de agente no card do workspace (`#49025`).
-
-
-
-
-
+- Alertar na CLI quando o comando invocado apontar para binário de outra instalação do Orca no sistema (`#49249`).
+- Adicionar ação rápida "Only" para focar em projeto único no seletor da página de Tarefas (`#49265`).
+- Preservar filtros e atributos do Linear na página de Tarefas ao alternar entre visões (`#49214`, resolve Issue `#49219`).
+- Habilitar palavra-chave dedicada de tabulação na busca de espaços em branco de diffs (`#49239`).
+- Reportar erro detalhado de resolução do branch base padrão em vez de falso "no default base" em worktrees (`#49073`).
+- Otimizar indexação de atualização de CLIs e verificar hosts conectados de forma proativa (`#49212`, `#49157`, `#49232`).
+- Suportar redimensionamento e comentários inline no modo de plano inline (`#49158`).
+- Pré-carregar dados da tela de Tarefas para evitar carregamento em branco ao reabrir (`#49067`).
+- Desabilitar botão de merge em PRs quando o usuário possuir acesso apenas de leitura ao repositório base (`#49096`).

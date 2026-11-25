@@ -1,6 +1,6 @@
 ---
 status: open
-description: Migração de chats ociosos do Claude para nova conta (#45478), uso de System default no Codex (#48873), WSL target persistido (#48882) e toast compacto de CLI update (#48850).
+description: Diagnostico de contas Google desconectadas (#49268), Home chat por pessoa em agentes (#49246) e token do Cursor no Windows (#49037).
 scope:
   - brza-studio
   - brza-workflow
@@ -73,6 +73,15 @@ references:
   - https://github.com/stablyai/orca/commit/ee135b48486
   - https://github.com/stablyai/orca/commit/d1916137334
   - https://github.com/stablyai/orca/commit/b2065bb81ed
+  - https://github.com/stablyai/orca/pull/49268
+  - https://github.com/stablyai/orca/pull/49246
+  - https://github.com/stablyai/orca/pull/49192
+  - https://github.com/stablyai/orca/pull/49210
+  - https://github.com/stablyai/orca/pull/49037
+  - https://github.com/stablyai/orca/pull/49243
+  - https://github.com/stablyai/orca/issues/40263
+  - https://github.com/stablyai/orca/issues/37785
+  - https://github.com/stablyai/orca/issues/24182
 ---
 
 # Gestão de contas Claude, chaveamento de cota e preservação de prompt cache
@@ -458,10 +467,11 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 - Comparar versão do Claude Code instalado via Homebrew cask com o canal estável antes de acusar update inválido (`#48842`, Issue `#49016`).
 - Corrigir detecção de login do Cursor no Windows com o cofre de credenciais padrão da CLI (`#49042`).
 - Permitir que plugins contribuam provedores customizados de uso para o painel de telemetria da status bar (`#49026`).
-
-
-
-
-
-
-
+- Exibir motivo explícito reportado pelo Google ao revogar acesso e desconectar contas expiradas (`#49268`).
+- Suportar agentes compartilhados com histórico individual de chat (Home chat) por membro da equipe (`#49246`).
+- Restaurar instruções de contexto de bots do Codex após retomada de sessão (`#49192`).
+- Impedir que o Source Control tente executar modelos do Codex não autorizados pela conta conectada (`#49210`).
+- Decodificar tokens protegidos do Cursor no banco de dados `state.vscdb` no Windows (`#49037`, resolve Issue `#37785`).
+- Identificar contas do Claude com restrição organizacional no seletor de agentes de servidores MCP (`#49243`).
+- Permitir chaveamento de contas do Claude mesmo em painéis com shells de background em execução pós-turno (`#40263`).
+- Injetar segredos delimitados por escopo de projeto diretamente nos processos de agentes sem expor valores ao modelo (`#24182`).

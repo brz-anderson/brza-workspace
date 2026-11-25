@@ -1,6 +1,6 @@
 ---
 status: open
-description: Prevenção de livelock no fs.watch (#48937), spawns off-main-thread (#48854/#48853), digitação no editor sem layout scan (#48891) e detecção de memory spikes (#48847).
+description: Compartilhamento de watch em pastas com symlink (#49252), supressao de reescrita em disco (#48812) e otimizacao de taskkill (#49076).
 scope:
   - brza-studio
   - tools-kit
@@ -37,6 +37,18 @@ references:
   - https://github.com/stablyai/orca/pull/48407
   - https://github.com/stablyai/orca/issues/48457
   - https://github.com/stablyai/orca/pull/48222
+  - https://github.com/stablyai/orca/pull/49252
+  - https://github.com/stablyai/orca/pull/48812
+  - https://github.com/stablyai/orca/pull/48219
+  - https://github.com/stablyai/orca/pull/49075
+  - https://github.com/stablyai/orca/pull/49076
+  - https://github.com/stablyai/orca/pull/49173
+  - https://github.com/stablyai/orca/pull/49171
+  - https://github.com/stablyai/orca/issues/49060
+  - https://github.com/stablyai/orca/issues/49062
+  - https://github.com/stablyai/orca/issues/49059
+  - https://github.com/stablyai/orca/issues/49080
+  - https://github.com/stablyai/orca/issues/33505
 ---
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
@@ -364,8 +376,13 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Otimizar busca de handles de terminais fechados com tabela hash em O(1) no mobile (`#48869`).
 - Tratar limpeza de workers de plugins que sofreram reap para não deixar requisições travadas em cancelamento (`#49032`).
 - Proteger ciclo de vida da janela no macOS contra travamentos em exceções do `NSAutoFillHeuristicController` (`#49007`).
-
-
-
-
-
+- Compartilhar um único file watcher entre pastas aninhadas em abas do editor atrás de links simbólicos (`#49252`).
+- Cessar a reescrita em disco de sessões de busca e linhas de checagem de PR inalteradas (`#48812`).
+- Reter em memória apenas chaves de configuração do Git inspecionadas em `StampedGitConfig` (`#48219`).
+- Interromper o reescaneamento completo de worktrees a cada salvamento de arquivos Markdown (`#49075`).
+- Omitir chamada síncrona a `taskkill /T` no Windows se o processo raiz já encerrou (`#49076`, mitigando Issue `#49060`).
+- Descarregar execuções de sondagem de catálogo de modelos e inicialização de CLIs da main thread no Windows (`#49062`, `#49059`).
+- Habilitar watchdog persistente de travamentos do processo principal no Windows (`#49080`).
+- Evitar enumeração excessiva de alvos do navegador a cada clique na página de servidores (`#49173`).
+- Abrir credenciais sob demanda por chamada de ferramenta e evitar releituras de visões encerradas (`#49171`).
+- Implementar confirmação por retenção de atalho ("Hold ⌘Q to quit") enquanto houver agentes em processamento ativo (`#33505`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Slide-up sheet para subagentes (#42455), respostas OMP após advisor (#48862), elicitação de formulários (#48904), pausa de chat (#49015) e contabilidade de tokens (#49009).
+description: Subagentes no Native Chat (#49227, #48386), retencao de formularios (#49204), link em perguntas Needs you (#49240) e filtros por pessoa (#49256).
 scope:
   - brza-studio
   - brza-workflow
@@ -50,6 +50,14 @@ references:
   - https://github.com/stablyai/orca/issues/48445
   - https://github.com/stablyai/orca/issues/48461
   - https://github.com/stablyai/orca/pull/48289
+  - https://github.com/stablyai/orca/pull/49227
+  - https://github.com/stablyai/orca/pull/49204
+  - https://github.com/stablyai/orca/pull/49256
+  - https://github.com/stablyai/orca/pull/49264
+  - https://github.com/stablyai/orca/issues/49240
+  - https://github.com/stablyai/orca/issues/48386
+  - https://github.com/stablyai/orca/issues/49056
+  - https://github.com/stablyai/orca/issues/37646
 ---
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
@@ -846,10 +854,10 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Suportar reações com emojis em mensagens de chat nativo e chats de grupo (`#48928`).
 - Desbloquear envio de imagens para modelos OpenCode configurados com suporte a visão em `opencode.jsonc` (`#48930`).
 - Implementar interface visual polida dedicada para o Muse (Meta) com paridade aos agentes Pi e Grok (`#49048`).
-
-
-
-
-
-
-
+- Exibir subagentes bifurcados de comandos slash e atividade de ferramentas ao vivo no Native Chat do Claude (`#49227`, resolve Issue `#48386`).
+- Reter respostas de formulários com arquivos anexados até que todas as perguntas pendentes sejam respondidas (`#49204`).
+- Adicionar link direto entre o card de pergunta "Needs you" e a mensagem de chat exata que originou a pergunta (`#49240`).
+- Exibir autoria e filtro por pessoa na aba Chats com altura uniforme por linha (`#49256`).
+- Limitar cards de respostas mantidos em cache mobile para evitar acúmulo de itens fechados em outros clientes (`#49264`).
+- Corrigir liquidação prematura de comandos slash no OpenCode 2 para garantir exibição contínua de perguntas interativas (`#49056`).
+- Renderizar componentes de interface de extensões/mods do Claude Code no Native Chat (band, pane, status, toast) (`#37646`).

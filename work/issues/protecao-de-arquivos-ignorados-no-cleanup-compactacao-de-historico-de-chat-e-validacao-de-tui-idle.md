@@ -1,6 +1,6 @@
 ---
 status: open
-description: Reload de diffs NFD (#48808), subscrições remotas após reload (#48901), foto fecha no back (#48877), status Done mantido (#49054) e detecção de branches no Windows (#49019).
+description: Busca em arquivos ignorados (#49161), protecao de abas de diff em cleanup (#49203) e delecao no AI Vault (#49216).
 scope:
   - brza-studio
   - workspace
@@ -49,6 +49,12 @@ references:
   - https://github.com/stablyai/orca/pull/47657
   - https://github.com/stablyai/orca/commit/70a1f42a331
   - https://github.com/stablyai/orca/commit/7c095f7e34d
+  - https://github.com/stablyai/orca/pull/49161
+  - https://github.com/stablyai/orca/pull/49203
+  - https://github.com/stablyai/orca/pull/49176
+  - https://github.com/stablyai/orca/issues/49267
+  - https://github.com/stablyai/orca/issues/49216
+  - https://github.com/stablyai/orca/issues/49151
 ---
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
@@ -649,9 +655,9 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Reabrir workspaces concluídos (Done) automaticamente ao enviar nova mensagem em seu chat (`#49054`).
 - Corrigir falha na detecção de branches Git existentes na criação de worktrees no Windows (`#49019`).
 - Preservar entrada de restauração de chat fechado do Devin após erro de `tab_not_found` mantendo journal (`#48979`).
-
-
-
-
-
-
+- Permitir a inclusão opcional de arquivos ignorados pelo Git (`.gitignore`) na busca global Find in Files (`#49161`).
+- Proteger contra fechamento acidental em Workspace Cleanup de worktrees contendo abas de diff com edições pendentes (`#49203`).
+- Resolver links de documentação em notas Markdown gravadas com nomes Unicode decompostos (NFD) (`#49176`).
+- Prevenir exibição de painel em branco e término abrupto visual de terminais ao deletar o workspace ativo (`#49267`).
+- Permitir exclusão de sessões antigas de Antigravity armazenadas no AI Vault sem erro de agente não suportado (`#49216`).
+- Corrigir confirmação por clique ou Enter do comando `/resume` nas interfaces de chat do Claude Code e OpenCode (`#49151`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Banner de auto-close quieto (#48875), relay token em teammate-mode auto (#48908), Doubao CLI terminal (#48909), omp via Pi RPC (#48880) e SSH multi-host (#49050).
+description: Fechamento de split na tab strip (#49250), lista vertical de abas (#49211), busca rapida (#49208) e suporte ao Doubao CLI (#49266).
 scope:
   - brza-studio
   - workspace
@@ -87,6 +87,24 @@ references:
   - https://github.com/stablyai/orca/commit/8e1290452bc
   - https://github.com/stablyai/orca/commit/b9da9329026
   - https://github.com/stablyai/orca/commit/924baaea3a5
+  - https://github.com/stablyai/orca/pull/49250
+  - https://github.com/stablyai/orca/pull/49211
+  - https://github.com/stablyai/orca/pull/49208
+  - https://github.com/stablyai/orca/pull/49236
+  - https://github.com/stablyai/orca/pull/49230
+  - https://github.com/stablyai/orca/pull/49011
+  - https://github.com/stablyai/orca/pull/49165
+  - https://github.com/stablyai/orca/pull/49049
+  - https://github.com/stablyai/orca/issues/49251
+  - https://github.com/stablyai/orca/issues/49248
+  - https://github.com/stablyai/orca/issues/49226
+  - https://github.com/stablyai/orca/issues/49215
+  - https://github.com/stablyai/orca/issues/49266
+  - https://github.com/stablyai/orca/issues/49131
+  - https://github.com/stablyai/orca/issues/49120
+  - https://github.com/stablyai/orca/issues/49068
+  - https://github.com/stablyai/orca/issues/48710
+  - https://github.com/stablyai/orca/issues/2284
 ---
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
@@ -867,10 +885,14 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 139. Sincronizar abas do Native Chat abertas de desktop remoto em conexões diretas mobile (`#49014`).
 140. Suportar continuidade de sessões de terminal do Copilot CLI diretamente em chat nativo (`#48944`).
 141. Disponibilizar modo Zen / Minimal UI com ocultação de ações de cabeçalho e controle de opacidade de janela (`#49024`).
-
-
-
-
-
-
-
+- Disponibilizar botão de fechar painel dividido diretamente na tab strip ao lado do seletor de comandos (`#49250`, Issue `#49251`).
+- Suportar lista vertical opcional de abas no estilo navegador à esquerda da área de trabalho (`#49211`).
+- Adicionar popup de busca rápida de abas (Search Tabs) via atalho `Cmd/Ctrl+Shift+A` (`#49208`).
+- Permitir incremento de meio ponto (passo de 0.5) no tamanho da fonte do terminal, viabilizando valores como 14.5 (`#49236`, Issue `#49215`).
+- Implementar ajuste numérico digitável e passos percentuais arredondados no zoom da interface (`#49248`).
+- Adicionar opção de confirmação obrigatória antes de fechar abas pelo botão "X" (`#49226`).
+- Adicionar suporte nativo ao Doubao CLI (`@bytedance/doubao-cli`) como agente selecionável para TUI e ACP (`#49266`).
+- Estabilizar renderização gráfica inline em aplicações TUI sob Windows com terminal Sixel (`#49131`).
+- Abrir agente padrão diretamente com `Cmd+Clique` no botão "+" de nova aba (`#49120`).
+- Suspender processamento em background do Antigravity para painéis inativos (`#49165`) e reconhecer login com gateway para Antigravity Chat (`#49049`).
+- Fixar tema visual do cliente inicial nos PTYs de RPC de sessões de agentes (`#49011`).

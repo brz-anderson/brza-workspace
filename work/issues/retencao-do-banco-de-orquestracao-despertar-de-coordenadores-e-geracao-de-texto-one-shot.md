@@ -1,6 +1,6 @@
 ---
 status: open
-description: Reinício e reemissão de worker handle (#41041), aninhamento de workers remotos sob coordenador (#48888), drop cursor em subagentes (#48871) e wake de workers no ask (#49035).
+description: Steering e correio OMP em tempo real (#49263, #49262), recusa de worker_done obsoleto (#49221) e validacao de agentes antes de worktrees (#49238).
 scope:
   - brza-studio
   - brza-workflow
@@ -46,6 +46,21 @@ references:
   - https://github.com/stablyai/orca/issues/48434
   - https://github.com/stablyai/orca/issues/48444
   - https://github.com/stablyai/orca/pull/48274
+  - https://github.com/stablyai/orca/pull/49263
+  - https://github.com/stablyai/orca/pull/49262
+  - https://github.com/stablyai/orca/pull/49221
+  - https://github.com/stablyai/orca/pull/49238
+  - https://github.com/stablyai/orca/pull/49160
+  - https://github.com/stablyai/orca/pull/48943
+  - https://github.com/stablyai/orca/pull/49127
+  - https://github.com/stablyai/orca/issues/49254
+  - https://github.com/stablyai/orca/issues/49220
+  - https://github.com/stablyai/orca/issues/49218
+  - https://github.com/stablyai/orca/issues/49183
+  - https://github.com/stablyai/orca/issues/49125
+  - https://github.com/stablyai/orca/issues/44184
+  - https://github.com/stablyai/orca/issues/46425
+  - https://github.com/stablyai/orca/issues/46406
 ---
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
@@ -786,10 +801,16 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Garantir que workers Antigravity acordem prontamente ao receber resposta de orquestração via ask (`#49035`).
 - Disponibilizar comando CLI para alterar modelo e nível de esforço de chats em execução (`#49043`).
 - Impedir desaparecimento de chats de bots ativos na barra lateral após reinicialização do aplicativo (`#49038`).
-
-
-
-
-
-
-
+- Manter rascunhos e sessões OMP em execução quando o usuário aplicar intervenção/steering no chat (`#49263`).
+- Entregar mensagens de correio de orquestração no meio do turno via `_session/steering` do OMP (`#49262`, Issue `#49125`).
+- Rejeitar `worker_done` referenciando Dispatch já encerrado enquanto houver um Dispatch mais recente ativo (`#49221`, resolve Issue `#49220`).
+- Validar a instalação e autenticação do agente no host remoto antes de provisionar a worktree do worker (`#49238`).
+- Reportar o coordenador atual na saída do comando de orquestração `orca orchestration run-show` (`#49160`).
+- Reenviar automaticamente relatórios de conclusão de workers (`worker completion reports`) que sofreram timeout (`#48943`).
+- Rejeitar comandos de inicialização `worker-start --item --on` antes do roteamento para servidores pareados (`#49127`).
+- Configurar política de retenção para expurgar automaticamente sessões de agentes de workers concluídos (`#49218`).
+- Permitir despertar workers ou bots em contexto limpo com novo resumo e ponteiro para a transcrição anterior (`#49254`).
+- Desbloquear a resolução e descarte de Dispatches com falha após retentativa bem-sucedida (`#49183`).
+- Marcar automaticamente sessões de workers como lidas no momento em que o coordenador recebe `worker_done` (`#44184`).
+- Implementar watchdog para escalonar e abortar workers que ficarem silenciosos ou esgotarem cota (`#46425`).
+- Notificar e despertar workers do Claude quando jobs iniciados em background no shell terminarem (`#46406`).

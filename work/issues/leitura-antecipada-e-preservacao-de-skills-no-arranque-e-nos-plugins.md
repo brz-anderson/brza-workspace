@@ -1,6 +1,6 @@
 ---
 status: open
-description: MCP em Repository settings (#48940), MCP servers em WSL (#48923/#48898), Claude Agent Teams com host MCP (#48895) e MCP em terminais (#48814).
+description: Reconexao interativa de MCP apos restart (#49244), isolamento de lookups de hosts (#49202) e escritas em burst (#49149).
 scope:
   - brza-studio
 priority: high
@@ -62,6 +62,19 @@ references:
   - https://github.com/stablyai/orca/pull/47979
   - https://github.com/stablyai/orca/issues/47797
   - https://github.com/stablyai/orca/commit/0b7fe2f6f10
+  - https://github.com/stablyai/orca/pull/49244
+  - https://github.com/stablyai/orca/pull/49178
+  - https://github.com/stablyai/orca/pull/49206
+  - https://github.com/stablyai/orca/pull/49202
+  - https://github.com/stablyai/orca/pull/49168
+  - https://github.com/stablyai/orca/pull/49149
+  - https://github.com/stablyai/orca/pull/49124
+  - https://github.com/stablyai/orca/pull/49128
+  - https://github.com/stablyai/orca/pull/49132
+  - https://github.com/stablyai/orca/pull/49123
+  - https://github.com/stablyai/orca/pull/49129
+  - https://github.com/stablyai/orca/pull/49121
+  - https://github.com/stablyai/orca/pull/49130
 ---
 
 # Leitura antecipada e preservação de skills no arranque e nos plugins
@@ -373,9 +386,11 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
 65. Retentar carregamento de arquivo de plugin após timeout transitório de transpilação (`#48910`).
 66. Ajustar documentação corrigindo o nome oficial e chamada da skill `orca-computer-use` (`#49047`).
 67. Encaminhar decisões de `agent.tool.before` (deny/rewrite) no Windows para o `PreToolUse` do Claude Code (`#49004`).
-
-
-
-
-
-
+- Oferecer reinicialização interativa de terminais de agentes que perderam conexão com servidores MCP após reinício do Orca (`#49244`).
+- Otimizar alternâncias de lista, colagens e validações de inicialização de servidores MCP para recalcular apenas o delta alterado (`#49178`).
+- Compartilhar leitura de lista de hosts entre consultas concorrentes de servidores MCP compartilhados (`#49202`).
+- Revalidar alcance de servidores MCP em agentes após operação de mover (`#49206`, `#49168`).
+- Agrupar persistência de registros de painéis em rajadas e ler a lista de servidores uma única vez ao contar terminais obsoletos (`#49149`).
+- Preservar edições concorrentes de configurações de agentes e comentários de usuários ao atualizar arquivos de servidores MCP (`#49124`, `#49130`, `#49121`).
+- Otimizar consumo de leitura do cofre de credenciais e evitar releituras cíclicas da lista de hosts em servidores de comando compartilhados (`#49123`, `#49128`, `#49132`).
+- Manter descoberta linear de servidores e dispensar sincronização de plugins inalterados (`#49129`).

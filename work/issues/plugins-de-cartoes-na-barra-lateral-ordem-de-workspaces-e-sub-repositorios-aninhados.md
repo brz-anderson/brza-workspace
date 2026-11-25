@@ -1,6 +1,6 @@
 ---
 status: open
-description: Agentes irmãos visíveis após fechar split (#48810), checklist de Customize aberto (#48881), foco em atalhos no menu (#48852) e Cmd+B no browser (#48935).
+description: CLI de grupos e aparencia de projetos (#49235, #49255), preservacao de layout em cards (#49258) e clipping de rolagem (#49247).
 scope:
   - brza-studio
   - workspace
@@ -77,6 +77,16 @@ references:
   - https://github.com/stablyai/orca/issues/47862
   - https://github.com/stablyai/orca/commit/2f31a354146
   - https://github.com/stablyai/orca/commit/84cd9c16126
+  - https://github.com/stablyai/orca/pull/49235
+  - https://github.com/stablyai/orca/pull/49224
+  - https://github.com/stablyai/orca/pull/49027
+  - https://github.com/stablyai/orca/issues/49255
+  - https://github.com/stablyai/orca/issues/49258
+  - https://github.com/stablyai/orca/issues/49247
+  - https://github.com/stablyai/orca/issues/49242
+  - https://github.com/stablyai/orca/issues/49241
+  - https://github.com/stablyai/orca/issues/36001
+  - https://github.com/stablyai/orca/issues/21118
 ---
 
 # Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados
@@ -439,7 +449,11 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
 - Manter grupos de status colapsados na barra lateral de Agents permanentemente fechados (`#48975`).
 - Disponibilizar opção de configuração para ocultar a seção Projects na sidebar (`#48970`).
 - Exibir na sidebar workspaces abertos via `Cmd+J` mesmo quando houver filtro ativo que os ocultaria (`#49020`).
-
-
-
-
+- Controlar grupos de projetos e aparência da barra lateral via CLI (`orca project appearance`, `#49235`, Issue `#49255`).
+- Preservar seleções de campos de exibição de cartões ao alternar layouts entre Compacto e Expandido (`#49258`).
+- Ajustar clipping de cartões de workspace sob o cabeçalho fixo do projeto durante a rolagem da barra lateral (`#49247`).
+- Suavizar expansão e recolhimento de workspaces filhos na barra lateral com animação fluida (`#49242`).
+- Eliminar rastros de ponteiro e desvanecimento lento de seleções anteriores na sidebar (`#49241`).
+- Garantir espaçamento entre o painel de agentes in-window e a barra lateral direita (`#49224`).
+- Manter o menu de envio de notas aberto ao selecionar um agente como alvo no card da sidebar (`#49027`).
+- Suportar workspaces multi-repositório com worktrees dedicadas baseadas em requisitos (`#36001`, `#21118`).

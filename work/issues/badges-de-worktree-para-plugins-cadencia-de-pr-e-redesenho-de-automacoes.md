@@ -1,6 +1,6 @@
 ---
 status: open
-description: Membros pareados no grupo Home (#49005), agente padrão em New bot (#48931), quebra de notas no item (#48872) e líder de bot groups (#48941).
+description: Badges em icones de paineis de plugins (#49269), tooltip de texto declarativo (#49155) e repasse de ambiente USER/LOGNAME (#49069).
 scope:
   - brza-studio
   - workspace
@@ -69,6 +69,12 @@ references:
   - https://github.com/stablyai/orca/commit/7a7b8b981dc
   - https://github.com/stablyai/orca/commit/b73ce0a1619
   - https://github.com/stablyai/orca/commit/1e56e0fc6a3
+  - https://github.com/stablyai/orca/pull/49155
+  - https://github.com/stablyai/orca/pull/49069
+  - https://github.com/stablyai/orca/issues/49269
+  - https://github.com/stablyai/orca/issues/49134
+  - https://github.com/stablyai/orca/issues/49159
+  - https://github.com/stablyai/orca/issues/44132
 ---
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
@@ -404,10 +410,9 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
 75. Permitir que bots acordados por DM no Slack façam download de imagens enviadas na conversa (`#48978`).
 76. Suportar indicação explícita de líder de equipe em grupos de bots (`#48941`).
 77. Permitir agrupamento de bots por Projeto com contexto específico do projeto (`#48927`).
-
-
-
-
-
-
-
+- Suportar badges dinâmicos (contadores numéricos ou pontos de alerta) nos ícones de painéis de plugins na Activity Bar (`#49269`).
+- Exibir texto declarativo truncado de plugins em tooltip flutuante ao passar o cursor (hover) (`#49155`).
+- Repassar variáveis de ambiente `USER`, `LOGNAME` e `USERNAME` para workers despachados por plugins (`#49069`).
+- Fornecer mensagem clara de confirmação pendente em vez de código de saída de erro quando `orca plugin install` for invocado sem `--approve` (`#49134`).
+- Informar aos plugins com hook `agent.launch.before` qual shell executará o comando (`#44132`).
+- Estruturar fluxo de auditoria automatizada para desbloqueio de versões de plugins em análise (`#49159`).

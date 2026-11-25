@@ -1,6 +1,6 @@
 ---
 status: open
-description: Plugins com servidores MCP (#48659/#48658), status de install local de skills (#48578), update de CLI (#48610) e symlinks seguros (#48616).
+description: Servidor MCP compartilhado no host (#48770), grupo Orca em /mcp (#48707), MCP em Grok/Cursor/Droid (#48778), reinício em troca de servidores (#48785) e SDK embutido (#48819).
 scope:
   - brza-studio
 priority: high
@@ -8,6 +8,17 @@ opened: 2026-11-03
 tags:
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48770
+  - https://github.com/stablyai/orca/pull/48707
+  - https://github.com/stablyai/orca/pull/48778
+  - https://github.com/stablyai/orca/pull/48785
+  - https://github.com/stablyai/orca/pull/48805
+  - https://github.com/stablyai/orca/pull/48789
+  - https://github.com/stablyai/orca/pull/48796
+  - https://github.com/stablyai/orca/pull/48819
+  - https://github.com/stablyai/orca/pull/48776
+  - https://github.com/stablyai/orca/pull/48713
+  - https://github.com/stablyai/orca/issues/48777
   - https://github.com/stablyai/orca/pull/48578
   - https://github.com/stablyai/orca/pull/48610
   - https://github.com/stablyai/orca/pull/48659
@@ -333,6 +344,18 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
 45. Suportar registro e gestão de servidores MCP diretamente por plugins (`#48659`, `#48658`).
 46. Rejeitar links simbólicos cross-device inseguros em pacotes de skills (`#48616`).
 47. Isolar ferramentas de servidores MCP com prefixo de namespace do plugin (`#48635`, `#48617`).
+48. Executar servidor de comando compartilhado uma única vez no host para todas as sessões de agentes (`#48770`).
+49. Disponibilizar os servidores MCP do host para todos os chats nativos com grupo Orca em `/mcp` (`#48707`).
+50. Espelhar servidores MCP do Orca nos arquivos de configuração do Grok, Cursor e Droid (`#48778`).
+51. Reiniciar chats em execução automaticamente ao alterar a lista de servidores MCP do host (`#48785`).
+52. Nomear entradas de arquivos MCP do Orca com hash único de sua pasta de dados (`#48805`).
+53. Tratar overrides `-c mcp_servers` do Codex em argumentos de agentes como nomes reservados (`#48789`).
+54. Ajustar cancelProblems para liberar apenas o interesse do chamador em checagens compartilhadas de diagnósticos (`#48796`).
+55. Embutir o SDK do MCP no binário `orca mcp connect` para empacotamento autocontido (`#48819`).
+56. Gerenciar servidores MCP do host remotamente a partir de dispositivos móveis pareados (`#48776`).
+57. Disponibilizar instaladores de um clique para aplicativos MCP (ClickUp, Airtable, Todoist, Zapier) (`#48713`).
+58. Carregar skills criadas com symlinks na pasta `skills/` de bots e plugins corporativos do Claude Code (`#48777`).
+
 
 
 

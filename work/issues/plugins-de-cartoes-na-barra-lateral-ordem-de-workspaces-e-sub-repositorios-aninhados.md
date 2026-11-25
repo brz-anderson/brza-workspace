@@ -1,6 +1,6 @@
 ---
 status: open
-description: Repo badges de 16px na linha de título (#48607/#48572), chip de modelo em sessões (#48489), aba Home de bot fixa (#48561) e remoção de borda âmbar (#48554).
+description: Menu de conta unificado no App Rail (#48724/#48784), RepoMark em seletores (#48835), workspaces aninhados em árvore (#48717) e menu de contexto em agentes (#48428).
 scope:
   - brza-studio
   - workspace
@@ -10,6 +10,20 @@ tags:
   - design
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48724
+  - https://github.com/stablyai/orca/pull/48784
+  - https://github.com/stablyai/orca/pull/48823
+  - https://github.com/stablyai/orca/pull/48835
+  - https://github.com/stablyai/orca/pull/48839
+  - https://github.com/stablyai/orca/pull/48653
+  - https://github.com/stablyai/orca/pull/48804
+  - https://github.com/stablyai/orca/pull/48717
+  - https://github.com/stablyai/orca/issues/48716
+  - https://github.com/stablyai/orca/pull/48428
+  - https://github.com/stablyai/orca/pull/48576
+  - https://github.com/stablyai/orca/pull/48377
+  - https://github.com/stablyai/orca/issues/48698
+  - https://github.com/stablyai/orca/issues/48768
   - https://github.com/stablyai/orca/pull/48607
   - https://github.com/stablyai/orca/pull/48572
   - https://github.com/stablyai/orca/pull/48565
@@ -393,5 +407,19 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
 - Fixar a aba Home do bot permanentemente à esquerda na barra de abas (`#48561`).
 - Remover borda âmbar fixa na visualização de Activity (`#48554`).
 - Assegurar persistência da ordenação customizada de workspaces e boards de plugins (`#48625`, `#48651`).
+- Substituir Help e Settings por botão único de conta com menu plano no App Rail (`#48724`).
+- Disponibilizar menu de customização '...' para exibir ou ocultar páginas do App Rail (`#48784`).
+- Devolver foco ao botão do rail após clique fora e permitir rolagem de Customizar em janelas baixas (`#48823`).
+- Utilizar RepoMark consistente em dropdowns de projetos, filtros e jump palette (`#48835`).
+- Substituir botão Done por engrenagem de configurações rápidas no ProjectPeek (`#48839`).
+- Manter o Workspace Board afastado e desobstruído da barra lateral direita (`#48653`).
+- Mesclar listas de PRs e issues multi-repositório por data de criação em vez de número sequencial (`#48804`).
+- Aninhar linhas de workspaces sob cabeçalhos de projetos em árvore hierárquica na sidebar (`#48717`, resolve Issue `#48716`).
+- Disponibilizar menu de contexto de clique direito dedicado nas linhas de agentes da sidebar (`#48428`).
+- Equalizar tamanho da caixa de hover entre menu e alternador da sidebar na titlebar (`#48576`).
+- Permitir a criação de workspaces de chat duráveis fora do escopo estrito de Projetos (`#48377`).
+- Qualificar chaves e identificadores pai por host na linhagem da sidebar (`#48698`).
+- Expandir altura do dropdown de PRs e issues do GitHub na criação de worktrees para evitar corte do primeiro item (`#48768`).
+
 
 

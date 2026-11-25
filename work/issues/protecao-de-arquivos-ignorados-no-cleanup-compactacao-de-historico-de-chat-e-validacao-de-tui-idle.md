@@ -1,6 +1,6 @@
 ---
 status: open
-description: Releitura de imagens locais (#48451), pairing web resiliente (#48524), títulos reais de perguntas (#48530) e recuperação de itens recusados (#48526).
+description: Combinação de caracteres em branches/folders (#48704), proteção de downloads em cópia (#48764), grupos colapsados retidos (#48773) e reload NFD no Source Control (#48807).
 scope:
   - brza-studio
   - workspace
@@ -11,6 +11,11 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48704
+  - https://github.com/stablyai/orca/pull/48764
+  - https://github.com/stablyai/orca/pull/48773
+  - https://github.com/stablyai/orca/issues/48706
+  - https://github.com/stablyai/orca/issues/48807
   - https://github.com/stablyai/orca/pull/48451
   - https://github.com/stablyai/orca/pull/48524
   - https://github.com/stablyai/orca/pull/48530
@@ -628,6 +633,11 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Limpar atomicamente o selo "Needs you" ao responder perguntas e exibir títulos descritivos em itens (`#48530`).
 - Reter o rascunho de respostas de itens quando a submissão sofrer recusa ou falha de validação (`#48526`).
 - Varrer e expurgar worktrees temporários órfãos de automações interrompidas no cleanup (`#48588`).
+- Preservar marcas de combinação Unicode em nomes de diretórios e branches de workspace (`#48704`).
+- Nunca remover ou renomear arquivos na pasta Downloads após falha de cópia no servidor (`#48764`).
+- Lembrar grupos de sessões colapsados na barra lateral entre reinicializações do app (`#48773`, resolve Issue `#48706`).
+- Recarregar abas abertas pelo Source Control quando arquivos em decomposição NFD sofrerem alteração em disco no macOS (`#48807`).
+
 
 
 

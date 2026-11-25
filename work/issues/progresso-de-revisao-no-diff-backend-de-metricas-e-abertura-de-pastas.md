@@ -1,6 +1,6 @@
 ---
 status: open
-description: Otimização de scope-menu de diff (#48553), Look around em PowerShell (#48558), run scripts no explorer (#48663) e zoom no board (#48650).
+description: Datação de PR pelo passo mais recente (#48732), limite ampliado de links (#48719), clipboard em previews (#48682) e suporte a fórmulas KaTeX (#48797).
 scope:
   - brza-studio
   - brza-workflow
@@ -12,6 +12,13 @@ tags:
   - infra
   - design
 references:
+  - https://github.com/stablyai/orca/pull/48732
+  - https://github.com/stablyai/orca/pull/48719
+  - https://github.com/stablyai/orca/pull/48682
+  - https://github.com/stablyai/orca/pull/48217
+  - https://github.com/stablyai/orca/issues/48797
+  - https://github.com/stablyai/orca/issues/48793
+  - https://github.com/stablyai/orca/issues/48845
   - https://github.com/stablyai/orca/pull/48553
   - https://github.com/stablyai/orca/pull/48558
   - https://github.com/stablyai/orca/pull/48520
@@ -262,6 +269,14 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 34. Transportar mensagens de chats que falharam no arranque de volta ao conector solicitante (`#48493`).
 35. Permitir execução direta de scripts via clique direito no File Explorer (`#48663`, resolve `#48661`).
 36. Incorporar controles de zoom e ajuste panorâmico no Workspace Board (`#48650`, resolve `#48647`).
+37. Datar o PR gerado por uma cadeia de workers pela timestamp do seu passo mais recente (`#48732`).
+38. Elevar o limite de links e referências associadas em itens de trabalho (`#48719`).
+39. Permitir operações de escrita na área de transferência originadas por gestos em páginas pré-visualizadas (`#48682`).
+40. Suportar renderização de fórmulas matemáticas (KaTeX / LaTeX) no visualizador de documentos e chat (`#48797`).
+41. Corrigir decodificação de texto chinês em codificações GBK e GB18030 na visualização de git diff (`#48793`).
+42. Estabilizar assistente de arrasto do Computer Use no macOS em sistemas com idiomas não-ingleses (`#48845`).
+43. Centralizar configuração de abertura de links em uma opção única respeitando navegador do sistema (`#48217`).
+
 
 
 

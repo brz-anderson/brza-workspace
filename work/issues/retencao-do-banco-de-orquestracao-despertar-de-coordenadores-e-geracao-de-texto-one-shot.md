@@ -1,6 +1,6 @@
 ---
 status: open
-description: Adormecimento de workspace em chat workers (#48562), workers sob wait-for-setup (#48202), descarte de subagente interrompido (#48518) e liberação de workers de terminal (#42264).
+description: Parada deliberada de workers no dock (#48738/#48684), preservação de setup (#48683), status de handoff (#48686), paginação de agent read (#47953) e histórico retido (#48841).
 scope:
   - brza-studio
   - brza-workflow
@@ -11,6 +11,16 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48738
+  - https://github.com/stablyai/orca/pull/48684
+  - https://github.com/stablyai/orca/pull/48683
+  - https://github.com/stablyai/orca/pull/48664
+  - https://github.com/stablyai/orca/pull/48686
+  - https://github.com/stablyai/orca/pull/48782
+  - https://github.com/stablyai/orca/pull/48794
+  - https://github.com/stablyai/orca/pull/47953
+  - https://github.com/stablyai/orca/issues/48841
+  - https://github.com/stablyai/orca/issues/48840
   - https://github.com/stablyai/orca/pull/48562
   - https://github.com/stablyai/orca/pull/48202
   - https://github.com/stablyai/orca/pull/48518
@@ -753,6 +763,16 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Descartar imediatamente subagentes interrompidos ou cancelados pelo Codex (`#48518`).
 - Assegurar a liberação incondicional de workers em `worker-release` quando o terminal PTY já encerrou (`#42264`).
 - Permitir limpeza de falhas de workers assentados no dock do Home Chat com ação de Clear (`#48427`, Issues `#48594`, `#48593`, `#48592`, `#48614`).
+- Interpretar no dock de orquestração a parada deliberada de workers como parada normal e intencional (`#48738`, `#48684`).
+- Preservar o script de setup de workspace em execução ao interromper um worker manualmente (`#48683`).
+- Não exibir workers parados pelo coordenador como falhas inesperadas no histórico de orquestração (`#48664`).
+- Identificar workers assentados cujo terminal foi transferido para tarefa seguinte como 'handed on' (`#48686`).
+- Otimizar leitura de terminais transferidos em cadeia de handoff para leitura única por cadeia (`#48782`).
+- Centralizar o botão Stop da linha de worker no alinhamento do título (`#48794`).
+- Permitir paginação reversa no comando `orca agent read` com o parâmetro `--cursor` (`#47953`).
+- Preservar histórico retido e transcrições ao reabrir workers finalizados em worktrees filhos reutilizados (`#48841`).
+- Respeitar padrões de workspace para workers criados por bots (Chat vs Terminal, aprovação vs acesso total) (`#48840`).
+
 
 
 

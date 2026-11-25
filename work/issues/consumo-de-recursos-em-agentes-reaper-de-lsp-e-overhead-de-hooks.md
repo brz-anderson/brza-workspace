@@ -1,6 +1,6 @@
 ---
 status: open
-description: Liberação de recursos em workspaces estacionados (#45956), fila FIFO de check:changed (#48577), home isolada do Codex (#48486) e spawn nativo (#48600).
+description: Parada de checagem git a cada 30s no idle (#48030), cache git sem reter saídas brutas (#48204), digest SHA-256 em KeyedJsonRowCache (#48207) e probe env sob demanda (#48736).
 scope:
   - brza-studio
   - tools-kit
@@ -11,6 +11,13 @@ tags:
   - tooling
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48030
+  - https://github.com/stablyai/orca/pull/48204
+  - https://github.com/stablyai/orca/pull/48207
+  - https://github.com/stablyai/orca/pull/48736
+  - https://github.com/stablyai/orca/pull/48802
+  - https://github.com/stablyai/orca/pull/48734
+  - https://github.com/stablyai/orca/pull/48759
   - https://github.com/stablyai/orca/pull/45956
   - https://github.com/stablyai/orca/pull/48577
   - https://github.com/stablyai/orca/pull/48486
@@ -331,6 +338,15 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Isolar diretório de trabalho do servidor Codex impedindo varredura de `~/.codex` (`#48486`).
 - Utilizar `posix_spawn` nativo no lançamento de subprocessos auxiliares (`#48600`).
 - Aplicar amortecimento dinâmico em sondagens contínuas de telemetria sob alta carga (`#48656`).
+- Interromper a checagem repetitiva de arquivos git a cada 30 segundos em todos os worktrees durante a ociosidade (`#48030`).
+- Impedir que dados em cache do git retenham buffers de saídas completas na memória heap (`#48204`).
+- Armazenar digest SHA-256 em vez do JSON bruto na linha de base de `KeyedJsonRowCache` (`#48207`).
+- Compartilhar opções de modelo idênticas ao carregar a lista de modelos salvos (`#48211`).
+- Construir variáveis de ambiente para sondagem de shell apenas quando a sondagem for efetivamente executada (`#48736`).
+- Omitir busca de Home de bots em faixas de abas nas quais nenhum bot resida (`#48802`).
+- Reter carimbo único por remetente em conectores mesmo através de falhas sucessivas de inicialização (`#48734`).
+- Notificar clientes pareados quando worktrees sofrerem alterações externas sem watcher desktop ativo (`#48759`).
+
 
 
 

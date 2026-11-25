@@ -1,6 +1,6 @@
 ---
 status: open
-description: Sign-in remoto do Claude com link curto (#48611), descarte de recusa antecipada (#48448), token check em wake 401 (#48570) e agentes compartilhados (#48246).
+description: Atualizações de CLI em card (#48610), limite de 1.000 identidades (#48727), percentual em chips compactos (#48788), countdown de reset Gemini (#48688) e recovery de login (#48134).
 scope:
   - brza-studio
   - brza-workflow
@@ -10,6 +10,19 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48610
+  - https://github.com/stablyai/orca/pull/48727
+  - https://github.com/stablyai/orca/pull/48679
+  - https://github.com/stablyai/orca/pull/48721
+  - https://github.com/stablyai/orca/pull/48788
+  - https://github.com/stablyai/orca/pull/48801
+  - https://github.com/stablyai/orca/pull/48134
+  - https://github.com/stablyai/orca/pull/48471
+  - https://github.com/stablyai/orca/issues/48470
+  - https://github.com/stablyai/orca/issues/48688
+  - https://github.com/stablyai/orca/issues/48739
+  - https://github.com/stablyai/orca/issues/48786
+  - https://github.com/stablyai/orca/issues/48838
   - https://github.com/stablyai/orca/pull/48611
   - https://github.com/stablyai/orca/pull/48448
   - https://github.com/stablyai/orca/pull/48570
@@ -415,6 +428,19 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 - Tratar recusas prematuras com retenção em buffer antes do listener `onRefusal` (`#48448`).
 - Adotar token check específico para requisições com 401 no wake de agentes evitando falso bloqueio de cota (`#48570`).
 - Permitir compartilhamento e colaboração de agentes entre contas Orca distintas (`#48246`).
+- Oferecer atualizações de CLI dos agentes instalados via card discreto no canto inferior direito (`#48610`).
+- Elevar limite de identidades registradas para 1.000 e bloquear criação além da cota (`#48727`).
+- Capturar ambiente de shell de login no PATH de lançamento para evitar duplicação de entradas do `.zshrc` (`#48679`).
+- Restaurar instruções permanentes (standing instructions) ao reabrir sessões de chat do Cursor (`#48721`).
+- Exibir apenas o percentual de uso em chips compactos de status bar para economizar espaço horizontal (`#48788`).
+- Ler credenciais de login DPAPI do Cursor no Windows para exibição de consumo de cota (`#48801`).
+- Adicionar fluxo integrado de recuperação e reautenticação de conta diretamente na visualização de chat (`#48134`).
+- Exibir uso de cota específico da distribuição WSL em foco na barra de status (`#48471`, Issue `#48470`).
+- Exibir contador regressivo para o reset de cota do Antigravity Gemini no rodapé da status bar (`#48688`).
+- Evitar que sessões PTY antigas do Antigravity sobrescrevam silenciosamente a conta ativa no Windows (`#48739`).
+- Disponibilizar configuração para desativar checagem automática de atualização de CLI no boot de agentes (`#48786`).
+- Fornecer opção para atualizar o agente Codex antes do disparo de execuções de automação agendadas (`#48838`).
+
 
 
 

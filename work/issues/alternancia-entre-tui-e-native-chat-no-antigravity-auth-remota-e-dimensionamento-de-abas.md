@@ -1,6 +1,6 @@
 ---
 status: open
-description: Chat unificado no agy com in-app sign-in (#48305/#48304), cross-site frames em server (#48525), browse via SSH (#48490) e probes sob proxy com auth (#48556).
+description: Ações de cabeçalho no hover da linha superior (#48832), forwards IPv4/IPv6 em SSH (#48748), zsh startup via wrapper (#48779) e modo auto no terminal (#48479).
 scope:
   - brza-studio
   - workspace
@@ -12,6 +12,18 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48832
+  - https://github.com/stablyai/orca/pull/48748
+  - https://github.com/stablyai/orca/pull/48560
+  - https://github.com/stablyai/orca/pull/48188
+  - https://github.com/stablyai/orca/issues/48758
+  - https://github.com/stablyai/orca/pull/48479
+  - https://github.com/stablyai/orca/pull/48779
+  - https://github.com/stablyai/orca/issues/48772
+  - https://github.com/stablyai/orca/pull/48563
+  - https://github.com/stablyai/orca/pull/48474
+  - https://github.com/stablyai/orca/pull/48078
+  - https://github.com/stablyai/orca/pull/47828
   - https://github.com/stablyai/orca/pull/48305
   - https://github.com/stablyai/orca/pull/48304
   - https://github.com/stablyai/orca/pull/48525
@@ -827,6 +839,17 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 120. Prevenir crashes em probes de release através de proxies com autenticação (`#48556`).
 121. Limpar grupos de atualização associados a hosts remotos removidos (`#48517`).
 122. Estabilizar a geometria de terminais e buffer de tela na transição entre TUI e Native Chat (`#48657`, `#48645`).
+123. Revelar ações de cabeçalho do painel de terminal no hover da linha superior (`#48832`).
+124. Restaurar forwards IPv4 salvos ao lado de servidores locais IPv6 [::1] e abrir loopback em 127.0.0.1 sob colisão (`#48748`).
+125. Desfazer recolhimento agressivo de abas para ícones na barra de títulos preservando visibilidade (`#48560`, revertendo `#41896`).
+126. Preservar títulos definidos manualmente em abas de terminais mesmo após patches de sessão de workspace (`#48758`).
+127. Disponibilizar atalho 'Approve for me' (`--mode auto`) em terminais Antigravity (`#48479`).
+128. Executar comandos de startup do zsh a partir do wrapper de processo em vez de digitá-los cegamente na PTY (`#48779`, resolve Issue `#48772`).
+129. Rotear conexões de hosts compartilhados pelo runtimeEnvironments do processo principal (`#48563`).
+130. Permitir conexão direta a agentes compartilhados a partir de dispositivos móveis com chave própria (`#48474`).
+131. Suportar direção concorrente de sessão/prompt (steering) no protocolo ACP do Antigravity (`#48078`).
+132. Garantir persistência contínua de chats ACP, Claude e Codex após reinicialização do Orca no macOS e Linux (`#47828`, `#47819`, `#47783`).
+
 
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Worker tray em chip (#48581), queued row espaçada (#48564/#48598), prompts sugeridos no Codex (#48472) e imagens coladas (#48666).
+description: Stop em background tools (#48089), status dot fixo no worker chip (#48787), alinhamento no composer (#48792), tipos na bandeja (#48762), workers no dashboard (#48697) e imagens inline (#48665).
 scope:
   - brza-studio
   - brza-workflow
@@ -10,6 +10,19 @@ tags:
   - chat
   - tooling
 references:
+  - https://github.com/stablyai/orca/pull/48089
+  - https://github.com/stablyai/orca/pull/48787
+  - https://github.com/stablyai/orca/pull/48792
+  - https://github.com/stablyai/orca/pull/48767
+  - https://github.com/stablyai/orca/pull/48667
+  - https://github.com/stablyai/orca/pull/48809
+  - https://github.com/stablyai/orca/pull/48575
+  - https://github.com/stablyai/orca/pull/48762
+  - https://github.com/stablyai/orca/issues/48752
+  - https://github.com/stablyai/orca/issues/48697
+  - https://github.com/stablyai/orca/issues/48665
+  - https://github.com/stablyai/orca/issues/48780
+  - https://github.com/stablyai/orca/issues/48830
   - https://github.com/stablyai/orca/pull/48581
   - https://github.com/stablyai/orca/pull/48564
   - https://github.com/stablyai/orca/pull/48598
@@ -799,6 +812,19 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Exibir chips de prompts sugeridos contextuais no Native Chat do Codex (`#48472`).
 - Tratar colagem de imagens diretamente da área de transferência (clipboard) no composer (`#48666`, refs `#48528`).
 - Restaurar foco no campo de entrada do chat principal ao fechar a sheet de inspeção de subagente (`#48609`, resolve Issue `#48602`).
+- Interromper ferramentas de background ativas no momento em que o chat for finalizado (`#48089`).
+- Exibir estado de execução do worker chip com ponto âmbar estático sem oscilação (`#48787`).
+- Uniformizar margens e alinhamentos de todas as linhas acima da caixa de mensagem do composer (`#48792`).
+- Importar registros de compactação superdimensionados do histórico do Codex sem truncamento (`#48767`).
+- Substituir o nome completo da skill ao selecioná-la com o cursor posicionado internamente (`#48667`).
+- Exibir o ícone do modo de acesso do composer (full access / ask approval) de forma neutra (`#48809`).
+- Liberar leituras de transcrição enfileiradas ao fechar painéis de chat (`#48575`).
+- Exibir tipo de trabalho (work type) de cada worker na bandeja de workers do chat (`#48762`, resolve Issue `#48752`).
+- Apresentar workers despachados ativos mesmo antes do primeiro reporte de status no Agent Dashboard e pop-out (`#48697`).
+- Renderizar imagens coladas inline no balão de envio de chat no local exato da colagem (`#48665`).
+- Oferecer opção de "Fork from this response" em qualquer resposta concluída de chats OMP (`#48780`).
+- Copiar anexos e imagens associadas ao copiar o texto de uma mensagem no Native Chat (`#48830`).
+
 
 
 

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Resiliência de Slack bot (#47907/#47901/#47381), headers MCP no relay (#48477), propósito de bot pós-criação (#48487) e cadência de PR (#48621).
+description: Mute de notificações por bot (#48837), escopo de paginação em status (#48813), atribuição por proveniência (#48774) e post de rotinas agendadas em grupos (#48700).
 scope:
   - brza-studio
   - workspace
@@ -12,6 +12,17 @@ tags:
   - design
   - infra
 references:
+  - https://github.com/stablyai/orca/pull/48837
+  - https://github.com/stablyai/orca/pull/48390
+  - https://github.com/stablyai/orca/pull/48813
+  - https://github.com/stablyai/orca/pull/48630
+  - https://github.com/stablyai/orca/pull/48673
+  - https://github.com/stablyai/orca/pull/48660
+  - https://github.com/stablyai/orca/pull/48774
+  - https://github.com/stablyai/orca/pull/48087
+  - https://github.com/stablyai/orca/issues/48700
+  - https://github.com/stablyai/orca/issues/48790
+  - https://github.com/stablyai/orca/issues/48826
   - https://github.com/stablyai/orca/pull/47907
   - https://github.com/stablyai/orca/pull/47901
   - https://github.com/stablyai/orca/pull/46794
@@ -358,6 +369,18 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
 52. Sincronizar mascote e cor do bot como avatar oficial em mensagens do Slack (`#47381`).
 53. Suprimir mensagens `NO_REPLY` em conversas de grupo de bots (`#48496`).
 54. Propagar cabeçalhos MCP estruturados no relay e manter follow-ups de bots na mesma thread (`#48477`, `#47789`, `#48621`, `#48615`).
+55. Permitir silenciar (mute) notificações de forma individual por bot (`#48837`).
+56. Reler visualização aberta de itens de bot quando respostas recusadas forem emitidas de views fechadas (`#48390`).
+57. Restringir paginação de cartões de itens de bots estritamente à sua seção de status (`#48813`).
+58. Desobrigar helper de postar na thread do requisitante ao processar emails de status ou perguntas de bots (`#48630`).
+59. Exibir modal de confirmação de troca de agente posicionado acima do seletor aberto (`#48673`).
+60. Aceitar wrappers de shell com aspas no padrão shlex no comando Look around para salvar sugestões do Codex (`#48660`).
+61. Garantir que atribuição de propriedade de bot ocorra exclusivamente sob proveniência verificada (`#48774`).
+62. Recuperar automaticamente falhas de modelo em páginas de execução de automações (`#48087`).
+63. Permitir que rotinas de automação agendadas publiquem resultados diretamente em grupos de bots (`#48700`).
+64. Corrigir falha em disparos de eventos de automação de bots (pr_opened, review_requested) (`#48790`).
+65. Ajustar destaque de seleção de cards na lista de bots para não invadir a barra de rolagem (`#48826`).
+
 
 
 

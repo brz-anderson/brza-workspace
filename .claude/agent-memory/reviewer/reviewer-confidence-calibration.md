@@ -43,6 +43,18 @@ metadata:
   pasta (procure pelo corpo, não pelo título); asserção de teste cortada pelo conserto porque o
   upstream mudou o comportamento (confira o teste novo do upstream); campo descartado por um
   spread trocado por função `brza/` (confira o tipo: hoje cobre tudo).
+- **Commit novo no meio da revisão** (sync da 278): a sessão do sync commitou `9b93796a198` enquanto
+  eu lia; a contagem do mobile mudou de 9 para 19 chaves. Rode `git log -1` no começo e de novo antes
+  do handback, e diga em que commit cada número foi tirado.
+- **Hipóteses que caíram no sync da 278** (não gaste tempo sem caminho novo): o pino assíncrono sem
+  `await` (único chamador espera); a desinstalação do upstream apagando `~/.orca` (detecta o Orca e
+  mantém); marcador de dock (`data-native-chat-dock-contents`) faltando no cartão do fork (o upstream
+  também o perde atrás do anchor do slot de subagente — dei ~75, ficou de fora como achado).
+- **Comparador de mensagem com "Orca" contra produtor "BrzA Studio"**: 92, lido dos dois lados; o
+  efeito (tradução perdida) é dedução direta do `return normalized`, sem precisar rodar.
+- **Ferramentas barradas no papel:** script inline (python, node -e) e redirecionar para o scratch da
+  sessão são recusados pelo hook; `>` para `/tmp/rv278/` passa. O cruzamento de linhas sai com
+  `awk` + `sort` + `join -v1` (`LC_ALL=C`), sem script.
 - **zsh**: `$r:src/...` também quebra em `git show`/`git grep` com `$r` antes de `:`; use `"${r}:…"`.
 
 Related: [[sync-review-patterns]]

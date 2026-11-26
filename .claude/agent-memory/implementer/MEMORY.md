@@ -15,4 +15,16 @@
 - [Rebrand de código e catálogos no sync 256](brza-studio-sync-256-rebrand-lessons.md) — troca só com aspas, listar todos os drifts, chave reusada, órfãs
 - [Lições do g1-chat-ui do sync v1.4.256](brza-studio-sync-256-chat-ui-lessons.md) — tsc TS7 com marcadores, símbolo movido, teste apagado, fork duplicado
 - [Remoção do Bifurcar e pino no Fork, sync 256](brza-studio-sync-256-fork-fix-lessons.md) — restaurar da tag, onde o pino de conta mora, falhas de linha de base
+- [Sync v1.4.263, shared/cli/config/mobile](brza-studio-sync-263-shared-cli-lessons.md) — helper de bloco, fork-only com import velho, gerador RPC, locale pela tag
 - [Consertos pós-merge v1.4.256](brza-studio-sync-256-fix-lessons.md) — max-lines por tipo em brza/, ratchet fs, rig sem ready, check:changed com base
+- [Sync v1.4.263, renderer UU](brza-studio-sync-263-renderer-lessons.md) — merge de 3 vias com base v256, feature movida para contexto, imports quebrados só do fork
+- [Lições do UD do sync v1.4.263](brza-studio-sync-263-ud-lessons.md) — .brza.test.ts por restauração, import velho em movido auto-mesclado, recibo de conta vira rodada
+- [Lições do g1-chat-ui do sync v1.4.263](brza-studio-sync-263-chat-ui-lessons.md) — nome repetido, dono de editor por aba, linha de limite de uso, max-lines exato, 13px
+- [Lições do sync v1.4.263 em src/main](brza-studio-sync-263-main-lessons.md) — tsc sombra, journal SQL async, mutação P36, testes envelhecidos, rodada do ACP
+- [Lições do UD do sync v1.4.278](brza-studio-sync-278-ud-lessons.md) — suíte e fixtures cortados, diff contra a tag anterior, brza.test sem harness, UU de outro grupo
+- [Sync v1.4.278, shared/cli/config/locale](brza-studio-sync-278-shared-cli-lessons.md) — HEAD==tag anterior, bloco vazio do theirs, rebrand de Hangul/alemão, verify de catálogos
+- [Lições do g1-renderer do sync v1.4.278](brza-studio-sync-278-renderer-lessons.md) — merge-file com base v263, rebrand só em string, feature refeita pelo upstream, max-lines por helper, tsc direto
+- [Lições do sync v1.4.278 em src/main](brza-studio-sync-278-main-lessons.md) — theirs inteiro em pick, P75 sobre loja async, glob vazio roda a suíte, testes envelhecidos
+- [Varredura Orca dos gates de idioma, sync 278](brza-studio-sync-278-rebrand-sweep-lessons.md) — fonte junto do catálogo, CJK no regex, mobile em src/shared, max-lines por t()
+- [Conserto pós-merge v1.4.278](brza-studio-sync-278-fix-lessons.md) — helper de teste por script, teste do fork envelhecido, ratchet de bloqueio, max-lines por extração
+- [Orçamento eager do mobile-web](brza-studio-mobile-web-eager-budget.md) — medir por metafile, lazy não reduz eager, fork soma ~16 KB (tools/brza)

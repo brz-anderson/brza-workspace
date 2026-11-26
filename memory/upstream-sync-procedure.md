@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 7884383f-7a82-4f9c-a066-e1d749d6c2a6
-  modified: 2026-11-11T23:23:38.816Z
+  modified: 2026-11-26T18:44:07.427Z
 ---
 
 O sync da v1.4.246 (2026-11-02) teve 404 arquivos em conflito, e o que funcionou fica aqui. O registro inteiro está no
@@ -41,6 +41,21 @@ Do sync da v1.4.256 (2026-11-11, 796 conflitos), mais:
   com recomendações opostas. Leia o código do upstream antes da rodada.
 - **Quando uma feature do fork sai, procure o receptor que fica.** O Bifurcar saiu, e o schema e o divisor do host
   ficaram sem chamador; o revisor achou. O mesmo vale para os testes de contrato e de cross-version que a citam.
+
+Do sync das v1.4.263 e v1.4.278 (2026-11-18 a 2026-11-26), mais:
+- **O scratch em `/private/tmp` some com o reinício do app.** Os scripts (`classify_hunks.py`, `classify_ud.py`,
+  `merge_locales.py`, `rebrand_locales.py`), o brief e as rodadas ficam em
+  `~/Library/Application Support/brza-studio/chat-scratch/d2b1b1fb0ad353b4ca07993e8c8d65cd/` (e `sync-278/`). Copie de lá
+  e grave lá o brief e as rodadas de cada sync.
+- **Merge em andamento se commita assim que os conflitos fecham**, antes da rodada dos pontos: um reinício no meio não
+  perde o trabalho dos grupos.
+- **Tag nova no meio do sync:** mescle a tag nova sobre a branch do sync em curso, não sobre a `master` (375 conflitos
+  contra 808 na 278).
+- **"O upstream já faz o mesmo" se confere antes da rodada**, lendo o código do upstream. Na 263, o modo ao vivo do
+  Antigravity não era o mesmo, e a decisão 3 teve de ser refeita.
+- **O bundle web do mobile tem orçamento de carga** (`verify-mobile-web-app-bundle.mjs`); o upstream usa quase todo, e o
+  fork tem +128 KiB próprios (R4 da 278). O `pnpm build:mac` é o que pega; rode-o antes do push.
+- **Briefs de teste pedem `bash -c` e lista conferida:** um glob vazio no zsh fez um `implementer` rodar a suíte inteira.
 
 **Why:** cada sync fica maior sem isso; a linha de base separa o que é do merge do que já vem quebrado do upstream.
 

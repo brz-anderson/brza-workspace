@@ -23,7 +23,7 @@ tags:
 
 - **Retomar:** P1 a P5 fechados; P5 em `brza-studio@7ee6b1e5cc6`, aprovado pelo Grok (REV-012, 103 testes).
   P6/C1 aguarda Anderson no app de dev, com dois chats Claude, observação da fila, origem, cursor e replay.
-  A branch está em `0ca6ac7abb5`, já sobre a v1.4.256; o app de dev se recompila a partir dela.
+  A branch está em `02e800c8d63`, já sobre a v1.4.278; o app de dev se recompila a partir dela.
   O merge da fase 1 e os passos seguintes aguardam o caso manual C1 executado por Anderson. Após o Observado e
   veredito de C1, fechar P6 com revisão independente e seguir P7 (suíte completa isolada, comparação à base e merge).
   **Em 2026-11-06, o sync da `v1.4.251` chegou à `master`** (`brza-studio@cb573babbfd`) e foi mesclado em
@@ -528,6 +528,11 @@ Estimado: 1 h · Executado: — h
   upstream se soma ao list/read/send, e a evidência do chamador no `agentSession.send` passa ao mecanismo novo
   (`CALLER_CHAT_METHODS`); `src/cli` com 156 arquivos verdes. O C1 precisa de um app de dev recompilado dessa branch.
   [O sync da v1.4.256 do upstream, que tirou o Bifurcar do fork](../../work/worklogs/2026-11-11-sync-da-v1-4-256-do-upstream.md)
+
+- 2026-11-26 — a `master` das v1.4.263 e v1.4.278 mesclada na `feat/pln-011-chat-cli` em `02e800c8d63`: o
+  `chat list|read|send` vai para `src/cli/agents/`, ao lado do `chat rename` do upstream, e o `agentSession.send` entra no
+  `SESSION_EVIDENCE_METHODS` do upstream; `src/cli` com 291 testes verdes.
+  [O sync das v1.4.263 e v1.4.278 do upstream, com o limite do bundle mobile](../../work/worklogs/2026-11-26-sync-das-v1-4-263-e-v1-4-278-do-upstream.md)
 
 ## Revisões
 

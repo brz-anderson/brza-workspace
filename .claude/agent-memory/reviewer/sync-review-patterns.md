@@ -52,6 +52,20 @@ Padrões que se repetiram na revisão do merge da v1.4.246 (2026-11-02):
   ramo no import) sem produtor. Procure quem ainda escreve o campo (`git grep` no renderer e
   no `src/cli`) antes de dar como "sem resto".
 
+- **Slug `brz-anderson/orca` voltou** (sync da 263/278, 2026-11-26), em três arquivos, um deles
+  regredindo o que a `master` já tinha certo. A troca em massa `stablyai/orca` → `brz-anderson/orca`
+  é o mecanismo provável. Rode sempre `git grep "brz-anderson/orca" HEAD | grep -v "orca-"` e compare
+  com a `master`.
+- **Comparador do renderer que o rebrand não alcança** (sync da 278): o upstream traz tabelas que
+  traduzem a mensagem crua do main (`test:` string ou regex, `includes`, `===`); o main já diz
+  "BrzA Studio" e a tabela segue em "Orca", então a tradução nunca casa e a tela mostra inglês cru.
+  O agente de rebrand troca o `fallback` da entrada e deixa o `test` dela. Procure
+  `git grep -n "test: .*Orca"`, `/…Orca…/` e `includes('…orca…')` no renderer e no shared, e confira
+  o produtor no main.
+- **Mobile e paridade:** os testes de paridade entre o catálogo do desktop e o do mobile
+  (`bot-template-text`, `bot-failure-codes`) puxam o rebrand para o mobile, contra a decisão "mobile
+  fica Orca". Conte as chaves com `git diff -U0 … | grep -c '^+ '`; a devolução do agente subconta.
+
 **Método que rendeu:** listar as linhas que o fork somou (`git diff -U0 <base do último sync> <master do
 fork> -- src`) e que não existem em lugar nenhum da árvore atual. Quase tudo é refatoração ou texto
 reescrito; o resto aponta o que caiu. Depois, `git diff v1.4.246 -- <arquivo>` nas junções.

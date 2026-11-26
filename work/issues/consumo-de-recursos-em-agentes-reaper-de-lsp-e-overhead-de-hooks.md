@@ -1,6 +1,6 @@
 ---
 status: open
-description: Otimizacao de row-builders e worktree catalog (#49617, #49611), eliminacao de lock em asar (#49622) e reducao de churn (#49620).
+description: Materializacao lazy de schemas Zod (#49932, #49923, #49920, #49903), cache lstat de ambientes (#49926, #49912) e supressao de polling Cursor DB (#49818).
 scope:
   - brza-studio
   - tools-kit
@@ -75,6 +75,19 @@ references:
   - https://github.com/stablyai/orca/issues/49630
   - https://github.com/stablyai/orca/issues/49621
   - https://github.com/stablyai/orca/issues/49551
+  - https://github.com/stablyai/orca/pull/49932
+  - https://github.com/stablyai/orca/pull/49926
+  - https://github.com/stablyai/orca/pull/49923
+  - https://github.com/stablyai/orca/pull/49920
+  - https://github.com/stablyai/orca/pull/49903
+  - https://github.com/stablyai/orca/pull/49897
+  - https://github.com/stablyai/orca/pull/49912
+  - https://github.com/stablyai/orca/pull/49818
+  - https://github.com/stablyai/orca/pull/49673
+  - https://github.com/stablyai/orca/pull/49671
+  - https://github.com/stablyai/orca/pull/49669
+  - https://github.com/stablyai/orca/pull/49674
+  - https://github.com/stablyai/orca/issues/49965
 ---
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
@@ -433,3 +446,9 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Inicializar poly1305 WASM no módulo SSH2 de forma preguiçosa somente sob negociação chacha20 (`#49492`).
 - Otimizar timeout do hook gerenciado `PreToolUse` do Claude Code no macOS evitando recusa de ferramentas sob carga (`#49630`).
 - Assegurar que decisão de permissão 'ask' em hooks não seja auto-aprovada em modo Full access sem confirmação (`#49551`).
+- Materializar esquemas Zod v4 do Main, Shared e protocolo ACP de forma preguiçosa sob demanda (`#49932`, `#49923`, `#49920`, `#49903`, `#49897`).
+- Servir leituras de `resolveEnvironment` e `listEnvironments` a partir de cache de carimbo lstat do ambiente pai (`#49926`, `#49912`).
+- Pular acionamento do `foreign-sqlite-reader` para bancos de dados ausentes ou inalterados do Cursor (`#49818`).
+- Acelerar encerramento por ociosidade para workers de spawn (45s), scan de portas (60s), opencode binder (30s) e environment store (30s) (`#49673`, `#49671`, `#49669`).
+- Ampliar o timeout do hook gerenciado `PreToolUse` do Claude Code para 30s após espera inicial de 8s (`#49674`).
+- Impedir que cliques no chevron de subagentes roubem o foco do terminal ativo (`#49965`).

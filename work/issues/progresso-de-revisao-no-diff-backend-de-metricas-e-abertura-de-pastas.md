@@ -1,6 +1,6 @@
 ---
 status: open
-description: Git Graph em pastas vinculadas (#49629), revalidacao de preflight de tarefas (#49633) e git blame inline no diff (#49558).
+description: Suporte a repositorios Nostr ngit NIP-34 (#49968, #49969), reconhecimento de work items no GitLab (#49894) e retentativa de consultas Jira Cloud (#49660).
 scope:
   - brza-studio
   - brza-workflow
@@ -95,6 +95,16 @@ references:
   - https://github.com/stablyai/orca/issues/49528
   - https://github.com/stablyai/orca/issues/49509
   - https://github.com/stablyai/orca/issues/49499
+  - https://github.com/stablyai/orca/pull/49968
+  - https://github.com/stablyai/orca/pull/49894
+  - https://github.com/stablyai/orca/pull/49660
+  - https://github.com/stablyai/orca/pull/49949
+  - https://github.com/stablyai/orca/issues/49969
+  - https://github.com/stablyai/orca/issues/49824
+  - https://github.com/stablyai/orca/issues/49806
+  - https://github.com/stablyai/orca/issues/49901
+  - https://github.com/stablyai/orca/issues/49940
+  - https://github.com/stablyai/orca/issues/49938
 ---
 
 # Progresso de revisão no diff, backend de métricas e abertura de pastas
@@ -356,3 +366,10 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 - Comparar seletores de nomes na CLI com suporte a strings Unicode em decomposição NFD (`#49504`).
 - Permitir edição direta de arquivos a partir da visualização de diff (`#49528`).
 - Acelerar o painel do Git com seletor persistente de branches e prévia de diff em tempo real no Histórico (`#49509`, `#49499`).
+- Adicionar suporte a repositórios descentralizados Nostr NIP-34 (`ngit`) para issues e PRs no desktop (`#49968`, resolve Issue `#49969`).
+- Reconhecer URLs de `work_items`, `epics` e `test_cases` na checagem de escopo de repositórios GitLab (`#49894`, resolve Issue `#49824`).
+- Reexecutar consultas JQL amplas delimitando aos projetos visíveis no Jira Cloud (`#49660`).
+- Mover servidor Orca salvo para novo host SSH em vez de duplicá-lo no cadastro (`#49949`).
+- Preservar ordenação `ORDER BY` de consultas JQL personalizadas no Jira Tasks (`#49806`).
+- Exibir contador regressivo em chips compactos quando uma janela de cota estiver prestes a resetar (`#49901`).
+- Abrir arquivos ao tocar em caminhos citados em comentários de itens no mobile (`#49940`) e recolher comentários extensos com 'Show more' (`#49938`).

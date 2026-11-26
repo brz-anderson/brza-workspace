@@ -1,6 +1,6 @@
 ---
 status: open
-description: Conexao Feishu para mencoes em grupo (#49639), ordenacao Planned antes de Waiting (#49610) e template OpenCodeReview (#49561).
+description: Resiliencia em pacotes e registros de bots (#49953, #49951), gravacao de resposta final em grupos (#49907) e instrucoes compartilhadas Group SOUL (#49924).
 scope:
   - brza-studio
   - workspace
@@ -102,6 +102,20 @@ references:
   - https://github.com/stablyai/orca/issues/49532
   - https://github.com/stablyai/orca/issues/49522
   - https://github.com/stablyai/orca/issues/49511
+  - https://github.com/stablyai/orca/pull/49953
+  - https://github.com/stablyai/orca/pull/49951
+  - https://github.com/stablyai/orca/pull/49907
+  - https://github.com/stablyai/orca/issues/49945
+  - https://github.com/stablyai/orca/issues/49944
+  - https://github.com/stablyai/orca/issues/49924
+  - https://github.com/stablyai/orca/issues/49961
+  - https://github.com/stablyai/orca/issues/49916
+  - https://github.com/stablyai/orca/issues/49902
+  - https://github.com/stablyai/orca/issues/49900
+  - https://github.com/stablyai/orca/issues/49891
+  - https://github.com/stablyai/orca/issues/49830
+  - https://github.com/stablyai/orca/issues/49854
+  - https://github.com/stablyai/orca/issues/49799
 ---
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
@@ -468,3 +482,14 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
 - Permitir renomeação da pasta home de um bot ao alterar seu nome de exibição (`#49532`).
 - Notificar proprietário no Slack quando a resposta final do bot estiver concluída (`#49522`).
 - Permitir reordenação customizada de grupos de status em Bot Items (`#49511`).
+- Compartilhar o restante de pacotes de bots mesmo diante de notas de memória ilegíveis (`#49953`, resolve Issue `#49945`).
+- Manter listagem e roteamento de grupos de bots ativos mesmo quando um registro individual estiver corrompido (`#49951`, resolve Issue `#49944`).
+- Gravar estritamente a resposta final de um turno de grupo como a réplica enviada (`#49907`).
+- Suportar conceito de 'Group SOUL' com instruções e skills compartilhadas para todos os bots do grupo (`#49924`).
+- Adicionar comando CLI para renomeação em lote de bots (`orca bot rename --batch`, `#49961`).
+- Preservar contexto de conversa ao alternar o agente base de um bot (`#49916`).
+- Conector direto para Google Chat em bots do Orca (`#49902`) e template de Super bot com ofertas aprovadas (`#49900`).
+- Remover mensagens transitórias de progresso ('Working on...') do Slack após envio da resposta final (`#49891`).
+- Impedir vazamento de narrações de ferramentas de bots para o histórico de salas de grupo (`#49830`).
+- Fixar perguntas não respondidas de bots na parte inferior do chat como fila pendente (`#49854`).
+- Injetar regras de `MEMORY.md` com precedência de instrução e não apenas como notas consultivas (`#49799`).

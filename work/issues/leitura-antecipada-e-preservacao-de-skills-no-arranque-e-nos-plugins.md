@@ -1,6 +1,6 @@
 ---
 status: open
-description: Ocultacao de pycache em @ (#49645), skills de projetos linkados em comentarios (#49497) e correcoes em stubs CLI (#49516, #49510).
+description: Listagem de skills no Kiro antes do primeiro envio (#49906), suporte ao servidor MCP do Meta Ads (#49892) e proxies HTTP em child processes (#49925).
 scope:
   - brza-studio
 priority: high
@@ -91,6 +91,13 @@ references:
   - https://github.com/stablyai/orca/issues/49645
   - https://github.com/stablyai/orca/issues/49510
   - https://github.com/stablyai/orca/issues/49505
+  - https://github.com/stablyai/orca/pull/49906
+  - https://github.com/stablyai/orca/pull/49925
+  - https://github.com/stablyai/orca/pull/49847
+  - https://github.com/stablyai/orca/issues/49892
+  - https://github.com/stablyai/orca/issues/49896
+  - https://github.com/stablyai/orca/issues/49843
+  - https://github.com/stablyai/orca/issues/49805
 ---
 
 # Leitura antecipada e preservação de skills no arranque e nos plugins
@@ -424,3 +431,10 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
 - Rejeitar inclusão de blocos `[[hooks]]` no Kimi quando inviabilizarem o carregamento do `config.toml` (`#49523`, resolve Issue `#49505`).
 - Encaminhar cabeçalhos completos no relay de ferramentas de agentes exceto hop-by-hop e credenciais próprias (`#49535`).
 - Identificar permissões faltantes em erros 403 do Composio e oferecer ação rápida de 'Change key' (`#49512`).
+- Listar skills instaladas no seletor slash do Kiro antes mesmo do envio da primeira mensagem (`#49906`).
+- Propagar configurações de proxy HTTP do aplicativo para processos filhos da CLI do GitHub (`gh`, `#49925`).
+- Isolar do cache do gerenciador leituras iniciadas antes de ações externas em automações (`#49847`).
+- Suportar autenticação no servidor MCP oficial do Meta Ads (`mcp.facebook.com/ads`) para ferramentas de bots (`#49892`).
+- Permitir ícones customizados em itens de status bar na API de plugins (`#49896`).
+- Integrar notificações de plugins (`notifications.show`) às configurações do sistema com som por plugin (`#49843`).
+- Permitir definição de editores customizados como padrão por extensão de arquivo via plugins (`#49805`).

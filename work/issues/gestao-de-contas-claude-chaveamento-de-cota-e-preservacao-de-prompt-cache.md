@@ -1,6 +1,6 @@
 ---
 status: open
-description: Perfis isolados por conta Google no Antigravity (#49595), protecao do Claude em fish shell (#49635) e sincronizacao de distros WSL no Codex (#49576).
+description: Localizacao de workspace URIs do Antigravity (#49966), rejeicao interativa no Claude 2.1.332 (#49970) e supressao de autoupdate em commit (#49914, #49911).
 scope:
   - brza-studio
   - brza-workflow
@@ -103,6 +103,17 @@ references:
   - https://github.com/stablyai/orca/issues/49579
   - https://github.com/stablyai/orca/issues/49547
   - https://github.com/stablyai/orca/issues/48321
+  - https://github.com/stablyai/orca/pull/49914
+  - https://github.com/stablyai/orca/pull/49930
+  - https://github.com/stablyai/orca/pull/49679
+  - https://github.com/stablyai/orca/issues/49966
+  - https://github.com/stablyai/orca/issues/49970
+  - https://github.com/stablyai/orca/issues/49911
+  - https://github.com/stablyai/orca/issues/49904
+  - https://github.com/stablyai/orca/issues/49828
+  - https://github.com/stablyai/orca/issues/49812
+  - https://github.com/stablyai/orca/issues/49780
+  - https://github.com/stablyai/orca/issues/49746
 ---
 
 # Gestão de contas Claude, chaveamento de cota e preservação de prompt cache
@@ -515,3 +526,12 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 - Atualizar identificador retornado em 'Copy Session ID' após comandos `/clear` ou conexão com sessões em background (`#49579`).
 - Exibir seções de contas Grok e Cursor em Accounts mesmo quando o host de configurações for um servidor pareado (`#49547`).
 - Suportar uso simultâneo de múltiplas contas do Claude sem migrar compulsoriamente sessões ativas existentes (`#48321`).
+- Corrigir resolução de localização de sessões Antigravity Desktop lendo `conversation_summaries.db` (`#49966`).
+- Tratar rejeição de ferramentas em sessões hospedadas do Claude Code 2.1.332 sob `bypassPermissions` (`#49970`).
+- Suprimir disparos de auto-updaters de CLIs de agentes durante geração de mensagens de commit e descoberta de modelos no Windows (`#49914`, resolve Issue `#49911`).
+- Repassar prompts de geração do Cursor via stdin em vez de argumentos de linha de comando (`#49930`).
+- Expurgar variáveis de ambiente de runtime de AppImage de processos filhos estruturados de agentes (`#49679`).
+- Esclarecer linha extra de 'Plan' no cartão de uso do Cursor ao lado dos pools de modelos (`#49904`).
+- Implementar transição e failover automático de provedores e contas ao atingir limites de uso (`#49828`, `#49812`).
+- Corrigir mapeamento de modelo Claude Opus com esforço de raciocínio no Cursor CLI (`#49780`).
+- Remover sessões arquivadas do Claude da listagem ativa do Agent Session History (`#49746`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Avatares de projetos GitLab na barra lateral (#49608, #49594), captura de paineis altos em plugins (#49618) e card de auto-name amigavel (#49555).
+description: Prioridade visual de status working sobre bell (#49928, #49915), abas de plugins em grupos de bots (#49888, #49800) e scope de repositórios (#49664).
 scope:
   - brza-studio
   - workspace
@@ -106,6 +106,14 @@ references:
   - https://github.com/stablyai/orca/issues/49527
   - https://github.com/stablyai/orca/issues/49483
   - https://github.com/stablyai/orca/issues/13303
+  - https://github.com/stablyai/orca/pull/49928
+  - https://github.com/stablyai/orca/pull/49888
+  - https://github.com/stablyai/orca/pull/49664
+  - https://github.com/stablyai/orca/pull/49654
+  - https://github.com/stablyai/orca/issues/49915
+  - https://github.com/stablyai/orca/issues/49800
+  - https://github.com/stablyai/orca/issues/49962
+  - https://github.com/stablyai/orca/issues/49706
 ---
 
 # Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados
@@ -491,3 +499,9 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
 - Permitir fixar chats e sessões individuais diretamente na barra lateral esquerda (`#49527`).
 - Corrigir posicionamento de cartões de workspace no estilo experimental alinhando com o cabeçalho do projeto (`#49483`).
 - Adicionar suporte a Spaces para alternar a barra lateral entre conjuntos isolados de projetos (`#13303`).
+- Manter spinner de working ativo visível na barra lateral com prioridade sobre sinos de mensagens não lidas (`#49928`, resolve Issue `#49915`).
+- Exibir abas de painéis de plugins na barra lateral direita de páginas de grupos de bots (`#49888`, resolve Issue `#49800`).
+- Delimitar leituras de metadados de worktrees por `repoId` em projeções de hosts (`#49664`).
+- Reutilizar singleton congelado de `ParsedExecutionHost` e cachear agrupamento de projetos por repositório (`#49654`).
+- Exibir lista de agentes como carrossel de blocos quadrados na interface (`#49962`).
+- Disponibilizar comandos de linha de comando para manipular grupos de projetos na sidebar (`#49706`).

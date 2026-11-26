@@ -1,6 +1,6 @@
 ---
 status: open
-description: Agentes ACP customizados em Chat (#49643), reinicio do chat em update do Claude (#49619), skills OpenCode via @ (#49612) e renderizacao Markdown em itens (#49560).
+description: Subagentes do Claude mantidos concluidos (#49959), desfecho de handoff de bots (#49960, #49937), cartoes de perguntas sem truncamento (#49948) e cores ultrathink (#49849).
 scope:
   - brza-studio
   - brza-workflow
@@ -84,6 +84,15 @@ references:
   - https://github.com/stablyai/orca/issues/49562
   - https://github.com/stablyai/orca/issues/49549
   - https://github.com/stablyai/orca/issues/49508
+  - https://github.com/stablyai/orca/pull/49959
+  - https://github.com/stablyai/orca/pull/49960
+  - https://github.com/stablyai/orca/pull/49879
+  - https://github.com/stablyai/orca/issues/49948
+  - https://github.com/stablyai/orca/issues/49937
+  - https://github.com/stablyai/orca/issues/49886
+  - https://github.com/stablyai/orca/issues/49849
+  - https://github.com/stablyai/orca/issues/49777
+  - https://github.com/stablyai/orca/issues/49967
 ---
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
@@ -908,3 +917,11 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Blindar a janela de chat contra congelamento em respostas runaway descontroladas do Codex (`#49575`).
 - Incluir alterações efetuadas por subagentes OMP no card Changed files do Native Chat (`#49549`).
 - Suportar perguntas laterais `/btw` e bifurcação de conversa para chats Antigravity ACP (`#49508`).
+- Manter conclusões de subagentes do Claude devidamente liquidadas após o despertar do agente pai (`#49959`).
+- Corrigir travamento visual de spinner em transferências (handoff) de bots respondidas em desktops pareados (`#49960`, resolve Issue `#49937`).
+- Preservar assuntos de respostas legíveis nas notificações e cards de chat (`#49879`).
+- Evitar truncamento de cards de perguntas em duas linhas para permitir leitura integral antes da resposta (`#49948`).
+- Corrigir abertura do compositor ao selecionar `/goal` em chats Antigravity em vez de deixar texto simples (`#49886`).
+- Colorir comandos e modos `ultrathink` / `ultraplan` / `ultracode` no compositor do chat com paridade ao Claude Code (`#49849`).
+- Renderizar plugins do Claude Code que desenham respostas estendidas no chat (`cc-stretch stretchtext`, `#49777`).
+- Exibir respostas do Pi como não lidas enquanto subagentes do mesmo turno ainda estiverem em execução (`#49967`).

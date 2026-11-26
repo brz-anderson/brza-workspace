@@ -277,3 +277,56 @@ refs:
 ### 3. Validação e Auditoria das Notas
 - Executado o validador oficial: `python3 .claude/skills/notes-checker/scripts/check_notes.py --detail`.
 - Resultado: **0 erros**, mantendo estrita integridade sintática e de frontmatter (`priority: high`) em todas as notas.
+
+---
+
+## Ciclo 7 — 12:00 BRT (15:00 UTC, 2026-11-26)
+
+### 1. Resumo Executivo e Janela de Observação
+- **Janela temporal:** 2026-11-26T09:00:00Z até 2026-11-26T15:05:00Z (06:00 às 12:00 BRT).
+- **Upstream Git:** Sincronizado o mirror local em `/Users/andepb/Projects/brza-studio` via `git fetch upstream`.
+  - **Novo range de commits:** `bc8085021b0..763ece3651b` (72 commits incorporados no `upstream/main`).
+- **Issues e PRs upstream:**
+  - Consulta estruturada via GitHub CLI (`gh pr list` e `gh issue list`) com filtro `updated:>=2026-11-26T09:00:00Z`.
+  - Retornados 100 PRs e 100 Issues atualizados ou abertos nas últimas 6h.
+  - Filtradas e incorporadas as novidades pertinentes nas 10 frentes temáticas ativas em `work/issues/`, sem duplicidades com ciclos anteriores.
+
+---
+
+### 2. Mapeamento e Atualizações por Frente Temática
+
+1. **[Painel de atividades de subagentes e anotações visuais no Native Chat](../issues/painel-de-atividades-de-subagentes-e-anotacoes-visuais-no-native-chat.md):**
+   - Incorporados o PR `#49959` (manutenção do estado liquidado de subagentes do Claude após o despertar do agente pai), PR `#49960` e Issue `#49937` (eliminação de spinner travado em transferências de bots em desktops pareados), PR `#49879` (assuntos de respostas legíveis em notificações e cards), Issue `#49948` (prevenção de truncamento em duas linhas de cards de perguntas para leitura integral antes da resposta), Issue `#49886` (abertura correta do compositor ao acionar `/goal` em chats Antigravity), Issue `#49849` (colorização dos modos `ultrathink`, `ultraplan` e `ultracode` no compositor), Issue `#49777` (renderização de extensões que desenham respostas estendidas no chat) e Issue `#49967` (exibição de respostas do Pi como não lidas enquanto subagentes do mesmo turno executam).
+
+2. **[Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot](../issues/retencao-do-banco-de-orquestracao-despertar-de-coordenadores-e-geracao-de-texto-one-shot.md):**
+   - Incorporados o PR `#49876` (relatório estruturado de finalização de processos de workers para coordenadores com código de saída e causa), PR `#49950` e Issue `#49943` (preservação de remotos de PR de worktrees ativas quando varreduras de worktree falharem), PR `#49882` e `#49868` (suporte a múltiplos fechamentos do mesmo item no mesmo dia e busca indexada por evento no journal), PR `#49889` (preservação de destinatário do turno de fechamento de itens), PR `#49670` (limitação de retentativas de reconexão apenas para agentes dormindo no host reconectado), Issue `#49963` (prevenção de perda de subagentes do Pi em clientes pareados pós-compactação), Issue `#49822` (desbloqueio de painéis Freebuff presos em estado working) e Issue `#49776` (vínculo direto de workers remotos a itens de bot do coordenador).
+
+3. **[Consumo de recursos em agentes, reaper de LSP e overhead de hooks](../issues/consumo-de-recursos-em-agentes-reaper-de-lsp-e-overhead-de-hooks.md):**
+   - Incorporados os PRs `#49932`, `#49923`, `#49920`, `#49903` e `#49897` (materialização lazy sob demanda de esquemas Zod v4 do Main, Shared e protocolo ACP), PRs `#49926` e `#49912` (serviço de leituras de `resolveEnvironment` e `listEnvironments` a partir de cache lstat do ambiente pai), PR `#49818` (supressão do despertar do `foreign-sqlite-reader` para bancos ausentes ou inalterados do Cursor), PRs `#49673`, `#49671` e `#49669` (encerramento acelerado por ociosidade para workers de spawn, scan de portas, opencode binder e environment store), PR `#49674` (ampliação do timeout do hook `PreToolUse` para 30s) e Issue `#49965` (impedimento de roubo de foco do terminal ao clicar no chevron de subagentes).
+
+4. **[Gestão de contas Claude, chaveamento de cota e preservação de prompt cache](../issues/gestao-de-contas-claude-chaveamento-de-cota-e-preservacao-de-prompt-cache.md):**
+   - Incorporados a Issue `#49966` (resolução correta da localização de sessões Antigravity Desktop lendo `conversation_summaries.db`), Issue `#49970` (tratamento de rejeição interativa de ferramentas em Claude Code 2.1.332 sob `bypassPermissions`), PR `#49914` e Issue `#49911` (supressão de disparos de auto-updaters de CLIs durante geração de commit messages e model discovery no Windows), PR `#49930` (passagem de prompts de geração do Cursor via stdin), PR `#49679` (expurgo de variáveis de ambiente de AppImage de processos filhos de agentes), Issue `#49904` (esclarecimento da linha Plan no card de uso do Cursor), Issues `#49828` e `#49812` (transição e failover automático de provedores por limite de uso), Issue `#49780` (correção no mapeamento de esforço de raciocínio no Cursor) e Issue `#49746` (remoção de sessões arquivadas do histórico ativo).
+
+5. **[Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle](../issues/protecao-de-arquivos-ignorados-no-cleanup-compactacao-de-historico-de-chat-e-validacao-de-tui-idle.md):**
+   - Incorporados o PR `#49933` e Issue `#49929` (clonagem de repositórios diretamente na raiz de unidades de disco no Windows sem falha de `mkdir`), PR `#49954` e Issue `#49946` (recusa de sobrescrita de stores de plugins superdimensionadas evitando perda de dados), PR `#49922` e Issue `#49921` (omissão do diálogo 'Close Window?' quando confirmações de tarefas em execução estiverem desativadas), PR `#49955` e Issue `#49947` (resolução correta de `--body-file` para chamadores WSL), PR `#49725` (cumprimento do prazo de `maxWaitMs` no coalescedor de runtime sob churn) e Issue `#49895` (execução do hook de Archive em repositórios bare rastreados).
+
+6. **[Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados](../issues/plugins-de-cartoes-na-barra-lateral-ordem-de-workspaces-e-sub-repositorios-aninhados.md):**
+   - Incorporados o PR `#49928` e Issue `#49915` (manutenção do spinner de working ativo visível com prioridade sobre o sino de mensagens não lidas), PR `#49888` e Issue `#49800` (exibição de abas de plugins na barra lateral direita de páginas de grupos de bots), PR `#49664` (delimitação de leituras de metadados de worktrees por `repoId`), PR `#49654` (reutilização de singleton congelado de `ParsedExecutionHost` e cache de agrupamento), Issue `#49962` (exibição da lista de agentes como carrossel de blocos quadrados) e Issue `#49706` (comandos CLI para gerenciamento de grupos de projetos).
+
+7. **[Badges de worktree para plugins, cadência de PR e redesenho de automações](../issues/badges-de-worktree-para-plugins-cadencia-de-pr-e-redesenho-de-automacoes.md):**
+   - Incorporados o PR `#49953` e Issue `#49945` (compartilhamento de pacotes de bots mesmo com notas de memória ilegíveis), PR `#49951` e Issue `#49944` (listagem e roteamento de grupos de bots resiliente a registros individuais corrompidos), PR `#49907` (gravação estrita da resposta final de um turno de grupo como a réplica enviada), Issue `#49924` (suporte ao conceito 'Group SOUL' para instruções e skills compartilhadas no grupo), Issue `#49961` (comando CLI para renomeação de bots em lote), Issue `#49916` (preservação de contexto ao alternar o agente base de um bot), Issue `#49902` (conector nativo para Google Chat), Issue `#49900` (template de Super bot com ofertas aprovadas), Issue `#49891` (remoção de mensagens transitórias de progresso no Slack), Issue `#49830` (bloqueio de vazamento de narrações de ferramentas), Issue `#49854` (fila pendente de perguntas não respondidas) e Issue `#49799` (injeção de `MEMORY.md` com precedência de instrução).
+
+8. **[Leitura antecipada e preservação de skills no arranque e nos plugins](../issues/leitura-antecipada-e-preservacao-de-skills-no-arranque-e-nos-plugins.md):**
+   - Incorporados o PR `#49906` (listagem de skills instaladas no seletor slash do Kiro antes do primeiro envio), PR `#49925` (propagação de configurações de proxy HTTP para processos filhos da CLI do GitHub `gh`), PR `#49847` (isolamento de leituras iniciadas antes de ações externas em automações), Issue `#49892` (suporte a autenticação no servidor MCP do Meta Ads para bots), Issue `#49896` (suporte a ícones customizados em status bar items na API de plugins), Issue `#49843` (integração de notificações de plugins com som por extensão) e Issue `#49805` (definição de editores customizados padrão por tipo de arquivo via plugins).
+
+9. **[Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas](../issues/alternancia-entre-tui-e-native-chat-no-antigravity-auth-remota-e-dimensionamento-de-abas.md):**
+   - Incorporados o PR `#49917` e Issue `#49913` (discagem de WebSockets de Runtimes remotos públicos através de proxies configurados pelo usuário), PR `#49874` (preservação de dois-pontos codificados em alvos de URLs de arquivos no terminal), PR `#49724` (supressão da abertura de inscrições remotas canceladas antes da microtarefa), Issue `#49934` (alternância de abas do Devin entre chat nativo e terminal/CLI), Issue `#49905` (abertura de sessões do Droid em chat a partir do histórico), Issue `#49941` (compositor em tela cheia/taller no mobile), Issue `#49957` (correção de expiração prematura de credenciais Relay no iOS) e Issue `#49717` (prevenção de recusa de inicialização de chats pós-abertura no macOS).
+
+10. **[Progresso de revisão no diff, backend de métricas e abertura de pastas](../issues/progresso-de-revisao-no-diff-backend-de-metricas-e-abertura-de-pastas.md):**
+    - Incorporados o PR `#49968` e Issue `#49969` (suporte a repositórios descentralizados Nostr NIP-34 `ngit` para issues e PRs no desktop), PR `#49894` e Issue `#49824` (reconhecimento de URLs de `work_items`, `epics` e `test_cases` em verificações de escopo GitLab), PR `#49660` (reexecução de consultas JQL amplas delimitadas a projetos visíveis no Jira Cloud), PR `#49949` (migração limpa de servidor Orca salvo para novo host SSH), Issue `#49806` (preservação de ordenação JQL no Jira Tasks), Issue `#49901` (contador regressivo em chips de uso para janelas prestes a resetar), Issue `#49940` (abertura de arquivos via toque em caminhos citados em comentários no mobile) e Issue `#49938` (recolhimento de comentários longos com 'Show more').
+
+---
+
+### 3. Validação e Auditoria das Notas
+- Executado o validador oficial: `python3 .claude/skills/notes-checker/scripts/check_notes.py --detail`.
+- Resultado: **0 erros**, mantendo estrita integridade sintática e de frontmatter (`priority: high`) em todas as notas.

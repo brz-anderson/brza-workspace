@@ -1,6 +1,6 @@
 ---
 status: open
-description: Busca unificada de nomes e conteudo (#49637), persistencia de historico contra delecoes (#49631) e recuperacao de downloads (#48764).
+description: Clonagem em raiz de unidades Windows (#49933, #49929), protecao de lojas de plugins contra overwrite (#49954, #49946) e confirmacao de fechamento (#49922, #49921).
 scope:
   - brza-studio
   - workspace
@@ -72,6 +72,16 @@ references:
   - https://github.com/stablyai/orca/issues/49571
   - https://github.com/stablyai/orca/issues/18200
   - https://github.com/stablyai/orca/issues/15612
+  - https://github.com/stablyai/orca/pull/49933
+  - https://github.com/stablyai/orca/pull/49954
+  - https://github.com/stablyai/orca/pull/49922
+  - https://github.com/stablyai/orca/pull/49955
+  - https://github.com/stablyai/orca/pull/49725
+  - https://github.com/stablyai/orca/issues/49929
+  - https://github.com/stablyai/orca/issues/49946
+  - https://github.com/stablyai/orca/issues/49921
+  - https://github.com/stablyai/orca/issues/49955
+  - https://github.com/stablyai/orca/issues/49895
 ---
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
@@ -694,3 +704,9 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Resolver links locais no Windows impedindo emissão de prefixos virtuais `sandbox:` em chats do Codex (`#49571`).
 - Garantir desmontagem limpa de pacotes AppImage sem deixar daemons órfãos mapeados em mounts encerrados (`#18200`).
 - Recarregar automaticamente e exibir banner de alteração em disco para arquivos abertos fora da raiz da worktree (`#15612`).
+- Permitir clonagem de repositórios diretamente na raiz de unidades de disco no Windows sem erro de `mkdir` (`#49933`, resolve Issue `#49929`).
+- Recusar sobrescrita de stores de plugins superdimensionadas em vez de tratá-las como vazias e perder chaves (`#49954`, resolve Issue `#49946`).
+- Omitir diálogo 'Close Window?' quando confirmações de tarefas em execução estiverem desativadas (`#49922`, resolve Issue `#49921`).
+- Resolver caminhos de `--body-file` na CLI respeitando o formato de shell de chamadores WSL (`#49955`, resolve Issue `#49947`).
+- Respeitar deadline de `maxWaitMs` no coalescedor de runtime mesmo sob alto churn de operações (`#49725`).
+- Executar hook de Archive em repositórios bare rastreados em `orca.yaml` ao remover pela interface (`#49895`).

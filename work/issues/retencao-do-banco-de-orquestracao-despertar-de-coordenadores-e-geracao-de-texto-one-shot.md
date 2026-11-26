@@ -1,6 +1,6 @@
 ---
 status: open
-description: Configuracoes de lancamento em preambulos (#49636), agrupamento de workers de servidores pareados (#49624) e sleep via CLI (#49609).
+description: Exits estruturados de workers para coordenadores (#49876), retencao de remotos PR ativos (#49950, #49943) e persistencia de encerramentos (#49882, #49868).
 scope:
   - brza-studio
   - brza-workflow
@@ -88,6 +88,16 @@ references:
   - https://github.com/stablyai/orca/issues/49550
   - https://github.com/stablyai/orca/issues/41962
   - https://github.com/stablyai/orca/issues/19980
+  - https://github.com/stablyai/orca/pull/49876
+  - https://github.com/stablyai/orca/pull/49950
+  - https://github.com/stablyai/orca/pull/49882
+  - https://github.com/stablyai/orca/pull/49868
+  - https://github.com/stablyai/orca/pull/49889
+  - https://github.com/stablyai/orca/pull/49670
+  - https://github.com/stablyai/orca/issues/49943
+  - https://github.com/stablyai/orca/issues/49963
+  - https://github.com/stablyai/orca/issues/49822
+  - https://github.com/stablyai/orca/issues/49776
 ---
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
@@ -865,3 +875,11 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Evitar que o fallback de perguntas sem resposta crie uma nova Task após a conclusão do Dispatch requisitante (`#49564`).
 - Ajustar reconciliador de perguntas quando o destinatário for um terminal de caixa de correio sem agente anexado (`#49550`).
 - Suportar modo orquestrador nativo para o Antigravity com execução direta em auto e plan (`#41962`).
+- Reportar encerramentos estruturados de processos de workers para coordenadores com código de saída e causa (`#48876` / `#49876`).
+- Preservar remotos de PR de worktrees ativas quando varreduras de worktree falharem (`#49950`, resolve Issue `#49943`).
+- Garantir que o journal registre múltiplos encerramentos de um mesmo item no mesmo dia e indexe buscas por evento (`#49882`, `#49868`).
+- Preservar para quem o turno de fechamento atuou ao encerrar itens de bot (`#49889`).
+- Limitar retentativas de reconexão de host apenas para agentes dormentes pertencentes àquele host específico (`#49670`).
+- Prevenir perda de subagentes do Pi em clientes pareados após compactações (`#49963`).
+- Evitar que painéis Freebuff fiquem permanentemente em estado working impedindo conclusão do turno (`#49822`).
+- Vincular workers em computadores pareados diretamente aos itens de bot do coordenador (`#49776`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Repasse de pane handle para WSL (#49627), largura de Markdown no editor (#49613) e pareamento por link unico (#49625).
+description: Conexao de runtimes publicos atraves de proxy (#49917, #49913), preservacao de dois-pontos em URLs de arquivos (#49874) e alternancia de abas no Devin (#49934).
 scope:
   - brza-studio
   - workspace
@@ -129,6 +129,15 @@ references:
   - https://github.com/stablyai/orca/issues/49559
   - https://github.com/stablyai/orca/issues/49533
   - https://github.com/stablyai/orca/issues/41251
+  - https://github.com/stablyai/orca/pull/49917
+  - https://github.com/stablyai/orca/pull/49874
+  - https://github.com/stablyai/orca/pull/49724
+  - https://github.com/stablyai/orca/issues/49913
+  - https://github.com/stablyai/orca/issues/49934
+  - https://github.com/stablyai/orca/issues/49905
+  - https://github.com/stablyai/orca/issues/49941
+  - https://github.com/stablyai/orca/issues/49957
+  - https://github.com/stablyai/orca/issues/49717
 ---
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
@@ -940,3 +949,11 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 - Opção para conectar automaticamente hosts WSL ao iniciar o aplicativo (`#49559`).
 - Corrigir renderização de números do teclado numérico em terminais embutidos no macOS (`#49533`).
 - Configuração para abrir links externos como aba em vez de divisão de painel (`#41251`).
+- Permitir discagem de WebSockets de Runtimes remotos públicos através de proxies configurados pelo usuário (`#49917`, resolve Issue `#49913`).
+- Preservar caracteres de dois-pontos codificados em alvos de URLs de arquivos no terminal (`#49874`).
+- Pular abertura de inscrições remotas temporizadas canceladas antes da execução da microtarefa (`#49724`).
+- Alternar abas do Devin entre visualizações de chat nativo e terminal/CLI (`#49934`).
+- Abrir sessões existentes do Droid diretamente em chats a partir do Histórico de Sessões (`#49905`).
+- Compositor de chat em tela cheia ou altura estendida no aplicativo mobile (`#49941`).
+- Corrigir expiração prematura de credenciais Relay (erro 4401) no iOS em segundo plano (`#49957`).
+- Prevenir recusa silenciosa de inicialização de chats iniciados após minutos de abertura do app no macOS (`#49717`).

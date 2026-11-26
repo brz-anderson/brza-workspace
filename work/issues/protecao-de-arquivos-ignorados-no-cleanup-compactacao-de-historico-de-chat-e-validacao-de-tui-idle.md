@@ -1,6 +1,6 @@
 ---
 status: open
-description: Busca em arquivos ignorados (#49161), protecao de abas de diff em cleanup (#49203) e delecao no AI Vault (#49216).
+description: Abertura instantanea do Command Palette (#49368), retencao de chats no mobile (#49366) e recuperacao de drives desplugados (#49459).
 scope:
   - brza-studio
   - workspace
@@ -55,6 +55,14 @@ references:
   - https://github.com/stablyai/orca/issues/49267
   - https://github.com/stablyai/orca/issues/49216
   - https://github.com/stablyai/orca/issues/49151
+  - https://github.com/stablyai/orca/pull/49368
+  - https://github.com/stablyai/orca/pull/49366
+  - https://github.com/stablyai/orca/pull/49427
+  - https://github.com/stablyai/orca/pull/49298
+  - https://github.com/stablyai/orca/pull/48831
+  - https://github.com/stablyai/orca/issues/49459
+  - https://github.com/stablyai/orca/issues/17550
+  - https://github.com/stablyai/orca/issues/47527
 ---
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
@@ -661,3 +669,10 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Prevenir exibição de painel em branco e término abrupto visual de terminais ao deletar o workspace ativo (`#49267`).
 - Permitir exclusão de sessões antigas de Antigravity armazenadas no AI Vault sem erro de agente não suportado (`#49216`).
 - Corrigir confirmação por clique ou Enter do comando `/resume` nas interfaces de chat do Claude Code e OpenCode (`#49151`).
+- Garantir abertura instantânea da caixa de busca do Command Palette (`Cmd+K`) mesmo com centenas de workspaces carregados (`#49368`).
+- Preservar chats de sessões no aplicativo mobile mesmo quando o host não conseguir ler o chat store (`#49366`).
+- Compartilhar índice de listagem de arquivos Markdown entre múltiplos painéis do editor (`#49427`).
+- Liquidar execuções de automação em chat que permaneceram rodando após reinício não planejado do app (`#49298`).
+- Manter página pareada encerrável mesmo após falha de limpeza provocada por reinício do servidor (`#48831`).
+- Tratar projetos em discos externos não montados no arranque sem perder metadados ou deixar o painel em branco (`#49459`, `#17550`).
+- Suportar arquivamento condicional de worktree quando o estado da conversa não houver sofrido alterações (`#47527`).

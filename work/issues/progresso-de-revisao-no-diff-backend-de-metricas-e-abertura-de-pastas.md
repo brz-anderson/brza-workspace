@@ -1,6 +1,6 @@
 ---
 status: open
-description: Aviso de conflito de binario da CLI (#49249), acao Only em Tarefas (#49265), busca de tabs no diff (#49239) e plano inline (#49158).
+description: Deadline para host automations em WSL (#49411, #49401), linkagem rapida em conectores (#49410) e hover fill em settings (#49389).
 scope:
   - brza-studio
   - brza-workflow
@@ -71,6 +71,17 @@ references:
   - https://github.com/stablyai/orca/issues/49067
   - https://github.com/stablyai/orca/issues/49096
   - https://github.com/stablyai/orca/issues/43635
+  - https://github.com/stablyai/orca/pull/49411
+  - https://github.com/stablyai/orca/pull/49401
+  - https://github.com/stablyai/orca/pull/49410
+  - https://github.com/stablyai/orca/pull/49389
+  - https://github.com/stablyai/orca/pull/49378
+  - https://github.com/stablyai/orca/pull/49294
+  - https://github.com/stablyai/orca/pull/49276
+  - https://github.com/stablyai/orca/pull/49335
+  - https://github.com/stablyai/orca/issues/49442
+  - https://github.com/stablyai/orca/issues/49399
+  - https://github.com/stablyai/orca/issues/49321
 ---
 
 # Progresso de revisão no diff, backend de métricas e abertura de pastas
@@ -313,3 +324,12 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 - Suportar redimensionamento e comentários inline no modo de plano inline (`#49158`).
 - Pré-carregar dados da tela de Tarefas para evitar carregamento em branco ao reabrir (`#49067`).
 - Desabilitar botão de merge em PRs quando o usuário possuir acesso apenas de leitura ao repositório base (`#49096`).
+- Estipular prazo limite (deadline) estrito para turnos de automação de host em background durante migrações WSL (`#49411`, `#49401`).
+- Enumerar links apenas uma vez quando um ouvinte de conector for anexado (`#49410`).
+- Aplicar preenchimento total de largura (full-width hover fill) em linhas agrupadas de configurações (`#49389`).
+- Ajustar contagens prévias, retentativa e automações locais transferidas em operações WSL Move (`#49378`).
+- Refinar barra de uso compacta com rótulos e ícones atenuados e numerais tabulares nítidos (`#49294`, `#49276`).
+- Exibir explicações detalhadas ao bloquear atualizações e reversões por encerramento de servidor não confirmado (`#49335`).
+- Corrigir links de referências de issues em chat para apontarem para o repositório de trabalho ativo em vez do upstream (`#49442`).
+- Oferecer opção de largura total (full-width) na visualização rica de Markdown (`#49399`).
+- Adicionar botão para salvar imagens diretamente a partir do visualizador integrado (`#49321`).

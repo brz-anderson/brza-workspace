@@ -1,6 +1,6 @@
 ---
 status: open
-description: Subagentes no Native Chat (#49227, #48386), retencao de formularios (#49204), link em perguntas Needs you (#49240) e filtros por pessoa (#49256).
+description: Progresso de workflow Claude no dock (#49286), URLs clicaveis em inline code (#49447), streaming sem congelamentos (#35462, #49422) e preview HTML (#49288).
 scope:
   - brza-studio
   - brza-workflow
@@ -58,6 +58,19 @@ references:
   - https://github.com/stablyai/orca/issues/48386
   - https://github.com/stablyai/orca/issues/49056
   - https://github.com/stablyai/orca/issues/37646
+  - https://github.com/stablyai/orca/pull/49286
+  - https://github.com/stablyai/orca/pull/49447
+  - https://github.com/stablyai/orca/pull/35462
+  - https://github.com/stablyai/orca/pull/49422
+  - https://github.com/stablyai/orca/pull/49288
+  - https://github.com/stablyai/orca/pull/49451
+  - https://github.com/stablyai/orca/pull/49439
+  - https://github.com/stablyai/orca/issues/49431
+  - https://github.com/stablyai/orca/issues/49310
+  - https://github.com/stablyai/orca/issues/49295
+  - https://github.com/stablyai/orca/issues/49285
+  - https://github.com/stablyai/orca/issues/43861
+  - https://github.com/stablyai/orca/issues/30156
 ---
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
@@ -861,3 +874,13 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Limitar cards de respostas mantidos em cache mobile para evitar acúmulo de itens fechados em outros clientes (`#49264`).
 - Corrigir liquidação prematura de comandos slash no OpenCode 2 para garantir exibição contínua de perguntas interativas (`#49056`).
 - Renderizar componentes de interface de extensões/mods do Claude Code no Native Chat (band, pane, status, toast) (`#37646`).
+- Exibir progresso de fases de workflow e agentes do Claude diretamente no dock (`#49286`, resolve Issue `#49285`).
+- Tornar URLs avulsas dentro de código inline clicáveis na interface do Native Chat (`#49447`, resolve Issue `#49431`).
+- Eliminar congelamentos em respostas longas de chat durante o streaming (`#35462`) e cessar caminhadas repetidas de linhas (`#49422`).
+- Habilitar preview de páginas HTML completas dentro de blocos de código e exportação para o Slack (`#49288`).
+- Adicionar superfície de visualização de chat dedicada para o DeepSeek Harness no ACP (`#49451`).
+- Adotar caixa de resposta de linha única com ações inline na visualização de itens (`#49439`).
+- Suportar sugestões do próximo prompt com aceitação via Tab no chat nativo do Codex (`#49310`).
+- Permitir colapsar blocos extensos de raciocínio/reasoning no OMP (`#49295`).
+- Exibir subagentes em primeiro plano do Pi no chat nativo com abertura da transcrição filha (`#43861`).
+- Suportar perguntas laterais `/btw` no chat nativo com paridade à CLI (`#30156`).

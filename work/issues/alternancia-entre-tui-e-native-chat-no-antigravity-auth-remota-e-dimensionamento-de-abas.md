@@ -1,6 +1,6 @@
 ---
 status: open
-description: Fechamento de split na tab strip (#49250), lista vertical de abas (#49211), busca rapida (#49208) e suporte ao Doubao CLI (#49266).
+description: Automacao de fechamento com orca chat close (#49405), resiliencia de ConPTY (#49464), recuperacao WebGL (#49289) e abas multi-row (#49072).
 scope:
   - brza-studio
   - workspace
@@ -105,6 +105,17 @@ references:
   - https://github.com/stablyai/orca/issues/49068
   - https://github.com/stablyai/orca/issues/48710
   - https://github.com/stablyai/orca/issues/2284
+  - https://github.com/stablyai/orca/pull/49464
+  - https://github.com/stablyai/orca/pull/49289
+  - https://github.com/stablyai/orca/pull/49072
+  - https://github.com/stablyai/orca/pull/49309
+  - https://github.com/stablyai/orca/pull/49277
+  - https://github.com/stablyai/orca/pull/49354
+  - https://github.com/stablyai/orca/issues/49405
+  - https://github.com/stablyai/orca/issues/49364
+  - https://github.com/stablyai/orca/issues/49363
+  - https://github.com/stablyai/orca/issues/49329
+  - https://github.com/stablyai/orca/issues/49324
 ---
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
@@ -896,3 +907,13 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 - Abrir agente padrão diretamente com `Cmd+Clique` no botão "+" de nova aba (`#49120`).
 - Suspender processamento em background do Antigravity para painéis inativos (`#49165`) e reconhecer login com gateway para Antigravity Chat (`#49049`).
 - Fixar tema visual do cliente inicial nos PTYs de RPC de sessões de agentes (`#49011`).
+- Adicionar comando de linha de comando `orca chat close` para fechamento programático de abas de chat (`#49405`).
+- Identificar etapa e HRESULT específico em falhas de inicialização do ConPTY no Windows com fallback para a ConPTY do sistema (`#49464`).
+- Recuperar automaticamente glifos em branco no atlas WebGL do terminal (`#49289`).
+- Implementar modo opcional de abas em múltiplas linhas (multi-row tab strip) para grandes volumes de abas (`#49072`).
+- Disponibilizar botão de fechar em divisões de editor e planilhas dentro do painel flutuante (`#49309`).
+- Colar arquivos no terminal do Windows aceitando formato exclusivo `CF_HDROP` (`#49277`) e exibir toast caso falhe (`#49354`).
+- Permitir abertura de chats de agentes em split lateral via flag `--split` no launch (`#49364`).
+- Corrigir corrupção de sílabas Hangul ao pressionar espaço em terminais no macOS (`#49363`).
+- Exibir menu interativo de confirmação do modo automático do Claude no Terminal Chat em vez de texto estático (`#49329`).
+- Habilitar execução direta com um clique de comandos shell contidos em blocos de resposta do chat (`#49324`).

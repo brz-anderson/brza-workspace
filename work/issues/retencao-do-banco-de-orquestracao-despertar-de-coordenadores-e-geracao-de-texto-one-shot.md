@@ -1,6 +1,6 @@
 ---
 status: open
-description: Steering e correio OMP em tempo real (#49263, #49262), recusa de worker_done obsoleto (#49221) e validacao de agentes antes de worktrees (#49238).
+description: Checkpoint workers preguicosos (#49445, #49441), presenca passiva em background-wait (#49458) e retencao de relatorios de workers (#49308).
 scope:
   - brza-studio
   - brza-workflow
@@ -61,6 +61,21 @@ references:
   - https://github.com/stablyai/orca/issues/44184
   - https://github.com/stablyai/orca/issues/46425
   - https://github.com/stablyai/orca/issues/46406
+  - https://github.com/stablyai/orca/pull/49445
+  - https://github.com/stablyai/orca/pull/49441
+  - https://github.com/stablyai/orca/pull/49458
+  - https://github.com/stablyai/orca/pull/49350
+  - https://github.com/stablyai/orca/pull/49300
+  - https://github.com/stablyai/orca/pull/49312
+  - https://github.com/stablyai/orca/pull/49280
+  - https://github.com/stablyai/orca/pull/44113
+  - https://github.com/stablyai/orca/issues/49308
+  - https://github.com/stablyai/orca/issues/49307
+  - https://github.com/stablyai/orca/issues/49274
+  - https://github.com/stablyai/orca/issues/49273
+  - https://github.com/stablyai/orca/issues/49271
+  - https://github.com/stablyai/orca/issues/45187
+  - https://github.com/stablyai/orca/issues/43668
 ---
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
@@ -814,3 +829,17 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Marcar automaticamente sessões de workers como lidas no momento em que o coordenador recebe `worker_done` (`#44184`).
 - Implementar watchdog para escalonar e abortar workers que ficarem silenciosos ou esgotarem cota (`#46425`).
 - Notificar e despertar workers do Claude quando jobs iniciados em background no shell terminarem (`#46406`).
+- Inicializar workers de checkpoint de orquestração de forma preguiçosa (lazy spawn) e desativá-los na ociosidade (`#49445`).
+- Inicializar workers de checkpoint de journal sob demanda com aposentadoria automática pós-inatividade (`#49441`).
+- Desduplicar paradas de ociosidade pós-resposta e tornar passiva a presença em background-wait (`#49458`).
+- Sondar estritamente o agente do worker ao validar sua instalação em hosts de orquestração (`#49350`).
+- Cessar contabilização de worker com falha assim que sua tarefa for concluída com sucesso por retry (`#49300`).
+- Esclarecer para workers que status 'failed' significa apenas impossibilidade de conclusão (`#49312`).
+- Apresentar na bandeja de workers o motivo da falha ao passar o cursor sobre linhas com erro (`#49280`).
+- Permitir que agentes em suspensão (slept) pareçam ociosos e acordem no local ao receberem mensagens (`#44113`).
+- Preservar o relatório exato submetido com `--report-path` através de rotinas de limpeza de worktree (`#49308`).
+- Registrar agente efetivo, modelo e esforço de raciocínio em dispatches de acompanhamento (`#49307`).
+- Retomar automaticamente workers Claude quando limites de cota forem redefinidos (`#49274`).
+- Permitir que coordenadores marquem perguntas como "waiting on a human" sem forçar decisão autônoma pelo worker (`#49273`).
+- Retirar automaticamente solicitações "Needs-you" quando PR, worker ou prazo vinculado forem liquidados (`#49271`).
+- Mensageria atômica para dispatches ativos sem forçar retomada desnecessária de workers (`#43668`).

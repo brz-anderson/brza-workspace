@@ -1,6 +1,6 @@
 ---
 status: open
-description: Reconexao interativa de MCP apos restart (#49244), isolamento de lookups de hosts (#49202) e escritas em burst (#49149).
+description: Conducao rapida de abas por CDP (#49412), escalonamento em sandboxes Windows (#49336) e consistencia em MCP Move (#49290).
 scope:
   - brza-studio
 priority: high
@@ -75,6 +75,14 @@ references:
   - https://github.com/stablyai/orca/pull/49129
   - https://github.com/stablyai/orca/pull/49121
   - https://github.com/stablyai/orca/pull/49130
+  - https://github.com/stablyai/orca/pull/49336
+  - https://github.com/stablyai/orca/pull/49290
+  - https://github.com/stablyai/orca/pull/49356
+  - https://github.com/stablyai/orca/pull/49355
+  - https://github.com/stablyai/orca/issues/49412
+  - https://github.com/stablyai/orca/issues/49404
+  - https://github.com/stablyai/orca/issues/49301
+  - https://github.com/stablyai/orca/issues/44947
 ---
 
 # Leitura antecipada e preservação de skills no arranque e nos plugins
@@ -394,3 +402,11 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
 - Preservar edições concorrentes de configurações de agentes e comentários de usuários ao atualizar arquivos de servidores MCP (`#49124`, `#49130`, `#49121`).
 - Otimizar consumo de leitura do cofre de credenciais e evitar releituras cíclicas da lista de hosts em servidores de comando compartilhados (`#49123`, `#49128`, `#49132`).
 - Manter descoberta linear de servidores e dispensar sincronização de plugins inalterados (`#49129`).
+- Disponibilizar comando `orca tab cdp` para automação ultrarrápida de abas do navegador via Chrome DevTools Protocol (`#49412`).
+- Orientar agentes sandboxed no Windows a solicitar escalonamento quando a CLI do Orca for reportada como não reconhecida (`#49336`, resolve Issue `#49301`).
+- Assegurar que operação Move de servidores MCP remova apenas agentes confirmados e que cópias inalteradas não recarreguem (`#49290`).
+- Localizar mensagens de inspeção e criação de configurações MCP de repositório (`#49356`).
+- Repassar variável `APPDATA` para workers de plugins no Windows e documentar hooks com percepção de host (`#49355`).
+- Tratar subida recursiva até a raiz real de pacotes ultrapassando marcadores intermediários de `package.json` (`#47979`).
+- Adicionar flag `--no-effects` na automação de navegador para omitir esperas de acomodação pós-ação (`#49404`).
+- Expor identidade do chat nativo selecionado no contexto de workspace de plugins (`#44947`).

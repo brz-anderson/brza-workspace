@@ -1,6 +1,6 @@
 ---
 status: open
-description: Diagnostico de contas Google desconectadas (#49268), Home chat por pessoa em agentes (#49246) e token do Cursor no Windows (#49037).
+description: Upkeep de memoria em bots Antigravity (#49467, #49465), suporte a Command Code (#49282) e isolamento root no Claude (#49396, #49377).
 scope:
   - brza-studio
   - brza-workflow
@@ -82,6 +82,17 @@ references:
   - https://github.com/stablyai/orca/issues/40263
   - https://github.com/stablyai/orca/issues/37785
   - https://github.com/stablyai/orca/issues/24182
+  - https://github.com/stablyai/orca/pull/49467
+  - https://github.com/stablyai/orca/pull/49468
+  - https://github.com/stablyai/orca/pull/49282
+  - https://github.com/stablyai/orca/pull/49396
+  - https://github.com/stablyai/orca/pull/49377
+  - https://github.com/stablyai/orca/pull/49361
+  - https://github.com/stablyai/orca/pull/49349
+  - https://github.com/stablyai/orca/pull/47245
+  - https://github.com/stablyai/orca/issues/49465
+  - https://github.com/stablyai/orca/issues/49339
+  - https://github.com/stablyai/orca/issues/49275
 ---
 
 # Gestão de contas Claude, chaveamento de cota e preservação de prompt cache
@@ -475,3 +486,12 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 - Identificar contas do Claude com restrição organizacional no seletor de agentes de servidores MCP (`#49243`).
 - Permitir chaveamento de contas do Claude mesmo em painéis com shells de background em execução pós-turno (`#40263`).
 - Injetar segredos delimitados por escopo de projeto diretamente nos processos de agentes sem expor valores ao modelo (`#24182`).
+- Implementar rotina de limpeza e manutenção de memória (upkeep/tidy-up) para bots Antigravity ACP via sessões reply-only (`#49467`, Issue `#49465`).
+- Listar todos os chats em agentes compartilhados na aba Chats dos membros, exibindo os próprios por padrão (`#49468`).
+- Adicionar suporte ao Command Code como provedor de contas gerenciadas no estúdio (`#49282`).
+- Respeitar configurações de bubblewrap e bypass inline no Claude em hosts com usuário root (`#49396`, `#49377`).
+- Garantir exibição de conversas no mobile para instâncias do Claude iniciadas com `CLAUDE_CONFIG_DIR` customizado (`#49361`).
+- Marcar follow-ups cancelados por encerramento de sessão do Claude como 'não executados' (`#49349`).
+- Retomar automaticamente conversas interrompidas por limite de cota após relançamento do app (`#47245`).
+- Permitir configuração remota da política de chaveamento de contas do Claude em servidores headless (`#49339`).
+- Disponibilizar comando de CLI para chaveamento seguro de motor, modelo e esforço de raciocínio padrão de bots (`#49275`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Compartilhamento de watch em pastas com symlink (#49252), supressao de reescrita em disco (#48812) e otimizacao de taskkill (#49076).
+description: Otimizacao de symlinks no editor (#49466, #49453, #49343), descarte de bitmap eager (#49434) e fim de polling de uso WSL (#49430, #49428).
 scope:
   - brza-studio
   - tools-kit
@@ -49,6 +49,19 @@ references:
   - https://github.com/stablyai/orca/issues/49059
   - https://github.com/stablyai/orca/issues/49080
   - https://github.com/stablyai/orca/issues/33505
+  - https://github.com/stablyai/orca/pull/49466
+  - https://github.com/stablyai/orca/pull/49453
+  - https://github.com/stablyai/orca/pull/49343
+  - https://github.com/stablyai/orca/pull/49434
+  - https://github.com/stablyai/orca/pull/49433
+  - https://github.com/stablyai/orca/pull/49430
+  - https://github.com/stablyai/orca/pull/49428
+  - https://github.com/stablyai/orca/pull/49429
+  - https://github.com/stablyai/orca/pull/49426
+  - https://github.com/stablyai/orca/pull/49390
+  - https://github.com/stablyai/orca/pull/49369
+  - https://github.com/stablyai/orca/issues/49457
+  - https://github.com/stablyai/orca/issues/49444
 ---
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
@@ -386,3 +399,13 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Evitar enumeração excessiva de alvos do navegador a cada clique na página de servidores (`#49173`).
 - Abrir credenciais sob demanda por chamada de ferramenta e evitar releituras de visões encerradas (`#49171`).
 - Implementar confirmação por retenção de atalho ("Hold ⌘Q to quit") enquanto houver agentes em processamento ativo (`#33505`).
+- Preservar watch ativo em pastas symlinked quando o afunilamento de escopo falhar e coalescer ao reabrir abas (`#49466`, `#49453`, `#49343`).
+- Evitar leitura afobada (eager) de bitmaps em `DataTransfer.files` na colagem DOM no terminal (`#49434`).
+- Evitar reaplicação redundante de temas e aparência a terminais headless existentes na criação de PTY (`#49433`).
+- Expurgar entradas aposentadas de uso WSL e remover timer ocioso de expiração periódica (`#49430`, `#49428`).
+- Computar `findIndexedWorktrees` a partir de `locationsById` em um único passo no renderer (`#49429`).
+- Otimizar autocompletar de documentação Markdown cortando transformações repetitivas de strings (`#49426`).
+- Interromper o recálculo contínuo do cabeçalho de uso para tooltips de chips na status bar (`#49390`).
+- Ignorar checagens de proprietário no macOS para clientes de encaminhamento de portas desconectados na fila (`#49369`).
+- Ler credenciais protegidas do Cursor via os-secret-store/cursor-safe-storage no Windows (`#49457`).
+- Reconectar terminais automaticamente após remontagem de unidades de disco desconectadas (`#49444`).

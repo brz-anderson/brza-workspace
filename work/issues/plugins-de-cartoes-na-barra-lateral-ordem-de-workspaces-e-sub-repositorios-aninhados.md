@@ -1,6 +1,6 @@
 ---
 status: open
-description: CLI de grupos e aparencia de projetos (#49235, #49255), preservacao de layout em cards (#49258) e clipping de rolagem (#49247).
+description: Seguranca de recarregamento em plugins (#49448), blindagem de terminalId em restart (#49419) e correcao de overlap no macOS (#49455).
 scope:
   - brza-studio
   - workspace
@@ -87,6 +87,15 @@ references:
   - https://github.com/stablyai/orca/issues/49241
   - https://github.com/stablyai/orca/issues/36001
   - https://github.com/stablyai/orca/issues/21118
+  - https://github.com/stablyai/orca/pull/49448
+  - https://github.com/stablyai/orca/pull/49419
+  - https://github.com/stablyai/orca/pull/49358
+  - https://github.com/stablyai/orca/pull/49283
+  - https://github.com/stablyai/orca/pull/49374
+  - https://github.com/stablyai/orca/issues/49455
+  - https://github.com/stablyai/orca/issues/49375
+  - https://github.com/stablyai/orca/issues/49327
+  - https://github.com/stablyai/orca/issues/39004
 ---
 
 # Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados
@@ -457,3 +466,10 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
 - Garantir espaçamento entre o painel de agentes in-window e a barra lateral direita (`#49224`).
 - Manter o menu de envio de notas aberto ao selecionar um agente como alvo no card da sidebar (`#49027`).
 - Suportar workspaces multi-repositório com worktrees dedicadas baseadas em requisitos (`#36001`, `#21118`).
+- Impedir que edições em pastas de desenvolvimento de plugins solicitem aprovação repetida quando houver shortcuts/recipes (`#49448`).
+- Associar agentes a terminais restaurados ainda não exibidos através do painel gravado (`#49419`, resolve Issue `#49375`).
+- Ajustar agrupamento de ícones de PRs vinculados na sidebar evitando sobreposições ilegíveis (`#49358`, Issue `#39004`).
+- Ocultar seletor legado de layout de cartões de workspace quando novos estilos estiverem ativos (`#49283`).
+- Aninhar adequadamente workers de hosts remotos cujas linhas são abas espelhadas de web-terminal (`#49374`).
+- Prevenir que a barra de abas da sidebar direita seja encoberta pela barra de menus do macOS em tela cheia (`#49455`).
+- Exibir botão de exclusão exclusivamente no workspace sob o cursor ao manter Option/Alt pressionado (`#49327`).

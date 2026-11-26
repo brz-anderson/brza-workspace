@@ -1,6 +1,6 @@
 ---
 status: open
-description: Badges em icones de paineis de plugins (#49269), tooltip de texto declarativo (#49155) e repasse de ambiente USER/LOGNAME (#49069).
+description: Suporte a Hermes e Droid (#49463, #49461, #49456), roteamento de lembretes (#49452) e fan-out de bots em grupos (#49436).
 scope:
   - brza-studio
   - workspace
@@ -75,6 +75,20 @@ references:
   - https://github.com/stablyai/orca/issues/49134
   - https://github.com/stablyai/orca/issues/49159
   - https://github.com/stablyai/orca/issues/44132
+  - https://github.com/stablyai/orca/pull/49463
+  - https://github.com/stablyai/orca/pull/49461
+  - https://github.com/stablyai/orca/pull/49456
+  - https://github.com/stablyai/orca/pull/49452
+  - https://github.com/stablyai/orca/pull/49438
+  - https://github.com/stablyai/orca/pull/49436
+  - https://github.com/stablyai/orca/pull/49423
+  - https://github.com/stablyai/orca/pull/49352
+  - https://github.com/stablyai/orca/pull/48439
+  - https://github.com/stablyai/orca/issues/49462
+  - https://github.com/stablyai/orca/issues/49460
+  - https://github.com/stablyai/orca/issues/49397
+  - https://github.com/stablyai/orca/issues/49299
+  - https://github.com/stablyai/orca/issues/47183
 ---
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
@@ -416,3 +430,16 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
 - Fornecer mensagem clara de confirmação pendente em vez de código de saída de erro quando `orca plugin install` for invocado sem `--approve` (`#49134`).
 - Informar aos plugins com hook `agent.launch.before` qual shell executará o comando (`#44132`).
 - Estruturar fluxo de auditoria automatizada para desbloqueio de versões de plugins em análise (`#49159`).
+- Instalar plugins do Hermes mesmo quando `config.yaml` possuir chaves sem valor atribuído (`#49463`, Issue `#49462`).
+- Eliminar retornos de carro espúrios (`\r\r\n`) ao editar listas em arquivos CRLF no Hermes (`#49461`, Issue `#49460`).
+- Preservar comandos de hooks de usuário e edições remotas concorrentes no Droid (`#49456`).
+- Rotear lembretes de itens de bots diretamente para o chat proprietário correspondente (`#49452`).
+- Adotar diálogo de importação de bots em linha única destacando a fonte no cabeçalho (`#49438`).
+- Otimizar regressões de fan-out de membros pareados na Home de grupos de bots (`#49436`).
+- Suprimir autodespertar por eco em `orca:items` para chats irmãos pertencentes ao mesmo bot (`#49423`).
+- Garantir que histórico colapsado de bots releia apenas workspaces modificados (`#49352`).
+- Atribuir autoria de bots estritamente baseada em proveniência verificada (`#48774`).
+- Abrir links de tópicos remotos diretamente a partir das respostas do servidor (`#48439`).
+- Implementar deep link para abertura direta de item específico de bot (`#49397`).
+- Garantir despertar de bots do Slack em canais compartilhados externamente via Slack Connect (`#49299`).
+- Adicionar comandos de CLI para arquivar e consolidar tópicos de bots no Home Chat (`#47183`).

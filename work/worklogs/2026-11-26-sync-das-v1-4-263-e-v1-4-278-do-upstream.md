@@ -110,10 +110,22 @@ Doze conflitos, todos da reorganização de `src/cli` do upstream (`handlers/` �
 `agentSession.send` entrou no `SESSION_EVIDENCE_METHODS` do upstream. Typecheck com 0 erros; `src/cli` com 291 testes
 verdes. O C1 precisa de um app de dev recompilado dessa branch.
 
+## A release v1.4.278-alpha.1
+
+A pedido de Anderson ("crie a tag, no padrão das últimas e gere o DMG"), sobre a `master` já com o PR #1 refeito
+(`0849f8b4253`), no padrão da `v1.4.251-alpha.1`:
+- `9eef46284d8`: "release: v1.4.278-alpha.1", só a versão do `package.json` (`1.4.278` → `1.4.278-alpha.1`), na `master`
+  e no origin.
+- Tag anotada `v1.4.278-alpha.1` ("BrzA Studio v1.4.278-alpha.1") no origin. Nenhum workflow dispara por ela: os de
+  release do mobile só pegam `android-v*` e `mobile-ios-v*`, e o `release-cut` é manual.
+- O DMG saiu do `pnpm build:mac --dmg` no clone principal, nesse commit: `~/Downloads/brza-studio-1.4.278-alpha.1-macos-arm64.dmg`,
+  260 MB, `hdiutil verify` válido, sha256 `46a2dcde6e5d2777f25cdcbec17994df9367a1a424c0823a423858ad88a51f46`, versão
+  `1.4.278-alpha.1.local…`, identidade `com.brzanderson.brzastudio`. Assinado ad hoc, sem notarização.
+
 ## O que ficou
 
-- **A conferência no app**, com Anderson, pelo DMG `~/Downloads/brza-studio-1.4.278-macos-arm64.dmg` (sha256
-  `00c67f5bde5ca6eb44ff45b6f9aeb079a7fa6814065a56e2fd694b3ae30df57d`). O roteiro do sync da v1.4.256 vale, mais a troca de
+- **A conferência no app**, com Anderson, pelo DMG da release, `~/Downloads/brza-studio-1.4.278-alpha.1-macos-arm64.dmg`
+  (o de `609bfbffaba`, `brza-studio-1.4.278-macos-arm64.dmg`, ficou para trás). O roteiro do sync da v1.4.256 vale, mais a troca de
   conta (a divisória "Account switched"), a faixa da pergunta, o Antigravity reiniciando para acesso total e os bots em
   `~/.brza/bots`.
 - **O PR #1 do `brza-studio`** foi avaliado, fechado e refeito na `master`: [O PR #1 do brza-studio, fechado e refeito na master](2026-11-26-pr-1-do-brza-studio-fechado-e-refeito-na-master.md).
@@ -131,7 +143,7 @@ verdes. O C1 precisa de um app de dev recompilado dessa branch.
   - **Risco:** nenhum.
   - **Estado:** ativo.
   - **Como desfazer:** `git push origin --delete sync/v1.4.278` e `git push origin :refs/tags/<tag>`.
-- **O DMG em `~/Downloads/brza-studio-1.4.278-macos-arm64.dmg`.**
+- **Os DMGs em `~/Downloads/brza-studio-1.4.278-macos-arm64.dmg` e `~/Downloads/brza-studio-1.4.278-alpha.1-macos-arm64.dmg`, e a tag `v1.4.278-alpha.1` no origin.**
   - **Risco:** nenhum; é build local assinado ad hoc.
   - **Estado:** ativo.
   - **Como desfazer:** apagar o arquivo.
@@ -145,4 +157,4 @@ verdes. O C1 precisa de um app de dev recompilado dessa branch.
 
 ## Custo da tarefa
 
-Corrido 188 h 29 min — agente 54 min, quem pediu 3 h 10 min, pausa 184 h 25 min · US$ 104,52 (turnos 28,26, subagentes 76,26) · CPU 4 min do `claude` e 2 h 58 min dos comandos, RSS até 556 MB · 26 turnos, 1 sessão · dividida com 1 outro worklog do commit · até 17:03 de 2026-11-26, pelo `brza note commit`
+Corrido 188 h 32 min — agente 58 min, quem pediu 3 h 10 min, pausa 184 h 25 min · US$ 105,85 (turnos 29,59, subagentes 76,26) · CPU 4 min do `claude` e 3 h 2 min dos comandos, RSS até 556 MB · 27 turnos, 1 sessão · dividida com 1 outro worklog do commit · até 17:10 de 2026-11-26, pelo `brza note commit`

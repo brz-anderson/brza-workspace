@@ -1,2 +1,2 @@
-- [Padrões da revisão de sync do upstream](sync-review-patterns.md) — identidade, slug, P36, ~/.orca, config de build, porte de lista, comparador "Orca", mobile
-- [Calibração da confiança](reviewer-confidence-calibration.md) — arquivo sob edição e commit novo caem; teste temporário; hipóteses que caem
+- [Padrões da revisão de sync do upstream](sync-review-patterns.md) — identidade, slug, P36, ~/.orca, config de build, porte, comparador "Orca", mobile, PR antigo
+- [Calibração da confiança](reviewer-confidence-calibration.md) — arquivo sob edição, commit novo, pnpm run reinstala, hipóteses que caem

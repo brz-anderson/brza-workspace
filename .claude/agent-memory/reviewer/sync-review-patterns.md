@@ -66,6 +66,20 @@ Padrões que se repetiram na revisão do merge da v1.4.246 (2026-11-02):
   (`bot-template-text`, `bot-failure-codes`) puxam o rebrand para o mobile, contra a decisão "mobile
   fica Orca". Conte as chaves com `git diff -U0 … | grep -c '^+ '`; a devolução do agente subconta.
 
+- **PR antigo de agente (Cursor) contra a `master` depois de syncs** (PR #1, 2026-11-26): o
+  grosso some porque o upstream apaga e move arquivos (E2E de 1065 para 129). Rode
+  `git cat-file -e origin/master:<f>` em cada arquivo, `git merge-tree --write-tree --name-only` para
+  o rebase, e os ratchets e o `oxfmt --check .` na `master` para separar o que ainda falha. O que
+  sobra costuma ser config de empacotamento que o rebrand não alcança: mapa de nome de artefato
+  (`static-appimage-package-contract.cjs`), `/opt/<productName>` nos scripts de deb/rpm,
+  `Orca.exe` no `pr.yml`. O padrão `preview` do Markdown do fork (D20) quebra spec do upstream
+  que espera `.rich-markdown-editor`.
+- **Arquivo do fork movido pelo upstream perde o rebrand** (sync 263/278): `src/cli/cli-error.ts`
+  virou `src/cli/output/cli-error.ts` e voltou a dizer "Orca is not running". Cruze as linhas
+  "BrzA Studio" da base com as da `master` (`comm -23`), troque por "Orca" e procure na `master`.
+- **`gh run list` agendado mostra o `headSha`:** antes de culpar a `master` nova, confira se a
+  falha é do commit anterior ao push do sync.
+
 **Método que rendeu:** listar as linhas que o fork somou (`git diff -U0 <base do último sync> <master do
 fork> -- src`) e que não existem em lugar nenhum da árvore atual. Quase tudo é refatoração ou texto
 reescrito; o resto aponta o que caiu. Depois, `git diff v1.4.246 -- <arquivo>` nas junções.

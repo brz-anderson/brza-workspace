@@ -28,3 +28,4 @@
 - [Varredura Orca dos gates de idioma, sync 278](brza-studio-sync-278-rebrand-sweep-lessons.md) — fonte junto do catálogo, CJK no regex, mobile em src/shared, max-lines por t()
 - [Conserto pós-merge v1.4.278](brza-studio-sync-278-fix-lessons.md) — helper de teste por script, teste do fork envelhecido, ratchet de bloqueio, max-lines por extração
 - [Orçamento eager do mobile-web](brza-studio-mobile-web-eager-budget.md) — medir por metafile, lazy não reduz eager, fork soma ~16 KB (tools/brza)
+- [Consertos de ratchet no brza-studio](brza-studio-ratchet-fix-lessons.md) — codemod de translate roda no repo todo, try/finally e ref no Compiler, gate sem origin/main

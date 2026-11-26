@@ -116,8 +116,7 @@ verdes. O C1 precisa de um app de dev recompilado dessa branch.
   `00c67f5bde5ca6eb44ff45b6f9aeb079a7fa6814065a56e2fd694b3ae30df57d`). O roteiro do sync da v1.4.256 vale, mais a troca de
   conta (a divisória "Account switched"), a faixa da pergunta, o Antigravity reiniciando para acesso total e os bots em
   `~/.brza/bots`.
-- **O PR #1 do `brza-studio`** (correções de CI de um agente do Cursor, de 2026-11-12) está sendo avaliado contra a
-  `master` nova, a pedido de Anderson; vai a worklog próprio.
+- **O PR #1 do `brza-studio`** foi avaliado, fechado e refeito na `master`: [O PR #1 do brza-studio, fechado e refeito na master](2026-11-26-pr-1-do-brza-studio-fechado-e-refeito-na-master.md).
 - **Os 267 commits do `upstream/main` depois da `v1.4.278`** entram no próximo sync.
 
 ## Fora do workspace
@@ -146,4 +145,4 @@ verdes. O C1 precisa de um app de dev recompilado dessa branch.
 
 ## Custo da tarefa
 
-Corrido 187 h 52 min — agente 47 min, quem pediu 2 h 40 min, pausa 184 h 25 min · US$ 94,72 (turnos 26,33, subagentes 68,39) · CPU 4 min do `claude` e 2 h 51 min dos comandos, RSS até 556 MB · 21 turnos, 1 sessão · até 15:44 de 2026-11-26, pelo `brza note commit`
+Corrido 188 h 29 min — agente 54 min, quem pediu 3 h 10 min, pausa 184 h 25 min · US$ 104,52 (turnos 28,26, subagentes 76,26) · CPU 4 min do `claude` e 2 h 58 min dos comandos, RSS até 556 MB · 26 turnos, 1 sessão · dividida com 1 outro worklog do commit · até 17:03 de 2026-11-26, pelo `brza note commit`

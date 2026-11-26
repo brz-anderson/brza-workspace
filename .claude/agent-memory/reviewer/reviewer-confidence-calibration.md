@@ -55,6 +55,16 @@ metadata:
 - **Ferramentas barradas no papel:** script inline (python, node -e) e redirecionar para o scratch da
   sessão são recusados pelo hook; `>` para `/tmp/rv278/` passa. O cruzamento de linhas sai com
   `awk` + `sort` + `join -v1` (`LC_ALL=C`), sem script.
+- **`pnpm run <script>` no clone principal reinstala o `node_modules`** quando o lockfile mudou
+  (verify-deps-before-run). Na revisão do PR #1, isso aconteceu sem pedir. O hook barra `node <script>`
+  mas deixa passar `pnpm run`. Para ratchet ou oxfmt, prefira `node_modules/.bin/<bin>`, ou confira
+  antes o `node_modules/.modules.yaml` contra o lockfile, e diga o efeito na devolução.
+- **Conserto de upstream já coberto por outro caminho** (Notepad pelo Win32 em vez do TextPattern;
+  trilho fixo do CSS de nota): 80-82, com a premissa escrita. Procure com `git log -S` a função nova
+  e confira se ela veio depois da base do PR (`merge-base --is-ancestor`).
+- **Spec E2E do upstream contra um padrão do fork** (preview × `.rich-markdown-editor`): 85. A
+  premissa é que o perfil de E2E não grava a preferência; confira o
+  `e2e-completed-onboarding-profile.ts`.
 - **zsh**: `$r:src/...` também quebra em `git show`/`git grep` com `$r` antes de `:`; use `"${r}:…"`.
 
 Related: [[sync-review-patterns]]

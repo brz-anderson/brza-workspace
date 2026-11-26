@@ -1,9 +1,10 @@
 ---
-status: open
+status: done
 description: O "loads worktree link validation from the installed CLI" do packaged-cli-assets.test.ts falha na CI Linux do fork, no projeto bun, com stdout vazio; passa no Mac e na tag pura do upstream.
 scope:
   - brza-studio
 opened: 2026-11-11
+completed: 2026-11-26
 priority: medium
 tags:
   - ci
@@ -42,3 +43,10 @@ descreve.
 1. Rodar o teste num container Linux com o Bun, ou empurrar uma branch que imprima o `result.stderr`, e ler a causa.
 2. Consertar no fork: um módulo do fork carregado pela CLI que não vai no pacote, ou algo próprio do Linux.
 3. Conferir na rodada seguinte da CI diária que a `master` passa a sair verde, fora o `orcad`, se ele for instável.
+
+## Como se resolveu
+
+O upstream apagou o `packaged-cli-assets.test.ts` no corte da suíte (#46786), que entrou no fork com o
+[sync das v1.4.263 e v1.4.278](../worklogs/2026-11-26-sync-das-v1-4-263-e-v1-4-278-do-upstream.md). Na `master` nova a
+suíte unitária da CI passou inteira (rodadas 45876221868 e 45881031829). A causa na CI Linux não foi achada; se o
+teste voltar, esta nota diz por onde começar.

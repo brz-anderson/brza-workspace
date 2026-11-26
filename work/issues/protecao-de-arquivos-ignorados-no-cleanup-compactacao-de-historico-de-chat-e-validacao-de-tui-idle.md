@@ -1,6 +1,6 @@
 ---
 status: open
-description: Abertura instantanea do Command Palette (#49368), retencao de chats no mobile (#49366) e recuperacao de drives desplugados (#49459).
+description: Busca unificada de nomes e conteudo (#49637), persistencia de historico contra delecoes (#49631) e recuperacao de downloads (#48764).
 scope:
   - brza-studio
   - workspace
@@ -63,6 +63,15 @@ references:
   - https://github.com/stablyai/orca/issues/49459
   - https://github.com/stablyai/orca/issues/17550
   - https://github.com/stablyai/orca/issues/47527
+  - https://github.com/stablyai/orca/pull/49637
+  - https://github.com/stablyai/orca/pull/49577
+  - https://github.com/stablyai/orca/pull/49477
+  - https://github.com/stablyai/orca/pull/49473
+  - https://github.com/stablyai/orca/issues/49631
+  - https://github.com/stablyai/orca/issues/49590
+  - https://github.com/stablyai/orca/issues/49571
+  - https://github.com/stablyai/orca/issues/18200
+  - https://github.com/stablyai/orca/issues/15612
 ---
 
 # Proteção de arquivos ignorados no cleanup, compactação de histórico de chat e validação de TUI idle
@@ -676,3 +685,12 @@ além da issue [`stablyai/orca#42909`](https://github.com/stablyai/orca/issues/4
 - Manter página pareada encerrável mesmo após falha de limpeza provocada por reinício do servidor (`#48831`).
 - Tratar projetos em discos externos não montados no arranque sem perder metadados ou deixar o painel em branco (`#49459`, `#17550`).
 - Suportar arquivamento condicional de worktree quando o estado da conversa não houver sofrido alterações (`#47527`).
+- Implementar campo unificado de pesquisa para nomes de arquivos e busca de texto simultânea (`#49637`).
+- Persistir histórico de chat para evitar perda de conversas após exclusão acidental (`#49631`).
+- Nunca remover ou renomear arquivos na pasta Downloads após falha de cópia pelo servidor (`#48764`).
+- Priorizar workspaces sobre abas abertas em empates de pontuação no atalho de navegação rápida `Cmd+J` (`#49577`).
+- Garantir flush durável de automações de undo, descarte de hosts e avanço em lote no WSL Move (`#49477`, `#49473`).
+- Evitar que rascunhos de inicialização fiquem retidos em estado pendente após finalização forçada durante movimentação (`#49590`).
+- Resolver links locais no Windows impedindo emissão de prefixos virtuais `sandbox:` em chats do Codex (`#49571`).
+- Garantir desmontagem limpa de pacotes AppImage sem deixar daemons órfãos mapeados em mounts encerrados (`#18200`).
+- Recarregar automaticamente e exibir banner de alteração em disco para arquivos abertos fora da raiz da worktree (`#15612`).

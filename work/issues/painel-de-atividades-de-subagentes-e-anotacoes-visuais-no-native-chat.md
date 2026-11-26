@@ -1,6 +1,6 @@
 ---
 status: open
-description: Progresso de workflow Claude no dock (#49286), URLs clicaveis em inline code (#49447), streaming sem congelamentos (#35462, #49422) e preview HTML (#49288).
+description: Agentes ACP customizados em Chat (#49643), reinicio do chat em update do Claude (#49619), skills OpenCode via @ (#49612) e renderizacao Markdown em itens (#49560).
 scope:
   - brza-studio
   - brza-workflow
@@ -71,6 +71,19 @@ references:
   - https://github.com/stablyai/orca/issues/49285
   - https://github.com/stablyai/orca/issues/43861
   - https://github.com/stablyai/orca/issues/30156
+  - https://github.com/stablyai/orca/pull/49643
+  - https://github.com/stablyai/orca/pull/49619
+  - https://github.com/stablyai/orca/pull/49612
+  - https://github.com/stablyai/orca/pull/49560
+  - https://github.com/stablyai/orca/pull/49574
+  - https://github.com/stablyai/orca/pull/49507
+  - https://github.com/stablyai/orca/pull/49493
+  - https://github.com/stablyai/orca/issues/49646
+  - https://github.com/stablyai/orca/issues/49614
+  - https://github.com/stablyai/orca/issues/49575
+  - https://github.com/stablyai/orca/issues/49562
+  - https://github.com/stablyai/orca/issues/49549
+  - https://github.com/stablyai/orca/issues/49508
 ---
 
 # Painel de atividades de subagentes e anotações visuais no Native Chat
@@ -884,3 +897,14 @@ além das issues [`stablyai/orca#41008`](https://github.com/stablyai/orca/issues
 - Permitir colapsar blocos extensos de raciocínio/reasoning no OMP (`#49295`).
 - Exibir subagentes em primeiro plano do Pi no chat nativo com abertura da transcrição filha (`#43861`).
 - Suportar perguntas laterais `/btw` no chat nativo com paridade à CLI (`#30156`).
+- Permitir execução direta de agentes ACP definidos pelo usuário no Native Chat (`#49643`).
+- Oferecer botão 'Restart chat' proativo quando versão mais recente do Claude Code for instalada (`#49619`).
+- Invocar skills do OpenCode como menções `@` a partir do seletor no chat nativo (`#49612`, resolve Issue `#49562`).
+- Renderizar textos de itens utilizando o mesmo renderizador Markdown rico do chat com headers de código e links (`#49560`).
+- Aguardar fechamento de blocos de código HTML antes de renderizar preview interativo (`#49574`).
+- Enviar respostas de cards de oferta como respostas enfileiradas e nunca como steer digitado (`#49507`).
+- Prevenir duplicação de mensagens do assistente sob gateways compatíveis com Anthropic com message id idêntico em streaming (`#49646`).
+- Disponibilizar atalho configurável para alternar entre os modos Plan e Build no chat do Codex (`#49614`).
+- Blindar a janela de chat contra congelamento em respostas runaway descontroladas do Codex (`#49575`).
+- Incluir alterações efetuadas por subagentes OMP no card Changed files do Native Chat (`#49549`).
+- Suportar perguntas laterais `/btw` e bifurcação de conversa para chats Antigravity ACP (`#49508`).

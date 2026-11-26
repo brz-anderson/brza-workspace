@@ -1,6 +1,6 @@
 ---
 status: open
-description: Upkeep de memoria em bots Antigravity (#49467, #49465), suporte a Command Code (#49282) e isolamento root no Claude (#49396, #49377).
+description: Perfis isolados por conta Google no Antigravity (#49595), protecao do Claude em fish shell (#49635) e sincronizacao de distros WSL no Codex (#49576).
 scope:
   - brza-studio
   - brza-workflow
@@ -93,6 +93,16 @@ references:
   - https://github.com/stablyai/orca/issues/49465
   - https://github.com/stablyai/orca/issues/49339
   - https://github.com/stablyai/orca/issues/49275
+  - https://github.com/stablyai/orca/pull/49635
+  - https://github.com/stablyai/orca/pull/49576
+  - https://github.com/stablyai/orca/pull/49530
+  - https://github.com/stablyai/orca/pull/49552
+  - https://github.com/stablyai/orca/pull/49570
+  - https://github.com/stablyai/orca/issues/49628
+  - https://github.com/stablyai/orca/issues/49595
+  - https://github.com/stablyai/orca/issues/49579
+  - https://github.com/stablyai/orca/issues/49547
+  - https://github.com/stablyai/orca/issues/48321
 ---
 
 # Gestão de contas Claude, chaveamento de cota e preservação de prompt cache
@@ -495,3 +505,13 @@ além da issue [`stablyai/orca#47829`](https://github.com/stablyai/orca/issues/4
 - Retomar automaticamente conversas interrompidas por limite de cota após relançamento do app (`#47245`).
 - Permitir configuração remota da política de chaveamento de contas do Claude em servidores headless (`#49339`).
 - Disponibilizar comando de CLI para chaveamento seguro de motor, modelo e esforço de raciocínio padrão de bots (`#49275`).
+- Executar cada conta Google salva do Antigravity em perfil de navegador isolado (`#49595`).
+- Iniciar o Claude Code sob o shell fish via `command env` evitando que funções de usuário interceptem a inicialização (`#49635`).
+- Pular trabalho redundante na sincronização de configurações do Codex no WSL e esquecer distribuições removidas (`#49576`).
+- Executar rotina de manutenção de memória (memory upkeep) em todo agente com turnos livres de ferramentas (`#49530`).
+- Apresentar respostas, ferramentas e raciocínio de sessões retomadas do OpenCode 2.4 no chat (`#49552`).
+- Descobrir automaticamente a CLI bundled integrada ao aplicativo desktop macOS do Codex (`#49570`).
+- Corrigir falso erro de 'not signed in' na abertura de sessões Antigravity evitando confusão entre ConnectionClosed e auth-required (`#49628`).
+- Atualizar identificador retornado em 'Copy Session ID' após comandos `/clear` ou conexão com sessões em background (`#49579`).
+- Exibir seções de contas Grok e Cursor em Accounts mesmo quando o host de configurações for um servidor pareado (`#49547`).
+- Suportar uso simultâneo de múltiplas contas do Claude sem migrar compulsoriamente sessões ativas existentes (`#48321`).

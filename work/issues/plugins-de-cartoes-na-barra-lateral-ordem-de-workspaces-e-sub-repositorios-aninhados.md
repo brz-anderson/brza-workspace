@@ -1,6 +1,6 @@
 ---
 status: open
-description: Seguranca de recarregamento em plugins (#49448), blindagem de terminalId em restart (#49419) e correcao de overlap no macOS (#49455).
+description: Avatares de projetos GitLab na barra lateral (#49608, #49594), captura de paineis altos em plugins (#49618) e card de auto-name amigavel (#49555).
 scope:
   - brza-studio
   - workspace
@@ -96,6 +96,16 @@ references:
   - https://github.com/stablyai/orca/issues/49375
   - https://github.com/stablyai/orca/issues/49327
   - https://github.com/stablyai/orca/issues/39004
+  - https://github.com/stablyai/orca/pull/49608
+  - https://github.com/stablyai/orca/pull/49618
+  - https://github.com/stablyai/orca/pull/49555
+  - https://github.com/stablyai/orca/pull/49400
+  - https://github.com/stablyai/orca/pull/49591
+  - https://github.com/stablyai/orca/issues/49594
+  - https://github.com/stablyai/orca/issues/49596
+  - https://github.com/stablyai/orca/issues/49527
+  - https://github.com/stablyai/orca/issues/49483
+  - https://github.com/stablyai/orca/issues/13303
 ---
 
 # Plugins de cartões na barra lateral, ordem de workspaces e sub-repositórios aninhados
@@ -473,3 +483,11 @@ além das issues [`stablyai/orca#47693`](https://github.com/stablyai/orca/issues
 - Aninhar adequadamente workers de hosts remotos cujas linhas são abas espelhadas de web-terminal (`#49374`).
 - Prevenir que a barra de abas da sidebar direita seja encoberta pela barra de menus do macOS em tela cheia (`#49455`).
 - Exibir botão de exclusão exclusivamente no workspace sob o cursor ao manter Option/Alt pressionado (`#49327`).
+- Apresentar avatares cacheados de projetos do GitLab na barra lateral de Projetos (`#49608`, Issue `#49594`).
+- Tratar captura de tela de plugins (`orca plugin shot`) quando o painel for mais alto que a janela sem truncar o conteúdo (`#49618`, resolve Issue `#49596`).
+- Substituir alertas intrusivos por card discreto de falha de auto-name com opções 'Try again' e 'Dismiss' (`#49555`).
+- Exibir glifo único de referência com visualização rápida (hover peek) de todos os status vinculados na sidebar (`#49400`).
+- Preservar esquema e porta em links de projetos auto-hospedados (`#49591`).
+- Permitir fixar chats e sessões individuais diretamente na barra lateral esquerda (`#49527`).
+- Corrigir posicionamento de cartões de workspace no estilo experimental alinhando com o cabeçalho do projeto (`#49483`).
+- Adicionar suporte a Spaces para alternar a barra lateral entre conjuntos isolados de projetos (`#13303`).

@@ -1,6 +1,6 @@
 ---
 status: open
-description: Checkpoint workers preguicosos (#49445, #49441), presenca passiva em background-wait (#49458) e retencao de relatorios de workers (#49308).
+description: Configuracoes de lancamento em preambulos (#49636), agrupamento de workers de servidores pareados (#49624) e sleep via CLI (#49609).
 scope:
   - brza-studio
   - brza-workflow
@@ -76,6 +76,18 @@ references:
   - https://github.com/stablyai/orca/issues/49271
   - https://github.com/stablyai/orca/issues/45187
   - https://github.com/stablyai/orca/issues/43668
+  - https://github.com/stablyai/orca/pull/49636
+  - https://github.com/stablyai/orca/pull/49624
+  - https://github.com/stablyai/orca/pull/49413
+  - https://github.com/stablyai/orca/pull/49587
+  - https://github.com/stablyai/orca/issues/49623
+  - https://github.com/stablyai/orca/issues/49609
+  - https://github.com/stablyai/orca/issues/49606
+  - https://github.com/stablyai/orca/issues/49602
+  - https://github.com/stablyai/orca/issues/49564
+  - https://github.com/stablyai/orca/issues/49550
+  - https://github.com/stablyai/orca/issues/41962
+  - https://github.com/stablyai/orca/issues/19980
 ---
 
 # Retenção do banco de orquestração, despertar de coordenadores e geração de texto one-shot
@@ -843,3 +855,13 @@ além das issues [`stablyai/orca#42731`](https://github.com/stablyai/orca/issues
 - Permitir que coordenadores marquem perguntas como "waiting on a human" sem forçar decisão autônoma pelo worker (`#49273`).
 - Retirar automaticamente solicitações "Needs-you" quando PR, worker ou prazo vinculado forem liquidados (`#49271`).
 - Mensageria atômica para dispatches ativos sem forçar retomada desnecessária de workers (`#43668`).
+- Reportar configurações efetivas de inicialização nos preâmbulos de workers despachados (`#49636`, Issue `#19980`).
+- Agrupar workers iniciados em servidor pareado sob a conversa proprietária que os disparou (`#49624`).
+- Omitir rotinas de despertar para agentes em suspensão (sleeping) diante de entradas recusadas ou hosts não relacionados (`#49413`).
+- Permitir que coordenadores escolham explicitamente entre enfileirar (`queue`) ou intervir (`steer`) ao enviar mensagem a um Dispatch ativo (`#49623`).
+- Disponibilizar comando de CLI para colocar um chat de agente em hibernação/sleep (`#49609`).
+- Limpar adequadamente painéis de sessões finalizadas em servidores pareados evitando travamento de conclusões (`#49606`).
+- Liberar Dispatches de coordenadores órfãos após reinicialização do runtime em servidores macOS pareados (`#49602`).
+- Evitar que o fallback de perguntas sem resposta crie uma nova Task após a conclusão do Dispatch requisitante (`#49564`).
+- Ajustar reconciliador de perguntas quando o destinatário for um terminal de caixa de correio sem agente anexado (`#49550`).
+- Suportar modo orquestrador nativo para o Antigravity com execução direta em auto e plan (`#41962`).

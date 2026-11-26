@@ -1,6 +1,6 @@
 ---
 status: open
-description: Automacao de fechamento com orca chat close (#49405), resiliencia de ConPTY (#49464), recuperacao WebGL (#49289) e abas multi-row (#49072).
+description: Repasse de pane handle para WSL (#49627), largura de Markdown no editor (#49613) e pareamento por link unico (#49625).
 scope:
   - brza-studio
   - workspace
@@ -116,6 +116,19 @@ references:
   - https://github.com/stablyai/orca/issues/49363
   - https://github.com/stablyai/orca/issues/49329
   - https://github.com/stablyai/orca/issues/49324
+  - https://github.com/stablyai/orca/pull/49627
+  - https://github.com/stablyai/orca/pull/49613
+  - https://github.com/stablyai/orca/pull/49625
+  - https://github.com/stablyai/orca/pull/49478
+  - https://github.com/stablyai/orca/pull/49586
+  - https://github.com/stablyai/orca/pull/49584
+  - https://github.com/stablyai/orca/pull/49581
+  - https://github.com/stablyai/orca/pull/49578
+  - https://github.com/stablyai/orca/issues/49632
+  - https://github.com/stablyai/orca/issues/49580
+  - https://github.com/stablyai/orca/issues/49559
+  - https://github.com/stablyai/orca/issues/49533
+  - https://github.com/stablyai/orca/issues/41251
 ---
 
 # Alternância entre TUI e Native Chat no Antigravity, auth remota e dimensionamento de abas
@@ -917,3 +930,13 @@ além das issues [`stablyai/orca#43183`](https://github.com/stablyai/orca/issues
 - Corrigir corrupção de sílabas Hangul ao pressionar espaço em terminais no macOS (`#49363`).
 - Exibir menu interativo de confirmação do modo automático do Claude no Terminal Chat em vez de texto estático (`#49329`).
 - Habilitar execução direta com um clique de comandos shell contidos em blocos de resposta do chat (`#49324`).
+- Exportar identificador `ORCA_TERMINAL_HANDLE` para shells filhos dentro do WSL (`#49627`, resolve Issue `#49580`).
+- Adicionar configuração customizável de largura de conteúdo para visualização e edição de Markdown (`#49613`).
+- Permitir que desktops pareados alcancem o host através de link único via Relay (`#49625`).
+- Desduplicar fluxos de eventos de clientes e liberar bloqueios no mobile relay (`#49478`).
+- Permitir customização de posicionamento do medidor de uso no composer em dispositivos móveis e tablets (`#49586`, `#49581`, `#49578`).
+- Alternar contas de OpenCode, Devin e Antigravity na tela de contas no mobile (`#49584`).
+- Prevenir perda de corpo da TUI ao reconectar relays SSH legados após estouro de buffer ANSI (`#49632`).
+- Opção para conectar automaticamente hosts WSL ao iniciar o aplicativo (`#49559`).
+- Corrigir renderização de números do teclado numérico em terminais embutidos no macOS (`#49533`).
+- Configuração para abrir links externos como aba em vez de divisão de painel (`#41251`).

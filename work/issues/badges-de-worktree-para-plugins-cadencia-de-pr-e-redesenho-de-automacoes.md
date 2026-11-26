@@ -1,6 +1,6 @@
 ---
 status: open
-description: Suporte a Hermes e Droid (#49463, #49461, #49456), roteamento de lembretes (#49452) e fan-out de bots em grupos (#49436).
+description: Conexao Feishu para mencoes em grupo (#49639), ordenacao Planned antes de Waiting (#49610) e template OpenCodeReview (#49561).
 scope:
   - brza-studio
   - workspace
@@ -89,6 +89,19 @@ references:
   - https://github.com/stablyai/orca/issues/49397
   - https://github.com/stablyai/orca/issues/49299
   - https://github.com/stablyai/orca/issues/47183
+  - https://github.com/stablyai/orca/pull/49639
+  - https://github.com/stablyai/orca/pull/49610
+  - https://github.com/stablyai/orca/pull/49561
+  - https://github.com/stablyai/orca/pull/49605
+  - https://github.com/stablyai/orca/pull/49644
+  - https://github.com/stablyai/orca/pull/49572
+  - https://github.com/stablyai/orca/pull/49568
+  - https://github.com/stablyai/orca/pull/49573
+  - https://github.com/stablyai/orca/issues/49598
+  - https://github.com/stablyai/orca/issues/49534
+  - https://github.com/stablyai/orca/issues/49532
+  - https://github.com/stablyai/orca/issues/49522
+  - https://github.com/stablyai/orca/issues/49511
 ---
 
 # Badges de worktree para plugins, cadência de PR e redesenho de automações
@@ -443,3 +456,15 @@ além das issues [`stablyai/orca#47796`](https://github.com/stablyai/orca/issues
 - Implementar deep link para abertura direta de item específico de bot (`#49397`).
 - Garantir despertar de bots do Slack em canais compartilhados externamente via Slack Connect (`#49299`).
 - Adicionar comandos de CLI para arquivar e consolidar tópicos de bots no Home Chat (`#47183`).
+- Conectar bots ao Feishu respondendo automaticamente a menções em grupos autorizados (`#49639`).
+- Listar itens de bots em estado 'Planned' antes de 'Waiting' no painel de acompanhamento (`#49610`).
+- Disponibilizar template integrado de automação `OpenCodeReview` para bots (`#49561`).
+- Preservar alvo de resposta selecionado ao navegar para fora de um item e retornar (`#49605`).
+- Exibir a opção 'Chat default' no topo do menu de agentes na criação de novos bots (`#49644`).
+- Reivindicar uploads de respostas de screenshot uma única vez quando a conversa permanecer inalterada (`#49572`).
+- Proteger gravações de configurações remotas e plugins de status não gerenciados no Hermes (`#49573`).
+- Permitir revogação ou rotação de token de ferramentas de bots sem necessidade de reiniciar o servidor (`#49598`).
+- Aprimorar fila de tarefas, roteamento de mensagens e status de execução em grupos de bots (`#49534`, `#48745`).
+- Permitir renomeação da pasta home de um bot ao alterar seu nome de exibição (`#49532`).
+- Notificar proprietário no Slack quando a resposta final do bot estiver concluída (`#49522`).
+- Permitir reordenação customizada de grupos de status em Bot Items (`#49511`).

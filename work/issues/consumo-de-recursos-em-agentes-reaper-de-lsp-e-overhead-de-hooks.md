@@ -1,6 +1,6 @@
 ---
 status: open
-description: Otimizacao de symlinks no editor (#49466, #49453, #49343), descarte de bitmap eager (#49434) e fim de polling de uso WSL (#49430, #49428).
+description: Otimizacao de row-builders e worktree catalog (#49617, #49611), eliminacao de lock em asar (#49622) e reducao de churn (#49620).
 scope:
   - brza-studio
   - tools-kit
@@ -62,6 +62,19 @@ references:
   - https://github.com/stablyai/orca/pull/49369
   - https://github.com/stablyai/orca/issues/49457
   - https://github.com/stablyai/orca/issues/49444
+  - https://github.com/stablyai/orca/pull/49617
+  - https://github.com/stablyai/orca/pull/49611
+  - https://github.com/stablyai/orca/pull/49607
+  - https://github.com/stablyai/orca/pull/49626
+  - https://github.com/stablyai/orca/pull/49622
+  - https://github.com/stablyai/orca/pull/49620
+  - https://github.com/stablyai/orca/pull/49569
+  - https://github.com/stablyai/orca/pull/49502
+  - https://github.com/stablyai/orca/pull/49492
+  - https://github.com/stablyai/orca/pull/49485
+  - https://github.com/stablyai/orca/issues/49630
+  - https://github.com/stablyai/orca/issues/49621
+  - https://github.com/stablyai/orca/issues/49551
 ---
 
 # Consumo de recursos em agentes: reaper de LSP e overhead de hooks
@@ -409,3 +422,14 @@ além das issues [`stablyai/orca#42675`](https://github.com/stablyai/orca/issues
 - Ignorar checagens de proprietário no macOS para clientes de encaminhamento de portas desconectados na fila (`#49369`).
 - Ler credenciais protegidas do Cursor via os-secret-store/cursor-safe-storage no Windows (`#49457`).
 - Reconectar terminais automaticamente após remontagem de unidades de disco desconectadas (`#49444`).
+- Compactar índice de worktrees detectadas na barra lateral com memoização de hosts e corte de alocações no row-builder (`#49617`).
+- Construir o `manualOrderCatalog` de worktrees sob demanda ao soltar (drop) em vez de recalcular a cada atualização (`#49611`).
+- Suprimir invalidação de row-plans fora do status de PR e desduplicar varreduras de lanes no `prCache` (`#49607`).
+- Implementar fast-path de linhagem na barra lateral quando a árvore estiver plana (`#49626`).
+- Impedir que o processo principal do Orca trave arquivos `*.asar` no Windows ao efetuar operações de stat (`#49622`, resolve Issue `#49621`).
+- Eliminar churn de alocação de `Object.entries` e conjuntos `Set` por alias nas varreduras de metadados de worktrees (`#49620`).
+- Ler a área de transferência uma única vez por requisição e cessar recodificação redundante de PNGs copiados (`#49569`).
+- Ignorar checagens de portas exclusivas do macOS em Windows e Linux e cancelar checagens enfileiradas em O(1) (`#49502`).
+- Inicializar poly1305 WASM no módulo SSH2 de forma preguiçosa somente sob negociação chacha20 (`#49492`).
+- Otimizar timeout do hook gerenciado `PreToolUse` do Claude Code no macOS evitando recusa de ferramentas sob carga (`#49630`).
+- Assegurar que decisão de permissão 'ask' em hooks não seja auto-aprovada em modo Full access sem confirmação (`#49551`).

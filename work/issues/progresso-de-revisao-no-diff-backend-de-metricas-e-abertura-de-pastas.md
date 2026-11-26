@@ -1,6 +1,6 @@
 ---
 status: open
-description: Deadline para host automations em WSL (#49411, #49401), linkagem rapida em conectores (#49410) e hover fill em settings (#49389).
+description: Git Graph em pastas vinculadas (#49629), revalidacao de preflight de tarefas (#49633) e git blame inline no diff (#49558).
 scope:
   - brza-studio
   - brza-workflow
@@ -82,6 +82,19 @@ references:
   - https://github.com/stablyai/orca/issues/49442
   - https://github.com/stablyai/orca/issues/49399
   - https://github.com/stablyai/orca/issues/49321
+  - https://github.com/stablyai/orca/pull/49629
+  - https://github.com/stablyai/orca/pull/49633
+  - https://github.com/stablyai/orca/pull/49641
+  - https://github.com/stablyai/orca/pull/49599
+  - https://github.com/stablyai/orca/pull/49593
+  - https://github.com/stablyai/orca/pull/49537
+  - https://github.com/stablyai/orca/pull/49504
+  - https://github.com/stablyai/orca/issues/49597
+  - https://github.com/stablyai/orca/issues/49583
+  - https://github.com/stablyai/orca/issues/49558
+  - https://github.com/stablyai/orca/issues/49528
+  - https://github.com/stablyai/orca/issues/49509
+  - https://github.com/stablyai/orca/issues/49499
 ---
 
 # Progresso de revisão no diff, backend de métricas e abertura de pastas
@@ -333,3 +346,13 @@ além da issue [`stablyai/orca#46359`](https://github.com/stablyai/orca/issues/4
 - Corrigir links de referências de issues em chat para apontarem para o repositório de trabalho ativo em vez do upstream (`#49442`).
 - Oferecer opção de largura total (full-width) na visualização rica de Markdown (`#49399`).
 - Adicionar botão para salvar imagens diretamente a partir do visualizador integrado (`#49321`).
+- Abrir o Git Graph de repositórios em cartões de pastas diretamente no workspace da pasta (`#49629`, resolve Issue `#49597`).
+- Reverificar vereditos de preflight locais obsoletos na visualização de Tarefas (`#49633`).
+- Ocultar projetos que não sejam do GitHub quando possuírem remotes adicionais conflitantes (`#49641`, resolve Issue `#49583`).
+- Exibir anotações inline de `git blame` na visualização de diff de revisão (`#49558`).
+- Finalizar limpa e previamente processos na pasta de instalação do Windows antes de aplicar updates (`#49599`).
+- Manter linhas de configurações experimentais visíveis durante toda a sessão de ajustes (`#49593`).
+- Empacotar ícones nativos de aplicativos no seletor 'Open in' eliminando requisições externas de favicons (`#49537`).
+- Comparar seletores de nomes na CLI com suporte a strings Unicode em decomposição NFD (`#49504`).
+- Permitir edição direta de arquivos a partir da visualização de diff (`#49528`).
+- Acelerar o painel do Git com seletor persistente de branches e prévia de diff em tempo real no Histórico (`#49509`, `#49499`).

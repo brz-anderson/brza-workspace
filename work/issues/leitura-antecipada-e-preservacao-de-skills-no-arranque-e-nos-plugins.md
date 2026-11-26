@@ -1,6 +1,6 @@
 ---
 status: open
-description: Conducao rapida de abas por CDP (#49412), escalonamento em sandboxes Windows (#49336) e consistencia em MCP Move (#49290).
+description: Ocultacao de pycache em @ (#49645), skills de projetos linkados em comentarios (#49497) e correcoes em stubs CLI (#49516, #49510).
 scope:
   - brza-studio
 priority: high
@@ -83,6 +83,14 @@ references:
   - https://github.com/stablyai/orca/issues/49404
   - https://github.com/stablyai/orca/issues/49301
   - https://github.com/stablyai/orca/issues/44947
+  - https://github.com/stablyai/orca/pull/49497
+  - https://github.com/stablyai/orca/pull/49516
+  - https://github.com/stablyai/orca/pull/49523
+  - https://github.com/stablyai/orca/pull/49535
+  - https://github.com/stablyai/orca/pull/49512
+  - https://github.com/stablyai/orca/issues/49645
+  - https://github.com/stablyai/orca/issues/49510
+  - https://github.com/stablyai/orca/issues/49505
 ---
 
 # Leitura antecipada e preservação de skills no arranque e nos plugins
@@ -410,3 +418,9 @@ além da issue [`stablyai/orca#47797`](https://github.com/stablyai/orca/issues/4
 - Tratar subida recursiva até a raiz real de pacotes ultrapassando marcadores intermediários de `package.json` (`#47979`).
 - Adicionar flag `--no-effects` na automação de navegador para omitir esperas de acomodação pós-ação (`#49404`).
 - Expor identidade do chat nativo selecionado no contexto de workspace de plugins (`#44947`).
+- Ocultar diretórios `__pycache__/` e arquivos `*.pyc` do menu de menção de arquivos `@` (`#49645`).
+- Listar skills de projetos vinculados no menu slash de comentários de itens (`#49497`).
+- Eliminar recomendação indevida de `--json` em stubs do `skills get` evitando loops de releitura na CLI (`#49516`, resolve Issue `#49510`).
+- Rejeitar inclusão de blocos `[[hooks]]` no Kimi quando inviabilizarem o carregamento do `config.toml` (`#49523`, resolve Issue `#49505`).
+- Encaminhar cabeçalhos completos no relay de ferramentas de agentes exceto hop-by-hop e credenciais próprias (`#49535`).
+- Identificar permissões faltantes em erros 403 do Composio e oferecer ação rápida de 'Change key' (`#49512`).

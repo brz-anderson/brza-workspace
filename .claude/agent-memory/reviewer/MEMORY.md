@@ -1,2 +1,3 @@
 - [Padrões da revisão de sync do upstream](sync-review-patterns.md) — identidade, slug, P36, ~/.orca, config de build, porte, comparador "Orca", mobile, PR antigo
-- [Calibração da confiança](reviewer-confidence-calibration.md) — arquivo sob edição, commit novo, pnpm run reinstala, hipóteses que caem
+- [Padrões da revisão de feature no host](host-feature-review-patterns.md) — fixture fora de ordem, decisão fora do serialize, estado que a UI não monta, rig de relógio parado
+- [Calibração da confiança](reviewer-confidence-calibration.md) — arquivo sob edição, commit novo, branch reescrita, pnpm run reinstala, hipóteses que caem

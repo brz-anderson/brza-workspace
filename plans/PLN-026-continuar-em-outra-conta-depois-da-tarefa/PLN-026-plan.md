@@ -18,7 +18,7 @@ tags:
 
 # PLN-026: O Continuar em outra conta espera a tarefa em segundo plano e continua na conta nova
 
-- **Retomar:** fase 1 (P1–P3) e o código do P5 feitos; R9 respondida; os consertos da revisão da fase 1 (A1–A5) em curso na `pln-026-p5`, na branch dela (X14); depois revisão da parte nova, CI, push, DMG, C1 e C2. P6.2 espera pedido de Anderson.
+- **Retomar:** fase 1, P5 e os consertos A1–A5 feitos (`92a028ccb58`); R10 respondida; os consertos das revisões do P5 (B1–B4, R5, R6, R10) em curso na `pln-026-p5`; depois CI, push, DMG, C1 e C2. P6.2 espera pedido de Anderson.
 - **Dividido:** [PLN-026 — Desenho](PLN-026-design.md)
 
 ## Pedido
@@ -216,6 +216,25 @@ Respondida em 2026-11-27.
    - deixar e abrir issue — custo: zero; a linha fica errada até 30 min. Se paga: nunca, se a seleção raramente voltar.
 
    **Decidido — "Sim, na hora (Recomendado)".**
+
+### Rodada 10 — as revisões do P5 (enviada 2026-11-27)
+
+> **Apresentado antes:** a revisão da sessão do P5 (R4–R7, R10.1, R10.2) e a do `reviewer` (B1–B5); a intermitência do A1
+> sumiu (12 rodadas), A2–A5 resolvidos. Sem rodada: B3/R7 (testes do fixado), B4 (o teste do cartão), R5 (`retryAt` na
+> exceção), R6 (o fallback do fixado não perde o resultado), B5 (issue).
+
+Respondida em 2026-11-27.
+
+1. **Cancelar ou Stop durante a decisão da troca do fixado** (B1/R4). Opções: cancelar impede até a troca começar
+   (recomendada; ~10 linhas em arquivos só do fork e 1 teste); esconder o Cancelar durante a troca (~20 linhas); deixar com
+   issue (zero). **Decidido — "Cancelar impede até a troca começar (Recomendado)".**
+2. **O aviso do acordar que falhou por outro motivo** (B2). Opções: mostrar na linha do corte armado (recomendada; ~2 linhas
+   no upstream, ~6 no fork, 1 teste); tirar o aviso (~20 linhas a menos). **Decidido — "Mostrar na linha do corte armado
+   (Recomendado)".**
+3. **A recusa da R8.1 no seletor quando o acordar não vem** (os revisores divergiram). Opções: limitar a 30 s (recomendada;
+   ~3 linhas e 1 teste); manter sem prazo (zero). **Decidido — "Limitar a 30 s (Recomendado)".**
+4. **Os testes do renderer que conferem chamadas de mock.** Opções: manter e registrar a exceção (recomendada); apagar e
+   cobrir no C2. **Decidido — "Manter e registrar a exceção (Recomendado)".**
 
 ## Desenho
 
@@ -428,6 +447,8 @@ com o rascunho do relato ao upstream.
 
 - [O auto-continue entrega a continuação ao agente retido na conta esgotada](../../work/issues/o-auto-continue-entrega-ao-agente-retido-na-conta-esgotada.md)
   — de P6; o reporte ao upstream espera o pedido de Anderson.
+- [O Continuar adiado some sem aviso quando o envio é recusado](../../work/issues/o-continuar-adiado-some-sem-aviso-quando-o-envio-e-recusado.md)
+  — de B5, da revisão do P5.
 
 ## Casos manuais
 
@@ -478,6 +499,10 @@ com o rascunho do relato ao upstream.
   e `limitRow`. Afeta D2.
 - **X14 — A fase 1 e o P5 vão ao `master` juntos**, pela branch do P5: os consertos da revisão da fase 1 entram lá, e o P4
   (revisão, CI, push) cobre as duas.
+
+- **X15 — Testes do renderer conferem chamadas de mock** (o `arm` antes da troca no fixado, o cancelamento do auto-continue
+  agendado, o Continue depois de falha da RPC), contra a regra do `AGENTS.md` do `brza-studio`. Ficam pela R10.4: guardam
+  invariantes cuja regressão perde o resultado da tarefa ou o Continue sem aviso.
 
 ## Worklogs
 

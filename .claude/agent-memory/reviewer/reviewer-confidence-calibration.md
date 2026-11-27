@@ -65,6 +65,18 @@ metadata:
 - **Spec E2E do upstream contra um padrão do fork** (preview × `.rich-markdown-editor`): 85. A
   premissa é que o perfil de E2E não grava a preferência; confira o
   `e2e-completed-onboarding-profile.ts`.
+- **Branch reescrita no meio da revisão** (PLN-026, 2026-11-26): o que estava sem commit no
+  worktree no começo virou o `rebase --autosquash`. Compare o `git diff <antigo> <novo>` com o
+  `git diff` sujo que você viu (`diff - <(...)`) e revise contra o HEAD novo.
+- **Teste intermitente provado por repetição** (8 rodadas, 1 falha registrada): 95. Que a mesma
+  janela não exista em produção, lido pela ordem de gravação do provider: 85.
+- **Timer que dispara cedo contra o `Date.now()`** (P5 do PLN-026): 300 timers marcados num laço
+  apertado → 94 disparam 1 ms antes; o caminho real do fallback, repetido 20 vezes → 0. Ficou abaixo
+  de 80 e fora dos achados. Não reabra sem medir no caminho real.
+- **Corrida provada com `deps` embrulhado** (o Cancelar durante o veredito): 88, não 90. O mecanismo
+  foi rodado; que a janela dure a troca inteira foi lido (o `run` no `serialize`).
+- **Ramo de UI morto lido em 4 elos** (`latest…Cut` → `usageLimitTurnItemId` → `active` → `slotKey`):
+  90, sem rodar o renderer.
 - **zsh**: `$r:src/...` também quebra em `git show`/`git grep` com `$r` antes de `:`; use `"${r}:…"`.
 
 Related: [[sync-review-patterns]]

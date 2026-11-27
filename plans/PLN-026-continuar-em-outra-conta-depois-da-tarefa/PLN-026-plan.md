@@ -1,16 +1,17 @@
 ---
-status: in_progress
-phase: execution
+status: open
+phase: blocked
 origin: request
 description: O chat que bateu no limite troca de conta e continua na conta nova quando a tarefa em segundo plano termina, sem perder o resultado dela.
-ready: sim
+ready: "não — o fechamento espera os casos manuais C1 e C2 de Anderson no app"
 estimate_h: 20.5
-executed_h: 1
-remaining_h: 10
+executed_h: 15
+remaining_h: 1
 scope:
   - brza-studio
 opened: 2026-11-26
 owner: Anderson
+blocks: O fechamento do PLN-026 espera os casos manuais C1 e C2, que só Anderson faz no app.
 priority: high
 tags:
   - chat
@@ -18,7 +19,7 @@ tags:
 
 # PLN-026: O Continuar em outra conta espera a tarefa em segundo plano e continua na conta nova
 
-- **Retomar:** fase 1, P5 e os consertos A1–A5 feitos (`92a028ccb58`); R10 respondida; os consertos das revisões do P5 (B1–B4, R5, R6, R10) em curso na `pln-026-p5`; depois CI, push, DMG, C1 e C2. P6.2 espera pedido de Anderson.
+- **Retomar:** P1–P5 fechados e na `master` (`brza-studio@4989924b1b6`); falta Anderson rodar C1 e C2 no DMG `~/Downloads/brza-studio-1.4.278-alpha.1-pln-026-macos-arm64.dmg`; P6.2 espera pedido dele.
 - **Dividido:** [PLN-026 — Desenho](PLN-026-design.md)
 
 ## Pedido
@@ -394,23 +395,27 @@ do prazo, "Dispensar"). `vitest`: os 4 do PLN-026 → 23 passed; `native-chat/us
 
 Executa P2, P3 · executor: a sessão que conduz (`reviewer`, CI `node-next-compat.yml`)
 
-Estimado: 1 h · Executado: — h
+Estimado: 1 h · Executado: 1 h
 
-- [ ] **1.** Revisão adversária; achados com destino.
-- [ ] **2.** CI da branch igual à `master`; fast-forward e push; DMG para C1.
+- [x] **1.** Revisão adversária; achados com destino.
+- [x] **2.** CI da branch igual à `master`; fast-forward e push; DMG para C1.
 
-**Evidência:**
+**Evidência:** duas revisões da fase 1 e do P5 (A1–A5, B1–B5, R4–R7), com destino em R9 e R10 e na issue do B5. A fase 1 e o
+P5 foram juntos (X14): CI `node-next-compat.yml` em `brza-studio@4989924b1b6`, rodada 46068838613 → success. `master`
+`9eef46284d8..4989924b1b6` por fast-forward, no origin. DMG `~/Downloads/brza-studio-1.4.278-alpha.1-pln-026-macos-arm64.dmg`,
+`hdiutil verify` válido, sha256 `9a4154df96474f82b1fc1bba2b33909af80af777472cc95a52fc2fd853631046`.
 
 ### P5 — Fase 2: o chat fixado
 
 Executa D5 · executor: sessão do `brza-studio`
 
-Estimado: 8 h · Executado: — h
+Estimado: 8 h · Executado: 13 h
 
 - [x] **1.** Detalhar D5 (rodada se houver ponto sem lastro). Ver o D5; os pontos foram à R8.
-- [ ] **2.** Teste que falha, implementação, testes, commit, revisão, CI e push. Host, RPC, R8.1, R8.2 e renderer feitos
-  sobre a fase 1 final (`df6c9619be8`, `0e585b4d06a`); em curso, na mesma branch, os consertos da revisão da fase 1 (A1–A5,
-  R9); depois revisão da parte nova, CI e push junto com a fase 1.
+- [x] **2.** Teste que falha, implementação, testes, commit, revisão, CI e push. `df6c9619be8` (host), `0e585b4d06a`
+  (renderer), `92a028ccb58` (R9, A1–A5), `4989924b1b6` (R10, B1–B4, R5, R6); 7 arquivos de teste → 61 passed; typecheck,
+  lint com `ORCA_CODE_QUALITY_BASE=master` (49/49) e gates de idioma verdes; CI e push pelo P4. O estouro de horas veio das
+  duas reescritas da fase 1 e da intermitência do A1.
 
 **Evidência (parcial):** `brza-studio@64d47dc5c56` (branch `fix/pln-026-p5-fixado`):
 `structured-agent-session-account-switch-pinned.brza.test.ts`, dois `it.fails` — com tarefa aberta, hoje recusa
@@ -504,11 +509,21 @@ com o rascunho do relato ao upstream.
   agendado, o Continue depois de falha da RPC), contra a regra do `AGENTS.md` do `brza-studio`. Ficam pela R10.4: guardam
   invariantes cuja regressão perde o resultado da tarefa ou o Continue sem aviso.
 
+- **X16 — A linha inativa do B2 precisou de 3 linhas no `NativeChatUsageLimitActions.tsx`** (upstream), um campo
+  `continueAfterWork` no contexto, porque o provider só expõe o botão em linha ativa; mais as 2 do `NativeChatUsageLimitRow.tsx`.
+- **X17 — O R6 vale para toda troca do fixado:** a operação prepara a conta (a cópia do transcript) antes de parar o agente,
+  também no seletor do composer; uma conta que não aceita deixa agente, tarefa e acordar no lugar.
+- **X18 — O ramo do fixado ficou no `brza-continue-after-work-pin.ts`** (123 linhas), e não num
+  `brza-deferred-continue-pinned.ts` à parte; a peça ficou em 276 linhas efetivas; o host não mudou além do P2.
+
 ## Worklogs
 
 - 2026-11-26 — abertura: R1–R7, D1–D6, P1–P6 aceitos; execução autorizada. P1 fechado (X1); P2/P3, P5 e P6 em três
   sessões do `brza-studio` em paralelo.
   [O Continuar em outra conta depois do sync](../../work/worklogs/2026-11-26-continuar-em-outra-conta-depois-do-sync.md)
+- 2026-11-27 — R8–R10; P2–P5 fechados, revisados e na `master` (`4989924b1b6`); P6.1 fechado (F14 provado). Parou nos casos
+  C1 e C2, com Anderson.
+  [PLN-026: a execução até os casos manuais](../../work/worklogs/2026-11-27-pln-026-execucao.md)
 
 ## Fechamento
 

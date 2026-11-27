@@ -324,7 +324,7 @@ Estimado: 7 h · Executado: 0.3 h
 - [x] **3. Os casos de D2** — unidade, por caminho.
 - [x] **4.** `pnpm typecheck`, `pnpm lint`, commit.
 
-**Evidência:** `brza-studio@3b834c7714a` (branch `fix/pln-026-continuar-em-outra-conta`; era `faa8691b1f8`, reescrito no P3 pelo X9). Novos em `brza/`:
+**Evidência:** `brza-studio@ff5ce19b54a` (branch `fix/pln-026-continuar-em-outra-conta`, no origin como `fix/pln-026-fase-1`; reescrito duas vezes, X9 e X11). Novos em `brza/`:
 `brza-deferred-usage-limit-continue.ts` (264 linhas), `brza-continue-after-work-{wake-up,status,wiring}.ts`, a RPC
 `agentSession.brzaContinueAfterWork`/`brzaCancelContinueAfterWork` e a capacidade
 `agent-session.structured.brza-continue-after-work.v1`. `vitest` nos dois `.brza.test.ts` novos → 13 passed; regressão em 7
@@ -342,7 +342,7 @@ Estimado: 3 h · Executado: 0.2 h
 - [x] **2. Implementar** D4 e as strings.
 - [x] **3.** Testes por caminho, typecheck, lint, gates de idioma, commit.
 
-**Evidência:** `brza-studio@6741d0471b9`: `brza/use-brza-continue-after-work{,-status}.ts`, `brza/BrzaContinueAfterWorkLine.tsx`,
+**Evidência:** `brza-studio@0f866eff56a` (era `6741d0471b9`, X11): `brza/use-brza-continue-after-work{,-status}.ts`, `brza/BrzaContinueAfterWorkLine.tsx`,
 `BrzaContinueInOtherAccount.tsx` e o hook; no upstream, só o tipo de 2 linhas em `NativeChatUsageLimitActions.tsx`. Strings
 em en, pt, es, fr, ja, ko, zh ("Vai continuar em {{account}} quando a tarefa em segundo plano terminar", "Cancelar", o aviso
 do prazo, "Dispensar"). `vitest`: os 4 do PLN-026 → 23 passed; `native-chat/usage` e `native-chat/brza` → 156 passed; host →
@@ -436,10 +436,16 @@ com o rascunho do relato ao upstream.
   pino de antes, em repouso; o status leva `expired` + `accountUnavailable`.
 - **X9 — O timer de 2 s do D1 virou sinal empurrado.** O `setInterval` esbarrava no `check:recurring-timer-ratchet`; o pedido
   assina o `subscribeStatus` do host e confere a cada publicação de status, com timers de disparo único só para os 30 min e
-  os 30 s. Entrou como fixup no P2 (`faa8691b1f8` → `3b834c7714a`); sem mudança no baseline. Afeta D1 e o P5.
+  os 30 s. Entrou como fixup no P2; sem mudança no baseline (`check-recurring-timer-ratchet.mjs` → OK). Afeta D1 e o P5.
 - **X10 — A linha da espera vive no componente do fork** (`BrzaUsageLimitContinueInOtherAccount`), no lugar do botão; o
   `NativeChatUsageLimitRow.tsx` do upstream não mudou. O aviso do prazo ganhou "Dispensar", que chama o cancelar. Os
   catálogos `tr` e `zh-Hant` não levam as strings, como no P79. Afeta D4.
+
+- **X11 — A branch da fase 1 foi reescrita de novo depois de enviada.** Um recado atrasado (o ponto de extensão do fixado:
+  `target?`, `accountId?`, `account?` opcional, o `Pending` com `target`, o dep `switchAccount`) entrou no P2 por
+  `rebase --autosquash`: P2 `ff5ce19b54a`, P3 `0f866eff56a`. O `--force-with-lease` no origin foi barrado pelo classificador;
+  a fase 1 foi ao origin como `fix/pln-026-fase-1`, e a `fix/pln-026-continuar-em-outra-conta` do origin ficou no
+  `6741d0471b9` antigo. O P5 adota os nomes da fase 1.
 
 ## Worklogs
 

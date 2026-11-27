@@ -18,7 +18,7 @@ tags:
 
 # PLN-026: O Continuar em outra conta espera a tarefa em segundo plano e continua na conta nova
 
-- **Retomar:** P1 e P2 fechados; P3 na sessão `pln-026-fase-1`; P5 implementando o host na `pln-026-p5` (o renderer depois do P3); P6.2 espera pedido de Anderson (R8.3).
+- **Retomar:** P1 e P2 fechados; P3 na sessão `pln-026-fase-1`; P5 com o host feito na `pln-026-p5` (o renderer depois do P3); P6.2 espera pedido de Anderson (R8.3).
 - **Dividido:** [PLN-026 — Desenho](PLN-026-design.md)
 
 ## Pedido
@@ -362,13 +362,16 @@ Executa D5 · executor: sessão do `brza-studio`
 Estimado: 8 h · Executado: — h
 
 - [x] **1.** Detalhar D5 (rodada se houver ponto sem lastro). Ver o D5; os pontos foram à R8.
-- [ ] **2.** Teste que falha, implementação, testes, commit, revisão, CI e push. Os testes que falham estão feitos; a
-  implementação espera o commit do P2.
+- [ ] **2.** Teste que falha, implementação, testes, commit, revisão, CI e push. Feito o lado do host e da RPC, R8.1 e
+  R8.2 (`2805db580ea`); falta o renderer do fixado sobre o P3, depois revisão, CI e push.
 
 **Evidência (parcial):** `brza-studio@64d47dc5c56` (branch `fix/pln-026-p5-fixado`):
 `structured-agent-session-account-switch-pinned.brza.test.ts`, dois `it.fails` — com tarefa aberta, hoje recusa
 `backgroundTasksRunning`; com tarefa terminada devendo o acordar, hoje para o agente antes do acordar →
-`Tests 2 expected fail (2)`. Executado até aqui: 1,5 h.
+`Tests 2 expected fail (2)`. Depois, `brza-studio@af45663b8cb` (merge do P2) e `brza-studio@2805db580ea`: `accountId?` nos
+params (X7), `brza-continue-after-work-pin.ts` (novo), o disparo `switchThenContinue`, R8.1 no
+`operations/structured-agent-session-account-switch.ts` e R8.2; `vitest` em 5 arquivos (o fixado, os da fase 1 e os de troca
+do upstream) → 33 passed; o caso da R8.1 cai sem a recusa. `pnpm typecheck` verde. Executado até aqui: 3 h.
 
 ### P6 — A issue do auto-continue do upstream
 
@@ -421,6 +424,13 @@ com o rascunho do relato ao upstream.
   7 aceita os dois desfechos com um envio aceito só (o auto-continue moveu antes, ou `continuationSuperseded`).
 - **X7 — Os params do D3 fecharam sem o `accountId`/`target` do fixado**; o recado ao P2 chegou depois do commit. O P5
   acrescenta os campos opcionais na mesma RPC (arquivo só do fork), sem abrir outra.
+
+- **X8 — A R8.2, lida assim:** definitivas são as recusas de conta do `prepareAccountSwitch`
+  (`claudeAccountFolderMissing`, `claudeAccountSetupFailed`); toda outra espera a próxima volta, limitada pelo prazo de 30 min,
+  que no fixado corre antes do disparo. Quando a conta recusa, o agente já foi parado pelo `switchAccount` e o chat fica no
+  pino de antes, em repouso; o status leva `expired` + `accountUnavailable`.
+- **X9 — O `setInterval` do D1 esbarra no `check:recurring-timer-ratchet`.** A linha do baseline sobe no P3, com a razão (o
+  timer só existe enquanto há pedido); o aval é do `reviewer` no P4.
 
 ## Worklogs
 

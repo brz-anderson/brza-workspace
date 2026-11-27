@@ -5,8 +5,8 @@ origin: request
 description: O chat que bateu no limite troca de conta e continua na conta nova quando a tarefa em segundo plano termina, sem perder o resultado dela.
 ready: sim
 estimate_h: 20.5
-executed_h: 0.5
-remaining_h: 20
+executed_h: 1
+remaining_h: 19
 scope:
   - brza-studio
 opened: 2026-11-26
@@ -18,7 +18,7 @@ tags:
 
 # PLN-026: O Continuar em outra conta espera a tarefa em segundo plano e continua na conta nova
 
-- **Retomar:** P1 fechado (F9 e F10 valem); P2 e P3 na sessão `pln-026-fase-1`; P5 (detalhar e testes que falham) e P6 em sessões próprias, em paralelo, a pedido de Anderson.
+- **Retomar:** P1 fechado; P6.1 fechado (F14 provado, issue aberta; o reporte ao upstream espera Anderson); P2 e P3 na sessão `pln-026-fase-1`; P5 na `pln-026-p5`.
 - **Dividido:** [PLN-026 — Desenho](PLN-026-design.md)
 
 ## Pedido
@@ -320,12 +320,17 @@ Estimado: 8 h · Executado: — h
 
 Executa D6 · executor: sessão do `brza-studio` e a sessão que conduz
 
-Estimado: 1 h · Executado: — h
+Estimado: 1 h · Executado: 0.5 h
 
-- [ ] **1.** Teste que prova ou descarta F14; issue no workstream `studio` com o resultado.
+- [x] **1.** Teste que prova ou descarta F14; issue no workstream `studio` com o resultado.
 - [ ] **2.** Provado: reportar ao upstream (a pedido de Anderson).
 
-**Evidência:**
+**Evidência:** F14 provado. `brza-studio@c3289c12c9a` (branch `test/pln-026-p6-auto-continue`):
+`structured-agent-session-usage-limit-account-switch.brza.test.ts:26`, `it.fails` → "1 expected fail"; sem o `it.fails`,
+`expected { handed: 1, agent: 'kept on A' } to not deeply equal …`. Controles: sem a troca, nada sai antes do reset; sem o
+acordar devido, o agente é trocado. Issue:
+[O auto-continue entrega a continuação ao agente retido na conta esgotada](../../work/issues/o-auto-continue-entrega-ao-agente-retido-na-conta-esgotada.md),
+com o rascunho do relato ao upstream.
 
 ## Regressão
 
@@ -333,6 +338,11 @@ Estimado: 1 h · Executado: — h
   o teste `NativeChatUsageLimitContinueAfterSwitch.brza.test.tsx` (`bb137633c35`).
 - **O auto-continue e o Continuar comum da linha de limite** do upstream: os testes de `native-chat/usage` e
   `agent-session-wire/recovery`, por caminho.
+
+## Pendências conhecidas
+
+- [O auto-continue entrega a continuação ao agente retido na conta esgotada](../../work/issues/o-auto-continue-entrega-ao-agente-retido-na-conta-esgotada.md)
+  — de P6; o reporte ao upstream espera o pedido de Anderson.
 
 ## Casos manuais
 

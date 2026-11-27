@@ -1,0 +1,349 @@
+---
+status: in_progress
+phase: execution
+origin: request
+description: O chat que bateu no limite troca de conta e continua na conta nova quando a tarefa em segundo plano termina, sem perder o resultado dela.
+ready: sim
+estimate_h: 20.5
+remaining_h: 20.5
+scope:
+  - brza-studio
+opened: 2026-11-26
+owner: Anderson
+priority: high
+tags:
+  - chat
+---
+
+# PLN-026: O Continuar em outra conta espera a tarefa em segundo plano e continua na conta nova
+
+- **Retomar:** R7 respondida e execução autorizada ("pode executar o plano"); próximo passo P1, a sonda.
+- **Dividido:** [PLN-026 — Desenho](PLN-026-design.md)
+
+## Pedido
+
+- **Origem:** pedido livre, na sessão do workstream `studio` de 2026-11-26, depois do
+  [sync das v1.4.263 e v1.4.278](../../work/worklogs/2026-11-26-sync-das-v1-4-263-e-v1-4-278-do-upstream.md).
+  O botão é o P79 do PLN-001 ([o worklog do P79](../../work/worklogs/2026-11-02-pln-001-p79-continuar-em-outra-conta-e-retomar-por-padrao.md)).
+
+"o \"Continuar em outra conta\" deixou de funcionar após o sync"
+
+### Cobertura
+
+| Origem     | Critério de aceite                                                                                                                         | Passo  | Teste (nível)                                                                                       |
+| :--------- | :----------------------------------------------------------------------------------------------------------------------------------------- | :----- | :-------------------------------------------------------------------------------------------------- |
+| `Pedido 1` | Num chat que segue a seleção, com tarefa em segundo plano, o Continuar em outra conta continua na conta escolhida, sem bater no limite de novo | P2, P3 | `structured-agent-session-account-switch.brza.test.ts` de `it.fails` para `it` (unidade); C1 (manual) |
+| `R3.1`     | O host continua sozinho quando a tarefa termina, sem perder o resultado dela                                                                | P2     | casos 1, 2 e 6 de D2 (unidade)                                                                      |
+| `R4.1`     | Se o acordar não vem em 30 s, a continuação leva o resultado da tarefa                                                                      | P2     | caso 10 de D2 (unidade)                                                                             |
+| `R4.2`     | A tarefa que não termina em 30 min encerra a espera com aviso                                                                               | P2, P3 | caso 9 de D2 (unidade)                                                                              |
+| `R4.3`     | O Cancelar da linha, o Stop, fechar o chat e a seleção voltar cancelam o pedido                                                             | P2, P3 | casos 4 e 5 de D2 (unidade)                                                                         |
+| `R4.4`     | Uma mensagem nova durante a espera não cancela o pedido                                                                                     | P2     | caso de D2 (unidade), condicionado à sonda (P1)                                                     |
+| `R5.1`     | A linha de limite mostra "Vai continuar em {conta} quando a tarefa em segundo plano terminar", com Cancelar                                 | P3     | teste do renderer (unidade); C1 (manual)                                                            |
+| `R5.2`     | O chat fixado não recusa nem perde o resultado com tarefa de fundo                                                                          | P5     | testes da fase 2 (unidade); C2 (manual)                                                             |
+| `R5.3`     | O provável defeito do auto-continue do upstream fica provado ou descartado, numa issue                                                      | P6     | teste na issue (unidade)                                                                            |
+
+### Fora de escopo
+
+- **Persistir o pedido no journal SQLite.** O reinício do app corta a tarefa de fundo, e depois dele o Continuar da linha
+  já vai à conta selecionada; persistir só pouparia um clique (Desenho, "O que ataquei"). Fica fora.
+- **Copiar o transcript para a conta nova.** O perfil de cada conta liga `projects/` ao home padrão; a cópia não serve e
+  arrisca histórico velho (R5 não perguntou; recomendação do Desenho, `D` não há).
+
+## Restrições
+
+- **Mudança mínima em arquivo do upstream.** O `structured-agent-session-host.ts` tem 18 commits do upstream desde
+  2026-09-01: só linhas de montagem; o resto em `brza/`.
+
+## Entrevista
+
+### Rodada 1 — o sintoma (enviada 2026-11-26)
+
+> **Apresentado antes:** o caminho do botão (aparecer, `agentSession.options`, a troca, o Continuar) e que o conserto do
+> PR #1 (`0849f8b4253`) só tirou o `try/finally` de dentro dos componentes.
+
+Respondida em 2026-11-26.
+
+1. **O que acontece.** Opções: o botão não aparece; aparece e dá erro; troca, mas não continua; nada acontece ao clicar.
+   **Resposta:** "Troca, mas não continua".
+
+### Rodada 2 — o caso (enviada 2026-11-26)
+
+> **Apresentado antes:** um `implementer` derrubou três hipóteses com teste (o Continuar sai calado; falta o sinal de
+> "o chat mudou de conta"; retoma na conta antiga) e deixou três suspeitos (histórico na outra conta; troca descartada
+> calada; tarefa em segundo plano). Testes de guarda em `brza-studio@bb137633c35`.
+
+Respondida em 2026-11-26.
+
+1. **Na tela.** **Resposta:** "Responde e bate no limite de novo".
+2. **Conta do chat.** **Resposta:** "Seguia a selecionada".
+3. **Tarefa em segundo plano.** **Resposta:** "Sim".
+
+### Rodada 3 — o comportamento (enviada 2026-11-26)
+
+> **Apresentado antes:** a causa provada — com trabalho em segundo plano aberto ou devendo acordar o lead, o host mantém o
+> agente na conta antiga de propósito (upstream #45478), e a continuação vai para ele. Teste `it.fails` em
+> `brza-studio@b5573520d9d`. O chat fixado recusa com tarefa aberta e perde o acordar com tarefa terminada.
+
+Respondida em 2026-11-26.
+
+1. **O que o botão faz com tarefa aberta.** Opções:
+   - avisar e não continuar (recomendada) — custo: pouco código no renderer, um sinal do host e as strings; se paga: agora;
+   - mover o chat de fato, fixando-o — custo: o chat fica fixado, ignorando a seleção; se paga: se o botão deve sempre mover;
+   - forçar a troca na hora — custo: a tarefa morre, e muda código que protege trabalho no upstream; se paga: só se continuar
+     na hora vale mais que a tarefa;
+   - trocar e continuar quando a tarefa acabar — custo: desenho novo no host; se paga: se esperar é aceitável.
+
+   **Decidido — "Trocar e continuar quando a tarefa acabar".**
+
+### Rodada 4 — o comportamento do desenho (enviada 2026-11-26)
+
+> **Apresentado antes:** o desenho H1 do `designer` ([Desenho](PLN-026-design.md)): o pedido fica em memória no host,
+> espera o trabalho acabar e manda a continuação comum, que já troca a conta pelo caminho do envio; sonda de ~30 min
+> antes de implementar.
+
+Respondida em 2026-11-26.
+
+1. **Como o resultado da tarefa chega à conta nova.** Opções:
+   - dois turnos, com rede de segurança (recomendada) — custo: ~40 linhas e a sonda; se paga: no primeiro caso em que a CLI
+     não acorda numa conta esgotada;
+   - só os dois turnos — custo: zero; se paga: só se a sonda provar que a CLI sempre acorda;
+   - um turno só na conta nova — custo: ~60 linhas e corrida com o acordar; se paga: nunca, enquanto a recomendada cobrir.
+
+   **Decidido — "Dois turnos, com rede de segurança (Recomendado)".**
+
+2. **Tarefa que nunca termina.** Opções:
+   - espera sem prazo, com Cancelar (recomendada) — custo: nenhum; se paga: agora;
+   - prazo de 30 min e aviso — custo: ~20 linhas, um texto e um teste; se paga: quando uma tarefa esquecida segurar o pedido.
+
+   **Decidido — "Prazo de 30 min e aviso".** O desfecho no prazo ficou na R7.2.
+
+3. **O que cancela o pedido** (múltipla). Opções: o Cancelar da linha; o Stop; fechar o chat; a seleção voltar à conta
+   antiga — todas recomendadas, cada uma de ~3 a ~15 linhas, que se pagam agora.
+
+   **Decidido — as quatro.**
+
+4. **Mensagem nova durante a espera.** Opções:
+   - cancela o pedido (recomendada) — custo: ~5 linhas; se paga: agora;
+   - não cancela — custo: zero, mas depende de a mensagem ficar no transcript (F9); se paga: depois da sonda, se F9 valer.
+
+   **Decidido — "Não cancela".** Condicionado à sonda (P1): se F9 cair, volta a rodada.
+
+### Rodada 5 — o escopo (enviada 2026-11-26)
+
+Respondida em 2026-11-26.
+
+1. **A linha na espera.** Opções: texto na linha com Cancelar (recomendada; ~60 linhas, strings e 2 testes; se paga:
+   agora); só um toast (~10 linhas, sem Cancelar; nunca, com o Cancelar escolhido).
+   **Decidido — "Texto na linha + Cancelar (Recomendado)".**
+2. **O chat fixado (P36).** Opções: fase 2 do mesmo plano (recomendada; ~+1 dia, quase todo em arquivo do fork; se paga
+   no primeiro fixado com tarefa de fundo); issue à parte (zero agora); fica de fora (nunca).
+   **Decidido — "Fase 2 do mesmo plano (Recomendado)".**
+3. **O auto-continue do upstream numa troca pelo seletor.** Opções: issue com teste e reportar (recomendada; ~1 h); barrar
+   no fork (~2 linhas num arquivo do upstream com 14 commits); nada.
+   **Decidido — "Issue com teste e reportar (Recomendado)".**
+4. **A sonda.** Opções: rede derrubada agora, conta real depois (recomendada; ~30 min); só com conta esgotada (a
+   implementação para até lá); sem sonda (o comportamento real só aparece no uso).
+   **Decidido — "Rede derrubada agora, conta real depois (Recomendado)".**
+
+### Rodada 6 — o destino (enviada 2026-11-26)
+
+Respondida em 2026-11-26.
+
+1. **Onde mora o plano.** Opções: `PLN` no workstream `studio` (recomendada); seção num worklog de hoje (só se tudo
+   fechasse hoje). **Decidido — "PLN no workstream studio (Recomendado)".**
+
+### Rodada 7 — o corte e o fim do prazo (enviada 2026-11-26, em texto)
+
+> **Apresentado antes:** a tabela P1–P6 com executor e estimativa (20,5 h; fase 1 P1–P4, ~11,5 h).
+
+Respondida em 2026-11-26: "R7 recomendados, pode executar o plano".
+
+1. **O corte.** Opções:
+   - aceitar P1–P6 (recomendada) — custo: nenhum; se paga: na fase 1;
+   - dividir P5 e P6 em plano próprio — custo: outro plano e outra entrevista; se paga: só se a fase 1 precisar fechar antes;
+   - juntar P2 e P3 — custo: um commit maior; se paga: só numa sessão só.
+
+   **Decidido — aceitar P1–P6.** É o aceite do plano.
+2. **O fim do prazo de 30 min.** Opções:
+   - encerrar o pedido e avisar na linha (recomendada) — custo: ~20 linhas e um teste; se paga: quando uma tarefa esquecida
+     segurar o pedido;
+   - avisar e continuar esperando — custo: o mesmo; se paga: se a tarefa é longa de propósito;
+   - avisar, parar a tarefa e continuar — custo: perde a tarefa; se paga: nunca, pela R3.
+
+   **Decidido — encerrar o pedido e avisar na linha.**
+
+## Desenho
+
+### O que este desenho assume
+
+- **R3.1:** o botão troca a conta e o host continua sozinho quando a tarefa termina.
+- **R4.1:** dois turnos (o acordar na conta antiga, a continuação na nova), com o fallback de 30 s.
+- **R4.2, R7.2:** prazo de 30 min; no fim, o pedido se encerra e a linha avisa, e o botão volta.
+- **R4.3:** cancelam o Cancelar da linha, o Stop, fechar o chat e a seleção voltar à conta do agente.
+- **R4.4:** mensagem nova não cancela, se a sonda confirmar F9.
+- **R5.1–R5.4:** linha com texto e Cancelar; fixado na fase 2; issue do upstream; sonda com rede derrubada agora.
+
+O Terreno, com as fontes `F1`–`F23`, as alternativas H2 e H3 e o que caiu estão em [PLN-026 — Desenho](PLN-026-design.md).
+
+### D1 — O pedido adiado no host — `src/main/native-chat/agent-session-wire/brza/brza-deferred-usage-limit-continue.ts` (P2)
+
+- **Origem:** R3.1, R4.2, R4.3, R4.4
+- **Contexto:** o host mantém o agente na conta antiga enquanto há trabalho aberto ou acordar devido
+  (`structured-agent-session-outgrown-child.ts:129-183`); nada o solta quando o trabalho acaba.
+
+#### Como fica
+
+- `arm({ sessionId, turnItemId })`, sob o `serialize` do host: sem agente, agente já na conta da seleção ou sem trabalho
+  devido → `{ kind: 'now' }`; senão guarda `{ turnItemId, armedAt, account }` num `Map`, publica o status e devolve
+  `{ kind: 'deferred' }`.
+- Um timer de 2 s, ligado só enquanto há pedido. A cada volta: **cancela** se o chat fechou ou saiu do host, ficou fixado,
+  a seleção voltou à conta do agente, houve Stop pessoal ou o Cancelar da linha; **descarta sem aviso** se não há mais corte
+  (o acordar deu certo na conta antiga); **espera** enquanto há trabalho aberto ou acordar devido; **encerra com aviso** aos
+  30 min (R4.2, R7.2): o pedido sai do `Map`, o status leva `expired` e a linha avisa.
+- Mensagem nova da pessoa não cancela (R4.4).
+- `cancel`, `readState` e `dispose`; montado no `structured-agent-session-host.ts` em ~3 linhas.
+
+### D2 — O disparo e a rede de segurança (P2)
+
+- **Origem:** R4.1
+- **Como fica:** quando o trabalho acaba e o acordar completa (com corte novo, no limite da conta antiga), o host envia o
+  `usageLimitContinueMutation` do corte mais novo pelo mesmo `send` do auto-continue
+  (`structured-agent-session-usage-limit-continue-message.ts:12-35`). O `retireOutgrownChild` do loop de entrega solta o
+  agente, e o `startProviderChild` relança com `--resume` na conta da seleção. `superseded` conta como feito. **Fallback:**
+  se a tarefa assentou há 30 s e o acordar não veio, o host para o agente e envia a continuação com o resultado da tarefa
+  no corpo, no formato `<task-notification>` (id, estado, resumo, `output_file`).
+- **Testes:** o `it.fails` vira `it`, dirigido pelo `arm`; casos: (1) tarefa terminada devendo o acordar → continua em
+  `/homes/b`; (2) tarefa aberta com handle do provider → espera e depois vai a B; (3) sem retenção → `now`; (4) Cancelar pela
+  RPC; (5) Stop, chat fechado, seleção de volta; (6) o acordar dá certo na conta antiga → cai sem aviso; (7) o auto-continue
+  chega antes → um envio só; (8) reinício; (9) prazo de 30 min; (10) fallback de 30 s; mais o caso de mensagem nova (R4.4).
+
+### D3 — A RPC e a capacidade (P2)
+
+- **Origem:** R3.1, R4.3
+- **Como fica:** `agentSession.brzaContinueAfterWork` e o cancelar, com os params em `src/shared/rpc-contract/brza/`; a
+  capacidade em `structured-agent-session-surface-capabilities.ts` (1 linha). Host sem a capacidade (mais velho ou remoto):
+  o renderer faz o `onContinue()` de hoje.
+
+### D4 — O status e a linha de limite (P3)
+
+- **Origem:** R5.1, R4.2
+- **Como fica:** o campo `brzaContinueAfterWork?: { account, since, expired? }` em `src/shared/agent-session/brza/`,
+  espalhado no `structured-agent-session-status-summary.ts` (1 linha, como o `agent-session-status-account-switch.ts`). Em
+  `BrzaContinueInOtherAccount.tsx` e no hook dele: no chat que segue a seleção, depois do `switchTo`, chama o `arm`; com
+  `deferred`, cancela o auto-continue agendado do corte e a linha mostra "Vai continuar em {conta} quando a tarefa em
+  segundo plano terminar", com Cancelar; com o prazo vencido, o aviso. Strings nos catálogos do desktop.
+
+### D5 — O chat fixado (P5)
+
+- **Origem:** R5.2
+- **Como fica:** a mesma peça: o pedido dispara o `switchAccount` e depois a continuação, sem recusar com tarefa aberta
+  (`structured-conversation-command-admission.ts:77-83`) e sem parar antes do acordar
+  (`operations/structured-agent-session-account-switch.ts:101-111`, arquivo só do fork). Detalhar ao abrir a fase 2.
+
+### D6 — O auto-continue do upstream numa troca pelo seletor (P6)
+
+- **Origem:** R5.3
+- **Como fica:** issue no workstream `studio` com o teste que prova ou descarta F14 (a varredura do auto-continue atribui
+  a conta pela seleção e não olha a retenção — `structured-agent-session-usage-limit-account-hold.ts:95-99`,
+  `structured-agent-session-usage-limit-disposition.ts:25-40`); provado, reportar ao upstream.
+
+## Passos
+
+### P1 — A sonda da CLI
+
+Executa D2 (F9, F10) · executor: sessão do `brza-studio`
+
+Estimado: 0.5 h · Executado: — h
+
+- [ ] **1.** Rodar a CLI do Claude em `stream-json` com uma tarefa em segundo plano (`sleep 30`), derrubar a rede antes de
+  a tarefa acabar e conferir no `.jsonl` se o turno do acordar começa (F10) e se a notificação fica no transcript (F9).
+- [ ] **2.** Registrar no plano; se F9 cair, a R4.4 volta à rodada. A prova com conta esgotada de verdade fica para C1.
+
+**Evidência:**
+
+### P2 — O pedido adiado, o disparo e a RPC no host
+
+Executa D1, D2, D3 · executor: sessão do `brza-studio`, branch `fix/pln-026-continuar-em-outra-conta` (a partir de
+`fix/continue-other-account`, que tem os testes de guarda `bb137633c35` e `b5573520d9d`)
+
+Estimado: 7 h · Executado: — h
+
+- [ ] **1. Teste que falha:** o `it.fails` de `structured-agent-session-account-switch.brza.test.ts` reescrito pelo `arm`.
+- [ ] **2. Implementar** D1, D2 e D3.
+- [ ] **3. Os casos de D2** — unidade, por caminho.
+- [ ] **4.** `pnpm typecheck`, `pnpm lint`, commit.
+
+**Evidência:**
+
+### P3 — A linha de limite na espera
+
+Executa D4 · executor: sessão do `brza-studio`
+
+Estimado: 3 h · Executado: — h
+
+- [ ] **1. Teste que falha** do renderer: a linha na espera, o Cancelar, o aviso do prazo, o host sem a capacidade.
+- [ ] **2. Implementar** D4 e as strings.
+- [ ] **3.** Testes por caminho, typecheck, lint, gates de idioma, commit.
+
+**Evidência:**
+
+### P4 — Revisão, CI e push
+
+Executa P2, P3 · executor: a sessão que conduz (`reviewer`, CI `node-next-compat.yml`)
+
+Estimado: 1 h · Executado: — h
+
+- [ ] **1.** Revisão adversária; achados com destino.
+- [ ] **2.** CI da branch igual à `master`; fast-forward e push; DMG para C1.
+
+**Evidência:**
+
+### P5 — Fase 2: o chat fixado
+
+Executa D5 · executor: sessão do `brza-studio`
+
+Estimado: 8 h · Executado: — h
+
+- [ ] **1.** Detalhar D5 (rodada se houver ponto sem lastro).
+- [ ] **2.** Teste que falha, implementação, testes, commit, revisão, CI e push.
+
+**Evidência:**
+
+### P6 — A issue do auto-continue do upstream
+
+Executa D6 · executor: sessão do `brza-studio` e a sessão que conduz
+
+Estimado: 1 h · Executado: — h
+
+- [ ] **1.** Teste que prova ou descarta F14; issue no workstream `studio` com o resultado.
+- [ ] **2.** Provado: reportar ao upstream (a pedido de Anderson).
+
+**Evidência:**
+
+## Regressão
+
+- **O Continuar em outra conta sem tarefa em segundo plano** continua como hoje (troca e continua na hora): caso 3 de D2 e
+  o teste `NativeChatUsageLimitContinueAfterSwitch.brza.test.tsx` (`bb137633c35`).
+- **O auto-continue e o Continuar comum da linha de limite** do upstream: os testes de `native-chat/usage` e
+  `agent-session-wire/recovery`, por caminho.
+
+## Casos manuais
+
+| ID  | Critério                                                    | Passos                                                                                                                                      | Esperado                                                                                                     | Observado | Veredito |
+| :-- | :---------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------- | :-------- | :------- |
+| C1  | `Pedido 1`, `R5.1`                                          | Num chat que segue a seleção, com uma tarefa em segundo plano rodando, bater no limite; escolher outra conta em "Continue in another account" | A linha diz que vai continuar na outra conta; quando a tarefa termina, o chat continua lá, com o resultado dela | —         | —        |
+| C2  | `R5.2`                                                      | O mesmo com um chat fixado numa conta                                                                                                       | Idem, sem recusa                                                                                             | —         | —        |
+
+## Worklogs
+
+- 2026-11-26 — abertura: R1–R7, D1–D6, P1–P6 aceitos; execução autorizada.
+  [O Continuar em outra conta depois do sync](../../work/worklogs/2026-11-26-continuar-em-outra-conta-depois-do-sync.md)
+
+## Fechamento
+
+- [ ] Todo passo `[x]` com evidência, ou `[-]` com motivo.
+- [ ] Todo achado com destino que existe.
+- [ ] Um resumo por commit ou PR do `brza-studio` da entrega, com o link do plano.
+- [ ] O durável saiu para a casa dona e está em `## Decisões` e `## Documentação`.
+- [ ] As decisões que o plano respondeu estão `done`, citando a rodada.
+- [ ] `status: done`, `phase: closed` e `completed` no frontmatter.

@@ -29,3 +29,4 @@
 - [Conserto pós-merge v1.4.278](brza-studio-sync-278-fix-lessons.md) — helper de teste por script, teste do fork envelhecido, ratchet de bloqueio, max-lines por extração
 - [Orçamento eager do mobile-web](brza-studio-mobile-web-eager-budget.md) — medir por metafile, lazy não reduz eager, fork soma ~16 KB (tools/brza)
 - [Consertos de ratchet no brza-studio](brza-studio-ratchet-fix-lessons.md) — codemod de translate roda no repo todo, try/finally e ref no Compiler, gate sem origin/main
+- [Continue in another account pós-278](brza-studio-continue-other-account-lessons.md) — o que já foi provado por camada, harness de teste, pontos abertos

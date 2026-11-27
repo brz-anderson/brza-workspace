@@ -18,7 +18,7 @@ tags:
 
 # PLN-026: O Continuar em outra conta espera a tarefa em segundo plano e continua na conta nova
 
-- **Retomar:** fase 1 (P1–P3) fechada; P4 em curso (revisão e CI da branch da fase 1); P5 trazendo a fase 1 nova e fazendo o renderer na `pln-026-p5`; P6.2 espera pedido de Anderson (R8.3).
+- **Retomar:** fase 1 (P1–P3) e o código do P5 feitos; R9 respondida; os consertos da revisão da fase 1 (A1–A5) em curso na `pln-026-p5`, na branch dela (X14); depois revisão da parte nova, CI, push, DMG, C1 e C2. P6.2 espera pedido de Anderson.
 - **Dividido:** [PLN-026 — Desenho](PLN-026-design.md)
 
 ## Pedido
@@ -195,6 +195,28 @@ Respondida em 2026-11-26.
 3. **Abrir a issue no `stablyai/orca`.** Opções: abrir agora (publica num repositório de terceiros; se paga quando o upstream
    corrigir); ainda não (o rascunho fica na issue do fork). **Decidido — "Ainda não".** O P6.2 fica a pedido.
 
+### Rodada 9 — a revisão da fase 1 (enviada 2026-11-26)
+
+> **Apresentado antes:** a revisão da fase 1 — A1 (alta: o pedido some calado quando o disparo não acha o corte), A2 (qualquer
+> `agentSession.cancel` derruba o pedido), A3 (a seleção voltar só cancela na publicação seguinte), A4 (casos sem prova) e A5
+> (o módulo perto do `max-lines`). A1, A4 e o cartão de pergunta do A2 se consertam de todo jeito.
+
+Respondida em 2026-11-27.
+
+1. **O Stop de uma tarefa na faixa cancela o pedido?** Opções:
+   - não, só o Stop do chat cancela (recomendada) — custo: ~4 linhas em arquivo só do fork e 1 teste; se paga: na primeira vez
+     que alguém parar a tarefa para seguir logo;
+   - qualquer Stop cancela — custo: zero, mas parar a tarefa derruba o pedido sem aviso; se paga: só se parar a tarefa quiser
+     dizer "desisti".
+
+   **Decidido — "Não, só o Stop do chat cancela (Recomendado)".**
+2. **A seleção voltar tira a linha na hora?** Opções:
+   - sim, na hora (recomendada) — custo: 1 a 2 linhas em arquivo do upstream e 1 teste; se paga: na primeira volta da seleção
+     durante a espera;
+   - deixar e abrir issue — custo: zero; a linha fica errada até 30 min. Se paga: nunca, se a seleção raramente voltar.
+
+   **Decidido — "Sim, na hora (Recomendado)".**
+
 ## Desenho
 
 ### O que este desenho assume
@@ -367,8 +389,9 @@ Executa D5 · executor: sessão do `brza-studio`
 Estimado: 8 h · Executado: — h
 
 - [x] **1.** Detalhar D5 (rodada se houver ponto sem lastro). Ver o D5; os pontos foram à R8.
-- [ ] **2.** Teste que falha, implementação, testes, commit, revisão, CI e push. Feito o lado do host e da RPC, R8.1 e
-  R8.2 (`2805db580ea`); falta o renderer do fixado sobre o P3, depois revisão, CI e push.
+- [ ] **2.** Teste que falha, implementação, testes, commit, revisão, CI e push. Host, RPC, R8.1, R8.2 e renderer feitos
+  sobre a fase 1 final (`df6c9619be8`, `0e585b4d06a`); em curso, na mesma branch, os consertos da revisão da fase 1 (A1–A5,
+  R9); depois revisão da parte nova, CI e push junto com a fase 1.
 
 **Evidência (parcial):** `brza-studio@64d47dc5c56` (branch `fix/pln-026-p5-fixado`):
 `structured-agent-session-account-switch-pinned.brza.test.ts`, dois `it.fails` — com tarefa aberta, hoje recusa
@@ -446,6 +469,15 @@ com o rascunho do relato ao upstream.
   `rebase --autosquash`: P2 `ff5ce19b54a`, P3 `0f866eff56a`. O `--force-with-lease` no origin foi barrado pelo classificador;
   a fase 1 foi ao origin como `fix/pln-026-fase-1`, e a `fix/pln-026-continuar-em-outra-conta` do origin ficou no
   `6741d0471b9` antigo. O P5 adota os nomes da fase 1.
+
+- **X12 — A branch do P5 foi reconstruída sobre a fase 1 final** (`0f866eff56a`), em vez de mesclada, para não carregar as
+  três versões da fase 1; os commits antigos ficam num backup local. O P5 adotou os nomes da fase 1 (`target`, `accountId`,
+  o dep `switchAccount`).
+- **X13 — O P5 achou e consertou o A1** (`withoutCut`): sem corte, o pedido espera a linha do limite quando o turno mais novo
+  falhou; encerra calado se o turno deu certo ou se um envio pendente já continua o chat. A fixture da fase 1 ganhou `fail`
+  e `limitRow`. Afeta D2.
+- **X14 — A fase 1 e o P5 vão ao `master` juntos**, pela branch do P5: os consertos da revisão da fase 1 entram lá, e o P4
+  (revisão, CI, push) cobre as duas.
 
 ## Worklogs
 

@@ -5,8 +5,8 @@ origin: request
 description: O chat que bateu no limite troca de conta e continua na conta nova quando a tarefa em segundo plano termina, sem perder o resultado dela.
 ready: sim
 estimate_h: 20.5
-executed_h: 1
-remaining_h: 19
+executed_h: 0.8
+remaining_h: 13
 scope:
   - brza-studio
 opened: 2026-11-26
@@ -18,7 +18,7 @@ tags:
 
 # PLN-026: O Continuar em outra conta espera a tarefa em segundo plano e continua na conta nova
 
-- **Retomar:** P1 fechado; P6.1 fechado (F14 provado, issue aberta; o reporte ao upstream espera Anderson); P2 e P3 na sessão `pln-026-fase-1`; P5 na `pln-026-p5`.
+- **Retomar:** P1 e P2 fechados; P3 na sessão `pln-026-fase-1`; P5 implementando o host na `pln-026-p5` (o renderer depois do P3); P6.2 espera pedido de Anderson (R8.3).
 - **Dividido:** [PLN-026 — Desenho](PLN-026-design.md)
 
 ## Pedido
@@ -173,6 +173,28 @@ Respondida em 2026-11-26: "R7 recomendados, pode executar o plano".
 
    **Decidido — encerrar o pedido e avisar na linha.**
 
+### Rodada 8 — os pontos do P5 e o relato ao upstream (enviada 2026-11-26)
+
+> **Apresentado antes:** o D5 detalhado pelo P5 (a troca é o próprio disparo no fixado) e o P6 provado.
+
+Respondida em 2026-11-26.
+
+1. **O seletor do composer num fixado com acordar devido** (hoje para o agente e o resultado se perde). Opções:
+   - recusar até o acordar (recomendada) — custo: ~5 linhas em arquivo só do fork e 1 teste; se paga: na primeira troca pelo
+     seletor logo depois de uma tarefa terminar;
+   - deixar como está — custo: zero; se paga: nunca;
+   - adiar a troca também no seletor — custo: ~+30 linhas e um estado novo; se paga: só com muito uso do seletor com tarefa.
+
+   **Decidido — "Recusar até o acordar (Recomendado)".**
+2. **A troca recusada no disparo.** Opções:
+   - passageira espera, definitiva encerra (recomendada) — custo: ~15 linhas e 1 texto; se paga: na primeira mensagem nova
+     durante a espera;
+   - encerrar em qualquer recusa — custo: ~5 linhas; se paga: só se mensagem nova na espera for rara.
+
+   **Decidido — "Passageira espera, definitiva encerra (Recomendado)".**
+3. **Abrir a issue no `stablyai/orca`.** Opções: abrir agora (publica num repositório de terceiros; se paga quando o upstream
+   corrigir); ainda não (o rascunho fica na issue do fork). **Decidido — "Ainda não".** O P6.2 fica a pedido.
+
 ## Desenho
 
 ### O que este desenho assume
@@ -237,9 +259,31 @@ O Terreno, com as fontes `F1`–`F23`, as alternativas H2 e H3 e o que caiu est�
 ### D5 — O chat fixado (P5)
 
 - **Origem:** R5.2
-- **Como fica:** a mesma peça: o pedido dispara o `switchAccount` e depois a continuação, sem recusar com tarefa aberta
-  (`structured-conversation-command-admission.ts:77-83`) e sem parar antes do acordar
-  (`operations/structured-agent-session-account-switch.ts:101-111`, arquivo só do fork). Detalhar ao abrir a fase 2.
+- **Contexto:** o `commitAccountSwitchRecord` só move o record com o lease solto, sem processo
+  (`src/main/runtime/agent-session-account-switch-record.ts:19-25`); por isso o `switchAccount` recusa com trabalho aberto
+  (`structured-conversation-command-admission.ts:77-83`) e para o agente sem olhar o acordar devido
+  (`operations/structured-agent-session-account-switch.ts:101-111`). No fixado, a troca é o próprio disparo.
+- **Como fica:**
+  1. **O botão:** no fixado, com a capacidade, **primeiro** o `arm` com `{ sessionId, turnItemId, accountId, account }`;
+     `now` → o caminho de hoje (`switchTo` + `onContinue`); `deferred` → cancela o auto-continue agendado do corte e a linha
+     mostra a espera de D4.
+  2. **O `arm`:** sem agente, sem trabalho devido ou já fixado na conta alvo → `now`; senão guarda o pedido com
+     `target: { kind: 'pin', accountId, account, pinAtArm, callerKey }` → `deferred`. Nada roda no `arm`.
+  3. **A espera:** o timer de D1; cancela pelo Cancelar da linha, o Stop, o chat fechado, o prazo de 30 min e **o pino
+     mudar desde o `arm`** (no lugar de "a seleção voltou").
+  4. **O disparo** (o trabalho acabou e o acordar completou em A, com corte novo), fora do `serialize` do timer: lê o fence;
+     chama `host.conversationCommands.switchAccount` com envelope cunhado no host (o `prepareAccountSwitch` copia o
+     transcript, o pino vai a B, a divisória "Account switched - {conta}" vem depois do acordar); envia o
+     `usageLimitContinueMutation` do corte mais novo com o fence lido antes da troca; o `startProviderChild` lança em B pelo
+     pino com `--resume`. `superseded` conta como feito. O fallback de 30 s (X1) é o mesmo disparo, com o resultado no corpo.
+  5. **Onde:** o `target` (`selection`/`pin`) e o disparo do fixado na peça do P2 (~50 linhas, ou um
+     `brza-deferred-continue-pinned.ts` ao lado); `accountId?`/`account?` nos params da RPC de D3; nenhuma linha nova no
+     `structured-agent-session-host.ts` além das do P2; o renderer como em (1).
+  6. **R8.1:** o seletor do composer recusa com "Wait for background tasks to finish before using this command." enquanto
+     o acordar é devido (`structuredAgentSessionChildOwesWork` antes do `stopAgent`, em arquivo só do fork).
+  7. **R8.2:** no disparo, recusa passageira (`turnActive`, `messagesUnsettled`) espera a próxima volta; definitiva
+     (`unknown-account`) encerra o pedido e a linha avisa, como no fim do prazo.
+  8. **Os params** (X7): `accountId?` no `BrzaContinueAfterWorkParams` e o `target` (`selection`/`pin`) no pedido.
 
 ### D6 — O auto-continue do upstream numa troca pelo seletor (P6)
 
@@ -273,14 +317,20 @@ duas (a R4.4 fica de pé). O texto da saída não vem na notificação, só o `o
 Executa D1, D2, D3 · executor: sessão do `brza-studio`, branch `fix/pln-026-continuar-em-outra-conta` (a partir de
 `fix/continue-other-account`, que tem os testes de guarda `bb137633c35` e `b5573520d9d`)
 
-Estimado: 7 h · Executado: — h
+Estimado: 7 h · Executado: 0.3 h
 
-- [ ] **1. Teste que falha:** o `it.fails` de `structured-agent-session-account-switch.brza.test.ts` reescrito pelo `arm`.
-- [ ] **2. Implementar** D1, D2 e D3.
-- [ ] **3. Os casos de D2** — unidade, por caminho.
-- [ ] **4.** `pnpm typecheck`, `pnpm lint`, commit.
+- [x] **1. Teste que falha:** o `it.fails` de `structured-agent-session-account-switch.brza.test.ts` reescrito pelo `arm`.
+- [x] **2. Implementar** D1, D2 e D3.
+- [x] **3. Os casos de D2** — unidade, por caminho.
+- [x] **4.** `pnpm typecheck`, `pnpm lint`, commit.
 
-**Evidência:**
+**Evidência:** `brza-studio@faa8691b1f8` (branch `fix/pln-026-continuar-em-outra-conta`). Novos em `brza/`:
+`brza-deferred-usage-limit-continue.ts` (264 linhas), `brza-continue-after-work-{wake-up,status,wiring}.ts`, a RPC
+`agentSession.brzaContinueAfterWork`/`brzaCancelContinueAfterWork` e a capacidade
+`agent-session.structured.brza-continue-after-work.v1`. `vitest` nos dois `.brza.test.ts` novos → 13 passed; regressão em 7
+arquivos (`recovery/`, `account-switch` do host e de `operations/`, `usage-limit-queue-recovery`, status) → 68 passed;
+mutação com o disparo desligado derruba os casos 1, 2, 10 e R4.4. `pnpm typecheck` verde; lint só com o
+`check:code-quality:changed` do ambiente (0 achados com `ORCA_CODE_QUALITY_BASE=9eef46284d8`).
 
 ### P3 — A linha de limite na espera
 
@@ -311,16 +361,20 @@ Executa D5 · executor: sessão do `brza-studio`
 
 Estimado: 8 h · Executado: — h
 
-- [ ] **1.** Detalhar D5 (rodada se houver ponto sem lastro).
-- [ ] **2.** Teste que falha, implementação, testes, commit, revisão, CI e push.
+- [x] **1.** Detalhar D5 (rodada se houver ponto sem lastro). Ver o D5; os pontos foram à R8.
+- [ ] **2.** Teste que falha, implementação, testes, commit, revisão, CI e push. Os testes que falham estão feitos; a
+  implementação espera o commit do P2.
 
-**Evidência:**
+**Evidência (parcial):** `brza-studio@64d47dc5c56` (branch `fix/pln-026-p5-fixado`):
+`structured-agent-session-account-switch-pinned.brza.test.ts`, dois `it.fails` — com tarefa aberta, hoje recusa
+`backgroundTasksRunning`; com tarefa terminada devendo o acordar, hoje para o agente antes do acordar →
+`Tests 2 expected fail (2)`. Executado até aqui: 1,5 h.
 
 ### P6 — A issue do auto-continue do upstream
 
 Executa D6 · executor: sessão do `brza-studio` e a sessão que conduz
 
-Estimado: 1 h · Executado: 0.5 h
+Estimado: 1 h · Executado: — h (0,5 h até aqui)
 
 - [x] **1.** Teste que prova ou descarta F14; issue no workstream `studio` com o resultado.
 - [ ] **2.** Provado: reportar ao upstream (a pedido de Anderson).
@@ -356,6 +410,17 @@ com o rascunho do relato ao upstream.
 - **X1 — A rede de segurança de 30 s olha o começo do turno do acordar.** O P1 mostrou que o acordar em nova tentativa
   leva ~3 min para completar; contar 30 s até completar dispararia o fallback no meio do turno. Fica: dispara só se não há
   turno ativo do provider 30 s depois do `settledAt`. Afeta P2 e D2 (o caso 10).
+
+- **X2 — O host ficou no limite de linhas.** O `structured-agent-session-host.ts` estava em 299/300; a montagem virou um campo
+  de 1 linha, o `dispose` e o Stop nas linhas que já existiam, e a reexportação no `structured-agent-session-host-background.ts`.
+  O host fica em 300/300: o próximo sync que somar uma linha estoura o `max-lines`. Afeta P2 e a Restrição.
+- **X3 — O Stop vem pelo `host.cancel`**, não pelo `readStopping` no timer, que só vale durante o `working`. Afeta D1.
+- **X4 — O status leva `turnItemId`** além de `{ account, since, expired? }`, para a linha casar com o corte. Afeta D4.
+- **X5 — O fallback leva id, estado e resumo da tarefa, sem o `output_file`**, que a `AgentChildWorkView` não tem. Afeta D2.
+- **X6 — Os casos 2 e 7 de D2:** o 2 simula o trabalho aberto pelo `hasOpenDispatch` (o rig não tem o handle do provider); o
+  7 aceita os dois desfechos com um envio aceito só (o auto-continue moveu antes, ou `continuationSuperseded`).
+- **X7 — Os params do D3 fecharam sem o `accountId`/`target` do fixado**; o recado ao P2 chegou depois do commit. O P5
+  acrescenta os campos opcionais na mesma RPC (arquivo só do fork), sem abrir outra.
 
 ## Worklogs
 

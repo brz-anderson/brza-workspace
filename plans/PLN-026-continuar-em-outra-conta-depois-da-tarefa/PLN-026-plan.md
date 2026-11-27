@@ -5,8 +5,8 @@ origin: request
 description: O chat que bateu no limite troca de conta e continua na conta nova quando a tarefa em segundo plano termina, sem perder o resultado dela.
 ready: sim
 estimate_h: 20.5
-executed_h: 0.8
-remaining_h: 13
+executed_h: 1
+remaining_h: 10
 scope:
   - brza-studio
 opened: 2026-11-26
@@ -18,7 +18,7 @@ tags:
 
 # PLN-026: O Continuar em outra conta espera a tarefa em segundo plano e continua na conta nova
 
-- **Retomar:** P1 e P2 fechados; P3 na sessão `pln-026-fase-1`; P5 com o host feito na `pln-026-p5` (o renderer depois do P3); P6.2 espera pedido de Anderson (R8.3).
+- **Retomar:** fase 1 (P1–P3) fechada; P4 em curso (revisão e CI da branch da fase 1); P5 trazendo a fase 1 nova e fazendo o renderer na `pln-026-p5`; P6.2 espera pedido de Anderson (R8.3).
 - **Dividido:** [PLN-026 — Desenho](PLN-026-design.md)
 
 ## Pedido
@@ -324,7 +324,7 @@ Estimado: 7 h · Executado: 0.3 h
 - [x] **3. Os casos de D2** — unidade, por caminho.
 - [x] **4.** `pnpm typecheck`, `pnpm lint`, commit.
 
-**Evidência:** `brza-studio@faa8691b1f8` (branch `fix/pln-026-continuar-em-outra-conta`). Novos em `brza/`:
+**Evidência:** `brza-studio@3b834c7714a` (branch `fix/pln-026-continuar-em-outra-conta`; era `faa8691b1f8`, reescrito no P3 pelo X9). Novos em `brza/`:
 `brza-deferred-usage-limit-continue.ts` (264 linhas), `brza-continue-after-work-{wake-up,status,wiring}.ts`, a RPC
 `agentSession.brzaContinueAfterWork`/`brzaCancelContinueAfterWork` e a capacidade
 `agent-session.structured.brza-continue-after-work.v1`. `vitest` nos dois `.brza.test.ts` novos → 13 passed; regressão em 7
@@ -336,13 +336,18 @@ mutação com o disparo desligado derruba os casos 1, 2, 10 e R4.4. `pnpm typech
 
 Executa D4 · executor: sessão do `brza-studio`
 
-Estimado: 3 h · Executado: — h
+Estimado: 3 h · Executado: 0.2 h
 
-- [ ] **1. Teste que falha** do renderer: a linha na espera, o Cancelar, o aviso do prazo, o host sem a capacidade.
-- [ ] **2. Implementar** D4 e as strings.
-- [ ] **3.** Testes por caminho, typecheck, lint, gates de idioma, commit.
+- [x] **1. Teste que falha** do renderer: a linha na espera, o Cancelar, o aviso do prazo, o host sem a capacidade.
+- [x] **2. Implementar** D4 e as strings.
+- [x] **3.** Testes por caminho, typecheck, lint, gates de idioma, commit.
 
-**Evidência:**
+**Evidência:** `brza-studio@6741d0471b9`: `brza/use-brza-continue-after-work{,-status}.ts`, `brza/BrzaContinueAfterWorkLine.tsx`,
+`BrzaContinueInOtherAccount.tsx` e o hook; no upstream, só o tipo de 2 linhas em `NativeChatUsageLimitActions.tsx`. Strings
+em en, pt, es, fr, ja, ko, zh ("Vai continuar em {{account}} quando a tarefa em segundo plano terminar", "Cancelar", o aviso
+do prazo, "Dispensar"). `vitest`: os 4 do PLN-026 → 23 passed; `native-chat/usage` e `native-chat/brza` → 156 passed; host →
+68 passed. Os seis gates de idioma com saída 0; `pnpm typecheck` verde; lint só com o `check:code-quality:changed` do ambiente
+(passa com `ORCA_CODE_QUALITY_BASE=9eef46284d8`).
 
 ### P4 — Revisão, CI e push
 
@@ -429,8 +434,12 @@ com o rascunho do relato ao upstream.
   (`claudeAccountFolderMissing`, `claudeAccountSetupFailed`); toda outra espera a próxima volta, limitada pelo prazo de 30 min,
   que no fixado corre antes do disparo. Quando a conta recusa, o agente já foi parado pelo `switchAccount` e o chat fica no
   pino de antes, em repouso; o status leva `expired` + `accountUnavailable`.
-- **X9 — O `setInterval` do D1 esbarra no `check:recurring-timer-ratchet`.** A linha do baseline sobe no P3, com a razão (o
-  timer só existe enquanto há pedido); o aval é do `reviewer` no P4.
+- **X9 — O timer de 2 s do D1 virou sinal empurrado.** O `setInterval` esbarrava no `check:recurring-timer-ratchet`; o pedido
+  assina o `subscribeStatus` do host e confere a cada publicação de status, com timers de disparo único só para os 30 min e
+  os 30 s. Entrou como fixup no P2 (`faa8691b1f8` → `3b834c7714a`); sem mudança no baseline. Afeta D1 e o P5.
+- **X10 — A linha da espera vive no componente do fork** (`BrzaUsageLimitContinueInOtherAccount`), no lugar do botão; o
+  `NativeChatUsageLimitRow.tsx` do upstream não mudou. O aviso do prazo ganhou "Dispensar", que chama o cancelar. Os
+  catálogos `tr` e `zh-Hant` não levam as strings, como no P79. Afeta D4.
 
 ## Worklogs
 

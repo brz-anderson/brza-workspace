@@ -5,7 +5,8 @@ origin: request
 description: O chat que bateu no limite troca de conta e continua na conta nova quando a tarefa em segundo plano termina, sem perder o resultado dela.
 ready: sim
 estimate_h: 20.5
-remaining_h: 20.5
+executed_h: 0.5
+remaining_h: 20
 scope:
   - brza-studio
 opened: 2026-11-26
@@ -17,7 +18,7 @@ tags:
 
 # PLN-026: O Continuar em outra conta espera a tarefa em segundo plano e continua na conta nova
 
-- **Retomar:** R7 respondida e execução autorizada ("pode executar o plano"); próximo passo P1, a sonda.
+- **Retomar:** P1 fechado (F9 e F10 valem); P2 e P3 na sessão `pln-026-fase-1`; P5 (detalhar e testes que falham) e P6 em sessões próprias, em paralelo, a pedido de Anderson.
 - **Dividido:** [PLN-026 — Desenho](PLN-026-design.md)
 
 ## Pedido
@@ -253,13 +254,19 @@ O Terreno, com as fontes `F1`–`F23`, as alternativas H2 e H3 e o que caiu est�
 
 Executa D2 (F9, F10) · executor: sessão do `brza-studio`
 
-Estimado: 0.5 h · Executado: — h
+Estimado: 0.5 h · Executado: 0.5 h
 
-- [ ] **1.** Rodar a CLI do Claude em `stream-json` com uma tarefa em segundo plano (`sleep 30`), derrubar a rede antes de
+- [x] **1.** Rodar a CLI do Claude em `stream-json` com uma tarefa em segundo plano (`sleep 30`), derrubar a rede antes de
   a tarefa acabar e conferir no `.jsonl` se o turno do acordar começa (F10) e se a notificação fica no transcript (F9).
-- [ ] **2.** Registrar no plano; se F9 cair, a R4.4 volta à rodada. A prova com conta esgotada de verdade fica para C1.
+- [x] **2.** Registrar no plano; se F9 cair, a R4.4 volta à rodada. A prova com conta esgotada de verdade fica para C1.
 
-**Evidência:**
+**Evidência:** CLI 2.1.322, `-p --input-format stream-json --output-format stream-json`, `sleep 30` em segundo plano, rede
+derrubada só para o processo por um proxy `HTTPS_PROXY` local. **F10 vale:** aos 30 s, `system/task_notification`, um
+`system/init` novo 0,1 s depois, 10 `system/api_retry` em ~3 min e `result` `is_error: true` (ECONNRESET). **F9 vale:** o
+registro `user` `origin.kind: task-notification` foi gravado às 01:42:52.064Z, antes da primeira `api-request`
+(01:42:52.084Z). A mensagem da pessoa durante a queda também ficou no transcript, e o `--resume` num processo novo viu as
+duas (a R4.4 fica de pé). O texto da saída não vem na notificação, só o `output-file`. Artefatos no scratch da sessão
+`pln-026-fase-1`, fora do repositório.
 
 ### P2 — O pedido adiado, o disparo e a RPC no host
 
@@ -334,9 +341,16 @@ Estimado: 1 h · Executado: — h
 | C1  | `Pedido 1`, `R5.1`                                          | Num chat que segue a seleção, com uma tarefa em segundo plano rodando, bater no limite; escolher outra conta em "Continue in another account" | A linha diz que vai continuar na outra conta; quando a tarefa termina, o chat continua lá, com o resultado dela | —         | —        |
 | C2  | `R5.2`                                                      | O mesmo com um chat fixado numa conta                                                                                                       | Idem, sem recusa                                                                                             | —         | —        |
 
+## Desvios
+
+- **X1 — A rede de segurança de 30 s olha o começo do turno do acordar.** O P1 mostrou que o acordar em nova tentativa
+  leva ~3 min para completar; contar 30 s até completar dispararia o fallback no meio do turno. Fica: dispara só se não há
+  turno ativo do provider 30 s depois do `settledAt`. Afeta P2 e D2 (o caso 10).
+
 ## Worklogs
 
-- 2026-11-26 — abertura: R1–R7, D1–D6, P1–P6 aceitos; execução autorizada.
+- 2026-11-26 — abertura: R1–R7, D1–D6, P1–P6 aceitos; execução autorizada. P1 fechado (X1); P2/P3, P5 e P6 em três
+  sessões do `brza-studio` em paralelo.
   [O Continuar em outra conta depois do sync](../../work/worklogs/2026-11-26-continuar-em-outra-conta-depois-do-sync.md)
 
 ## Fechamento
